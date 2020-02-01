@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Output;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Helper\AnimateOutputEffect;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
@@ -26,16 +27,16 @@ class ConsoleAnimateOutput extends StreamOutput
 
     private const ANIMATE_LETTER_TIME = 5000;
 
-    private $progressive = false;
     private $slowDown = 0;
     private $cursorVisible = true;
-
+    private $currentEffect;
     private $terminal;
 
     public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null, int $slowDown = 0)
     {
         parent::__construct($stream, $verbosity, $decorated, $formatter);
         $this->terminal = new Terminal();
+        $this->currentEffect = $this->progressiveWrite();
     }
 
     /**
@@ -45,14 +46,13 @@ class ConsoleAnimateOutput extends StreamOutput
      */
     public function setProgressive(int $progressive = self::NO_PROGRESSIVE)
     {
-        $this->progressive = true;
-        if ($progressive === self::NO_PROGRESSIVE) {
-            $this->progressive = false;
-        }
-
+        $this->currentEffect = $this->progressiveWrite();
         $this->slowDown = $progressive;
     }
 
+    /**
+     * Clear all terminal screen
+     */
     public function clearScreen()
     {
         $this->clearLines($this->terminal->getHeight());
@@ -61,7 +61,7 @@ class ConsoleAnimateOutput extends StreamOutput
     /**
      * Clears previous output for this console
      *
-     * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
+     * @param int $lines Number of lines to clear. If 0, then the current line is cleaned
      */
     public function clear(int $lines = 0)
     {
@@ -89,16 +89,37 @@ class ConsoleAnimateOutput extends StreamOutput
         parent::doWrite("\033[?25l", false);
     }
 
+    public function setCustomEffect(\Closure $closure)
+    {
+        $this->currentEffect = $closure;
+    }
+
+
+    public function setSlowDown(int $slowDown = self::PROGRESSIVE_NORMAL)
+    {
+        $this->slowDown = $slowDown;
+    }
+
+    public function getSlowDown(): int
+    {
+        return $this->slowDown;
+    }
+
+    public function parentWrite(string $message, bool $newLine = false)
+    {
+        parent::doWrite($message, $newLine);
+    }
+
     /**
      * Overwrites the previous output with a new message.
      *
      * @param array|string $message
      */
-    public function overwriteln($message, ?int $progressive = null, int $linesToClear = 0)
+    public function overwriteln($message, ?int $slowDown = null, int $linesToClear = 0)
     {
         $this->clear($linesToClear);
-        if (null !== $progressive) {
-            $this->setProgressive($progressive);
+        if (null !== $slowDown) {
+            $this->setSlowDown($slowDown);
         }
 
         $this->writeln($message);
@@ -109,14 +130,19 @@ class ConsoleAnimateOutput extends StreamOutput
      *
      * @param array|string $message
      */
-    public function overwrite($message, ?int $progressive = null, int $linesToClear = 0)
+    public function overwrite($message, ?int $slowDown = null, int $linesToClear = 0)
     {
         $this->clear($linesToClear);
-        if (null !== $progressive) {
-            $this->setProgressive($progressive);
+        if (null !== $slowDown) {
+            $this->setSlowDown($slowDown);
         }
 
         $this->write($message);
+    }
+
+    public function getUsleepDuration()
+    {
+        return self::ANIMATE_LETTER_TIME * $this->slowDown;
     }
 
     public function __destruct()
@@ -136,14 +162,7 @@ class ConsoleAnimateOutput extends StreamOutput
             return;
         }
 
-        foreach (str_split($message) as $char) {
-            parent::doWrite($char, false);
-            usleep(self::ANIMATE_LETTER_TIME * $this->slowDown);
-        }
-
-        if ($newline) {
-            parent::doWrite('', $newline);
-        }
+        call_user_func($this->currentEffect, $message, $newline);
     }
 
     private function clearLines(int $numberOfLinesToClear = 0): void
@@ -164,5 +183,11 @@ class ConsoleAnimateOutput extends StreamOutput
             // erase to end of screen
             parent::doWrite("\x1b[0J", false);
         }
+    }
+
+    private function progressiveWrite(): \Closure
+    {
+        return AnimateOutputEffect::progressive($this);
+
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\AutoMapper\Transformer;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\String_;
 use Symfony\Component\AutoMapper\Extractor\PropertyMapping;
 use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 
@@ -32,8 +33,11 @@ final class DateTimeImmutableToMutableTransformer implements TransformerInterfac
     public function transform(Expr $input, PropertyMapping $propertyMapping, UniqueVariableScope $uniqueVariableScope): array
     {
         return [
-            new Expr\StaticCall(new Name\FullyQualified(\DateTime::class), 'createFromImmutable', [
-                new Arg($input)
+            new Expr\StaticCall(new Name\FullyQualified(\DateTime::class), 'createFromFormat', [
+                new Arg(new String_(\DateTime::RFC3339)),
+                new Arg(new Expr\MethodCall($input, 'format', [
+                    new Arg(new String_(\DateTime::RFC3339)),
+                ])),
             ]),
             []
         ];

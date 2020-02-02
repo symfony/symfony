@@ -14,10 +14,13 @@ class AnimateOutputEffect
 {
     public static function progressive(ConsoleAnimateOutput $output): \Closure
     {
-        return function ($message, $newLine) use ($output) {
-            foreach (preg_split('//u', $message, -1, PREG_SPLIT_NO_EMPTY) as $char) {
+        return static function ($message, $newLine) use ($output) {
+            foreach (preg_split('/(\\033\[[\d;]+\d+m)|(.)/u', $message, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE) as $char) {
                 $output->directWrite($char, false);
-                usleep($output->getUsleepDuration());
+
+                if (mb_strlen($char) === 1) {
+                    usleep($output->getUsleepDuration());
+                }
             }
 
             if ($newLine === true) {
@@ -31,25 +34,27 @@ class AnimateOutputEffect
         return static function(string $message, bool $newLine) use ($output) {
             $totalStr = '';
             $output->directWrite("\033[s", false);
-
-            foreach (preg_split('//u', $message, -1, PREG_SPLIT_NO_EMPTY) as $char) {
+            foreach (preg_split('/(\\033\[[\d;]+\d+m)|(.)/u', $message, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE) as $char) {
                 $current = ord('!');
                 $limit = 50;
-                do {
+                $shouldSplitFlapChar = ctype_alnum($char) && mb_strlen($char) === 1;
+
+                while ($current < $limit && $shouldSplitFlapChar) {
                     $output->directWrite("\033[u", false);
                     $output->directWrite("\033[0J", false);
                     $output->directWrite($totalStr . mb_convert_encoding('&#' . $current . ';', 'UTF-8', 'HTML-ENTITIES'), false);
                     usleep($output->getUsleepDuration());
                     $current++;
-                } while ($current < $limit && in_array($char, range('A','z')));
+                }
 
                 $totalStr .= $char;
                 $output->directWrite("\033[u", false);
                 $output->directWrite("\033[0J", false);
                 $output->directWrite($totalStr, false);
-                usleep($output->getUsleepDuration());
+                if ($shouldSplitFlapChar) {
+                    usleep($output->getUsleepDuration());
+                }
             }
-
             if ($newLine === true) {
                 $output->directWrite(PHP_EOL, false);
             }
@@ -58,26 +63,24 @@ class AnimateOutputEffect
 
     public static function glitch(ConsoleAnimateOutput $output, int $duration): \Closure
     {
-        return function(string $message, bool $newLine) use ($output, $duration) {
-            $glitchChars = array_merge(range('!', 'z'), range('€','¿'));
+        return static function(string $message, bool $newLine) use ($output, $duration) {
+            $glitchChars = array_merge(range('!', 'z'));
             // Save cursor position
             $output->directWrite("\033[s", false);
 
             $currentSlowDown = $output->getSlowDown();
-
-            $output->setSlowDown(ConsoleAnimateOutput::WRITE_SLOW);
-            $output->hideCursor();
+            $output->setSlowDown(ConsoleAnimateOutput::WRITE_VERY_SLOW);
 
             $duration = (int) microtime(true) + $duration;
             while (microtime(true) <= $duration) {
                 $newMessage = '';
 
-                foreach (preg_split('//u', $message, -1, PREG_SPLIT_NO_EMPTY) as $char) {
-                    if (random_int(0, 100) >= 90 && $char !== ' ') {
+                foreach (preg_split('/(\\033\[[\d;]+\d+m)|(.)/u', $message, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE) as $char) {
+                    if ($char !== ' ' && mb_strlen($char) === 1 && random_int(0, 100) >= 90) {
                         $newMessage .= $glitchChars[random_int(0, count($glitchChars) - 1)];
-                    } else {
-                        $newMessage .= $char;
+                        continue;
                     }
+                    $newMessage .= $char;
                 }
 
                 // Restore cursor position
@@ -85,10 +88,10 @@ class AnimateOutputEffect
                 // Restore erase text after cursor
                 $output->directWrite("\033[0J", false);
                 $output->directWrite($newMessage, false);
-                usleep($output->getUsleepDuration()*2);
+
+                usleep($output->getUsleepDuration() * 2);
             }
 
-            $output->showCursor();
             $output->directWrite("\033[u", false);
             $output->directWrite("\033[0J", false);
             $output->directWrite($message, $newLine);

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.5",
         "nikic/php-parser": "^4.0",
         "symfony/property-info": "~5.1"
     },

@@ -7,6 +7,7 @@ use Symfony\Component\Console\Output\ConsoleAnimateOutput;
 
 /**
  * Provides some custom effect to register in ConsoleAnimateOutput
+ *
  * @author Jibé Barth <barth.jib@gmail.com>
  */
 class AnimateOutputEffect
@@ -15,12 +16,12 @@ class AnimateOutputEffect
     {
         return function ($message, $newLine) use ($output) {
             foreach (preg_split('//u', $message, -1, PREG_SPLIT_NO_EMPTY) as $char) {
-                $output->parentWrite($char, false);
+                $output->directWrite($char, false);
                 usleep($output->getUsleepDuration());
             }
 
             if ($newLine === true) {
-                $output->parentWrite(PHP_EOL, false);
+                $output->directWrite(PHP_EOL, false);
             }
         };
     }
@@ -29,28 +30,28 @@ class AnimateOutputEffect
     {
         return static function(string $message, bool $newLine) use ($output) {
             $totalStr = '';
-            $output->parentWrite("\033[s", false);
+            $output->directWrite("\033[s", false);
 
             foreach (preg_split('//u', $message, -1, PREG_SPLIT_NO_EMPTY) as $char) {
                 $current = ord('!');
                 $limit = 50;
                 do {
-                    $output->parentWrite("\033[u", false);
-                    $output->parentWrite("\033[0J", false);
-                    $output->parentWrite($totalStr . mb_convert_encoding('&#' . $current . ';', 'UTF-8', 'HTML-ENTITIES'), false);
+                    $output->directWrite("\033[u", false);
+                    $output->directWrite("\033[0J", false);
+                    $output->directWrite($totalStr . mb_convert_encoding('&#' . $current . ';', 'UTF-8', 'HTML-ENTITIES'), false);
                     usleep($output->getUsleepDuration());
                     $current++;
                 } while ($current < $limit && in_array($char, range('A','z')));
 
                 $totalStr .= $char;
-                $output->parentWrite("\033[u", false);
-                $output->parentWrite("\033[0J", false);
-                $output->parentWrite($totalStr, false);
+                $output->directWrite("\033[u", false);
+                $output->directWrite("\033[0J", false);
+                $output->directWrite($totalStr, false);
                 usleep($output->getUsleepDuration());
             }
 
             if ($newLine === true) {
-                $output->parentWrite(PHP_EOL, false);
+                $output->directWrite(PHP_EOL, false);
             }
         };
     }
@@ -60,11 +61,11 @@ class AnimateOutputEffect
         return function(string $message, bool $newLine) use ($output, $duration) {
             $glitchChars = array_merge(range('!', 'z'), range('€','¿'));
             // Save cursor position
-            $output->parentWrite("\033[s", false);
+            $output->directWrite("\033[s", false);
 
             $currentSlowDown = $output->getSlowDown();
 
-            $output->setSlowDown(ConsoleAnimateOutput::PROGRESSIVE_SLOW);
+            $output->setSlowDown(ConsoleAnimateOutput::WRITE_SLOW);
             $output->hideCursor();
 
             $duration = (int) microtime(true) + $duration;
@@ -80,17 +81,17 @@ class AnimateOutputEffect
                 }
 
                 // Restore cursor position
-                $output->parentWrite("\033[u", false);
+                $output->directWrite("\033[u", false);
                 // Restore erase text after cursor
-                $output->parentWrite("\033[0J", false);
-                $output->parentWrite($newMessage, false);
+                $output->directWrite("\033[0J", false);
+                $output->directWrite($newMessage, false);
                 usleep($output->getUsleepDuration()*2);
             }
 
             $output->showCursor();
-            $output->parentWrite("\033[u", false);
-            $output->parentWrite("\033[0J", false);
-            $output->parentWrite($message, $newLine);
+            $output->directWrite("\033[u", false);
+            $output->directWrite("\033[0J", false);
+            $output->directWrite($message, $newLine);
 
             $output->setSlowDown($currentSlowDown);
         };

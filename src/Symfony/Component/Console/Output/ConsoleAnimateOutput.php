@@ -16,44 +16,58 @@ use Symfony\Component\Console\Helper\AnimateOutputEffect;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
+/**
+ * @author Jibé Barth <barth.jib@gmail.com>
+ */
 class ConsoleAnimateOutput extends StreamOutput
 {
-    public const NO_PROGRESSIVE = 0;
-    public const PROGRESSIVE_VERY_QUICK = 1;
-    public const PROGRESSIVE_QUICK = 5;
-    public const PROGRESSIVE_NORMAL = 10;
-    public const PROGRESSIVE_SLOW = 15;
-    public const PROGRESSIVE_VERY_SLOW = 20;
+    /**
+     * Write instantly
+     */
+    public const NO_WRITE_ANIMATION = 0;
+    /**
+     * Write 1 char every 0.005 sec
+     */
+    public const WRITE_VERY_FAST = 1;
+    /**
+     * Write 1 char every 0.025 sec
+     */
+    public const WRITE_FAST = 5;
+    /**
+     * Write 1 char every 0.05 sec
+     */
+    public const WRITE_NORMAL = 10;
+    /**
+     * Write 1 char every 0.25 sec
+     */
+    public const WRITE_SLOW = 50;
+    /**
+     * Write 1 char every 0.5 sec
+     */
+    public const WRITE_VERY_SLOW = 100;
+    /**
+     * Write 1 char every second
+     */
+    public const WRITE_VERY_VERY_SLOW = 200;
 
     private const ANIMATE_LETTER_TIME = 5000;
 
-    private $slowDown = 0;
-    private $cursorVisible = true;
+    private $slowDown;
     private $currentEffect;
     private $terminal;
 
-    public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null, int $slowDown = 0)
+    public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null, int $slowDown = self::WRITE_NORMAL)
     {
         parent::__construct($stream, $verbosity, $decorated, $formatter);
         $this->terminal = new Terminal();
         $this->currentEffect = $this->progressiveWrite();
-    }
-
-    /**
-     * Set progressive writing speed. (NO_PROGRESSIVE write instantanly)
-     *
-     * @param int $progressive
-     */
-    public function setProgressive(int $progressive = self::NO_PROGRESSIVE)
-    {
-        $this->currentEffect = $this->progressiveWrite();
-        $this->slowDown = $progressive;
+        $this->slowDown = $slowDown;
     }
 
     /**
      * Clear all terminal screen
      */
-    public function clearScreen()
+    public function clearScreen(): void
     {
         $this->clearLines($this->terminal->getHeight());
     }
@@ -63,7 +77,7 @@ class ConsoleAnimateOutput extends StreamOutput
      *
      * @param int $lines Number of lines to clear. If 0, then the current line is cleaned
      */
-    public function clear(int $lines = 0)
+    public function clear(int $lines = 0): void
     {
         if (!$this->isDecorated()) {
             return;
@@ -72,20 +86,18 @@ class ConsoleAnimateOutput extends StreamOutput
         $this->clearLines($lines);
     }
 
-    public function wait(float $time = 1)
+    public function wait(float $time = 1): void
     {
         usleep(1000000 * $time);
     }
 
-    public function showCursor()
+    public function showCursor(): void
     {
-        $this->cursorVisible = true;
         parent::doWrite("\033[?25h", false);
     }
 
-    public function hideCursor()
+    public function hideCursor(): void
     {
-        $this->cursorVisible = false;
         parent::doWrite("\033[?25l", false);
     }
 
@@ -94,8 +106,12 @@ class ConsoleAnimateOutput extends StreamOutput
         $this->currentEffect = $closure;
     }
 
+    public function resetEffect(): void
+    {
+        $this->currentEffect = $this->progressiveWrite();
+    }
 
-    public function setSlowDown(int $slowDown = self::PROGRESSIVE_NORMAL)
+    public function setSlowDown(int $slowDown = self::WRITE_NORMAL): void
     {
         $this->slowDown = $slowDown;
     }
@@ -105,7 +121,10 @@ class ConsoleAnimateOutput extends StreamOutput
         return $this->slowDown;
     }
 
-    public function parentWrite(string $message, bool $newLine = false)
+    /**
+     * Bypass animation
+     */
+    public function directWrite(string $message, bool $newLine = false): void
     {
         parent::doWrite($message, $newLine);
     }
@@ -115,12 +134,9 @@ class ConsoleAnimateOutput extends StreamOutput
      *
      * @param array|string $message
      */
-    public function overwriteln($message, ?int $slowDown = null, int $linesToClear = 0)
+    public function overwriteln($message, int $linesToClear = 0): void
     {
         $this->clear($linesToClear);
-        if (null !== $slowDown) {
-            $this->setSlowDown($slowDown);
-        }
 
         $this->writeln($message);
     }
@@ -130,17 +146,14 @@ class ConsoleAnimateOutput extends StreamOutput
      *
      * @param array|string $message
      */
-    public function overwrite($message, ?int $slowDown = null, int $linesToClear = 0)
+    public function overwrite($message, int $linesToClear = 0): void
     {
         $this->clear($linesToClear);
-        if (null !== $slowDown) {
-            $this->setSlowDown($slowDown);
-        }
 
         $this->write($message);
     }
 
-    public function getUsleepDuration()
+    public function getUsleepDuration(): int
     {
         return self::ANIMATE_LETTER_TIME * $this->slowDown;
     }
@@ -154,7 +167,7 @@ class ConsoleAnimateOutput extends StreamOutput
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         if (!$this->isDecorated()) {
             parent::doWrite($message, $newline);

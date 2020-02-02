@@ -37,7 +37,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $content = '';
+        $content = null;
         $traceInfo = [];
         $this->tracedRequests[] = [
             'method' => $method,

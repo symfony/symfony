@@ -23,6 +23,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     private $container;
     private $loaders;
     private $loadedVars = [];
+    private $dotenvVars = [];
 
     /**
      * @param EnvVarLoaderInterface[] $loaders
@@ -31,6 +32,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     {
         $this->container = $container;
         $this->loaders = $loaders ?? new \ArrayIterator();
+        $this->dotenvVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
     }
 
     /**
@@ -129,53 +131,59 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (null === $env = $getEnv($name)) {
                 return null;
             }
-        } elseif (isset($_ENV[$name])) {
-            $env = $_ENV[$name];
-        } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
-            $env = $_SERVER[$name];
-        } elseif (false === ($env = getenv($name)) || null === $env) { // null is a possible value because of thread safety issues
+        } elseif (isset($this->dotenvVars[$name], $_ENV[$name]) && '' === $_ENV[$name] && '' !== $name) {
+            $env = false; // give precedence to env var loaders when a .env var is set to the empty string
+        } else {
+            $env = $_ENV[$name] ?? (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_') ? $_SERVER[$name] : getenv($name));
+        }
+
+        if (false === $env || null === $env) { // null is a possible value because of thread safety issues with getenv()
             foreach ($this->loadedVars as $vars) {
                 if (false !== $env = ($vars[$name] ?? false)) {
                     break;
                 }
             }
+        }
 
-            if (false === $env || null === $env) {
-                $loaders = $this->loaders;
-                $this->loaders = new \ArrayIterator();
+        if (false === $env || null === $env) {
+            $loaders = $this->loaders;
+            $this->loaders = new \ArrayIterator();
 
-                try {
-                    $i = 0;
-                    $ended = true;
-                    $count = $loaders instanceof \Countable ? $loaders->count() : 0;
-                    foreach ($loaders as $loader) {
-                        if (\count($this->loadedVars) > $i++) {
-                            continue;
-                        }
-                        $this->loadedVars[] = $vars = $loader->loadEnvVars();
-                        if (false !== $env = $vars[$name] ?? false) {
-                            $ended = false;
-                            break;
-                        }
+            try {
+                $i = 0;
+                $ended = true;
+                $count = $loaders instanceof \Countable ? $loaders->count() : 0;
+                foreach ($loaders as $loader) {
+                    if (\count($this->loadedVars) > $i++) {
+                        continue;
                     }
-                    if ($ended || $count === $i) {
-                        $loaders = $this->loaders;
+                    $this->loadedVars[] = $vars = $loader->loadEnvVars();
+                    if (false !== $env = $vars[$name] ?? false) {
+                        $ended = false;
+                        break;
                     }
-                } catch (ParameterCircularReferenceException $e) {
-                    // skip loaders that need an env var that is not defined
-                } finally {
-                    $this->loaders = $loaders;
                 }
+                if ($ended || $count === $i) {
+                    $loaders = $this->loaders;
+                }
+            } catch (ParameterCircularReferenceException $e) {
+                // skip loaders that need an env var that is not defined
+            } finally {
+                $this->loaders = $loaders;
+            }
+        }
+
+        if (false === $env || null === $env) {
+            $env = $_ENV[$name] ?? $env;
+        }
+
+        if (false === $env || null === $env) {
+            if (!$this->container->hasParameter("env($name)")) {
+                throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
             }
 
-            if (false === $env || null === $env) {
-                if (!$this->container->hasParameter("env($name)")) {
-                    throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
-                }
-
-                if (null === $env = $this->container->getParameter("env($name)")) {
-                    return null;
-                }
+            if (null === $env = $this->container->getParameter("env($name)")) {
+                return null;
             }
         }
 

@@ -57,7 +57,7 @@ class UserConstructorDTO
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getAge()
     {

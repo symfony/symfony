@@ -18,7 +18,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Does not do any transformation, output = input.
  *
- * @expiremental in 4.3
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

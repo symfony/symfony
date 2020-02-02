@@ -16,6 +16,8 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 /**
  * Reduce array of type to only one type on source and target.
  *
+ * @expiremental in 5.1
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class UniqueTypeTransformerFactory implements TransformerFactoryInterface

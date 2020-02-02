@@ -22,7 +22,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Built in transformer to handle PHP scalar types.
  *
- * @expiremental in 4.3
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

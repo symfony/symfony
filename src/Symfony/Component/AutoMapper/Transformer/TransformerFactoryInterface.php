@@ -17,7 +17,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Create transformer.
  *
- * @internal
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

@@ -22,6 +22,8 @@ use Symfony\Component\AutoMapper\Exception\CompileException;
 /**
  * Read accessor tell how to read from a property.
  *
+ * @expiremental in 5.1
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class ReadAccessor

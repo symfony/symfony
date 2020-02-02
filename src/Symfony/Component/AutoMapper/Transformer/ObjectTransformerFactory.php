@@ -16,7 +16,7 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @expiremental in 4.3
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

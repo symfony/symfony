@@ -18,7 +18,7 @@ use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 /**
  * Use file system to load mapper, and persist them using a registry.
  *
- * @expiremental in 4.3
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

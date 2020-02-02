@@ -19,7 +19,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Transformer tell how to transform a property mapping.
  *
- * @internal
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

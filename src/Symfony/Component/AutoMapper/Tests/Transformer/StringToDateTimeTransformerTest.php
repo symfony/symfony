@@ -12,7 +12,6 @@
 namespace Symfony\Component\AutoMapper\Tests\Transformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AutoMapper\Transformer\DateTimeToStringTansformer;
 use Symfony\Component\AutoMapper\Transformer\StringToDateTimeTransformer;
 
 class StringToDateTimeTransformerTest extends TestCase

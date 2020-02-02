@@ -18,6 +18,8 @@ use Symfony\Component\AutoMapper\Exception\CircularReferenceException;
  *
  * Allows to customize how is done the mapping
  *
+ * @expiremental in 5.1
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 class MapperContext

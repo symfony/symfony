@@ -14,7 +14,7 @@ namespace Symfony\Component\AutoMapper;
 /**
  * An auto mapper has the role of mapping a source to a target.
  *
- * @expiremental in 4.3
+ * @expiremental in 5.1
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

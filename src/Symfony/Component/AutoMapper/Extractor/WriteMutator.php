@@ -22,6 +22,8 @@ use Symfony\Component\AutoMapper\Exception\CompileException;
 /**
  * Writes mutator tell how to write to a property.
  *
+ * @expiremental in 5.1
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class WriteMutator

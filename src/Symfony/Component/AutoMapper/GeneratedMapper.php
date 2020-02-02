@@ -14,6 +14,8 @@ namespace Symfony\Component\AutoMapper;
 /**
  * Class derived for each generated mapper.
  *
+ * @expiremental in 5.1
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 abstract class GeneratedMapper implements MapperInterface

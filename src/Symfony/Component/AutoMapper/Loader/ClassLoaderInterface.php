@@ -15,6 +15,8 @@ use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
  * Loads (require) a mapping given metadata.
+ *
+ * @expiremental in 5.1
  */
 interface ClassLoaderInterface
 {

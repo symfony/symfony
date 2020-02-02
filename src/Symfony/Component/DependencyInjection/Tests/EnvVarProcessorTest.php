@@ -523,11 +523,17 @@ CSV;
 
     public function testEnvLoader()
     {
+        $_ENV['FAKE_REALENV_VAR'] = 'abc';
+        $_ENV['FAKE_DOTENV_VAR'] = 'def';
+        $_ENV['FOO_ENV_LOADER'] = 'foo';
+        $_ENV['SYMFONY_DOTENV_VARS'] = 'FAKE_DOTENV_VAR,FOO_ENV_LOADER';
+
         $loaders = function () {
             yield new class() implements EnvVarLoaderInterface {
                 public function loadEnvVars(): array
                 {
                     return [
+                        'FAKE_REALENV_VAR' => '345',
                         'FOO_ENV_LOADER' => '123',
                     ];
                 }
@@ -546,6 +552,12 @@ CSV;
 
         $processor = new EnvVarProcessor(new Container(), $loaders());
 
+        $result = $processor->getEnv('string', 'FAKE_REALENV_VAR', function () {});
+        $this->assertSame('abc', $result);
+
+        $result = $processor->getEnv('string', 'FAKE_DOTENV_VAR', function () {});
+        $this->assertSame('def', $result);
+
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result);
 
@@ -554,6 +566,8 @@ CSV;
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+
+        unset($_ENV['FAKE_REALENV_VAR'], $_ENV['FAKE_DOTENV_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_ENV['FOO_ENV_LOADER']);
     }
 
     public function testCircularEnvLoader()

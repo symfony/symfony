@@ -379,6 +379,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $locatorArgument);
     }
+
+    public function testAlias()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', RegisterTestController::class)
+            ->addTag('controller.service_arguments');
+
+        $container->setAlias(RegisterTestController::class, 'foo')->setPublic(true);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
+    }
 }
 
 class RegisterTestController

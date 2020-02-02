@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * allowed using public aliases to reference controllers
+
 5.0.0
 -----
 

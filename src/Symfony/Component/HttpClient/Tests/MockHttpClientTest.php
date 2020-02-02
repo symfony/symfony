@@ -22,6 +22,127 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
+    /**
+     * @dataProvider mockingProvider
+     */
+    public function testMocking($factory, array $expectedResponses)
+    {
+        $client = new MockHttpClient($factory, 'https://example.com/');
+        $this->assertSame(0, $client->getRequestsCount());
+
+        $urls = ['/foo', '/bar'];
+        foreach ($urls as $i => $url) {
+            $response = $client->request('POST', $url, ['body' => 'payload']);
+            $this->assertEquals($expectedResponses[$i], $response->getContent());
+        }
+
+        $this->assertSame(2, $client->getRequestsCount());
+    }
+
+    public function mockingProvider(): iterable
+    {
+        yield 'callable' => [
+            static function (string $method, string $url, array $options = []) {
+                return new MockResponse($method.': '.$url.' (body='.$options['body'].')');
+            },
+            [
+                'POST: https://example.com/foo (body=payload)',
+                'POST: https://example.com/bar (body=payload)',
+            ],
+        ];
+
+        yield 'array of callable' => [
+            [
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [1]');
+                },
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [2]');
+                },
+            ],
+            [
+                'POST: https://example.com/foo (body=payload) [1]',
+                'POST: https://example.com/bar (body=payload) [2]',
+            ],
+        ];
+
+        yield 'array of response objects' => [
+            [
+                new MockResponse('static response [1]'),
+                new MockResponse('static response [2]'),
+            ],
+            [
+                'static response [1]',
+                'static response [2]',
+            ],
+        ];
+
+        yield 'iterator' => [
+            new \ArrayIterator(
+                [
+                    new MockResponse('static response [1]'),
+                    new MockResponse('static response [2]'),
+                ]
+            ),
+            [
+                'static response [1]',
+                'static response [2]',
+            ],
+        ];
+
+        yield 'null' => [
+            null,
+            [
+                '',
+                '',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider transportExceptionProvider
+     */
+    public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
+    {
+        $client = new MockHttpClient($factory, 'https://example.com/');
+
+        $client->request('POST', '/foo');
+        $client->request('POST', '/foo');
+
+        $this->expectException(TransportException::class);
+        $client->request('POST', '/foo');
+    }
+
+    public function transportExceptionProvider(): iterable
+    {
+        yield 'array of callable' => [
+            [
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse();
+                },
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse();
+                },
+            ],
+        ];
+
+        yield 'array of response objects' => [
+            [
+                new MockResponse(),
+                new MockResponse(),
+            ],
+        ];
+
+        yield 'iterator' => [
+            new \ArrayIterator(
+                [
+                    new MockResponse(),
+                    new MockResponse(),
+                ]
+            ),
+        ];
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];

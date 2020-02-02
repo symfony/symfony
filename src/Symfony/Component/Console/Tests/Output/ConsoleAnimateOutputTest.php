@@ -60,7 +60,7 @@ class ConsoleAnimateOutputTest extends TestCase
         $output->write('Loremipsum');
         $finalTime = microtime(true);
 
-        $this->assertEqualsWithDelta($expectedTime, $finalTime, 0.01);
+        $this->assertGreaterThanOrEqual($expectedTime, $finalTime);
     }
 
     public function testClearCurrentLine(): void
@@ -126,7 +126,7 @@ class ConsoleAnimateOutputTest extends TestCase
         $output->write('Foo');
         $finalTime = microtime(true);
 
-        $this->assertEqualsWithDelta($expectedTime, $finalTime, 0.01);
+        $this->assertGreaterThanOrEqual($expectedTime, $finalTime);
     }
 
     public function testGetSlowDown(): void
@@ -217,7 +217,7 @@ class ConsoleAnimateOutputTest extends TestCase
         $output->write('Loremipsum');
         $finalTime = microtime(true);
 
-        $this->assertEqualsWithDelta($expectedTime, $finalTime, 0.01);
+        $this->assertGreaterThanOrEqual($expectedTime, $finalTime);
     }
 
     public function testCleanScreen(): void

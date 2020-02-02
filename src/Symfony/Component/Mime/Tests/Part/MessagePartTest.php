@@ -34,7 +34,7 @@ class MessagePartTest extends TestCase
     {
         $p = new MessagePart((new Email())->from('fabien@symfony.com')->text('content')->subject('Subject'));
         $this->assertEquals(new Headers(
-            new ParameterizedHeader('Content-Type', 'message/rfc822', ['name' => 'Subject.eml']),
+            new ParameterizedHeader('Content-Type', 'message/rfc822'),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'Subject.eml', 'filename' => 'Subject.eml'])
         ), $p->getPreparedHeaders());

@@ -131,9 +131,6 @@ class TextPart extends AbstractPart
         if ($this->charset) {
             $headers->setHeaderParameter('Content-Type', 'charset', $this->charset);
         }
-        if ($this->name) {
-            $headers->setHeaderParameter('Content-Type', 'name', $this->name);
-        }
         $headers->setHeaderBody('Text', 'Content-Transfer-Encoding', $this->encoding);
 
         if (!$headers->has('Content-Disposition') && null !== $this->disposition) {

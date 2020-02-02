@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Output;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\AnimateOutputEffect;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
 /**
@@ -22,31 +21,31 @@ use Symfony\Component\Console\Terminal;
 class ConsoleAnimateOutput extends StreamOutput
 {
     /**
-     * Write instantly
+     * Write instantly.
      */
     public const NO_WRITE_ANIMATION = 0;
     /**
-     * Write 1 char every 0.005 sec
+     * Write 1 char every 0.005 sec.
      */
     public const WRITE_VERY_FAST = 1;
     /**
-     * Write 1 char every 0.025 sec
+     * Write 1 char every 0.025 sec.
      */
     public const WRITE_FAST = 5;
     /**
-     * Write 1 char every 0.05 sec
+     * Write 1 char every 0.05 sec.
      */
     public const WRITE_NORMAL = 10;
     /**
-     * Write 1 char every 0.25 sec
+     * Write 1 char every 0.25 sec.
      */
     public const WRITE_SLOW = 50;
     /**
-     * Write 1 char every 0.5 sec
+     * Write 1 char every 0.5 sec.
      */
     public const WRITE_VERY_SLOW = 100;
     /**
-     * Write 1 char every second
+     * Write 1 char every second.
      */
     public const WRITE_VERY_VERY_SLOW = 200;
 
@@ -65,7 +64,7 @@ class ConsoleAnimateOutput extends StreamOutput
     }
 
     /**
-     * Clear all terminal screen
+     * Clear all terminal screen.
      */
     public function clearScreen(): void
     {
@@ -73,7 +72,7 @@ class ConsoleAnimateOutput extends StreamOutput
     }
 
     /**
-     * Clears previous output for this console
+     * Clears previous output for this console.
      *
      * @param int $lines Number of lines to clear. If 0, then the current line is cleaned
      */
@@ -122,7 +121,7 @@ class ConsoleAnimateOutput extends StreamOutput
     }
 
     /**
-     * Bypass animation
+     * Bypass animation.
      */
     public function directWrite(string $message, bool $newLine = false): void
     {
@@ -175,13 +174,13 @@ class ConsoleAnimateOutput extends StreamOutput
             return;
         }
 
-        call_user_func($this->currentEffect, $message, $newline);
+        \call_user_func($this->currentEffect, $message, $newline);
     }
 
     private function clearLines(int $numberOfLinesToClear = 0): void
     {
         // erase current line
-        if ($numberOfLinesToClear === 0) {
+        if (0 === $numberOfLinesToClear) {
             // add a new Line
             parent::doWrite(PHP_EOL, false);
             // jump cursor to beginning of previous line
@@ -201,6 +200,5 @@ class ConsoleAnimateOutput extends StreamOutput
     private function progressiveWrite(): \Closure
     {
         return AnimateOutputEffect::progressive($this);
-
     }
 }

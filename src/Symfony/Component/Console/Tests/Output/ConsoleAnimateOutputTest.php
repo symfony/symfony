@@ -88,7 +88,7 @@ class ConsoleAnimateOutputTest extends TestCase
     {
         $output = new ConsoleAnimateOutput($this->stream, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
 
-        $output->write('Foo' . PHP_EOL . 'Bar');
+        $output->write('Foo'.PHP_EOL.'Bar');
         $output->overwrite('Bar', 2);
         rewind($output->getStream());
         $this->assertEquals('Foo'.PHP_EOL.'Bar'."\x1b[2A\x1b[0JBar", stream_get_contents($output->getStream()));
@@ -210,7 +210,7 @@ class ConsoleAnimateOutputTest extends TestCase
     {
         $output = new ConsoleAnimateOutput($this->stream, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
 
-        $output->setCustomEffect(function() {});
+        $output->setCustomEffect(function () {});
         $output->resetEffect();
 
         $expectedTime = microtime(true) + 0.5; // ten letters

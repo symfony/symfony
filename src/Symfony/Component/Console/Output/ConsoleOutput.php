@@ -58,7 +58,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     }
 
     /**
-     * Creates an animated output
+     * Creates an animated output.
      */
     public function animate(): ConsoleAnimateOutput
     {

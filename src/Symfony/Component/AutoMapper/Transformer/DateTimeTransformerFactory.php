@@ -53,13 +53,11 @@ final class DateTimeTransformerFactory extends AbstractUniqueTypeTransformerFact
             return new CopyTransformer();
         }
 
-        // Source is mutable but target is not, transform into a datetime immutable type @TODO
         if ($isSourceMutable) {
-            return new CopyTransformer();
+            return new DateTimeMutableToImmutableTransformer();
         }
 
-        // Target is mutable but source is not, transform into a datetime mutable type @TODO
-        return new CopyTransformer();
+        return new DateTimeImmutableToMutableTransformer();
     }
 
     protected function createTransformerForSource(Type $targetType, MapperMetadataInterface $mapperMetadata): ?TransformerInterface
@@ -104,10 +102,6 @@ final class DateTimeTransformerFactory extends AbstractUniqueTypeTransformerFact
 
     private function isDateTimeMutable(Type $type): bool
     {
-        if (Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
-            return false;
-        }
-
         if (\DateTime::class !== $type->getClassName() && !is_subclass_of($type->getClassName(), \DateTime::class)) {
             return false;
         }

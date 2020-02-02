@@ -44,7 +44,7 @@ class User
     public $addresses = [];
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTime
      */
     public $createdAt;
 

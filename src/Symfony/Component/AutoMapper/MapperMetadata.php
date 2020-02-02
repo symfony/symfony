@@ -88,11 +88,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
      */
     public function getPropertyMapping(string $property): ?PropertyMapping
     {
-        if (null === $this->propertiesMapping) {
-            $this->buildPropertyMapping();
-        }
-
-        return $this->propertiesMapping[$property] ?? null;
+        return $this->getPropertiesMapping()[$property] ?? null;
     }
 
     /**

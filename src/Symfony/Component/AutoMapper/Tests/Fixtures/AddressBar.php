@@ -11,18 +11,10 @@
 
 namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-class Address
+class AddressBar
 {
     /**
      * @var string|null
      */
-    private $city;
-
-    /**
-     * @param string $city
-     */
-    public function setCity(?string $city): void
-    {
-        $this->city = $city;
-    }
+    public $city;
 }

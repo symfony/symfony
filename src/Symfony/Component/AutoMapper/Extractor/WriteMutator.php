@@ -49,16 +49,6 @@ final class WriteMutator
         return $this->type;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function isPrivate(): bool
-    {
-        return $this->private;
-    }
-
     /**
      * Get AST expression for writing from a value to an output.
      *
@@ -95,10 +85,6 @@ final class WriteMutator
             }
 
             return new Expr\Assign(new Expr\ArrayDimFetch($output, new Scalar\String_($this->name)), $value);
-        }
-
-        if (self::TYPE_CONSTRUCTOR === $this->type) {
-            return null;
         }
 
         throw new CompileException('Invalid accessor for write expression');

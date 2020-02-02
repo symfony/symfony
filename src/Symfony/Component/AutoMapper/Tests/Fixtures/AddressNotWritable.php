@@ -11,18 +11,15 @@
 
 namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-class Address
+class AddressNotWritable
 {
     /**
      * @var string|null
      */
     private $city;
 
-    /**
-     * @param string $city
-     */
-    public function setCity(?string $city): void
+    public function getCity(): ?string
     {
-        $this->city = $city;
+        return $this->city;
     }
 }

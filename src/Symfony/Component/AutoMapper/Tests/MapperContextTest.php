@@ -102,4 +102,41 @@ class MapperContextTest extends TestCase
         self::assertContains('group1', $context->toArray()[MapperContext::GROUPS]);
         self::assertNotContains('group2', $context->toArray()[MapperContext::GROUPS]);
     }
+
+    public function testTargetToPopulate(): void
+    {
+        $object = new \stdClass();
+        $context = new MapperContext();
+        $context->setTargetToPopulate($object);
+
+        self::assertSame($object, $context->toArray()[MapperContext::TARGET_TO_POPULATE]);
+    }
+
+    public function testWithNewContextIgnoredAttributesNested(): void
+    {
+        $context = [
+            MapperContext::IGNORED_ATTRIBUTES => [
+                'foo' => ['bar'],
+                'baz',
+            ]
+        ];
+
+        $newContext = MapperContext::withNewContext($context, 'foo');
+
+        self::assertEquals(['bar'], $newContext[MapperContext::IGNORED_ATTRIBUTES]);
+    }
+
+    public function testWithNewContextAllowedAttributesNested(): void
+    {
+        $context = [
+            MapperContext::ALLOWED_ATTRIBUTES => [
+                'foo' => ['bar'],
+                'baz',
+            ]
+        ];
+
+        $newContext = MapperContext::withNewContext($context, 'foo');
+
+        self::assertEquals(['bar'], $newContext[MapperContext::ALLOWED_ATTRIBUTES]);
+    }
 }

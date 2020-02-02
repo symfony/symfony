@@ -27,12 +27,15 @@ class SourceTargetMappingExtractor extends MappingExtractor
      */
     public function getPropertiesMapping(MapperMetadataInterface $mapperMetadata): array
     {
-        $sourceProperties = array_unique($this->propertyInfoExtractor->getProperties($mapperMetadata->getSource()));
-        $targetProperties = array_unique($this->propertyInfoExtractor->getProperties($mapperMetadata->getTarget()));
+        $sourceProperties = $this->propertyInfoExtractor->getProperties($mapperMetadata->getSource());
+        $targetProperties = $this->propertyInfoExtractor->getProperties($mapperMetadata->getTarget());
 
         if (null === $sourceProperties || null === $targetProperties) {
             return [];
         }
+
+        $sourceProperties = array_unique($sourceProperties ?? []);
+        $targetProperties = array_unique($targetProperties ?? []);
 
         $mapping = [];
 

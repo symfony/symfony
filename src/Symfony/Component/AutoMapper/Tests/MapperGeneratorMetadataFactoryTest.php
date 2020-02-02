@@ -129,17 +129,21 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
 
     public function testCreateWithBothObjects(): void
     {
-        $userConstructorDTOReflection = new \ReflectionClass(Fixtures\UserConstructorDTO::class);
-
         $metadata = $this->factory->create($this->autoMapper, Fixtures\UserConstructorDTO::class, Fixtures\User::class);
         self::assertTrue($metadata->hasConstructor());
         self::assertTrue($metadata->shouldCheckAttributes());
         self::assertTrue($metadata->isTargetCloneable());
         self::assertEquals(Fixtures\UserConstructorDTO::class, $metadata->getSource());
         self::assertEquals(Fixtures\User::class, $metadata->getTarget());
-        self::assertCount(\count($userConstructorDTOReflection->getProperties()), $metadata->getPropertiesMapping());
         self::assertInstanceOf(PropertyMapping::class, $metadata->getPropertyMapping('id'));
         self::assertInstanceOf(PropertyMapping::class, $metadata->getPropertyMapping('name'));
         self::assertNull($metadata->getPropertyMapping('email'));
+    }
+
+    public function testHasNotConstructor(): void
+    {
+        $metadata = $this->factory->create($this->autoMapper, 'array', Fixtures\UserDTO::class);
+
+        self::assertFalse($metadata->hasConstructor());
     }
 }

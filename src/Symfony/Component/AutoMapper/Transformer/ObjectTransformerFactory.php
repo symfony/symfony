@@ -50,7 +50,7 @@ final class ObjectTransformerFactory extends AbstractUniqueTypeTransformerFactor
             $targetTypeName = $targetType->getClassName();
         }
 
-        if ($this->autoMapper->hasMapper($sourceTypeName, $targetTypeName)) {
+        if (null !== $sourceTypeName && null !== $targetTypeName && $this->autoMapper->hasMapper($sourceTypeName, $targetTypeName)) {
             return new ObjectTransformer($sourceType, $targetType);
         }
 

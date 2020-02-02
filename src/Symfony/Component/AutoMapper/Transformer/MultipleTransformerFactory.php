@@ -32,18 +32,29 @@ final class MultipleTransformerFactory implements TransformerFactoryInterface
      */
     public function getTransformer(?array $sourcesTypes, ?array $targetTypes, MapperMetadataInterface $mapperMetadata): ?TransformerInterface
     {
-        if (null === $sourcesTypes || 0 === \count($sourcesTypes)) {
+        if (null === $sourcesTypes || \count($sourcesTypes) <= 1) {
             return null;
         }
 
-        if (\count($sourcesTypes) > 1) {
-            $transformer = new MultipleTransformer();
+        $transformers = [];
 
-            foreach ($sourcesTypes as $sourceType) {
-                $transformer->addTransformer($this->chainTransformerFactory->getTransformer([$sourceType], $targetTypes, $mapperMetadata), $sourceType);
+        foreach ($sourcesTypes as $sourceType) {
+            $transformer = $this->chainTransformerFactory->getTransformer([$sourceType], $targetTypes, $mapperMetadata);
+
+            if (null !== $transformer) {
+                $transformers[] = [
+                    'transformer' => $transformer,
+                    'type' => $sourceType
+                ];
             }
+        }
 
-            return $transformer;
+        if (\count($transformers) > 1) {
+            return new MultipleTransformer($transformers);
+        }
+
+        if (\count($transformers) === 1) {
+            return $transformers[0]['transformer'];
         }
 
         return null;

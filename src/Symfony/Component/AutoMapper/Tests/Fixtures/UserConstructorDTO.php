@@ -27,11 +27,17 @@ class UserConstructorDTO
      */
     private $age;
 
+    /**
+     * @var bool
+     */
+    private $constructor = false;
+
     public function __construct(string $id, string $name, int $age = 30)
     {
         $this->id = $id;
         $this->name = $name;
         $this->age = $age;
+        $this->constructor = true;
     }
 
     /**
@@ -56,5 +62,10 @@ class UserConstructorDTO
     public function getAge()
     {
         return $this->age;
+    }
+
+    public function getConstructor(): bool
+    {
+        return $this->constructor;
     }
 }

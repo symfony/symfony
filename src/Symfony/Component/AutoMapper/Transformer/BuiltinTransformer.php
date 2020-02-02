@@ -53,9 +53,7 @@ final class BuiltinTransformer implements TransformerInterface
         Type::BUILTIN_TYPE_ITERABLE => [
             Type::BUILTIN_TYPE_ARRAY => 'fromIteratorToArray',
         ],
-        Type::BUILTIN_TYPE_ARRAY => [
-            Type::BUILTIN_TYPE_ITERABLE => null,
-        ],
+        Type::BUILTIN_TYPE_ARRAY => [],
         Type::BUILTIN_TYPE_STRING => [
             Type::BUILTIN_TYPE_ARRAY => 'toArray',
             Type::BUILTIN_TYPE_ITERABLE => 'toArray',
@@ -89,13 +87,13 @@ final class BuiltinTransformer implements TransformerInterface
         }, $this->targetTypes);
 
         // Source type is in target => no cast
-        if (\in_array($this->sourceType->getBuiltinType(), $targetTypes)) {
+        if (\in_array($this->sourceType->getBuiltinType(), $targetTypes, true)) {
             return [$input, []];
         }
 
         // Cast needed
         foreach (self::CAST_MAPPING[$this->sourceType->getBuiltinType()] as $castType => $castMethod) {
-            if (\in_array($castType, $targetTypes)) {
+            if (\in_array($castType, $targetTypes, true)) {
                 if (method_exists($this, $castMethod)) {
                     return [$this->$castMethod($input), []];
                 }

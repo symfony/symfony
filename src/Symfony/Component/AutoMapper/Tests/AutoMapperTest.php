@@ -75,6 +75,29 @@ class AutoMapperTest extends AutoMapperBaseTest
         self::assertEquals(1987, $userDto->createdAt->format('Y'));
     }
 
+    public function testAutoMapperFromArrayCustomDateTime(): void
+    {
+        $dateTime = \DateTime::createFromFormat(\DateTime::RFC3339, '1987-04-30T06:00:00Z');
+        $customFormat = 'U';
+        $user = [
+            'id' => 1,
+            'address' => [
+                'city' => 'Toulon',
+            ],
+            'createdAt' => $dateTime->format($customFormat),
+        ];
+
+        $autoMapper = AutoMapper::create(true, $this->loader, null, 'CustomDateTime_');
+        $configuration = $autoMapper->getMetadata('array', Fixtures\UserDTO::class);
+        $configuration->setDateTimeFormat($customFormat);
+
+        /** @var Fixtures\UserDTO $userDto */
+        $userDto = $autoMapper->map($user, Fixtures\UserDTO::class);
+
+        self::assertInstanceOf(Fixtures\UserDTO::class, $userDto);
+        self::assertEquals($dateTime->format($customFormat), $userDto->createdAt->format($customFormat));
+    }
+
     public function testAutoMapperToArray(): void
     {
         $address = new Fixtures\Address();
@@ -112,6 +135,62 @@ class AutoMapperTest extends AutoMapperBaseTest
 
         self::assertInstanceOf(\stdClass::class, $user);
         self::assertEquals(1, $user->id);
+    }
+
+    public function testNotReadable(): void
+    {
+        $autoMapper = AutoMapper::create(false, $this->loader, null, 'NotReadable_');
+        $address = new Fixtures\Address();
+        $address->setCity('test');
+
+        $addressArray = $autoMapper->map($address, 'array');
+
+        self::assertIsArray($addressArray);
+        self::assertArrayNotHasKey('city', $addressArray);
+
+        $addressMapped = $autoMapper->map($address, Fixtures\Address::class);
+
+        self::assertInstanceOf(Fixtures\Address::class, $addressMapped);
+
+        $property = (new \ReflectionClass($addressMapped))->getProperty('city');
+        $property->setAccessible(true);
+
+        $city = $property->getValue($addressMapped);
+
+        self::assertNull($city);
+    }
+
+    public function testNoTypes(): void
+    {
+        $autoMapper = AutoMapper::create(false, $this->loader, null, 'NotReadable_');
+        $address = new Fixtures\AddressNoTypes();
+        $address->city = 'test';
+
+        $addressArray = $autoMapper->map($address, 'array');
+
+        self::assertIsArray($addressArray);
+        self::assertArrayNotHasKey('city', $addressArray);
+    }
+
+    public function testNoTransformer(): void
+    {
+        $addressFoo = new Fixtures\AddressFoo();
+        $addressFoo->city = new Fixtures\CityFoo();
+        $addressFoo->city->name = 'test';
+
+        $addressBar = $this->autoMapper->map($addressFoo, Fixtures\AddressBar::class);
+
+        self::assertInstanceOf(Fixtures\AddressBar::class, $addressBar);
+        self::assertNull($addressBar->city);
+    }
+
+    public function testNoProperties(): void
+    {
+        $noProperties = new Fixtures\FooNoProperties();
+        $noPropertiesMapped = $this->autoMapper->map($noProperties, Fixtures\FooNoProperties::class);
+
+        self::assertInstanceOf(Fixtures\FooNoProperties::class, $noPropertiesMapped);
+        self::assertNotSame($noProperties, $noPropertiesMapped);
     }
 
     public function testGroupsSourceTarget(): void
@@ -205,6 +284,28 @@ class AutoMapperTest extends AutoMapperBaseTest
         self::assertSame($newNode, $newNode['parent']['parent']['parent']);
     }
 
+    public function testCircularReferenceDeep(): void
+    {
+        $foo = new Fixtures\CircularFoo();
+        $bar = new Fixtures\CircularBar();
+        $baz = new Fixtures\CircularBaz();
+
+        $foo->bar = $bar;
+        $bar->baz = $baz;
+        $baz->foo = $foo;
+
+
+        $newFoo = $this->autoMapper->map($foo, Fixtures\CircularFoo::class);
+
+        self::assertNotSame($foo, $newFoo);
+        self::assertNotNull($newFoo->bar);
+        self::assertNotSame($bar, $newFoo->bar);
+        self::assertNotNull($newFoo->bar->baz);
+        self::assertNotSame($baz, $newFoo->bar->baz);
+        self::assertNotNull($newFoo->bar->baz->foo);
+        self::assertSame($newFoo, $newFoo->bar->baz->foo);
+    }
+
     public function testCircularReferenceArray(): void
     {
         $nodeA = new Fixtures\Node();
@@ -248,6 +349,28 @@ class AutoMapperTest extends AutoMapperBaseTest
         self::assertSame('10', $userDto->getId());
         self::assertSame('foo', $userDto->getName());
         self::assertSame(3, $userDto->getAge());
+        self::assertTrue($userDto->getConstructor());
+    }
+
+    public function testConstructorNotAllowed(): void
+    {
+        $autoMapper = AutoMapper::create(true, $this->loader, null, 'NotAllowedMapper_');
+        $configuration = $autoMapper->getMetadata(Fixtures\UserDTO::class, Fixtures\UserConstructorDTO::class);
+        $configuration->setConstructorAllowed(false);
+
+        $user = new Fixtures\UserDTO();
+        $user->id = 10;
+        $user->setName('foo');
+        $user->age = 3;
+
+        /** @var Fixtures\UserConstructorDTO $userDto */
+        $userDto = $autoMapper->map($user, Fixtures\UserConstructorDTO::class);
+
+        self::assertInstanceOf(Fixtures\UserConstructorDTO::class, $userDto);
+        self::assertSame('10', $userDto->getId());
+        self::assertSame('foo', $userDto->getName());
+        self::assertSame(3, $userDto->getAge());
+        self::assertFalse($userDto->getConstructor());
     }
 
     public function testConstructorWithDefault(): void

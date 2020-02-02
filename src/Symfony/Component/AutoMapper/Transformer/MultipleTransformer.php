@@ -46,12 +46,9 @@ final class MultipleTransformer implements TransformerInterface
 
     private $transformers = [];
 
-    public function addTransformer(TransformerInterface $transformer, Type $sourceType)
+    public function __construct(array $transformers)
     {
-        $this->transformers[] = [
-            'transformer' => $transformer,
-            'type' => $sourceType,
-        ];
+        $this->transformers = $transformers;
     }
 
     /**

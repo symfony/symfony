@@ -42,10 +42,6 @@ final class NullableTransformerFactory implements TransformerFactoryInterface
         /** @var Type $propertyType */
         $propertyType = $sourcesTypes[0];
 
-        if (null === $propertyType) {
-            var_dump($sourcesTypes);
-        }
-
         if (!$propertyType->isNullable()) {
             return null;
         }

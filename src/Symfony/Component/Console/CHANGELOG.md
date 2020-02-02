@@ -6,6 +6,7 @@ CHANGELOG
 
  * `Command::setHidden()` is final since Symfony 5.1
  * Add `SingleCommandApplication`
+ * Add `ConsoleAnimateOutput` and `AnimateOutputEffect`
 
 5.0.0
 -----

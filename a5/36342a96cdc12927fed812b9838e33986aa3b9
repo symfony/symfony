@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-27T01:00:42Z
+
+Can you please rebase against 3.4 and add a test to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by leevigraham at 2019-10-27T10:32:37Z
+
+@chalasr Yep… I thought I would throw in a quick PR to get some feedback.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-29T09:31:51Z
+
+I am not really sure how this could happen. Could you please add a test that illustrates why this is necessary?
+
+---------------------------------------------------------------------------
+
+by Nek- at 2019-10-29T13:19:13Z
+
+@xabbuh did you see https://github.com/symfony/symfony/issues/34093 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-29T19:44:02Z
+
+I think we need to clarify that the `$default` argument must be one of the choices. I am not sure that returning it as is when the choice does not exist is a good approach, but IMO we should throw an exception instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-29T20:31:32Z
+
+I thought this was about supporting using the choice key instead of the value as default, read too fast.
+I agree with @xabbuh here, the default must be a valid choice. IIRC it's already enforced by the ChoiceQuestion's default validator, let's prevent the notice with a proper exception.
+
+---------------------------------------------------------------------------
+
+by leevigraham at 2019-10-31T03:00:38Z
+
+Thanks for the feedback @xabbuh
+
+> I am not really sure how this could happen. Could you please add a test that illustrates why this is necessary?
+
+I ran into this issue when I was trying to figure out how to confirm option inputs during the interact  function see: https://github.com/symfony/symfony/issues/34093
+
+In the original example the flow should probably be that if the user enters an option skip the question but if I did that when I use the value I would need to throw an `InvalidArgument` Exception in the `execute` method.
+
+> I think we need to clarify that the $default argument must be one of the choices.
+
+That doesn't seem to be enforced in the `QuestionHelper` https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Console/Helper/QuestionHelper.php#L63
+
+> I am not sure that returning it as is when the choice does not exist is a good approach, but IMO we should throw an exception instead.
+
+If the user is prevented an invalid default and quickly presses enter the console shows an Invalid value error and prompts the user to select a valid value.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T09:51:23Z
+
+> I think we need to clarify that the $default argument must be one of the choices.
+
+It looks like nothing requires it in `QuestionHelper`, so I don't see the need for this enforcement.
+Anyway, this would need a test case. @leevigraham can you add one please?
+
+---------------------------------------------------------------------------
+
+by leevigraham at 2019-11-28T22:08:46Z
+
+> It looks like nothing requires it in `QuestionHelper`
+
+Yep that was my thinking. The implementation mirrors the `QuestionHelper`. I'll add test cases today or over the weekend.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-08T17:09:59Z
+
+friendly ping @leevigraham

@@ -79,6 +79,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
         if ('' === $raw) {
             return false;
         }
+
         if (\strlen($raw) > self::MAX_PASSWORD_LENGTH) {
             return false;
         }

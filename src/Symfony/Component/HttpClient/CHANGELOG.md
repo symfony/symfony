@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+* added `NoPrivateNetworkHttpClient` decorator
 * added `LoggerAwareInterface` to `ScopingHttpClient` and `TraceableHttpClient`
 
 4.4.0

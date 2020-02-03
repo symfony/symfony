@@ -72,5 +72,53 @@ class SwitchUserTokenTest extends TestCase
         $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
         $token->setUser($impersonated);
         $this->assertTrue($token->isAuthenticated());
+
+        $impersonator = new class() implements UserInterface {
+            public function getUsername()
+            {
+                return 'impersonator';
+            }
+
+            public function getPassword()
+            {
+                return null;
+            }
+
+            public function eraseCredentials()
+            {
+            }
+
+            public function getRoles()
+            {
+                return ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'];
+            }
+
+            public function getSalt()
+            {
+                return null;
+            }
+        };
+
+        $originalToken = new UsernamePasswordToken($impersonator, 'foo', 'provider-key', ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+
+        $token = new SwitchUserToken($impersonator, 'foo', 'provider-key', ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+        $token->setUser($impersonator);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token = new SwitchUserToken($impersonator, 'foo', 'provider-key', ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+        $token->setUser($impersonator);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token = new SwitchUserToken($impersonator, 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+        $token->setUser($impersonator);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token = new SwitchUserToken($impersonator, 'foo', 'provider-key', ['ROLE_TEST', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+        $token->setUser($impersonator);
+        $this->assertFalse($token->isAuthenticated());
+
+        $token = new SwitchUserToken($impersonator, 'foo', 'provider-key', ['ROLE_USER', 'ROLE_TEST', 'ROLE_PREVIOUS_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $originalToken);
+        $token->setUser($impersonator);
+        $this->assertFalse($token->isAuthenticated());
     }
 }

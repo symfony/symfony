@@ -1,9 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Danil Pyatnitsev
- * Date: 03.02.2020
- * Time: 22:12
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
@@ -40,7 +43,7 @@ class RequestContextPassTest extends TestCase
 
         $this->assertEquals('foo.example.com', $container->getParameter('router.request_context.host'));
         $this->assertEquals('https', $container->getParameter('router.request_context.scheme'));
-        $this->assertEquals(false, $container->hasParameter('router.request_context.base_url'));
+        $this->assertFalse(false, $container->hasParameter('router.request_context.base_url'));
         $this->assertEquals('8080', $container->getParameter('request_listener.https_port'));
     }
 }

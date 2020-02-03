@@ -15,13 +15,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Add support of url property for routing generator
+ * Add support of url property for routing generator.
  *
  * @author Danil Pyatnitsev <danil@pyatnitsev.ru>
  */
 class RequestContextPass implements CompilerPassInterface
 {
-
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasParameter('router.request_context.url')) {

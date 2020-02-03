@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-02-01T11:42:54Z
+
+> @xabbuh this would now work differently than how PHP behaves in 7.4.1+.
+
+Here we trying to solve one special case, when typed property is `unset` in constructor. In that state `__get` method is invoked when the property is accessed.
+
+Only difference with 7.4.0 that this magic method was invoked in uninitialized state also.
+
+This is normal (invoking `__get` for unset properties)  but not clearly documented feature. ProxyManager uses it, and previous bugfix broke this special case.
+
+---------------------------------------------------------------------------
+
+by alekitto at 2020-02-03T10:43:08Z
+
+> Reasonable, isn't it?
+
+Yes, i've corrected the comments.

@@ -41,7 +41,7 @@ class RequestContextPass implements CompilerPassInterface
             $container->setParameter("request_listener.{$name}_port", $urlComponents['port']);
         }
         if (isset($urlComponents['path'])) {
-            $container->setParameter("router.request_context.base_url", $urlComponents['path']);
+            $container->setParameter('router.request_context.base_url', $urlComponents['path']);
         }
     }
 }

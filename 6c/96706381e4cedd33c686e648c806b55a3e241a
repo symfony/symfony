@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T12:16:20Z
+
+Can you give us more details as to why this is needed?
+Looking at the changes, this raises a red flag on my side: that's a clear behavior change, thus has the potential to break existing apps.
+
+---------------------------------------------------------------------------
+
+by sbogx at 2020-01-06T09:09:49Z
+
+It is indeed a behaviour change.
+The issue with the current implementation is that if you have two fields with the same name, and the 2nd one is disabled, it is considered in the logic and it affects the way the first field is getting processed.
+
+Normally if a field is disabled in a form, it is completely ignored and that's what I intended to fix with the changes.
+
+---------------------------------------------------------------------------
+
+by sbogx at 2020-01-06T10:20:30Z
+
+@nicolas-grekas , I created the following mini-repo for demoing the issue https://github.com/sbogx/DomCrawler-disabled

@@ -86,7 +86,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             return $this->mapperRegistry[$className];
         }
 
-        if (!class_exists($className)) {
+        if (!\class_exists($className)) {
             $this->classLoader->loadClass($metadata);
         }
 
@@ -122,9 +122,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
 
         if (\is_object($sourceData)) {
             $source = \get_class($sourceData);
-        }
-
-        if (\is_array($sourceData)) {
+        } elseif (\is_array($sourceData)) {
             $source = 'array';
         }
 
@@ -135,14 +133,10 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
         if (\is_object($targetData)) {
             $target = \get_class($targetData);
             $context[MapperContext::TARGET_TO_POPULATE] = $targetData;
-        }
-
-        if (\is_array($targetData)) {
+        } elseif (\is_array($targetData)) {
             $target = 'array';
             $context[MapperContext::TARGET_TO_POPULATE] = $targetData;
-        }
-
-        if (\is_string($targetData)) {
+        } elseif (\is_string($targetData)) {
             $target = $targetData;
         }
 

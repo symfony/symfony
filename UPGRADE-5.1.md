@@ -40,3 +40,8 @@ Routing
 -------
 
  * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+
+Yaml
+----
+
+ * Deprecated using the `!php/object` and `!php/const` tags without a value.

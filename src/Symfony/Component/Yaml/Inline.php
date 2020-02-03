@@ -590,6 +590,8 @@ class Inline
                     case 0 === strpos($scalar, '!php/object'):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
+                                @trigger_error('Using the !php/object tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
+
                                 return false;
                             }
 
@@ -604,6 +606,8 @@ class Inline
                     case 0 === strpos($scalar, '!php/const'):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
+                                @trigger_error('Using the !php/const tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
+
                                 return '';
                             }
 

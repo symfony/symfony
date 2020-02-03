@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T09:57:56Z
+
+We don't handle dumping null names, that's what you mean? Any suggestions?
+Worth a test case?
+Shouldn't this be merged in 4.4?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-03T16:46:30Z
+
+> We don't handle dumping null names, that's what you mean?
+
+We don't handle a `PrototypedArrayNode` that has no key attribute and that have another `PrototypedArrayNode` as its child.
+
+>  Worth a test case?
+
+I don't think so. A test should be added once we support it.
+
+>  Shouldn't this be merged in 4.4?
+
+No because the `string` arg type on `setName()` was added in 5.0.

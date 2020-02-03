@@ -20,7 +20,6 @@
         "ext-xml": "*",
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "^1.3",
-        "fig/link-util": "^1.0",
         "nikic/php-parser": "^4.0",
         "twig/twig": "^2.10|^3.0",
         "psr/cache": "~1.0",

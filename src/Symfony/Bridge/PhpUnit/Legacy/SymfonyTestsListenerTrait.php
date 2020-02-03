@@ -211,6 +211,10 @@ class SymfonyTestsListenerTrait
                 }
             }
 
+            if (!$test->getTestResultObject()) {
+                return;
+            }
+
             $annotations = Test::parseTestMethodAnnotations(\get_class($test), $test->getName(false));
 
             if (isset($annotations['class']['expectedDeprecation'])) {

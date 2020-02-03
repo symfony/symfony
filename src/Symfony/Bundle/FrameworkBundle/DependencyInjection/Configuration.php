@@ -489,6 +489,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('host')->defaultValue('%router.request_context.host%')->end()
                                 ->scalarNode('scheme')->defaultValue('%router.request_context.scheme%')->end()
                                 ->scalarNode('base_url')->defaultValue('%router.request_context.base_url%')->end()
+                                ->scalarNode('url')->defaultValue('%router.request_context.url%')->end()
                             ->end()
                         ->end()
                     ->end()

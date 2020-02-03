@@ -8,6 +8,7 @@
         <parameter key="router.request_context.host">localhost</parameter>
         <parameter key="router.request_context.scheme">http</parameter>
         <parameter key="router.request_context.base_url"></parameter>
+        <parameter key="router.request_context.url"></parameter>
     </parameters>
 
     <services>

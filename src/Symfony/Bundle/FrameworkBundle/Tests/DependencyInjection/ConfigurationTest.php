@@ -417,6 +417,7 @@ class ConfigurationTest extends TestCase
                     'host' => '%router.request_context.host%',
                     'scheme' => '%router.request_context.scheme%',
                     'base_url' => '%router.request_context.base_url%',
+                    'url' => '%router.request_context.url%'
                 ],
             ],
             'session' => [

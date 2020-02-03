@@ -19,7 +19,8 @@
         "php": "^7.2.5",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.8",
-        "symfony/service-contracts": "^1.1|^2"
+        "symfony/service-contracts": "^1.1|^2",
+        "symfony/string": "^5.1"
     },
     "require-dev": {
         "symfony/config": "^4.4|^5.0",

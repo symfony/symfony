@@ -797,6 +797,25 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals(['AcmeDemoBundle', 'AsseticBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
+    public function testAutocompleteMoveCursorBackwards()
+    {
+        // F<TAB><BACKSPACE><BACKSPACE><BACKSPACE>
+        $inputStream = $this->getInputStream("F\t\177\177\177");
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('Question?', 'F⭐Y');
+        $question->setAutocompleterValues(['F⭐Y']);
+
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
+
+        $stream = $output->getStream();
+        rewind($stream);
+        $this->assertStringEndsWith("\033[1D\033[K\033[2D\033[K\033[1D\033[K", stream_get_contents($stream));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

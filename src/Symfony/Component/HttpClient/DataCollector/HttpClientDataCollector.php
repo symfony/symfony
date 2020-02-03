@@ -114,7 +114,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
             unset($info['filetime'], $info['http_code'], $info['ssl_verify_result'], $info['content_type']);
 
-            if ($trace['method'] === $info['http_method']) {
+            if (($info['http_method'] ?? null) === $trace['method']) {
                 unset($info['http_method']);
             }
 

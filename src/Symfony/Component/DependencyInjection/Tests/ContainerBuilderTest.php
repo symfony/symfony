@@ -1097,7 +1097,7 @@ class ContainerBuilderTest extends TestCase
         $container->set('a', new \stdClass());
     }
 
-    public function testThrowsExceptionWhenAddServiceOnACompiledContainer()
+    public function testNoExceptionWhenAddServiceOnACompiledContainer()
     {
         $container = new ContainerBuilder();
         $container->compile();

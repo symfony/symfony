@@ -50,13 +50,13 @@ class TemplateController
             $response->setMaxAge($maxAge);
         }
 
-        if ($sharedAge) {
+        if (null !== $sharedAge) {
             $response->setSharedMaxAge($sharedAge);
         }
 
         if ($private) {
             $response->setPrivate();
-        } elseif (false === $private || (null === $private && ($maxAge || $sharedAge))) {
+        } elseif (false === $private || (null === $private && (null !== $maxAge || null !== $sharedAge))) {
             $response->setPublic();
         }
 

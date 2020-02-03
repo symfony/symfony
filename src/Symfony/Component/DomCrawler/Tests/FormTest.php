@@ -158,12 +158,12 @@ class FormTest extends TestCase
     public function testMultiValuedFields()
     {
         $form = $this->createForm('<form>
-            <input type="text" name="foo[4]" value="foo" disabled="disabled" />
-            <input type="text" name="foo" value="foo" disabled="disabled" />
-            <input type="text" name="foo[2]" value="foo" disabled="disabled" />
-            <input type="text" name="foo[]" value="foo" disabled="disabled" />
-            <input type="text" name="bar[foo][]" value="foo" disabled="disabled" />
-            <input type="text" name="bar[foo][foobar]" value="foo" disabled="disabled" />
+            <input type="text" name="foo[4]" value="foo" />
+            <input type="text" name="foo" value="foo" />
+            <input type="text" name="foo[2]" value="foo" />
+            <input type="text" name="foo[]" value="foo" />
+            <input type="text" name="bar[foo][]" value="foo" />
+            <input type="text" name="bar[foo][foobar]" value="foo" />
             <input type="submit" />
         </form>
         ');
@@ -226,10 +226,10 @@ class FormTest extends TestCase
                 [],
             ],
             [
-                'takes into account disabled input fields',
+                'skips disabled input fields',
                 '<input type="text" name="foo" value="foo" disabled="disabled" />
                  <input type="submit" />',
-                ['foo' => ['InputFormField', 'foo']],
+                [],
             ],
             [
                 'appends the submitted button value',

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T11:04:25Z
+
+Thank you for this PR.
+
+Here is the code for `ContainerBuilder::set`:
+
+```php
+public function set(string $id, ?object $service)
+{
+    if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
+        // setting a synthetic service on a compiled container is alright
+        throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a compiled container is not allowed.', $id));
+    }
+    // ...
+```
+
+I think there are more things that are not correct here. The exception message is
+
+> Setting service "%s" for an unknown or non-synthetic service definition on a compiled container is not allowed
+
+So currently, If the container is compiled:
+- We can set a new service
+- We can set a defined service if it is synthetic
+- We *cannot* set a defined service if it is non-synthetic
+
+I would like someone to confirm the correct logic.
+
+If the current logic is correct, I believe the exception message should be updated too. IE:
+
+> Service "%s" is defined as non-synthetic and it cannot be updated with a service on a compiled container.
+
+---------------------------------------------------------------------------
+
+by signor-pedro at 2020-01-30T09:18:44Z
+
+I am in favour of updating the exception message:
+
+1. I find your wording a bit more natural
+2. since you can do this:
+```
+$container = new ContainerBuilder();
+$container->compile();
+$container->set('foo', new \stdClass()); // this was set normally
+```
+I find the word "unknown" in the current message confusing - if the definition is unknown, you are simply setting a new service.
+
+By the way, if the definition is known, you are setting the service anyways
+```
+$container = new ContainerBuilder();
+$container->setDefinition('foo', new Definition(\stdClass::class));
+$container->compile();
+$container->set('foo', new MyClass()); // this was set normally
+```

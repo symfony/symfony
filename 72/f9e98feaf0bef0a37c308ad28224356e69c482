@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-28T14:01:52Z
+
+Can you add the same test case on the SodiumPasswordEncoder?
+From your description, I would have expected the patch on SodiumPasswordEncoder btw.
+Note that this should target 4.3.
+Thanks for the PR.
+
+---------------------------------------------------------------------------
+
+by umulmrum at 2020-01-28T14:32:40Z
+
+My description could have been better :-) - without this PR, the call to `sodium_crypto_pwhash_str_verify()` in `NativePasswordEncoder::isPasswordValid()` issues the warning, so the change belongs here. Also added it in `SodiumPasswordEncoder` now - thanks for the pointer.
+
+As for the target branch: The release info on https://symfony.com/releases/4.3 already marks 4.3 as security-fixes-only. As this is not a security fix, I targetted 4.4 - which one is correct?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-28T14:34:57Z
+
+There will be a last 4.3 in a few days.

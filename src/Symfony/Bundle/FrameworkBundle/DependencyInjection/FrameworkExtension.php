@@ -392,8 +392,6 @@ class FrameworkExtension extends Extension
             ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(AbstractController::class)
             ->addTag('controller.service_arguments');
-        $container->registerForAutoconfiguration('Symfony\Bundle\FrameworkBundle\Controller\Controller')
-            ->addTag('controller.service_arguments');
         $container->registerForAutoconfiguration(DataCollectorInterface::class)
             ->addTag('data_collector');
         $container->registerForAutoconfiguration(FormTypeInterface::class)

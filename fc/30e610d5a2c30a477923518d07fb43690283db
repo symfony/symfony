@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by ismail1432 at 2019-08-24T00:42:27Z
+
+I started to work on this feature and I have few questions :
+
+> putting requests in the "Performance" tab would be great (all timings are already in the collected "info")
+
+Does display the total of request in **Performance metrics** section is enough (see picture) or we should also implement details for each request in **Execution timeline** section
+
+![image](https://user-images.githubusercontent.com/13260307/63630118-66062a80-c60f-11e9-9410-571739422987.png)
+
+> add a copy-as-curl button next to each request
+
+I just add a href link, I don't know how to implement a copy as curl button in pure html but the user can still copy the link :-)
+
+![image](https://user-images.githubusercontent.com/13260307/63630181-f93f6000-c60f-11e9-9d01-a1952e893cdd.png)
+
+> response bodies are not collected yet
+
+Body is returned via `toArray` IMO it's more readable and it's display a caret thanks to VarDumper :heart:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-24T19:23:16Z
+
+Now I'm wondering: where are the request options, which contain the request headers? It might be useful to display them too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-24T19:42:59Z
+
+For copy-as-curl, we should be able to borrow from the copy/paste buttons here on the GitHub UI for example.
+Then, it's not only about a link, but about all headers. See copy-as-curl from the browser network panel.
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2019-08-25T14:59:49Z
+
+![image](https://user-images.githubusercontent.com/13260307/63651726-ef247b00-c74f-11e9-9343-dff0d57c113b.png)
+
+Thanks for reaction :+1:
+Now we display request headers (see picture).
+I tried without success to get the Response while downloading :disappointed:
+IMO Response body, headers and info should be displayed into a table too instead of being returned as a dump. This is why I removed the dump at this time.
+
+Few questions :
+Should we display all request options ? (for me Yes)
+We can't implement without pain a copy-as-curl functionality in vanilla JS, can we use third JS library (exemple : https://www.npmjs.com/package/request-to-curl) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-25T17:17:52Z
+
+I personally prefer a compact layout, so that when 10+ requests are made, you don't have to scroll 10+ screens to seem them all. But I'll let others decide what's best as design is not my 1st skill...
+
+---------------------------------------------------------------------------
+
+by stof at 2019-08-26T08:08:44Z
+
+another solution for the case of many requests is to allow collapsing each request (we already have the JS for that)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-07T12:16:45Z
+
+@ismail1432 up to move this one forward? If there are things that you don't have time to finish, please remove them from the PR so we can merge the ready parts.
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2019-10-07T12:39:07Z
+
+Sorry for the delay, I'll remove asap the part that I can't finish.
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2019-10-07T13:43:37Z
+
+done @nicolas-grekas
+I update the description with the content of the `PR`

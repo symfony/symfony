@@ -53,6 +53,13 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         $parameterBag = $container->getParameterBag();
         $controllers = [];
 
+        $publicAliases = [];
+        foreach ($container->getAliases() as $id => $alias) {
+            if ($alias->isPublic()) {
+                $publicAliases[(string) $alias][] = $id;
+            }
+        }
+
         foreach ($container->findTaggedServiceIds($this->controllerTag, true) as $id => $tags) {
             $def = $container->getDefinition($id);
             $def->setPublic(true);
@@ -182,6 +189,10 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 // register the maps as a per-method service-locators
                 if ($args) {
                     $controllers[$id.'::'.$r->name] = ServiceLocatorTagPass::register($container, $args);
+
+                    foreach ($publicAliases[$id] ?? [] as $alias) {
+                        $controllers[$alias.'::'.$r->name] = clone $controllers[$id.'::'.$r->name];
+                    }
                 }
             }
         }

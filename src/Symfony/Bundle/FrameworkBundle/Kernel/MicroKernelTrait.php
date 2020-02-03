@@ -141,7 +141,7 @@ trait MicroKernelTrait
                 AbstractConfigurator::$valuePreProcessor = $valuePreProcessor;
             }
 
-            $container->setAlias(static::class, 'kernel');
+            $container->setAlias(static::class, 'kernel')->setPublic(true);
         });
     }
 

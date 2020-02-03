@@ -50,7 +50,7 @@ class NotificationEmail extends TemplatedEmail
             $missingPackages['twig/inky-extra'] = 'Inky';
         }
 
-        if ([] !== $missingPackages) {
+        if ($missingPackages) {
             throw new \LogicException(sprintf('You cannot use "%s" if the %s Twig extension%s not available; try running "composer require %s".', static::class, implode(' and ', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', implode(' ', array_keys($missingPackages))));
         }
 

@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-4.3.0
+5.1.0
 -----
 
  * Initial release

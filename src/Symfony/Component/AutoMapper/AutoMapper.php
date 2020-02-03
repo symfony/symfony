@@ -86,7 +86,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             return $this->mapperRegistry[$className];
         }
 
-        if (!\class_exists($className)) {
+        if (!class_exists($className)) {
             $this->classLoader->loadClass($metadata);
         }
 

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-17T07:07:10Z
+
+Do we really deprecate it in 3.4 AND 4.3,4.4?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-17T11:19:44Z
+
+@OskarStark We deprecate it on master (5.1). We can't deprecate anything on lower versions. What I meant is that I pushed some code here on master that is already on 3.4 (because 3.4 is not yet fully merged into master). This code is unrelated.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-17T12:38:15Z
+
+> @OskarStark We deprecate it on master (5.1). We can't deprecate anything on lower versions. What I meant is that I pushed some code here on master that is already on 3.4 (because 3.4 is not yet fully merged into master). This code is unrelated.
+
+Thanks for the clarification 👍
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-03T17:18:42Z
+
+This one is now ready for review 😃

@@ -49,7 +49,7 @@ class StreamWrapper
      */
     public static function createResource(ResponseInterface $response, HttpClientInterface $client = null)
     {
-        if (null === $client && \is_callable([$response, 'toStream']) && isset(class_uses($response)[ResponseTrait::class])) {
+        if (\is_callable([$response, 'toStream']) && isset(class_uses($response)[ResponseTrait::class])) {
             $stack = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
             if ($response !== ($stack[1]['object'] ?? null)) {

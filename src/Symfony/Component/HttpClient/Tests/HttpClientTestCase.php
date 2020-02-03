@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
@@ -90,5 +91,41 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('<2>', fread($stream, 8192));
         $this->assertSame('', fread($stream, 8192));
         $this->assertTrue(feof($stream));
+    }
+
+    public function testResponseStreamRewind()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $stream = $response->toStream();
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
+    }
+
+    public function testStreamWrapperStreamRewind()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $stream = StreamWrapper::createResource($response);
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
+    }
+
+    public function testStreamWrapperWithClientStreamRewind()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $stream = StreamWrapper::createResource($response, $client);
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
     }
 }

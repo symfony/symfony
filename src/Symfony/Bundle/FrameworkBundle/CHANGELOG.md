@@ -55,6 +55,7 @@ CHANGELOG
  * Made `framework.session.handler_id` accept a DSN
  * Marked the `RouterDataCollector` class as `@final`.
  * [BC Break] The `framework.messenger.buses.<name>.middleware` config key is not deeply merged anymore.
+ * Moved `MailerAssertionsTrait` in `KernelTestCase`
 
 4.3.0
 -----

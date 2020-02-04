@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2020-01-27T18:51:20Z
+
+An alternative implementation is to use a trigger instead of calling `pg_notify` directly from PHP. The benefit of using a trigger is that the system works even if another app or client insert a line in the Messenger's database. The drawback is that Doctrine DBAL doesn't "support" triggers, and we'll have to execute a custom query after the setup (not a big deal IMHO).
+
+For the record, I first used `LISTEN`/`NOTIFY` as a driver for the HA version of Mercure.rocks. For Mercure, I use a trigger, and it works perfectly well.
+
+Edit: implementation added in 5207f51dc28dc3c78dc49cb1ef37ab0635fb5034

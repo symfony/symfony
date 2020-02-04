@@ -24,7 +24,7 @@ final class Base64ContentEncoder extends Base64Encoder implements ContentEncoder
             throw new \TypeError(sprintf('Method "%s" takes a stream as a first argument.', __METHOD__));
         }
 
-        $filter = stream_filter_append($stream, 'convert.base64-encode', \STREAM_FILTER_READ, [
+        $filter = stream_filter_append($stream, 'convert.base64-encode', STREAM_FILTER_READ, [
             'line-length' => 0 >= $maxLineLength || 76 < $maxLineLength ? 76 : $maxLineLength,
             'line-break-chars' => "\r\n",
         ]);

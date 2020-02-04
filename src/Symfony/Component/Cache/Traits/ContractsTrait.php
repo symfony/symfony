@@ -52,7 +52,7 @@ trait ContractsTrait
     private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null)
     {
         if (0 > $beta = $beta ?? 1.0) {
-            throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta));
+            throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta));
         }
 
         static $setMetadata;

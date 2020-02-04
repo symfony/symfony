@@ -208,7 +208,17 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function handleCircularReference(object $object, string $format = null, array $context = [])
     {
+<<<<<<< HEAD
         $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER];
+=======
+        if (\func_num_args() < 2 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = []" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+        $format = \func_num_args() > 1 ? func_get_arg(1) : null;
+        $context = \func_num_args() > 2 ? func_get_arg(2) : [];
+
+        $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->circularReferenceHandler;
+>>>>>>> 4.4
         if ($circularReferenceHandler) {
             return $circularReferenceHandler($object, $format, $context);
         }

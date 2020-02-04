@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-01-21T15:51:35Z
+
+I'm not convinced we should commit the docker-based setup in the VarDumper component. but if we do, it should be excluded from downloads in our `.gitattributes` file, as this is useless for people using the component.
+
+I have no knowledge at all about rdkafka so I cannot know whether the caster is correct.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-21T16:56:48Z
+
+The docker part is not used in the CI. I don't think it's a good idea to add it here. We don't do that for other component
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2020-01-21T16:58:05Z
+
+This is WIP code, I'll clean my mess and ask for a review once it's ready :)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2020-01-22T13:31:02Z
+
+PR updated, comments addressed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2020-01-22T14:35:49Z
+
+PR updated, comments addressed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2020-02-03T18:26:36Z
+
+PR updated, comments addressed

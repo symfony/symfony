@@ -67,7 +67,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Write parents locale file for the Translation component
         file_put_contents(
             __DIR__.'/../../../Translation/Resources/data/parents.json',
-            json_encode($this->localeParents, \JSON_PRETTY_PRINT).\PHP_EOL
+            json_encode($this->localeParents, JSON_PRETTY_PRINT).PHP_EOL
         );
     }
 

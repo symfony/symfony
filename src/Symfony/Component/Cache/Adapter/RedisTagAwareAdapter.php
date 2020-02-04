@@ -80,7 +80,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
             foreach (\is_array($compression) ? $compression : [$compression] as $c) {
                 if (\Redis::COMPRESSION_NONE !== $c) {
-                    throw new InvalidArgumentException(sprintf('phpredis compression must be disabled when using "%s", use "%s" instead.', \get_class($this), DeflateMarshaller::class));
+                    throw new InvalidArgumentException(sprintf('phpredis compression must be disabled when using "%s", use "%s" instead.', static::class, DeflateMarshaller::class));
                 }
             }
         }

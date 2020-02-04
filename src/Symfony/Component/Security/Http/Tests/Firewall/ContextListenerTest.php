@@ -352,8 +352,9 @@ class ContextListenerTest extends TestCase
             $session->set('_security_session', $original);
         }
 
-        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class([
-            'session' => function () use ($session) { return $session; }
+        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class(['session' => function () use ($session) {
+            return $session;
+        },
         ]) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
@@ -404,8 +405,9 @@ class ContextListenerTest extends TestCase
 
         if (method_exists(Request::class, 'getPreferredFormat')) {
             $usageIndex = $session->getUsageIndex();
-            $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class([
-                'session' => function () use ($session) { return $session; }
+            $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(['session' => function () use ($session) {
+                return $session;
+            },
             ]) implements ContainerInterface {
                 use ServiceLocatorTrait;
             });

@@ -50,15 +50,15 @@ class Range extends Constraint
     {
         if (\is_array($options)) {
             if (isset($options['min']) && isset($options['minPropertyPath'])) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', \get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
             }
 
             if (isset($options['max']) && isset($options['maxPropertyPath'])) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', \get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
             }
 
             if ((isset($options['minPropertyPath']) || isset($options['maxPropertyPath'])) && !class_exists(PropertyAccess::class)) {
-                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', \get_class($this)));
+                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
             }
         }
 

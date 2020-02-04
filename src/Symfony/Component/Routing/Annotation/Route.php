@@ -43,7 +43,7 @@ class Route
     public function __construct(array $data)
     {
         if (isset($data['localized_paths'])) {
-            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', \get_class($this)));
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', static::class));
         }
 
         if (isset($data['value'])) {

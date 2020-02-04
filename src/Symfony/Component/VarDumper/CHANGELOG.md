@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added `RdKafka` support
+
 4.4.0
 -----
 

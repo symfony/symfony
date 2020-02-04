@@ -78,7 +78,7 @@ class MessengerPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: %s).', $serviceId, $tag['bus'], $this->handlerTag, implode(', ', $busIds)));
                 }
 
-                $className = $container->getDefinition($serviceId)->getClass();
+                $className = $this->getServiceClass($container, $serviceId);
                 $r = $container->getReflectionClass($className);
 
                 if (null === $r) {
@@ -240,7 +240,7 @@ class MessengerPass implements CompilerPassInterface
         $receiverMapping = [];
 
         foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
-            $receiverClass = $container->findDefinition($id)->getClass();
+            $receiverClass = $this->getServiceClass($container, $id);
             if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
                 throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
             }
@@ -335,5 +335,20 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition($busId)->replaceArgument(0, new IteratorArgument($middlewareReferences));
+    }
+
+    private function getServiceClass(ContainerBuilder $container, string $serviceId): string
+    {
+        while (true) {
+            $definition = $container->findDefinition($serviceId);
+
+            if (!$definition->getClass() && $definition instanceof ChildDefinition) {
+                $serviceId = $definition->getParent();
+
+                continue;
+            }
+
+            return $definition->getClass();
+        }
     }
 }

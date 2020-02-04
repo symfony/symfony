@@ -1,0 +1,218 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-16T15:16:30Z
+
+Can you please add an entry to `UPGRADE-5.1.md` and `UPGRADE-6.0.md`?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2019-12-16T15:19:05Z
+
+@chalasr  done
+
+---------------------------------------------------------------------------
+
+by nikophil at 2019-12-16T15:51:10Z
+
+indeed, i had to update tests
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-04T12:44:40Z
+
+I don't know where this error comes from in appveyor:
+```
+Uncaught Error: Call to a member function beStrictAboutTestsThatDoNotTestAnything() on null
+```
+i guess because redis is unreachable on app veryor, but, even if i add an assertion in the test, i still get the error
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-25T15:12:29Z
+
+@nikophil The mentioned failure seems to be gone. Can you rebase to see tests green?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-25T15:20:11Z
+
+i've done that sooner this morning, but still see the failure on app veyor + some new errors in travis which are not related to this PR
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-25T15:21:29Z
+
+Ok thanks, I'm looking at it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-01-26T21:18:08Z
+
+IMO the options resolver should indeed be used for this to not reinvent the wheel.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-27T13:59:57Z
+
+ok, i'm gonna do that :+1:
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T07:42:41Z
+
+@Tobion @Nyholm i've started to work on the usage of an option resolver, but it seems that's not the good solution, because we want to only deprecate the use of invalid options (look at [this resolved comment](https://github.com/symfony/symfony/pull/34925#pullrequestreview-332430156)). But `OptionResolver::resovle()` is strict and only throws exception.
+
+I wanted to replace my `validateOptions()` method by something like:
+```php
+        $resolver = new OptionsResolver();
+        self::configureOptions($resolver);
+
+        try {
+            $amqpOptions = $resolver->resolve($options);
+        } catch (OptionResolverInvalidArgumentException $exception) {
+            @trigger_error($exception->getMessage()."\nPassing invalid options is deprecated since Symfony 5.1.", E_USER_DEPRECATED);
+        }
+```
+but this would lead to `$amqpOptions` not to be instantiated.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T08:26:32Z
+
+You should still define deprecated options as valid. Then after you do the option resolver validation, you can check if the deprecated options were used.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T08:31:58Z
+
+The actual problem is not to define some known options as deprecated, but to deprecate the use of any invalid option which we can't know in advance... i think this behavior does not exist in option resolver
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T08:46:23Z
+
+Oh, sorry that is right.. We currently allow all options, and you want do deprecate all but a few named...
+
+Hm... Could we do a hack? (Or do we want to do a hack?)
+Like configure the option resolver after we look at the input.
+
+```
+Valid options: a b c
+Input options: a f
+
+Deprecated: array_diff (input, valid)
+OptionResovler->setDefaults(valid)
+foreach(deprecated as d)
+   OptionResolver->setDeprecated(d)
+```
+
+That would always deprecate options that are not valid, right?
+(I think it will work)
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T08:53:38Z
+
+haha, this seems terribly hacky!
+
+that would definitely work, but because i'll do some `array_diff` on three different places, is it still relevant to use option resolver?
+
+i'll follow your decision ;)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-29T15:01:11Z
+
+Given the current implementation works, I’d not try to « hijack » the option-resolver here.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T16:43:33Z
+
+I agree with Robin.
+Thank you for trying this out for us.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T17:22:03Z
+
+it would have been nice to use the option resolver here. This have to be done in the 6.0 version!
+in.... 2 years :scream:
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T17:24:51Z
+
+Yeah.  =)
+
+Could you rebase the PR?
+
+Most of these files has been moved to Messenger\Bridge
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T17:25:29Z
+
+yep i was doing that right now ;)
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T17:40:50Z
+
+@Nyholm that's OK now,
+i guess we'll have to wait for #35489 to be merged before having these tests green
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-29T18:52:08Z
+
+> You dont need to add this changelog here. The Redis and AMQP have a separate changelog.
+
+Wait! Now that we moved transports to separate packages, do we really care about providing an upgrade path here? I mean, can't we only patch the new transports and make them throw directly in case of unknown options instead of triggering deprecation notices?
+You'll have to change your code in order to use the new packages anyways.
+That would unlock the use of OptionResolver.
+
+Note that this question applies to any change that has BC concerns for 5.1 features on messenger transports, do we want to introduce the new packages with deprecations?
+
+EDIT: Not relevant as per https://github.com/symfony/symfony/pull/34925#issuecomment-579922067.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-29T19:32:22Z
+
+No, sorry.
+There are class aliases so you can keep using the "old classes" until 6.0. Even though you reference old classes you will still be using new code.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-29T19:35:36Z
+
+@Nyholm Right, thank you.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-01-29T20:04:09Z
+
+it seems ok, but i don't know why the deprecation tests fails... where is coming from this weird `%A` char? :thinking:
+
+```
+1) Symfony\Component\Messenger\Bridge\Redis\Tests\Transport\ConnectionTest::testDeprecationIfInvalidOptionIsPassedWithDsn
+
+Failed asserting that string matches format description.
+
+--- Expected
+
++++ Actual
+
+@@ @@
+
+ @expectedDeprecation:
+
+-%A  Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+
++  Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+```
+
+it's on Travis, but i've got that in local as well

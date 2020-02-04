@@ -393,13 +393,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function getContainerClass()
     {
-<<<<<<< HEAD
         $class = \get_class($this);
         $class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class))).str_replace('.', '_', ContainerBuilder::hash($class)) : $class;
-=======
-        $class = static::class;
-        $class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).str_replace('.', '_', ContainerBuilder::hash($class)) : $class;
->>>>>>> 5.0
         $class = str_replace('\\', '_', $class).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
         if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $class)) {
             throw new \InvalidArgumentException(sprintf('The environment "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->environment));

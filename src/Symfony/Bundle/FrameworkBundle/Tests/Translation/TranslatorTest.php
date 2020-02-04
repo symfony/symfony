@@ -147,7 +147,7 @@ class TranslatorTest extends TestCase
 
     public function testLoadResourcesWithoutCaching()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -224,7 +224,7 @@ class TranslatorTest extends TestCase
 
     public function testCatalogResourcesAreAddedForScannedDirectories()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -386,7 +386,7 @@ class TranslatorTest extends TestCase
 
     public function testWarmup()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -411,7 +411,7 @@ class TranslatorTest extends TestCase
 
     public function testLoadingTranslationFilesWithDotsInMessageDomain()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'en' => [
                 __DIR__.'/../Fixtures/Resources/translations/domain.with.dots.en.yml',

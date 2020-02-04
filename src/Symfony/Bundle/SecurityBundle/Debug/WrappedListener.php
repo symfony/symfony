@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Wraps a security listener for calls record.

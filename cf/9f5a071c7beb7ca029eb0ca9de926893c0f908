@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by ajcerezo at 2019-07-04T13:23:52Z
+
+Hi @nicolas-grekas ,
+The integration tests with travis do not work, but I do not understand why it fails, since I have not changed anything in the Mailer component.
+The error it gives is the following:
+
+```
+1) Symfony\Component\Mailer\Tests\TransportTest::testFromDsnMailgun
+TypeError: Argument 4 passed to Symfony\Component\Mailer\Bridge\Mailgun\Smtp\MailgunTransport::__construct() must implement interface Psr\Log\LoggerInterface or be null, instance of Mock_EventDispatcherInterface_fc379422 given, called in /home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/Transport.php on line 104
+/home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/vendor/symfony/mailgun-mailer/Smtp/MailgunTransport.php:25
+/home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/Transport.php:104
+/home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/Transport.php:58
+/home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/Tests/TransportTest.php:105
+```
+And from what I can see in the code as a fourth parameter, it is passing a mock of an LoggerInterface
+
+Could you help me?
+
+Thank you.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-15T04:46:53Z
+
+@ajcerezo are you planing to finish this PR?
+
+---------------------------------------------------------------------------
+
+by ajcerezo at 2019-08-18T23:42:12Z
+
+Hello @OskarStark , I am sorry for the delay in the response at this time, I only have one problem with the integration tests in travis, but it is nothing of the code that I have touched, the exact comment of this problem is just above and I do not know why I fail . If you can help me, I imagine that it has been part of one of the rebase that I had to do to merge with the latest changes in branch 4.4.
+
+The new functionality is finished.
+
+---------------------------------------------------------------------------
+
+by ajcerezo at 2019-08-27T06:39:40Z
+
+Hi @OskarStark,
+I change BC break status in the table of header but the labels of pull request not change.
+
+Thank you
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-27T06:49:03Z
+
+@nicolas-grekas can you please take care of the label and give another review here? Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-25T19:22:23Z
+
+I'd like to get an idea on the number of people in the community using couchbase before merging this PR in core.
+
+---------------------------------------------------------------------------
+
+by ajcerezo at 2019-09-30T10:30:55Z
+
+Ok, thank you.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-11-01T06:09:47Z
+
+> I'd like to get an idea on the number of people in the community using couchbase before merging this PR in core.
+
+I asked via Twitter: https://twitter.com/OskarStark/status/1190148688565415936
+
+---------------------------------------------------------------------------
+
+by Jeroen-Sen at 2019-11-01T10:36:56Z
+
+👍 (We’ll open source our Symfony-Doctrine-Couchebase integration soon.😁)
+
+---------------------------------------------------------------------------
+
+by Mrkisha at 2019-11-01T12:58:26Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by mgroves at 2019-11-01T13:52:45Z
+
+> > I'd like to get an idea on the number of people in the community using couchbase before merging this PR in core.
+>
+> I asked via Twitter: https://twitter.com/OskarStark/status/1190148688565415936
+
+I'm a DA with Couchbase. I think we'll add this PR to our monthly newsletter. In the meantime, is there anything else I can do to get this in front of Couchbase/PHP/symfony users?
+
+Also, feel free to post a message on our PHP forum if you'd like: https://forums.couchbase.com/c/php-sdk
+
+---------------------------------------------------------------------------
+
+by fparis-sp at 2019-11-04T08:24:52Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by Dolgy at 2019-11-04T08:57:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by wcarvalloalandia at 2019-11-04T12:03:04Z
+
+:+1:

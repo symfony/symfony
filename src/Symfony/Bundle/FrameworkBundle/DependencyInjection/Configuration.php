@@ -686,6 +686,16 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()
                         ->end()
+                        ->arrayNode('enabled_locales')
+                            ->prototype('scalar')
+                            ->defaultValue([])
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($config) {
+                                    return array_unique((array) $config);
+                                })
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

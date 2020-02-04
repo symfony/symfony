@@ -16,6 +16,7 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <argument type="collection" /> <!-- enabled locales -->
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>

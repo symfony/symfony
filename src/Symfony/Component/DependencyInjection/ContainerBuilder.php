@@ -474,7 +474,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (\func_num_args() >= 3) {
             $priority = func_get_arg(2);
         } else {
-            if (__CLASS__ !== \get_class($this)) {
+            if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('Method %s() will have a third `int $priority = 0` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', __METHOD__), E_USER_DEPRECATED);

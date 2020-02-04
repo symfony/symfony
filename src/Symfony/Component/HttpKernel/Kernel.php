@@ -236,7 +236,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, \get_class($this)));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, static::class));
         }
 
         if (true === $first) {
@@ -583,7 +583,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $oldContainer = null;
         if ($fresh = $cache->isFresh()) {
             // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
+            $errorLevel = error_reporting(E_ALL ^ E_WARNING);
             $fresh = $oldContainer = false;
             try {
                 if (file_exists($cache->getPath()) && \is_object($this->container = include $cache->getPath())) {
@@ -651,7 +651,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (null === $oldContainer && file_exists($cache->getPath())) {
-            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
+            $errorLevel = error_reporting(E_ALL ^ E_WARNING);
             try {
                 $oldContainer = include $cache->getPath();
             } catch (\Throwable $e) {

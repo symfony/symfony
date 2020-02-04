@@ -201,9 +201,9 @@ class NumberFormatter
      * @see https://php.net/round
      */
     private static $phpRoundingMap = [
-        self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
-        self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
-        self::ROUND_HALFUP => \PHP_ROUND_HALF_UP,
+        self::ROUND_HALFDOWN => PHP_ROUND_HALF_DOWN,
+        self::ROUND_HALFEVEN => PHP_ROUND_HALF_EVEN,
+        self::ROUND_HALFUP => PHP_ROUND_HALF_UP,
     ];
 
     /**
@@ -357,7 +357,7 @@ class NumberFormatter
 
         // The original NumberFormatter does not support this format type
         if (self::TYPE_CURRENCY === $type) {
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, E_USER_WARNING);
 
             return false;
         }
@@ -513,7 +513,7 @@ class NumberFormatter
         $type = (int) $type;
 
         if (self::TYPE_DEFAULT === $type || self::TYPE_CURRENCY === $type) {
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, E_USER_WARNING);
 
             return false;
         }

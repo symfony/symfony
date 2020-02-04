@@ -52,7 +52,7 @@ class LogoutUrlGenerator
         if (\func_num_args() >= 6) {
             $context = func_get_arg(5);
         } else {
-            if (__CLASS__ !== \get_class($this)) {
+            if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('The "%s()" method will have a 6th `string $context = null` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);

@@ -81,7 +81,7 @@ class SemaphoreStore implements StoreInterface
         if (\PHP_VERSION_ID >= 50601) {
             $acquired = @sem_acquire($resource, !$blocking);
         } elseif (!$blocking) {
-            throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', \get_class($this)));
+            throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', static::class));
         } else {
             $acquired = @sem_acquire($resource);
         }

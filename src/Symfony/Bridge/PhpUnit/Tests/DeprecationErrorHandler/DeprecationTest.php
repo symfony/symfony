@@ -11,12 +11,32 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
+use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
+use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV5;
 
 class DeprecationTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        $vendorDir = self::getVendorDir();
+
+        mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true);
+        mkdir($vendorDir.'/myfakevendor/myfakepackage2');
+        touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php');
+        touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php');
+        touch($vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php');
+    }
+
+    private static function getVendorDir(): string
+    {
+        $reflection = new \ReflectionClass(ClassLoader::class);
+
+        return \dirname($reflection->getFileName(), 2);
+    }
+
     public function testItCanDetermineTheClassWhereTheDeprecationHappened()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
@@ -118,12 +138,135 @@ class DeprecationTest extends TestCase
         $this->assertTrue($deprecation->isMuted());
     }
 
+    public function providerGetTypeDetectsSelf(): array
+    {
+        foreach (get_declared_classes() as $class) {
+            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $v = \dirname(\dirname($r->getFileName()));
+                if (file_exists($v.'/composer/installed.json')) {
+                    $loader = require $v.'/autoload.php';
+                    $reflection = new \ReflectionClass($loader);
+                    $prop = $reflection->getProperty('prefixDirsPsr4');
+                    $prop->setAccessible(true);
+                    $currentValue = $prop->getValue($loader);
+                    $currentValue['Symfony\\Bridge\\PhpUnit\\'] = [realpath(__DIR__.'/../..')];
+                    $prop->setValue($loader, $currentValue);
+                }
+            }
+        }
+
+        return [
+            'not_from_vendors_file' => [Deprecation::TYPE_SELF, '', 'MyClass1', ''],
+            'nonexistent_file' => [Deprecation::TYPE_UNDETERMINED, '', 'MyClass1', 'dummy_vendor_path'],
+            'serialized_trace_with_nonexistent_triggering_file' => [
+                Deprecation::TYPE_UNDETERMINED,
+                serialize([
+                    'class' => '',
+                    'method' => '',
+                    'deprecation' => '',
+                    'triggering_file' => 'dummy_vendor_path',
+                    'files_stack' => [],
+                ]),
+                SymfonyTestsListenerForV5::class,
+                '',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerGetTypeDetectsSelf
+     */
+    public function testGetTypeDetectsSelf(string $expectedType, string $message, string $traceClass, string $file): void
+    {
+        $trace = [
+            ['class' => 'MyClass1', 'function' => 'myMethod'],
+            ['class' => $traceClass, 'function' => 'myMethod'],
+        ];
+        $deprecation = new Deprecation($message, $trace, $file);
+        $this->assertEquals($expectedType, $deprecation->getType());
+    }
+
+    public function providerGetTypeUsesRightTrace(): array
+    {
+        $vendorDir = self::getVendorDir();
+
+        return [
+            'no_file_in_stack' => [Deprecation::TYPE_DIRECT, '', [['function' => 'myfunc1'], ['function' => 'myfunc2']]],
+            'files_in_stack_from_various_packages' => [
+                Deprecation::TYPE_INDIRECT,
+                '',
+                [
+                    ['function' => 'myfunc1', 'file' => $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php'],
+                    ['function' => 'myfunc2', 'file' => $vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php'],
+                ],
+            ],
+            'serialized_stack_files_from_same_package' => [
+                Deprecation::TYPE_DIRECT,
+                serialize([
+                    'deprecation' => 'My deprecation message',
+                    'class' => 'MyClass',
+                    'method' => 'myMethod',
+                    'files_stack' => [
+                        $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php',
+                        $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php',
+                    ],
+                ]),
+                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV5::class, 'method' => 'mymethod']],
+            ],
+            'serialized_stack_files_from_various_packages' => [
+                Deprecation::TYPE_INDIRECT,
+                serialize([
+                    'deprecation' => 'My deprecation message',
+                    'class' => 'MyClass',
+                    'method' => 'myMethod',
+                    'files_stack' => [
+                        $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php',
+                        $vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php',
+                    ],
+                ]),
+                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV5::class, 'method' => 'mymethod']],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerGetTypeUsesRightTrace
+     */
+    public function testGetTypeUsesRightTrace(string $expectedType, string $message, array $trace): void
+    {
+        $deprecation = new Deprecation(
+            $message,
+            $trace,
+            self::getVendorDir().'/myfakevendor/myfakepackage2/MyFakeFile.php'
+        );
+        $this->assertEquals($expectedType, $deprecation->getType());
+    }
+
     /**
      * This method is here to simulate the extra level from the piece of code
-     * triggering an error to the error handler
+     * triggering an error to the error handler.
      */
     public function debugBacktrace(): array
     {
         return debug_backtrace();
+    }
+
+    private static function removeDir($dir): void
+    {
+        $files = glob($dir.'/*');
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            } else {
+                self::removeDir($file);
+            }
+        }
+        rmdir($dir);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::removeDir(self::getVendorDir().'/myfakevendor');
     }
 }

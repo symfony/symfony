@@ -314,6 +314,32 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
+    public function testTaggedIteratorWithMultipleIndexAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar'])
+            ->addTag('foo_bar', ['foo' => 'bar_duplicate'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new TaggedIteratorArgument('foo_bar', 'foo'))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame(['bar' => $container->get(BarTagClass::class), 'bar_duplicate' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+    }
+
     public function testTaggedServiceWithDefaultPriorityMethod()
     {
         $container = new ContainerBuilder();
@@ -350,7 +376,7 @@ class IntegrationTest extends TestCase
             ->addTag('foo_bar')
         ;
         $container->register('foo_bar_tagged', FooBarTaggedClass::class)
-            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo')))
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', null, true)))
             ->setPublic(true)
         ;
 
@@ -369,6 +395,40 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
+    public function testTaggedServiceLocatorWithMultipleIndexAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar_tag', BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar'])
+            ->addTag('foo_bar', ['foo' => 'bar_duplicate'])
+        ;
+        $container->register('foo_tag', FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+            ->addTag('foo_bar')
+        ;
+        $container->register('foo_bar_tagged', FooBarTaggedClass::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', null, true)))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get('foo_bar_tagged');
+
+        /** @var ServiceLocator $serviceLocator */
+        $serviceLocator = $s->getParam();
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+
+        $same = [
+            'bar' => $serviceLocator->get('bar'),
+            'bar_duplicate' => $serviceLocator->get('bar_duplicate'),
+            'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
+        ];
+        $this->assertSame(['bar' => $container->get('bar_tag'), 'bar_duplicate' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
+    }
+
     public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
     {
         $container = new ContainerBuilder();
@@ -381,7 +441,7 @@ class IntegrationTest extends TestCase
             ->addTag('foo_bar', ['foo' => 'foo'])
         ;
         $container->register('foo_bar_tagged', FooBarTaggedClass::class)
-            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar')))
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar', true)))
             ->setPublic(true)
         ;
 

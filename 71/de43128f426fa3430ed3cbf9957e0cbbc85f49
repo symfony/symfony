@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by chindit at 2019-05-07T09:16:49Z
+
+I think that's a nice idea, but why naming it `custom_service` and not just `service`  in config ?
+
+---------------------------------------------------------------------------
+
+by Pchol at 2019-05-08T18:22:41Z
+
+> I think that's a nice idea, but why naming it `custom_service` and not just `service` in config ?
+
+thank you, i renamed to `service`, it's more accurate
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2019-05-09T13:16:25Z
+
+We would need this for Contao, too (see #31078), so +1. 😉
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2019-05-09T14:43:13Z
+
+> > I think that's a nice idea, but why naming it `custom_service` and not just `service` in config ?
+>
+> thank you, i renamed to `service`, it's more accurate
+
+I believe that the common name is `id`.

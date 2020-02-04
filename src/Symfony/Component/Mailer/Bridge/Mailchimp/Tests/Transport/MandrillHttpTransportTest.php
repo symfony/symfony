@@ -59,7 +59,7 @@ class MandrillHttpTransportTest extends TestCase
             $body = json_decode($options['body'], true);
             $message = $body['raw_message'];
             $this->assertSame('KEY', $body['key']);
-            $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $body['to'][0]);
+            $this->assertSame('saif.gmati@symfony.com', $body['to'][0]);
             $this->assertSame('Fabien <fabpot@symfony.com>', $body['from_email']);
 
             $this->assertStringContainsString('Subject: Hello!', $message);

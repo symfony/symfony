@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle;
 
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;

@@ -193,7 +193,7 @@ class ByteString extends AbstractString
 
     public function match(string $regexp, int $flags = 0, int $offset = 0): array
     {
-        $match = ((\PREG_PATTERN_ORDER | \PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
+        $match = ((PREG_PATTERN_ORDER | PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
 
         if ($this->ignoreCase) {
             $regexp .= 'i';
@@ -271,7 +271,7 @@ class ByteString extends AbstractString
 
         if (\is_array($to)) {
             if (!\is_callable($to)) {
-                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', \get_class($this)));
+                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', static::class));
             }
 
             $replace = 'preg_replace_callback';

@@ -12,10 +12,10 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;

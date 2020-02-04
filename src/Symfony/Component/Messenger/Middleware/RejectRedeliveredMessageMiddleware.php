@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
-
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;

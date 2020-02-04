@@ -39,11 +39,11 @@ class TransportFactory implements TransportFactoryInterface
 
         // Help the user to select Symfony packages based on protocol.
         $packageSuggestion = '';
-        if (substr($dsn, 0, 7) === 'amqp://') {
+        if ('amqp://' === substr($dsn, 0, 7)) {
             $packageSuggestion = ' Run "composer require symfony/amqp-messenger" to install AMQP transport.';
-        } elseif (substr($dsn, 0, 11) === 'doctrine://') {
+        } elseif ('doctrine://' === substr($dsn, 0, 11)) {
             $packageSuggestion = ' Run "composer require symfony/doctrine-messenger" to install Doctrine transport.';
-        } elseif (substr($dsn, 0, 8) === 'redis://') {
+        } elseif ('redis://' === substr($dsn, 0, 8)) {
             $packageSuggestion = ' Run "composer require symfony/redis-messenger" to install Redis transport.';
         }
 

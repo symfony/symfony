@@ -13,11 +13,11 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineSender;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
-use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineSender;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineSenderTest extends TestCase

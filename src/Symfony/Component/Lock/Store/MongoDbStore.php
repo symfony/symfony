@@ -19,6 +19,7 @@ use MongoDB\Driver\Exception\WriteException;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
@@ -27,7 +28,6 @@ use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\BlockingStoreInterface;
 
 /**
  * MongoDbStore is a StoreInterface implementation using MongoDB as a storage

@@ -201,9 +201,9 @@ abstract class NumberFormatter
      * @see https://php.net/round
      */
     private static $phpRoundingMap = [
-        self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
-        self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
-        self::ROUND_HALFUP => \PHP_ROUND_HALF_UP,
+        self::ROUND_HALFDOWN => PHP_ROUND_HALF_DOWN,
+        self::ROUND_HALFEVEN => PHP_ROUND_HALF_EVEN,
+        self::ROUND_HALFUP => PHP_ROUND_HALF_UP,
     ];
 
     /**
@@ -354,7 +354,7 @@ abstract class NumberFormatter
     {
         // The original NumberFormatter does not support this format type
         if (self::TYPE_CURRENCY === $type) {
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, E_USER_WARNING);
 
             return false;
         }
@@ -508,7 +508,7 @@ abstract class NumberFormatter
     public function parse(string $value, int $type = self::TYPE_DOUBLE, int &$position = 0)
     {
         if (self::TYPE_DEFAULT === $type || self::TYPE_CURRENCY === $type) {
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, E_USER_WARNING);
 
             return false;
         }

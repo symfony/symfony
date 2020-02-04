@@ -109,9 +109,9 @@ abstract class Collator
     public function asort(array &$array, int $sortFlag = self::SORT_REGULAR)
     {
         $intlToPlainFlagMap = [
-            self::SORT_REGULAR => \SORT_REGULAR,
-            self::SORT_NUMERIC => \SORT_NUMERIC,
-            self::SORT_STRING => \SORT_STRING,
+            self::SORT_REGULAR => SORT_REGULAR,
+            self::SORT_NUMERIC => SORT_NUMERIC,
+            self::SORT_STRING => SORT_STRING,
         ];
 
         $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;

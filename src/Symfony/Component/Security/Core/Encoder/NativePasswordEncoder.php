@@ -33,8 +33,8 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, string $algo = null)
     {
         $cost = $cost ?? 13;
-        $opsLimit = $opsLimit ?? max(4, \defined('SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE') ? \SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE : 4);
-        $memLimit = $memLimit ?? max(64 * 1024 * 1024, \defined('SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE') ? \SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE : 64 * 1024 * 1024);
+        $opsLimit = $opsLimit ?? max(4, \defined('SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE') ? SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE : 4);
+        $memLimit = $memLimit ?? max(64 * 1024 * 1024, \defined('SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE') ? SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE : 64 * 1024 * 1024);
 
         if (3 > $opsLimit) {
             throw new \InvalidArgumentException('$opsLimit must be 3 or greater.');
@@ -89,7 +89,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
             return (72 >= \strlen($raw) || 0 !== strpos($encoded, '$2')) && password_verify($raw, $encoded);
         }
 
-        if (\extension_loaded('sodium') && version_compare(\SODIUM_LIBRARY_VERSION, '1.0.14', '>=')) {
+        if (\extension_loaded('sodium') && version_compare(SODIUM_LIBRARY_VERSION, '1.0.14', '>=')) {
             return sodium_crypto_pwhash_str_verify($encoded, $raw);
         }
 

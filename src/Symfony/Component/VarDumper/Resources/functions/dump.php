@@ -38,6 +38,6 @@ if (!function_exists('dd')) {
             VarDumper::dump($v);
         }
 
-        die(1);
+        exit(1);
     }
 }

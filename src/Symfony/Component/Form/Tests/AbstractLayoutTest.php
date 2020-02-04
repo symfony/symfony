@@ -120,7 +120,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderHelp(FormView $view)
     {
-        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', \get_class($this)));
+        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
     }
 
     abstract protected function renderErrors(FormView $view);

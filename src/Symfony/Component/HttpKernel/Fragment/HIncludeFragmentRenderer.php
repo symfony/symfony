@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
-use Twig\Loader\SourceContextLoaderInterface;
 
 /**
  * Implements the Hinclude rendering strategy.

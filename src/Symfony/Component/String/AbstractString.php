@@ -31,15 +31,15 @@ use Symfony\Component\String\Exception\RuntimeException;
  */
 abstract class AbstractString implements \JsonSerializable
 {
-    public const PREG_PATTERN_ORDER = \PREG_PATTERN_ORDER;
-    public const PREG_SET_ORDER = \PREG_SET_ORDER;
-    public const PREG_OFFSET_CAPTURE = \PREG_OFFSET_CAPTURE;
-    public const PREG_UNMATCHED_AS_NULL = \PREG_UNMATCHED_AS_NULL;
+    public const PREG_PATTERN_ORDER = PREG_PATTERN_ORDER;
+    public const PREG_SET_ORDER = PREG_SET_ORDER;
+    public const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
+    public const PREG_UNMATCHED_AS_NULL = PREG_UNMATCHED_AS_NULL;
 
     public const PREG_SPLIT = 0;
-    public const PREG_SPLIT_NO_EMPTY = \PREG_SPLIT_NO_EMPTY;
-    public const PREG_SPLIT_DELIM_CAPTURE = \PREG_SPLIT_DELIM_CAPTURE;
-    public const PREG_SPLIT_OFFSET_CAPTURE = \PREG_SPLIT_OFFSET_CAPTURE;
+    public const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
+    public const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
+    public const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
 
     protected $string = '';
     protected $ignoreCase = false;
@@ -262,7 +262,7 @@ abstract class AbstractString implements \JsonSerializable
     public function endsWith($suffix): bool
     {
         if (!\is_array($suffix) && !$suffix instanceof \Traversable) {
-            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, \get_class($this)));
+            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
         foreach ($suffix as $s) {
@@ -317,7 +317,7 @@ abstract class AbstractString implements \JsonSerializable
     public function equalsTo($string): bool
     {
         if (!\is_array($string) && !$string instanceof \Traversable) {
-            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, \get_class($this)));
+            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
         foreach ($string as $s) {
@@ -351,7 +351,7 @@ abstract class AbstractString implements \JsonSerializable
     public function indexOf($needle, int $offset = 0): ?int
     {
         if (!\is_array($needle) && !$needle instanceof \Traversable) {
-            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, \get_class($this)));
+            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
         $i = \PHP_INT_MAX;
@@ -373,7 +373,7 @@ abstract class AbstractString implements \JsonSerializable
     public function indexOfLast($needle, int $offset = 0): ?int
     {
         if (!\is_array($needle) && !$needle instanceof \Traversable) {
-            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, \get_class($this)));
+            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
         $i = null;
@@ -541,7 +541,7 @@ abstract class AbstractString implements \JsonSerializable
     public function startsWith($prefix): bool
     {
         if (!\is_array($prefix) && !$prefix instanceof \Traversable) {
-            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, \get_class($this)));
+            throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
         foreach ($prefix as $prefix) {

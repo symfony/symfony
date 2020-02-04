@@ -70,6 +70,6 @@ class JsonSerializableNormalizer extends AbstractNormalizer
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 }

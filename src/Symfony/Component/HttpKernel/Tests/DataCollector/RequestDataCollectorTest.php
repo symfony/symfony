@@ -99,7 +99,7 @@ class RequestDataCollectorTest extends TestCase
                 '"Regular" callable',
                 [$this, 'testControllerInspection'],
                 [
-                    'class' => RequestDataCollectorTest::class,
+                    'class' => self::class,
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
                     'line' => $r1->getStartLine(),

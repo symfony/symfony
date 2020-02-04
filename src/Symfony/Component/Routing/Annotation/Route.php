@@ -43,7 +43,7 @@ class Route
     public function __construct(array $data)
     {
         if (isset($data['localized_paths'])) {
-            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', \get_class($this)));
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', static::class));
         }
 
         if (isset($data['value'])) {
@@ -74,7 +74,7 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, \get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, static::class));
             }
             $this->$method($value);
         }

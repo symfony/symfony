@@ -31,8 +31,6 @@ class Exporter
      * @param int               &$objectsCount
      * @param bool              &$valuesAreStatic
      *
-     * @return array
-     *
      * @throws NotInstantiableTypeException When a value cannot be serialized
      */
     public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic): array

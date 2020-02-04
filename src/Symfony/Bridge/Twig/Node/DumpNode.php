@@ -32,9 +32,6 @@ final class DumpNode extends Node
         $this->varPrefix = $varPrefix;
     }
 
-    /**
-     * @return void
-     */
     public function compile(Compiler $compiler): void
     {
         $compiler

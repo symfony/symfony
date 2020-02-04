@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;

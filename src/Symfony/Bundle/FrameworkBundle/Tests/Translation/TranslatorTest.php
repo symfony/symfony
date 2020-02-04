@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends TestCase
@@ -123,7 +124,7 @@ class TranslatorTest extends TestCase
      */
     public function testLoadResourcesWithoutCachingOmittingLocale()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -171,7 +172,7 @@ class TranslatorTest extends TestCase
      */
     public function testWarmupOmittingLocale()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -259,7 +260,7 @@ class TranslatorTest extends TestCase
 
     public function testLoadResourcesWithoutCaching()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -436,7 +437,7 @@ class TranslatorTest extends TestCase
 
     public function testWarmup()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',

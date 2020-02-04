@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-08-07T12:25:15Z
+
+Thanks for the reviews. I have made the suggested changes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-07T12:40:12Z
+
+The test failures on Travis seem to be related to your changes.
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-08-07T13:23:51Z
+
+Thanks. I fixed my code/tests so they are passing again. Travis is now failing for reasons that appear to be unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-07T13:26:37Z
+
+@jdufresne is your current branch up to date with 4.4?
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-08-07T13:38:39Z
+
+The parent commit is d3a7be81b456bd69ffa5bf85b0f8942d85abc0e9 (a few new commits landed minutes ago).
+
+Looks like the 4.4 branch is also failing with the same errors as of today.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-07T14:03:51Z
+
+The test failures have been caused by Twig. The issue should be fixed with https://github.com/twigphp/Twig/commit/debc5c3ca50d0091594bacf8410c866de285cbc0
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-08-08T00:02:55Z
+
+Thanks for the review! I've followed the linked example by dropping the argument and using the shim.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-20T09:50:42Z
+
+I'm divided about this proposal. The `prefix` is needed because this method returns an absolute path to a file, so it's not trivial to prefix only the file name.
+
+But, adding a suffix should always be simple because it's safe to append a string to the value returned by this function. So, I'd probably close this as "won't fix".
+
+However, another option would be to change the current "prefix" option to be a "pattern" option with only one placeholder called `{filename}`, so you can do this:
+
+```php
+// Before
+$fs->tempnam('/tmp', 'prefix_');
+$fs->tempnam('/tmp', 'prefix_', '.png');
+
+// After
+$fs->tempnam('/tmp', 'prefix_{filename}');
+$fs->tempnam('/tmp', 'prefix_{filename}.png');
+```
+
+---------------------------------------------------------------------------
+
+by pierredup at 2019-09-20T10:16:46Z
+
+> The prefix is needed because this method returns an absolute path to a file, so it's not trivial to prefix only the file name.
+
+The prefix is actually a required parameter in the native `tempnam` function which this method uses, so it's not just about the path.
+
+> adding a suffix should always be simple because it's safe to append a string to the value returned by this function
+
+The problem here is that you will then manually need to create the file and remove the original file (as the method creates the file as well and doesn't just return a path).
+
+So going from
+
+```
+$file = $fs->tempnam('/tmp', 'prefix_', '.png');
+```
+
+to this
+
+```
+$file = $fs->tempnam('/tmp', 'prefix_');
+$fs->remove($file); // remove created file
+$file .= '.png';
+$fs->touch($file); // create new file
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-20T10:22:25Z
+
+@pierredup you explained it well. I think I'm now a bit more 👍 about this proposal.
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-09-26T11:40:56Z
+
+I've made the suggested change from @stof and dropped the deprecation warning so that `DebugClassLoader` handles it.
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-09-26T13:32:58Z
+
+Thanks. I understand now. I have applied the suggested patch in the latest revision.
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-09-26T13:39:45Z
+
+fabbot is suggesting that I should remove `$suffix` from the docblock. Is this expected? Should I remove it? Or should I alter it a specific way to appease the bot?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-11-01T06:05:06Z
+
+> Should I remove it? Or should I alter it a specific way to appease the bot?
+
+I would say its a false/positive
+
+---------------------------------------------------------------------------
+
+by jdufresne at 2019-11-03T01:52:45Z
+
+Thanks. At this stage is there anything I should do to move this PR forward?

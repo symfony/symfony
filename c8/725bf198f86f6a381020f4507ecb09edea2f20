@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T11:33:27Z
+
+There is a failure on deps=low
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-08T07:44:13Z
+
+@fabpot In this case, shouldn't the methods at least set the passed $transport? I don't understand how keeping any unused argument can be better for usability. Especially the mandatory $recipient on ChatMessage. Could you explain your intention please? Thank you :)

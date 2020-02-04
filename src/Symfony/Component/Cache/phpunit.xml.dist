@@ -12,6 +12,9 @@
         <ini name="error_reporting" value="-1" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="COUCHBASE_HOST" value="localhost" />
+        <env name="COUCHBASE_USER" value="Administrator" />
+        <env name="COUCHBASE_PASS" value="111111" />
     </php>
 
     <testsuites>

@@ -139,7 +139,7 @@ class NativeSessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if (\PHP_SESSION_ACTIVE === session_status()) {
+        if (PHP_SESSION_ACTIVE === session_status()) {
             throw new \RuntimeException('Failed to start the session: already started by PHP.');
         }
 
@@ -202,7 +202,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function regenerate($destroy = false, $lifetime = null)
     {
         // Cannot regenerate the session ID for non-active sessions.
-        if (\PHP_SESSION_ACTIVE !== session_status()) {
+        if (PHP_SESSION_ACTIVE !== session_status()) {
             return false;
         }
 
@@ -362,7 +362,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
-        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
+        if (headers_sent() || PHP_SESSION_ACTIVE === session_status()) {
             return;
         }
 
@@ -427,7 +427,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
         $this->saveHandler = $saveHandler;
 
-        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
+        if (headers_sent() || PHP_SESSION_ACTIVE === session_status()) {
             return;
         }
 

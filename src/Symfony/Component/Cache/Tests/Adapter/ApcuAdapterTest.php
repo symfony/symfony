@@ -55,7 +55,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testVersion()
     {
-        $namespace = str_replace('\\', '.', \get_class($this));
+        $namespace = str_replace('\\', '.', static::class);
 
         $pool1 = new ApcuAdapter($namespace, 0, 'p1');
 
@@ -80,7 +80,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testNamespace()
     {
-        $namespace = str_replace('\\', '.', \get_class($this));
+        $namespace = str_replace('\\', '.', static::class);
 
         $pool1 = new ApcuAdapter($namespace.'_1', 0, 'p1');
 

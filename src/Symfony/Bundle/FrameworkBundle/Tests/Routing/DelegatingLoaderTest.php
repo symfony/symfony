@@ -32,13 +32,13 @@ class DelegatingLoaderTest extends TestCase
 
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('/', [], [], ['utf8' => false]));
-        $routeCollection->add('bar', new Route('/', [], [], ['foo' => 123]));
+        $routeCollection->add('bar', new Route('/', [], ['_locale' => 'de'], ['foo' => 123]));
 
         $loader->expects($this->once())
             ->method('load')
             ->willReturn($routeCollection);
 
-        $delegatingLoader = new DelegatingLoader($loaderResolver, ['utf8' => true]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver, ['utf8' => true], ['_locale' => 'fr|en']);
 
         $loadedRouteCollection = $delegatingLoader->load('foo');
         $this->assertCount(2, $loadedRouteCollection);
@@ -48,6 +48,7 @@ class DelegatingLoaderTest extends TestCase
             'utf8' => false,
         ];
         $this->assertSame($expected, $routeCollection->get('foo')->getOptions());
+        $this->assertSame(['_locale' => 'fr|en'], $routeCollection->get('foo')->getRequirements());
 
         $expected = [
             'compiler_class' => 'Symfony\Component\Routing\RouteCompiler',
@@ -55,5 +56,6 @@ class DelegatingLoaderTest extends TestCase
             'utf8' => true,
         ];
         $this->assertSame($expected, $routeCollection->get('bar')->getOptions());
+        $this->assertSame(['_locale' => 'de'], $routeCollection->get('bar')->getRequirements());
     }
 }

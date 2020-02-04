@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 /**

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-12-03T06:47:43Z
+
+@javiereguiluz Can you rebase on current master? I'm wondering it we could use this new settings to automatically restrict `_locale` in URLs if no explicit requirement is set? Would that make sense?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-12-03T16:43:18Z
+
+I've rebased and added a test, but please tell me any other test that you think it may be necessary. Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-12-03T16:58:09Z
+
+I tweaked a bit the behavior of this option. It now works as follows:
+
+```yaml
+# config/packages/translation.yaml
+framework:
+    translator:
+        # if you don't define this option or set it to null or [], all
+        # catalogs are generated (same behavior as current versions)
+        enabled_locales: null
+        enabled_locales: []
+
+        # if you define some values in this option, only those catalogs are generated
+        enabled_locales: ['es', 'en']
+```

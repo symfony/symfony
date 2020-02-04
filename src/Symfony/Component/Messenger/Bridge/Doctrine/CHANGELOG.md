@@ -5,3 +5,4 @@ CHANGELOG
 -----
 
  * Introduced the Doctrine bridge.
+ * Added support for PostgreSQL `LISTEN`/`NOTIFY`.

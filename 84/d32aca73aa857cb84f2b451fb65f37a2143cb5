@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-10-14T20:16:55Z
+
+I just renamed test methods that were tied to methods that no longer exists (`isSelf()`, `isIndirect()`). I think we'll have to do without a review from @l-vo …
+
+---------------------------------------------------------------------------
+
+by l-vo at 2019-10-14T20:25:38Z
+
+@greg0ire Excuse me, I'm currently running out of time and I have to get back into the context. But I'm going to look at this as soon as I can 😊
+
+---------------------------------------------------------------------------
+
+by l-vo at 2019-10-20T09:47:44Z
+
+I reviewed and tested the changes, it looks good to me. Although there is a problem, the tests don't pass. The changes on the type "self" determination makes the type "self" difficult to test.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-10-24T17:52:18Z
+
+@l-vo I applied your suggestions, please review again :)
+Note that the patch from fabbot should not be applied as code in this particular component should still be compatible with php 5.5.9

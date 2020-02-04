@@ -1358,6 +1358,21 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
     }
 
+    public function testHttpClientWithQueryParameterKey()
+    {
+        $container = $this->createContainerFromFile('http_client_xml_key');
+
+        $expected = [
+            'key' => 'foo',
+        ];
+        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2)['query']);
+
+        $expected = [
+            'host' => '127.0.0.1',
+        ];
+        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2)['resolve']);
+    }
+
     public function testHttpClientFullDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_full_default_options');

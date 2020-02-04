@@ -12,9 +12,11 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
+use Symfony\Component\Mime\Address;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -45,7 +47,7 @@ class MandrillHttpTransport extends AbstractHttpTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send-raw.json', [
             'json' => [
                 'key' => $this->key,
-                'to' => $this->stringifyAddresses($envelope->getRecipients()),
+                'to' => $this->getRecipients($envelope->getRecipients()),
                 'from_email' => $envelope->getSender()->toString(),
                 'raw_message' => $message->toString(),
             ],
@@ -68,5 +70,15 @@ class MandrillHttpTransport extends AbstractHttpTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getRecipients(Envelope $envelope): array
+    {
+        return array_map(function (Address $recipient): string {
+            return $recipient->getAddress();
+        }, $envelope->getRecipients());
     }
 }

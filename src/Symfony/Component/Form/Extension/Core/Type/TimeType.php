@@ -94,7 +94,17 @@ class TimeType extends AbstractType
             // so we need to handle the cascade setting here
             $emptyData = $builder->getEmptyData() ?: [];
 
-            if (isset($emptyData['hour'])) {
+            if ($emptyData instanceof \Closure) {
+                $lazyEmptyData = static function ($option) use ($emptyData) {
+                    return static function (FormInterface $form) use ($emptyData, $option) {
+                        $emptyData = $emptyData($form->getParent());
+
+                        return isset($emptyData[$option]) ? $emptyData[$option] : '';
+                    };
+                };
+
+                $hourOptions['empty_data'] = $lazyEmptyData('hour');
+            } elseif (isset($emptyData['hour'])) {
                 $hourOptions['empty_data'] = $emptyData['hour'];
             }
 
@@ -161,14 +171,18 @@ class TimeType extends AbstractType
             $builder->add('hour', self::$widgets[$options['widget']], $hourOptions);
 
             if ($options['with_minutes']) {
-                if (isset($emptyData['minute'])) {
+                if ($emptyData instanceof \Closure) {
+                    $minuteOptions['empty_data'] = $lazyEmptyData('minute');
+                } elseif (isset($emptyData['minute'])) {
                     $minuteOptions['empty_data'] = $emptyData['minute'];
                 }
                 $builder->add('minute', self::$widgets[$options['widget']], $minuteOptions);
             }
 
             if ($options['with_seconds']) {
-                if (isset($emptyData['second'])) {
+                if ($emptyData instanceof \Closure) {
+                    $secondOptions['empty_data'] = $lazyEmptyData('second');
+                } elseif (isset($emptyData['second'])) {
                     $secondOptions['empty_data'] = $emptyData['second'];
                 }
                 $builder->add('second', self::$widgets[$options['widget']], $secondOptions);

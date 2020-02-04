@@ -29,6 +29,7 @@ class SodiumPasswordEncoderTest extends TestCase
         $result = $encoder->encodePassword('password', null);
         $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
+        $this->assertFalse($encoder->isPasswordValid($result, '', null));
     }
 
     public function testBCryptValidation()

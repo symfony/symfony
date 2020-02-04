@@ -38,9 +38,9 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
     {
         if (\defined('PASSWORD_ARGON2I')) {
             $this->config = [
-                'memory_cost' => $memoryCost ?? \PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
-                'time_cost' => $timeCost ?? \PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                'threads' => $threads ?? \PASSWORD_ARGON2_DEFAULT_THREADS,
+                'memory_cost' => $memoryCost ?? PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
+                'time_cost' => $timeCost ?? PASSWORD_ARGON2_DEFAULT_TIME_COST,
+                'threads' => $threads ?? PASSWORD_ARGON2_DEFAULT_THREADS,
             ];
         }
     }

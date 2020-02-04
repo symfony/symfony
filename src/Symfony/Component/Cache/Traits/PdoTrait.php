@@ -403,7 +403,7 @@ trait PdoTrait
             } else {
                 switch ($this->driver = $this->conn->getDriver()->getName()) {
                     case 'mysqli':
-                        throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', \get_class($this)));
+                        throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
                     case 'pdo_mysql':
                     case 'drizzle_pdo_mysql':
                         $this->driver = 'mysql';

@@ -61,12 +61,12 @@ class PhpBridgeSessionStorageTest extends TestCase
     {
         $storage = $this->getStorage();
 
-        $this->assertNotSame(\PHP_SESSION_ACTIVE, session_status());
+        $this->assertNotSame(PHP_SESSION_ACTIVE, session_status());
         $this->assertFalse($storage->isStarted());
 
         session_start();
         $this->assertTrue(isset($_SESSION));
-        $this->assertSame(\PHP_SESSION_ACTIVE, session_status());
+        $this->assertSame(PHP_SESSION_ACTIVE, session_status());
         // PHP session might have started, but the storage driver has not, so false is correct here
         $this->assertFalse($storage->isStarted());
 

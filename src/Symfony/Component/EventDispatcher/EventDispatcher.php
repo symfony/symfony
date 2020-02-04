@@ -38,7 +38,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function __construct()
     {
-        if (__CLASS__ === \get_class($this)) {
+        if (__CLASS__ === static::class) {
             $this->optimized = [];
         }
     }

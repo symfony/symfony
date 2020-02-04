@@ -81,7 +81,7 @@ class RedisStore implements StoreInterface
     public function waitAndSave(Key $key)
     {
         @trigger_error(sprintf('%s() is deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__), E_USER_DEPRECATED);
-        throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', \get_class($this)));
+        throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', static::class));
     }
 
     /**

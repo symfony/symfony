@@ -47,7 +47,7 @@ abstract class AbstractComparison extends Constraint
             }
 
             if (isset($options['propertyPath']) && !class_exists(PropertyAccess::class)) {
-                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "propertyPath" option.', \get_class($this)));
+                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "propertyPath" option.', static::class));
             }
         }
 

@@ -35,8 +35,8 @@ class RedisTransportFactoryTest extends TestCase
     {
         $factory = new RedisTransportFactory();
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['foo' => 'bar']), $serializer);
+        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['stream' => 'bar']), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['foo' => 'bar'], $serializer));
+        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['stream' => 'bar'], $serializer));
     }
 }

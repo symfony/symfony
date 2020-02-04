@@ -5,3 +5,4 @@ CHANGELOG
 -----
 
  * Introduced the AMQP bridge.
+ * Deprecated use of invalid options

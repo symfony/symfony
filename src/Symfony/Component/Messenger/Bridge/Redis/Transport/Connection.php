@@ -34,6 +34,7 @@ class Connection
         'auto_setup' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
+        'tls' => false,
     ];
 
     private $connection;
@@ -85,6 +86,8 @@ class Connection
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $redisOptions);
         }
+
+        self::validateOptions($redisOptions);
 
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
@@ -142,6 +145,16 @@ class Connection
         }
 
         return new self($configuration, $connectionCredentials, $redisOptions, $redis);
+    }
+
+    private static function validateOptions(array $options): void
+    {
+        $availableOptions = array_keys(self::DEFAULT_OPTIONS);
+        $availableOptions[] = 'serializer';
+
+        if (0 < \count($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
+            @trigger_error(sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport. Passing invalid options is deprecated since Symfony 5.1.', implode('", "', $invalidOptions)), E_USER_DEPRECATED);
+        }
     }
 
     public function get(): ?array

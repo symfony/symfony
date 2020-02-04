@@ -22,7 +22,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
-
 class ConnectionTest extends TestCase
 {
     public function testGetAMessageWillChangeItsStatus()
@@ -247,12 +246,14 @@ class ConnectionTest extends TestCase
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
         $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
         $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 

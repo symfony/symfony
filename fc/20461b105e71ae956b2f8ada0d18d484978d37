@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-07T12:03:26Z
+
+Can you please have a look at failing tests?
+Please also update the table in the description of your PR, we need them to be filled in to triage things.
+Thanks.
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2019-11-11T15:08:30Z
+
+@nicolas-grekas Do you have an idea why the one travis pipline failes?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-10T12:04:15Z
+
+@CoalaJoe No worries about tests (as the failed one is not related to this PR). Could you add a test about this new feature?
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2020-01-13T12:22:55Z
+
+I am sorry. I do not know where to start nor what to do. Can someone give me a hand?

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-20T11:36:43Z
+
+> It is during container compilation, not a critical path
+
+Actually, it is: the developer experience is directly affected by the compilation time, and making it faster improves the DX. That's why we strive to have the most performant code here also.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-01-27T21:03:23Z
+
+> Actually, it is: the developer experience is directly affected by the compilation time, and making it faster improves the DX. That's why we strive to have the most performant code here also.
+
+The only applicable ways I know to delay computation are:
+1. Proxy the computation in a callable or an object;
+2. Too many if statements to handle the branching;
+
+Simplest way is likely to be an anonymous class.
+It is likely to become a bigger merge nightmare than the previous refactorisation.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-01-31T18:54:17Z
+
+Restarting from nothing; Only the tests are left.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-01-31T19:56:46Z
+
+array_key_last... Should I force symfony/dependency-injection to depend of symfony/polyfill-php73 or implement an internal polyfill?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-31T20:14:44Z
+
+use `end($array); return key($array);`

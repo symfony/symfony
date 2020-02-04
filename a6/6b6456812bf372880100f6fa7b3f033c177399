@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by janvernieuwe at 2019-05-13T07:32:56Z
+
+Updated it, guess my fork got out of sync
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-04T09:35:03Z
+
+instead of a new CallableValidator, which isn't really a validator from the component pov (as it's not a true ValidatorInterface implementation) ... what about `Validation::createCallable($constraints): Closure`
+
+---------------------------------------------------------------------------
+
+by janvernieuwe at 2019-06-07T12:43:34Z
+
+@ro0NL that can work too, it should be pretty easy as something like this in the Validation class:
+
+```php
+    public static function createCallable(Constraint...$constraints): callable
+    {
+        $validator = self::createValidator();
+
+        return static function ($value) use ($constraints, $validator) {
+            $violations = $validator->validate($value, $constraints);
+            if (0 !== $violations->count()) {
+                throw new LogicException((string)$violations);
+            }
+
+            return $value;
+        };
+    }
+```
+
+Don't know if it is desirable to create a new Validator instance for each new callable though, but it shouldn't be too bad.
+
+---------------------------------------------------------------------------
+
+by janvernieuwe at 2019-07-26T08:33:04Z
+
+Failures on travis don't seem to be related to any of my code changes as far as i can see...
+
+---------------------------------------------------------------------------
+
+by janvernieuwe at 2020-01-21T14:15:05Z
+
+@nicolas-grekas what's the status of this one?
+I see lots of activity today :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-21T21:59:20Z
+
+can you please rebase+retarget for master?
+if not no worries, we can do it on merger's side.
+
+---------------------------------------------------------------------------
+
+by janvernieuwe at 2020-01-22T08:20:55Z
+
+I won't immediately have time for retargetting. So if it can be done on the merger's side, that'd be great!

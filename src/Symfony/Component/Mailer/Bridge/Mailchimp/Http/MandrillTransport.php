@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
-use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
+use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

@@ -139,7 +139,7 @@ abstract class AbstractUnicodeString extends AbstractString
                 }
             } elseif (!\function_exists('iconv')) {
                 $s = preg_replace('/[^\x00-\x7F]/u', '?', $s);
-            } elseif (\ICONV_IMPL === 'glibc') {
+            } elseif (ICONV_IMPL === 'glibc') {
                 $s = iconv('UTF-8', 'ASCII//TRANSLIT', $s);
             } else {
                 $s = preg_replace_callback('/[^\x00-\x7F]/u', static function ($c) {
@@ -223,7 +223,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function match(string $regexp, int $flags = 0, int $offset = 0): array
     {
-        $match = ((\PREG_PATTERN_ORDER | \PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
+        $match = ((PREG_PATTERN_ORDER | PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
 
         if ($this->ignoreCase) {
             $regexp .= 'i';
@@ -309,7 +309,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         if (\is_array($to) || $to instanceof \Closure) {
             if (!\is_callable($to)) {
-                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', \get_class($this)));
+                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', static::class));
             }
 
             $replace = 'preg_replace_callback';

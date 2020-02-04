@@ -399,8 +399,9 @@ class ContextListenerTest extends TestCase
 
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
-        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class([
-            'session' => function () use ($session) { return $session; }
+        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(['session' => function () use ($session) {
+            return $session;
+        },
         ]) implements ContainerInterface {
             use ServiceLocatorTrait;
         });

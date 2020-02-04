@@ -34,7 +34,7 @@ final class SmsMessage implements MessageInterface
         $this->phone = $phone;
     }
 
-    public static function fromNotification(Notification $notification, Recipient $recipient, string $transport = null): self
+    public static function fromNotification(Notification $notification, Recipient $recipient): self
     {
         if (!$recipient instanceof SmsRecipientInterface) {
             throw new LogicException(sprintf('To send a SMS message, "%s" should implement "%s" or the recipient should implement "%s".', \get_class($notification), SmsNotificationInterface::class, SmsRecipientInterface::class));

@@ -21,7 +21,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -145,7 +144,7 @@ final class SlackTransportTest extends TestCase
             ->willReturn(json_encode(['ok' => true]));
 
         $notification = new Notification($message);
-        $chatMessage = ChatMessage::fromNotification($notification, new Recipient('test-email@example.com'));
+        $chatMessage = ChatMessage::fromNotification($notification);
         $options = SlackOptions::fromNotification($notification);
 
         $expectedBody = http_build_query([

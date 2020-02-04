@@ -32,7 +32,7 @@ class SmsChannel extends AbstractChannel
         }
 
         if (null === $message) {
-            $message = SmsMessage::fromNotification($notification, $recipient, $transportName);
+            $message = SmsMessage::fromNotification($notification, $recipient);
         }
 
         if (null !== $transportName) {

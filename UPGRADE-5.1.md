@@ -37,6 +37,14 @@ Messenger
  * Deprecated RedisExt transport. It has moved to a separate package. Run `composer require symfony/redis-messenger` to use the new classes.
  * Deprecated use of invalid options in Redis and AMQP connections.
 
+Notifier
+--------
+
+ * [BC BREAK] The `ChatMessage::fromNotification()` method's `$recipient` and `$transport`
+   arguments were removed.
+ * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
+   methods' `$transport` argument was removed.
+
 Routing
 -------
 

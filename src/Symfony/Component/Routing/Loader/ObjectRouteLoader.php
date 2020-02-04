@@ -55,7 +55,7 @@ abstract class ObjectRouteLoader extends Loader
         $loaderObject = $this->getServiceObject($serviceString);
 
         if (!\is_object($loaderObject)) {
-            throw new \LogicException(sprintf('%s:getServiceObject() must return an object: %s returned', \get_class($this), \gettype($loaderObject)));
+            throw new \LogicException(sprintf('%s:getServiceObject() must return an object: %s returned', static::class, \gettype($loaderObject)));
         }
 
         if (!method_exists($loaderObject, $method)) {

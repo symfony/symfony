@@ -105,6 +105,6 @@ class Logger extends AbstractLogger
             $message = strtr($message, $replacements);
         }
 
-        return sprintf('%s [%s] %s', date(\DateTime::RFC3339), $level, $message).\PHP_EOL;
+        return sprintf('%s [%s] %s', date(\DateTime::RFC3339), $level, $message).PHP_EOL;
     }
 }

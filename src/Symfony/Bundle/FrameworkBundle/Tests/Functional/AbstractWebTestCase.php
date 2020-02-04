@@ -68,6 +68,6 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 
     protected static function getVarDir()
     {
-        return 'FB'.substr(strrchr(\get_called_class(), '\\'), 1);
+        return 'FB'.substr(strrchr(static::class, '\\'), 1);
     }
 }

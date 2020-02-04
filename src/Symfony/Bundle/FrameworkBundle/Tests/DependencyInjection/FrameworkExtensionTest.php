@@ -1141,7 +1141,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true)
     {
-        $cacheKey = md5(\get_class($this).$file.serialize($data));
+        $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }

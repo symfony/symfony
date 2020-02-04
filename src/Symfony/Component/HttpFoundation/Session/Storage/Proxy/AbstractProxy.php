@@ -65,7 +65,7 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
-        return \PHP_SESSION_ACTIVE === session_status();
+        return PHP_SESSION_ACTIVE === session_status();
     }
 
     /**

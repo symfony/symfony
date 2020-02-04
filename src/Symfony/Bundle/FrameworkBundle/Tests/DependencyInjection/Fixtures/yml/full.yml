@@ -41,6 +41,7 @@ framework:
         default_path: '%kernel.project_dir%/translations'
         cache_dir: '%kernel.cache_dir%/translations'
         paths: ['%kernel.project_dir%/Fixtures/translations']
+        enabled_locales: [fr, en]
     validation:
         enabled: true
     annotations:

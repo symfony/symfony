@@ -28,6 +28,8 @@
         <framework:assets version="v1" />
         <framework:translator enabled="true" fallback="fr" logging="true" cache-dir="%kernel.cache_dir%/translations">
             <framework:path>%kernel.project_dir%/Fixtures/translations</framework:path>
+            <framework:enabled-locale>fr</framework:enabled-locale>
+            <framework:enabled-locale>en</framework:enabled-locale>
         </framework:translator>
         <framework:validation enabled="true" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />

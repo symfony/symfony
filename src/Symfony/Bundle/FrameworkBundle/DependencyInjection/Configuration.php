@@ -669,6 +669,7 @@ class Configuration implements ConfigurationInterface
                     ->{!class_exists(FullStack::class) && class_exists(Translator::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
+                    ->fixXmlConfig('enabled_locale')
                     ->children()
                         ->arrayNode('fallbacks')
                             ->info('Defaults to the value of "default_locale".')
@@ -689,12 +690,6 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('enabled_locales')
                             ->prototype('scalar')
                             ->defaultValue([])
-                            ->beforeNormalization()
-                                ->always()
-                                ->then(function ($config) {
-                                    return array_unique((array) $config);
-                                })
-                            ->end()
                         ->end()
                     ->end()
                 ->end()

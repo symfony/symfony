@@ -165,24 +165,6 @@ class Deprecation
         return false !== strpos($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
     }
 
-    private function getOriginalFilesStack(): array
-    {
-        if (null === $this->originalFilesStack) {
-            $this->originalFilesStack = [];
-            foreach ($this->trace as $line) {
-                if (\in_array($line['function'], ['require', 'require_once', 'include', 'include_once'], true)) {
-                    continue;
-                }
-                if (!isset($line['file'])) {
-                    continue;
-                }
-                $this->originalFilesStack[] = $line['file'];
-            }
-        }
-
-        return $this->originalFilesStack;
-    }
-
     /**
      * Tells whether both the calling package and the called package are vendor
      * packages.
@@ -222,6 +204,22 @@ class Deprecation
         }
 
         return self::TYPE_DIRECT;
+    }
+
+    private function getOriginalFilesStack(): array
+    {
+        if (null === $this->originalFilesStack) {
+            $this->originalFilesStack = [];
+            foreach ($this->trace as $frame) {
+                if (!isset($frame['file']) || \in_array($frame['function'], ['require', 'require_once', 'include', 'include_once'], true)) {
+                    continue;
+                }
+
+                $this->originalFilesStack[] = $frame['file'];
+            }
+        }
+
+        return $this->originalFilesStack;
     }
 
     /**

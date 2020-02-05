@@ -16,9 +16,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV5;
+use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
 
 class DeprecationTest extends TestCase
 {
+    use SetUpTearDownTrait;
+
     private static $vendorDir;
 
     private static function getVendorDir()
@@ -275,7 +278,7 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         self::removeDir(self::getVendorDir().'/myfakevendor');
     }

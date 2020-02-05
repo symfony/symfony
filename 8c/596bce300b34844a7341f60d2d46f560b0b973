@@ -1,0 +1,220 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-01-30T18:49:04Z
+
+is the `@` operator required to meet the proposed purpose?
+
+>  trigger deprecations in a way that can be silenced on production environment
+by using the zend.assertions ini setting and that can be caught during development to generate reports
+
+i.e. is it worth clarifying the difference when used y/n?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-30T20:52:08Z
+
+In your example it looks like 8.9 is a float but it should be a string.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-30T21:04:21Z
+
+Let’s say I will mute it via zend.assertions, I would also mute my follow code right?
+
+assert(null !== $object);
+
+If yes, this could lead to unexpected behavior...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-30T21:17:29Z
+
+> In your example it looks like 8.9 is a float but it should be a string.
+
+In PHP there is a really nice feature which is called type coercion. It's really nice because we can delegate these kind of details to the engine when they don't matter and let it deal with the concern for us!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-30T21:19:52Z
+
+> Let’s say I will mute it via zend.assertions, I would also mute my follow code right? `assert(null !== $object);` If yes, this could lead to unexpected behavior...
+
+That's totally expected as that exactly what assert has been designed for. The opposite would be the unexpected behavior.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-31T08:55:22Z
+
+> That's totally expected as that exactly what assert has been designed for. The opposite would be the unexpected behavior.
+
+Let me be more clear on this topic, from a DX perspective. You explain, that one can mute this by setting setting X to Y but it is not clear (unless you check the method body itself), that the "muting" is done by deactivating the `assert()` function and not everybody knows (me too until now) that this ini settings exists.
+
+Apart from this I really welcome this PR and I am 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-31T09:40:25Z
+
+@OskarStark I'm not sure I understand what you want me to do, can you please tell me how you think I should update the PR?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-31T10:04:58Z
+
+This reads more natural:
+```diff
+- Deprecated: Since symfony/foo 12.3: lala lala
++ Deprecated since symfony/foo 12.3: lala lala
+```
+
+Shall we do some string manipulation or keep the two `:` in the sentence?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-31T10:10:12Z
+
+There is no "Deprecated" prefix in my proposal because all the time, it's found in the message.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-31T13:40:40Z
+
+> There is no "Deprecated" prefix in my proposal because all the time, it's found in the message.
+
+This is the exact final output, based on:
+https://3v4l.org/CIZch
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-31T13:45:19Z
+
+PR updated, comments addressed.
+
+> is the @ operator required to meet the proposed purpose?
+
+nope, updated, operator moved inside the function.
+
+> This is the exact final output, based on: 3v4l.org/CIZch
+
+I think that doesn't work in real life, with real messages.
+
+> people who log deprecations in production, but don't want to make normal assertions causing crashes in production
+
+Normal assertions can be configured to trigger a warning instead of an exception, and warnings can be turned to logs in prod (by default on Symfony). So I think this PR has a solution for every situations.
+
+---------------------------------------------------------------------------
+
+by beberlei at 2020-01-31T13:54:43Z
+
+@ostrolucky `trigger_error` always returns true in this function, so the assertion is only a mechanism to make the AST assert optimization remove that code completly in production, making it essentially:
+
+```php
+function deprecated($component, $version, $message)
+{
+}
+```
+
+---------------------------------------------------------------------------
+
+by beberlei at 2020-01-31T14:07:17Z
+
+@nicolas-grekas hm now that I think about it, the assert woudl only make the deprecations visible in development, iff you have zend.assertion configured. By default its off, so nobody would see the deprecations anymore unless you plan to enable them in the Kernel when debug=true
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-01-31T14:14:53Z
+
+> assertion is only a mechanism to make the AST assert optimization remove that code completly in production
+
+Yes I know but it's not very related. It's certainly nice that unlike before, deprecation triggers are not executed by default in production at all (although it doesn't seem anybody measured impact compared to normal error handler which ignores notices). My point though was that enabling zend assertions will cause problems in other parts of the codebase, as suddenly codebase might produce lot of warnings/errors - other parts than triggering deprecations. Another thing is enabling it will cause much greater negative performance impact than it is now. These points are especially true for packages which started using `assert` as glorified `/** @var Foo $foo */`, like proposed at https://github.com/doctrine/coding-standard/pull/47
+
+I'm also pretty sure this change will lock out some folks from getting deprecation notices. *At least* during development, people certainly want to convert warnings to exceptions. They *also* want to know about deprecations. However as soon as one of their dependencies have failing assertion, they have no control over that and will have to disable assertions, with which they loose deprecation notices as well.
+
+I'm also missing what are the pros of this solution, as PR description explains what was done only, not *why*.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2020-01-31T14:30:41Z
+
+@ostrolucky quoting Marco from the linked PR:
+
+> Assertions are supposed to:
+> 1. Never fail
+> 2. Be disabled in production
+
+With that in mind, we should ignore the first use-case as we don't want people to enable assertions in productions, period. That is also why this is an advantageous solution: it has no performance impact on production, unlike the previous solution which always hits the error handler.
+
+As for locking folks out, this could be handled in Symfony by checking whether assertions are in production mode and throwing an exception (as they can't be re-enabled). If the setting is `0` (which only skips them from being called) then Symfony can change the ini setting to `1` which enables deprecation warnings.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-01-31T14:52:43Z
+
+>    Assertions are supposed to:
+>
+>        Never fail
+>        Be disabled in production
+
+&
+
+> we don't want people to enable assertions in productions
+
+This is why I am making my point. People *don't want to enable assertions in production*. But now they *will have to* if they want to log deprecations there.
+
+> it has no performance impact on production
+
+If you don't enable assertions then no, but even then it has potentially non negligible performance impact in development, which is already notoriously very slow with Symfony due to container compilations. If there is thousand regular assertions in execution path but from those only single deprecation, enabling assertions for catching this deprecation will cause 1001 extra code/assertions to be executed.
+
+If this micro optimization is important to you, it would be better to just overwrite function with empty one in production, instead of relying on letting assertions to do it implicitly. Perhaps DI container can generate such function. Then we won't have problem with mixed up two different usage concepts of assertions.
+
+> As for locking folks out, this could be handled in Symfony by checking whether assertions are in production mode and throwing an exception (as they can't be re-enabled). If the setting is 0 (which only skips them from being called) then Symfony can change the ini setting to 1 which enables deprecation warnings.
+
+This doesn't solve the problem of dependency causing unrelated assertion failures, hence blocking user/whatever else to enable this ini setting.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T10:11:30Z
+
+~The function definition is now wrapped in a `function_exists('deprecated')` check. That gives one more way to decide for the behavior ppl want. I think this should solve @ostrolucky's concern.~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T10:22:45Z
+
+Actually, we might not need the `function_exists()` check I just added:
+a better alternative would be for projects that want another behavior to "replace" the package and provide their (potentially empty) implementation instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T10:55:19Z
+
+`function_exists()` now replaced by a hint in the docblock.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T11:05:45Z
+
+Check #35550 to see how using this function could look like on Symfony itself.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-05T13:17:11Z
+
+I think that the function name should be a verb, like `trigger_deprecation()` instead of `deprecated()`. That would also be more consistent with built-in PHP functions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-05T13:25:02Z
+
+> I think that the function name should be a verb, like trigger_deprecation() instead of deprecated().
+
+I'm not sold on this one, because the function is explicitly designed to *not* trigger a deprecation in prod. Any verb would kinda lie to the reader.
+In this regard, while this is a function call, this is closer to an annotation to me: it states that this code path is deprecated. What happens when this code path is run is configuration dependent. The caller doesn't need nor want to care. Said another way, that's a declarative statement.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-02-05T13:35:41Z
+
+> it states that this code path is deprecated.
+
+This explanation fits very well 👍

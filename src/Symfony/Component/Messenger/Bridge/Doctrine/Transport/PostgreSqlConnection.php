@@ -15,11 +15,10 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
  * @internal
- * @final
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PostgreSqlConnection extends Connection
+final class PostgreSqlConnection extends Connection
 {
     /**
      * * use_notify: Set to false to disable the use of LISTEN/NOTIFY. Default: true

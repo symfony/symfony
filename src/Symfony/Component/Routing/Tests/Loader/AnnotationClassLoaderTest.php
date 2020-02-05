@@ -144,7 +144,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testMethodActionControllers()
     {
         $routes = $this->loader->load(MethodActionControllers::class);
-        $this->assertCount(2, $routes);
+        $this->assertSame(['put', 'post'], array_keys($routes->all()));
         $this->assertEquals('/the/path', $routes->get('put')->getPath());
         $this->assertEquals('/the/path', $routes->get('post')->getPath());
     }
@@ -178,7 +178,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testUtf8RoutesLoadWithAnnotation()
     {
         $routes = $this->loader->load(Utf8ActionControllers::class);
-        $this->assertCount(2, $routes);
+        $this->assertSame(['one', 'two'], array_keys($routes->all()));
         $this->assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
         $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
     }

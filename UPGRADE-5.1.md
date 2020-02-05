@@ -57,6 +57,7 @@ Routing
 -------
 
  * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+ * Added argument `$priority` to `RouteCollection::add()`
 
 Yaml
 ----

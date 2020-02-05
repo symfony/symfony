@@ -330,4 +330,37 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals('api_bar', $collection->get('api_bar')->getDefault('_canonical_route'));
         $this->assertEquals('api_api_foo', $collection->get('api_api_foo')->getDefault('_canonical_route'));
     }
+
+    public function testAddWithPriority()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'), 0);
+        $collection->add('bar', $bar = new Route('/bar'), 1);
+        $collection->add('baz', $baz = new Route('/baz'));
+
+        $expected = [
+            'bar' => $bar,
+            'foo' => $foo,
+            'baz' => $baz,
+        ];
+
+        $this->assertSame($expected, $collection->all());
+
+        $collection2 = new RouteCollection();
+        $collection2->add('foo2', $foo2 = new Route('/foo'), 0);
+        $collection2->add('bar2', $bar2 = new Route('/bar'), 1);
+        $collection2->add('baz2', $baz2 = new Route('/baz'));
+        $collection2->addCollection($collection);
+
+        $expected = [
+            'bar2' => $bar2,
+            'bar' => $bar,
+            'foo2' => $foo2,
+            'baz2' => $baz2,
+            'foo' => $foo,
+            'baz' => $baz,
+        ];
+
+        $this->assertSame($expected, $collection2->all());
+    }
 }

@@ -17,7 +17,7 @@ class MethodActionControllers
     }
 
     /**
-     * @Route(name="put", methods={"PUT"})
+     * @Route(name="put", methods={"PUT"}, priority=10)
      */
     public function put()
     {

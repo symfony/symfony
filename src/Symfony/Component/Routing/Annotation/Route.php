@@ -34,6 +34,7 @@ class Route
     private $locale;
     private $format;
     private $utf8;
+    private $priority;
 
     /**
      * @param array $data An array of key/value parameters
@@ -178,5 +179,15 @@ class Route
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function setPriority(int $priority): void
+    {
+        $this->priority = $priority;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
     }
 }

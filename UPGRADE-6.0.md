@@ -47,3 +47,4 @@ Routing
 -------
 
  * Removed `RouteCollectionBuilder`.
+ * Added argument `$priority` to `RouteCollection::add()`

@@ -4,7 +4,9 @@ CHANGELOG
 5.1.0
 -----
 
- * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+ * deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+ * added "priority" option to annotated routes
+ * added argument `$priority` to `RouteCollection::add()`
 
 5.0.0
 -----

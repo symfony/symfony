@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-26T11:51:21Z
+
+> We also need to trigger some deprecations if implementations of the FormConfigInterface and FormConfigBuilderInterface do not implement the new methods. And those changes must be documented in the CHANGELOG.md file of the Form component as well as in the UPGRADE-4.4.md and UPGRADE-5.0.md files.
+
+Nice point, let's throw a deprecation in the `Form::isEmpty()` method if the new config method does not exist?
+
+Is the BC break on `CheckboxType` considered empty now for false value ok btw?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-26T12:03:07Z
+
+> Is the BC break on `CheckboxType` considered empty now for false value ok btw?
+
+I was thinking about that as well. Right now I couldn't come up with anything that used to work before and would now break. And our test suite seems to confirm this. But we should try hard to think about potential use cases that could break with this change.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-29T14:03:25Z
+
+I wonder if it might be useful to add a dedicated option to set it up, maybe an `is_empty` option (`callable`). The advantage would be to be able to change this behavior from the outside. Make sense for you?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-29T14:08:01Z
+
+I was actually rather thinking about whether we should mark the new method as internal instead as I am not really sure that this is an extension point we should expose that much. I think usage of this in userland is quite limited and it increases risk by forms not working correctly if not used correctly.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-30T21:16:28Z
+
+> I wonder if it might be useful to add a dedicated option to set it up, maybe an is_empty option (callable). The advantage would be to be able to change this behavior from the outside. Make sense for you?
+
+Using an option would mean that it could not exist (in custom form type not extending `FormType` or in a standalone component usage) so we would still need a default behavior in `Form::isEmpty()` which I'm trying to remove.
+
+> I was actually rather thinking about whether we should mark the new method as internal instead as I am not really sure that this is an extension point we should expose that much. I think usage of this in userland is quite limited and it increases risk by forms not working correctly if not used correctly.
+
+I agree that userland usage is limited. However, I'm against making it internal because it adds a nice customisable behavior if well used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-05T16:32:11Z
+
+Comments discussed with @fancyweb on Slack, we can ignore them, PR is good to go.

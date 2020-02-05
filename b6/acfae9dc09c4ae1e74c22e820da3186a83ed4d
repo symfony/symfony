@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-02-05T07:46:22Z
+
+Locally, I have the following:
+
+```
+PHPUnit 8.3.5 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Bridge/PhpUnit
+..........S....................................................S. 65 / 71 ( 91%)
+...S..                                                            71 / 71 (100%)
+
+Time: 12.45 seconds, Memory: 23.04 MB
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 71, Assertions: 147, Skipped: 3.
+PHP Notice:  Undefined index: remaining selfCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining selfCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+PHP Notice:  Undefined index: remaining directCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining directCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+PHP Notice:  Undefined index: remaining indirectCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining indirectCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+PHP Notice:  Undefined index: remaining selfCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining selfCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+PHP Notice:  Undefined index: remaining directCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining directCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+PHP Notice:  Undefined index: remaining indirectCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+Notice: Undefined index: remaining indirectCount in /home/greg/dev/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler/Configuration.php on line 104
+
+```
+
+not great, but better than the outright failure I get without this commit.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-02-05T07:57:16Z
+
+The remaining failures seem to stem from a permission issue when attempting a call to `mkdir`.

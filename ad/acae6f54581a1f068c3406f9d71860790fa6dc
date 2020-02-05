@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-05T17:31:49Z
+
+Note for mergers: When merging this up to master, the patch should be applied to the `AuthententicatorInterface` as of 4.4.

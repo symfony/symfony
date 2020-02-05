@@ -696,6 +696,20 @@ class ObjectNormalizerTest extends TestCase
             $normalizer->normalize($obj, 'any')
         );
     }
+
+    public function testNormalizeStdClass()
+    {
+        $o1 = new \stdClass();
+        $o1->foo = 'f';
+        $o1->bar = 'b';
+
+        $this->assertSame(['foo' => 'f', 'bar' => 'b'], $this->normalizer->normalize($o1));
+
+        $o2 = new \stdClass();
+        $o2->baz = 'baz';
+
+        $this->assertSame(['baz' => 'baz'], $this->normalizer->normalize($o2));
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

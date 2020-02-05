@@ -262,7 +262,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             array_unshift($attributes, $mapping->getTypeProperty());
         }
 
-        if ($context['cache_key']) {
+        if ($context['cache_key'] && \stdClass::class !== $class) {
             $this->attributesCache[$key] = $attributes;
         }
 

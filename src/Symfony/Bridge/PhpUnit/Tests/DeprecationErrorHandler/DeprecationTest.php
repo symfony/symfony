@@ -19,22 +19,32 @@ use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV5;
 
 class DeprecationTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        $vendorDir = self::getVendorDir();
+    private static $vendorDir;
 
-        mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true);
+    private static function getVendorDir(): string
+    {
+        if (null !== self::$vendorDir) {
+            return self::$vendorDir;
+        }
+
+        foreach (get_declared_classes() as $class) {
+            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $vendorDir = \dirname(\dirname($r->getFileName()));
+                if (file_exists($vendorDir.'/composer/installed.json') && @mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true)) {
+                    break;
+                }
+            }
+        }
+
+        self::$vendorDir = $vendorDir;
         mkdir($vendorDir.'/myfakevendor/myfakepackage2');
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php');
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php');
         touch($vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php');
-    }
 
-    private static function getVendorDir(): string
-    {
-        $reflection = new \ReflectionClass(ClassLoader::class);
 
-        return \dirname($reflection->getFileName(), 2);
+        return self::$vendorDir;
     }
 
     public function testItCanDetermineTheClassWhereTheDeprecationHappened()
@@ -184,7 +194,7 @@ class DeprecationTest extends TestCase
             ['class' => $traceClass, 'function' => 'myMethod'],
         ];
         $deprecation = new Deprecation($message, $trace, $file);
-        $this->assertEquals($expectedType, $deprecation->getType());
+        $this->assertSame($expectedType, $deprecation->getType());
     }
 
     public function providerGetTypeUsesRightTrace(): array
@@ -240,7 +250,7 @@ class DeprecationTest extends TestCase
             $trace,
             self::getVendorDir().'/myfakevendor/myfakepackage2/MyFakeFile.php'
         );
-        $this->assertEquals($expectedType, $deprecation->getType());
+        $this->assertSame($expectedType, $deprecation->getType());
     }
 
     /**

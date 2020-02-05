@@ -97,4 +97,16 @@ class History
 
         return clone $this->stack[$this->position];
     }
+
+    /**
+     * Returns all the requests in history.
+     *
+     * @return Request[]
+     */
+    public function all(): array
+    {
+        return array_map(function (Request $request) {
+            return clone $request;
+        }, $this->stack);
+    }
 }

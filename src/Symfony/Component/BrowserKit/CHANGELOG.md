@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `History::all()` to retrieve requests in history
+
 4.3.0
 -----
 
@@ -14,7 +19,7 @@ CHANGELOG
 4.2.0
 -----
 
- * The method `Client::submit()` will have a new `$serverParameters` argument 
+ * The method `Client::submit()` will have a new `$serverParameters` argument
    in version 5.0, not defining it is deprecated
  * Added ability to read the "samesite" attribute of cookies using `Cookie::getSameSite()`
 

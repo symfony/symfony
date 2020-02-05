@@ -99,4 +99,17 @@ class HistoryTest extends TestCase
 
         $this->assertSame('http://www.example1.com/', $history->current()->getUri(), '->forward() returns the next request in the history');
     }
+
+    public function testAll()
+    {
+        $history = new History();
+        $history->add(new Request('http://www.example.com/', 'get'));
+        $history->add(new Request('http://www.example1.com/', 'get'));
+
+        $requests = $history->all();
+
+        $this->assertCount(2, $requests, '->all() returns the same amount of requests');
+        $this->assertSame('http://www.example.com/', $requests[0]->getUri(), '->all() returns first request');
+        $this->assertSame('http://www.example1.com/', $requests[1]->getUri(), '->all() returns second request');
+    }
 }

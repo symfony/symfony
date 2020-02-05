@@ -157,7 +157,7 @@ class DeprecationTest extends TestCase
         }
 
         return [
-            'not_from_vendors_file' => [Deprecation::TYPE_SELF, '', 'MyClass1', ''],
+            'not_from_vendors_file' => [Deprecation::TYPE_SELF, '', 'MyClass1', __FILE__],
             'nonexistent_file' => [Deprecation::TYPE_UNDETERMINED, '', 'MyClass1', 'dummy_vendor_path'],
             'serialized_trace_with_nonexistent_triggering_file' => [
                 Deprecation::TYPE_UNDETERMINED,

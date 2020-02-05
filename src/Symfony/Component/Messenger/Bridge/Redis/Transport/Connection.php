@@ -35,6 +35,8 @@ class Connection
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
         'tls' => false,
+        'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
+        'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
     ];
 
     private $connection;
@@ -44,6 +46,9 @@ class Connection
     private $consumer;
     private $autoSetup;
     private $maxEntries;
+    private $redeliverTimeout;
+    private $nextClaim = 0;
+    private $claimInterval;
     private $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
@@ -70,6 +75,8 @@ class Connection
         $this->queue = $this->stream.'__queue';
         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
         $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
+        $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
+        $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
@@ -113,6 +120,18 @@ class Connection
             unset($redisOptions['tls']);
         }
 
+        $redeliverTimeout = null;
+        if (\array_key_exists('redeliver_timeout', $redisOptions)) {
+            $redeliverTimeout = filter_var($redisOptions['redeliver_timeout'], FILTER_VALIDATE_INT);
+            unset($redisOptions['redeliver_timeout']);
+        }
+
+        $claimInterval = null;
+        if (\array_key_exists('claim_interval', $redisOptions)) {
+            $claimInterval = filter_var($redisOptions['claim_interval'], FILTER_VALIDATE_INT);
+            unset($redisOptions['claim_interval']);
+        }
+
         $configuration = [
             'stream' => $redisOptions['stream'] ?? null,
             'group' => $redisOptions['group'] ?? null,
@@ -120,6 +139,8 @@ class Connection
             'auto_setup' => $autoSetup,
             'stream_max_entries' => $maxEntries,
             'dbindex' => $dbIndex,
+            'redeliver_timeout' => $redeliverTimeout,
+            'claim_interval' => $claimInterval,
         ];
 
         if (isset($parsedUrl['host'])) {
@@ -157,6 +178,49 @@ class Connection
         }
     }
 
+    private function claimOldPendingMessages()
+    {
+        try {
+            // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
+            // https://github.com/antirez/redis/issues/6256
+            $pendingMessages = $this->connection->xpending($this->stream, $this->group, '-', '+', 1);
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        $claimableIds = [];
+        foreach ($pendingMessages as $pendingMessage) {
+            if ($pendingMessage[1] === $this->consumer) {
+                $this->couldHavePendingMessages = true;
+
+                return;
+            }
+
+            if ($pendingMessage[2] >= $this->redeliverTimeout) {
+                $claimableIds[] = $pendingMessage[0];
+            }
+        }
+
+        if (\count($claimableIds) > 0) {
+            try {
+                $this->connection->xclaim(
+                    $this->stream,
+                    $this->group,
+                    $this->consumer,
+                    $this->redeliverTimeout,
+                    $claimableIds,
+                    ['JUSTID']
+                );
+
+                $this->couldHavePendingMessages = true;
+            } catch (\RedisException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
+            }
+        }
+
+        $this->nextClaim = $this->getCurrentTimeInMilliseconds() + $this->claimInterval;
+    }
+
     public function get(): ?array
     {
         if ($this->autoSetup) {
@@ -189,6 +253,10 @@ class Connection
                     );
                 }
             }
+        }
+
+        if (!$this->couldHavePendingMessages && $this->nextClaim <= $this->getCurrentTimeInMilliseconds()) {
+            $this->claimOldPendingMessages();
         }
 
         $messageId = '>'; // will receive new messages

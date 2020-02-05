@@ -123,7 +123,7 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
-            ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
+            ->willReturn(['queue' => [['message' => '{"body":"Test","headers":[]}']]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $this->assertNotNull($connection->get());
@@ -164,23 +164,67 @@ class ConnectionTest extends TestCase
         $this->assertSame(2, $redis->getDbNum());
     }
 
-    public function testFirstGetPendingMessagesThenNewMessages()
+    public function testGetPendingMessageFirst()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
-        $count = 0;
+        $redis->expects($this->exactly(1))->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '0'], 1, null)
+            ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection->get();
+    }
+
+    public function testClaimAbandonedMessageWithRaceCondition()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(3))->method('xreadgroup')
+            ->withConsecutive(
+                ['symfony', 'consumer', ['queue' => '0'], 1, null], // first call for pending messages
+                ['symfony', 'consumer', ['queue' => '0'], 1, null], // sencond call because of claimed message (redisid-123)
+                ['symfony', 'consumer', ['queue' => '>'], 1, null] // third call because of no result (other consumer claimed message redisid-123)
+            )
+            ->willReturnOnConsecutiveCalls([], [], []);
+
+        $redis->expects($this->once())->method('xpending')->willReturn([[
+            0 => 'redisid-123', // message-id
+            1 => 'consumer-2', // consumer-name
+            2 => 3600001, // idle
+        ]]);
+
+        $redis->expects($this->exactly(1))->method('xclaim')
+            ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
+            ->willReturn([]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection->get();
+    }
+
+    public function testClaimAbandonedMessage()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
         $redis->expects($this->exactly(2))->method('xreadgroup')
-            ->with('symfony', 'consumer', $this->callback(function ($arr_streams) use (&$count) {
-                ++$count;
+            ->withConsecutive(
+                ['symfony', 'consumer', ['queue' => '0'], 1, null], // first call for pending messages
+                ['symfony', 'consumer', ['queue' => '0'], 1, null] // sencond call because of claimed message (redisid-123)
+            )
+            ->willReturnOnConsecutiveCalls(
+                [], // first call returns no result
+                ['queue' => [['message' => '{"body":"1","headers":[]}']]] // second call returns clamed message (redisid-123)
+            );
 
-                if (1 === $count) {
-                    return '0' === $arr_streams['queue'];
-                }
+        $redis->expects($this->once())->method('xpending')->willReturn([[
+            0 => 'redisid-123', // message-id
+            1 => 'consumer-2', // consumer-name
+            2 => 3600001, // idle
+        ]]);
 
-                return '>' === $arr_streams['queue'];
-            }), 1, null)
-            ->willReturn(['queue' => []]);
+        $redis->expects($this->exactly(1))->method('xclaim')
+            ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
+            ->willReturn([]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $connection->get();

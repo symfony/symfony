@@ -70,6 +70,14 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['serialized-name'])) {
                     $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
                 }
+
+                if (isset($attribute['since'])) {
+                    $attributeMetadata->setSince((string) $attribute['since']);
+                }
+
+                if (isset($attribute['until'])) {
+                    $attributeMetadata->setUntil((string) $attribute['until']);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {

@@ -24,3 +24,8 @@
       second: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
   attributes:
     foo: ~
+'Symfony\Component\Serializer\Tests\Fixtures\VersionDummy':
+  attributes:
+    foo:
+      since: '1.0'
+      until: '1.1.9'

@@ -105,4 +105,17 @@ class AnnotationLoaderTest extends TestCase
 
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true), $classMetadata);
     }
+
+    public function testLoadVersion()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\VersioningDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        $this->assertEquals('1.0', $attributesMetadata['foo']->getSince());
+        $this->assertEquals('1.1.2', $attributesMetadata['bar']->getSince());
+        $this->assertEquals('1.1.9', $attributesMetadata['foo']->getUntil());
+        $this->assertEquals('1.3', $attributesMetadata['username']->getUntil());
+    }
 }

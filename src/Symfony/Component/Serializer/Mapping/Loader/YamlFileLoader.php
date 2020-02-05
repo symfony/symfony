@@ -93,6 +93,14 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
                 }
+
+                if (isset($data['since'])) {
+                    $attributeMetadata->setSince((string) $data['since']);
+                }
+
+                if (isset($data['until'])) {
+                    $attributeMetadata->setUntil((string) $data['until']);
+                }
             }
         }
 

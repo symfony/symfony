@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for scalar values denormalization
+ * added support for `\stdClass` to `ObjectNormalizer`
 
 5.0.0
 -----

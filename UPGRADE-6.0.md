@@ -16,6 +16,12 @@ EventDispatcher
 
  * Removed `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
 
+Form
+----
+
+ * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
+ * Added the `setIsEmptyCallback()` method to the `FormConfigBuilderInterface`.
+
 FrameworkBundle
 ---------------
 

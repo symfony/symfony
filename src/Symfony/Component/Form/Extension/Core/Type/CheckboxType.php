@@ -60,6 +60,9 @@ class CheckboxType extends AbstractType
             'empty_data' => $emptyData,
             'compound' => false,
             'false_values' => [null],
+            'is_empty_callback' => static function ($modelData): bool {
+                return false === $modelData;
+            },
         ]);
 
         $resolver->setAllowedTypes('false_values', 'array');

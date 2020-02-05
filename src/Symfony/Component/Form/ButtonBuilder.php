@@ -468,6 +468,16 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @throws BadMethodCallException
+     */
+    public function setIsEmptyCallback(?callable $isEmptyCallback)
+    {
+        throw new BadMethodCallException('Buttons do not support "is empty" callback.');
+    }
+
+    /**
+     * Unsupported method.
      */
     public function getEventDispatcher()
     {
@@ -736,6 +746,16 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getOption(string $name, $default = null)
     {
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @throws BadMethodCallException
+     */
+    public function getIsEmptyCallback(): ?callable
+    {
+        throw new BadMethodCallException('Buttons do not support "is empty" callback.');
     }
 
     /**

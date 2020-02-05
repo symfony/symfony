@@ -16,6 +16,14 @@ EventDispatcher
 
  * Deprecated `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
 
+Form
+----
+
+ * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
+   is deprecated. The method will be added to the interface in 6.0.
+ * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
+   is deprecated. The method will be added to the interface in 6.0.
+
 FrameworkBundle
 ---------------
 

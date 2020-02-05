@@ -107,7 +107,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * Called when authentication executed, but failed (e.g. wrong username password).
      *
      * This should return the Response sent back to the user, like a
-     * RedirectResponse to the login page or a 403 response.
+     * RedirectResponse to the login page or a 401 response.
      *
      * If you return null, the request will continue, but the user will
      * not be authenticated. This is probably not what you want to do.

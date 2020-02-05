@@ -21,7 +21,7 @@ class DeprecationTest extends TestCase
 {
     private static $vendorDir;
 
-    private static function getVendorDir(): string
+    private static function getVendorDir()
     {
         if (null !== self::$vendorDir) {
             return self::$vendorDir;
@@ -148,7 +148,7 @@ class DeprecationTest extends TestCase
         $this->assertTrue($deprecation->isMuted());
     }
 
-    public function providerGetTypeDetectsSelf(): array
+    public function providerGetTypeDetectsSelf()
     {
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
@@ -187,7 +187,7 @@ class DeprecationTest extends TestCase
     /**
      * @dataProvider providerGetTypeDetectsSelf
      */
-    public function testGetTypeDetectsSelf(string $expectedType, string $message, string $traceClass, string $file): void
+    public function testGetTypeDetectsSelf(string $expectedType, string $message, string $traceClass, string $file)
     {
         $trace = [
             ['class' => 'MyClass1', 'function' => 'myMethod'],
@@ -197,7 +197,7 @@ class DeprecationTest extends TestCase
         $this->assertSame($expectedType, $deprecation->getType());
     }
 
-    public function providerGetTypeUsesRightTrace(): array
+    public function providerGetTypeUsesRightTrace()
     {
         $vendorDir = self::getVendorDir();
 
@@ -243,7 +243,7 @@ class DeprecationTest extends TestCase
     /**
      * @dataProvider providerGetTypeUsesRightTrace
      */
-    public function testGetTypeUsesRightTrace(string $expectedType, string $message, array $trace): void
+    public function testGetTypeUsesRightTrace(string $expectedType, string $message, array $trace)
     {
         $deprecation = new Deprecation(
             $message,
@@ -257,12 +257,12 @@ class DeprecationTest extends TestCase
      * This method is here to simulate the extra level from the piece of code
      * triggering an error to the error handler.
      */
-    public function debugBacktrace(): array
+    public function debugBacktrace()
     {
         return debug_backtrace();
     }
 
-    private static function removeDir($dir): void
+    private static function removeDir($dir)
     {
         $files = glob($dir.'/*');
         foreach ($files as $file) {
@@ -275,7 +275,7 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
-    public static function tearDownAfterClass(): void
+    public static function tearDownAfterClass()
     {
         self::removeDir(self::getVendorDir().'/myfakevendor');
     }

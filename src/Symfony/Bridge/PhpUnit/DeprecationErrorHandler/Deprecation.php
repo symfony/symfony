@@ -206,7 +206,7 @@ class Deprecation
         return self::TYPE_DIRECT;
     }
 
-    private function getOriginalFilesStack(): array
+    private function getOriginalFilesStack()
     {
         if (null === $this->originalFilesStack) {
             $this->originalFilesStack = [];

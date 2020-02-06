@@ -17,8 +17,6 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental in 5.0
  */
 class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 {

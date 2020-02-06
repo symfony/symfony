@@ -22,8 +22,6 @@ use Symfony\Component\String\Exception\RuntimeException;
  * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
- *
- * @experimental in 5.0
  */
 class ByteString extends AbstractString
 {

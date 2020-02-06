@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-10-04T15:11:03Z
+
+something else we may want to consider, and what we did for DI configurators as well, is to make it truly fluid;
+
+```php
+$optionsResolver
+    ->define('foo')
+        ->required()
+    ->define('bar')
+        ->required()
+;
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-07T18:27:23Z
+
+@lmillucci thanks for your work and for solving all comments.
+
+After the discussion we had about this https://github.com/symfony/symfony/pull/33848#discussion_r331474213 where I suggest you to remove the annotation `@return $this`, I think we should add it again now, because it should help make it clear that it is a fluent interface by saying that each method will return the same instance of the class `$this`, except for the `define()` method that will return a new instance.
+
+I'm sorry about that, and I hope you're okay.
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2019-10-07T19:03:06Z
+
+@yceruto no problem, I've easily restored `@return $this` annotation for all methods except `define()`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-09T13:54:11Z
+
+@stof could you please review this PR again and have your vote on this ? thanks!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-15T22:10:31Z
+
+ping @symfony/mergers ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-21T15:54:23Z
+
+Ready for final reviews (the fabbot.io failure is a false positive)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-11-04T19:00:50Z
+
+I'd like to merge this one for 4.4, wdyt?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-18T13:52:59Z
+
+@lmillucci do you like to finish this proposal?
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2020-01-20T18:26:10Z
+
+> @lmillucci do you like to finish this proposal?
+
+@yceruto  Yes, what exception should be thrown when defining an already defined option? Something like `OptionDefinitionException` should be ok?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-20T18:36:35Z
+
+@lmillucci yes, `OptionDefinitionException` would be ok.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-21T15:11:39Z
+
+@lmillucci almost done :) you just need to rebase on `master` branch to make it ready for Symfony 5.1
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-21T20:04:55Z
+
+there is a commit that don't belongs to this PR https://github.com/symfony/symfony/pull/33848/commits/f825642a648227248abbc27a50fe5328403ecf17 (the first one) could you please, fix it? thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-27T15:52:30Z
+
+The component's CHANGELOG file should mention this change.

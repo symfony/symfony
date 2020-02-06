@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -536,6 +537,10 @@ class XmlFileLoader extends FileLoader
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="binary" is not a valid base64 encoded string.', $name));
                     }
                     $arguments[$key] = $value;
+                    break;
+                case 'abstract':
+                    $serviceId = $node->getAttribute('id');
+                    $arguments[$key] = new AbstractArgument($serviceId, (string) $key, $arg->nodeValue);
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

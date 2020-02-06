@@ -22,6 +22,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -41,6 +42,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -540,6 +542,18 @@ class ContainerBuilderTest extends TestCase
         $builder->register('bar', 'BarClass');
         $builder->register('foo', 'Bar\FooClass')->addArgument(['foo' => new Expression('service("bar").foo ~ parameter("bar")')]);
         $this->assertEquals('foobar', $builder->get('foo')->arguments['foo']);
+    }
+
+    public function testCreateServiceWithAbstractArgument()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract (should be defined by Pass), did you forget to define it?');
+
+        $builder = new ContainerBuilder();
+        $builder->register('foo', FooWithAbstractArgument::class)
+            ->addArgument(new AbstractArgument('foo', '$baz', 'should be defined by Pass'));
+
+        $builder->get('foo');
     }
 
     public function testResolveServices()

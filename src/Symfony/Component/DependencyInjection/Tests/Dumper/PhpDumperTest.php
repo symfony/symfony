@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -33,6 +34,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
@@ -1362,6 +1364,24 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
         $this->assertInstanceOf(\stdClass::class, $container->get('deprecated1'));
         $this->assertInstanceOf(\stdClass::class, $container->get('deprecated2'));
+    }
+
+    public function testDumpServiceWithAbstractArgument()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract (should be defined by Pass), did you forget to define it?');
+
+        $container = new ContainerBuilder();
+
+        $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
+            ->setArgument('$baz', new AbstractArgument(FooWithAbstractArgument::class, '$baz', 'should be defined by Pass'))
+            ->setArgument('$bar', 'test')
+            ->setPublic(true);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
     }
 }
 

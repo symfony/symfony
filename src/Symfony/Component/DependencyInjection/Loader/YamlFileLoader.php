@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -446,7 +447,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['arguments'])) {
-            $definition->setArguments($this->resolveServices($service['arguments'], $file));
+            $definition->setArguments($this->resolveServices($service['arguments'], $file, false, $id));
         }
 
         if (isset($service['properties'])) {
@@ -722,7 +723,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array|string|Reference|ArgumentInterface
      */
-    private function resolveServices($value, string $file, bool $isParameter = false)
+    private function resolveServices($value, string $file, bool $isParameter = false, string $serviceId = '', string $argKey = '')
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -795,13 +796,16 @@ class YamlFileLoader extends FileLoader
 
                 return new Reference($id);
             }
+            if ('abstract' === $value->getTag()) {
+                return new AbstractArgument($serviceId, $argKey, $value->getValue());
+            }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));
         }
 
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$k] = $this->resolveServices($v, $file, $isParameter);
+                $value[$k] = $this->resolveServices($v, $file, $isParameter, $serviceId, $k);
             }
         } elseif (\is_string($value) && 0 === strpos($value, '@=')) {
             if (!class_exists(Expression::class)) {

@@ -20,6 +20,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -1215,6 +1216,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $this->getParameter((string) $value);
         } elseif ($value instanceof Expression) {
             $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this]);
+        } elseif ($value instanceof AbstractArgument) {
+            throw new RuntimeException(sprintf('Argument "%s" of service "%s" is abstract%s, did you forget to define it?', $value->getArgumentKey(), $value->getServiceId(), $value->getText() ? ' ('.$value->getText().')' : ''));
         }
 
         return $value;

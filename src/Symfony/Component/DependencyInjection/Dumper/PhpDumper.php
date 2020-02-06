@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Composer\Autoload\ClassLoader;
 use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -1739,6 +1740,8 @@ EOF;
 
                 return $code;
             }
+        } elseif ($value instanceof AbstractArgument) {
+            throw new RuntimeException(sprintf('Argument "%s" of service "%s" is abstract%s, did you forget to define it?', $value->getArgumentKey(), $value->getServiceId(), $value->getText() ? ' ('.$value->getText().')' : ''));
         } elseif (\is_object($value) || \is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }

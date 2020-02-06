@@ -15,7 +15,6 @@ use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Framework\Warning;
 
 /**
  * Collects and replays skipped tests.
@@ -30,7 +29,7 @@ class SymfonyTestsListenerForV7 implements TestListener
 
     private $trait;
 
-    public function __construct(array $mockedNamespaces = array())
+    public function __construct(array $mockedNamespaces = [])
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }

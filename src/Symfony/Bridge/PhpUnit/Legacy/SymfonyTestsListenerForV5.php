@@ -22,7 +22,7 @@ class SymfonyTestsListenerForV5 extends \PHPUnit_Framework_BaseTestListener
 {
     private $trait;
 
-    public function __construct(array $mockedNamespaces = array())
+    public function __construct(array $mockedNamespaces = [])
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }

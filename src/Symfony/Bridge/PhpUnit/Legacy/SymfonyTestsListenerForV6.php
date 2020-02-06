@@ -14,7 +14,6 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Framework\Warning;
 
 /**
  * Collects and replays skipped tests.
@@ -27,7 +26,7 @@ class SymfonyTestsListenerForV6 extends BaseTestListener
 {
     private $trait;
 
-    public function __construct(array $mockedNamespaces = array())
+    public function __construct(array $mockedNamespaces = [])
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }

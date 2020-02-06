@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
-use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
@@ -45,7 +44,6 @@ class DeprecationTest extends TestCase
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php');
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php');
         touch($vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php');
-
 
         return self::$vendorDir;
     }
@@ -106,12 +104,12 @@ class DeprecationTest extends TestCase
         yield 'not from phpunit, and not a whitelisted message' => [
             false,
             \My\Source\Code::class,
-            'Self deprecating humor is deprecated by itself'
+            'Self deprecating humor is deprecated by itself',
         ];
         yield 'from phpunit, but not a whitelisted message' => [
             false,
             \PHPUnit\Random\Piece\Of\Code::class,
-            'Self deprecating humor is deprecated by itself'
+            'Self deprecating humor is deprecated by itself',
         ];
         yield 'whitelisted message, but not from phpunit' => [
             false,
@@ -146,7 +144,7 @@ class DeprecationTest extends TestCase
                 ['file' => 'should_not_matter.php'],
                 ['file' => 'should_not_matter_either.php'],
             ],
-            'random_path' . \DIRECTORY_SEPARATOR . 'vendor' . \DIRECTORY_SEPARATOR . 'phpunit' . \DIRECTORY_SEPARATOR . 'whatever.php'
+            'random_path'.\DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR.'whatever.php'
         );
         $this->assertTrue($deprecation->isMuted());
     }

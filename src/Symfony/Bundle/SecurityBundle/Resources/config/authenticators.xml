@@ -4,17 +4,28 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="security.firewall.guard.locator"
+        <service id="security.authenticator_handler"
+                 class="Symfony\Component\Security\Http\Authentication\AuthenticatorHandler"
+        >
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="event_dispatcher" on-invalid="null" />
+            <argument /> <!-- stateless firewall keys -->
+            <call method="setSessionAuthenticationStrategy">
+                <argument type="service" id="security.authentication.session_strategy" />
+            </call>
+        </service>
+
+        <service id="security.firewall.authenticator.locator"
                  class="Symfony\Component\DependencyInjection\ServiceLocator"
                  abstract="true" />
 
-        <service id="security.firewall.guard"
-                 class="Symfony\Bundle\SecurityBundle\EventListener\LazyGuardManagerListener"
+        <service id="security.firewall.authenticator"
+                 class="Symfony\Bundle\SecurityBundle\EventListener\LazyAuthenticatorManagerListener"
                  abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.authentication.manager" />
-            <argument type="service" id="security.authentication.guard_handler" />
-            <argument/> <!-- guard authenticator locator -->
+            <argument type="service" id="security.authenticator_handler" />
+            <argument/> <!-- authenticator locator -->
             <argument/> <!-- provider key -->
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="logger" on-invalid="null" />
@@ -48,7 +59,7 @@
         <!-- Authenticators -->
 
         <service id="security.authenticator.http_basic"
-                 class="Symfony\Component\Security\Http\Authentication\Authenticator\HttpBasicAuthenticator"
+                 class="Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator"
                  abstract="true">
             <argument type="abstract">realm name</argument>
             <argument type="abstract">user provider</argument>
@@ -57,7 +68,7 @@
         </service>
 
         <service id="security.authenticator.form_login"
-                 class="Symfony\Component\Security\Http\Authentication\Authenticator\FormLoginAuthenticator"
+                 class="Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator"
                  abstract="true">
             <argument type="service" id="security.http_utils" />
             <argument /> <!-- csrf token generator -->
@@ -66,7 +77,7 @@
         </service>
 
         <service id="security.authenticator.anonymous"
-                 class="Symfony\Component\Security\Http\Authentication\Authenticator\AnonymousAuthenticator"
+                 class="Symfony\Component\Security\Http\Authenticator\AnonymousAuthenticator"
                  abstract="true">
             <argument type="abstract">secret</argument>
             <argument type="service" id="security.token_storage" />

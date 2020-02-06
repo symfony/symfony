@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface, EntryPointFactoryInterface
+class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
     public function __construct()
     {
@@ -97,7 +97,7 @@ class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface,
         return $entryPointId;
     }
 
-    public function createGuard(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.form_login.'.$id;
         $defaultOptions = array_merge($this->defaultSuccessHandlerOptions, $this->options);

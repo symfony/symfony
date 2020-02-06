@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Guard\Token;
 
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken as CorePreAuthenticationGuardToken;
-
 /**
  * The token used by the guard auth system before authentication.
  *
@@ -22,6 +20,10 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardT
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-class PreAuthenticationGuardToken extends CorePreAuthenticationGuardToken implements GuardTokenInterface
+class PreAuthenticationToken extends \Symfony\Component\Security\Http\Authenticator\Token\CorePreAuthenticationGuardToken implements GuardTokenInterface
 {
+    public function getGuardKey()
+    {
+        return $this->getAuthenticatorKey();
+    }
 }

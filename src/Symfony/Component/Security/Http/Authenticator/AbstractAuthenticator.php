@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Authentication\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 /**
  * An optional base class that creates the necessary tokens for you.
@@ -25,13 +25,13 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 abstract class AbstractAuthenticator implements AuthenticatorInterface
 {
     /**
-     * Shortcut to create a PostAuthenticationGuardToken for you, if you don't really
+     * Shortcut to create a PostAuthenticationToken for you, if you don't really
      * care about which authenticated token you're using.
      *
-     * @return PostAuthenticationGuardToken
+     * @return PostAuthenticationToken
      */
     public function createAuthenticatedToken(UserInterface $user, string $providerKey): TokenInterface
     {
-        return new PostAuthenticationGuardToken($user, $providerKey, $user->getRoles());
+        return new PostAuthenticationToken($user, $providerKey, $user->getRoles());
     }
 }

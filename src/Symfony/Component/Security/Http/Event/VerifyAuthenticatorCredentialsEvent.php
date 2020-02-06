@@ -4,7 +4,7 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**

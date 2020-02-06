@@ -16,32 +16,32 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Http\Firewall\GuardManagerListener;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorHandler;
+use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @experimental in 5.1
  */
-class LazyGuardManagerListener extends GuardManagerListener
+class LazyAuthenticatorManagerListener extends AuthenticatorManagerListener
 {
     private $guardLocator;
 
     public function __construct(
         AuthenticationManagerInterface $authenticationManager,
-        GuardAuthenticatorHandler $guardHandler,
+        AuthenticatorHandler $authenticatorHandler,
         ServiceLocator $guardLocator,
         string $providerKey,
         EventDispatcherInterface $eventDispatcher,
         ?LoggerInterface $logger = null
     ) {
-        parent::__construct($authenticationManager, $guardHandler, [], $providerKey, $eventDispatcher, $logger);
+        parent::__construct($authenticationManager, $authenticatorHandler, [], $providerKey, $eventDispatcher, $logger);
 
         $this->guardLocator = $guardLocator;
     }
 
-    protected function getSupportingGuardAuthenticators(Request $request): array
+    protected function getSupportingAuthenticators(Request $request): array
     {
         $guardAuthenticators = [];
         foreach ($this->guardLocator->getProvidedServices() as $key => $type) {

@@ -13,15 +13,13 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
-use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorHandler;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Token\PreAuthenticationToken;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
@@ -32,25 +30,25 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  *
  * @experimental in 5.1
  */
-class GuardManagerListener
+class AuthenticatorManagerListener
 {
-    use GuardManagerListenerTrait;
+    use AuthenticatorManagerListenerTrait;
 
     private $authenticationManager;
-    private $guardHandler;
-    private $guardAuthenticators;
+    private $authenticatorHandler;
+    private $authenticators;
     protected $providerKey;
     private $eventDispatcher;
     protected $logger;
 
     /**
-     * @param AuthenticatorInterface[] $guardAuthenticators
+     * @param AuthenticatorInterface[] $authenticators
      */
-    public function __construct(AuthenticationManagerInterface $authenticationManager, GuardAuthenticatorHandler $guardHandler, iterable $guardAuthenticators, string $providerKey, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null)
+    public function __construct(AuthenticationManagerInterface $authenticationManager, AuthenticatorHandler $authenticatorHandler, iterable $authenticators, string $providerKey, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null)
     {
         $this->authenticationManager = $authenticationManager;
-        $this->guardHandler = $guardHandler;
-        $this->guardAuthenticators = $guardAuthenticators;
+        $this->authenticatorHandler = $authenticatorHandler;
+        $this->authenticators = $authenticators;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
@@ -59,12 +57,12 @@ class GuardManagerListener
     public function __invoke(RequestEvent $requestEvent)
     {
         $request = $requestEvent->getRequest();
-        $guardAuthenticators = $this->getSupportingGuardAuthenticators($request);
-        if (!$guardAuthenticators) {
+        $authenticators = $this->getSupportingAuthenticators($request);
+        if (!$authenticators) {
             return;
         }
 
-        $this->executeAuthenticators($guardAuthenticators, $requestEvent);
+        $this->executeAuthenticators($authenticators, $requestEvent);
     }
 
     /**
@@ -72,12 +70,12 @@ class GuardManagerListener
      */
     protected function executeAuthenticators(array $authenticators, RequestEvent $event): void
     {
-        foreach ($authenticators as $key => $guardAuthenticator) {
-            $this->executeAuthenticator($key, $guardAuthenticator, $event);
+        foreach ($authenticators as $key => $authenticator) {
+            $this->executeAuthenticator($key, $authenticator, $event);
 
             if ($event->hasResponse()) {
                 if (null !== $this->logger) {
-                    $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', ['authenticator' => \get_class($guardAuthenticator)]);
+                    $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', ['authenticator' => \get_class($authenticator)]);
                 }
 
                 break;
@@ -101,7 +99,7 @@ class GuardManagerListener
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = $this->createPreAuthenticatedToken($credentials, $uniqueAuthenticatorKey, $this->providerKey);
+            $token = new PreAuthenticationToken($credentials, $uniqueAuthenticatorKey, $uniqueAuthenticatorKey);
 
             if (null !== $this->logger) {
                 $this->logger->debug('Passing token information to the AuthenticatorManager', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
@@ -115,7 +113,7 @@ class GuardManagerListener
             }
 
             // sets the token on the token storage, etc
-            $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey);
+            $this->authenticatorHandler->authenticateWithToken($token, $request, $this->providerKey);
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
 
@@ -123,7 +121,7 @@ class GuardManagerListener
                 $this->logger->info('Authenticator failed.', ['exception' => $e, 'authenticator' => \get_class($authenticator)]);
             }
 
-            $response = $this->guardHandler->handleAuthenticationFailure($e, $request, $authenticator, $this->providerKey);
+            $response = $this->authenticatorHandler->handleAuthenticationFailure($e, $request, $authenticator, $this->providerKey);
 
             if ($response instanceof Response) {
                 $event->setResponse($response);
@@ -135,7 +133,7 @@ class GuardManagerListener
         }
 
         // success!
-        $response = $this->guardHandler->handleAuthenticationSuccess($token, $request, $authenticator, $this->providerKey);
+        $response = $this->authenticatorHandler->handleAuthenticationSuccess($token, $request, $authenticator, $this->providerKey);
         if ($response instanceof Response) {
             if (null !== $this->logger) {
                 $this->logger->debug('Authenticator set success response.', ['response' => $response, 'authenticator' => \get_class($authenticator)]);
@@ -149,10 +147,5 @@ class GuardManagerListener
         }
 
         $this->eventDispatcher->dispatch(new LoginSuccessEvent($authenticator, $token, $request, $response, $this->providerKey));
-    }
-
-    protected function createPreAuthenticatedToken($credentials, string $uniqueAuthenticatorKey, string $providerKey): PreAuthenticationGuardToken
-    {
-        return new PreAuthenticationGuardToken($credentials, $uniqueAuthenticatorKey, $providerKey);
     }
 }

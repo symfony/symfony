@@ -5,9 +5,9 @@ namespace Symfony\Component\Security\Http\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
-use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Http\Authentication\Authenticator\CustomAuthenticatedInterface;
-use Symfony\Component\Security\Http\Authentication\Authenticator\TokenAuthenticatedInterface;
+use Symfony\Component\Security\Http\Authenticator\CustomAuthenticatedInterface;
+use Symfony\Component\Security\Http\Authenticator\PasswordAuthenticatedInterface;
+use Symfony\Component\Security\Http\Authenticator\TokenAuthenticatedInterface;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 
 /**

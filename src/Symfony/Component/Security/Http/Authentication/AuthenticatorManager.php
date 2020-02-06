@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Token\PreAuthenticationToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
@@ -33,20 +33,20 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @experimental in 5.1
  */
-class GuardAuthenticationManager implements AuthenticationManagerInterface
+class AuthenticatorManager implements AuthenticationManagerInterface
 {
-    use GuardAuthenticationManagerTrait;
+    use AuthenticatorManagerTrait;
 
-    private $guardAuthenticators;
+    private $authenticators;
     private $eventDispatcher;
     private $eraseCredentials;
 
     /**
-     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param AuthenticatorInterface[] $authenticators The authenticators, with keys that match what's passed to AuthenticatorManagerListener
      */
-    public function __construct(iterable $guardAuthenticators, EventDispatcherInterface $eventDispatcher, bool $eraseCredentials = true)
+    public function __construct(iterable $authenticators, EventDispatcherInterface $eventDispatcher, bool $eraseCredentials = true)
     {
-        $this->guardAuthenticators = $guardAuthenticators;
+        $this->authenticators = $authenticators;
         $this->eventDispatcher = $eventDispatcher;
         $this->eraseCredentials = $eraseCredentials;
     }
@@ -58,10 +58,10 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
 
     public function authenticate(TokenInterface $token)
     {
-        if (!$token instanceof PreAuthenticationGuardToken) {
+        if (!$token instanceof PreAuthenticationToken) {
             /*
-             * The listener *only* passes PreAuthenticationGuardToken instances.
-             * This means that an authenticated token (e.g. PostAuthenticationGuardToken)
+             * The listener *only* passes PreAuthenticationToken instances.
+             * This means that an authenticated token (e.g. PostAuthenticationToken)
              * is being passed here, which happens if that token becomes
              * "not authenticated" (e.g. happens if the user changes between
              * requests). In this case, the user should be logged out.
@@ -77,13 +77,13 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
             throw new AuthenticationExpiredException();
         }
 
-        $guard = $this->findOriginatingAuthenticator($token);
-        if (null === $guard) {
-            $this->handleFailure(new ProviderNotFoundException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators.', $token->getGuardProviderKey())), $token);
+        $authenticator = $this->findOriginatingAuthenticator($token);
+        if (null === $authenticator) {
+            $this->handleFailure(new ProviderNotFoundException(sprintf('Token with provider key "%s" did not originate from any of the authenticators.', $token->getAuthenticatorKey())), $token);
         }
 
         try {
-            $result = $this->authenticateViaGuard($guard, $token, $token->getProviderKey());
+            $result = $this->authenticateViaAuthenticator($authenticator, $token, $token->getProviderKey());
         } catch (AuthenticationException $exception) {
             $this->handleFailure($exception, $token);
         }
@@ -101,14 +101,14 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
         return $result;
     }
 
-    protected function getGuardKey(string $key): string
+    protected function getAuthenticatorKey(string $key): string
     {
-        // Guard authenticators in the GuardAuthenticationManager are already indexed
+        // Authenticators in the AuthenticatorManager are already indexed
         // by an unique key
         return $key;
     }
 
-    private function authenticateViaGuard(AuthenticatorInterface $authenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
+    private function authenticateViaAuthenticator(AuthenticatorInterface $authenticator, PreAuthenticationToken $token, string $providerKey): TokenInterface
     {
         // get the user from the Authenticator
         $user = $authenticator->getUser($token->getCredentials());

@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A utility class that does much of the *work* during the guard authentication process.
+ * A utility class that does much of the *work* during the authentication process.
  *
  * By having the logic here instead of the listener, more of the process
  * can be called directly (e.g. for manual authentication) or overridden.
@@ -34,7 +34,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @internal
  */
-class GuardAuthenticatorHandler
+class AuthenticatorHandler
 {
     private $tokenStorage;
     private $dispatcher;
@@ -66,24 +66,24 @@ class GuardAuthenticatorHandler
     }
 
     /**
-     * Returns the "on success" response for the given GuardAuthenticator.
+     * Returns the "on success" response for the given Authenticator.
      *
-     * @param AuthenticatorInterface|GuardAuthenticatorInterface $guardAuthenticator
+     * @param AuthenticatorInterface|GuardAuthenticatorInterface $authenticator
      */
-    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, $guardAuthenticator, string $providerKey): ?Response
+    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, $authenticator, string $providerKey): ?Response
     {
-        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof GuardAuthenticatorInterface) {
-            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        if (!$authenticator instanceof AuthenticatorInterface && !$authenticator instanceof GuardAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
         }
 
-        $response = $guardAuthenticator->onAuthenticationSuccess($request, $token, $providerKey);
+        $response = $authenticator->onAuthenticationSuccess($request, $token, $providerKey);
 
         // check that it's a Response or null
         if ($response instanceof Response || null === $response) {
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationSuccess()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), get_debug_type($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationSuccess()" method must return null or a Response object. You returned "%s".', \get_class($authenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
     }
 
     /**
@@ -95,7 +95,7 @@ class GuardAuthenticatorHandler
     public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, $authenticator, string $providerKey): ?Response
     {
         if (!$authenticator instanceof AuthenticatorInterface && !$authenticator instanceof GuardAuthenticatorInterface) {
-            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+            throw new \UnexpectedValueException('Invalid authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
         }
 
         // create an authenticated token for the User
@@ -111,21 +111,21 @@ class GuardAuthenticatorHandler
      * Handles an authentication failure and returns the Response for the
      * GuardAuthenticator.
      *
-     * @param AuthenticatorInterface|GuardAuthenticatorInterface $guardAuthenticator
+     * @param AuthenticatorInterface|GuardAuthenticatorInterface $authenticator
      */
-    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, $guardAuthenticator, string $providerKey): ?Response
+    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, $authenticator, string $providerKey): ?Response
     {
-        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof GuardAuthenticatorInterface) {
-            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        if (!$authenticator instanceof AuthenticatorInterface && !$authenticator instanceof GuardAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
         }
 
-        $response = $guardAuthenticator->onAuthenticationFailure($request, $authenticationException);
+        $response = $authenticator->onAuthenticationFailure($request, $authenticationException);
         if ($response instanceof Response || null === $response) {
             // returning null is ok, it means they want the request to continue
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationFailure()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), get_debug_type($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationFailure()" method must return null or a Response object. You returned "%s".', \get_class($authenticator), get_debug_type($response)));
     }
 
     /**

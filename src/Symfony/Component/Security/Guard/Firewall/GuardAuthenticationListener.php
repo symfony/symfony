@@ -16,14 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken as GuardPreAuthenticationGuardToken;
+use Symfony\Component\Security\Guard\GuardHandler;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationToken as GuardPreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
-use Symfony\Component\Security\Http\Firewall\GuardManagerListenerTrait;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
@@ -36,12 +34,12 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class GuardAuthenticationListener extends AbstractListener
 {
-    use GuardManagerListenerTrait;
+    use AuthenticatorManagerListenerTrait;
 
     private $guardHandler;
     private $authenticationManager;
     private $providerKey;
-    private $guardAuthenticators;
+    private $authenticators;
     private $logger;
     private $rememberMeServices;
 
@@ -49,7 +47,7 @@ class GuardAuthenticationListener extends AbstractListener
      * @param string                            $providerKey         The provider (i.e. firewall) key
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -58,7 +56,7 @@ class GuardAuthenticationListener extends AbstractListener
         $this->guardHandler = $guardHandler;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
-        $this->guardAuthenticators = $guardAuthenticators;
+        $this->authenticators = $guardAuthenticators;
         $this->logger = $logger;
     }
 
@@ -70,14 +68,14 @@ class GuardAuthenticationListener extends AbstractListener
         if (null !== $this->logger) {
             $context = ['firewall_key' => $this->providerKey];
 
-            if ($this->guardAuthenticators instanceof \Countable || \is_array($this->guardAuthenticators)) {
-                $context['authenticators'] = \count($this->guardAuthenticators);
+            if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
+                $context['authenticators'] = \count($this->authenticators);
             }
 
             $this->logger->debug('Checking for guard authentication credentials.', $context);
         }
 
-        $guardAuthenticators = $this->getSupportingGuardAuthenticators($request);
+        $guardAuthenticators = $this->getSupportingAuthenticators($request);
         if (!$guardAuthenticators) {
             return false;
         }
@@ -143,7 +141,7 @@ class GuardAuthenticationListener extends AbstractListener
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = $this->createPreAuthenticatedToken($credentials, $uniqueGuardKey, $this->providerKey);
+            $token = new GuardPreAuthenticationGuardToken($credentials, $uniqueGuardKey, $this->providerKey);
 
             if (null !== $this->logger) {
                 $this->logger->debug('Passing guard token information to the GuardAuthenticationProvider', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
@@ -219,10 +217,5 @@ class GuardAuthenticationListener extends AbstractListener
         }
 
         $this->rememberMeServices->loginSuccess($request, $response, $token);
-    }
-
-    protected function createPreAuthenticatedToken($credentials, string $uniqueGuardKey, string $providerKey): PreAuthenticationGuardToken
-    {
-        return new GuardPreAuthenticationGuardToken($credentials, $uniqueGuardKey, $providerKey);
     }
 }

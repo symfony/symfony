@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Authentication\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @experimental in 5.1
  */
-abstract class AbstractFormLoginAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
+abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     /**
      * Return the URL to the login page.

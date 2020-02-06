@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Http\Authentication\GuardAuthenticationManagerTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -29,7 +28,8 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationToken;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerTrait;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
@@ -40,12 +40,12 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class GuardAuthenticationProvider implements AuthenticationProviderInterface
 {
-    use GuardAuthenticationManagerTrait;
+    use AuthenticatorManagerTrait;
 
     /**
      * @var AuthenticatorInterface[]
      */
-    private $guardAuthenticators;
+    private $authenticators;
     private $userProvider;
     private $providerKey;
     private $userChecker;
@@ -58,7 +58,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
     {
-        $this->guardAuthenticators = $guardAuthenticators;
+        $this->authenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
         $this->userChecker = $userChecker;
@@ -78,7 +78,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             throw new \InvalidArgumentException('GuardAuthenticationProvider only supports GuardTokenInterface.');
         }
 
-        if (!$token instanceof PreAuthenticationGuardToken) {
+        if (!$token instanceof PreAuthenticationToken) {
             /*
              * The listener *only* passes PreAuthenticationGuardToken instances.
              * This means that an authenticated token (e.g. PostAuthenticationGuardToken)
@@ -101,7 +101,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $guardAuthenticator = $this->findOriginatingAuthenticator($token);
 
         if (null === $guardAuthenticator) {
-            throw new AuthenticationException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators of provider "%s".', $token->getGuardProviderKey(), $this->providerKey));
+            throw new AuthenticationException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators of provider "%s".', $token->getAuthenticatorKey(), $this->providerKey));
         }
 
         return $this->authenticateViaGuard($guardAuthenticator, $token, $this->providerKey);
@@ -109,7 +109,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        if ($token instanceof PreAuthenticationGuardToken) {
+        if ($token instanceof PreAuthenticationToken) {
             return null !== $this->findOriginatingAuthenticator($token);
         }
 
@@ -121,12 +121,12 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $this->rememberMeServices = $rememberMeServices;
     }
 
-    protected function getGuardKey(string $key): string
+    protected function getAuthenticatorKey(string $key): string
     {
         return $this->providerKey.'_'.$key;
     }
 
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, \Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, \Symfony\Component\Security\Http\Authenticator\Token\PreAuthenticationToken $token, string $providerKey): TokenInterface
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);

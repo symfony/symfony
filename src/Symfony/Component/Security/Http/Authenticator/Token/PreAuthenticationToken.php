@@ -9,32 +9,34 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Authentication\Token;
+namespace Symfony\Component\Security\Http\Authenticator\Token;
+
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
- * The token used by the guard auth system before authentication.
+ * The token used by the authenticator system before authentication.
  *
- * The GuardAuthenticationListener creates this, which is then consumed
- * immediately by the GuardAuthenticationProvider. If authentication is
+ * The AuthenticatorManagerListener creates this, which is then consumed
+ * immediately by the AuthenticatorManager. If authentication is
  * successful, a different authenticated token is returned
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-class PreAuthenticationGuardToken extends AbstractToken
+class PreAuthenticationToken extends AbstractToken
 {
     private $credentials;
-    private $guardProviderKey;
+    private $authenticatorProviderKey;
     private $providerKey;
 
     /**
      * @param mixed       $credentials
-     * @param string      $guardProviderKey Unique key that bind this token to a specific AuthenticatorInterface
-     * @param string|null $providerKey      The general provider key (when using with HTTP, this is the firewall name)
+     * @param string      $authenticatorProviderKey Unique key that bind this token to a specific AuthenticatorInterface
+     * @param string|null $providerKey              The general provider key (when using with HTTP, this is the firewall name)
      */
-    public function __construct($credentials, string $guardProviderKey, ?string $providerKey = null)
+    public function __construct($credentials, string $authenticatorProviderKey, ?string $providerKey = null)
     {
         $this->credentials = $credentials;
-        $this->guardProviderKey = $guardProviderKey;
+        $this->authenticatorProviderKey = $authenticatorProviderKey;
         $this->providerKey = $providerKey;
 
         parent::__construct([]);
@@ -48,9 +50,9 @@ class PreAuthenticationGuardToken extends AbstractToken
         return $this->providerKey;
     }
 
-    public function getGuardProviderKey()
+    public function getAuthenticatorKey()
     {
-        return $this->guardProviderKey;
+        return $this->authenticatorProviderKey;
     }
 
     /**
@@ -66,6 +68,6 @@ class PreAuthenticationGuardToken extends AbstractToken
 
     public function setAuthenticated(bool $authenticated)
     {
-        throw new \LogicException('The PreAuthenticationGuardToken is *never* authenticated.');
+        throw new \LogicException('The PreAuthenticationToken is *never* authenticated.');
     }
 }

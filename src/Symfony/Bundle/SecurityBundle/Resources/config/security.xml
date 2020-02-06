@@ -52,8 +52,8 @@
                 <argument type="service" id="event_dispatcher" />
             </call>
         </service>
-        <service id="security.authentication.manager.guard" class="Symfony\Component\Security\Http\Authentication\GuardAuthenticationManager">
-            <argument /> <!-- guard authenticators -->
+        <service id="security.authentication.manager.authenticator" class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager">
+            <argument /> <!-- authenticators -->
             <argument type="service" id="event_dispatcher" />
             <argument>%security.authentication.manager.erase_credentials%</argument>
             <call method="setEventDispatcher">

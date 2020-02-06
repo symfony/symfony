@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Guard;
 
-use Symfony\Component\Security\Http\Authentication\GuardAuthenticatorHandler as CoreAuthenticatorHandlerAlias;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorHandler;
 
 /**
  * A utility class that does much of the *work* during the guard authentication process.
@@ -23,6 +23,6 @@ use Symfony\Component\Security\Http\Authentication\GuardAuthenticatorHandler as 
  *
  * @final
  */
-class GuardAuthenticatorHandler extends CoreAuthenticatorHandlerAlias
+class GuardHandler extends AuthenticatorHandler
 {
 }

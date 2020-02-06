@@ -9,22 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Authentication\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -36,7 +32,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @final
  * @experimental in 5.1
  */
-class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
+class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
 

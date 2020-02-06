@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpBasicFactory implements SecurityFactoryInterface, GuardFactoryInterface
+class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
     {
@@ -46,7 +46,7 @@ class HttpBasicFactory implements SecurityFactoryInterface, GuardFactoryInterfac
         return [$provider, $listenerId, $entryPointId];
     }
 
-    public function createGuard(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.http_basic.'.$id;
         $container

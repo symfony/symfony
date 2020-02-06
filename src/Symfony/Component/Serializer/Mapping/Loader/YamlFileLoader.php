@@ -101,6 +101,14 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setIgnore($data['ignore']);
                 }
+
+                if (isset($data['since'])) {
+                    $attributeMetadata->setSince((string) $data['since']);
+                }
+
+                if (isset($data['until'])) {
+                    $attributeMetadata->setUntil((string) $data['until']);
+                }
             }
         }
 

@@ -30,3 +30,9 @@
       ignore: true
     ignored2:
       ignore: true
+
+'Symfony\Component\Serializer\Tests\Fixtures\VersionDummy':
+  attributes:
+    foo:
+      since: '1.0.0'
+      until: '1.1.9'

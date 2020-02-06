@@ -704,6 +704,18 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Defines an option configurator with the given name.
+     */
+    public function define(string $option): OptionConfigurator
+    {
+        if (isset($this->defined[$option])) {
+            throw new OptionDefinitionException(sprintf('The options "%s" is already defined.', $option));
+        }
+
+        return new OptionConfigurator($option, $this);
+    }
+
+    /**
      * Removes the option with the given name.
      *
      * Undefined options are ignored.
@@ -830,7 +842,7 @@ class OptionsResolver implements Options
      * Returns the resolved value of an option.
      *
      * @param string $option             The option name
-     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not
+     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
      *
      * @return mixed The option value
      *

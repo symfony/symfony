@@ -13,18 +13,19 @@ namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\Since;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @author Arnaud Tarroux <ta.arnaud@gmail.com>
  */
 class SinceTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\Since" should be set.
-     */
     public function testNotSetVersionParameter()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Parameter of annotation "Symfony\Component\Serializer\Annotation\Since" should be set.'
+        );
         new Since([]);
     }
 
@@ -38,12 +39,13 @@ class SinceTest extends TestCase
 
     /**
      * @dataProvider provideInvalidValues
-     *
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\Since" must be a non-empty string.
      */
     public function testNotAStringVersionParameter($value)
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Parameter of annotation "Symfony\Component\Serializer\Annotation\Since" must be a non-empty string.'
+        );
         new Since(['value' => $value]);
     }
 

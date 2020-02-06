@@ -60,7 +60,7 @@ class Event extends BaseEvent
         return $this->workflow->getName();
     }
 
-    public function getMetadata(string $key, object $subject)
+    public function getMetadata(string $key, $subject)
     {
         return $this->workflow->getMetadataStore()->getMetadata($key, $subject);
     }

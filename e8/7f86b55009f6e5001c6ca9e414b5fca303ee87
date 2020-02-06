@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-26T08:53:30Z
+
+Before spending more time here: is it worth it?
+This looks like a lot of code, for something that is of low value to me.
+
+---------------------------------------------------------------------------
+
+by Islam93 at 2019-12-26T15:15:53Z
+
+most part of changes are tests.
+abstract argument definition looks more clear and obvious and I'd like to continue
+
+---------------------------------------------------------------------------
+
+by Islam93 at 2019-12-29T15:06:09Z
+
+> and ContainerBuilder should throw an exception when it encounters one when creating a service.
+
+@nicolas-grekas, what if specific pass will be registered in removing passes list, like DefinitionErrorExceptionPass, to check an abstract argument existence? and this pass will throw an exception, if an abstract argument is not replaced yet
+
+if this behavior is suitable, do dumpers still have to able to deal with abstract arguments?
+
+---------------------------------------------------------------------------
+
+by Islam93 at 2019-12-29T15:16:49Z
+
+> the YamlLoader and YamlDumper should also be able to deal with abstract arguments
+
+example for yaml config
+```
+    App\Test\Test:
+        arguments:
+            $a: !abstract should be defined by TestPass
+```
+tags functionality looks suitable
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-02-06T13:25:21Z
+
+@Islam93 Nice 👍 thank you having a look at this issue.

@@ -37,6 +37,10 @@
         <xsd:element name="services" type="services" />
         <xsd:group ref="foreign" />
       </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="autoconfigured-instanceof" type="autoconfigured-instanceof" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
     </xsd:sequence>
   </xsd:complexType>
 
@@ -58,6 +62,25 @@
       <xsd:element name="defaults" type="defaults" minOccurs="0" maxOccurs="1" />
       <xsd:element name="instanceof" type="instanceof" minOccurs="0" />
     </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="autoconfigured-instanceof">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Enclosing element for the autoconfigured instanceof
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="autoconfigured-instanceof-item" type="service" minOccurs="1" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="autoconfigured-instanceof-item">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="id" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="imports">

@@ -29,7 +29,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * @internal
  */
-final class DebugAutoconfigurationCommand extends Command
+final class DebugAutoconfigurationCommand extends ContainerDebugCommand
 {
     protected static $defaultName = 'debug:autoconfiguration';
 
@@ -45,8 +45,7 @@ final class DebugAutoconfigurationCommand extends Command
             ])
             ->setDescription('Displays current autoconfiguration for an application')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command displays all services that
-are autoconfigured:
+The <info>%command.name%</info> command displays all services that are autoconfigured:
 
   <info>php %command.full_name%</info>
 
@@ -62,108 +61,83 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
-        $autoconfiguredInstanceofItems = $this->getContainerBuilder()->getAutoconfiguredInstanceof();
+        $definitions = $this->getContainerBuilder()->getAutoconfiguredInstanceof();
+        ksort($definitions, SORT_NATURAL);
 
         if ($search = $input->getArgument('search')) {
-            $autoconfiguredInstanceofItems = array_filter($autoconfiguredInstanceofItems, function ($key) use ($search) {
+            $definitions = array_filter($definitions, function ($key) use ($search) {
                 return false !== stripos(str_replace('\\', '', $key), $search);
             }, ARRAY_FILTER_USE_KEY);
 
-            if (!$autoconfiguredInstanceofItems) {
+            if (0 === \count($definitions)) {
                 $errorIo->error(sprintf('No autoconfiguration interface/class found matching "%s"', $search));
 
                 return 1;
             }
-        }
 
-        ksort($autoconfiguredInstanceofItems, SORT_NATURAL);
+            $name = $this->findProperInterfaceName(array_keys($definitions), $input, $io, $search);
+            /** @var ChildDefinition $definition */
+            $definition = $definitions[$name];
 
-        $io->title('Autoconfiguration');
-        if ($search) {
-            $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
-        }
-        $io->newLine();
-
-        /** @var ChildDefinition $autoconfiguredInstanceofItem */
-        foreach ($autoconfiguredInstanceofItems as $key => $autoconfiguredInstanceofItem) {
+            $io->title(sprintf('Information for Interface/Class "<info>%s</info>"', $name));
+            $tableHeaders = ['Option', 'Value'];
             $tableRows = [];
 
-            foreach ($autoconfiguredInstanceofItem->getTags() as $tag => $tagAttributes) {
-                $tableRows[] = ['Tag', $tag];
-                if ($tagAttributes !== [[]]) {
-                    $tableRows[] = ['Tag attribute', $this->dumpTagAttribute($tagAttributes)];
+            $tagInformation = [];
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $tagParameters) {
+                    $parameters = array_map(function ($key, $value) {
+                        return sprintf('<info>%s</info>: %s', $key, $value);
+                    }, array_keys($tagParameters), array_values($tagParameters));
+                    $parameters = implode(', ', $parameters);
+
+                    if ('' === $parameters) {
+                        $tagInformation[] = sprintf('%s', $tagName);
+                    } else {
+                        $tagInformation[] = sprintf('%s (%s)', $tagName, $parameters);
+                    }
                 }
             }
+            $tableRows[] = ['Tags', implode("\n", $tagInformation)];
 
-            if ($autoconfiguredInstanceofItem->getMethodCalls()) {
-                $tableRows[] = ['Method call', $this->dumpMethodCall($autoconfiguredInstanceofItem)];
+            $calls = $definition->getMethodCalls();
+            if (\count($calls) > 0) {
+                $callInformation = [];
+                foreach ($calls as $call) {
+                    $callInformation[] = $call[0];
+                }
+                $tableRows[] = ['Calls', implode(', ', $callInformation)];
             }
 
-            if ($autoconfiguredInstanceofItem->getBindings()) {
-                $tableRows[] = ['Bindings', $this->dumpBindings($autoconfiguredInstanceofItem)];
-            }
-
-            $io->title(sprintf('Autoconfiguration for "%s"', $key));
-            $io->newLine();
-            $io->table(['Option', 'Value'], $tableRows);
-        }
-    }
-
-    private function dumpMethodCall(ChildDefinition $autoconfiguredInstanceofItem)
-    {
-        $tagContainerBuilder = new ContainerBuilder();
-        foreach ($tagContainerBuilder->getServiceIds() as $serviceId) {
-            $tagContainerBuilder->removeDefinition($serviceId);
-            $tagContainerBuilder->removeAlias($serviceId);
-        }
-        $tagContainerBuilder->addDefinitions([$autoconfiguredInstanceofItem]);
-
-        $dumper = new YamlDumper($tagContainerBuilder);
-        preg_match('/calls\:\n((?: +- .+\n)+)/', $dumper->dump(), $matches);
-
-        return preg_replace('/^\s+/m', '', $matches[1]);
-    }
-
-    private function dumpBindings(ChildDefinition $autoconfiguredInstanceofItem)
-    {
-        $tagContainerBuilder = new ContainerBuilder();
-        foreach ($tagContainerBuilder->getServiceIds() as $serviceId) {
-            $tagContainerBuilder->removeDefinition($serviceId);
-            $tagContainerBuilder->removeAlias($serviceId);
+            $io->table($tableHeaders, $tableRows);
+        } else {
+            $io->table(['Interface/Class'], array_map(static function ($interface) {
+                return [$interface];
+            }, array_keys($definitions)));
         }
 
-        $dumper = new YamlDumper($tagContainerBuilder);
-        foreach ($autoconfiguredInstanceofItem->getBindings() as $bindingKey => $bindingValue) {
-            $tagContainerBuilder->setParameter($bindingKey, $bindingValue->getValues()[0]);
+        $io->newLine();
+
+        return 0;
+    }
+
+    private function findProperInterfaceName(array $list, InputInterface $input, SymfonyStyle $io, string $name): string
+    {
+        $name = ltrim($name, '\\');
+
+        if (\in_array($name, $list, true)) {
+            return $name;
         }
 
-        preg_match('/parameters\:\n((?: + .+\n)+)/', $dumper->dump(), $matches);
+        if (1 === \count($list)) {
+            return $list[0];
+        }
 
-        return preg_replace('/^\s+/m', '', $matches[1]);
-    }
-
-    private function dumpTagAttribute(array $tagAttribute)
-    {
-        $cloner = new VarCloner();
-        $cliDumper = new CliDumper(null, null, AbstractDumper::DUMP_LIGHT_ARRAY);
-
-        return $cliDumper->dump($cloner->cloneVar(current($tagAttribute)), true);
-    }
-
-    private function getContainerBuilder(): ContainerBuilder
-    {
-        $kernel = $this->getApplication()->getKernel();
-        $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
-        $container = $buildContainer();
-        $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
-        $container->compile();
-
-        return $container;
+        return $io->choice('Select one of the following interfaces to display its information', $list);
     }
 }

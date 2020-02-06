@@ -71,6 +71,9 @@ class XmlFileLoader extends FileLoader
             $this->instanceof = [];
             $this->registerAliasesForSinglyImplementedInterfaces();
         }
+
+        // autoconfiguredInstanceof
+        $this->parseAutoconfiguredInstanceOf($xml, $path);
     }
 
     /**
@@ -109,6 +112,51 @@ class XmlFileLoader extends FileLoader
         foreach ($imports as $import) {
             $this->setCurrentDir($defaultDirectory);
             $this->import($import->getAttribute('resource'), XmlUtils::phpize($import->getAttribute('type')) ?: null, XmlUtils::phpize($import->getAttribute('ignore-errors')) ?: false, $file);
+        }
+    }
+
+    private function parseAutoconfiguredInstanceOf(\DOMDocument $xml, string $file)
+    {
+        $xpath = new \DOMXPath($xml);
+        $xpath->registerNamespace('container', self::NS);
+
+        if (false === $autoconfiguredInstanceof = $xpath->query(('//container:autoconfigured-instanceof/container:autoconfigured-instanceof-item'))) {
+            return;
+        }
+
+        foreach ($autoconfiguredInstanceof as $item) {
+            $definition = $this->container->registerForAutoconfiguration($item->getAttribute('id'));
+
+            foreach ($this->getChildren($item, 'call') as $call) {
+                $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument', $file), XmlUtils::phpize($call->getAttribute('returns-clone')));
+            }
+
+            $tags = $this->getChildren($item, 'tag');
+
+            if (!empty($defaults['tags'])) {
+                $tags = array_merge($tags, $defaults['tags']);
+            }
+
+            foreach ($tags as $tag) {
+                $parameters = [];
+                foreach ($tag->attributes as $name => $node) {
+                    if ('name' === $name) {
+                        continue;
+                    }
+
+                    if (false !== strpos($name, '-') && false === strpos($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                        $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
+                    }
+                    // keep not normalized key
+                    $parameters[$name] = XmlUtils::phpize($node->nodeValue);
+                }
+
+                if ('' === $tag->getAttribute('name')) {
+                    throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', (string) $item->getAttribute('id'), $file));
+                }
+
+                $definition->addTag($tag->getAttribute('name'), $parameters);
+            }
         }
     }
 

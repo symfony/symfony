@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -53,6 +54,7 @@ class XmlDumper extends Dumper
 
         $this->addParameters($container);
         $this->addServices($container);
+        $this->addAutoconfiguredInstanceof($container);
 
         $this->document->appendChild($container);
         $xml = $this->document->saveXML();
@@ -335,6 +337,47 @@ class XmlDumper extends Dumper
             }
             $parent->appendChild($element);
         }
+    }
+
+    private function addAutoconfiguredInstanceof(\DOMElement $parent)
+    {
+        $childDefinitions = $this->container->getAutoconfiguredInstanceof();
+
+        if (!$childDefinitions) {
+            return;
+        }
+
+        $autoconfiguredInstanceOf = $this->document->createElement('autoconfigured-instanceof');
+
+        foreach ($childDefinitions as $id => $definition) {
+            $this->addAutoconfiguredInstanceofItem($definition, $id, $autoconfiguredInstanceOf);
+        }
+
+//        dump($this->container);
+//        die;
+
+        $parent->appendChild($autoconfiguredInstanceOf);
+    }
+
+    private function addAutoconfiguredInstanceofItem(ChildDefinition $definition, string $id, \DOMElement $parent)
+    {
+        $item = $this->document->createElement('autoconfigured-instanceof-item');
+        $item->setAttribute('id', $id);
+
+        foreach ($definition->getTags() as $name => $tags) {
+            foreach ($tags as $attributes) {
+                $tag = $this->document->createElement('tag');
+                $tag->setAttribute('name', $name);
+                foreach ($attributes as $key => $value) {
+                    $tag->setAttribute($key, $value);
+                }
+                $item->appendChild($tag);
+            }
+        }
+
+        $this->addMethodCalls($definition->getMethodCalls(), $item);
+
+        $parent->appendChild($item);
     }
 
     /**

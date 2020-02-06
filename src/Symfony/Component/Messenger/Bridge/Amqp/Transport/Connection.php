@@ -376,6 +376,7 @@ class Connection
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
+            'x-queue-mode' => 'lazy',
         ]);
 
         return $queue;

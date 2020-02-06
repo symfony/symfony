@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Guard;
 
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
 /**
  * An optional interface for "guard" authenticators that deal with user passwords.
  */
@@ -24,6 +22,4 @@ interface PasswordAuthenticatedInterface
      * @param mixed $credentials The user credentials
      */
     public function getPassword($credentials): ?string;
-
-    /* public function getPasswordEncoder(): ?UserPasswordEncoderInterface; */
 }

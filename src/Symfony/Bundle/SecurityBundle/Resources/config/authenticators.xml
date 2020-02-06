@@ -12,12 +12,40 @@
                  class="Symfony\Bundle\SecurityBundle\EventListener\LazyGuardManagerListener"
                  abstract="true">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.authentication.manager"/>
-            <argument type="service" id="security.authentication.guard_handler"/>
+            <argument type="service" id="security.authentication.manager" />
+            <argument type="service" id="security.authentication.guard_handler" />
             <argument/> <!-- guard authenticator locator -->
+            <argument/> <!-- provider key -->
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <!-- Listeners -->
+
+        <service id="Symfony\Component\Security\Http\EventListener\AuthenticatingListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <service id="Symfony\Component\Security\Http\EventListener\PasswordMigratingListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <service id="Symfony\Component\Security\Http\EventListener\UserCheckerListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="Symfony\Component\Security\Core\User\UserCheckerInterface" />
+        </service>
+
+        <service id="security.listener.remember_me"
+                 class="Symfony\Component\Security\Http\EventListener\RememberMeListener"
+                 abstract="true">
+            <tag name="monolog.logger" channel="security" />
             <argument/> <!-- provider key -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
+
+        <!-- Authenticators -->
 
         <service id="security.authenticator.http_basic"
                  class="Symfony\Component\Security\Http\Authentication\Authenticator\HttpBasicAuthenticator"
@@ -34,14 +62,13 @@
             <argument type="service" id="security.http_utils" />
             <argument /> <!-- csrf token generator -->
             <argument type="abstract">user provider</argument>
-            <argument type="service" id="security.encoder_factory" />
             <argument type="abstract">options</argument>
         </service>
 
         <service id="security.authenticator.anonymous"
                  class="Symfony\Component\Security\Http\Authentication\Authenticator\AnonymousAuthenticator"
                  abstract="true">
-            <argument /> <!-- secret -->
+            <argument type="abstract">secret</argument>
             <argument type="service" id="security.token_storage" />
         </service>
     </services>

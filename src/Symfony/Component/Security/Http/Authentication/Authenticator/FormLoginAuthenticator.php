@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
@@ -23,6 +24,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -34,23 +36,19 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @final
  * @experimental in 5.1
  */
-class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
+class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
-    use TargetPathTrait, UsernamePasswordTrait {
-        UsernamePasswordTrait::checkCredentials as checkPassword;
-    }
+    use TargetPathTrait;
 
     private $options;
     private $httpUtils;
     private $csrfTokenManager;
     private $userProvider;
-    private $encoderFactory;
 
-    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, UserProviderInterface $userProvider, EncoderFactoryInterface $encoderFactory, array $options)
+    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, UserProviderInterface $userProvider, array $options)
     {
         $this->httpUtils = $httpUtils;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->encoderFactory = $encoderFactory;
         $this->options = array_merge([
             'username_parameter' => '_username',
             'password_parameter' => '_password',
@@ -109,11 +107,17 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return $credentials;
     }
 
+    public function getPassword($credentials): ?string
+    {
+        return $credentials['password'];
+    }
+
     public function getUser($credentials): ?UserInterface
     {
         return $this->userProvider->loadUserByUsername($credentials['username']);
     }
 
+    /* @todo How to do CSRF protection?
     public function checkCredentials($credentials, UserInterface $user): bool
     {
         if (null !== $this->csrfTokenManager) {
@@ -123,6 +127,11 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         }
 
         return $this->checkPassword($credentials, $user);
+    }*/
+
+    public function createAuthenticatedToken(UserInterface $user, $providerKey): TokenInterface
+    {
+        return new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): Response

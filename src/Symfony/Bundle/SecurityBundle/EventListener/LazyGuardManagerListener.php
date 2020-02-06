@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
@@ -32,9 +33,10 @@ class LazyGuardManagerListener extends GuardManagerListener
         GuardAuthenticatorHandler $guardHandler,
         ServiceLocator $guardLocator,
         string $providerKey,
+        EventDispatcherInterface $eventDispatcher,
         ?LoggerInterface $logger = null
     ) {
-        parent::__construct($authenticationManager, $guardHandler, [], $providerKey, $logger);
+        parent::__construct($authenticationManager, $guardHandler, [], $providerKey, $eventDispatcher, $logger);
 
         $this->guardLocator = $guardLocator;
     }

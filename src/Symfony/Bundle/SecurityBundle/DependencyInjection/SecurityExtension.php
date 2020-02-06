@@ -419,16 +419,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
         if ($this->guardAuthenticationManagerEnabled) {
-            // guard authentication manager listener (must be before calling createAuthenticationListeners() to inject remember me services)
+            // Remember me listener (must be before calling createAuthenticationListeners() to inject remember me services)
             $container
-                ->setDefinition('security.firewall.guard.'.$id, new ChildDefinition('security.firewall.guard'))
-                ->replaceArgument(2, new Reference('security.firewall.guard.'.$id.'.locator'))
-                ->replaceArgument(3, $id)
-                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
+                ->setDefinition('security.listener.remember_me.'.$id, new ChildDefinition('security.listener.remember_me'))
+                ->replaceArgument(0, $id)
+                ->addTag('kernel.event_subscriber')
                 ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => 'none'])
             ;
-
-            $listeners[] = new Reference('security.firewall.guard.'.$id);
         }
 
         // Authentication listeners
@@ -438,7 +435,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
 
         if ($this->guardAuthenticationManagerEnabled) {
-            // add authentication providers for this firewall to the GuardManagerListener (if guard is enabled)
+            // guard authentication manager listener
             $container
                 ->setDefinition('security.firewall.guard.'.$id.'.locator', new ChildDefinition('security.firewall.guard.locator'))
                 ->setArguments([array_map(function ($id) {
@@ -446,10 +443,15 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 }, $firewallAuthenticationProviders)])
                 ->addTag('container.service_locator')
             ;
+
             $container
-                ->getDefinition('security.firewall.guard.'.$id)
+                ->setDefinition('security.firewall.guard.'.$id, new ChildDefinition('security.firewall.guard'))
                 ->replaceArgument(2, new Reference('security.firewall.guard.'.$id.'.locator'))
+                ->replaceArgument(3, $id)
+                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
             ;
+
+            $listeners[] = new Reference('security.firewall.guard.'.$id);
         }
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);

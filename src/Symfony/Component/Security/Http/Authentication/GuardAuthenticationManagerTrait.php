@@ -30,65 +30,6 @@ use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 trait GuardAuthenticationManagerTrait
 {
     /**
-     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
-     */
-    private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
-    {
-        // get the user from the GuardAuthenticator
-        if ($guardAuthenticator instanceof AuthenticatorInterface) {
-            if (!isset($this->userProvider)) {
-                throw new LogicException(sprintf('%s only supports authenticators implementing "%s", update "%s" or use the legacy guard integration instead.', __CLASS__, CoreAuthenticatorInterface::class, \get_class($guardAuthenticator)));
-            }
-            $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
-        } elseif ($guardAuthenticator instanceof CoreAuthenticatorInterface) {
-            $user = $guardAuthenticator->getUser($token->getCredentials());
-        } else {
-            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
-        }
-
-        if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf('The "%s::getUser()" method must return a UserInterface. You returned "%s".', get_debug_type($guardAuthenticator), get_debug_type($user)));
-        }
-
-        $this->userChecker->checkPreAuth($user);
-        if (true !== $checkCredentialsResult = $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
-            if (false !== $checkCredentialsResult) {
-                throw new \TypeError(sprintf('"%s::checkCredentials()" must return a boolean value.', get_debug_type($guardAuthenticator)));
-            }
-
-            throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
-        }
-
-        if ($guardAuthenticator instanceof PasswordAuthenticatedInterface
-            && null !== $password = $guardAuthenticator->getPassword($token->getCredentials())
-            && null !== $passwordEncoder = $this->passwordEncoder ?? (method_exists($guardAuthenticator, 'getPasswordEncoder') ? $guardAuthenticator->getPasswordEncoder() : null)
-        ) {
-            if (method_exists($passwordEncoder, 'needsRehash') && $passwordEncoder->needsRehash($user)) {
-                if (!isset($this->userProvider)) {
-                    if ($guardAuthenticator instanceof PasswordUpgraderInterface) {
-                        $guardAuthenticator->upgradePassword($user, $guardAuthenticator->getPasswordEncoder()->encodePassword($user, $password));
-                    }
-                } elseif ($this->userProvider instanceof PasswordUpgraderInterface) {
-                    $this->userProvider->upgradePassword($user, $passwordEncoder->encodePassword($user, $password));
-                }
-            }
-        }
-        $this->userChecker->checkPostAuth($user);
-
-        // turn the UserInterface into a TokenInterface
-        $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $providerKey);
-        if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf('The "%s::createAuthenticatedToken()" method must return a TokenInterface. You returned "%s".', get_debug_type($guardAuthenticator), get_debug_type($authenticatedToken)));
-        }
-
-        return $authenticatedToken;
-    }
-
-    /**
      * @return CoreAuthenticatorInterface|\Symfony\Component\Security\Guard\AuthenticatorInterface|null
      */
     private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token)

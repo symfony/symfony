@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,7 +24,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -35,18 +38,16 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
     use GuardAuthenticationManagerTrait;
 
     private $guardAuthenticators;
-    private $userChecker;
-    private $eraseCredentials;
-    /** @var EventDispatcherInterface */
     private $eventDispatcher;
+    private $eraseCredentials;
 
     /**
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
      */
-    public function __construct($guardAuthenticators, UserCheckerInterface $userChecker, bool $eraseCredentials = true)
+    public function __construct(iterable $guardAuthenticators, EventDispatcherInterface $eventDispatcher, bool $eraseCredentials = true)
     {
         $this->guardAuthenticators = $guardAuthenticators;
-        $this->userChecker = $userChecker;
+        $this->eventDispatcher = $eventDispatcher;
         $this->eraseCredentials = $eraseCredentials;
     }
 
@@ -100,6 +101,40 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
         return $result;
     }
 
+    protected function getGuardKey(string $key): string
+    {
+        // Guard authenticators in the GuardAuthenticationManager are already indexed
+        // by an unique key
+        return $key;
+    }
+
+    private function authenticateViaGuard(AuthenticatorInterface $authenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
+    {
+        // get the user from the Authenticator
+        $user = $authenticator->getUser($token->getCredentials());
+        if (null === $user) {
+            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', \get_class($authenticator)));
+        }
+
+        if (!$user instanceof UserInterface) {
+            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', \get_class($authenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
+        }
+
+        $event = new VerifyAuthenticatorCredentialsEvent($authenticator, $token, $user);
+        $this->eventDispatcher->dispatch($event);
+        if (true !== $event->areCredentialsValid()) {
+            throw new BadCredentialsException(sprintf('Authentication failed because %s did not approve the credentials.', \get_class($authenticator)));
+        }
+
+        // turn the UserInterface into a TokenInterface
+        $authenticatedToken = $authenticator->createAuthenticatedToken($user, $providerKey);
+        if (!$authenticatedToken instanceof TokenInterface) {
+            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', \get_class($authenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
+        }
+
+        return $authenticatedToken;
+    }
+
     private function handleFailure(AuthenticationException $exception, TokenInterface $token)
     {
         if (null !== $this->eventDispatcher) {
@@ -109,12 +144,5 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
         $exception->setToken($token);
 
         throw $exception;
-    }
-
-    protected function getGuardKey(string $key): string
-    {
-        // Guard authenticators in the GuardAuthenticationManager are already indexed
-        // by an unique key
-        return $key;
     }
 }

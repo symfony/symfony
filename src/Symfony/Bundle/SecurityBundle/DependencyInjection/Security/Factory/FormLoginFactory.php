@@ -106,7 +106,7 @@ class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface,
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, isset($config['csrf_token_generator']) ? new Reference($config['csrf_token_generator']) : null)
             ->replaceArgument(2, new Reference($userProviderId))
-            ->replaceArgument(4, $options);
+            ->replaceArgument(3, $options);
 
         return $authenticatorId;
     }

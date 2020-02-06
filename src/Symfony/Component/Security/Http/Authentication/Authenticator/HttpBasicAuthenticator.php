@@ -15,10 +15,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
@@ -28,10 +30,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * @final
  * @experimental in 5.1
  */
-class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
+class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, PasswordAuthenticatedInterface
 {
-    use UsernamePasswordTrait;
-
     private $realmName;
     private $userProvider;
     private $encoderFactory;
@@ -67,9 +67,19 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         ];
     }
 
+    public function getPassword($credentials): ?string
+    {
+        return $credentials['password'];
+    }
+
     public function getUser($credentials): ?UserInterface
     {
         return $this->userProvider->loadUserByUsername($credentials['username']);
+    }
+
+    public function createAuthenticatedToken(UserInterface $user, $providerKey): TokenInterface
+    {
+        return new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response

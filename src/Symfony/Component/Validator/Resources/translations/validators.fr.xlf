@@ -370,6 +370,10 @@
                 <source>This value is not a valid hostname.</source>
                 <target>Cette valeur n'est pas un nom d'hôte valide.</target>
             </trans-unit>
+            <trans-unit id="96">
+                <source>This value is not a valid hexadecimal color.</source>
+                <target>Cette valeur n'est pas une couleur hexadécimale valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

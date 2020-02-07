@@ -20,3 +20,11 @@ function b(string $string = ''): ByteString
 {
     return new ByteString($string);
 }
+
+/**
+ * @return UnicodeString|ByteString
+ */
+function s(string $string): AbstractString
+{
+    return preg_match('//u', $string) ? new UnicodeString($string) : new ByteString($string);
+}

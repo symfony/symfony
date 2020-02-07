@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-22T08:39:53Z
+
+Can you please ensure you had opcache enabled when doing the profiling?
+On the cli it's disabled by default, so this change might still be nice for the console, but maybe it changes little when opcache is used? I'd like to know :)
+`opcache.enable_cli=1`
+
+---------------------------------------------------------------------------
+
+by NamelessCoder at 2019-10-22T08:43:32Z
+
+Absolutely, I will do some further profiling and maybe throw some more complex files at it to test the difference in long lines particularly.
+
+And fix the various style/test problems, of course ;)
+
+---------------------------------------------------------------------------
+
+by NamelessCoder at 2019-10-22T11:48:10Z
+
+> Can you please ensure you had opcache enabled when doing the profiling?
+
+The difference is much less pronounced with opcache enabled, but should increase with YAML data sets containing long lines.
+
+https://blackfire.io/profiles/compare/4db7ae64-4fa7-4102-b6e3-16aea9b8c9e9/graph
+
+(profile done with fixes for issues mentioned by @stof applied, which has increased the calls to strncmp - still working on resolving 12 failing tests)
+
+---------------------------------------------------------------------------
+
+by NamelessCoder at 2019-10-23T14:16:22Z
+
+Updated profile comparison:
+
+https://blackfire.io/profiles/compare/60e240e4-6fc6-4101-ba57-2eb7d3acf05b/graph
+
+With opcache the optimisations don't have as much impact, however, the costs incurred by `strpos` vs. `strncmp` are visible even with the current test fixtures which don't contain long strings. Profiling continues here.
+
+Hopefully I've taken care of all the review comments raised.
+
+Should you decide against the PR on the grounds that it moves a lot of code for a relatively small benefit I will of course understand. I'm hoping to prove a more pronounced difference with some more real-life-like fixtures.
+
+(thanks btw everyone for a good experience with my first Symfony PR!)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-11T12:22:25Z
+
+(rebase + retarget needed for master)

@@ -104,6 +104,7 @@ class ErrorHandler
     private static $silencedErrorCache = [];
     private static $silencedErrorCount = 0;
     private static $exitCode = 0;
+    private static $assertQuietEval = false;
 
     /**
      * Registers the error handler.
@@ -114,6 +115,8 @@ class ErrorHandler
             self::$reservedMemory = str_repeat('x', 10240);
             register_shutdown_function(__CLASS__.'::handleFatalError');
         }
+
+        self::$assertQuietEval = filter_var(ini_get('assert.quiet_eval'), FILTER_VALIDATE_BOOLEAN);
 
         if ($handlerIsNew = null === $handler) {
             $handler = new static();
@@ -412,6 +415,11 @@ class ErrorHandler
         $log = $this->loggedErrors & $type;
         $throw = $this->thrownErrors & $type & $level;
         $type &= $level | $this->screamedErrors;
+
+        // Make assert() silent when assert.quiet_eval=1, workaround https://bugs.php.net/75769
+        if (E_WARNING === $type && 'a' === $message[0] && self::$assertQuietEval && 0 === strncmp($message, 'assert(): ', 10)) {
+            $throw = $level = 0;
+        }
 
         if (!$type || (!$log && !$throw)) {
             return !$silenced && $type && $log;

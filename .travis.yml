@@ -285,7 +285,7 @@ install:
               (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
               COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-              if [[ $COMPONENTS && $LEGACY && $TRAVIS_PULL_REQUEST != false ]]; then
+              if [[ $COMPONENTS && $LEGACY && $TRAVIS_BRANCH != master && $TRAVIS_PULL_REQUEST != false ]]; then
                   export FLIP='🙃'
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
@@ -309,7 +309,7 @@ install:
           else
               if [[ $PHP = 7.4* ]]; then
                   # add return types before running the test suite
-                  rm vendor/symfony/contracts -Rf
+                  rm src/Symfony/Contract -Rf && mv vendor/symfony/contracts src/Symfony/Contract
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader

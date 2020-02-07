@@ -17,8 +17,6 @@ use Symfony\Component\String\AbstractUnicodeString;
  * Creates a URL-friendly slug from a given string.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental in 5.0
  */
 interface SluggerInterface
 {

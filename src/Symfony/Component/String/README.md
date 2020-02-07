@@ -4,11 +4,6 @@ String Component
 The String component provides an object-oriented API to strings and deals
 with bytes, UTF-8 code points and grapheme clusters in a unified way.
 
-**This component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Resources
 ---------
 

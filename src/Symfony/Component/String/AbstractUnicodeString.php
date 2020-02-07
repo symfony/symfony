@@ -25,8 +25,6 @@ use Symfony\Component\String\Exception\RuntimeException;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @throws ExceptionInterface
- *
- * @experimental in 5.0
  */
 abstract class AbstractUnicodeString extends AbstractString
 {

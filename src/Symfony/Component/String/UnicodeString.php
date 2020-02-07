@@ -29,8 +29,6 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
  * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
- *
- * @experimental in 5.0
  */
 class UnicodeString extends AbstractUnicodeString
 {

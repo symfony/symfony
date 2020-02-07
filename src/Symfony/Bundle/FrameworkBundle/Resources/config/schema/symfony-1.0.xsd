@@ -113,6 +113,7 @@
         <xsd:attribute name="cookie-domain" type="xsd:string" />
         <xsd:attribute name="cookie-secure" type="xsd:boolean" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
+        <xsd:attribute name="cookie-samesite" type="cookie_samesite" />
         <xsd:attribute name="use-cookies" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
@@ -305,6 +306,15 @@
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
+
+    <xsd:simpleType name="cookie_samesite">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="" />
+            <xsd:enumeration value="none" />
+            <xsd:enumeration value="lax" />
+            <xsd:enumeration value="strict" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:simpleType name="workflow_type">
         <xsd:restriction base="xsd:string">

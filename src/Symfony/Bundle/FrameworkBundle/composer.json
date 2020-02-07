@@ -24,7 +24,7 @@
         "symfony/config": "^3.4.31|^4.3.4",
         "symfony/debug": "~2.8|~3.0|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
-        "symfony/http-foundation": "^3.4.13|~4.3",
+        "symfony/http-foundation": "^3.4.37|^4.4.5",
         "symfony/http-kernel": "^3.4.31|^4.3.4",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.8|~3.0|~4.0",

@@ -155,7 +155,6 @@ class ErrorListenerTest extends TestCase
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
-        $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
     }
 
     /**

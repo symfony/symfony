@@ -26,6 +26,7 @@ CHANGELOG
  * removed support for phpredis 4 `compression`
  * [BC BREAK] `RedisTagAwareAdapter` is not compatible with `RedisCluster` from `Predis` anymore, use `phpredis` instead
  * Marked the `CacheDataCollector` class as `@final`.
+ * added `SodiumMarshaller` to encrypt/decrypt values using libsodium
 
 4.3.0
 -----

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T14:38:30Z
+
+AFAICT, this could now make command actually hang when they are running in a place where they are not interactive but you don't explicitly add the flag, for instance on CI.
+
+Should we instead add a flag to explicit force interactive mode for case where you want to pipe your own input, rather than never detecting anything and breaking things for cases which were relying on this detection to disable interaction ?
+
+Without such detection, adding a question in an existing command becomes a BC break, as it becomes interactive and will hang.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-10-08T15:07:12Z
+
+I don't think it will hang with this patch. What's the reproduction scenario for that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-03T13:44:04Z
+
+~I'm :-1: for this change - this will break background jobs that are fine with the default choice.
+Instead, I propose we add a new `--interactive` global flag.
+PR welcome.~
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-02-03T14:03:51Z
+
+No it won't, what's reproducer for that? I already asked for that (and didn't get answer) and explained in detail why nothing important breaks in PR description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-06T15:12:13Z
+
+I'm reopening and canceling my downvote: I checked out this locally and can't find a situation where the removed logic was useful. Good for 5.0 on my side, could be good for 4.4 also, maybe 3.4.

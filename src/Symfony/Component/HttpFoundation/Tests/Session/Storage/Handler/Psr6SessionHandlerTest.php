@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -30,18 +31,18 @@ class Psr6SessionHandlerTest extends TestCase
     private $handler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheItemPoolInterface
+     * @var MockObject|CacheItemPoolInterface
      */
     private $psr6;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->psr6 = $this->getMockBuilder(Cache::class)
-            ->setMethods(array('getItem', 'deleteItem', 'save'))
+            ->setMethods(['getItem', 'deleteItem', 'save'])
             ->getMock();
-        $this->handler = new Psr6SessionHandler($this->psr6, array('prefix' => self::PREFIX, 'ttl' => self::TTL));
+        $this->handler = new Psr6SessionHandler($this->psr6, ['prefix' => self::PREFIX, 'ttl' => self::TTL]);
     }
 
     public function testOpen()
@@ -125,12 +126,12 @@ class Psr6SessionHandlerTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     private function getItemMock()
     {
         return $this->getMockBuilder(CacheItemInterface::class)
-            ->setMethods(array('isHit', 'getKey', 'get', 'set', 'expiresAt', 'expiresAfter'))
+            ->setMethods(['isHit', 'getKey', 'get', 'set', 'expiresAt', 'expiresAfter'])
             ->getMock();
     }
 }
@@ -141,7 +142,7 @@ class Cache implements CacheItemPoolInterface
     {
     }
 
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
     }
 

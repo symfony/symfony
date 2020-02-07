@@ -218,7 +218,7 @@ RdKafka\KafkaConsumer {
     0 => "test-topic"
   ]
   assignment: []
-  orig_broker_id: %d
+  orig_broker_id: %i
   orig_broker_name: "$this->broker/%s"
   brokers: RdKafka\Metadata\Collection {
     +0: RdKafka\Metadata\Broker {

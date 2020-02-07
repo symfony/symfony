@@ -17,12 +17,15 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "symfony/mime": "^4.4|^5.0",
         "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
         "predis/predis": "~1.0",
+        "symfony/mime": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0"
+    },
+    "suggest" : {
+        "symfony/mime": "To use the file extension guesser"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },

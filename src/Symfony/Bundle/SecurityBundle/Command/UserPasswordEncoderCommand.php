@@ -87,16 +87,16 @@ generated to encode the password:
 Pass the full user class path as the second argument to encode passwords for
 your own entities:
 
-  <info>php %command.full_name% --no-interaction [password] App\Entity\User</info>
+  <info>php %command.full_name% --no-interaction [password] 'App\Entity\User'</info>
 
 Executing the command interactively allows you to generate a random salt for
 encoding the password:
 
-  <info>php %command.full_name% [password] App\Entity\User</info>
+  <info>php %command.full_name% [password] 'App\Entity\User'</info>
 
 In case your encoder doesn't require a salt, add the <comment>empty-salt</comment> option:
 
-  <info>php %command.full_name% --empty-salt [password] App\Entity\User</info>
+  <info>php %command.full_name% --empty-salt [password] 'App\Entity\User'</info>
 
 EOF
             )

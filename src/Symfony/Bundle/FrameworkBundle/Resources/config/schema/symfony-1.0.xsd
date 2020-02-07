@@ -362,6 +362,7 @@
     <xsd:simpleType name="cookie_samesite">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="" />
+            <xsd:enumeration value="none" />
             <xsd:enumeration value="lax" />
             <xsd:enumeration value="strict" />
         </xsd:restriction>

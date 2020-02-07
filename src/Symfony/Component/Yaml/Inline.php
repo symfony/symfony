@@ -269,7 +269,7 @@ class Inline
      */
     public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array $references = [])
     {
-        if (\in_array($scalar[$i], ['"', "'"])) {
+        if (\in_array($scalar[$i], ['"', "'"], true)) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
 
@@ -324,7 +324,7 @@ class Inline
             throw new ParseException(sprintf('Malformed inline YAML string: %s.', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
         }
 
-        $output = substr($match[0], 1, \strlen($match[0]) - 2);
+        $output = substr($match[0], 1, -1);
 
         $unescaper = new Unescaper();
         if ('"' == $scalar[$i]) {
@@ -371,7 +371,7 @@ class Inline
                     $value = self::parseMapping($sequence, $flags, $i, $references);
                     break;
                 default:
-                    $isQuoted = \in_array($sequence[$i], ['"', "'"]);
+                    $isQuoted = \in_array($sequence[$i], ['"', "'"], true);
                     $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
@@ -551,9 +551,8 @@ class Inline
     private static function evaluateScalar(string $scalar, int $flags, array $references = [])
     {
         $scalar = trim($scalar);
-        $scalarLower = strtolower($scalar);
 
-        if (0 === strpos($scalar, '*')) {
+        if ('*' === ($scalar[0] ?? '')) {
             if (false !== $pos = strpos($scalar, '#')) {
                 $value = substr($scalar, 1, $pos - 2);
             } else {
@@ -572,6 +571,8 @@ class Inline
             return $references[$value];
         }
 
+        $scalarLower = strtolower($scalar);
+
         switch (true) {
             case 'null' === $scalarLower:
             case '' === $scalar:
@@ -583,11 +584,11 @@ class Inline
                 return false;
             case '!' === $scalar[0]:
                 switch (true) {
-                    case 0 === strpos($scalar, '!!str '):
+                    case 0 === strncmp($scalar, '!!str ', 6):
                         return (string) substr($scalar, 6);
-                    case 0 === strpos($scalar, '! '):
+                    case 0 === strncmp($scalar, '! ', 2):
                         return substr($scalar, 2);
-                    case 0 === strpos($scalar, '!php/object'):
+                    case 0 === strncmp($scalar, '!php/object', 11):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
                                 @trigger_error('Using the !php/object tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
@@ -603,7 +604,7 @@ class Inline
                         }
 
                         return null;
-                    case 0 === strpos($scalar, '!php/const'):
+                    case 0 === strncmp($scalar, '!php/const', 10):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
                                 @trigger_error('Using the !php/const tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
@@ -623,9 +624,9 @@ class Inline
                         }
 
                         return null;
-                    case 0 === strpos($scalar, '!!float '):
+                    case 0 === strncmp($scalar, '!!float ', 8):
                         return (float) substr($scalar, 8);
-                    case 0 === strpos($scalar, '!!binary '):
+                    case 0 === strncmp($scalar, '!!binary ', 9):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
@@ -633,7 +634,7 @@ class Inline
 
             // Optimize for returning strings.
             // no break
-            case '+' === $scalar[0] || '-' === $scalar[0] || '.' === $scalar[0] || is_numeric($scalar[0]):
+            case \in_array($scalar[0], ['+', '-', '.'], true) || is_numeric($scalar[0]):
                 if (Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar)) {
                     $scalar = str_replace('_', '', (string) $scalar);
                 }

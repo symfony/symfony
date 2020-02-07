@@ -52,6 +52,14 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
+    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    {
+        return new self($command, $cwd, $env, $timeout);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function start(callable $callback = null, array $env = [])
     {
         if (null === $this->getCommandLine()) {

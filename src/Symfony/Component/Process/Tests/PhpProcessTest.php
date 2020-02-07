@@ -60,4 +60,15 @@ PHP;
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
     }
+
+    public function testCreateFromShellCommandLine(): void
+    {
+        $expected = 'hello world!';
+        $process = PhpProcess::fromShellCommandline(<<<PHP
+<?php echo '$expected';
+PHP
+        );
+        $process->run();
+        $this->assertEquals($expected, $process->getOutput());
+    }
 }

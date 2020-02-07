@@ -308,7 +308,7 @@ install:
           else
               if [[ $PHP = 7.4* ]]; then
                   # add return types before running the test suite
-                  rm vendor/symfony/contracts -Rf
+                  rm src/Symfony/Contract -Rf && mv vendor/symfony/contracts src/Symfony/Contract
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader

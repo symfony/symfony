@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-11-27T16:01:07Z
+
+I like this idea a lot (and the PR explains it perfectly! thanks for that). Just as a very minor comment: given that we already use `GroupSequence` ... what if we use the same word ("sequence") for this too?
+
+```
+@Assert\Sequentially(...)  ->  @Assert\Sequence(...)
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-11-27T16:23:55Z
+
+@javiereguiluz : I hesitated to explain this point in the PR, but I preferred to avoid naming it `Sequence` as in the original proposition, because I think it's too much connotated as "validating a number sequence" or an array with sequence as indexes. It's also easiest to understand it'll validate the nested constraint sequentially. But I'm fine with `Sequence` if it's only me :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-07T13:33:23Z
+
+rebase needed
+is there any blocker?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-02-07T16:17:41Z
+
+Rebased
+There is no blocker to me. Thanks for the ping

@@ -41,7 +41,7 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },
-        "files": [ "Deprecation/deprecated.php" ],
+        "files": [ "Deprecation/function.php" ],
         "exclude-from-classmap": [
             "**/Tests/"
         ]

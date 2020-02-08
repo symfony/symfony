@@ -15,11 +15,11 @@
         }
     ],
     "require": {
-        "php": "^7.0"
+        "php": "^7.1"
     },
     "autoload": {
         "files": [
-            "deprecated.php"
+            "function.php"
         ]
     },
     "minimum-stability": "dev",

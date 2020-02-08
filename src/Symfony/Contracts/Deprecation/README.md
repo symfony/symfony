@@ -3,9 +3,10 @@ Symfony Deprecation Contracts
 
 A generic function and convention to trigger deprecation notices.
 
-This package provides a single global function named `deprecated()`.
-Its purpose is to trigger deprecations in a way that can be silenced on production environments
-by using the `zend.assertions` ini setting and that can be caught during development to generate reports.
+This package provides a single global function named `trigger_deprecation()` that triggers silenced deprecation notices.
+
+By using a custom PHP error handler such as the one provided by the Symfony ErrorHandler component,
+the triggered deprecations can be caught and logged for later discovery, both on dev and prod environments.
 
 The function requires at least 3 arguments:
  - the name of the Composer package that is triggering the deprecation
@@ -15,8 +16,11 @@ The function requires at least 3 arguments:
 
 Example:
 ```php
-deprecated('symfony/blockchain', 8.9, 'Using "%s" is deprecated, use "%s" instead.', 'bitcoin', 'fabcoin');
+trigger_deprecation('symfony/blockchain', '8.9', 'Using "%s" is deprecated, use "%s" instead.', 'bitcoin', 'fabcoin');
 ```
 
 This will generate the following message:
 `Since symfony/blockchain 8.9: Using "bitcoin" is deprecated, use "fabcoin" instead.`
+
+While not necessarily recommended, the deprecation notices can be completely ignored by declaring an empty
+`function trigger_deprecation() {}` in your application.

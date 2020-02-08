@@ -8,7 +8,6 @@
         <service id="http_client" class="Symfony\Contracts\HttpClient\HttpClientInterface">
             <tag name="monolog.logger" channel="http_client" />
             <tag name="http_client.client" />
-            <factory class="Symfony\Component\HttpClient\HttpClient" method="create" />
             <argument type="collection" /> <!-- default options -->
             <argument /> <!-- max host connections -->
             <call method="setLogger">

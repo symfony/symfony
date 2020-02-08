@@ -100,4 +100,87 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertEquals($body, $encoded['body']);
         $this->assertEquals($headers, $encoded['headers']);
     }
+
+    public function testConnectionBelowRedeliverTimeout()
+    {
+        // lower redeliver timeout and claim interval
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+
+        $connection->cleanup();
+        $connection->setup();
+
+        $body = '{"message": "Hi"}';
+        $headers = ['type' => DummyMessage::class];
+
+        // Add two messages
+        $connection->add($body, $headers);
+
+        // Read first message with other consumer
+        $this->redis->xreadgroup(
+            $this->getConnectionGroup($connection),
+            'other-consumer2',
+            [$this->getConnectionStream($connection) => '>'],
+            1
+        );
+
+        // Queue will not have any messages yet
+        $this->assertNull($connection->get());
+    }
+
+    public function testConnectionClaimAndRedeliver()
+    {
+        // lower redeliver timeout and claim interval
+        $connection = Connection::fromDsn(
+            getenv('MESSENGER_REDIS_DSN'),
+            ['redeliver_timeout' => 0, 'claim_interval' => 500],
+            $this->redis
+        );
+
+        $connection->cleanup();
+        $connection->setup();
+
+        $body1 = '{"message": "Hi"}';
+        $body2 = '{"message": "Bye"}';
+        $headers = ['type' => DummyMessage::class];
+
+        // Add two messages
+        $connection->add($body1, $headers);
+        $connection->add($body2, $headers);
+
+        // Read first message with other consumer
+        $this->redis->xreadgroup(
+            $this->getConnectionGroup($connection),
+            'other-consumer2',
+            [$this->getConnectionStream($connection) => '>'],
+            1
+        );
+
+        // Queue will return the pending message first because redeliver_timeout = 0
+        $encoded = $connection->get();
+        $this->assertEquals($body1, $encoded['body']);
+        $this->assertEquals($headers, $encoded['headers']);
+        $connection->ack($encoded['id']);
+
+        // Queue will return the second message
+        $encoded = $connection->get();
+        $this->assertEquals($body2, $encoded['body']);
+        $this->assertEquals($headers, $encoded['headers']);
+        $connection->ack($encoded['id']);
+    }
+
+    private function getConnectionGroup(Connection $connection): string
+    {
+        $property = (new \ReflectionClass(Connection::class))->getProperty('group');
+        $property->setAccessible(true);
+
+        return $property->getValue($connection);
+    }
+
+    private function getConnectionStream(Connection $connection): string
+    {
+        $property = (new \ReflectionClass(Connection::class))->getProperty('stream');
+        $property->setAccessible(true);
+
+        return $property->getValue($connection);
+    }
 }

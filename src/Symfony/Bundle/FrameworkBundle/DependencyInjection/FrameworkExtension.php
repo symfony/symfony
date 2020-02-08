@@ -1862,7 +1862,36 @@ class FrameworkExtension extends Extension
     {
         $loader->load('http_client.xml');
 
-        $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);
+        $defaultOptions = $config['default_options'] ?? [];
+        $maxHostConnections = $config['max_host_connections'] ?? 6;
+        $httpClient = $container->getDefinition('http_client');
+
+        switch ($transport = $config['transport']) {
+            case 'auto':
+                $httpClient
+                    ->setFactory([HttpClient::class, 'create'])
+                    ->setArguments([$defaultOptions, $maxHostConnections]);
+                break;
+
+            case 'curl':
+                $httpClient
+                    ->setClass(CurlHttpClient::class)
+                    ->setArguments([$defaultOptions, $maxHostConnections]);
+                break;
+
+            case 'native':
+                $httpClient
+                    ->setClass(NativeHttpClient::class)
+                    ->setArguments([$defaultOptions, $maxHostConnections]);
+                break;
+
+            case 'mock':
+                $httpClient->setClass(MockHttpClient::class);
+                break;
+
+            default:
+                throw new InvalidArgumentException(sprintf('Unsupported transport "%s".', $transport));
+        }
 
         if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
             $container->removeDefinition('psr18.http_client');

@@ -413,6 +413,11 @@ class ErrorHandler
         $throw = $this->thrownErrors & $type & $level;
         $type &= $level | $this->screamedErrors;
 
+        // Never throw on warnings triggered by assert()
+        if (E_WARNING === $type && 'a' === $message[0] && 0 === strncmp($message, 'assert(): ', 10)) {
+            $throw = 0;
+        }
+
         if (!$type || (!$log && !$throw)) {
             return !$silenced && $type && $log;
         }

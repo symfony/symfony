@@ -615,4 +615,39 @@ class ErrorHandlerTest extends TestCase
             }
         }
     }
+
+    public function testAssertQuietEval()
+    {
+        $ini = [
+            ini_set('zend.assertions', 1),
+            ini_set('assert.active', 1),
+            ini_set('assert.bail', 0),
+            ini_set('assert.warning', 1),
+            ini_set('assert.callback', null),
+            ini_set('assert.exception', 0),
+        ];
+
+        $logger = new BufferingLogger();
+        $handler = new ErrorHandler($logger);
+        $handler = ErrorHandler::register($handler);
+
+        try {
+            \assert(false);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+
+            ini_set('zend.assertions', $ini[0]);
+            ini_set('assert.active', $ini[1]);
+            ini_set('assert.bail', $ini[2]);
+            ini_set('assert.warning', $ini[3]);
+            ini_set('assert.callback', $ini[4]);
+            ini_set('assert.exception', $ini[5]);
+        }
+
+        $logs = $logger->cleanLogs();
+
+        $this->assertSame('warning', $logs[0][0]);
+        $this->assertSame('Warning: assert(): assert(false) failed', $logs[0][1]);
+    }
 }

@@ -35,6 +35,8 @@ class SmtpTransport extends AbstractTransport
     private $restartThreshold = 100;
     private $restartThresholdSleep = 0;
     private $restartCounter;
+    private $pingThreshold = 100;
+    private $lastMessageTime = 0;
     private $stream;
     private $domain = '[127.0.0.1]';
 
@@ -62,6 +64,28 @@ class SmtpTransport extends AbstractTransport
     {
         $this->restartThreshold = $threshold;
         $this->restartThresholdSleep = $sleep;
+
+        return $this;
+    }
+
+    /**
+     * Sets the minimum number of seconds required between two messages, before the server is pinged.
+     * If the transport wants to send a message and the time since the last message exceeds the specified threshold,
+     * the transport will ping the server first (NOOP command) to check if the connection is still alive.
+     * Otherwise the message will be sent without pinging the server first.
+     *
+     * Do not set the threshold too low, as the SMTP server may drop the connection if there are too many
+     * non-mail commands (like pinging the server with NOOP).
+     *
+     * By default, the threshold is set to 100 seconds.
+     *
+     * @param int $seconds The minimum number of seconds between two messages required to ping the server
+     *
+     * @return $this
+     */
+    public function setPingThreshold(int $seconds): self
+    {
+        $this->pingThreshold = $seconds;
 
         return $this;
     }
@@ -160,7 +184,10 @@ class SmtpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $this->ping();
+        if (microtime(true) - $this->lastMessageTime > $this->pingThreshold) {
+            $this->ping();
+        }
+
         if (!$this->started) {
             $this->start();
         }
@@ -183,6 +210,8 @@ class SmtpTransport extends AbstractTransport
             $e->appendDebug($this->stream->getDebug());
 
             throw $e;
+        } finally {
+            $this->lastMessageTime = microtime(true);
         }
     }
 
@@ -213,6 +242,7 @@ class SmtpTransport extends AbstractTransport
         $this->assertResponseCode($this->getFullResponse(), [220]);
         $this->doHeloCommand();
         $this->started = true;
+        $this->lastMessageTime = 0;
 
         $this->getLogger()->debug(sprintf('Email transport "%s" started', __CLASS__));
     }

@@ -28,6 +28,7 @@
         "symfony/dependency-injection": "^3.4|^4.0|^5.0",
         "symfony/error-handler": "^4.4|^5.0",
         "symfony/http-foundation": "^3.4|^4.0|^5.0",
+        "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^3.4|^4.0|^5.0",
         "symfony/property-info": "^3.4.13|~4.0|^5.0",
         "symfony/validator": "^3.4|^4.0|^5.0",

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-02-01T12:10:16Z
+
+Given the amount of occurrences of this -> `deprecated('', '', '... deprecation message...')`  in the PR, shouldn't we change the signature of this method like this?
+
+```php
+// Before
+deprecated($package, $version, $message)
+
+// After
+deprecated(string $message, string $package = '', string $version = '')
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-01T12:17:00Z
+
+> Given the amount of occurrences of this -> deprecated('', '', '... deprecation message...') in the PR, shouldn't we change the signature of this method like this?
+
+actually no: we should improve the deprecation subsystem to allow specifying the package and version of it that introduced eg deprecating this service or this config option.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-02-05T19:21:59Z
+
+Do we have a some plan for e.g. vendors to provide the package/version details? Currently the ecosystem includes those in the message i tend to believe, as the message is the only way currently.
+
+Im talking about deprecated services, config nodes, option resolvers & co. Thus where the user provides deprecation details ...
+
+The amount of `deprecated('', '', ...)` occurrences triggered me :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-05T19:28:50Z
+
+We do, in https://github.com/orgs/symfony/projects/1#card-32681032, help wanted :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-08T09:27:18Z
+
+@ostrolucky the answer is definitely yes, this should be done on 5.1. If there should be any discussion about the exact behavior of the function itself, let's have one, but the goal has to be to merge this PR in 5.1.

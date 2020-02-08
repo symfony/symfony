@@ -31,6 +31,7 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/cache": "^4.4|^5.0",
+        "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",

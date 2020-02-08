@@ -110,7 +110,7 @@
     {%- set widget_attr = {} -%}
     {%- set describedby = '' -%}
     {%- if errors|length > 0 -%}
-        {%- set describedby = (describedby~" form-error-"~id) | trim -%}
+        {%- set describedby = "form-error-"~id -%}
     {%- endif -%}
     {%- if help is not empty -%}
         {%- set describedby = (describedby~" "~id~"_help") | trim -%}

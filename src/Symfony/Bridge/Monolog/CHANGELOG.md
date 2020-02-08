@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+ * Added `MailerHandler`
+
 5.0.0
 -----
 

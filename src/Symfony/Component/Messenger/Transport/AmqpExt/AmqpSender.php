@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpSender as BridgeAmqpSender;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpSender::class, BridgeAmqpSender::class), E_USER_DEPRECATED);
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpSender::class, BridgeAmqpSender::class);
 
 class_exists(BridgeAmqpSender::class);
 

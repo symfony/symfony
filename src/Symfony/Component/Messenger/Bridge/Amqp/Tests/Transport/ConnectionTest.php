@@ -104,7 +104,7 @@ class ConnectionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.
      */
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()
     {
@@ -113,7 +113,7 @@ class ConnectionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.
      */
     public function testDeprecationIfInvalidOptionIsPassedAsArgument()
     {
@@ -122,7 +122,7 @@ class ConnectionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Invalid queue option(s) "foo" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/messenger 5.1: Invalid queue option(s) "foo" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated.
      */
     public function testDeprecationIfInvalidQueueOptionIsPassed()
     {
@@ -131,7 +131,7 @@ class ConnectionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Invalid exchange option(s) "foo" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/messenger 5.1: Invalid exchange option(s) "foo" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated.
      */
     public function testDeprecationIfInvalidExchangeOptionIsPassed()
     {

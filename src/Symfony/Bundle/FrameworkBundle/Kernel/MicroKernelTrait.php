@@ -174,7 +174,7 @@ trait MicroKernelTrait
             }
         }
 
-        @trigger_error(sprintf('Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated since Symfony 5.1, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class), E_USER_DEPRECATED);
+        trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
 
         $routes = new RouteCollectionBuilder($loader);
         $this->configureRoutes($routes);

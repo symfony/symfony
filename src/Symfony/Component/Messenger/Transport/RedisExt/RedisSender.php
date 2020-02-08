@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Transport\RedisExt;
 
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisSender as BridgeRedisSender;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisSender::class, BridgeRedisSender::class), E_USER_DEPRECATED);
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisSender::class, BridgeRedisSender::class);
 
 class_exists(BridgeRedisSender::class);
 

@@ -18,6 +18,7 @@
     "require": {
         "php": "^7.2.5",
         "psr/container": "^1.0",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/service-contracts": "^1.1.6|^2"
     },
     "require-dev": {

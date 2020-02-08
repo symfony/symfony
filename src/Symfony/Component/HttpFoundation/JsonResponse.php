@@ -68,7 +68,7 @@ class JsonResponse extends Response
      */
     public static function create($data = null, int $status = 200, array $headers = [])
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 5.1; use __construct() instead.', __METHOD__), E_USER_DEPRECATED);
+        trigger_deprecation('symfony/http-foundation', '5.1', 'The "%s()" method is deprecated, use "new %s()" instead.', __METHOD__, \get_called_class());
 
         return new static($data, $status, $headers);
     }

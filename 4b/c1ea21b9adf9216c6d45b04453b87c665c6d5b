@@ -1,0 +1,383 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-19T15:38:08Z
+
+Thanks for the PR. I'll find time to give my thoughts asap.
+ping @alexander-schranz also
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-01-21T13:59:24Z
+
+As written with you on slack @toooni this should moved into a function call inside the following if line:
+
+https://github.com/symfony/symfony/blob/9f93a38fffd2d57595b2732a3eadeb12d0af0892/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php#L174-L176
+
+so e.g.:
+
+```php
+        if ($this->couldHavePendingMessages) {
+            if ($this->isRandomConsumer) {
+                $this->claimOldMessages(); // this function does the xpending and xclaim
+                // the logic after this doesn't need to change as it will read the correct messages
+            }
+            $messageId = '0'; // will receive consumers pending/claimed messages
+        }
+```
+
+as it is required to have a uniqid consumer name for your flag you should do that in the constructor of the connection here:
+
+https://github.com/symfony/symfony/blob/9f93a38fffd2d57595b2732a3eadeb12d0af0892/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php#L68
+
+e.g.:
+
+```php
+if ($configuration['randomconsumer'] === 'true') {
+     $this->consumer .= '_'.uniqid();
+     $this->isRandomConsumer = true;
+}
+```
+
+and currently you still will end in a race condition as you still use the same consumer name else both will claim the same messages.
+
+The couldHavePendingMessages should be at start on true and only then claim old messages not in every loop so that flag you should not touch in your PR when you move the logic to the claimOldMessages as written above.
+
+The whole logic should be behind a flag e.g. `randomConsumer=true` as it is a bc break how messages are consumed, because currently one consumer you could be 100% sure that the order of the messages is the same as the created this can not longer be provided. As written its bad practice to spam redis with new consumers on every connection so its not what I recommend to use, but I understand thats for some people its annoying to set a unique consumer name themselves. My recommendation still would be if you want to start multiple processes on the same server use something like instead of a random consumer which claims other messages:
+
+```bash
+CONSUMER_NAME=consumer1 bin/console messenger:consume ...
+CONSUMER_NAME=consumer2 bin/console messenger:consume ...
+CONSUMER_NAME=consumer3 bin/console messenger:consume ...
+```
+
+And for kubernetes the [stateful](https://github.com/symfony/symfony-docs/pull/11869) should be used. This implementation is something I would only use if you have no control which with env the consumer are started and you wanted to have multiple consumers.
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-21T20:32:28Z
+
+@alexander-schranz I don't think so. With the PR the flow looks like the following (It's not everything we talked about):
+- `couldHavePendingMessages` is `false` by default
+- `XPENDING` checks for pending message
+- if there is a pending message for the current consumer `couldHavePendingMessages` is set to true
+- if there is a pending message from another consumer which has a higher idle than the `claimTimeout`, the message gets claimed. (`XPENDING` check on next run will return this message again for the current consumer which will then set `couldHavePendingMessages` to `true`
+- depending on `couldHavePendingMessages` the id `0` or `>` is set to get a pending message or the next message in the queue
+
+This PR currently has nothing to do with random consumer names. I intentionally didn't include this in the PR because it's not directly related to this. The benefit of this PR is that no messages are being lost - even if you are using random consumer names or for example the hostname as the consumer name (or you are just switching to a lower number of consumers). Scaling consumers up or down without this feature is not really possible.
+
+To have `XPENDING` run on every `get()` call isn't very good for performance, i know. But it makes the whole transport safe to not loosing messages whatever you do. (Like the delay implementation).
+The best would be if `XPENDING` with `XCLAIM` would be called by a second command regularly but unfortunately this isn't possible.
+Not running `XPENDING` on every `get()` call and using a timeout or counter to use `XPENDING` only periodically does not work because of possible low `time-limit`, `memory-limit` or `limit` options of the consume command.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-01-22T00:07:56Z
+
+@toooni currenty never a message is lost because on restart the couldHavePendingMessages is true and will read all messages which are not acked so this statement is not true when using it the correct way.
+
+Using this implementation you provided without a random consumer name could end up in the same error you have in your issue as if 2 consume messages start at the same time a race condition between xpending and xclaim both processes would have the same consumer name and so they will process the same messages the xclaim doesnt do anything in this case as the old messages where the same consumer name. So the only thing is that we stopped reading crashed  pending messages immediately after the crash and make the maybe exception a little less common because it happens later at the time-lmit but it still can happen at that place if the processes start at the same time, so for me this way is not a fix of that issue then.
+
+Unless that if we really want to implement it this way we should move that xpending <-> xclaim part into a function and call that not on every `get`. I would say on first call of the get and when the time is reached or a xpending message could be old enough to get claimed.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-01-22T01:22:34Z
+
+I tested a little bit around and thing we should implement it this way then @toooni:
+
+We only claim messages if there are no pending messages so we don't change the old behaviour.
+So on first start it will behave like before. First read its own pending message and finish it. After it finished couldHavePendingMessages is false and it will claim messages of other consumers. With the claimInterval we avoid that its called on every get and make it also possible to disable the behaviour by providing a high claimInterval.
+
+```php
+    private $couldHavePendingMessages = true;
+    private $lastClaim = 0;
+    private $claimInterval = 1000; // not sure in which interval we want to check for claim messages maybe evey 10 seconds? parameter should be configureable ?claim-interval=
+
+    public function get()
+    {
+         // ...
+
+         if (!$this->couldHavePendingMessages && ($this->lastClaim + $this->claimInterval) > time()) {
+               $this->claimOldPendingMessages();
+         }
+
+         $messageId = '>'; // will receive new messages
+         if ($this->couldHavePendingMessages) {
+             $messageId = '0'; // will receive pending messages
+         }
+
+         // ...
+    }
+
+     private function claimOldPendingMessages()
+     {
+        try {
+            // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
+            // https://github.com/antirez/redis/issues/6256
+            $pendingMessages = $this->connection->xpending($this->stream, $this->group, '-', '+', 3);
+
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        $claimableIds = [];
+        foreach ($pendingMessages as $pendingMessage) {
+            if ($pendingMessage[1] === $this->consumer) {
+                 $this->couldHavePendingMessages = true;
+                 continue;
+            }
+
+            if ($pendingMessage[2] < (time() - $this->redeliveryTime)) {
+                $claimableIds[] = $pendingMessage[0];
+            }
+        }
+
+        if (\count($claimableIds) > 0) {
+            try {
+                $this->connection->xclaim(
+                    $this->stream,
+                    $this->group,
+                    $this->consumer,
+                    $this->claimTimeout,
+                    $claimableIds,
+                    ['JUSTID']
+                );
+
+                 $this->couldHavePendingMessages = true;
+            } catch (\RedisException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
+            }
+        }
+
+        $this->lastClaim = time();
+     }
+```
+
+With that claimInterval it will be possible to disable the behaviour if somebody is using a
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-22T06:11:58Z
+
+Just for traceability:
+> currenty never a message is lost because on restart the couldHavePendingMessages is true and will read all messages which are not acked so this statement is not true when using it the correct way.
+
+The messages are lost if there won't be a consumer with the same name again. This isn't only an issue if you want to use random names but also if you want to scale your workers up and down.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-01-22T13:11:32Z
+
+@toooni
+
+> The messages are lost if there won't be a consumer with the same name again. This isn't only an issue if you want to use random names but also if you want to scale your workers up and down.
+
+Oh yeah you are totally correct about that use case 👍  some little changes then it looks good for me.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-01-22T22:12:33Z
+
+@toooni as the xpending response doesnt seems to look the same for me I needed to change how the message timestamp is read. And I needed to disable the claimIdleTime for the integration test as symfony clockmock have no effect on the redis min idle time on xclaim.
+
+```diff
+diff --git a/src/Symfony/Component/Messenger/Tests/Transport/RedisExt/RedisExtIntegrationTest.php b/src/Symfony/Component/Messenger/Tests/Transport/RedisExt/RedisExtIntegrationTest.php
+index 537c3fba68..04a61e0e9c 100644
+--- a/src/Symfony/Component/Messenger/Tests/Transport/RedisExt/RedisExtIntegrationTest.php
++++ b/src/Symfony/Component/Messenger/Tests/Transport/RedisExt/RedisExtIntegrationTest.php
+@@ -32,6 +32,7 @@ class RedisExtIntegrationTest extends TestCase
+
+         $this->redis = new \Redis();
+         $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
++        $this->connection->disableClaimIdleTime(true);
+         $this->connection->cleanup();
+         $this->connection->setup();
+     }
+@@ -104,4 +105,36 @@ class RedisExtIntegrationTest extends TestCase
+         $this->assertEquals($body, $encoded['body']);
+         $this->assertEquals($headers, $encoded['headers']);
+     }
++
++    public function testConnectionGetClaimMessages()
++    {
++        $body = '{"message": "Hi"}';
++        $headers = ['type' => DummyMessage::class];
++
++        $this->connection->add($body, $headers);
++
++        // Read message with other consumer
++        $messages = $this->redis->xreadgroup(
++            $this->connection->getGroup(),
++            'other-consumer2',
++            [$this->connection->getStream() => '>'],
++            1
++        );
++
++        // Queue will not have any messages yet
++        $this->assertNull($this->connection->get());
++
++        // Wait for next claim check
++        sleep(1001);
++
++        // Should still be empty
++        $this->assertNull($this->connection->get());
++
++        // Wait for redelivery timeout
++        sleep(2600);
++
++        $encoded = $this->connection->get();
++        $this->assertEquals($body, $encoded['body']);
++        $this->assertEquals($headers, $encoded['headers']);
++    }
+ }
+diff --git a/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php b/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php
+index fea1bb8cbf..959e6b6a8f 100644
+--- a/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php
++++ b/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php
+@@ -48,6 +48,7 @@ class Connection
+     private $redeliverTimeout;
+     private $nextClaim = 0;
+     private $claimInterval;
++    private $disabledClaimIdleTime = false;
+     private $couldHavePendingMessages = true;
+
+     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
+@@ -74,7 +75,7 @@ class Connection
+         $this->queue = $this->stream.'__queue';
+         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
+         $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
+-        $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
++        $this->redeliverTimeout = $configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout'];
+         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
+     }
+
+@@ -167,6 +168,7 @@ class Connection
+         }
+
+         $claimableIds = [];
++
+         foreach ($pendingMessages as $pendingMessage) {
+             if ($pendingMessage[1] === $this->consumer) {
+                 $this->couldHavePendingMessages = true;
+@@ -174,18 +176,26 @@ class Connection
+                 return;
+             }
+
+-            if ($pendingMessage[2] < (time() - $this->redeliverTimeout)) {
++            $messageTimestampInSeconds = (int) (intval($pendingMessage[0]) / 1000);
++            if ($messageTimestampInSeconds < (time() - $this->redeliverTimeout)) {
+                 $claimableIds[] = $pendingMessage[0];
+             }
+         }
+
+         if (\count($claimableIds) > 0) {
++            $claimIdleTime = ($this->redeliverTimeout * 1000);
++
++            if ($this->disabledClaimIdleTime) {
++                // For tests it needed to disable the idle timeout
++                $claimIdleTime = 0;
++            }
++
+             try {
+                 $this->connection->xclaim(
+                     $this->stream,
+                     $this->group,
+                     $this->consumer,
+-                    $this->redeliverTimeout,
++                    $claimIdleTime,
+                     $claimableIds,
+                     ['JUSTID']
+                 );
+@@ -388,9 +398,24 @@ class Connection
+         return (int) (microtime(true) * 1000);
+     }
+
++    public function disableClaimIdleTime(): void
++    {
++        $this->disabledClaimIdleTime = true;
++    }
++
+     public function cleanup(): void
+     {
+         $this->connection->del($this->stream);
+         $this->connection->del($this->queue);
+     }
++
++    public function getStream(): string
++    {
++        return $this->stream;
++    }
++
++    public function getGroup(): string
++    {
++        return $this->group;
++    }
+ }
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-27T15:48:39Z
+
+Exposing new options for the transport should be done on master ideally.
+The fact we need to expose them here makes this looks like a BC break more than a bugfix.
+Can we inline their default values instead for now and make them configurable in another PR on master?
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-27T16:01:11Z
+
+@chalasr I disagree. The new options are completely optional and it's not a BC break because you must not really care if the configuration worked for you before. I don't see the point in delaying optional parameters.
+The only problem might be the docs. If the users are browsing the 4.4 docs and do see these options and want to use them in their currently installed version which does not have the options yet. If we care about this, we could just delay the docs and target the master branch in the docs PR. What do you think?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-27T16:11:12Z
+
+@toooni I'm not saying that exposing them is a BC break, sorry for being unclear.
+What I mean is that exposing these new options is not required for fixing the target bug (stop me if I'm wrong), thus their addition qualifies as a new feature which deserves a CHANGELOG entry, as proven by your PR on symfony-docs.
+We are expending the public API of the transport here, which we better avoid in a patch, especially if the addition is useful enough to be documented.
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-27T16:28:53Z
+
+@chalasr Yes, the options are not really required to fix the targeted issue. But if somebody is familiar with the issue they might want to set their own values for these options.
+Btw. I intended to replace the following PR (https://github.com/symfony/symfony-docs/pull/11869/files) in my symfony-docs PR too. This is why I added the `caution` message.
+
+I can understand if you really don't want to expose the options and I will change the PR if you like. But in my opinion there is no reason to since the options are just defined in an array and not in a separate method parameter and therefore not "exposed" but "available by knowledge".
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-28T06:54:47Z
+
+@chalasr @alexander-schranz I've updated the `claim_interval` default value to 1 Minute. It doesn't make sense to have it lower if we have a default `redeliver_timeout` of 1 hour.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-02T19:34:03Z
+
+> they might want to set their own values for these options.
+
+Which would mean that they are using this change as a new feature, since they would need to update their code. Upgrading to patch versions should not involve code changes.
+
+Sorry to insist, but if we are not confident that the default values are good enough for everyone as a bugfix, then this PR should target master.
+Inlining the default values for 3.4 and exposing these options as a new feature on master (and document it on master as well) is the right tradeoff IMHO.
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-02-03T15:25:31Z
+
+I will change the PR to target the `master` branch. But I don't think it makes sense to introduce these changes to 3.4 if there is no way to change the default values.
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-02-03T16:28:24Z
+
+@chalasr The PR now targets the master branch 👍
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-02-04T13:45:09Z
+
+@chalasr I've rebased again but travisci is still failing because of another `master` branch issue.

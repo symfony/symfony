@@ -6,6 +6,7 @@ CHANGELOG
 
  * added the `Hostname` constraint and validator
  * added option `alpha3` to `Country` constraint
+ * allow to define a reusable set of constraints by extending the `Compound` constraint
 
 5.0.0
 -----

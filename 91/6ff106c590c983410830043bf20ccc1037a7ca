@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by BoShurik at 2019-09-04T11:59:29Z
+
+@stof done, but not sure why build fails. Looks like unrelated
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-28T14:16:52Z
+
+Proposing this for the 4.4 milestone so that this doesn't block Mailer as a first-class citizen in 4.4/5.0
+
+---------------------------------------------------------------------------
+
+by acasademont at 2019-12-12T10:49:53Z
+
+Any news here? I guess a PR to monolog-bundle would be also needed?
+
+---------------------------------------------------------------------------
+
+by mmarton at 2020-01-06T11:06:57Z
+
+Any update here? It's the last reason we are still on swiftmailer. :/
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-01-15T16:45:05Z
+
+Hi @BoShurik, how can I help to get this for 5.1?
+
+Thank you,
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2020-01-15T23:48:57Z
+
+@noniagriconomie Hi! Sorry for delay. I'll add changes by the end of the week
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2020-01-17T09:55:08Z
+
+Needs a review

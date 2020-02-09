@@ -149,6 +149,10 @@ abstract class FileLoader extends BaseFileLoader
             $this->instanceof[$id] = $definition;
         } else {
             $conditionals = array_filter($this->instanceof, function (string $instanceOfId) use ($id) {
+                if (!isset($this->instanceofIgnored[$instanceOfId])) {
+                    return true;
+                }
+
                 return !isset($this->instanceofIgnored[$instanceOfId][$id]);
             }, ARRAY_FILTER_USE_KEY);
             $this->container->setDefinition($id, $definition instanceof ChildDefinition ? $definition : $definition->setInstanceofConditionals($conditionals));

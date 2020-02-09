@@ -22,7 +22,7 @@ class GoneRouteConfigurator extends RouteConfigurator
     use AddTrait;
 
     /**
-     * @param bool $permanent Whether the redirection is permanent
+     * @param bool $permanent Whether the route is gone permanently
      *
      * @return $this
      */

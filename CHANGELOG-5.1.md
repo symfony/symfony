@@ -9,4 +9,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 5.1.0
 
- * feature #35658 [DependencyInjection]Add "ignore" option to "_instanceof" configuration (ottaviano)" (nicolas-grekas)
+ * feature #35658 [DependencyInjection] Add "ignore" option to "_instanceof" configuration (tsantos84)

@@ -69,6 +69,7 @@ class XmlFileLoader extends FileLoader
             $this->parseDefinitions($xml, $path, $defaults);
         } finally {
             $this->instanceof = [];
+            $this->instanceofIgnored = [];
             $this->registerAliasesForSinglyImplementedInterfaces();
         }
     }

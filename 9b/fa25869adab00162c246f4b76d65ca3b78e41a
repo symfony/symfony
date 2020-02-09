@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2020-01-20T12:00:14Z
+
+In the xliff 1.2 loader, there is a support for `resName` which isn't there anymore on xliff 2. But, on 1.2, there is no `name`.
+
+According to http://docs.oasis-open.org/xliff/xliff-core/v2.0/xliff-core-v2.0.html#name :
+
+> Resource name - the original identifier of the resource corresponding to the Extracted <unit> or <group>.
+>
+> For example: the key in the key/value pair in a Java properties file, the ID of a string in a Windows string table, the index value of an entry in a database table, etc.
+
+So seems fitting here... But it is not available for `<segment>` (only for `<unit>` and `<group>`). We could probably detect if there is more than one segment and then deny ? Or use `id` instead, as it's optional for `<segment>` according to the xliff2 specs ?
+
+The problem comes with indeed translator tools (e.g memsource in my case) and ICU handling : We would like to use the ICU notation, and proceeding on xliff2 with how it's proposed in the doc doesn't do well with translator tool.
+
+They base themselves on the `source` element, and provide a translation in `target`... so for them, the `source` is not translatable. While having support for the `name` key allows to use the ICU basic string in the `source`, so the tool can translate how it can.

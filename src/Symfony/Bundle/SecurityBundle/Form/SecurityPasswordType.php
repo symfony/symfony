@@ -56,11 +56,6 @@ class SecurityPasswordType extends AbstractType
         });
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['required'] = false;
-    }
-
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('security_user', null);

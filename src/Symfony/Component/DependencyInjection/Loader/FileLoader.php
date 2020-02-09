@@ -34,6 +34,7 @@ abstract class FileLoader extends BaseFileLoader
     protected $container;
     protected $isLoadingInstanceof = false;
     protected $instanceof = [];
+    protected $instanceofIgnored = [];
     protected $interfaces = [];
     protected $singlyImplemented = [];
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
@@ -147,7 +148,10 @@ abstract class FileLoader extends BaseFileLoader
             }
             $this->instanceof[$id] = $definition;
         } else {
-            $this->container->setDefinition($id, $definition instanceof ChildDefinition ? $definition : $definition->setInstanceofConditionals($this->instanceof));
+            $conditionals = array_filter($this->instanceof, function(string $instanceOfId) use ($id) {
+                return !isset($this->instanceofIgnored[$instanceOfId][$id]);
+            }, ARRAY_FILTER_USE_KEY);
+            $this->container->setDefinition($id, $definition instanceof ChildDefinition ? $definition : $definition->setInstanceofConditionals($conditionals));
         }
     }
 

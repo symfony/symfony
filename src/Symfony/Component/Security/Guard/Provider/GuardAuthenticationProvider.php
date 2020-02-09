@@ -82,7 +82,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
                 return $token;
             }
 
-            // this AccountStatusException causes the user to be logged out
+            // this AccountExpiredException causes the user to be logged out
             throw new AuthenticationExpiredException();
         }
 

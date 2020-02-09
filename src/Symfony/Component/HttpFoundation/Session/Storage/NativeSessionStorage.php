@@ -52,7 +52,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * @var string|null
      */
-    private $emulateSameSite;
+    protected $emulateSameSite;
 
     /**
      * Depending on how you want the storage driver to behave you probably

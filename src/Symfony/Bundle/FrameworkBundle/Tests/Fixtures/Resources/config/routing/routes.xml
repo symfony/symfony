@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/framework-routing-1.0.xsd">
+
+    <route id="classic_route" path="/classic" />
+
+    <template-route id="template_route"
+           path="/static"
+           template="static.html.twig"
+           max-age="300"
+           shared-max-age="100"
+           private="true"
+           methods="GET">
+        <context>
+            <string key="foo">bar</string>
+        </context>
+        <option key="utf8">true</option>
+        <condition>abc</condition>
+    </template-route>
+
+    <redirect-route id="redirect_route"
+           path="/redirect"
+           redirect-to-route="target_route"
+           permanent="true"
+           ignore-attributes="attr, ibutes"
+           keep-request-method="true"
+           keep-query-params="true"
+           schemes="http"
+           host="legacy">
+        <option key="utf8">true</option>
+    </redirect-route>
+
+    <url-redirect-route id="url_redirect_route"
+           path="/redirect-url"
+           redirect-to-url="/url-target"
+           permanent="true"
+           scheme="http"
+           http-port="1"
+           keep-request-method="true"
+           host="legacy">
+        <option key="utf8">true</option>
+    </url-redirect-route>
+
+    <gone-route id="not_a_route" path="/not-a-path" host="legacy">
+        <option key="utf8">true</option>
+    </gone-route>
+
+    <gone-route id="gone_route" path="/gone-path" permanent="true">
+        <option key="utf8">true</option>
+    </gone-route>
+
+</routes>

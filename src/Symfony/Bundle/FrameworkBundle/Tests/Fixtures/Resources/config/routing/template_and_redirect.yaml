@@ -1,0 +1,4 @@
+invalid_route:
+    path: '/path'
+    template: 'template.html.twig'
+    redirect_to_route: 'target_route'

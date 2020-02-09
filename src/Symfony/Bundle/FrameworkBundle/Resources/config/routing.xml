@@ -15,12 +15,12 @@
 
         <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver" />
 
-        <service id="routing.loader.xml" class="Symfony\Component\Routing\Loader\XmlFileLoader">
+        <service id="routing.loader.xml" class="Symfony\Bundle\FrameworkBundle\Routing\Loader\XmlFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.yml" class="Symfony\Component\Routing\Loader\YamlFileLoader">
+        <service id="routing.loader.yml" class="Symfony\Bundle\FrameworkBundle\Routing\Loader\YamlFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>

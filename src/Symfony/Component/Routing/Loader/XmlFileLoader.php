@@ -30,7 +30,7 @@ class XmlFileLoader extends FileLoader
     use PrefixTrait;
 
     const NAMESPACE_URI = 'http://symfony.com/schema/routing';
-    const SCHEME_PATH = '/schema/routing/routing-1.0.xsd';
+    const SCHEME_PATH = __DIR__.'/schema/routing/routing-1.0.xsd';
 
     /**
      * Loads an XML file.
@@ -229,7 +229,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function loadFile(string $file)
     {
-        return XmlUtils::loadFile($file, __DIR__.static::SCHEME_PATH);
+        return XmlUtils::loadFile($file, static::SCHEME_PATH);
     }
 
     /**
@@ -303,7 +303,7 @@ class XmlFileLoader extends FileLoader
             if (isset($defaults['_stateless'])) {
                 $name = $node->hasAttribute('id') ? sprintf('"%s"', $node->getAttribute('id')) : sprintf('the "%s" tag', $node->tagName);
 
-                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for %s.', $path, $name));
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for "%s".', $path, $name));
             }
 
             $defaults['_stateless'] = XmlUtils::phpize($stateless);
@@ -317,7 +317,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array|bool|float|int|string|null The parsed value of the "default" element
      */
-    private function parseDefaultsConfig(\DOMElement $element, string $path)
+    final protected function parseDefaultsConfig(\DOMElement $element, string $path)
     {
         if ($this->isElementValueNull($element)) {
             return null;

@@ -1,0 +1,4 @@
+invalid_route:
+    path: '/path'
+    template: 'template.html.twig'
+    controller: 'SomeControllerClass'

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/routing"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://symfony.com/schema/routing"
+            elementFormDefault="qualified">
+
+  <xsd:redefine schemaLocation="https://symfony.com/schema/routing/routing-1.0.xsd">
+    <xsd:complexType name="routes">
+      <xsd:complexContent>
+        <xsd:extension base="routes">
+          <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="template-route" type="template-route" />
+            <xsd:element name="redirect-route" type="redirect-route" />
+            <xsd:element name="url-redirect-route" type="url-redirect-route" />
+            <xsd:element name="gone-route" type="gone-route" />
+          </xsd:choice>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:redefine>
+
+  <xsd:group name="base-configs">
+    <xsd:choice>
+      <xsd:element name="path" type="localized-path" />
+      <xsd:element name="requirement" type="element" />
+      <xsd:element name="option" type="element" />
+      <xsd:element name="condition" type="xsd:string" />
+    </xsd:choice>
+  </xsd:group>
+
+  <xsd:complexType name="base-route" abstract="true">
+    <xsd:attribute name="id" type="xsd:string" use="required" />
+    <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="host" type="xsd:string" />
+    <xsd:attribute name="methods" type="xsd:string" />
+    <xsd:attribute name="locale" type="xsd:string" />
+    <xsd:attribute name="format" type="xsd:string" />
+    <xsd:attribute name="utf8" type="xsd:boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="template-route">
+    <xsd:complexContent>
+      <xsd:extension base="base-route">
+        <xsd:sequence>
+          <xsd:element name="context" type="map" minOccurs="0" maxOccurs="1" />
+          <xsd:group ref="base-configs" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="template" type="xsd:string" use="required" />
+        <xsd:attribute name="max-age" type="xsd:int" />
+        <xsd:attribute name="shared-max-age" type="xsd:int" />
+        <xsd:attribute name="private" type="xsd:boolean" />
+        <xsd:attribute name="schemes" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="redirect-route">
+    <xsd:complexContent>
+      <xsd:extension base="base-route">
+        <xsd:sequence>
+          <xsd:group ref="base-configs" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="redirect-to-route" type="xsd:string" use="required"/>
+        <xsd:attribute name="permanent" type="xsd:boolean" />
+        <xsd:attribute name="ignore-attributes" type="xsd:string" />
+        <xsd:attribute name="keep-request-method" type="xsd:boolean" />
+        <xsd:attribute name="keep-query-params" type="xsd:boolean" />
+        <xsd:attribute name="schemes" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="url-redirect-route">
+    <xsd:complexContent>
+      <xsd:extension base="base-route">
+        <xsd:sequence>
+          <xsd:group ref="base-configs" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="redirect-to-url" type="xsd:string" use="required" />
+        <xsd:attribute name="permanent" type="xsd:boolean" />
+        <xsd:attribute name="scheme" type="xsd:string" />
+        <xsd:attribute name="http-port" type="xsd:int" />
+        <xsd:attribute name="https-port" type="xsd:int" />
+        <xsd:attribute name="keep-request-method" type="xsd:boolean" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="gone-route">
+    <xsd:complexContent>
+      <xsd:extension base="base-route">
+        <xsd:sequence>
+          <xsd:group ref="base-configs" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="permanent" type="xsd:boolean" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

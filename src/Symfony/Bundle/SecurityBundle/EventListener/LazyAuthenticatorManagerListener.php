@@ -26,37 +26,39 @@ use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
  */
 class LazyAuthenticatorManagerListener extends AuthenticatorManagerListener
 {
-    private $guardLocator;
+    private $authenticatorLocator;
 
     public function __construct(
         AuthenticationManagerInterface $authenticationManager,
         AuthenticatorHandler $authenticatorHandler,
-        ServiceLocator $guardLocator,
+        ServiceLocator $authenticatorLocator,
         string $providerKey,
         EventDispatcherInterface $eventDispatcher,
         ?LoggerInterface $logger = null
     ) {
         parent::__construct($authenticationManager, $authenticatorHandler, [], $providerKey, $eventDispatcher, $logger);
 
-        $this->guardLocator = $guardLocator;
+        $this->authenticatorLocator = $authenticatorLocator;
     }
 
     protected function getSupportingAuthenticators(Request $request): array
     {
-        $guardAuthenticators = [];
-        foreach ($this->guardLocator->getProvidedServices() as $key => $type) {
-            $guardAuthenticator = $this->guardLocator->get($key);
+        $authenticators = [];
+        $lazy = true;
+        foreach ($this->authenticatorLocator->getProvidedServices() as $key => $type) {
+            $authenticator = $this->authenticatorLocator->get($key);
             if (null !== $this->logger) {
-                $this->logger->debug('Checking support on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
+                $this->logger->debug('Checking support on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
             }
 
-            if ($guardAuthenticator->supports($request)) {
-                $guardAuthenticators[$key] = $guardAuthenticator;
+            if (false !== $supports = $authenticator->supports($request)) {
+                $authenticators[$key] = $authenticator;
+                $lazy = $lazy && null === $supports;
             } elseif (null !== $this->logger) {
-                $this->logger->debug('Guard authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
+                $this->logger->debug('Guard authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
             }
         }
 
-        return $guardAuthenticators;
+        return [$authenticators, $lazy];
     }
 }

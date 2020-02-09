@@ -453,7 +453,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->setDefinition('security.firewall.authenticator.'.$id, new ChildDefinition('security.firewall.authenticator'))
                 ->replaceArgument(2, new Reference('security.firewall.authenticator.'.$id.'.locator'))
                 ->replaceArgument(3, $id)
-                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
             ;
 
             $listeners[] = new Reference('security.firewall.authenticator.'.$id);

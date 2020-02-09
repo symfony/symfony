@@ -41,7 +41,8 @@ class AnonymousAuthenticator implements AuthenticatorInterface, CustomAuthentica
     public function supports(Request $request): ?bool
     {
         // do not overwrite already stored tokens (i.e. from the session)
-        return null === $this->tokenStorage->getToken();
+        // the `null` return value indicates that this authenticator supports lazy firewalls
+        return null === $this->tokenStorage->getToken() ? null : false;
     }
 
     public function getCredentials(Request $request)

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -30,10 +31,8 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  *
  * @experimental in 5.1
  */
-class AuthenticatorManagerListener
+class AuthenticatorManagerListener extends AbstractListener
 {
-    use AuthenticatorManagerListenerTrait;
-
     private $authenticationManager;
     private $authenticatorHandler;
     private $authenticators;
@@ -54,15 +53,58 @@ class AuthenticatorManagerListener
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function __invoke(RequestEvent $requestEvent)
+    public function supports(Request $request): ?bool
     {
-        $request = $requestEvent->getRequest();
-        $authenticators = $this->getSupportingAuthenticators($request);
+        if (null !== $this->logger) {
+            $context = ['firewall_key' => $this->providerKey];
+
+            if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
+                $context['authenticators'] = \count($this->authenticators);
+            }
+
+            $this->logger->debug('Checking for guard authentication credentials.', $context);
+        }
+
+        [$authenticators, $lazy] = $this->getSupportingAuthenticators($request);
+        if (!$authenticators) {
+            return false;
+        }
+
+        $request->attributes->set('_guard_authenticators', $authenticators);
+
+        return $lazy ? null : true;
+    }
+
+    public function authenticate(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+        $authenticators = $request->attributes->get('_guard_authenticators');
+        $request->attributes->remove('_guard_authenticators');
         if (!$authenticators) {
             return;
         }
 
-        $this->executeAuthenticators($authenticators, $requestEvent);
+        $this->executeAuthenticators($authenticators, $event);
+    }
+
+    protected function getSupportingAuthenticators(Request $request): array
+    {
+        $authenticators = [];
+        $lazy = true;
+        foreach ($this->authenticators as $key => $authenticator) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+            }
+
+            if (false !== $supports = $authenticator->supports($request)) {
+                $authenticators[$key] = $authenticator;
+                $lazy = $lazy && null === $supports;
+            } elseif (null !== $this->logger) {
+                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+            }
+        }
+
+        return [$authenticators, $lazy];
     }
 
     /**
@@ -71,6 +113,15 @@ class AuthenticatorManagerListener
     protected function executeAuthenticators(array $authenticators, RequestEvent $event): void
     {
         foreach ($authenticators as $key => $authenticator) {
+            // recheck if the authenticator still supports the listener. support() is called
+            // eagerly (before token storage is initialized), whereas authenticate() is called
+            // lazily (after initialization). This is important for e.g. the AnonymousAuthenticator
+            // as its support is relying on the (initialized) token in the TokenStorage.
+            if (false === $authenticator->supports($event->getRequest())) {
+                $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator)]);
+                continue;
+            }
+
             $this->executeAuthenticator($key, $authenticator, $event);
 
             if ($event->hasResponse()) {

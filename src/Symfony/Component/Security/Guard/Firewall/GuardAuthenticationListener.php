@@ -34,8 +34,6 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class GuardAuthenticationListener extends AbstractListener
 {
-    use AuthenticatorManagerListenerTrait;
-
     private $guardHandler;
     private $authenticationManager;
     private $providerKey;
@@ -75,7 +73,19 @@ class GuardAuthenticationListener extends AbstractListener
             $this->logger->debug('Checking for guard authentication credentials.', $context);
         }
 
-        $guardAuthenticators = $this->getSupportingAuthenticators($request);
+        $guardAuthenticators = [];
+        foreach ($this->authenticators as $key => $authenticator) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+            }
+
+            if ($authenticator->supports($request)) {
+                $guardAuthenticators[$key] = $authenticator;
+            } elseif (null !== $this->logger) {
+                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+            }
+        }
+
         if (!$guardAuthenticators) {
             return false;
         }

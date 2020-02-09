@@ -80,7 +80,7 @@
                  class="Symfony\Component\Security\Http\Authenticator\AnonymousAuthenticator"
                  abstract="true">
             <argument type="abstract">secret</argument>
-            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.untracked_token_storage" />
         </service>
     </services>
 </container>

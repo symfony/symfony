@@ -126,7 +126,12 @@ class XmlFileLoader extends FileLoader
         $this->isLoadingInstanceof = true;
         $instanceof = $xpath->query('//container:services/container:instanceof');
         foreach ($instanceof as $service) {
-            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, []));
+            $id = (string) $service->getAttribute('id');
+            $this->instanceofIgnored[$id] = [];
+            foreach ($this->getChildren($service, 'ignore') as $ignored) {
+                $this->instanceofIgnored[$id][(string) $ignored->getAttribute('name')] = true;
+            }
+            $this->setDefinition($id, $this->parseDefinition($service, $file, []));
         }
 
         $this->isLoadingInstanceof = false;

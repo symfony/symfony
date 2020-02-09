@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -810,6 +811,17 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
+    }
+
+    public function testInstanceofWithIgnoreClass()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_instanceof_ignore_class.xml');
+        $container->compile();
+
+        $definition = $container->getDefinition(Baz::class);
+        $this->assertEmpty($definition->getTags());
     }
 
     public function testInstanceOfAndChildDefinitionNotAllowed()

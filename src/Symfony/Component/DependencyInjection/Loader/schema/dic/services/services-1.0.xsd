@@ -143,6 +143,7 @@
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="ignore" type="ignore" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="shared" type="boolean" />
@@ -247,6 +248,10 @@
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
     <xsd:attribute name="returns-clone" type="boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="ignore">
+    <xsd:attribute name="name" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">

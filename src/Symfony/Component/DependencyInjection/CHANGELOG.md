@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support to autowire public typed properties in php 7.4
  * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
+ * added support for ignoring specific implementations from `_instanceof` configuration
  * added possibility to define abstract service arguments
 
 5.0.0

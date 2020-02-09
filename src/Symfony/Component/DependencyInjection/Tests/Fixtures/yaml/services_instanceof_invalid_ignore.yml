@@ -1,0 +1,16 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface:
+            autowire: true
+            lazy: true
+            tags:
+                - { name: foo }
+            ignore: 'Symfony\Component\DependencyInjection\Tests\Fixtures\Baz'
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Bar:
+        public: true
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Baz:
+        public: true
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface: '@Symfony\Component\DependencyInjection\Tests\Fixtures\Bar'

@@ -21,7 +21,7 @@ class RouteConfigurator
     use Traits\AddTrait;
     use Traits\RouteTrait;
 
-    private $parentConfigurator;
+    protected $parentConfigurator;
 
     public function __construct(RouteCollection $collection, $route, string $name = '', CollectionConfigurator $parentConfigurator = null, array $prefixes = null)
     {

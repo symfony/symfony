@@ -80,6 +80,7 @@
         "symfony/messenger": "<4.4",
         "symfony/mime": "<4.4",
         "symfony/property-info": "<4.4",
+        "symfony/routing": "<5.1",
         "symfony/serializer": "<4.4",
         "symfony/stopwatch": "<4.4",
         "symfony/translation": "<5.0",

@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added `Routing\Loader` and `Routing\Loader\Configurator` namespaces to ease defining routes with default controllers
  * Added the `framework.router.context` configuration node to configure the `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
@@ -29,7 +30,7 @@ CHANGELOG
  * Removed the `translator.selector` and `session.save_listener` services
  * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
  * Removed `routing.loader.service`.
- * Service route loaders must be tagged with `routing.route_loader`. 
+ * Service route loaders must be tagged with `routing.route_loader`.
  * Added `slugger` service and `SluggerInterface` alias
  * Removed the `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract` services.
  * Removed the `router.cache_class_prefix` parameter.
@@ -81,8 +82,8 @@ CHANGELOG
    options if you're using Symfony's serializer.
  * [BC Break] Removed the `framework.messenger.routing.send_and_handle` configuration.
    Instead of setting it to true, configure a `SyncTransport` and route messages to it.
- * Added information about deprecated aliases in `debug:autowiring` 
- * Added php ini session options `sid_length` and `sid_bits_per_character` 
+ * Added information about deprecated aliases in `debug:autowiring`
+ * Added php ini session options `sid_length` and `sid_bits_per_character`
    to the `session` section of the configuration
  * Added support for Translator paths, Twig paths in translation commands.
  * Added support for PHP files with translations in translation commands.

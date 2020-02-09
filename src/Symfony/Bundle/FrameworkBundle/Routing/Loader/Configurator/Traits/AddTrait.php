@@ -9,32 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Loader\Configurator\Traits;
+namespace Symfony\Bundle\FrameworkBundle\Routing\Loader\Configurator\Traits;
 
+use Symfony\Bundle\FrameworkBundle\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\CollectionConfigurator;
-use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
-use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator as BaseRouteConfigurator;
 
-/**
- * @author Nicolas Grekas <p@tchwork.com>
- */
 trait AddTrait
 {
-    use LocalizedRouteTrait;
-
-    /**
-     * @var RouteCollection
-     */
-    protected $collection;
-    protected $name = '';
-    protected $prefixes;
-
     /**
      * Adds a route.
      *
      * @param string|array $path the path, or the localized paths of the route
+     *
+     * @return RouteConfigurator
      */
-    public function add(string $name, $path): RouteConfigurator
+    public function add(string $name, $path): BaseRouteConfigurator
     {
         $parentConfigurator = $this instanceof CollectionConfigurator ? $this : ($this instanceof RouteConfigurator ? $this->parentConfigurator : null);
         $route = $this->createLocalizedRoute($this->collection, $name, $path, $this->name, $this->prefixes);
@@ -46,8 +36,10 @@ trait AddTrait
      * Adds a route.
      *
      * @param string|array $path the path, or the localized paths of the route
+     *
+     * @return RouteConfigurator
      */
-    public function __invoke(string $name, $path): RouteConfigurator
+    final public function __invoke(string $name, $path): BaseRouteConfigurator
     {
         return $this->add($name, $path);
     }

@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-09T16:51:54Z
+
+I'd really appreciate some help if anyone had already overridden some xsd schema thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-10T15:31:55Z
+
+I've updated symfony/symfony-docs#11120 with a nice before/after view.
+
+Also I need to rebase on top of #30507.
+
+Xml config is working properly, but the IDE cannot resolve validation/autocompletion yet, this works thanks to the loader using its constant local path.
+I guess we need to create a new path on `https://symfony.com/routing` that we need to declare explicitly in `config/routes.xml` or any xml file where this feature should be used, are you the one handling this @fabpot? Can you help me on this?
+
+Apart this last points, the feature is ready from side, only reviews needed now :), thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-11T09:32:14Z
+
+Thanks for working on this. To make this feature completely self-explanatory, I think we should rename `redirect-to` as `redirect-to-route` (we already have `redirect-to-url`). What do you think?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-21T18:49:33Z
+
+Rebased and squashed here, while I addressed @javiereguiluz's comment.
+
+Also, I was not happy with the xml definition because all attributes are there and it's hard to guess which one to use  in which context, so I propose to use dedicated types instead: https://github.com/symfony/symfony/compare/a46c76a8c3a05adb7f984ea4d9cffbd3a446f3f5..7055ba0a5b09cec84d88f5c0447e79b65aa48a85#diff-96d406b9b38189be981bbea1bad334bd.
+
+Tests are passing locally and on travis, but not on windows.. I wonder how this line https://github.com/symfony/symfony/pull/30501/files#diff-44f544990841fe196e4ea5c76dcc18dfR8 can be a problem, if anyone has a clue on that topic that would be awesome.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-08T15:31:29Z
+
+Did you consider this instead for the PHP-DSL?
+```php
+    $routes->add('template_route', '/static')
+        ->template('static.html.twig')
+        ->maxAge(300)
+        ->sharedMaxAge(100)
+        ->private(true)
+        ->methods(['GET'])
+        ->options(['utf8' => true])
+        ->condition('abc')
+    ;
+    $routes->add('redirect_route', '/redirect')
+        ->redirectToRoute('target_route')
+        ->permanent(true)
+        ->ignoreAttributes(['attr', 'ibutes'])
+        ->keepRequestMethod(true)
+        ->keepQueryParams(true)
+        ->schemes(['http'])
+        ->host('legacy')
+        ->options(['utf8' => true])
+    ;
+    $routes->add('url_redirect_route', '/redirect-url')
+        ->redirectToUrl('/url-target')
+        ->permanent(true)
+        ->scheme('http')
+        ->httpPort(1)
+        ->httpsPort(2)
+        ->keepRequestMethod(true)
+        ->host('legacy')
+        ->options(['utf8' => true])
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-17T12:34:19Z
+
+Now that https://github.com/symfony/symfony/pull/34873 is merged, can you please rebase and take it into account to inject your new ContainerConfigurator?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-12-18T19:09:13Z
+
+Done, rebased and squashed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-04T18:23:30Z
+
+I've updated symfony/symfony-docs#11120 accordingly.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-06T18:25:57Z
+
+Thank you @Tobion for the review. I agree we could only support PHP-fluent, easier to implement and document, and maybe I can split my PR in two or discard others formats.
+
+However, about:
+>But I wonder if we really need to add the custom options for xml and yaml. It means IDEs like phpstorm explicitly need to add support for them.
+
+That's only true for YAML which would need a plugin update indeed. But the XSD is here to ensure that auto-completion and validation are mostly "native" in many tools too.
+
+>where is the new extended routing scheme going to be hosted? a new location means all the documentation would need updates.
+
+I guess we should publish a new path like `http://symfony.com/schema/routing/framework-routing-1.0.xsd`. We could either document it as part of the features only (a few example in the docs) by adding a note mentioning that they require this specific schema. Or do a find/replace in all the docs, it may worth it.
+
+Also, I think we should consider that the related issue is about a YAML feature request, I guess because for now YAML is the first tab we show in the docs, so ppl may miss this feature, PHP being still the third and last tab for now. Maybe we should change that visibility first before making this feature exclusive to PHP configuration?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-02-06T21:23:20Z
+
+> maybe I can split my PR in two or discard others formats
+
+I would like it. Then we can decide later if yaml and xml is needed and how to solve the documentation and xsd path issues.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-09T13:04:01Z
+
+I've updated this PR to only update the PHP loader. ping @Tobion @nicolas-grekas

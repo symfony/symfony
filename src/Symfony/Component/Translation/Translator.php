@@ -189,8 +189,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $default A default message if the translation had not been found
      */
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null/*, ?string $default = null*/)
     {
         if (null === $id || '' === $id) {
             return '';
@@ -201,21 +203,25 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         }
 
         $catalogue = $this->getCatalogue($locale);
-        $locale = $catalogue->getLocale();
-        while (!$catalogue->defines($id, $domain)) {
+        $catalogueLocale = $catalogue->getLocale();
+        while ($notFound = !$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
-                $locale = $catalogue->getLocale();
+                $catalogueLocale = $catalogue->getLocale();
             } else {
                 break;
             }
         }
 
-        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
-            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, $parameters);
+        if (($notFound || null !== $locale && $catalogueLocale !== $locale) && null !== (\func_get_args()[4] ?? null)) {
+            return \func_get_args()[4];
         }
 
-        return $this->formatter->format($catalogue->get($id, $domain), $locale, $parameters);
+        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+            return $this->formatter->formatIntl($catalogue->get($id, $domain), $catalogueLocale, $parameters);
+        }
+
+        return $this->formatter->format($catalogue->get($id, $domain), $catalogueLocale, $parameters);
     }
 
     /**

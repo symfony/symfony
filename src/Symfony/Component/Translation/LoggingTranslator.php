@@ -43,10 +43,12 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $default A default message if the translation had not been found
      */
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null/*, ?string $default = null*/)
     {
-        $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
+        $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale, \func_get_args()[4] ?? null);
         $this->log($id, $domain, $locale);
 
         return $trans;

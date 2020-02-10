@@ -40,6 +40,8 @@ trait TranslatorTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $default A default message if the translation had not been found
      */
     public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {

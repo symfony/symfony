@@ -15,7 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class StubTranslator implements TranslatorInterface
 {
-    public function trans($id, array $parameters = [], $domain = null, $locale = null): string
+    /**
+     * {@inheritdoc}
+     * @param string|null $default    A default message if the translation had not been found
+     */
+    public function trans($id, array $parameters = [], $domain = null, $locale = null/*, ?string $default = null*/): string
     {
         return '[trans]'.strtr($id, $parameters).'[/trans]';
     }

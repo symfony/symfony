@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+1.2.0
+
+ * add support for default translation message when translation is missing
+
 1.1.0
 -----
 

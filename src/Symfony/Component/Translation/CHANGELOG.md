@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for `name` attribute on `unit` element from xliff2 to be used as a translation key instead of always the `source` element
+ * added support for default translation message when translation is missing
 
 5.0.0
 -----

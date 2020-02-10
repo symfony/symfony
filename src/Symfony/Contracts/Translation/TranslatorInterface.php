@@ -56,10 +56,12 @@ interface TranslatorInterface
      * @param array       $parameters An array of parameters for the message
      * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default
+     * @param string|null $locale     The locale or null to use the default
+     * @param string|null $default    A default message if the translation had not been found
      *
      * @return string The translated string
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      */
-    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null);
+    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null/*, ?string $default = null*/);
 }

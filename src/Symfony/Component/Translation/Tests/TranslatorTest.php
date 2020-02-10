@@ -367,6 +367,40 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($id, $parameters, $domain, $locale));
     }
 
+    public function getTransWithDefaultTests()
+    {
+        //      $id         $locale      $expected
+        //            $default    $domain
+        yield ['foo', null, null, null, 'foo (messages EN)'];
+        yield ['foo', null, 'fr', null, 'foo (messages FR)'];
+        yield ['foo', null, 'es', null, 'foo (messages FR)'];
+        yield ['foo', null, null, 'domain2', 'foo (messages EN, domain2)'];
+        yield ['foo', null, null, 'domain3', 'foo'];
+        yield ['nope', null, null, null, 'nope'];
+
+        yield ['foo', 'bar', null, null, 'foo (messages EN)'];
+        yield ['foo', 'bar', 'fr', null, 'foo (messages FR)'];
+        yield ['foo', 'bar', 'es', null, 'bar'];
+        yield ['foo', 'bar', null, 'domain2', 'foo (messages EN, domain2)'];
+        yield ['foo', 'bar', null, 'domain3', 'bar'];
+        yield ['nope', 'bar', null, null, 'bar'];
+    }
+
+    /**
+     * @dataProvider getTransWithDefaultTests
+     */
+    public function testTransWithDefault(string $id, ?string $default, ?string $locale, ?string $domain, string $expected)
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foo (messages EN)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (messages EN, domain2)'], 'en', 'domain2');
+        $translator->setFallbackLocales(['fr']);
+        $translator->addResource('array', ['foo' => 'foo (messages FR)'], 'fr');
+
+        $this->assertSame($expected, $translator->trans($id, [], $domain, $locale, $default));
+    }
+
     /**
      * @dataProvider getInvalidLocalesTests
      */

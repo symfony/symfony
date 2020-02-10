@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by Wirone at 2019-10-18T12:19:03Z
+
+@Jeroeny yeah, I suggested it and even thought about implementation, but you were first 😉 👍
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2019-11-13T11:50:10Z
+
+Is this good to go?
+
+Edit: Actually, looking at https://github.com/symfony/symfony/pull/33875, I think it's missing:
+- `Symfony/Component/Notifier/Transport.php` Factory class
+- Framework extension entry and config change
+- `Notifier/Exception/UnsupportedSchemeException.php` entry
+
+Edit: Fixed
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2020-01-04T09:25:32Z
+
+Because I updated from the 5.0 upstream branch, which was wrong, I had 600+ commits as diff, also causing GitHub to request reviews from code owners. My bad, I reverted that push.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-10T12:43:12Z
+
+@Jeroeny Can you rebase to get rid of the merge commit? Thank you.

@@ -38,6 +38,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',
         ],
+        'rocketchat' => [
+            'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
+            'package' => 'rocketchat-notifier',
+        ],
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',

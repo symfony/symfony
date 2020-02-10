@@ -720,7 +720,7 @@ class Parser
             if ('' !== $matches['tag']) {
                 if ('!!binary' === $matches['tag']) {
                     return Inline::evaluateBinaryScalar($data);
-                } elseif ('tagged' === $matches['tag']) {
+                } elseif ('tagged' === $matches['tag'] || 'tagged_iterator' === $matches['tag']) {
                     return new TaggedValue(substr($matches['tag'], 1), $data);
                 } elseif ('!' !== $matches['tag']) {
                     @trigger_error($this->getDeprecationMessage(sprintf('Using the custom tag "%s" for the value "%s" is deprecated since Symfony 3.3. It will be replaced by an instance of %s in 4.0.', $matches['tag'], $data, TaggedValue::class)), E_USER_DEPRECATED);

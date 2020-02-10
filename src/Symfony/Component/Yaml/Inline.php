@@ -823,7 +823,7 @@ class Inline
         $nextOffset += strspn($value, ' ', $nextOffset);
 
         // Is followed by a scalar
-        if ((!isset($value[$nextOffset]) || !\in_array($value[$nextOffset], ['[', '{'], true)) && 'tagged' !== $tag) {
+        if ((!isset($value[$nextOffset]) || !\in_array($value[$nextOffset], ['[', '{'], true)) && 'tagged' !== $tag && 'tagged_iterator' !== $tag) {
             // Manage non-whitelisted scalars in {@link self::evaluateScalar()}
             return null;
         }

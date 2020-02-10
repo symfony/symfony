@@ -114,6 +114,7 @@ class TextDescriptor extends Descriptor
             ];
         }
         $map += [
+            'Info' => 'info',
             'Required' => 'required',
             'Default' => 'default',
             'Allowed types' => 'allowedTypes',

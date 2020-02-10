@@ -73,6 +73,7 @@ class JsonDescriptor extends Descriptor
             }
         }
         $map += [
+            'info' => 'info',
             'required' => 'required',
             'default' => 'default',
             'allowed_types' => 'allowedTypes',

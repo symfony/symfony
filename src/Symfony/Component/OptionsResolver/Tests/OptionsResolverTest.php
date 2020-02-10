@@ -14,7 +14,9 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -2399,6 +2401,7 @@ class OptionsResolverTest extends TestCase
             ->normalize(static function (Options $options, $value) {
                 return $value;
             })
+            ->info('info message')
         ;
         $introspector = new OptionsResolverIntrospector($this->resolver);
 
@@ -2409,5 +2412,63 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['string', 'bool'], $introspector->getAllowedTypes('foo'));
         $this->assertSame(['bar', 'zab'], $introspector->getAllowedValues('foo'));
         $this->assertCount(1, $introspector->getNormalizers('foo'));
+        $this->assertSame('info message', $this->resolver->getInfo('foo'));
+    }
+
+    public function testGetInfo()
+    {
+        $info = 'The option info message';
+        $this->resolver->setDefined('foo');
+        $this->resolver->setInfo('foo', $info);
+
+        $this->assertSame($info, $this->resolver->getInfo('foo'));
+    }
+
+    public function testSetInfoOnNormalization()
+    {
+        $this->expectException(AccessException::class);
+        $this->expectExceptionMessage('The Info message cannot be set from a lazy option or normalizer.');
+
+        $this->resolver->setDefined('foo');
+        $this->resolver->setNormalizer('foo', static function (Options $options, $value) {
+            $options->setInfo('foo', 'Info');
+        });
+
+        $this->resolver->resolve(['foo' => 'bar']);
+    }
+
+    public function testSetInfoOnUndefinedOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "bar" does not exist. Defined options are: "foo".');
+
+        $this->resolver->setDefined('foo');
+        $this->resolver->setInfo('bar', 'The option info message');
+    }
+
+    public function testGetInfoOnUndefinedOption2()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "bar" does not exist. Defined options are: "foo".');
+
+        $this->resolver->setDefined('foo');
+        $this->resolver->getInfo('bar');
+    }
+
+    public function testInfoOnInvalidValue()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "expires" with value DateTime is invalid. Info: A future date time.');
+
+        $this->resolver
+            ->setRequired('expires')
+            ->setInfo('expires', 'A future date time')
+            ->setAllowedTypes('expires', \DateTime::class)
+            ->setAllowedValues('expires', static function ($value) {
+                return $value >= new \DateTime('now');
+            })
+        ;
+
+        $this->resolver->resolve(['expires' => new \DateTime('-1 hour')]);
     }
 }

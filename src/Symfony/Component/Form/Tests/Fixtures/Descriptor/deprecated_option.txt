@@ -6,6 +6,8 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (bar)
  --------------------- ----------------------------------- 
   Deprecation message   "The option "bar" is deprecated."  
  --------------------- ----------------------------------- 
+  Info                  -                                  
+ --------------------- ----------------------------------- 
   Required              false                              
  --------------------- ----------------------------------- 
   Default               -                                  

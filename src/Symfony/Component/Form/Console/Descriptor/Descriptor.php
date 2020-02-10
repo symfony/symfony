@@ -108,7 +108,15 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function getOptionDefinition(OptionsResolver $optionsResolver, string $option)
     {
-        $definition = [
+        $definition = [];
+
+        if ($info = $optionsResolver->getInfo($option)) {
+            $definition = [
+                'info' => $info,
+            ];
+        }
+
+        $definition += [
             'required' => $optionsResolver->isRequired($option),
             'deprecated' => $optionsResolver->isDeprecated($option),
         ];

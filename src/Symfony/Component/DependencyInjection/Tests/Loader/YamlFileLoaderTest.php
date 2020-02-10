@@ -544,13 +544,11 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEmpty($definition->getTags());
     }
 
-    public function testInstanceofWithInvalidIgnoreList()
+    public function testInstanceofWithIgnoreAsString()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('The configuration key "ignore" of "Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface" definition must be an array.');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('services_instanceof_invalid_ignore.yml');
+        $loader->load('services_instanceof_ignore_string.yml');
         $container->compile();
 
         $definition = $container->getDefinition(Baz::class);

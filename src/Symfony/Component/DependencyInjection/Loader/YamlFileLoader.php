@@ -226,10 +226,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('Type definition "%s" cannot be an alias within "_instanceof" in %s. Check your YAML syntax.', $id, $file));
                 }
                 if (\array_key_exists('ignore', $service)) {
-                    if (!\is_array($service['ignore'])) {
-                        throw new InvalidArgumentException(sprintf('The configuration key "ignore" of "%s" definition must be an array.', $id));
-                    }
-                    $this->instanceofIgnored[$id] = array_flip($service['ignore']);
+                    $this->instanceofIgnored[$id] = array_flip((array) $service['ignore']);
                     unset($service['ignore']);
                 }
                 $this->parseDefinition($id, $service, $file, []);

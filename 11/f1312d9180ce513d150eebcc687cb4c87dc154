@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-10-12T11:58:55Z
+
+Please keep an eye on https://github.com/symfony/symfony/pull/33967
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-10-12T13:55:16Z
+
+#33967 is only for the Mailer, so this PR is not impacted.

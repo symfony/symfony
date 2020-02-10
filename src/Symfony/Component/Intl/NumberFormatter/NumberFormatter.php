@@ -250,8 +250,8 @@ abstract class NumberFormatter
      *                             described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
      * @see https://php.net/numberformatter.create
-     * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
-     * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
+     * @see https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classicu_1_1DecimalFormat.html#details
+     * @see https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classicu_1_1RuleBasedNumberFormat.html#details
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported

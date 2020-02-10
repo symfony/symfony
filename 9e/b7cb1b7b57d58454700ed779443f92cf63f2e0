@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-01-20T14:09:51Z
+
+Here's a crazy proposal 🙈  to solve this same problem but using the Symfony Validator component:
+
+```php
+// Before:
+$resolver = new OptionsResolver();
+$resolver->setAllowedValues('date', static function ($value): bool {
+    return $value >= new \DateTime('now');
+});
+$resolver->setInfo('date', 'This option must be a date in the future.');
+
+// After:
+use Symfony\Component\Validator\Constraints\GreaterThan;
+
+$resolver = new OptionsResolver();
+$resolver->setValidator('date', new GreaterThan([
+    'value' => new DateTime('today'),
+    'message' => 'This option must be a date in the future.'
+]));
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-20T14:36:42Z
+
+Hi @javiereguiluz, thanks for your input :) your proposal would require the integration of the Validator component, isn't it?
+
+Note that my proposal isn't only about improving the validation error message, but also about debugging information on `debug:form` cmd. It's just like the `setInfo` method in the `BaseNode` of the Config component.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-01-20T14:42:20Z
+
+Thanks for your comments ... I was thinking about an optional dependency with the Validator component (the usual *"You can't use XXXX because YYYY. Try running composer require ..."* message we use in other parts of Symfony). But yes, my comment is completely different from your original proposal. We can ignore it! Thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-02-10T00:43:18Z
+
+Comments addressed, thanks!

@@ -130,7 +130,7 @@ class XmlFileLoader extends FileLoader
             $id = (string) $service->getAttribute('id');
             $this->instanceofIgnored[$id] = [];
             foreach ($this->getChildren($service, 'ignore') as $ignored) {
-                $this->instanceofIgnored[$id][(string) $ignored->getAttribute('name')] = true;
+                $this->instanceofIgnored[$id][(string) $ignored->textContent] = true;
             }
             $this->setDefinition($id, $this->parseDefinition($service, $file, []));
         }

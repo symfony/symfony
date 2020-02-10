@@ -3,7 +3,7 @@
     <services>
         <instanceof id="Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface" lazy="true" autowire="true">
             <tag name="foo" />
-            <ignore name="Symfony\Component\DependencyInjection\Tests\Fixtures\Baz" />
+            <ignore>Symfony\Component\DependencyInjection\Tests\Fixtures\Baz</ignore>
         </instanceof>
         <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" public="true" />
         <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Baz" public="true" />

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Telegram;
+namespace Symfony\Component\Notifier\Bridge\Mattermost;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -20,36 +20,26 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * TelegramTransport.
+ * @author Emanuele Panzeri <thepanz@gmail.com>
  *
- * To get the chat id, send a message in Telegram with the user you want
- * and then curl 'https://api.telegram.org/bot%token%/getUpdates' | json_pp
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @internal
- *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
-final class TelegramTransport extends AbstractTransport
+final class MattermostTransport extends AbstractTransport
 {
-    protected const HOST = 'api.telegram.org';
-
     private $token;
-    private $chatChannel;
+    private $channel;
 
-    public function __construct(string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
-        $this->chatChannel = $channel;
-        $this->client = $client;
+        $this->channel = $channel;
 
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return sprintf('mattermost://%s?channel=%s', $this->getEndpoint(), $this->channel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -58,7 +48,7 @@ final class TelegramTransport extends AbstractTransport
     }
 
     /**
-     * @see https://core.telegram.org/bots/api
+     * @see https://api.mattermost.com
      */
     protected function doSend(MessageInterface $message): void
     {
@@ -66,21 +56,23 @@ final class TelegramTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
         }
 
-        $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);
+        $endpoint = sprintf('https://%s/api/v4/post', $this->getEndpoint());
+
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['chat_id'])) {
-            $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
+        $options['message'] = $message->getSubject();
+
+        if (!isset($options['channel_id'])) {
+            $options['channel_id'] = $message->getRecipientId() ?: $this->channel;
         }
-        $options['text'] = $message->getSubject();
-        $options['parse_mode'] = 'Markdown';
         $response = $this->client->request('POST', $endpoint, [
+            'bearer' => $this->token,
             'json' => array_filter($options),
         ]);
 
         if (200 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Telegram message: %s (%s).', $result['description'], $result['error_code']), $response);
+            throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
         }
     }
 }

@@ -33,10 +33,10 @@ final class SlackTransport extends AbstractTransport
     private $accessToken;
     private $chatChannel;
 
-    public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accessToken = $accessToken;
-        $this->chatChannel = $chatChannel;
+        $this->chatChannel = $channel;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);

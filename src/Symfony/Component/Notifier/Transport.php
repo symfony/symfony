@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier;
 
+use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
@@ -36,6 +37,7 @@ class Transport
     private const FACTORY_CLASSES = [
         SlackTransportFactory::class,
         TelegramTransportFactory::class,
+        MattermostTransportFactory::class,
         NexmoTransportFactory::class,
         TwilioTransportFactory::class,
     ];

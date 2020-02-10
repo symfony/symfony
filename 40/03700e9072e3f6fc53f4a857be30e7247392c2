@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-11T01:49:55Z
+
+To me we should prioritize finalizing the messenger API for 4.4 and fixing all the open messenger problems. So adding another transport should come after that.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-17T15:37:31Z
+
+> To me we should prioritize finalizing the messenger API for 4.4 and fixing all the open messenger problems. So adding another transport should come after that.
+
+I don't want that to block this PR... as we won't be 100% sure of API changes until feature freeze for 4.4. I think we should push this forward.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T07:18:11Z
+
+I'm also for merging this PR rather sooner than later, so that when we evolve the code for 4.4 stabilization, it can be included as well in the changes.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-08-09T10:46:24Z
+
+sqs has first class support for 'failures', dead letter queues. is it possible to support them somehow?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-08-09T11:06:19Z
+
+@bendavies In this PR I included the minimal features required by Messenger. I think that behaviors like FIFO, Deadletter, could be added in dedicated PR
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-12-23T14:03:37Z
+
+PR rebase and target is now master.
+
+Last comment https://github.com/symfony/symfony/pull/32454#discussion_r329358619
+I don't have a better solution to let the worker notifying the cusumers that they'll be shut stopped.
+
+Maye be a new `StoppableReceiverInterface` interface that let caller gracefully stop the receiver?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-01-19T22:11:44Z
+
+> Symfony should only provide transports that are use by the vast majority of people.
+
+Is it a rule of thumb? What's about SES Mailer Transport, Zookeeper Lock Store, QT translation loader?
+
+I really don't think more people use Redis to dispatch messagess than SQS.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-20T05:28:54Z
+
+No, it is not a rule of thumb, it is just my opinion.
+
+SES SMTP mailer transport is 40 lines of code. That is way easier to maintain compared to a larger feature like this. It is a balance between popularity and burden of maintenance.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-21T07:46:40Z
+
+After some discussions with others in the core team, we've agreed on a solution to move this PR forward.
+A third party transport like this should live in the Symfony organisation but in a separate package. Just like the Mailer Transports.
+
+@jderusse, could I ask you to move this transport to the namespace `Symfony\Component\Messenger\Bridge\AmazonSqs`?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-21T15:36:38Z
+
+I just spoke with Nicolas about the namespace. It is not needed to change it to "Bridge". He will configure the subtree split so it will put the SqsExt in a separate repo.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-21T15:39:38Z
+
+I'm not sure that the `Ext` suffix makes sense here. It's not a php extension, as opposed to AMQP or Redis.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-21T15:47:55Z
+
+Correct. I first thought `Sqs`, but that might be too vague.. So will `Amazon`. So lets rename `SqsExt` to `AmazonSqs`.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-01-25T09:47:36Z
+
+code moved in dedicated bridge named `Amazon SQS`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-03T17:35:37Z
+
+@jderusse Can you finish this one so that it can be merged? Ping me when it's done :) Thank you.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-09T17:14:01Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-10T08:07:33Z
+
+@jderusse Is it ready on your side? Perhaps a last rebase before merging?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-02-10T08:20:11Z
+
+yes it's ok for me
+
+---------------------------------------------------------------------------
+
+by bendavies at 2020-02-10T11:47:36Z
+
+I noticed that the namespaces are at odds with `Mailer` here, where the namespace is `Amazon`.
+https://github.com/symfony/symfony/tree/master/src/Symfony/Component/Mailer/Bridge/Amazon/Transport
+
+This namesapce could be `Amazon` instead of `AmazonSqs` here too, with all classes renamed to include `Sqs*`, just like mailer does.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-02-10T11:50:04Z
+
+Excellent point. However, I think `AmazonSqs` is good because it could be a future to include a  SNS transport. If so, it would be in a separate package. So it make sense to have `AmazonSqs` and `AmazonSns`.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2020-02-10T12:02:27Z
+
+Sure, but my point is that, that's not how mailer has done it. all impls are in one `Amazon` namespace:
+https://github.com/symfony/symfony/tree/master/src/Symfony/Component/Mailer/Bridge/Amazon/Transport
+You could argue they are all `SES`, but...
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-02-10T12:08:15Z
+
+In my opinion,the difference is AWS provides a single mailing service but several messaging services. (SQS, SNS, Kinesis).

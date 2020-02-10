@@ -90,6 +90,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -2003,6 +2004,7 @@ class FrameworkExtension extends Extension
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+            FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
         ];
 
         foreach ($classToServices as $class => $service) {

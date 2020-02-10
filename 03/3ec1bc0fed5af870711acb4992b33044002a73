@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by peterjaap at 2020-02-07T09:02:07Z
+
+@fabpot done! :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-07T11:53:34Z
+
+The failure in tests is relevant to the change proposed here.
+
+---------------------------------------------------------------------------
+
+by peterjaap at 2020-02-07T13:35:15Z
+
+@nicolas-grekas done :tada:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-10T15:10:28Z
+
+@peterjaap Can you rebase to get rid of the merge commit? Thank you.

@@ -12,19 +12,19 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\UriExpander;
+use Symfony\Component\DomCrawler\UriResolver;
 
-class UriExpanderTest extends TestCase
+class UriResolverTest extends TestCase
 {
     /**
-     * @dataProvider provideExpandUriTests
+     * @dataProvider provideResolverTests
      */
-    public function testExpandUri(string $uri, string $currentUri, string $expected)
+    public function testResolver(string $uri, string $baseUri, string $expected)
     {
-        $this->assertEquals($expected, UriExpander::expand($uri, $currentUri));
+        $this->assertEquals($expected, UriResolver::resolve($uri, $baseUri));
     }
 
-    public function provideExpandUriTests()
+    public function provideResolverTests()
     {
         return [
             ['/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],

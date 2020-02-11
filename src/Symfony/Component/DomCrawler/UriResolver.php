@@ -12,22 +12,23 @@
 namespace Symfony\Component\DomCrawler;
 
 /**
- * Expand an URI according a current URI.
+ * The UriResolver class takes an URI (relative, absolute, fragment, etc.)
+ * and turns it into an absolute URI against another given base URI.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UriExpander
+class UriResolver
 {
     /**
-     * Expand an URI according to a current Uri.
+     * Resolves a URI according to a base URI.
      *
-     * For example if $uri=/foo/bar and $currentUri=https://symfony.com it will
+     * For example if $uri=/foo/bar and $baseUri=https://symfony.com it will
      * return https://symfony.com/foo/bar
      *
-     * If the $uri is not absolute you must pass an absolute $currentUri
+     * If the $uri is not absolute you must pass an absolute $baseUri
      */
-    public static function expand(string $uri, ?string $currentUri): string
+    public static function resolve(string $uri, ?string $baseUri): string
     {
         $uri = trim($uri);
 
@@ -36,43 +37,43 @@ class UriExpander
             return $uri;
         }
 
-        if (null === $currentUri) {
+        if (null === $baseUri) {
             throw new \InvalidArgumentException('The URI is relative, so you must define its base URI passing an absolute URL.');
         }
 
         // empty URI
         if (!$uri) {
-            return $currentUri;
+            return $baseUri;
         }
 
         // an anchor
         if ('#' === $uri[0]) {
-            return self::cleanupAnchor($currentUri).$uri;
+            return self::cleanupAnchor($baseUri).$uri;
         }
 
-        $baseUri = self::cleanupUri($currentUri);
+        $baseUriCleaned = self::cleanupUri($baseUri);
 
         if ('?' === $uri[0]) {
-            return $baseUri.$uri;
+            return $baseUriCleaned.$uri;
         }
 
         // absolute URL with relative schema
         if (0 === strpos($uri, '//')) {
-            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
+            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUriCleaned).$uri;
         }
 
-        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
+        $baseUriCleaned = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUriCleaned);
 
         // absolute path
         if ('/' === $uri[0]) {
-            return $baseUri.$uri;
+            return $baseUriCleaned.$uri;
         }
 
         // relative path
-        $path = parse_url(substr($currentUri, \strlen($baseUri)), PHP_URL_PATH);
+        $path = parse_url(substr($baseUri, \strlen($baseUriCleaned)), PHP_URL_PATH);
         $path = self::canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
 
-        return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;
+        return $baseUriCleaned.('' === $path || '/' !== $path[0] ? '/' : '').$path;
     }
 
     /**

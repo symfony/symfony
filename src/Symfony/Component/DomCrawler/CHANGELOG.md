@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
 * Added an internal cache layer on top of the CssSelectorConverter
-* Added `UriExpander` to expand an URL according to another URL
+* Added `UriResolver` to resolve an URI according to a base URI
 
 5.0.0
 -----

@@ -41,7 +41,6 @@ final class OvhCloudTransport extends AbstractTransport
     private $applicationSecret;
     private $consumerKey;
     private $serviceName;
-    private $timeDelta;
 
     public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -110,7 +109,7 @@ final class OvhCloudTransport extends AbstractTransport
     }
 
     /**
-     * Calculate time delta between local machine and API's server.
+     * Calculates the time delta between the local machine and the API server.
      */
     private function calculateTimeDelta(): int
     {

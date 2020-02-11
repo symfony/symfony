@@ -80,7 +80,7 @@ abstract class AbstractUriElement
      */
     public function getUri()
     {
-        return UriExpander::expand($this->getRawUri(), $this->currentUri);
+        return UriResolver::resolve($this->getRawUri(), $this->currentUri);
     }
 
     /**

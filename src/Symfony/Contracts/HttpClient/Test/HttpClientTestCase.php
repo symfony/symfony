@@ -786,8 +786,6 @@ abstract class HttpClientTestCase extends TestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
-        $start = microtime(true);
-
         try {
             $client->request('GET', 'http://localhost:8057/404');
             $this->fail(ClientExceptionInterface::class.' expected');

@@ -782,6 +782,18 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertLessThan(4, $duration);
     }
 
+    public function testGetContentAfterDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        try {
+            $client->request('GET', 'http://localhost:8057/404');
+            $this->fail(ClientExceptionInterface::class.' expected');
+        } catch (ClientExceptionInterface $e) {
+            $this->assertSame('GET', $e->getResponse()->toArray(false)['REQUEST_METHOD']);
+        }
+    }
+
     public function testProxy()
     {
         $client = $this->getHttpClient(__FUNCTION__);

@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\InformationalChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -113,7 +114,7 @@ final class CurlResponse implements ResponseInterface
         $this->initializer = static function (self $response) {
             $waitFor = curl_getinfo($ch = $response->handle, CURLINFO_PRIVATE);
 
-            return 'H' === $waitFor[0] || 'D' === $waitFor[0];
+            return 'H' === $waitFor[0];
         };
 
         // Schedule the request in a non-blocking way
@@ -174,17 +175,15 @@ final class CurlResponse implements ResponseInterface
                 return; // Unused pushed response
             }
 
-            $waitFor = curl_getinfo($this->handle, CURLINFO_PRIVATE);
-
-            if ('C' === $waitFor[0] || '_' === $waitFor[0]) {
-                $this->close();
-            } elseif ('H' === $waitFor[0]) {
-                $waitFor[0] = 'D'; // D = destruct
-                curl_setopt($this->handle, CURLOPT_PRIVATE, $waitFor);
+            $e = null;
+            $this->doDestruct();
+        } catch (HttpExceptionInterface $e) {
+            throw $e;
+        } finally {
+            if ($e ?? false) {
+                throw $e;
             }
 
-            $this->doDestruct();
-        } finally {
             $this->close();
 
             if (!$this->multi->openHandles) {
@@ -304,7 +303,7 @@ final class CurlResponse implements ResponseInterface
     {
         $waitFor = @curl_getinfo($ch, CURLINFO_PRIVATE) ?: '_0';
 
-        if ('H' !== $waitFor[0] && 'D' !== $waitFor[0]) {
+        if ('H' !== $waitFor[0]) {
             return \strlen($data); // Ignore HTTP trailers
         }
 
@@ -370,7 +369,7 @@ final class CurlResponse implements ResponseInterface
             // Headers and redirects completed, time to get the response's content
             $multi->handlesActivity[$id][] = new FirstChunk();
 
-            if ('D' === $waitFor[0] || 'HEAD' === $info['http_method'] || \in_array($statusCode, [204, 304], true)) {
+            if ('HEAD' === $info['http_method'] || \in_array($statusCode, [204, 304], true)) {
                 $waitFor = '_0'; // no content expected
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = null;

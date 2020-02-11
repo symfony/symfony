@@ -180,7 +180,7 @@ final class CurlResponse implements ResponseInterface
         } catch (HttpExceptionInterface $e) {
             throw $e;
         } finally {
-            if (null !== $e) {
+            if ($e ?? false) {
                 throw $e;
             }
 

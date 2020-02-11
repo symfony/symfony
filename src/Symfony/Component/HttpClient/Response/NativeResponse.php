@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\NativeClientState;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -84,11 +85,16 @@ final class NativeResponse implements ResponseInterface
 
     public function __destruct()
     {
-        $this->shouldBuffer = null;
-
         try {
+            $e = null;
             $this->doDestruct();
+        } catch (HttpExceptionInterface $e) {
+            throw $e;
         } finally {
+            if ($e ?? false) {
+                throw $e;
+            }
+
             $this->close();
 
             // Clear the DNS cache when all requests completed

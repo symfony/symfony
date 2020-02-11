@@ -18,7 +18,8 @@
     "require": {
         "php": "^7.2.5",
         "symfony/http-client": "^4.3|5.0",
-        "symfony/messenger": "^4.3|^5.0"
+        "symfony/messenger": "^4.3|^5.0",
+        "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
         "symfony/http-client-contracts": "^1.0|^2.0",

@@ -645,7 +645,15 @@ class Application
         // filter out aliases for commands which are already on the list
         if (\count($commands) > 1) {
             $commandList = $this->commandLoader ? array_merge(array_flip($this->commandLoader->getNames()), $this->commands) : $this->commands;
-            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use (&$commandList, $commands, &$aliases) {
+
+            if (isset($commandList[$name])) {
+                return $this->get($name);
+            }
+
+            foreach ($commands as $k => $nameOrAlias) {
+                if ($nameOrAlias === $name) {
+                    return $this->get($nameOrAlias);
+                }
                 if (!$commandList[$nameOrAlias] instanceof Command) {
                     $commandList[$nameOrAlias] = $this->commandLoader->get($nameOrAlias);
                 }
@@ -654,8 +662,14 @@ class Application
 
                 $aliases[$nameOrAlias] = $commandName;
 
-                return $commandName === $nameOrAlias || !\in_array($commandName, $commands);
-            }));
+                if ($commandName === $nameOrAlias || !\in_array($commandName, $commands)) {
+                    continue;
+                }
+
+                unset($commands[$k]);
+            }
+
+            $commands = array_unique($commands);
         }
 
         $exact = \in_array($name, $commands, true) || isset($aliases[$name]);

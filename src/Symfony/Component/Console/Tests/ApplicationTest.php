@@ -1642,6 +1642,31 @@ class ApplicationTest extends TestCase
         $this->assertArrayNotHasKey('disabled', $application->all());
     }
 
+    public function testFindAlternativesDoesNotLoadSameNamespaceCommandsOnExactMatch()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+
+        $loaded = [];
+
+        $application->setCommandLoader(new FactoryCommandLoader([
+            'foo:bar' => function () use (&$loaded) {
+                $loaded['foo:bar'] = true;
+
+                return (new Command('foo:bar'))->setCode(function () {});
+            },
+            'foo' => function () use (&$loaded) {
+                $loaded['foo'] = true;
+
+                return (new Command('foo'))->setCode(function () {});
+            },
+        ]));
+
+        $application->run(new ArrayInput(['command' => 'foo']), new NullOutput());
+
+        $this->assertSame(['foo' => true], $loaded);
+    }
+
     protected function getDispatcher($skipCommand = false)
     {
         $dispatcher = new EventDispatcher();

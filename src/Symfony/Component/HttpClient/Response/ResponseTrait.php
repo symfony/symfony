@@ -294,6 +294,8 @@ trait ResponseTrait
      */
     private function doDestruct()
     {
+        $this->shouldBuffer = true;
+
         if ($this->initializer && null === $this->info['error']) {
             self::initialize($this);
             $this->checkStatusCode();

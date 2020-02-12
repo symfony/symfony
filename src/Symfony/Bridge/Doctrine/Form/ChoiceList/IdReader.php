@@ -84,12 +84,12 @@ class IdReader
      *
      * This method assumes that the object has a single-column ID.
      *
-     * @return mixed The ID value
+     * @return string The ID value
      */
     public function getIdValue(object $object = null)
     {
         if (!$object) {
-            return null;
+            return '';
         }
 
         if (!$this->om->contains($object)) {
@@ -104,7 +104,7 @@ class IdReader
             $idValue = $this->associationIdReader->getIdValue($idValue);
         }
 
-        return $idValue;
+        return (string) $idValue;
     }
 
     /**

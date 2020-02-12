@@ -182,7 +182,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     }
 
     /**
-     * Set hits_read_ratio key on a given array by reference
+     * Set hits_read_ratio key on a given array by reference.
      *
      * @param array $array Array containing 'hits' & 'reads' keys, passed by reference
      */

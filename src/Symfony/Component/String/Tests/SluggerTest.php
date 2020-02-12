@@ -31,6 +31,8 @@ class SluggerTest extends TestCase
     {
         return [
             ['Стойността трябва да бъде лъжа', 'bg', 'Stoinostta-tryabva-da-bude-luzha'],
+            ['You & I', 'en', 'You-and-I'],
+            ['symfony@symfony.com', 'en', 'symfony-at-symfony-com'],
             ['Dieser Wert sollte größer oder gleich', 'de', 'Dieser-Wert-sollte-groesser-oder-gleich'],
             ['Dieser Wert sollte größer oder gleich', 'de_AT', 'Dieser-Wert-sollte-groesser-oder-gleich'],
             ['Αυτή η τιμή πρέπει να είναι ψευδής', 'el', 'Avti-i-timi-prepi-na-inai-psevdhis'],

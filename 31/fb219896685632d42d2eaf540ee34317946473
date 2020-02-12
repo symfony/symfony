@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-11-24T18:45:10Z
+
+Appveyor failures unrelated. This one is ready on my side.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-11-27T09:33:30Z
+
+Hi Jules! This looks "complicated" because different people have attempted to solve this in multiple different pull requests. So, could you please update your pull request description with a link to the issue/PR which explains how this feature will behave for end users?
+
+If not such a link exists, please update the PR description to briefly explain what does this do, how does it work, show a simple example, etc.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-11-27T19:00:12Z
+
+Thank you for your comment @javiereguiluz, I've updated the description.

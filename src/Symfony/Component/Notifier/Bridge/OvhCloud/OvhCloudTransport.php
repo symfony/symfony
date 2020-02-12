@@ -26,9 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class OvhCloudTransport extends AbstractTransport
 {
-    private $endpoints = [
-        'ovh-eu' => 'https://eu.api.ovh.com/1.0',
-    ];
+    protected const HOST = 'eu.api.ovh.com';
 
     private $applicationKey;
     private $applicationSecret;
@@ -43,13 +41,6 @@ final class OvhCloudTransport extends AbstractTransport
         $this->serviceName = $serviceName;
 
         parent::__construct($client, $dispatcher);
-    }
-
-    public function setEndpointName(?string $endpoint): self
-    {
-        $this->host = $this->endpoints[$endpoint] ?: self::HOST;
-
-        return $this;
     }
 
     public function __toString(): string
@@ -68,7 +59,7 @@ final class OvhCloudTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
         }
 
-        $endpoint = sprintf('%s/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
+        $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
 
         $content = [
             'charset' => 'UTF-8',

@@ -6,6 +6,7 @@ CHANGELOG
 
  * added max-items + LRU + max-lifetime capabilities to `ArrayCache`
  * added `CouchbaseBucketAdapter`
+ * added private method `calculateHitReadRatio` in `CacheDataCollector`
 
 5.0.0
 -----

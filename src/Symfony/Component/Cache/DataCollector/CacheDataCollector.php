@@ -151,11 +151,8 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                     ++$statistics[$name]['deletes'];
                 }
             }
-            if ($statistics[$name]['reads']) {
-                $statistics[$name]['hit_read_ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2);
-            } else {
-                $statistics[$name]['hit_read_ratio'] = null;
-            }
+
+            $this->calculateHitReadRatio($statistics[$name]);
         }
 
         return $statistics;
@@ -178,12 +175,19 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                 $totals[$key] += $statistics[$name][$key];
             }
         }
-        if ($totals['reads']) {
-            $totals['hit_read_ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2);
-        } else {
-            $totals['hit_read_ratio'] = null;
-        }
+
+        $this->calculateHitReadRatio($totals);
 
         return $totals;
+    }
+
+    /**
+     * Set hits_read_ratio key on a given array by reference
+     *
+     * @param array $array Array containing 'hits' & 'reads' keys, passed by reference
+     */
+    private function calculateHitReadRatio(array &$array): void
+    {
+        $array['hit_read_ratio'] = $array['reads'] ? round(100 * $array['hits'] / $array['reads'], 2) : null;
     }
 }

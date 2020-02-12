@@ -46,7 +46,7 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
         return [$provider, $listenerId, $entryPointId];
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.http_basic.'.$id;
         $container

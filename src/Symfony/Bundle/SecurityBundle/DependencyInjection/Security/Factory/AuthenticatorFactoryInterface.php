@@ -25,5 +25,5 @@ interface AuthenticatorFactoryInterface
      *
      * @return string|string[] The authenticator service ID(s) to be used by the firewall
      */
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId);
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId);
 }

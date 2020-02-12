@@ -42,7 +42,7 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
         return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         if (null === $config['secret']) {
             $config['secret'] = new Parameter('container.build_hash');

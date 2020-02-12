@@ -75,9 +75,4 @@ class AnonymousAuthenticator implements AuthenticatorInterface, CustomAuthentica
     {
         return null;
     }
-
-    public function supportsRememberMe(): bool
-    {
-        return false;
-    }
 }

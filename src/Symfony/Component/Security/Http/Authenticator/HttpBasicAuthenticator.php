@@ -94,9 +94,4 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
 
         return $this->start($request, $exception);
     }
-
-    public function supportsRememberMe(): bool
-    {
-        return false;
-    }
 }

@@ -102,18 +102,4 @@ interface AuthenticatorInterface
      * will be authenticated. This makes sense, for example, with an API.
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response;
-
-    /**
-     * Does this method support remember me cookies?
-     *
-     * Remember me cookie will be set if *all* of the following are met:
-     *  A) This method returns true
-     *  B) The remember_me key under your firewall is configured
-     *  C) The "remember me" functionality is activated. This is usually
-     *      done by having a _remember_me checkbox in your form, but
-     *      can be configured by the "always_remember_me" and "remember_me_parameter"
-     *      parameters under the "remember_me" firewall key
-     *  D) The onAuthenticationSuccess method returns a Response object
-     */
-    public function supportsRememberMe(): bool;
 }

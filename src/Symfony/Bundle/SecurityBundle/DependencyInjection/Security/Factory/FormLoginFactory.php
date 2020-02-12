@@ -97,7 +97,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $entryPointId;
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.form_login.'.$id;
         $defaultOptions = array_merge($this->defaultSuccessHandlerOptions, $this->options);

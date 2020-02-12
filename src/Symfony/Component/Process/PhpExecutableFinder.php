@@ -21,6 +21,8 @@ class PhpExecutableFinder
 {
     private $executableFinder;
 
+    private $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+
     public function __construct()
     {
         $this->executableFinder = new ExecutableFinder();
@@ -35,7 +37,7 @@ class PhpExecutableFinder
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
-                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
+                $command = $this->isWindows ? 'where' : 'command -v';
                 if ($php = strtok(exec($command.' '.escapeshellarg($php)), PHP_EOL)) {
                     if (!is_executable($php)) {
                         return false;
@@ -70,12 +72,12 @@ class PhpExecutableFinder
             }
         }
 
-        if (@is_executable($php = PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        if (@is_executable($php = PHP_BINDIR.($this->isWindows ? '\\php.exe' : '/php'))) {
             return $php;
         }
 
         $dirs = [PHP_BINDIR];
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ($this->isWindows) {
             $dirs[] = 'C:\xampp\php\\';
         }
 

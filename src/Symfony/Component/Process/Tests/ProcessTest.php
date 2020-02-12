@@ -29,6 +29,8 @@ class ProcessTest extends TestCase
     private static $process;
     private static $sigchild;
 
+    private static $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+
     public static function setUpBeforeClass(): void
     {
         $phpBin = new PhpExecutableFinder();
@@ -65,7 +67,7 @@ class ProcessTest extends TestCase
 
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('This test is transient on Windows');
         }
         @trigger_error('Test Error', E_USER_NOTICE);
@@ -129,7 +131,7 @@ class ProcessTest extends TestCase
 
     public function testWaitUntilSpecificOutput()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
         }
 
@@ -327,7 +329,7 @@ class ProcessTest extends TestCase
 
     public function chainedCommandsOutputProvider()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             return [
                 ["2 \r\n2\r\n", '&&', '2'],
             ];
@@ -446,7 +448,7 @@ class ProcessTest extends TestCase
 
     public function testZeroAsOutput()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             // see http://stackoverflow.com/questions/7105433/windows-batch-echo-without-new-line
             $p = $this->getProcess('echo | set /p dummyName=0');
         } else {
@@ -459,7 +461,7 @@ class ProcessTest extends TestCase
 
     public function testExitCodeCommandFailed()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does not support POSIX exit code');
         }
 
@@ -472,7 +474,7 @@ class ProcessTest extends TestCase
 
     public function testTTYCommand()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does not have /dev/tty support');
         }
 
@@ -487,7 +489,7 @@ class ProcessTest extends TestCase
 
     public function testTTYCommandExitCode()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does have /dev/tty support');
         }
 
@@ -502,7 +504,7 @@ class ProcessTest extends TestCase
     {
         $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
         $this->expectExceptionMessage('TTY mode is not supported on Windows platform.');
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
+        if (!self::$isWindows) {
             $this->markTestSkipped('This test is for Windows platform only');
         }
 
@@ -664,7 +666,7 @@ class ProcessTest extends TestCase
 
     public function testProcessIsNotSignaled()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
@@ -675,7 +677,7 @@ class ProcessTest extends TestCase
 
     public function testProcessWithoutTermSignal()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
@@ -686,7 +688,7 @@ class ProcessTest extends TestCase
 
     public function testProcessIsSignaledIfStopped()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
@@ -989,7 +991,7 @@ class ProcessTest extends TestCase
     public function testWrongSignal()
     {
         $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
@@ -1136,7 +1138,7 @@ class ProcessTest extends TestCase
             'include \''.__DIR__.'/PipeStdinInStdoutStdErrStreamSelect.php\';',
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if (self::$isWindows) {
             // Avoid XL buffers on Windows because of https://bugs.php.net/65650
             $sizes = [1, 2, 4, 8];
         } else {
@@ -1414,7 +1416,7 @@ class ProcessTest extends TestCase
     {
         $p = new Process(['/usr/bin/php']);
 
-        $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
+        $expected = self::$isWindows ? '"/usr/bin/php"' : "'/usr/bin/php'";
         $this->assertSame($expected, $p->getCommandLine());
     }
 
@@ -1439,7 +1441,7 @@ Array
 (
     [0] => -
     [1] => a
-    [2] => 
+    [2] =>
     [3] => b
 )
 
@@ -1504,7 +1506,7 @@ EOTXT;
     public function testEnvArgument()
     {
         $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
-        $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
+        $cmd = self::$isWindows ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
         $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 

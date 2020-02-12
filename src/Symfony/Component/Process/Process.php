@@ -80,6 +80,8 @@ class Process implements \IteratorAggregate
 
     private static $sigchild;
 
+    private $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+
     /**
      * Exit codes translation table.
      *
@@ -150,7 +152,7 @@ class Process implements \IteratorAggregate
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
         // @see : https://bugs.php.net/51800
         // @see : https://bugs.php.net/50524
-        if (null === $this->cwd && (\defined('ZEND_THREAD_SAFE') || '\\' === \DIRECTORY_SEPARATOR)) {
+        if (null === $this->cwd && (\defined('ZEND_THREAD_SAFE') || $this->isWindows)) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {
@@ -159,7 +161,7 @@ class Process implements \IteratorAggregate
 
         $this->setInput($input);
         $this->setTimeout($timeout);
-        $this->useFileHandles = '\\' === \DIRECTORY_SEPARATOR;
+        $this->useFileHandles = $this->isWindows;
         $this->pty = false;
     }
 
@@ -295,7 +297,7 @@ class Process implements \IteratorAggregate
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
 
-            if ('\\' !== \DIRECTORY_SEPARATOR) {
+            if (!$this->isWindows) {
                 // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec '.$commandline;
             }
@@ -305,7 +307,7 @@ class Process implements \IteratorAggregate
 
         $options = ['suppress_errors' => true];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ($this->isWindows) {
             $options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
         } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
@@ -411,8 +413,8 @@ class Process implements \IteratorAggregate
 
         do {
             $this->checkTimeout();
-            $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
-            $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+            $running = $this->isWindows ? $this->isRunning() : $this->processPipes->areOpen();
+            $this->readPipes($running, !$this->isWindows || !$running);
         } while ($running);
 
         while ($this->isRunning()) {
@@ -452,8 +454,8 @@ class Process implements \IteratorAggregate
         $ready = false;
         while (true) {
             $this->checkTimeout();
-            $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
-            $output = $this->processPipes->readAndWrite($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+            $running = $this->isWindows ? $this->isRunning() : $this->processPipes->areOpen();
+            $output = $this->processPipes->readAndWrite($running, !$this->isWindows || !$running);
 
             foreach ($output as $type => $data) {
                 if (3 !== $type) {
@@ -1039,7 +1041,7 @@ class Process implements \IteratorAggregate
      */
     public function setTty(bool $tty)
     {
-        if ('\\' === \DIRECTORY_SEPARATOR && $tty) {
+        if ($this->isWindows && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
 
@@ -1250,7 +1252,7 @@ class Process implements \IteratorAggregate
         if ($this->input instanceof \Iterator) {
             $this->input->rewind();
         }
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ($this->isWindows) {
             $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $this->hasCallback);
         } else {
             $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->hasCallback);
@@ -1304,7 +1306,7 @@ class Process implements \IteratorAggregate
         $this->processInformation = proc_get_status($this->process);
         $running = $this->processInformation['running'];
 
-        $this->readPipes($running && $blocking, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+        $this->readPipes($running && $blocking, !$this->isWindows || !$running);
 
         if ($this->fallbackStatus && $this->isSigchildEnabled()) {
             $this->processInformation = $this->fallbackStatus + $this->processInformation;
@@ -1466,7 +1468,7 @@ class Process implements \IteratorAggregate
             return false;
         }
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ($this->isWindows) {
             exec(sprintf('taskkill /F /T /PID %d 2>&1', $pid), $output, $exitCode);
             if ($exitCode && $this->isRunning()) {
                 if ($throwException) {
@@ -1578,7 +1580,7 @@ class Process implements \IteratorAggregate
         if ('' === $argument || null === $argument) {
             return '""';
         }
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
+        if (!$this->isWindows) {
             return "'".str_replace("'", "'\\''", $argument)."'";
         }
         if (false !== strpos($argument, "\0")) {

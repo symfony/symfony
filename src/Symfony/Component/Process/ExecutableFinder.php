@@ -21,6 +21,8 @@ class ExecutableFinder
 {
     private $suffixes = ['.exe', '.bat', '.cmd', '.com'];
 
+    private $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+
     /**
      * Replaces default suffixes of executable.
      */
@@ -69,13 +71,13 @@ class ExecutableFinder
         }
 
         $suffixes = [''];
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ($this->isWindows) {
             $pathExt = getenv('PATHEXT');
             $suffixes = array_merge($pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes, $suffixes);
         }
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
-                if (@is_file($file = $dir.\DIRECTORY_SEPARATOR.$name.$suffix) && ('\\' === \DIRECTORY_SEPARATOR || @is_executable($file))) {
+                if (@is_file($file = $dir.\DIRECTORY_SEPARATOR.$name.$suffix) && ($this->isWindows || @is_executable($file))) {
                     return $file;
                 }
             }

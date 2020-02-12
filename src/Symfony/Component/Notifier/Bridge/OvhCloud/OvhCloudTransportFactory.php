@@ -34,7 +34,7 @@ final class OvhCloudTransportFactory extends AbstractTransportFactory
         $port = $dsn->getPort();
 
         if ('ovhcloud' === $scheme) {
-            return (new OvhCloudTransport($applicationKey, $applicationSecret, $consumerKey, $serviceName, $this->client, $this->dispatcher))->setEndpointName($host)->setPort($port);
+            return (new OvhCloudTransport($applicationKey, $applicationSecret, $consumerKey, $serviceName, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'ovhcloud', $this->getSupportedSchemes());

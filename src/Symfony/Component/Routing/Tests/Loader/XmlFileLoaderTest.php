@@ -185,6 +185,9 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+
+        $this->assertEquals('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
+        $this->assertEquals('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedImportsOfNotLocalizedRoutes()

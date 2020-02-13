@@ -1,5 +1,5 @@
 {
-    "name": "symfony/rocketchat-notifier",
+    "name": "symfony/rocket-chat-notifier",
     "type": "symfony-bridge",
     "description": "Symfony RocketChat Notifier Bridge",
     "keywords": ["rocketchat", "notifier"],

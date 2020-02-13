@@ -1,5 +1,5 @@
 {
-    "name": "symfony/ovhcloud-notifier",
+    "name": "symfony/ovh-cloud-notifier",
     "type": "symfony-bridge",
     "description": "Symfony OvhCloud Notifier Bridge",
     "keywords": ["sms", "OvhCloud", "notifier"],

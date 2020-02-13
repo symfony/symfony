@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-12T21:19:02Z
+
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by Warxcell at 2020-02-13T07:16:50Z
+
+@nicolas-grekas I think it's also a good idea to be able to add custom behaviour in that slugger (for such replacements). I was thinking about callback. What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-13T13:47:11Z
+
+> be able to add custom behaviour in that slugger
+
+I don't think it's needed: decoration alreadt allows implementing custom behaviors to me.

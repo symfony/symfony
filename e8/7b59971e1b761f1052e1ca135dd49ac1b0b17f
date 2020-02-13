@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-11T14:45:17Z
+
+Thanks for the PR.
+Does this issue exist on 3.4?
+Please add a test case also.
+
+---------------------------------------------------------------------------
+
+by adam-prickett at 2020-02-11T14:49:06Z
+
+@nicolas-grekas Furthest back this issue goes is to 4.1. Test case incoming.

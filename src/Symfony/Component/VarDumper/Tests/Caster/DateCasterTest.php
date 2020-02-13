@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\DateCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild;
 
 /**
  * @author Dany Maillard <danymaillard93b@gmail.com>
@@ -55,7 +56,7 @@ EODUMP;
 
         $stub = new Stub();
         $date = new \DateTime($time, new \DateTimeZone($timezone));
-        $cast = DateCaster::castDateTime($date, ['foo' => 'bar'], $stub, false, 0);
+        $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTime::class), $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -95,6 +96,40 @@ EODUMP;
             ['2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
             ['2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
         ];
+    }
+
+    public function testCastDateTimeWithAdditionalChildProperty()
+    {
+        $stub = new Stub();
+        $date = new DateTimeChild('2020-02-13 00:00:00.123456', new \DateTimeZone('Europe/Paris'));
+        $objectCast = Caster::castObject($date, DateTimeChild::class);
+        $dateCast = DateCaster::castDateTime($date, $objectCast, $stub, false, 0);
+
+        $xDate = '2020-02-13 00:00:00.123456 Europe/Paris (+01:00)';
+        $xInfo = 'Thursday, February 13, 2020%Afrom now';
+        $xDump = <<<EODUMP
+array:2 [
+  "\\x00Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild\\x00addedProperty" => "foo"
+  "\\x00~\\x00date" => $xDate
+]
+EODUMP;
+
+        $this->assertDumpEquals($xDump, $dateCast);
+
+        $xDump = <<<EODUMP
+Symfony\Component\VarDumper\Caster\ConstStub {
+  +type: 1
+  +class: "$xDate"
+  +value: "%A$xInfo%A"
+  +cut: 0
+  +handle: 0
+  +refCount: 0
+  +position: 0
+  +attr: []
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $dateCast["\0~\0date"]);
     }
 
     /**

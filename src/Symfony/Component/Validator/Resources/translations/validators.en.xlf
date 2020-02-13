@@ -370,6 +370,10 @@
                 <source>This value is not a valid hostname.</source>
                 <target>This value is not a valid hostname.</target>
             </trans-unit>
+            <trans-unit id="96">
+                <source>This is not a valid RGB color.</source>
+                <target>This is not a valid RGB color.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

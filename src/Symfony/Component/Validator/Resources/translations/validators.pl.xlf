@@ -334,6 +334,10 @@
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Ta wartość powinna być pomiędzy {{ min }} a {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="96">
+                <source>This is not a valid RGB color.</source>
+                <target>To nie jest poprawny kolor RGB.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

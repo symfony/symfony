@@ -112,6 +112,18 @@ class LexerTest extends TestCase
                 [new Token('string', '#foo', 1)],
                 '"#foo"',
             ],
+            [
+                [
+                    new Token('name', 'foo', 1),
+                    new Token('punctuation', '.', 4),
+                    new Token('name', 'not', 5),
+                    new Token('operator', 'in', 9),
+                    new Token('punctuation', '[', 12),
+                    new Token('name', 'bar', 13),
+                    new Token('punctuation', ']', 16),
+                ],
+                'foo.not in [bar]',
+            ],
         ];
     }
 }

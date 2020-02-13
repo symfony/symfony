@@ -98,6 +98,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         return (new UnicodeString($string))
             ->ascii($transliterator)
             ->replace('@', $separator.'at'.$separator)
+            ->replace('&', $separator.'and'.$separator)
             ->replaceMatches('/[^A-Za-z0-9]++/', $separator)
             ->trim($separator)
         ;

@@ -145,8 +145,8 @@ final class User implements UserInterface, EquatableInterface
 
         $currentRoles = array_map('strval', (array) $this->getRoles());
         $newRoles = array_map('strval', (array) $user->getRoles());
-        $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
-        if ($rolesChanged) {
+
+        if (\count($newRoles) !== \count(array_intersect($newRoles, $currentRoles))) {
             return false;
         }
 

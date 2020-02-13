@@ -1,7 +1,5 @@
 CHANGELOG
 =========
 
-1.2.0
------
-
- * added `trigger_deprecation` function
+The changelog is maintained for all Symfony contracts at the following URL:
+https://github.com/symfony/contracts/blob/master/CHANGELOG.md

@@ -782,6 +782,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     private function normalizeDir(string $dir): string
     {
+        if ('/' === $dir) {
+            return $dir;
+        }
+
         $dir = rtrim($dir, '/'.\DIRECTORY_SEPARATOR);
 
         if (preg_match('#^(ssh2\.)?s?ftp://#', $dir)) {

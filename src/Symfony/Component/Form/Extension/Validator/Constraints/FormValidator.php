@@ -70,7 +70,7 @@ class FormValidator extends ConstraintValidator
                 foreach ($groups as $group) {
                     if (\in_array($group, $formConstraint->groups)) {
                         $validator->atPath('data')->validate($form->getData(), $formConstraint, $group);
-                        if (\count($this->context->getViolations()) > 0) {
+                        if ($this->context->getViolations()->count() > 0) {
                             break;
                         }
                     }

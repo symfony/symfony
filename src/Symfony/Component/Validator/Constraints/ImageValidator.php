@@ -34,11 +34,11 @@ class ImageValidator extends FileValidator
             throw new UnexpectedTypeException($constraint, Image::class);
         }
 
-        $violations = \count($this->context->getViolations());
+        $violations = $this->context->getViolations()->count();
 
         parent::validate($value, $constraint);
 
-        $failed = \count($this->context->getViolations()) !== $violations;
+        $failed = $this->context->getViolations()->count() !== $violations;
 
         if ($failed || null === $value || '' === $value) {
             return;

@@ -668,7 +668,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function stepThroughGroupSequence($value, $object, ?string $cacheKey, ?MetadataInterface $metadata, string $propertyPath, int $traversalStrategy, GroupSequence $groupSequence, ?string $cascadedGroup, ExecutionContextInterface $context)
     {
-        $violationCount = \count($context->getViolations());
+        $violationCount = $context->getViolations()->count();
         $cascadedGroups = $cascadedGroup ? [$cascadedGroup] : null;
 
         foreach ($groupSequence->groups as $groupInSequence) {
@@ -700,7 +700,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             // Abort sequence validation if a violation was generated
-            if (\count($context->getViolations()) > $violationCount) {
+            if ($context->getViolations()->count() > $violationCount) {
                 break;
             }
         }

@@ -951,6 +951,38 @@ TABLE;
         $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
     }
 
+    public function testSectionOutputHandlesZeroRowsAfterRender()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->writeln('My Table');
+        $table = new Table($output);
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
+            ->setRows([]);
+
+        $table->render();
+
+        $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
+
+        $expected =
+            <<<TABLE
+My Table
++------+-------+--------+-------+
+|\033[32m ISBN \033[39m|\033[32m Title \033[39m|\033[32m Author \033[39m|\033[32m Price \033[39m|
++------+-------+--------+-------+
+\x1b[3A\x1b[0J+---------------+----------------------+-----------------+--------+
+|\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
++---------------+----------------------+-----------------+--------+
+| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
++---------------+----------------------+-----------------+--------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     public function testIsNotDefinedStyleException()
     {
         $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');

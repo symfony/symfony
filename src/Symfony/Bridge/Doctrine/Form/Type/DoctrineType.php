@@ -282,3 +282,5 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $this->choiceLoaders = [];
     }
 }
+
+interface_exists(ObjectManager::class);

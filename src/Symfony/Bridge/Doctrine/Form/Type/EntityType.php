@@ -97,3 +97,5 @@ class EntityType extends DoctrineType
         return [$parameter->getName(), $parameter->getType(), $parameter->getValue()];
     }
 }
+
+interface_exists(ObjectManager::class);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.1.0
+-----
+
+ * added "symfony/deprecation-contracts"
+
 2.0.1
 -----
 

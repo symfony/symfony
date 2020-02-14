@@ -115,5 +115,9 @@
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
             <argument type="service" id="twig" on-invalid="ignore" />
         </service>
+
+        <service id="Symfony\Component\Routing\Matcher\ExpressionLanguageProvider" public="false">
+            <tag name="routing.expression_language_provider" />
+        </service>
     </services>
 </container>

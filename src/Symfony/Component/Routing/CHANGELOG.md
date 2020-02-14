@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
  * added "priority" option to annotated routes
  * added argument `$priority` to `RouteCollection::add()`
+ * added `ExpressionLanguageProvider` that provides `env` function.
 
 5.0.0
 -----

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * allowed using public aliases to reference controllers
+ * added session usage reporting when the `_stateless` attribute of the request is set to `true`
 
 5.0.0
 -----

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by blry at 2020-02-13T21:13:46Z
+
+Hi @nicolas-grekas. This issue appears also in Symfony 5
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-13T22:57:30Z
+
+We merge lower branches into upper ones periodically.

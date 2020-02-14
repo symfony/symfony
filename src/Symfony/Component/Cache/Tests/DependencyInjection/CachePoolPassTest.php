@@ -135,7 +135,7 @@ class CachePoolPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('tQNhcV-8xa', $cachePool->getArgument(1));
+        $this->assertSame('croSeNd5bG', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
@@ -156,7 +156,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('+naTpPa4Sm', $cachePool->getArgument(1));
+        $this->assertSame('-Tv17ISg7e', $cachePool->getArgument(1));
     }
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()

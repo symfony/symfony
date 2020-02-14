@@ -145,6 +145,7 @@
 
         <service id="console.command.router_match" class="Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand">
             <argument type="service" id="router" />
+            <argument type="tagged_iterator" tag="routing.expression_language_provider" />
             <tag name="console.command" command="router:match" />
         </service>
 

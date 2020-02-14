@@ -9,6 +9,7 @@ CHANGELOG
  * added "priority" option to annotated routes
  * added argument `$priority` to `RouteCollection::add()`
  * deprecated the `RouteCompiler::REGEX_DELIMITER` constant
+ * added `ExpressionLanguageProvider` to expose extra functions to route conditions
 
 5.0.0
 -----

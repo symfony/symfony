@@ -1,7 +1,5 @@
 CHANGELOG
 =========
 
-1.0.0
------
-
- * added `Translation\TranslatorInterface` and `Translation\TranslatorTrait`
+The changelog is maintained for all Symfony contracts at the following URL:
+https://github.com/symfony/contracts/blob/master/CHANGELOG.md

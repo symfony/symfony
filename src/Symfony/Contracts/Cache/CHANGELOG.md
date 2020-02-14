@@ -1,7 +1,5 @@
 CHANGELOG
 =========
 
-1.0.0
------
-
- * added `Cache` contract to extend PSR-6 with tag invalidation, callback-based computation and stampede protection
+The changelog is maintained for all Symfony contracts at the following URL:
+https://github.com/symfony/contracts/blob/master/CHANGELOG.md

@@ -1,7 +1,5 @@
 CHANGELOG
 =========
 
-1.1.0
------
-
- * added `EventDispatcherInterface` and `Event` in namespace `EventDispatcher`
+The changelog is maintained for all Symfony contracts at the following URL:
+https://github.com/symfony/contracts/blob/master/CHANGELOG.md

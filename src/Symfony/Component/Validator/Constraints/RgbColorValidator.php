@@ -39,7 +39,7 @@ class RgbColorValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        
+
         $pattern = sprintf('/^rgb%s\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})%s\)$/%s', $constraint->allowAlpha ? 'a?' : '', $constraint->allowAlpha ? '(,\s*[0-1]{0,1}(?:\.\d{1,'.$constraint->alphaPrecision.'})?)?' : '', $constraint->lowerCaseOnly ? '' : 'i');
 
         if (!preg_match($pattern, $value, $matches) || !$this->areRangesValid($matches)) {
@@ -49,21 +49,21 @@ class RgbColorValidator extends ConstraintValidator
                 ->addViolation();
         }
     }
-    
+
     private function areRangesValid(array $matches): bool
     {
-        for ($i = 1; $i < 4; $i++) {
+        for ($i = 1; $i < 4; ++$i) {
             if (0 > $matches[$i] || 255 < $matches[$i]) {
                 return false;
             }
         }
-        
+
         if ($alpha = trim($matches[4] ?? null, ',')) {
             if (0 > $alpha || 1 < $alpha) {
                 return false;
             }
         }
-        
+
         return true;
     }
 }

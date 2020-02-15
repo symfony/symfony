@@ -30,7 +30,7 @@ class RgbColorValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "alphaPrecision" option must be a positive integer ("foo" given)');
-        
+
         new RgbColor(['alphaPrecision' => 'foo']);
     }
 
@@ -142,7 +142,7 @@ class RgbColorValidatorTest extends ConstraintValidatorTestCase
     public function testValidRgbColorsWithAllowAlphaFalse($color)
     {
         $this->validator->validate($color, new RgbColor(['allowAlpha' => false]));
-        
+
         $this->assertNoViolation();
     }
 

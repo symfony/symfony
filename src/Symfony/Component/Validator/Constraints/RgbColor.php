@@ -36,8 +36,8 @@ class RgbColor extends Constraint
     public function __construct($options = null)
     {
         parent::__construct($options);
-        
-        if (!is_int($this->alphaPrecision) || 1 > $this->alphaPrecision) {
+
+        if (!\is_int($this->alphaPrecision) || 1 > $this->alphaPrecision) {
             throw new InvalidArgumentException(sprintf('The "alphaPrecision" option must be a positive integer ("%s" given)', $this->alphaPrecision));
         }
     }

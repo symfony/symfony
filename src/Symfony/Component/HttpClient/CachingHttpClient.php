@@ -55,6 +55,8 @@ class CachingHttpClient implements HttpClientInterface
         unset($defaultOptions['allow_revalidate']);
         unset($defaultOptions['stale_while_revalidate']);
         unset($defaultOptions['stale_if_error']);
+        unset($defaultOptions['trace_level']);
+        unset($defaultOptions['trace_header']);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);

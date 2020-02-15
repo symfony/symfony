@@ -45,6 +45,8 @@ class Glob
         $firstByte = true;
         $escaping = false;
         $inCurlies = 0;
+        $inNegative = 0;
+        $negativeForCurlies = [];
         $regex = '';
         $sizeGlob = \strlen($glob);
         for ($i = 0; $i < $sizeGlob; ++$i) {
@@ -79,15 +81,36 @@ class Glob
                 $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
             } elseif ('?' === $car) {
                 $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
+            } elseif ('!' === $car && isset($glob[$i + 1])) {
+                $regex .= $escaping ? '!' : '(?!';
+                if (!$escaping) {
+                    ++$inNegative;
+                    if ('{' === $glob[$i + 1]) {
+                        $negativeForCurlies[$inNegative] = 0;
+                    }
+
+                    continue;
+                }
             } elseif ('{' === $car) {
                 $regex .= $escaping ? '\\{' : '(';
                 if (!$escaping) {
                     ++$inCurlies;
+                    if ($inNegative && isset($negativeForCurlies[$inNegative])) {
+                        ++$negativeForCurlies[$inNegative];
+                    }
                 }
             } elseif ('}' === $car && $inCurlies) {
                 $regex .= $escaping ? '}' : ')';
                 if (!$escaping) {
                     --$inCurlies;
+                    if ($inNegative && isset($negativeForCurlies[$inNegative])) {
+                        --$negativeForCurlies[$inNegative];
+                        if (0 === $negativeForCurlies[$inNegative])  {
+                            $regex .= ')';
+                            unset($negativeForCurlies[$inNegative]);
+                            --$inNegative;
+                        }
+                    }
                 }
             } elseif (',' === $car && $inCurlies) {
                 $regex .= $escaping ? ',' : '|';
@@ -103,6 +126,12 @@ class Glob
             } else {
                 $regex .= $car;
             }
+
+            if ($inNegative && !isset($negativeForCurlies[$inNegative])) {
+                $regex .= ')';
+                --$inNegative;
+            }
+
             $escaping = false;
         }
 

@@ -92,4 +92,14 @@ class GlobTest extends TestCase
 
         $this->assertSame(['one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
+
+    public function testGlobToRegexNegativeLookup()
+    {
+        $this->assertEquals('#^(?=[^\.])(?!(a|b))$#', Glob::toRegex('!{a,b}'));
+        $this->assertEquals('#^(?=[^\.])(?!c)har/(?=[^\.])(a|b)$#', Glob::toRegex('!char/{a,b}'));
+        $this->assertEquals('#^(?=[^\.])(?!(Service))$#', Glob::toRegex('!{Service}'));
+        $this->assertEquals('#^(?=[^\.])(?!(a|(?!(a|b))|b|c))(?!(d|e|f))x$#', Glob::toRegex('!{a,!{a,b},b,c}!{d,e,f}x'));
+        $this->assertEquals('#^(?=[^\.])(?!!)!((?!a)|(?!b))$#', Glob::toRegex('!\\!\\!{!a,!b}'));
+        $this->assertEquals('#^(?=[^\.])(?!((?!((?!(a|b))|c))))$#', Glob::toRegex('!{!{!{a,b},c}}'));
+    }
 }

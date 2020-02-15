@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -140,6 +139,9 @@ class Container implements ContainerInterface, ResetInterface
      *
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
+     *
+     * @param string $id The parameter id
+     * @param object|null $service
      */
     public function set(string $id, ?object $service)
     {
@@ -226,6 +228,13 @@ class Container implements ContainerInterface, ResetInterface
      * Creates a service.
      *
      * As a separate method to allow "get()" to use the really fast `??` operator.
+     *
+     * @param string $id
+     * @param int $invalidBehavior
+     *
+     * @return mixed|null
+     *
+     * @throws \Exception
      */
     private function make(string $id, int $invalidBehavior)
     {
@@ -375,7 +384,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return mixed The value to use for the provided environment variable name
      *
-     * @throws EnvNotFoundException When the environment variable is not found and has no default value
+     * @throws \ReflectionException
      */
     protected function getEnv($name)
     {
@@ -413,10 +422,12 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
-     * @param string|false $registry
-     * @param string|bool  $load
+     * @param $registry
+     * @param string $id
+     * @param string|null $method
+     * @param $load
      *
-     * @return mixed
+     * @return $this|mixed|null
      *
      * @internal
      */

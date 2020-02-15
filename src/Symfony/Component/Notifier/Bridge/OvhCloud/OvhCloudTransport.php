@@ -100,8 +100,6 @@ final class OvhCloudTransport extends AbstractTransport
         $endpoint = sprintf('%s/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
-        $serverTimestamp = (int) (string) $response->getContent();
-
-        return $serverTimestamp - (int) time();
+        return $response->getContent() - time();
     }
 }

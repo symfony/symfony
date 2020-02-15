@@ -16,6 +16,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * XmlFileLoader loads XML routing files.
@@ -129,6 +130,7 @@ class XmlFileLoader extends FileLoader
             foreach ($paths as $locale => $p) {
                 $defaults['_locale'] = $locale;
                 $defaults['_canonical_route'] = $id;
+                $requirements['_locale'] = preg_quote($locale, RouteCompiler::REGEX_DELIMITER);
                 $route = new Route($p, $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
                 $collection->add($id.'.'.$locale, $route);
             }

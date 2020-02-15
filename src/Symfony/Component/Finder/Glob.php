@@ -105,7 +105,7 @@ class Glob
                     --$inCurlies;
                     if ($inNegative && isset($negativeForCurlies[$inNegative])) {
                         --$negativeForCurlies[$inNegative];
-                        if (0 === $negativeForCurlies[$inNegative])  {
+                        if (0 === $negativeForCurlies[$inNegative]) {
                             $regex .= ')';
                             unset($negativeForCurlies[$inNegative]);
                             --$inNegative;

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Form;
+namespace Symfony\Component\Form\Extension\Security\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\SubmitEvent;
@@ -17,8 +17,6 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

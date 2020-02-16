@@ -5,7 +5,6 @@ CHANGELOG
 -----
 
  * Added security configuration for priority-based access decision strategy
- * Added `SecurityPasswordType`
 
 5.0.0
 -----

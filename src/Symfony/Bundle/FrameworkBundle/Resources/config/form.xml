@@ -111,5 +111,15 @@
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>
+
+        <!-- SecurityExtension -->
+        <service id="form.extension.security" class="Symfony\Component\Form\Extension\Security\SecurityExtension">
+            <argument type="service" id="security.user_password_encoder" on-invalid="ignore"/>
+            <tag name="form.type_extension" />
+        </service>
+        <service id="form.extension.security.type.security_password" class="Symfony\Component\Form\Extension\Security\Type\SecurityPasswordType">
+            <argument type="service" id="security.user_password_encoder" on-invalid="ignore"/>
+            <tag name="form.type" alias="security_password" />
+        </service>
     </services>
 </container>

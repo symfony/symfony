@@ -11,6 +11,7 @@ CHANGELOG
    is deprecated. The method will be added to the interface in 6.0.
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
+ * Added `SecurityExtension` and `SecurityPasswordType`
 
 5.0.0
 -----

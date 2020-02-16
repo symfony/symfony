@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler\FingersCrossed;
 
+use Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -20,23 +21,36 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Pierrick Vignand <pierrick.vignand@gmail.com>
+ *
+ * @final
  */
-class NotFoundActivationStrategy extends ErrorLevelActivationStrategy
+class NotFoundActivationStrategy extends ErrorLevelActivationStrategy implements ActivationStrategyInterface
 {
+    private $inner;
     private $exclude;
     private $requestStack;
 
-    public function __construct(RequestStack $requestStack, array $excludedUrls, $actionLevel)
+    /**
+     * @param ActivationStrategyInterface|int|string $inner an ActivationStrategyInterface to decorate
+     */
+    public function __construct(RequestStack $requestStack, array $excludedUrls, $inner)
     {
-        parent::__construct($actionLevel);
+        if (!$inner instanceof ActivationStrategyInterface) {
+            trigger_deprecation('symfony/monolog-bridge', '5.2', 'Passing an actionLevel (int|string) as constructor\'s 3rd argument of "%s" is deprecated, "%s" expected.', __CLASS__, ActivationStrategyInterface::class);
 
+            $actionLevel = $inner;
+            $inner = new ErrorLevelActivationStrategy($actionLevel);
+        }
+
+        $this->inner = $inner;
         $this->requestStack = $requestStack;
         $this->exclude = '{('.implode('|', $excludedUrls).')}i';
     }
 
     public function isHandlerActivated(array $record): bool
     {
-        $isActivated = parent::isHandlerActivated($record);
+        $isActivated = $this->inner->isHandlerActivated($record);
 
         if (
             $isActivated

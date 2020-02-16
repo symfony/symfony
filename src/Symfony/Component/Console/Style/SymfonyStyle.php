@@ -109,7 +109,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a command text.
      */
     public function text($message)
     {
@@ -132,7 +132,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a command success.
      */
     public function success($message)
     {
@@ -140,7 +140,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats error.
      */
     public function error($message)
     {
@@ -148,7 +148,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a warning message.
      */
     public function warning($message)
     {
@@ -156,7 +156,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a note.
      */
     public function note($message)
     {
@@ -164,7 +164,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a caution.
      */
     public function caution($message)
     {
@@ -172,7 +172,7 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a table.
      */
     public function table(array $headers, array $rows)
     {

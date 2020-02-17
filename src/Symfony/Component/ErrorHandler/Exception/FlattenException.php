@@ -14,6 +14,7 @@ namespace Symfony\Component\ErrorHandler\Exception;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\ProblemHttpException;
 
 /**
  * FlattenException wraps a PHP Error or Exception to be able to serialize it.
@@ -30,6 +31,10 @@ class FlattenException
     private $trace;
     private $traceAsString;
     private $class;
+    private $type;
+    private $title;
+    private $instance;
+    private $extensions = [];
     private $statusCode;
     private $statusText;
     private $headers;
@@ -83,6 +88,13 @@ class FlattenException
 
         if ($previous instanceof \Throwable) {
             $e->setPrevious(static::createFromThrowable($previous));
+        }
+
+        if ($exception instanceof ProblemHttpException) {
+            $e->setType($exception->getType());
+            $e->setTitle($exception->getTitle());
+            $e->setInstance($exception->getInstance());
+            $e->setExtensions($exception->getExtensions());
         }
 
         return $e;
@@ -206,6 +218,66 @@ class FlattenException
         }
 
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getInstance(): ?string
+    {
+        return $this->instance;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setInstance(?string $instance): self
+    {
+        $this->instance = $instance;
+
+        return $this;
+    }
+
+    public function getExtensions(): array
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setExtensions(array $extensions): self
+    {
+        $this->extensions = $extensions;
 
         return $this;
     }

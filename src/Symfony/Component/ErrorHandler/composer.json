@@ -21,8 +21,11 @@
         "symfony/var-dumper": "^4.4|^5.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0"
+        "symfony/http-kernel": "^5.1",
+        "symfony/serializer": "^5.1"
+    },
+    "conflict": {
+        "symfony/framework-bundle": "<4.4.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },

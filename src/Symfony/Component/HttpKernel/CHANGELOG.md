@@ -6,13 +6,14 @@ CHANGELOG
 
  * allowed using public aliases to reference controllers
  * added session usage reporting when the `_stateless` attribute of the request is set to `true`
+ * added `ProblemHttpException` class
 
 5.0.0
 -----
 
  * removed support for getting the container from a non-booted kernel
- * removed the first and second constructor argument of `ConfigDataCollector` 
- * removed `ConfigDataCollector::getApplicationName()` 
+ * removed the first and second constructor argument of `ConfigDataCollector`
+ * removed `ConfigDataCollector::getApplicationName()`
  * removed `ConfigDataCollector::getApplicationVersion()`
  * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
  * removed `TranslatorListener` in favor of `LocaleAwareListener`
@@ -24,7 +25,7 @@ CHANGELOG
  * removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
  * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * removed `PostResponseEvent`, use `TerminateEvent` instead
- * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
+ * removed `SaveSessionListener` in favor of `AbstractSessionListener`
  * removed `Client`, use `HttpKernelBrowser` instead
  * added method `getProjectDir()` to `KernelInterface`
  * removed methods `serialize` and `unserialize` from `DataCollector`, store the serialized state in the data property instead

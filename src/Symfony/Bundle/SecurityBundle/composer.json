@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/http-kernel": "^5.0",
+        "symfony/http-kernel": "^5.1",
         "symfony/security-core": "^4.4|^5.0",
         "symfony/security-csrf": "^4.4|^5.0",
         "symfony/security-guard": "^4.4|^5.0",
@@ -35,9 +35,9 @@
         "symfony/dom-crawler": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
-        "symfony/framework-bundle": "^4.4|^5.0",
+        "symfony/framework-bundle": "^4.4.1|^5.0.1",
         "symfony/process": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0",
+        "symfony/serializer": "^5.1",
         "symfony/translation": "^4.4|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/twig-bridge": "^4.4|^5.0",
@@ -50,7 +50,9 @@
         "symfony/console": "<4.4",
         "symfony/framework-bundle": "<4.4",
         "symfony/ldap": "<4.4",
-        "symfony/twig-bundle": "<4.4"
+        "symfony/twig-bundle": "<4.4",
+        "symfony/serializer": "<5.1",
+        "symfony/error-handler": "<5.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

@@ -26,7 +26,7 @@
         "symfony/cache": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/error-handler": "^4.4|^5.0",
+        "symfony/error-handler": "^5.1",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
@@ -39,7 +39,9 @@
         "symfony/dependency-injection": "<4.4",
         "symfony/property-access": "<4.4",
         "symfony/property-info": "<4.4",
-        "symfony/yaml": "<4.4"
+        "symfony/yaml": "<4.4",
+        "symfony/error-handler": "<5.1",
+        "symfony/security-bundle": "<5.1"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

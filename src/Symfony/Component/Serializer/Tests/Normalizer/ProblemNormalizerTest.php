@@ -38,9 +38,8 @@ class ProblemNormalizerTest extends TestCase
     {
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
+            'title' => 'Internal Server Error',
             'status' => 500,
-            'detail' => 'Internal Server Error',
         ];
 
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));

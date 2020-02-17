@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\ProblemHttpException;
 
 /**
  * Normalizes errors according to the API Problem spec (RFC 7807).
@@ -26,7 +27,6 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     private $debug;
     private $defaultContext = [
         'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-        'title' => 'An error occurred',
     ];
 
     public function __construct(bool $debug = false, array $defaultContext = [])
@@ -40,21 +40,25 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
      */
     public function normalize($exception, string $format = null, array $context = [])
     {
-        $context += $this->defaultContext;
         $debug = $this->debug && ($context['debug'] ?? true);
+        $e = $context['exception'] ?? null;
 
         $data = [
-            'type' => $context['type'],
-            'title' => $context['title'],
+            'type' => $context['type'] ?? $exception->getType() ?? $this->defaultContext['type'],
+            'title' => $context['title'] ?? $exception->getTitle() ?? $exception->getStatusText(),
             'status' => $context['status'] ?? $exception->getStatusCode(),
-            'detail' => $debug ? $exception->getMessage() : $exception->getStatusText(),
-        ];
+            'detail' => $debug || $e instanceof ProblemHttpException ? $exception->getMessage() : null,
+            'instance' => $exception->getInstance(),
+        ] + $exception->getExtensions();
+
         if ($debug) {
             $data['class'] = $exception->getClass();
             $data['trace'] = $exception->getTrace();
         }
 
-        return $data;
+        return array_filter($data, static function ($value): bool {
+            return null !== $value && '' !== $value;
+        });
     }
 
     /**

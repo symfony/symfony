@@ -34,6 +34,6 @@ class SerializerErrorRendererTest extends TestCase
             function () { return 'json'; }
         );
 
-        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->render($exception)->getAsString());
+        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"Internal Server Error","status":500}', $errorRenderer->render($exception)->getAsString());
     }
 }

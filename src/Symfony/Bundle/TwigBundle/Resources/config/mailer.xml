@@ -13,6 +13,9 @@
 
         <service id="twig.mime_body_renderer" class="Symfony\Bridge\Twig\Mime\BodyRenderer">
             <argument type="service" id="twig" />
+            <call method="setTranslator">
+                <argument type="service" id="translator" on-invalid="ignore" />
+            </call>
         </service>
     </services>
 </container>

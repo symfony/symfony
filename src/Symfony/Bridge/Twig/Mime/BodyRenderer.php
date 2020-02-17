@@ -15,6 +15,7 @@ use League\HTMLToMarkdown\HtmlConverter;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Message;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /**
@@ -25,6 +26,7 @@ final class BodyRenderer implements BodyRendererInterface
     private $twig;
     private $context;
     private $converter;
+    private $translator;
 
     public function __construct(Environment $twig, array $context = [])
     {
@@ -37,6 +39,16 @@ final class BodyRenderer implements BodyRendererInterface
                 'remove_nodes' => 'head style',
             ]);
         }
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+
+        return $this;
     }
 
     public function render(Message $message): void
@@ -54,12 +66,26 @@ final class BodyRenderer implements BodyRendererInterface
             'email' => new WrappedTemplatedEmail($this->twig, $message),
         ]);
 
+        $previousLocale = null;
+        if (null !== $message->getLocale() &&
+            null !== $this->translator &&
+            method_exists($this->translator, 'getLocale')
+            && method_exists($this->translator, 'setLocale')
+        ) {
+            $previousLocale = $this->translator->getLocale();
+            $this->translator->setLocale($message->getLocale());
+        }
+
         if ($template = $message->getTextTemplate()) {
             $message->text($this->twig->render($template, $vars));
         }
 
         if ($template = $message->getHtmlTemplate()) {
             $message->html($this->twig->render($template, $vars));
+        }
+
+        if ($previousLocale) {
+            $this->translator->setLocale($previousLocale);
         }
 
         // if text body is empty, compute one from the HTML body

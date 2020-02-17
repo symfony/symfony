@@ -20,6 +20,7 @@ class TemplatedEmail extends Email
 {
     private $htmlTemplate;
     private $textTemplate;
+    private $locale;
     private $context = [];
 
     /**
@@ -50,6 +51,21 @@ class TemplatedEmail extends Email
     public function getHtmlTemplate(): ?string
     {
         return $this->htmlTemplate;
+    }
+
+    /**
+     * @return $this
+     */
+    public function locale(?string $locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
     }
 
     /**

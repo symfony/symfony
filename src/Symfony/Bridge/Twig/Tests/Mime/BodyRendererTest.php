@@ -16,6 +16,7 @@ use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Translation\Translator;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
@@ -61,7 +62,25 @@ class BodyRendererTest extends TestCase
         $this->prepareEmail('Text', '', ['email' => 'reserved!']);
     }
 
-    private function prepareEmail(?string $text, ?string $html, array $context = []): TemplatedEmail
+    public function testRenderLocaleAware(): void
+    {
+        $translator = $this->createMock(Translator::class);
+        $translator
+            ->expects($this->once())
+            ->method('getLocale')
+            ->willReturn('en');
+        $translator
+            ->expects($this->exactly(2))
+            ->method('setLocale')
+            ->withConsecutive(
+                ['de'],
+                ['en']
+            );
+
+        $this->prepareEmail('Text', '<b>HTML</b>', [], 'de', $translator);
+    }
+
+    private function prepareEmail(?string $text, ?string $html, array $context = [], string $locale = null, Translator $translator = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,
@@ -80,6 +99,10 @@ class BodyRendererTest extends TestCase
         }
         if (null !== $html) {
             $email->htmlTemplate('html');
+        }
+        if (null !== $locale && null !== $translator) {
+            $email->locale($locale);
+            $renderer->setTranslator($translator);
         }
         $renderer->render($email);
 

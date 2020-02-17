@@ -46,7 +46,6 @@ class Glob
         $escaping = false;
         $inCurlies = 0;
         $inNegative = 0;
-        $negativeForCurlies = [];
         $regex = '';
         $sizeGlob = \strlen($glob);
         for ($i = 0; $i < $sizeGlob; ++$i) {
@@ -86,6 +85,9 @@ class Glob
                 if (!$escaping) {
                     ++$inNegative;
                     if ('{' === $glob[$i + 1]) {
+                        if (!isset($negativeForCurlies)) {
+                            $negativeForCurlies = [];
+                        }
                         $negativeForCurlies[$inNegative] = 0;
                     }
 

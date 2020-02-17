@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * made the `trans()` filter accept a list of messages to use as fallbacks when translation is missing
+
 5.0.0
 -----
 

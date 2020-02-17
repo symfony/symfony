@@ -113,6 +113,7 @@ class TranslationExtensionTest extends TestCase
             ['{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
             ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
             ['{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'],
+            ['{{ ["bar", "fallback"]|trans }}', 'fallback'],
 
             // trans filter with count
             ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans(count=count) }}', 'There is 5 apples', ['count' => 5]],

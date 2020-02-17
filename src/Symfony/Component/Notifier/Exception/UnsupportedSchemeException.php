@@ -54,6 +54,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovhcloud-notifier',
         ],
+        'sinch' => [
+            'class' => Bridge\Sinch\SinchTransportFactory::class,
+            'package' => 'symfony/sinch-notifier',
+        ],
     ];
 
     /**

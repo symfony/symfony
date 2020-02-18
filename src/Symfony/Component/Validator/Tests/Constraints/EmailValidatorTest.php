@@ -181,7 +181,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             [' example@example.com '],
             [' example @example .com '],
             ['example@-example.com'],
-            ['example.@example.com'],
+            ['foo.@example.com'],
             [sprintf('example@%s.com', str_repeat('a', 64))],
         ];
     }

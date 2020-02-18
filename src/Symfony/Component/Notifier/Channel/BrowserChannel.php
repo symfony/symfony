@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
@@ -30,7 +29,7 @@ final class BrowserChannel implements ChannelInterface
         $this->stack = $stack;
     }
 
-    public function notify(Notification $notification, Recipient $recipient, string $transportName = null, MessageBusInterface $bus = null): void
+    public function notify(Notification $notification, Recipient $recipient, string $transportName = null): void
     {
         if (null === $request = $this->stack->getCurrentRequest()) {
             return;

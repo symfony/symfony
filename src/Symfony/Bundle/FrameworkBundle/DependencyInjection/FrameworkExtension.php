@@ -106,7 +106,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\Notifier\Recipient\AdminRecipient;
+use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -2096,7 +2096,7 @@ class FrameworkExtension extends Extension
             $notifier = $container->getDefinition('notifier');
             foreach ($config['admin_recipients'] as $i => $recipient) {
                 $id = 'notifier.admin_recipient.'.$i;
-                $container->setDefinition($id, new Definition(AdminRecipient::class, [$recipient['email'], $recipient['phone']]));
+                $container->setDefinition($id, new Definition(Recipient::class, [$recipient['email'], $recipient['phone']]));
                 $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
             }
         }

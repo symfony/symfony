@@ -16,10 +16,6 @@ namespace Symfony\Component\Notifier\Recipient;
  *
  * @experimental in 5.1
  */
-class NoRecipient extends Recipient
+class NoRecipient implements RecipientInterface
 {
-    public function getEmail(): string
-    {
-        return '';
-    }
 }

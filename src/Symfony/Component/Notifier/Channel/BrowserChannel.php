@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -29,7 +29,7 @@ final class BrowserChannel implements ChannelInterface
         $this->stack = $stack;
     }
 
-    public function notify(Notification $notification, Recipient $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         if (null === $request = $this->stack->getCurrentRequest()) {
             return;
@@ -42,7 +42,7 @@ final class BrowserChannel implements ChannelInterface
         $request->getSession()->getFlashBag()->add('notification', $message);
     }
 
-    public function supports(Notification $notification, Recipient $recipient): bool
+    public function supports(Notification $notification, RecipientInterface $recipient): bool
     {
         return true;
     }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * Interface for the Notifier system.
@@ -23,5 +23,5 @@ use Symfony\Component\Notifier\Recipient\Recipient;
  */
 interface NotifierInterface
 {
-    public function send(Notification $notification, Recipient ...$recipients): void;
+    public function send(Notification $notification, RecipientInterface ...$recipients): void;
 }

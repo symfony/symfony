@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/polyfill-php80": "^1.15"
+        "symfony/polyfill-php80": "^1.15",
+        "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4",

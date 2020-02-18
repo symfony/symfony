@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 trait AccessTrait
 {
     /** @var int */
-    private $access;
+    protected $access;
 
     public function getAccess(): int
     {

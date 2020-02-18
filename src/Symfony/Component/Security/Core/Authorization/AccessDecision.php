@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\Voter\AccessTrait;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecision
@@ -20,7 +21,7 @@ class AccessDecision
     use AccessTrait;
 
     /** @var Vote[] */
-    private $votes;
+    private $votes = [];
 
     private function __construct(int $access, array $votes = [])
     {
@@ -41,12 +42,37 @@ class AccessDecision
     /**
      * @return Vote[]
      */
-    public function getVotes(int $access = null): array
+    public function getVotes(): array
     {
-        if (null === $access) {
-            return $this->votes;
-        }
+        return $this->votes;
+    }
 
+    /**
+     * @return Vote[]
+     */
+    public function getGrantedVotes(): array
+    {
+        return $this->getVotesByAccess(Voter::ACCESS_GRANTED);
+    }
+
+    /**
+     * @return Vote[]
+     */
+    public function getAbstainedVotes(): array
+    {
+        return $this->getVotesByAccess(Voter::ACCESS_ABSTAIN);
+    }
+
+    /**
+     * @return Vote[]
+     */
+    public function getDeniedVotes(): array
+    {
+        return $this->getVotesByAccess(Voter::ACCESS_DENIED);
+    }
+
+    private function getVotesByAccess(int $access): array
+    {
         return array_filter($this->votes, function (Vote $vote) use ($access) { return $vote->getAccess() === $access; });
     }
 }

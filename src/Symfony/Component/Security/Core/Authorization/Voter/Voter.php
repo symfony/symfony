@@ -19,10 +19,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-abstract class Voter implements VoterInterface, ExplainedVoterInterface
+abstract class Voter implements VoterInterface
 {
-    use ExplainedVoterTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -39,7 +37,8 @@ abstract class Voter implements VoterInterface, ExplainedVoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = $this->deny();
 
-            if (($v = $this->voteOnAttribute($attribute, $subject, $token))->isGranted()) {
+            $v = \is_bool($v = $this->voteOnAttribute($attribute, $subject, $token)) ? Vote::create($v) : $v; // BC layer
+            if ($v->isGranted()) {
                 // grant access as soon as at least one attribute returns a positive response
                 return $v;
             } else {
@@ -48,6 +47,30 @@ abstract class Voter implements VoterInterface, ExplainedVoterInterface
         }
 
         return $vote;
+    }
+
+    /**
+     * Creates an granted vote.
+     */
+    public function grant(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createGranted($reason, $parameters);
+    }
+
+    /**
+     * Creates an abstained vote.
+     */
+    public function abstain(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createAbstrain($reason, $parameters);
+    }
+
+    /**
+     * Creates an denied vote.
+     */
+    public function deny(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createDenied($reason, $parameters);
     }
 
     /**

@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * AccessDeniedException is thrown when the account has not the required role.
@@ -70,7 +69,7 @@ class AccessDeniedException extends RuntimeException
     public function setAccessDecision(AccessDecision $accessDecision)
     {
         $this->accessDecision = $accessDecision;
-        $reasons = array_map(function (Vote $vote) { return $vote->getReason(); }, $this->accessDecision->getVotes(VoterInterface::ACCESS_DENIED));
+        $reasons = array_map(function (Vote $vote) { return $vote->getReason(); }, $this->accessDecision->getDeniedVotes());
         $this->message .= rtrim(' '.implode(' ', $reasons));
     }
 

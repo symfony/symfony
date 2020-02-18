@@ -107,6 +107,10 @@ class Connection extends AbstractConnection
                 $value['referrals'] = $options['referrals'];
             }
 
+            if (!isset($value['network_timeout'])) {
+                $value['network_timeout'] = ini_get('default_socket_timeout');
+            }
+
             return $value;
         });
 

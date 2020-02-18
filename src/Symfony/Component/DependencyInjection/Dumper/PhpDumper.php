@@ -786,7 +786,8 @@ EOF;
                 $return[] = '';
             }
 
-            $return[] = sprintf('@deprecated %s', $definition->getDeprecationMessage($id));
+            $deprecation = $definition->getDeprecation($id);
+            $return[] = sprintf('@deprecated %s', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
         }
 
         $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
@@ -835,7 +836,8 @@ EOF;
             $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
 
             if ($definition->isDeprecated()) {
-                $code .= sprintf("        trigger_deprecation('', '', %s);\n\n", $this->export($definition->getDeprecationMessage($id)));
+                $deprecation = $definition->getDeprecation($id);
+                $code .= sprintf("        trigger_deprecation(%s, %s, %s);\n\n", $this->export($deprecation['package']), $this->export($deprecation['version']), $this->export($deprecation['message']));
             } else {
                 foreach ($this->inlinedDefinitions as $def) {
                     foreach ($this->getClasses($def) as $class) {
@@ -1341,7 +1343,10 @@ EOF;
             $id = (string) $definition;
             $methodNameAlias = $this->generateMethodName($alias);
             $idExported = $this->export($id);
-            $messageExported = $this->export($definition->getDeprecationMessage($alias));
+            $deprecation = $definition->getDeprecation($alias);
+            $packageExported = $this->export($deprecation['package']);
+            $versionExported = $this->export($deprecation['version']);
+            $messageExported = $this->export($deprecation['message']);
             $code .= <<<EOF
 
     /*{$this->docStar}
@@ -1351,7 +1356,7 @@ EOF;
      */
     protected function {$methodNameAlias}()
     {
-        trigger_deprecation('', '', $messageExported);
+        trigger_deprecation($packageExported, $versionExported, $messageExported);
 
         return \$this->get($idExported);
     }

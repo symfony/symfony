@@ -394,11 +394,28 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('foo')->isDeprecated());
         $message = 'The "foo" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
+        $this->assertSame($message, $container->getDefinition('foo')->getDeprecation('foo')['message']);
 
         $this->assertTrue($container->getDefinition('bar')->isDeprecated());
         $message = 'The "bar" service is deprecated.';
-        $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
+        $this->assertSame($message, $container->getDefinition('bar')->getDeprecation('bar')['message']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.
+     */
+    public function testDeprecatedWithoutPackageAndVersion()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_deprecated_without_package_and_version.xml');
+
+        $this->assertTrue($container->getDefinition('foo')->isDeprecated());
+        $deprecation = $container->getDefinition('foo')->getDeprecation('foo');
+        $this->assertSame('The "foo" service is deprecated.', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     public function testDeprecatedAliases()
@@ -409,11 +426,28 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
         $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
+        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo')['message']);
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
-        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
+        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar')['message']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.
+     */
+    public function testDeprecatedAliaseWithoutPackageAndVersion()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('deprecated_alias_definitions_without_package_and_version.xml');
+
+        $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
+        $deprecation = $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo');
+        $this->assertSame('The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     public function testConvertDomElementToArray()

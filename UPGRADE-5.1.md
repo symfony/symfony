@@ -6,6 +6,13 @@ Console
 
  * `Command::setHidden()` is final since Symfony 5.1
 
+DependencyInjection
+-------------------
+
+ * The signature of method `Definition::setDeprecated()` has been updated to `Definition::setDeprecation(string $package, string $version, string $message)`.
+ * The signature of method `Alias::setDeprecated()` has been updated to `Alias::setDeprecation(string $package, string $version, string $message)`.
+ * The signature of method `DeprecateTrait::deprecate()` has been updated to `DeprecateTrait::deprecation(string $package, string $version, string $message)`.
+
 Dotenv
 ------
 

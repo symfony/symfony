@@ -6,6 +6,13 @@ Console
 
  * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter
 
+DependencyInjection
+-------------------
+
+ * The signature of method `Definition::setDeprecated()` has been updated to `Definition::setDeprecation(string $package, string $version, string $message)`.
+ * The signature of method `Alias::setDeprecated()` has been updated to `Alias::setDeprecation(string $package, string $version, string $message)`.
+ * The signature of method `DeprecateTrait::deprecate()` has been updated to `DeprecateTrait::deprecation(string $package, string $version, string $message)`.
+
 Dotenv
 ------
 

@@ -298,7 +298,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('deprecated_parent')
-            ->setDeprecated(true)
+            ->setDeprecated('vendor/package', '1.1', '%service_id%')
         ;
 
         $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'));
@@ -308,6 +308,11 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.
+     */
     public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
     {
         $container = new ContainerBuilder();

@@ -88,7 +88,7 @@ return function (ContainerConfigurator $c) {
         ->decorate('decorated', 'decorated.pif-pouf');
 
     $s->set('deprecated_service', 'stdClass')
-        ->deprecate();
+        ->deprecate('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.');
 
     $s->set('new_factory', 'FactoryClass')
         ->property('foo', 'bar')
@@ -105,7 +105,7 @@ return function (ContainerConfigurator $c) {
         ->factory(['Bar\FooClass', 'getInstance']);
 
     $s->set('factory_simple', 'SimpleFactoryClass')
-        ->deprecate()
+        ->deprecate('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
         ->args(['foo'])
         ->private();
 

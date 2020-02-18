@@ -679,7 +679,7 @@ class AutowirePassTest extends TestCase
     public function testProcessDoesNotTriggerDeprecations()
     {
         $container = new ContainerBuilder();
-        $container->register('deprecated', 'Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass')->setDeprecated(true);
+        $container->register('deprecated', 'Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass')->setDeprecated('vendor/package', '1.1', '%service_id%');
         $container->register('foo', Foo::class);
         $container->register('bar', Bar::class)->setAutowired(true);
 

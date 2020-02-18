@@ -41,8 +41,8 @@ class ResolveHotPathPassTest extends TestCase
             ->addArgument(new Reference('lazy'))
             ->addArgument(new Reference('lazy'));
         $container->register('buz');
-        $container->register('deprec_with_tag')->setDeprecated()->addTag('container.hot_path');
-        $container->register('deprec_ref_notag')->setDeprecated();
+        $container->register('deprec_with_tag')->setDeprecated('vendor/package', '1.1', '%service_id%')->addTag('container.hot_path');
+        $container->register('deprec_ref_notag')->setDeprecated('vendor/package', '1.1', '%service_id%');
 
         (new ResolveHotPathPass())->process($container);
 

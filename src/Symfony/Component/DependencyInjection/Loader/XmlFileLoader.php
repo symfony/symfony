@@ -205,7 +205,19 @@ class XmlFileLoader extends FileLoader
             }
 
             if ($deprecated = $this->getChildren($service, 'deprecated')) {
-                $alias->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
+                $message = $deprecated[0]->nodeValue ?: '';
+                $package = $deprecated[0]->getAttribute('package') ?: '';
+                $version = $deprecated[0]->getAttribute('version') ?: '';
+
+                if (!$deprecated[0]->hasAttribute('package')) {
+                    trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "package" of the node "deprecated" is deprecated.');
+                }
+
+                if (!$deprecated[0]->hasAttribute('version')) {
+                    trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "version" of the node "deprecated" is deprecated.');
+                }
+
+                $alias->setDeprecated($package, $version, $message);
             }
 
             return null;
@@ -284,7 +296,19 @@ class XmlFileLoader extends FileLoader
         }
 
         if ($deprecated = $this->getChildren($service, 'deprecated')) {
-            $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
+            $message = $deprecated[0]->nodeValue ?: '';
+            $package = $deprecated[0]->getAttribute('package') ?: '';
+            $version = $deprecated[0]->getAttribute('version') ?: '';
+
+            if ('' === $package) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "package" of the node "deprecated" is deprecated.');
+            }
+
+            if ('' === $version) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "version" of the node "deprecated" is deprecated.');
+            }
+
+            $definition->setDeprecated($package, $version, $message);
         }
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', $file, $definition instanceof ChildDefinition));

@@ -174,11 +174,28 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
-        $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
+        $this->assertSame($def, $def->setDeprecated('vendor/package', '1.1', '%service_id%'), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
 
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message'], '->getDeprecation() should return an array with the formatted message template');
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
+     */
+    public function testSetDeprecatedWithoutPackageAndVersion()
+    {
+        $def = new Definition('stdClass');
         $def->setDeprecated(true, '%service_id%');
-        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
+
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     /**
@@ -188,7 +205,7 @@ class DefinitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $def = new Definition('stdClass');
-        $def->setDeprecated(false, $message);
+        $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
     public function invalidDeprecationMessageProvider()
@@ -341,7 +358,7 @@ class DefinitionTest extends TestCase
         $def->setAutowired(true);
         $def->setConfigurator('configuration_func');
         $def->setDecoratedService(null);
-        $def->setDeprecated(true);
+        $def->setDeprecated('vendor/package', '1.1', '%service_id%');
         $def->setFactory('factory_func');
         $def->setFile('foo.php');
         $def->setLazy(true);

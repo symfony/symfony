@@ -113,7 +113,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
@@ -157,7 +157,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
@@ -179,6 +179,16 @@
   <xsd:complexType name="tag">
     <xsd:attribute name="name" type="xsd:string" use="required" />
     <xsd:anyAttribute namespace="##any" processContents="lax" />
+  </xsd:complexType>
+
+  <xsd:complexType name="deprecated">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <!-- In Symfony 6, make these attributes required -->
+        <xsd:attribute name="package" type="xsd:string" />
+        <xsd:attribute name="version" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 
   <xsd:complexType name="parameters">

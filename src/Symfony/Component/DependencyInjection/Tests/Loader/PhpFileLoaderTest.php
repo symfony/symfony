@@ -100,4 +100,15 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/factory_short_notation.php');
         $container->compile();
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
+     */
+    public function testDeprecatedWithoutPackageAndVersion()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
+    }
 }

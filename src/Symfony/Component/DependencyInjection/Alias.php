@@ -18,8 +18,7 @@ class Alias
     private $id;
     private $public;
     private $private;
-    private $deprecated;
-    private $deprecationTemplate;
+    private $deprecation = [];
 
     private static $defaultDeprecationTemplate = 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.';
 
@@ -28,7 +27,6 @@ class Alias
         $this->id = $id;
         $this->public = $public;
         $this->private = 2 > \func_num_args();
-        $this->deprecated = false;
     }
 
     /**
@@ -85,40 +83,76 @@ class Alias
      * Whether this alias is deprecated, that means it should not be referenced
      * anymore.
      *
-     * @param bool   $status   Whether this alias is deprecated, defaults to true
-     * @param string $template Optional template message to use if the alias is deprecated
+     * @param string $package The name of the composer package that is triggering the deprecation
+     * @param string $version The version of the package that introduced the deprecation
+     * @param string $message The deprecation message to use
      *
      * @return $this
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(bool $status = true, string $template = null)
+    public function setDeprecated(/* string $package, string $version, string $message */)
     {
-        if (null !== $template) {
-            if (preg_match('#[\r\n]|\*/#', $template)) {
+        $args = \func_get_args();
+
+        if (\func_num_args() < 3) {
+            trigger_deprecation('symfony/dependency-injection', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
+
+            $status = $args[0] ?? true;
+
+            if (!$status) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
+            }
+
+            $message = (string) ($args[1] ?? null);
+            $package = $version = '';
+        } else {
+            $status = true;
+            $package = (string) $args[0];
+            $version = (string) $args[1];
+            $message = (string) $args[2];
+        }
+
+        if ('' !== $message) {
+            if (preg_match('#[\r\n]|\*/#', $message)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (false === strpos($template, '%alias_id%')) {
+            if (false === strpos($message, '%alias_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%alias_id%" placeholder.');
             }
-
-            $this->deprecationTemplate = $template;
         }
 
-        $this->deprecated = $status;
+        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::$defaultDeprecationTemplate] : [];
 
         return $this;
     }
 
     public function isDeprecated(): bool
     {
-        return $this->deprecated;
+        return (bool) $this->deprecation;
     }
 
+    /**
+     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
+     */
     public function getDeprecationMessage(string $id): string
     {
-        return str_replace('%alias_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
+        trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
+
+        return $this->getDeprecation($id)['message'];
+    }
+
+    /**
+     * @param string $id Service id relying on this definition
+     */
+    public function getDeprecation(string $id): array
+    {
+        return [
+            'package' => $this->deprecation['package'],
+            'version' => $this->deprecation['version'],
+            'message' => str_replace('%alias_id%', $id, $this->deprecation['message']),
+        ];
     }
 
     /**

@@ -115,7 +115,7 @@ $container
 ;
 $container
     ->register('deprecated_service', 'stdClass')
-    ->setDeprecated(true)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
     ->setPublic(true)
 ;
 $container
@@ -142,7 +142,7 @@ $container
 $container
     ->register('factory_simple', 'SimpleFactoryClass')
     ->addArgument('foo')
-    ->setDeprecated(true)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
     ->setPublic(false)
 ;
 $container

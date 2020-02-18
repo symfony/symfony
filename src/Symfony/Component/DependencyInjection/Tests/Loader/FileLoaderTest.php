@@ -134,6 +134,13 @@ class FileLoaderTest extends TestCase
             ],
             array_keys($container->getAliases())
         );
+
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            'Prototype/NotExistingDir'
+        );
     }
 
     public function testNestedRegisterClasses()

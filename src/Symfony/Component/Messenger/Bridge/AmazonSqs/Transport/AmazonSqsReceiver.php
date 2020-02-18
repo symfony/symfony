@@ -93,7 +93,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function getMessageCount(): int
     {
         try {
-            $this->connection->getMessageCount();
+            return $this->connection->getMessageCount();
         } catch (HttpExceptionInterface $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

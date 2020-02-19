@@ -24,7 +24,7 @@
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
     "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0|<6.4,>=6.0"
     },
     "autoload": {
         "files": [ "bootstrap.php" ],

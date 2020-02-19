@@ -11,8 +11,9 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
-use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestListener;
+use PHPUnit\Framework\TestListenerDefaultImplementation;
 
 /**
  * CoverageListener adds `@covers <className>` on each test when possible to
@@ -22,8 +23,10 @@ use PHPUnit\Framework\Test;
  *
  * @internal
  */
-class CoverageListenerForV6 extends BaseTestListener
+class CoverageListenerForV6 implements TestListener
 {
+    use TestListenerDefaultImplementation;
+
     private $trait;
 
     public function __construct(callable $sutFqcnResolver = null, $warningOnSutNotFound = false)

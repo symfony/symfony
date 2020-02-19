@@ -110,7 +110,7 @@ abstract class FileLoader extends BaseFileLoader
         $excludePrefix = null;
         if ($excludePattern) {
             $excludePattern = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePattern));
-            foreach ($this->glob($excludePattern, true, $resource) as $path => $info) {
+            foreach ($this->glob($excludePattern, true, $resource, true) as $path => $info) {
                 if (null === $excludePrefix) {
                     $excludePrefix = $resource->getPrefix();
                 }

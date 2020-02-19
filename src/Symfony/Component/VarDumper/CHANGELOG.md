@@ -6,6 +6,11 @@ CHANGELOG
 
  * added `RdKafka` support
 
+5.0.0
+-----
+
+ * drop support for PHP 7.1
+
 4.4.0
 -----
 

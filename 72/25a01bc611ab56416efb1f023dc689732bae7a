@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2020-02-19T14:56:16Z
+
+FWIW there is a locale independant float specifier `%F` but it would output `0.500000`.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-02-19T14:57:59Z
+
+Thank you very much Greg ❤️

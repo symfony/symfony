@@ -72,6 +72,11 @@ class Route
             unset($data['utf8']);
         }
 
+        if (isset($data['stateless'])) {
+            $data['defaults']['_stateless'] = filter_var($data['stateless'], FILTER_VALIDATE_BOOLEAN) ?: false;
+            unset($data['stateless']);
+        }
+
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {

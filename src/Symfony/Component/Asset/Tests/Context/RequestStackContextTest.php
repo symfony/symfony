@@ -37,7 +37,7 @@ class RequestStackContextTest extends TestCase
 
         $requestStackContext = new RequestStackContext($requestStack);
 
-        $this->assertEquals($testBasePath, $requestStackContext->getBasePath());
+        $this->assertSame($testBasePath, $requestStackContext->getBasePath());
     }
 
     public function testIsSecureFalse()

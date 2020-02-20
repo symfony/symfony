@@ -24,7 +24,7 @@ class UrlPackageTest extends TestCase
     public function testGetUrl($baseUrls, $format, $path, $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
-        $this->assertEquals($expected, $package->getUrl($path));
+        $this->assertSame($expected, $package->getUrl($path));
     }
 
     public function getConfigs()
@@ -58,7 +58,7 @@ class UrlPackageTest extends TestCase
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
 
-        $this->assertEquals($expected, $package->getUrl($path));
+        $this->assertSame($expected, $package->getUrl($path));
     }
 
     public function getContextConfigs()
@@ -85,7 +85,7 @@ class UrlPackageTest extends TestCase
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new UrlPackage('https://example.com', $versionStrategy);
 
-        $this->assertEquals('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
+        $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
     public function testNoBaseUrls()

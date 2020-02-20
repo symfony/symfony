@@ -146,6 +146,20 @@ class InputOption
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
 
+    public function addMode(int $mode)
+    {
+        if ($mode > 15 || $mode < 1) {
+            throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
+        }
+
+        $this->mode |= $mode;
+    }
+
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
     /**
      * Sets the default value.
      *

@@ -6,6 +6,7 @@ CHANGELOG
 
  * `Command::setHidden()` is final since Symfony 5.1
  * Add `SingleCommandApplication`
+ * added fluent PHP-DSL for configuring commands
 
 5.0.0
 -----

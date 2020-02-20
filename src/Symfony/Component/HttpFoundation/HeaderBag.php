@@ -125,7 +125,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
                 return $default;
             }
 
-            if (null === $headers[$key][0]) {
+            if (!isset($headers[$key][0])) {
                 return null;
             }
 

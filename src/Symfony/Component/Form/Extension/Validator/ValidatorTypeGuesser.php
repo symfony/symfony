@@ -43,8 +43,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
-        return $this->guess($class, $property, function (Constraint $constraint) {
-            return $this->guessRequiredForConstraint($constraint);
+        return $this->guess($class, $property, function (Constraint $constraint) use ($class) {
+            return $this->guessRequiredForConstraint($constraint, $class);
         // If we don't find any constraint telling otherwise, we can assume
         // that a field is not required (with LOW_CONFIDENCE)
         }, false);
@@ -162,13 +162,21 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess whether the field is required
      */
-    public function guessRequiredForConstraint(Constraint $constraint)
+    public function guessRequiredForConstraint(Constraint $constraint, $class = null)
     {
         switch (\get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\NotNull':
             case 'Symfony\Component\Validator\Constraints\NotBlank':
             case 'Symfony\Component\Validator\Constraints\IsTrue':
-                return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
+                $groups = ['Default'];
+                if ($class) {
+                    $classParts = explode('\\', $class);
+                    $groups[] = end($classParts);
+                }
+
+                if (array_intersect($constraint->groups, $groups)) {
+                    return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
+                }
         }
 
         return null;

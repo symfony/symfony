@@ -54,11 +54,10 @@ class File extends \SplFileInfo
      */
     public function guessExtension()
     {
-        if (!class_exists(MimeTypes::class)) {
-            throw new \LogicException('You cannot guess the extension as the Mime component is not installed. Try running "composer require symfony/mime".');
-        }
+        // Do not inline this
+        $mimeType = $this->getMimeType();
 
-        return MimeTypes::getDefault()->getExtensions($this->getMimeType())[0] ?? null;
+        return MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
     }
 
     /**
@@ -74,6 +73,10 @@ class File extends \SplFileInfo
      */
     public function getMimeType()
     {
+        if (!class_exists(MimeTypes::class)) {
+            throw new \LogicException('You cannot guess the mime type as the Mime component is not installed. Try running "composer require symfony/mime".');
+        }
+
         return MimeTypes::getDefault()->guessMimeType($this->getPathname());
     }
 

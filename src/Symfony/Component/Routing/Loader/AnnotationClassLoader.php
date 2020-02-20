@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Annotation\Route as RouteAnnotation;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * AnnotationClassLoader loads routing information from a PHP class and its methods.
@@ -211,6 +212,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->configureRoute($route, $class, $method, $annot);
             if (0 !== $locale) {
                 $route->setDefault('_locale', $locale);
+                $route->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
                 $route->setDefault('_canonical_route', $name);
                 $collection->add($name.'.'.$locale, $route);
             } else {

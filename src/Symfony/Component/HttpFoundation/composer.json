@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "predis/predis": "~1.0",
+        "symfony/cache": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0"
     },

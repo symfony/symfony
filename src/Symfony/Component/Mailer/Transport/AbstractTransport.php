@@ -65,6 +65,8 @@ abstract class AbstractTransport implements TransportInterface
         }
 
         if (!$envelope->getRecipients()) {
+            $this->getLogger()->notice('There are no recipients in the mailer envelope. Nothing was sent.');
+
             return null;
         }
 

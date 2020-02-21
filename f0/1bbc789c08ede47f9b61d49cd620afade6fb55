@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-19T17:24:16Z
+
+What issue does this fix considering we already have a dedicated contraint?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-19T17:28:20Z
+
+Currently you have to do everything manually:
+```php
+new Callback(static function ($collection, ExecutionContextInterface $context): void {
+    $context
+        ->getValidator()
+        ->inContext($context)
+        ->validate(\count($collection), new DivisibleBy([
+            'value' => 3,
+        ]));
+}),
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-19T17:33:52Z
+
+What about supporting countable in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraints/DivisibleByValidator.php#L21 this instead?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-19T17:35:06Z
+
+I thought about this but `Count` is made for collections. Otherwise, we should also support countable for other comparisons constraints such as `GreaterThan`, `LessThan`, etc.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-19T17:37:38Z
+
+Why not? :)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-19T17:54:05Z
+
+That implies way more work and it’s also less logical to use from a DX POV.
+The collection « count » is divisible by X, not the collection itself. My
+collection cannot be « greater than » X, it’s an array/object. Its « count
+» must be minimum X. Etc. I’m sure the Count constraint was made for this.
+
+On Wed 19 Feb 2020 at 18:37, Jules Pietri <notifications@github.com> wrote:
+
+> Why not? :)
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/35783?email_source=notifications&email_token=AA35DBYJFWYIW5N4XZS2VATRDVU6JA5CNFSM4KXT2VJKYY3PNVWWK3TUL52HS4DFVREXG43VMVBW63LNMVXHJKTDN5WW2ZLOORPWSZGOEMIXO5I#issuecomment-588347253>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AA35DB72WPRA5LJ3WAQPVILRDVU6JANCNFSM4KXT2VJA>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-19T18:49:01Z
+
+>The collection « count » is divisible by X, not the collection itself.
+
+It is usually different, but when an object is countable, this is just the same thing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-19T20:37:52Z
+
+I think this approach (this PR) is more clear to me also.

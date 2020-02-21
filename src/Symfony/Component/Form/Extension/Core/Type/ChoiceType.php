@@ -13,6 +13,13 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceAttr;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceValue;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\GroupBy;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\PreferredChoice;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -324,13 +331,13 @@ class ChoiceType extends AbstractType
 
         $resolver->setAllowedTypes('choices', ['null', 'array', '\Traversable']);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
-        $resolver->setAllowedTypes('choice_loader', ['null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface']);
-        $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
-        $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
-        $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
-        $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
-        $resolver->setAllowedTypes('preferred_choices', ['array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
-        $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('choice_loader', ['null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', ChoiceLoader::class]);
+        $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceLabel::class]);
+        $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceFieldName::class]);
+        $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceValue::class]);
+        $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceAttr::class]);
+        $resolver->setAllowedTypes('preferred_choices', ['array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', PreferredChoice::class]);
+        $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', GroupBy::class]);
     }
 
     /**

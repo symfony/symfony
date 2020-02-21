@@ -1205,13 +1205,13 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     public function testLoaderCachingWithParameters()
@@ -1265,13 +1265,13 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     protected function createRegistryMock($name, $em)

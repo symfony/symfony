@@ -1405,9 +1405,9 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideTruncate
      */
-    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis)
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
     {
-        $instance = static::createFromString($origin)->truncate($length, $ellipsis);
+        $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
         $this->assertEquals(static::createFromString($expected), $instance);
     }
@@ -1417,12 +1417,17 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             ['', '', 3, ''],
             ['', 'foo', 0, '...'],
+            ['foo', 'foo', 0, '...', false],
             ['fo', 'foobar', 2, ''],
             ['foobar', 'foobar', 10, ''],
+            ['foobar', 'foobar', 10, '...', false],
             ['foo', 'foo', 3, '...'],
             ['fo', 'foobar', 2, '...'],
             ['...', 'foobar', 3, '...'],
             ['fo...', 'foobar', 5, '...'],
+            ['foobar...', 'foobar foo', 6, '...', false],
+            ['foobar...', 'foobar foo', 7, '...', false],
+            ['foobar foo...', 'foobar foo a', 10, '...', false],
         ];
     }
 

@@ -620,7 +620,7 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
-    public function truncate(int $length, string $ellipsis = ''): self
+    public function truncate(int $length, string $ellipsis = '', bool $cut = true): self
     {
         $stringLength = $this->length();
 
@@ -632,6 +632,10 @@ abstract class AbstractString implements \JsonSerializable
 
         if ($length < $ellipsisLength) {
             $ellipsisLength = 0;
+        }
+
+        if (!$cut) {
+            $length = $ellipsisLength + ($this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1) ?? $stringLength);
         }
 
         $str = $this->slice(0, $length - $ellipsisLength);

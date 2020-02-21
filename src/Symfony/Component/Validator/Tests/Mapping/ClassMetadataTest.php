@@ -13,8 +13,11 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
@@ -50,6 +53,20 @@ class ClassMetadataTest extends TestCase
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new PropertyConstraint());
+    }
+
+    public function testAddCompositeConstraintRejectsNestedPropertyConstraints()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint" cannot be put on classes.');
+
+        $this->metadata->addConstraint(new ClassCompositeConstraint([new PropertyConstraint()]));
+    }
+
+    public function testAddCompositeConstraintAcceptsNestedClassConstraints()
+    {
+        $this->metadata->addConstraint($constraint = new ClassCompositeConstraint([new ClassConstraint()]));
+        $this->assertSame($this->metadata->getConstraints(), [$constraint]);
     }
 
     public function testAddPropertyConstraints()
@@ -309,5 +326,25 @@ class ClassMetadataTest extends TestCase
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
+    }
+}
+
+class ClassCompositeConstraint extends Composite
+{
+    public $nested;
+
+    public function getDefaultOption()
+    {
+        return $this->getCompositeOption();
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'nested';
+    }
+
+    public function getTargets()
+    {
+        return [self::CLASS_CONSTRAINT];
     }
 }

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T13:22:32Z
+
+@HeahDude What's the status of this PR? Are you willing to finish it?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-11-24T20:10:52Z
+
+This one is ready for another round of reviews.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-12-07T21:30:17Z
+
+I've fixed the tests, it seems that they will benefit from the optimization too in 6.0.
+
+ping @xabbuh @stof @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-15T10:19:14Z
+
+Rebased and squashed here, the last implementation does not trigger deprecations anymore, it is just about optimizing when we can, without the cost of a BC layer.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-17T18:24:46Z
+
+Thank you for the review <3. I've updated the description to better explain the common scenarii and the after/before effects.
+I've also done more profiling and added some nice screenshots :).
+Docs PR is coming!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-18T19:36:33Z
+
+Doc PR opened symfony/symfony-docs#13182.

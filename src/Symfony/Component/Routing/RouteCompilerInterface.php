@@ -21,10 +21,11 @@ interface RouteCompilerInterface
     /**
      * Compiles the current route instance.
      *
+     * @param $fixStaticVariables Tell the compiler to convert static variables to text
      * @return CompiledRoute A CompiledRoute instance
      *
      * @throws \LogicException If the Route cannot be compiled because the
      *                         path or host pattern is invalid
      */
-    public static function compile(Route $route);
+    public static function compile(Route $route /**, bool $fixStaticVariables = false */);
 }

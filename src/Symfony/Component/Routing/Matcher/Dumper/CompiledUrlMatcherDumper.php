@@ -170,7 +170,7 @@ EOF;
         $dynamicRoutes = new RouteCollection();
 
         foreach ($collection->all() as $name => $route) {
-            $compiledRoute = $route->compile();
+            $compiledRoute = $route->compile(true);
             $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
             $hostRegex = $compiledRoute->getHostRegex();
             $regex = $compiledRoute->getRegex();
@@ -182,7 +182,9 @@ EOF;
 
             if (!$compiledRoute->getPathVariables()) {
                 $host = !$compiledRoute->getHostVariables() ? $route->getHost() : '';
-                $url = $route->getPath();
+                $url = preg_replace_callback('#{([^}]+)}#', static function (array $matches) use ($route) {
+                    return $route->getRequirement($matches[1]);
+                }, $route->getPath());
                 if ($hasTrailingSlash) {
                     $url = substr($url, 0, -1);
                 }

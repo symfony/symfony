@@ -147,21 +147,21 @@ trait ResponseTrait
         $contentType = $this->headers['content-type'][0] ?? 'application/json';
 
         if (!preg_match('/\bjson\b/i', $contentType)) {
-            throw new JsonException(sprintf('Response content-type is "%s" while a JSON-compatible one was expected.', $contentType));
+            throw new JsonException(sprintf('Response content-type is "%s" while a JSON-compatible one was expected for "%s".', $contentType, $this->getInfo('url')));
         }
 
         try {
             $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
-            throw new JsonException($e->getMessage(), $e->getCode());
+            throw new JsonException(sprintf('%s for "%s".', $e->getMessage(), $this->getInfo('url')), $e->getCode());
         }
 
         if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
-            throw new JsonException(json_last_error_msg(), json_last_error());
+            throw new JsonException(sprintf('%s for "%s".', json_last_error_msg(), $this->getInfo('url')), json_last_error());
         }
 
         if (!\is_array($content)) {
-            throw new JsonException(sprintf('JSON content was expected to decode to an array, %s returned.', \gettype($content)));
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, %s returned for "%s".', \gettype($content), $this->getInfo('url')));
         }
 
         if (null !== $this->content) {

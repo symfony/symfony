@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator\Constraints;
  * Validation for the nested constraints collection will stop at first violation.
  *
  * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
@@ -37,5 +37,10 @@ class Sequentially extends Composite
     protected function getCompositeOption()
     {
         return 'constraints';
+    }
+
+    public function getTargets()
+    {
+        return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }
 }

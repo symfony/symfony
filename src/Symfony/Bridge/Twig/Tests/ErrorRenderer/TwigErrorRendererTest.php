@@ -29,7 +29,7 @@ class TwigErrorRendererTest extends TestCase
         $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
         $nativeRenderer
             ->expects($this->once())
-            ->method('render')
+            ->method('flatten')
             ->with($exception)
         ;
 
@@ -45,7 +45,7 @@ class TwigErrorRendererTest extends TestCase
         $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
         $nativeRenderer
             ->expects($this->once())
-            ->method('render')
+            ->method('flatten')
             ->with($exception)
             ->willReturn(FlattenException::createFromThrowable($exception))
         ;

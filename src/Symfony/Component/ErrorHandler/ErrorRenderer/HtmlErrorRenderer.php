@@ -78,7 +78,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(\Throwable $exception): FlattenException
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 5.1, use "%s" instead.', __METHOD__, 'flatten'), E_USER_DEPRECATED);
+        trigger_deprecation('symfony/error-handler', '5.1', 'The "%s" method is deprecated, use "%s" instead.', __METHOD__, 'flatten');
 
         return $this->flatten($exception);
     }

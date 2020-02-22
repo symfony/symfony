@@ -48,7 +48,13 @@ class TwigErrorRenderer implements ErrorRendererInterface
      */
     public function flatten(\Throwable $exception): FlattenException
     {
-        $exception = $this->fallbackErrorRenderer->flatten($exception);
+        if (!method_exists($this->fallbackErrorRenderer, 'flatten')) {
+            @trigger_error(sprintf('Not implementing "flatten" is deprecated since Symfony 5.1.'), E_USER_DEPRECATED);
+
+            $exception = $this->fallbackErrorRenderer->render($exception);
+        } else {
+            $exception = $this->fallbackErrorRenderer->flatten($exception);
+        }
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
 
         if ($debug || !$template = $this->findTemplate($exception->getStatusCode())) {

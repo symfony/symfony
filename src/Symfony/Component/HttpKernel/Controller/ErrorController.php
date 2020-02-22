@@ -38,7 +38,13 @@ class ErrorController
 
     public function __invoke(\Throwable $exception): Response
     {
-        $exception = $this->errorRenderer->flatten($exception);
+        if (!method_exists($this->errorRenderer, 'flatten')) {
+            @trigger_error(sprintf('Not implementing "flatten" is deprecated since Symfony 5.1.'), E_USER_DEPRECATED);
+
+            $exception = $this->errorRenderer->render($exception);
+        } else {
+            $exception = $this->errorRenderer->flatten($exception);
+        }
 
         return new Response($exception->getAsString(), $exception->getStatusCode(), $exception->getHeaders());
     }

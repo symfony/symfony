@@ -63,6 +63,12 @@ class SerializerErrorRenderer implements ErrorRendererInterface
                 'debug' => \is_bool($this->debug) ? $this->debug : ($this->debug)($exception),
             ]));
         } catch (NotEncodableValueException $e) {
+            if (!method_exists($this->fallbackErrorRenderer, 'flatten')) {
+                @trigger_error(sprintf('Not implementing "flatten" is deprecated since Symfony 5.1.'), E_USER_DEPRECATED);
+
+                return $this->fallbackErrorRenderer->render($exception);
+            }
+
             return $this->fallbackErrorRenderer->flatten($exception);
         }
     }

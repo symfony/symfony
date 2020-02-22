@@ -11,6 +11,11 @@ Dotenv
 
  * Removed argument `$usePutenv` from Dotenv's constructor, use `Dotenv::usePutenv()` instead.
 
+ErrorHandler
+---------------
+
+ * Deprecated `ErrorRendererInterface::render()`. Use `ErrorRendererInterface::flatten()` instead.
+
 EventDispatcher
 ---------------
 

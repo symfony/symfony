@@ -21,7 +21,14 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 interface ErrorRendererInterface
 {
     /**
+     * @deprecated since Symfony 5.1, use flatten() instead.
+     *
      * Renders a Throwable as a FlattenException.
      */
     public function render(\Throwable $exception): FlattenException;
+
+    /**
+     * Flattens a Throwable as a FlattenException.
+     */
+    public function flatten(\Throwable $exception): FlattenException;
 }

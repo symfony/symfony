@@ -46,7 +46,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function render(\Throwable $exception): FlattenException
+    public function flatten(\Throwable $exception): FlattenException
     {
         $exception = $this->fallbackErrorRenderer->render($exception);
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
@@ -60,6 +60,16 @@ class TwigErrorRenderer implements ErrorRendererInterface
             'status_code' => $exception->getStatusCode(),
             'status_text' => $exception->getStatusText(),
         ]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function render(\Throwable $exception): FlattenException
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 5.1, use "%s" instead.', __METHOD__, 'flatten'), E_USER_DEPRECATED);
+
+        return $this->flatten($exception);
     }
 
     public static function isDebug(RequestStack $requestStack, bool $debug): \Closure

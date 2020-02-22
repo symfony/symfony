@@ -23,7 +23,7 @@ class CliErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function render(\Throwable $exception): FlattenException
+    public function flatten(\Throwable $exception): FlattenException
     {
         $cloner = new VarCloner();
         $dumper = new class() extends CliDumper {
@@ -42,5 +42,15 @@ class CliErrorRenderer implements ErrorRendererInterface
 
         return FlattenException::createFromThrowable($exception)
             ->setAsString($dumper->dump($cloner->cloneVar($exception), true));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function render(\Throwable $exception): FlattenException
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 5.1, use "%s" instead.', __METHOD__, 'flatten'), E_USER_DEPRECATED);
+
+        return $this->flatten($exception);
     }
 }

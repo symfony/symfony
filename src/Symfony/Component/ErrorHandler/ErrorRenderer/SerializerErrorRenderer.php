@@ -51,7 +51,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function render(\Throwable $exception): FlattenException
+    public function flatten(\Throwable $exception): FlattenException
     {
         $flattenException = FlattenException::createFromThrowable($exception);
 
@@ -65,6 +65,16 @@ class SerializerErrorRenderer implements ErrorRendererInterface
         } catch (NotEncodableValueException $e) {
             return $this->fallbackErrorRenderer->render($exception);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function render(\Throwable $exception): FlattenException
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 5.1, use "%s" instead.', __METHOD__, 'flatten'), E_USER_DEPRECATED);
+
+        return $this->flatten($exception);
     }
 
     public static function getPreferredFormat(RequestStack $requestStack): \Closure

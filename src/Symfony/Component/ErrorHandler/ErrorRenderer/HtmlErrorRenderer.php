@@ -64,13 +64,23 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function render(\Throwable $exception): FlattenException
+    public function flatten(\Throwable $exception): FlattenException
     {
         $exception = FlattenException::createFromThrowable($exception, null, [
             'Content-Type' => 'text/html; charset='.$this->charset,
         ]);
 
         return $exception->setAsString($this->renderException($exception));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function render(\Throwable $exception): FlattenException
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 5.1, use "%s" instead.', __METHOD__, 'flatten'), E_USER_DEPRECATED);
+
+        return $this->flatten($exception);
     }
 
     /**

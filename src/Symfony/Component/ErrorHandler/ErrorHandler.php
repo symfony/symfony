@@ -706,7 +706,7 @@ class ErrorHandler
     {
         $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliErrorRenderer() : new HtmlErrorRenderer($this->debug);
 
-        $exception = $renderer->render($exception);
+        $exception = $renderer->flatten($exception);
 
         if (!headers_sent()) {
             http_response_code($exception->getStatusCode());

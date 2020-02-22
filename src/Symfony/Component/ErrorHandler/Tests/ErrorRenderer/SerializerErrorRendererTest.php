@@ -23,7 +23,7 @@ class SerializerErrorRendererTest extends TestCase
     {
         $errorRenderer = new SerializerErrorRenderer(new Serializer(), 'html');
 
-        self::assertStringContainsString('<h2>The server returned a "500 Internal Server Error".</h2>', $errorRenderer->render(new \RuntimeException())->getAsString());
+        self::assertStringContainsString('<h2>The server returned a "500 Internal Server Error".</h2>', $errorRenderer->flatten(new \RuntimeException())->getAsString());
     }
 
     public function testSerializerContent()
@@ -34,6 +34,6 @@ class SerializerErrorRendererTest extends TestCase
             function () { return 'json'; }
         );
 
-        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->render($exception)->getAsString());
+        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->flatten($exception)->getAsString());
     }
 }

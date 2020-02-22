@@ -17,14 +17,23 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 class HtmlErrorRendererTest extends TestCase
 {
     /**
-     * @dataProvider getRenderData
+     * @legacy
+     * @dataProvider getFlattenData
      */
     public function testRender(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected)
     {
-        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
+        $this->assertStringMatchesFormat($expected, $errorRenderer->flatten($exception)->getAsString());
     }
 
-    public function getRenderData(): iterable
+    /**
+     * @dataProvider getFlattenData
+     */
+    public function testFlatten(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected)
+    {
+        $this->assertStringMatchesFormat($expected, $errorRenderer->flatten($exception)->getAsString());
+    }
+
+    public function getFlattenData(): iterable
     {
         $expectedDebug = <<<HTML
 <!-- Foo (500 Internal Server Error) -->

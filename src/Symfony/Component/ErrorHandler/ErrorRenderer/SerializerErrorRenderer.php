@@ -63,7 +63,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
                 'debug' => \is_bool($this->debug) ? $this->debug : ($this->debug)($exception),
             ]));
         } catch (NotEncodableValueException $e) {
-            return $this->fallbackErrorRenderer->render($exception);
+            return $this->fallbackErrorRenderer->flatten($exception);
         }
     }
 

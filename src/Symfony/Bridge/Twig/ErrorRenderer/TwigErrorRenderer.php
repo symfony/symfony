@@ -48,7 +48,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
      */
     public function flatten(\Throwable $exception): FlattenException
     {
-        $exception = $this->fallbackErrorRenderer->render($exception);
+        $exception = $this->fallbackErrorRenderer->flatten($exception);
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
 
         if ($debug || !$template = $this->findTemplate($exception->getStatusCode())) {

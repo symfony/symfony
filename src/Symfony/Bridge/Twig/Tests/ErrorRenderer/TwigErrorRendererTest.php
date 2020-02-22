@@ -33,7 +33,7 @@ class TwigErrorRendererTest extends TestCase
             ->with($exception)
         ;
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
+        (new TwigErrorRenderer($twig, $nativeRenderer, true))->flatten(new \Exception());
     }
 
     public function testFallbackToNativeRendererIfCustomTemplateNotFound()
@@ -50,7 +50,7 @@ class TwigErrorRendererTest extends TestCase
             ->willReturn(FlattenException::createFromThrowable($exception))
         ;
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, false))->render($exception);
+        (new TwigErrorRenderer($twig, $nativeRenderer, false))->flatten($exception);
     }
 
     public function testRenderCustomErrorTemplate()
@@ -58,7 +58,7 @@ class TwigErrorRendererTest extends TestCase
         $twig = new Environment(new ArrayLoader([
             '@Twig/Exception/error404.html.twig' => '<h1>Page Not Found</h1>',
         ]));
-        $exception = (new TwigErrorRenderer($twig))->render(new NotFoundHttpException());
+        $exception = (new TwigErrorRenderer($twig))->flatten(new NotFoundHttpException());
 
         $this->assertSame('<h1>Page Not Found</h1>', $exception->getAsString());
     }

@@ -38,7 +38,7 @@ class ErrorController
 
     public function __invoke(\Throwable $exception): Response
     {
-        $exception = $this->errorRenderer->render($exception);
+        $exception = $this->errorRenderer->flatten($exception);
 
         return new Response($exception->getAsString(), $exception->getStatusCode(), $exception->getHeaders());
     }

@@ -64,7 +64,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
             ]));
         } catch (NotEncodableValueException $e) {
             if (!method_exists($this->fallbackErrorRenderer, 'flatten')) {
-                trigger_deprecation('symfony/error-handler', '5.1', 'Not implementing the "%s::flatten()" method in "%s" is deprecated.', ErrorRendererInterface::class, get_class($this->fallbackErrorRenderer));
+                trigger_deprecation('symfony/error-handler', '5.1', 'Not implementing the "%s::flatten()" method in "%s" is deprecated.', ErrorRendererInterface::class, \get_class($this->fallbackErrorRenderer));
 
                 return $this->fallbackErrorRenderer->render($exception);
             }

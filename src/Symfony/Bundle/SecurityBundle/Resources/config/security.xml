@@ -45,24 +45,6 @@
         </service>
 
         <!-- Authentication related services -->
-        <service id="security.authentication.manager.provider" class="Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager">
-            <argument /> <!-- providers -->
-            <argument>%security.authentication.manager.erase_credentials%</argument>
-            <call method="setEventDispatcher">
-                <argument type="service" id="event_dispatcher" />
-            </call>
-        </service>
-        <service id="security.authentication.manager.authenticator" class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager">
-            <argument /> <!-- authenticators -->
-            <argument type="service" id="event_dispatcher" />
-            <argument>%security.authentication.manager.erase_credentials%</argument>
-            <call method="setEventDispatcher">
-                <argument type="service" id="event_dispatcher" />
-            </call>
-        </service>
-        <service id="security.authentication.manager" alias="security.authentication.manager.provider"/>
-        <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
-
         <service id="security.authentication.trust_resolver" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver" />
 
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">

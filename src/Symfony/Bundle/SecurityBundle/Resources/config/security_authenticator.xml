@@ -4,6 +4,18 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- Manager -->
+
+        <service id="security.authentication.manager.authenticator" class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager">
+            <argument type="abstract">authenticators</argument>
+            <argument type="service" id="event_dispatcher" />
+            <argument>%security.authentication.manager.erase_credentials%</argument>
+            <call method="setEventDispatcher">
+                <argument type="service" id="event_dispatcher" />
+            </call>
+        </service>
+        <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
+
         <service id="security.authenticator_handler"
                  class="Symfony\Component\Security\Http\Authentication\AuthenticatorHandler"
         >
@@ -38,12 +50,12 @@
             <argument type="service" id="security.encoder_factory" />
         </service>
 
-        <service id="Symfony\Component\Security\Http\EventListener\PasswordMigratingListener">
+        <service id="security.listener.password_migrating" class="Symfony\Component\Security\Http\EventListener\PasswordMigratingListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="security.encoder_factory" />
         </service>
 
-        <service id="Symfony\Component\Security\Http\EventListener\UserCheckerListener">
+        <service id="security.listener.user_checker" class="Symfony\Component\Security\Http\EventListener\UserCheckerListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="Symfony\Component\Security\Core\User\UserCheckerInterface" />
         </service>
@@ -53,7 +65,6 @@
                  abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="abstract">remember me services</argument>
-            <argument type="abstract">provider key</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

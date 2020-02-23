@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by afilina at 2020-02-22T18:47:03Z
+
+I don't understand what's wrong with thew CI system. Appveyor reports an error despite having all checks green. fabpot.io reports CS issues. I went and fixed CS issues in *preexisting code* as per the CONTRIBUTING.md docs, and now fabpot.io reports reports one more issue than previously. I have no idea what I'm expected to do here to pass the build. The rules are obfuscated and this bug is going to affect my workshop on Monday.

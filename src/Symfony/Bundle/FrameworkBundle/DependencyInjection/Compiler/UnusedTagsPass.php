@@ -24,6 +24,7 @@ class UnusedTagsPass implements CompilerPassInterface
     private $whitelist = [
         'annotations.cached_reader',
         'cache.pool.clearer',
+        'chatter.transport_factory',
         'console.command',
         'container.hot_path',
         'container.reversible',
@@ -56,6 +57,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'security.voter',
         'serializer.encoder',
         'serializer.normalizer',
+        'texter.transport_factory',
         'translation.dumper',
         'translation.extractor',
         'translation.loader',

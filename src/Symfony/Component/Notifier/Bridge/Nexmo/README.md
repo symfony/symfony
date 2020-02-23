@@ -3,19 +3,6 @@ Nexmo Notifier
 
 Provides Nexmo integration for Symfony Notifier.
 
-Getting Started
----------------
-
-```
-$ composer install symfony/debug
-```
-
-```php
-use Symfony\Component\Debug\Debug;
-
-Debug::enable();
-```
-
 Resources
 ---------
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2020-02-20T20:13:40Z
+
+I already submitted a fix for this 30 minutes before this PR at https://github.com/symfony/symfony/pull/35807.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2020-02-20T20:14:00Z
+
+I would still argue for reverting all this entirely for the reasons explained on my PR.

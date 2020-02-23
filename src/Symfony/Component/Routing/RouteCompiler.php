@@ -44,14 +44,12 @@ class RouteCompiler implements RouteCompilerInterface
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as
      *                                   a PCRE subpattern
      */
-    public static function compile(Route $route /**, bool $fixStaticVariables = false */)
+    public static function compile(Route $route)
     {
         $hostVariables = [];
         $variables = [];
         $hostRegex = null;
         $hostTokens = [];
-
-        $fixStaticVariables = 1 < \func_num_args() ? (int) func_get_arg(1) : false;
 
         if ('' !== $host = $route->getHost()) {
             $result = self::compilePattern($route, $host, true);
@@ -65,7 +63,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         $path = $route->getPath();
 
-        $result = self::compilePattern($route, $path, false, $fixStaticVariables);
+        $result = self::compilePattern($route, $path, false);
 
         $staticPrefix = $result['staticPrefix'];
 
@@ -94,7 +92,7 @@ class RouteCompiler implements RouteCompilerInterface
         );
     }
 
-    private static function compilePattern(Route $route, string $pattern, bool $isHost, bool $fixStaticVariables = false): array
+    private static function compilePattern(Route $route, string $pattern, bool $isHost): array
     {
         $tokens = [];
         $variables = [];
@@ -186,12 +184,6 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = self::transformCapturingGroupsToNonCapturings($regexp);
             }
 
-            // Fixed variable, could be transformed as text token
-            if ($fixStaticVariables && preg_quote($regexp, self::REGEX_DELIMITER) === $regexp) {
-                $tokens[] = ['text', ($isSeparator ? $precedingChar : '').$regexp];
-                continue;
-            }
-
             if ($important) {
                 $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName, false, true];
             } else {
@@ -204,10 +196,6 @@ class RouteCompiler implements RouteCompilerInterface
 
         if ($pos < \strlen($pattern)) {
             $tokens[] = ['text', substr($pattern, $pos)];
-        }
-
-        if ($fixStaticVariables) {
-            $tokens = self::mergeContiguousTextTokens($tokens);
         }
 
         // find the first optional token
@@ -247,21 +235,6 @@ class RouteCompiler implements RouteCompilerInterface
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         ];
-    }
-
-    private static function mergeContiguousTextTokens(array $tokens): array
-    {
-        $mergedTokens = [$tokens[0]];
-        for ($i = 1; $i < \count($tokens); ++$i) {
-            if ('text' !== $tokens[$i][0] || 'variable' === end($mergedTokens)[0]) {
-                $mergedTokens[] = $tokens[$i];
-                continue;
-            }
-
-            $mergedTokens[\count($mergedTokens) - 1][1] .= $tokens[$i][1];
-        }
-
-        return $mergedTokens;
     }
 
     /**

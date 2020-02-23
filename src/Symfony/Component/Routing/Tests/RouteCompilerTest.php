@@ -20,12 +20,12 @@ class RouteCompilerTest extends TestCase
     /**
      * @dataProvider provideCompileData
      */
-    public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens, $fixStaticVariables)
+    public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens)
     {
         $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
         $route = $r->newInstanceArgs($arguments);
 
-        $compiled = $route->compile($fixStaticVariables);
+        $compiled = $route->compile();
         $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
         $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
         $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
@@ -41,7 +41,6 @@ class RouteCompilerTest extends TestCase
                 '/foo', '#^/foo$#sD', [], [
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -51,7 +50,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -61,7 +59,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -72,7 +69,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -83,7 +79,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -94,7 +89,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -103,7 +97,6 @@ class RouteCompilerTest extends TestCase
                 '', '#^/(?P<bar>[^/]++)?$#sD', ['bar'], [
                     ['variable', '/', '[^/]++', 'bar'],
                 ],
-                false,
             ],
 
             [
@@ -112,7 +105,6 @@ class RouteCompilerTest extends TestCase
                 '', '#^/(?P<bar>0)?$#sD', ['bar'], [
                     ['variable', '/', '0', 'bar'],
                 ],
-                false,
             ],
 
             [
@@ -121,7 +113,6 @@ class RouteCompilerTest extends TestCase
                 '', '#^/(?P<bar>(?:foo|bar))?$#sD', ['bar'], [
                     ['variable', '/', '(?:foo|bar)', 'bar'],
                 ],
-                false,
             ],
 
             [
@@ -131,7 +122,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/]++', 'bar'],
                     ['variable', '/', '[^/]++', 'foo'],
                 ],
-                false,
             ],
 
             [
@@ -141,7 +131,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '-', '[^/]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -152,7 +141,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '', '[^/]+', 'var'],
                     ['text', '/{static'],
                 ],
-                false,
             ],
 
             [
@@ -165,7 +153,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '', '[^/\.]+', 'x'],
                     ['variable', '/', '[^/\.]+', 'w'],
                 ],
-                false,
             ],
 
             [
@@ -176,7 +163,6 @@ class RouteCompilerTest extends TestCase
                     ['variable', '/', '[^/\.]++', 'bar'],
                     ['text', '/foo'],
                 ],
-                false,
             ],
 
             [
@@ -185,7 +171,6 @@ class RouteCompilerTest extends TestCase
                 "/fo\xE9", "#^/fo\xE9$#sD", [], [
                     ['text', "/fo\xE9"],
                 ],
-                false,
             ],
 
             [
@@ -194,27 +179,6 @@ class RouteCompilerTest extends TestCase
                 '', '#^/(?P<bar>.)?$#sDu', ['bar'], [
                     ['variable', '/', '.', 'bar', true],
                 ],
-                false,
-            ],
-
-            [
-                'Route with fixed variables',
-                ['/prefix/{fixed1}/{fixed2}', [], ['fixed1' => 'fixed1', 'fixed2' => 'fixed2']],
-                '/prefix/fixed1/fixed2', '#^/prefix/fixed1/fixed2$#sD', [], [
-                    ['text', '/prefix/fixed1/fixed2'],
-                ],
-                true,
-            ],
-
-            [
-                'Route with fixed and and mutating variables',
-                ['/prefix/{variable}/foo/{fixed}', [], ['fixed' => 'fixed']],
-                '/prefix', '#^/prefix/(?P<variable>[^/]++)/foo/fixed$#sD', ['variable'], [
-                    ['text', '/foo/fixed'],
-                    ['variable', '/', '[^/]++', 'variable'],
-                    ['text', '/prefix']
-            ],
-                true,
             ],
         ];
     }

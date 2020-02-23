@@ -29,14 +29,9 @@ class Route implements \Serializable
     private $condition = '';
 
     /**
-     * @var CompiledRoute|null Route compiled for the matcher
+     * @var CompiledRoute|null
      */
-    private $matcherCompiled;
-
-    /**
-     * @var CompiledRoute|null Route compiled for the generator
-     */
-    private $generatorCompiled;
+    private $compiled;
 
     /**
      * Constructor.
@@ -78,8 +73,7 @@ class Route implements \Serializable
             'schemes' => $this->schemes,
             'methods' => $this->methods,
             'condition' => $this->condition,
-            'matcherCompiled' => $this->matcherCompiled,
-            'generatorCompiled' => $this->generatorCompiled,
+            'compiled' => $this->compiled,
         ];
     }
 
@@ -104,15 +98,8 @@ class Route implements \Serializable
         if (isset($data['condition'])) {
             $this->condition = $data['condition'];
         }
-        if (isset($data['matcherCompiled'])) {
-            $this->matcherCompiled = $data['matcherCompiled'];
-        }
-        if (isset($data['generatorCompiled'])) {
-            $this->generatorCompiled = $data['generatorCompiled'];
-        }
-        // Make serialized representation of a route in older symfony version also works in current
         if (isset($data['compiled'])) {
-            $this->matcherCompiled = $data['compiled'];
+            $this->compiled = $data['compiled'];
         }
     }
 
@@ -159,8 +146,7 @@ class Route implements \Serializable
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
         $this->path = '/'.ltrim(trim($pattern), '/');
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -185,8 +171,7 @@ class Route implements \Serializable
     public function setHost(?string $pattern)
     {
         $this->host = (string) $pattern;
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -215,8 +200,7 @@ class Route implements \Serializable
     public function setSchemes($schemes)
     {
         $this->schemes = array_map('strtolower', (array) $schemes);
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -255,8 +239,7 @@ class Route implements \Serializable
     public function setMethods($methods)
     {
         $this->methods = array_map('strtoupper', (array) $methods);
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -299,8 +282,7 @@ class Route implements \Serializable
         foreach ($options as $name => $option) {
             $this->options[$name] = $option;
         }
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -317,8 +299,7 @@ class Route implements \Serializable
     public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -383,8 +364,7 @@ class Route implements \Serializable
         foreach ($defaults as $name => $default) {
             $this->defaults[$name] = $default;
         }
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -419,8 +399,7 @@ class Route implements \Serializable
     public function setDefault(string $name, $default)
     {
         $this->defaults[$name] = $default;
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -465,8 +444,7 @@ class Route implements \Serializable
         foreach ($requirements as $key => $regex) {
             $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         }
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -499,8 +477,7 @@ class Route implements \Serializable
     public function setRequirement(string $key, string $regex)
     {
         $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -525,8 +502,7 @@ class Route implements \Serializable
     public function setCondition(?string $condition)
     {
         $this->condition = (string) $condition;
-        $this->matcherCompiled = null;
-        $this->generatorCompiled = null;
+        $this->compiled = null;
 
         return $this;
     }
@@ -534,7 +510,6 @@ class Route implements \Serializable
     /**
      * Compiles the route.
      *
-     * @param bool $forGenerator If the route should be compiler for the generator
      * @return CompiledRoute A CompiledRoute instance
      *
      * @throws \LogicException If the Route cannot be compiled because the
@@ -542,23 +517,15 @@ class Route implements \Serializable
      *
      * @see RouteCompiler which is responsible for the compilation process
      */
-    public function compile(bool $forGenerator = false)
+    public function compile()
     {
+        if (null !== $this->compiled) {
+            return $this->compiled;
+        }
+
         $class = $this->getOption('compiler_class');
 
-        if ($forGenerator) {
-            if (null !== $this->generatorCompiled) {
-                return $this->generatorCompiled;
-            }
-
-            return $this->generatorCompiled = $class::compile($this, true);
-        }
-
-        if (null !== $this->matcherCompiled) {
-            return $this->matcherCompiled;
-        }
-
-        return $this->matcherCompiled = $class::compile($this, false);
+        return $this->compiled = $class::compile($this);
     }
 
     private function sanitizeRequirement(string $key, string $regex)

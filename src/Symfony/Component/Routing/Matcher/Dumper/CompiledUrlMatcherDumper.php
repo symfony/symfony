@@ -13,8 +13,10 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * CompiledUrlMatcherDumper creates PHP arrays to be used with CompiledUrlMatcher.
@@ -170,7 +172,7 @@ EOF;
         $dynamicRoutes = new RouteCollection();
 
         foreach ($collection->all() as $name => $route) {
-            $compiledRoute = $route->compile(true);
+            $compiledRoute = $this->getCompiledRoute($route);
             $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
             $hostRegex = $compiledRoute->getHostRegex();
             $regex = $compiledRoute->getRegex();
@@ -182,6 +184,7 @@ EOF;
 
             if (!$compiledRoute->getPathVariables()) {
                 $host = !$compiledRoute->getHostVariables() ? $route->getHost() : '';
+                //Replace static variable placeholders by their value
                 $url = preg_replace_callback('#{([^}]+)}#', static function (array $matches) use ($route) {
                     return $route->getRequirement($matches[1]);
                 }, $route->getPath());
@@ -206,6 +209,68 @@ EOF;
         return [$staticRoutes, $dynamicRoutes];
     }
 
+    private function getRouteStaticVariables(Route $route): array
+    {
+        $result = [];
+        foreach ($route->compile()->getTokens() as $token) {
+            if ('variable' === $token[0]) {
+                $regexp = $token[2];
+                if (preg_quote($regexp, RouteCompiler::REGEX_DELIMITER) === $regexp) {
+                    $result[$token[3]] = $token[2];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function getCompiledRoute(Route $route): CompiledRoute
+    {
+        $compiledRoute = $route->compile();
+        $staticVariables = $this->getRouteStaticVariables($route);
+
+        $tokens = $compiledRoute->getTokens();
+        foreach ($tokens as $i => $token) {
+            if (\array_key_exists($token[3] ?? null, $staticVariables)) {
+                $tokens[$i] = ['text', $token[1].$staticVariables[$token[3]]];
+            }
+        }
+
+        $mergedTokens = [$tokens[\count($tokens) - 1]];
+        for ($i = \count($tokens) - 2; $i > 0; --$i) {
+            if ('text' !== $tokens[$i][0] || 'variable' === end($mergedTokens)[0]) {
+                $mergedTokens[] = $tokens[$i];
+                continue;
+            }
+
+            $mergedTokens[\count($mergedTokens) - 1][1] .= $tokens[$i][1];
+        }
+
+        $variables = array_filter($compiledRoute->getVariables(), static function (string $variable) use ($staticVariables) {
+            return !\array_key_exists($variable, $staticVariables);
+        });
+
+        $pathVariables = array_filter($compiledRoute->getPathVariables(), static function (string $variable) use ($staticVariables) {
+            return !\array_key_exists($variable, $staticVariables);
+        });
+
+        $regexp = $compiledRoute->getRegex();
+        foreach ($staticVariables as $key => $value) {
+            $regexp = preg_replace('#\(\?P\<'.$key.'\>'.$value.'\)#', $value, $regexp);
+        }
+
+        return new CompiledRoute(
+            $compiledRoute->getStaticPrefix(),
+            $regexp,
+            $mergedTokens,
+            $pathVariables,
+            $compiledRoute->getHostRegex(),
+            $compiledRoute->getHostTokens(),
+            $compiledRoute->getHostVariables(),
+            $variables
+        );
+    }
+
     /**
      * Compiles static routes in a switch statement.
      *
@@ -224,7 +289,8 @@ EOF;
         foreach ($staticRoutes as $url => $routes) {
             $compiledRoutes[$url] = [];
             foreach ($routes as $name => list($route, $hasTrailingSlash)) {
-                $compiledRoutes[$url][] = $this->compileRoute($route, $name, (!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex()) ?: null, $hasTrailingSlash, false, $conditions);
+                $compiledRoute = $this->getCompiledRoute($route);
+                $compiledRoutes[$url][] = $this->compileRoute($route, $name, (!$compiledRoute->getHostVariables() ? $route->getHost() : $compiledRoute->getHostRegex()) ?: null, $hasTrailingSlash, false, $conditions);
             }
         }
 
@@ -279,8 +345,9 @@ EOF;
         $prev = null;
         $perModifiers = [];
         foreach ($collection->all() as $name => $route) {
-            preg_match('#[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
-            if ($chunkLimit < ++$chunkSize || $prev !== $rx[0] && $route->compile()->getPathVariables()) {
+            $compiledRoute = $this->getCompiledRoute($route);
+            preg_match('#[a-zA-Z]*$#', $compiledRoute->getRegex(), $rx);
+            if ($chunkLimit < ++$chunkSize || $prev !== $rx[0] && $compiledRoute->getPathVariables()) {
                 $chunkSize = 1;
                 $routes = new RouteCollection();
                 $perModifiers[] = [$rx[0], $routes];
@@ -293,7 +360,8 @@ EOF;
             $prev = false;
             $perHost = [];
             foreach ($routes->all() as $name => $route) {
-                $regex = $route->compile()->getHostRegex();
+                $compiledRoute = $this->getCompiledRoute($route);
+                $regex = $compiledRoute->getHostRegex();
                 if ($prev !== $regex) {
                     $routes = new RouteCollection();
                     $perHost[] = [$regex, $routes];
@@ -327,7 +395,8 @@ EOF;
 
                 $tree = new StaticPrefixCollection();
                 foreach ($routes->all() as $name => $route) {
-                    preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
+                    $compiledRoute = $this->getCompiledRoute($route);
+                    preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $compiledRoute->getRegex(), $rx);
 
                     $state->vars = [];
                     $regex = preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]);
@@ -394,7 +463,7 @@ EOF;
             }
 
             list($name, $regex, $vars, $route, $hasTrailingSlash, $hasTrailingVar) = $route;
-            $compiledRoute = $route->compile();
+            $compiledRoute = $this->getCompiledRoute($route);
             $vars = array_merge($state->hostVars, $vars);
 
             if ($compiledRoute->getRegex() === $prevRegex) {
@@ -421,6 +490,9 @@ EOF;
     private function compileRoute(Route $route, string $name, $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): array
     {
         $defaults = $route->getDefaults();
+        foreach ($this->getRouteStaticVariables($route) as $key => $value) {
+            $defaults[$key] = $value;
+        }
 
         if (isset($defaults['_canonical_route'])) {
             $name = $defaults['_canonical_route'];

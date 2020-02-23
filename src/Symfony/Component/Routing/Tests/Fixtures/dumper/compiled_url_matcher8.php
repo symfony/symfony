@@ -8,7 +8,7 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
-        '/a' => [[['_route' => 'a'], null, null, null, false, false, null]],
+        '/a' => [[['_route' => 'a', 'a' => 'a'], null, null, null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'

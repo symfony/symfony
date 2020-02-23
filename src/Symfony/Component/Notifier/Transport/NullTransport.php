@@ -34,6 +34,10 @@ class NullTransport implements TransportInterface
 
     public function send(MessageInterface $message): SentMessage
     {
+        if (null === $message->getTransport()) {
+            $message->transport((string) $this);
+        }
+
         if (null !== $this->dispatcher) {
             $this->dispatcher->dispatch(new MessageEvent($message));
         }

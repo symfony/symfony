@@ -27,7 +27,8 @@
         </service>
 
         <service id="notifier.transport_factory.null" class="Symfony\Component\Notifier\Transport\NullTransportFactory" parent="notifier.transport_factory.abstract">
-            <tag name="notifier.transport_factory" />
+            <tag name="chatter.transport_factory" />
+            <tag name="texter.transport_factory" />
         </service>
     </services>
 </container>

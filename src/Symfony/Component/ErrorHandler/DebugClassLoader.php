@@ -428,17 +428,17 @@ class DebugClassLoader
                 }
             }
 
-            if ($refl->isInterface() && false !== strpos($doc, 'method') && preg_match_all('#\n \* @method\s+(static\s+)?+(?:[\w\|&\[\]\\\]+\s+)?(\w+(?:\s*\([^\)]*\))?)+(.+?([[:punct:]]\s*)?)?(?=\r?\n \*(?: @|/$|\r?\n))#', $doc, $notice, PREG_SET_ORDER)) {
+            if ($refl->isInterface() && false !== strpos($doc, 'method') && preg_match_all('#\n \* @method\s+(static\s+)?+([\w\|&\[\]\\\]+\s+)?(\w+(?:\s*\([^\)]*\))?)+(.+?([[:punct:]]\s*)?)?(?=\r?\n \*(?: @|/$|\r?\n))#', $doc, $notice, PREG_SET_ORDER)) {
                 foreach ($notice as $method) {
-                    $static = '' !== $method[1];
-                    $name = $method[2];
-                    $description = $method[3] ?? null;
+                    $static = '' !== $method[1] && !empty($method[2]);
+                    $name = $method[3];
+                    $description = $method[4] ?? null;
                     if (false === strpos($name, '(')) {
                         $name .= '()';
                     }
                     if (null !== $description) {
                         $description = trim($description);
-                        if (!isset($method[4])) {
+                        if (!isset($method[5])) {
                             $description .= '.';
                         }
                     }

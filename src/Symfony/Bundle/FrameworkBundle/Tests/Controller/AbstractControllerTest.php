@@ -65,6 +65,18 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
     }
 
+    public function testSubscribedServicesAreExtended()
+    {
+        $extendedServicesController = new class() extends AbstractController {
+            protected static $subscribedServices = ['test'];
+        };
+        $controller = $this->createController();
+
+        $this->assertSame($controller::getSubscribedServices(), AbstractController::getSubscribedServices());
+        $this->assertNotContains('test', $controller::getSubscribedServices());
+        $this->assertContains('test', $extendedServicesController::getSubscribedServices());
+    }
+
     public function testGetParameter()
     {
         if (!class_exists(ContainerBag::class)) {

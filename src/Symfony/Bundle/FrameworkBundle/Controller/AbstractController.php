@@ -60,6 +60,11 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected $container;
 
     /**
+     * @var array|null When overridden those services will be merged with the defaults
+     */
+    protected static $subscribedServices;
+
+    /**
      * @internal
      * @required
      */
@@ -86,6 +91,15 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     public static function getSubscribedServices()
+    {
+        if (static::$subscribedServices) {
+            return array_merge(self::getDefaultsServices(), static::$subscribedServices);
+        }
+
+        return self::getDefaultsServices();
+    }
+
+    private static function getDefaultsServices(): array
     {
         return [
             'router' => '?'.RouterInterface::class,

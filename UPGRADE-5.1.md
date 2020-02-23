@@ -36,6 +36,7 @@ HttpFoundation
  * Deprecate `Response::create()`, `JsonResponse::create()`,
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
+ * Made the Mime component an optional dependency
 
 Messenger
 ---------

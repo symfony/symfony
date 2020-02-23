@@ -74,6 +74,10 @@ class File extends \SplFileInfo
      */
     public function getMimeType()
     {
+        if (!class_exists(MimeTypes::class)) {
+            throw new \LogicException('You cannot guess the mime type as the Mime component is not installed. Try running "composer require symfony/mime".');
+        }
+
         return MimeTypes::getDefault()->guessMimeType($this->getPathname());
     }
 

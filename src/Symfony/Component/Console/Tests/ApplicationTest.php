@@ -891,7 +891,8 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new class('') extends \InvalidArgumentException { };
+            throw new class('') extends \InvalidArgumentException {
+            };
         });
         $tester = new ApplicationTester($application);
 
@@ -901,7 +902,8 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() { })));
+            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() {
+            })));
         });
         $tester = new ApplicationTester($application);
 
@@ -914,7 +916,8 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new class('') extends \InvalidArgumentException { };
+            throw new class('') extends \InvalidArgumentException {
+            };
         });
         $tester = new ApplicationTester($application);
 
@@ -924,7 +927,8 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() { })));
+            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() {
+            })));
         });
         $tester = new ApplicationTester($application);
 

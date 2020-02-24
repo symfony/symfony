@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Notification;
 
 use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\Notifier\Recipient\Recipient;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -158,7 +157,7 @@ class Notification
         return $this;
     }
 
-    public function getChannels(Recipient $recipient): array
+    public function getChannels(): array
     {
         return $this->channels;
     }

@@ -14,39 +14,17 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * @Entity
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineRelation
+final class DoctrineDummy210 extends DoctrineDummy
 {
     /**
-     * @Id
-     * @Column(type="smallint")
+     * @Column(type="json", nullable=true)
      */
-    public $id;
-
-    /**
-     * @Column(type="guid")
-     */
-    protected $rguid;
-
-    /**
-     * @Column(type="guid")
-     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="indexedFoo")
-     */
-    protected $foo;
-
-    /**
-     * @Column(type="datetime")
-     */
-    private $dt;
-
-    /**
-     * @Column(type="foo")
-     */
-    private $customType;
+    private $json;
 }

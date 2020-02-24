@@ -19,10 +19,10 @@ namespace Symfony\Component\Security\Core\User;
  * password (for checking against a submitted password), assigning roles
  * and so on.
  *
- * Regardless of how your user are loaded or where they come from (a database,
- * configuration, web service, etc), you will have a class that implements
- * this interface. Objects that implement this interface are created and
- * loaded by different objects that implement UserProviderInterface
+ * Regardless of how your users are loaded or where they come from (a database,
+ * configuration, web service, etc.), you will have a class that implements
+ * this interface. Objects that implement this interface are created and 
+ * loaded by different objects that implement UserProviderInterface.
  *
  * @see UserProviderInterface
  *

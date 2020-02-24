@@ -122,6 +122,12 @@ trait AbstractAdapterTrait
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
+            if ('' === $namespaceVersionToClear = $this->namespaceVersion) {
+                foreach ($this->doFetch([static::NS_SEPARATOR.$this->namespace]) as $v) {
+                    $namespaceVersionToClear = $v;
+                }
+            }
+            $namespaceToClear = $this->namespace.$namespaceVersionToClear;
             $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5);
             try {
                 $cleared = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
@@ -132,10 +138,12 @@ trait AbstractAdapterTrait
                 $this->namespaceVersion = $namespaceVersion;
                 $this->ids = [];
             }
+        } else {
+            $namespaceToClear = $this->namespace.$prefix;
         }
 
         try {
-            return $this->doClear($this->namespace.$prefix) || $cleared;
+            return $this->doClear($namespaceToClear) || $cleared;
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to clear the cache: '.$e->getMessage(), ['exception' => $e]);
 

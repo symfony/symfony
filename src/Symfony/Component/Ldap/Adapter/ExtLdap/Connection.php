@@ -116,6 +116,10 @@ class Connection extends AbstractConnection
                 $options->setDefault('debug_level', 7);
             }
 
+            if (!isset($parent['network_timeout'])) {
+                $options->setDefault('network_timeout', ini_get('default_socket_timeout'));
+            }
+
             $options->setDefaults([
                 'protocol_version' => $parent['version'],
                 'referrals' => $parent['referrals'],

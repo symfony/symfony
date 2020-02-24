@@ -15,6 +15,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Yaml;
@@ -140,6 +141,7 @@ class YamlFileLoader extends FileLoader
             foreach ($config['path'] as $locale => $path) {
                 $localizedRoute = clone $route;
                 $localizedRoute->setDefault('_locale', $locale);
+                $localizedRoute->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
                 $localizedRoute->setDefault('_canonical_route', $name);
                 $localizedRoute->setPath($path);
                 $collection->add($name.'.'.$locale, $localizedRoute);

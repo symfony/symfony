@@ -618,8 +618,19 @@ class Application implements ResetInterface
             $commands = preg_grep('{^'.$expr.'}i', $allCommands);
         }
 
+        $nameSwapped = implode(':', array_reverse(explode(':', $name)));
+        $exprSwapped = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $nameSwapped);
+
+        if (empty($commands)) {
+            $commands = preg_grep('{^'.$exprSwapped.'}', $allCommands);
+        }
+
+        if (empty($commands)) {
+            $commands = preg_grep('{^'.$exprSwapped.'}i', $allCommands);
+        }
+
         // if no commands matched or we just matched namespaces
-        if (empty($commands) || \count(preg_grep('{^'.$expr.'$}i', $commands)) < 1) {
+        if (empty($commands) || (\count(preg_grep('{^'.$expr.'$}i', $commands)) < 1 && \count(preg_grep('{^'.$exprSwapped.'$}i', $commands)) < 1)) {
             if (false !== $pos = strrpos($name, ':')) {
                 // check if a namespace exists and contains commands
                 $this->findNamespace(substr($name, 0, $pos));

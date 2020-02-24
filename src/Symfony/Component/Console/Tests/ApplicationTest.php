@@ -357,6 +357,14 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('FooCommand', $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
     }
 
+    public function testFindSwappedNamespaceAndCommandName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $this->assertInstanceOf('FooCommand', $application->find('foo:bar'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf('FooCommand', $application->find('bar:foo'), '->find() returns a command if it exists for the swapped namespace and command name');
+    }
+
     public function testFindCaseSensitiveFirst()
     {
         $application = new Application();

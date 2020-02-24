@@ -114,7 +114,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         $typeOfField = $subMetadata->getTypeOfField($indexProperty);
                     }
 
-                    $collectionKeyType = $this->getPhpType($typeOfField);
+                    if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
+                        return null;
+                    }
                 }
             }
 
@@ -134,39 +136,46 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
+
+            if (!$builtinType = $this->getPhpType($typeOfField)) {
+                return null;
+            }
+
             $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
 
-            switch ($typeOfField) {
-                case DBALType::DATE:
-                case DBALType::DATETIME:
-                case DBALType::DATETIMETZ:
-                case 'vardatetime':
-                case DBALType::TIME:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+            switch ($builtinType) {
+                case Type::BUILTIN_TYPE_OBJECT:
+                    switch ($typeOfField) {
+                        case DBALType::DATE:
+                        case DBALType::DATETIME:
+                        case DBALType::DATETIMETZ:
+                        case 'vardatetime':
+                        case DBALType::TIME:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
 
-                case 'date_immutable':
-                case 'datetime_immutable':
-                case 'datetimetz_immutable':
-                case 'time_immutable':
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
+                        case 'date_immutable':
+                        case 'datetime_immutable':
+                        case 'datetimetz_immutable':
+                        case 'time_immutable':
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
 
-                case 'dateinterval':
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+                        case 'dateinterval':
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+                    }
 
-                case DBALType::TARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
+                    break;
+                case Type::BUILTIN_TYPE_ARRAY:
+                    switch ($typeOfField) {
+                        case DBALType::TARRAY:
+                        case DBALType::JSON_ARRAY:
+                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
-                case DBALType::SIMPLE_ARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
-
-                case DBALType::JSON_ARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
-
-                default:
-                    $builtinType = $this->getPhpType($typeOfField);
-
-                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
+                        case DBALType::SIMPLE_ARRAY:
+                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
+                    }
             }
+
+            return [new Type($builtinType, $nullable)];
         }
 
         return null;
@@ -258,7 +267,22 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 return Type::BUILTIN_TYPE_RESOURCE;
 
             case DBALType::OBJECT:
+            case DBALType::DATE:
+            case DBALType::DATETIME:
+            case DBALType::DATETIMETZ:
+            case 'vardatetime':
+            case DBALType::TIME:
+            case 'date_immutable':
+            case 'datetime_immutable':
+            case 'datetimetz_immutable':
+            case 'time_immutable':
+            case 'dateinterval':
                 return Type::BUILTIN_TYPE_OBJECT;
+
+            case DBALType::TARRAY:
+            case DBALType::SIMPLE_ARRAY:
+            case DBALType::JSON_ARRAY:
+                return Type::BUILTIN_TYPE_ARRAY;
         }
 
         return null;

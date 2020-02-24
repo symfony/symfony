@@ -66,6 +66,9 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function configure(Event $event = null)
     {
+        if ($event instanceof ConsoleEvent && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            return;
+        }
         if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMasterRequest()) {
             return;
         }
@@ -146,7 +149,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
 
-        if ('cli' === \PHP_SAPI && \defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
+        if (\defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = ['configure', 2048];
         }
 

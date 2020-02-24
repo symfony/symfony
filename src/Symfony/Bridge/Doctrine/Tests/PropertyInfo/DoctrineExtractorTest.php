@@ -11,12 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -68,6 +70,8 @@ class DoctrineExtractorTest extends TestCase
                 'bar',
                 'indexedBar',
                 'indexedFoo',
+                'indexedByDt',
+                'indexedByCustomType',
             ],
             $this->createExtractor($legacy)->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy')
         );
@@ -192,6 +196,15 @@ class DoctrineExtractorTest extends TestCase
             ['simpleArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
             ['customFoo', null],
             ['notMapped', null],
+            ['indexedByDt', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_OBJECT),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
+            ['indexedByCustomType', null],
         ];
     }
 

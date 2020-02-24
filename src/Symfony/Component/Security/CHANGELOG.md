@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added access decision strategy to override access decisions by voter service priority
+ * Added `IS_ANONYMOUS`, `IS_REMEMBERED`, `IS_IMPERSONATOR`
 
 5.0.0
 -----

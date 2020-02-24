@@ -30,6 +30,7 @@ class Language extends Constraint
     ];
 
     public $message = 'This value is not a valid language.';
+    public $alpha3 = false;
 
     public function __construct($options = null)
     {

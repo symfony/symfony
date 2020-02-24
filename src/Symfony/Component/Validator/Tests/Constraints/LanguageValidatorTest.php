@@ -102,6 +102,55 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider getValidAlpha3Languages
+     */
+    public function testValidAlpha3Languages($language)
+    {
+        $this->validator->validate($language, new Language([
+            'alpha3' => true,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidAlpha3Languages()
+    {
+        return [
+            ['deu'],
+            ['eng'],
+            ['fra'],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidAlpha3Languages
+     */
+    public function testInvalidAlpha3Languages($language)
+    {
+        $constraint = new Language([
+            'alpha3' => true,
+            'message' => 'myMessage',
+        ]);
+
+        $this->validator->validate($language, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$language.'"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidAlpha3Languages()
+    {
+        return [
+            ['foobar'],
+            ['en'],
+            ['ZZZ'],
+            ['zzz'],
+        ];
+    }
+
     public function testValidateUsingCountrySpecificLocale()
     {
         IntlTestHelper::requireFullIntl($this, false);

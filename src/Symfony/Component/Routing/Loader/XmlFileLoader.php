@@ -17,6 +17,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * XmlFileLoader loads XML routing files.

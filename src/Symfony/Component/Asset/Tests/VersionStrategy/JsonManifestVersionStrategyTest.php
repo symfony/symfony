@@ -20,21 +20,21 @@ class JsonManifestVersionStrategyTest extends TestCase
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
-        $this->assertEquals('main.123abc.js', $strategy->getVersion('main.js'));
+        $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
     public function testApplyVersion()
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
-        $this->assertEquals('css/styles.555def.css', $strategy->getVersion('css/styles.css'));
+        $this->assertSame('css/styles.555def.css', $strategy->getVersion('css/styles.css'));
     }
 
     public function testApplyVersionWhenKeyDoesNotExistInManifest()
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
-        $this->assertEquals('css/other.css', $strategy->getVersion('css/other.css'));
+        $this->assertSame('css/other.css', $strategy->getVersion('css/other.css'));
     }
 
     public function testMissingManifestFileThrowsException()

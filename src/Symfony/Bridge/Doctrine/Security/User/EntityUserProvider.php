@@ -153,3 +153,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }
 }
+
+interface_exists(ObjectManager::class);
+interface_exists(ObjectRepository::class);

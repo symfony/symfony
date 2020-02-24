@@ -15,9 +15,13 @@ arsort($operators);
 
 $regex = [];
 foreach ($operators as $operator => $length) {
-    // an operator that ends with a character must be followed by
-    // a whitespace or a parenthesis
-    $regex[] = preg_quote($operator, '/').(ctype_alpha($operator[$length - 1]) ? '(?=[\s(])' : '');
+    // Collisions of character operators:
+    // - an operator that begins with a character must have a space or a parenthesis before or starting at the beginning of a string
+    // - an operator that ends with a character must be followed by a whitespace or a parenthesis
+    $regex[] =
+        (ctype_alpha($operator[0]) ? '(?<=^|[\s(])' : '')
+        .preg_quote($operator, '/')
+        .(ctype_alpha($operator[$length - 1]) ? '(?=[\s(])' : '');
 }
 
 echo '/'.implode('|', $regex).'/A';

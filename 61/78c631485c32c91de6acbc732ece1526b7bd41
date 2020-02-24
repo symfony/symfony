@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-20T17:36:51Z
+
+Looks great, thanks.
+About the expression function, we could add a `$allowAnonymous` (or better name) argument to it and deprecate not passing it as `false` explicitly (using `func_num_args()` etc for detection), the argument would default to `true` in 5.0 to match the new `IS_AUTHENTICATED` attr for access controls.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-04-20T18:11:53Z
+
+Thanks for the suggestion @chalasr! I've updated the PR. Also realized that I forgot to do the same for `IS_AUTHENTICATED_REMEMBERED`, so added that as well.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-04-20T18:29:25Z
+
+Actually, I've decided to take another step and deprecate all `is_*()` functions except from `is_granted()`. Now `is_granted()` is introduced in Symfony 4.2 and the attribute names are shorter & easier, I think it is not worth duplicating all logic of `AuthenticatedVoter` in the expression language provider.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-20T18:34:51Z
+
+`AbstractController::isGranted()` doesn't have such shortcuts, dropping them for expressions seems consistent. Works for me 👍
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-04-24T20:14:18Z
+
+Didn't realize 4.3 release was soo close. I've updated the PR to 4.4 and added a documentation PR. Ready for review when 4.3 is released
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T09:43:20Z
+
+> IS_AUTHENTICATED_ANONYMOUSLY actually meant "is authenticated, either anonymous or fully". As this is confusing, it is replaced by IS_AUTHENTICATED.
+
+I'm not sure the new version is more clear: having role inheritance in mind, the current wording is clear to me. The new one might make me think one is authenticated *not-anonymously*.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-27T10:07:54Z
+
+Hmm, I completely forgot about this PR. Sorry! Let's see how we can continue and what we manage to get into 4.4/5.0 before the freeze:
+
+> The PRs modifies some of the attributes used by the `AuthenticatedVoter`:
+>
+> 1. New `IS_IMPERSONATOR`, `IS_ANONYMOUS` and `IS_REMEMBERED` attributes are introduced to indicate the user either impersonated, anonymous or rembered.
+> 2. `IS_AUTHENTICATED_ANONYMOUSLY` actually meant "is authenticated, either anonymous or fully". As this is confusing, it is replaced by `IS_AUTHENTICATED`.
+> 3. All `is_*()` functions in expressions are deprecated in favor of `is_granted('IS_*')`. It's not worth duplicating the `AuthenticatedVoter` logic in two places now we have shorter `IS_*` attributes
+
+From what I see above, people seem to agree on (1) and (3). So let's remove change (2) from this PR, to allow this to be merged?
+
+---
+
+(2) seems up for debate and now I think about this, I think it's indeed a confusing change, people would maybe think that `IS_AUTHENTICATED` is `IS_AUTHENTICATED_FULLY`. @HeahDude as you made this change in your first commit to the branch, can you maybe share your ideas?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-05T16:09:14Z
+
+Moving to milestone "next", meaning for 5.1 or later.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-04T13:49:33Z
+
+@wouterj I'd like that we move forward with all your PRs/issues/big plans related to security. Whenever you have time, ping me and we will see how to make it work for 5.1.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-02-22T11:41:21Z
+
+This PR is now ready to be merged imho.
+
+ As discussed previously in this issue, deprecating `IS_AUTHENTICATED_*` attributes has been reverted. From an inheritance view, they make perfectly sense. The `IS_AUTHENTICATED` attribute has also been reverted, as I'm not sure if it solves or creates confusion :)
+
+So this PR now contains 1 feature and 1 deprecation:
+
+* Introducing `IS_REMEMBERED`, `IS_IMPERSONATOR` and `IS_ANONYMOUS`. These only check the specific condition of being remembered, etc.
+* As a result, the `is_*()` expression functions have been deprecated. They duplicate the `AuthenticatedVoter` and can only result in out-of-sync problems. Also, `is_remember_me()` is not more readable than `is_granted('IS_REMEMBERED')` imho, so the syntax sugar no longer makes sense.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-02-22T17:17:37Z
+
+> Travis build seems failing with low deps
+
+Yeah, the bundle requires `^4.4|^5.0`. As the functional tests used `is_anonymous()`, there are 2 options: Change requirement to `^5.1` (only to make the tests pass, the bundle still supports 4.4) or use the deprecated function in the functional tests. What do you want me to do?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-22T17:25:43Z
+
+@wouterj Bumping to `^5.1` looks good to me.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-02-22T18:30:49Z
+
+Thanks for the quick response. I've bumped the requirement. The tests should now pass
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-02-22T18:57:42Z
+
+status: needs review

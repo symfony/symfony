@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\FormFieldRegistry;
 
@@ -953,7 +954,7 @@ class FormTest extends TestCase
         return $dom;
     }
 
-    public function testgetPhpValuesWithEmptyTextarea()
+    public function testGetPhpValuesWithEmptyTextarea()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -967,5 +968,35 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertEquals($form->getPhpValues(), ['example' => '']);
+    }
+
+    public function testGetReturnTypes()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form>
+                    <textarea name="foo[collection][0][bar]">item 0</textarea>
+                </form>
+            </html>'
+        );
+
+        $nodes = $dom->getElementsByTagName('form');
+        $form = new Form($nodes->item(0), 'http://example.com');
+
+        // FormField
+        $this->assertInstanceOf(TextareaFormField::class, $textareaFormField = $form->get('foo[collection][0][bar]'));
+
+        // Array of FormField
+        $this->assertSame([
+            'bar' => $textareaFormField,
+        ], $form->get('foo[collection][0]'));
+
+        // Array of array of FormField
+        $this->assertSame([
+            [
+                'bar' => $textareaFormField,
+            ],
+        ], $form->get('foo[collection]'));
     }
 }

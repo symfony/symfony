@@ -21,7 +21,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -56,8 +59,44 @@ class ExceptionListener
     private $httpUtils;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, string $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, string $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, /*AuthenticationTrustResolverInterface */$trustResolver, /*HttpUtils */$httpUtils, /*string */$providerKey = null, /*AuthenticationEntryPointInterface */$authenticationEntryPoint = null, /*string */$errorPage = null, /*AccessDeniedHandlerInterface */$accessDeniedHandler = null, /*LoggerInterface */$logger = null, /*bool */$stateless = false)
     {
+        if ($trustResolver instanceof AuthenticationTrustResolverInterface) {
+            // old signature
+            trigger_deprecation('symfony/security-core', '5.1', 'Passing an %s as second argument to %s is deprecated.', AuthenticationTrustResolverInterface::class, __CLASS__);
+        } else {
+            // new signature
+            $stateless = $logger ?? false;
+            $logger = $accessDeniedHandler;
+            $accessDeniedHandler = $errorPage;
+            $errorPage = $authenticationEntryPoint;
+            $authenticationEntryPoint = $providerKey;
+            $providerKey = $httpUtils;
+            $httpUtils = $trustResolver;
+        }
+
+        if (!$httpUtils instanceof HttpUtils) {
+            throw new \InvalidArgumentException(sprintf('Argument 2 of %s must be an instance of %s, %s given.', __METHOD__, HttpUtils::class, is_object($httpUtils) ? get_class($httpUtils) : gettype($httpUtils)));
+        }
+        if (!\is_string($providerKey)) {
+            throw new \InvalidArgumentException(sprintf('Argument 3 of %s must be a string, %s given.', __METHOD__, is_object($providerKey) ? get_class($providerKey) : gettype($providerKey)));
+        }
+        if (null !== $authenticationEntryPoint && !$authenticationEntryPoint instanceof AuthenticationEntryPointInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 4 of %s must be an instance of %s, %s given.', __METHOD__, AuthenticationEntryPointInterface::class, is_object($authenticationEntryPoint) ? get_class($authenticationEntryPoint) : gettype($authenticationEntryPoint)));
+        }
+        if (null !== $errorPage && !\is_string($errorPage)) {
+            throw new \InvalidArgumentException(sprintf('Argument 5 of %s must be a string, %s given.', __METHOD__, is_object($errorPage) ? get_class($errorPage) : gettype($errorPage)));
+        }
+        if (null !== $accessDeniedHandler && !$accessDeniedHandler instanceof AccessDeniedHandlerInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 6 of %s must be an instance of %s, %s given.', __METHOD__, AccessDeniedHandlerInterface::class, is_object($accessDeniedHandler) ? get_class($accessDeniedHandler) : gettype($accessDeniedHandler)));
+        }
+        if (null !== $logger && !$logger instanceof LoggerInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 7 of %s must be an instance of %s, %s given.', __METHOD__, LoggerInterface::class, is_object($logger) ? get_class($logger) : gettype($logger)));
+        }
+        if (!\is_bool($stateless)) {
+            throw new \InvalidArgumentException(sprintf('Argument 8 of %s must be a boolean, %s given.', __METHOD__, is_object($stateless) ? get_class($stateless) : gettype($stateless)));
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->httpUtils = $httpUtils;
@@ -137,7 +176,7 @@ class ExceptionListener
         $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
         $token = $this->tokenStorage->getToken();
-        if (!$this->authenticationTrustResolver->isFullFledged($token)) {
+        if (!$this->isFullFledged($token)) {
             if (null !== $this->logger) {
                 $this->logger->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
             }
@@ -179,6 +218,11 @@ class ExceptionListener
 
             $event->setThrowable(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
         }
+    }
+
+    private function isFullFledged(?TokenInterface $token): bool
+    {
+        return null !== $this->authenticationTrustResolver ? $this->authenticationTrustResolver->isFullFledged($token) : (null !== $token && !$token instanceof RememberMeToken && !$token instanceof AnonymousToken);
     }
 
     private function handleLogoutException(LogoutException $exception): void

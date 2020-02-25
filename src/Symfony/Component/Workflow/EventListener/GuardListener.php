@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\EventListener;
 
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -33,8 +34,26 @@ class GuardListener
     private $roleHierarchy;
     private $validator;
 
-    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, /*AuthenticationTrustResolverInterface */$trustResolver = null, /*RoleHierarchyInterface */$roleHierarchy = null, /*ValidatorInterface */$validator = null)
     {
+        if ($trustResolver instanceof AuthenticationTrustResolverInterface) {
+            // old signature
+            trigger_deprecation('symfony/security-core', '5.1', 'Passing an %s as second argument to %s is deprecated.', AuthenticationTrustResolverInterface::class, __CLASS__);
+        } else {
+            // new signature
+            $validator = $roleHierarchy;
+            $roleHierarchy = $trustResolver;
+            $trustResolver = new AuthenticationTrustResolver(false);
+        }
+
+        if (null !== $roleHierarchy && !$roleHierarchy instanceof RoleHierarchyInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 5 of %s must be an instance of %s or null, %s given.', __METHOD__, RoleHierarchyInterface::class, is_object($roleHierarchy) ? get_class($roleHierarchy) : gettype($roleHierarchy)));
+        }
+
+        if (null !== $validator && !$validator instanceof ValidatorInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 6 of %s must be an instance of %s or null, %s given.', __METHOD__, ValidatorInterface::class, is_object($validator) ? get_class($validator) : gettype($validator)));
+        }
+
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
         $this->tokenStorage = $tokenStorage;

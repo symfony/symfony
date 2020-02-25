@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -31,8 +32,28 @@ class ExpressionVoter implements VoterInterface
     private $authChecker;
     private $roleHierarchy;
 
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(ExpressionLanguage $expressionLanguage, /*AuthenticationTrustResolverInterface */$trustResolver, /*AuthorizationCheckerInterface */$authChecker = null, /*RoleHierarchyInterface */$roleHierarchy = null)
     {
+        // $expr, $trust, $auth, ?$role
+        // $expr, $auth, ?$role
+        if ($trustResolver instanceof AuthenticationTrustResolverInterface) {
+            // old signature
+            trigger_deprecation('symfony/security-core', '5.1', 'Passing an %s as second argument to %s is deprecated.', AuthenticationTrustResolverInterface::class, __CLASS__);
+        } else {
+            // new signature: ExpressionLanguage $expressionLanguage, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null
+            $roleHierarchy = $authChecker;
+            $authChecker = $trustResolver;
+            $trustResolver = new AuthenticationTrustResolver(false);
+        }
+
+        if (!$authChecker instanceof AuthorizationCheckerInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 2 of %s must be an instance of %s, %s given.', __METHOD__, AuthorizationCheckerInterface::class, is_object($authChecker) ? get_class($authChecker) : gettype($authChecker)));
+        }
+
+        if (null !== $roleHierarchy && !$roleHierarchy instanceof RoleHierarchyInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 3 of %s must be an instance of %s or null, %s given.', __METHOD__, RoleHierarchyInterface::class, is_object($roleHierarchy) ? get_class($roleHierarchy) : gettype($roleHierarchy)));
+        }
+
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
         $this->authChecker = $authChecker;

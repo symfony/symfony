@@ -14,19 +14,31 @@ namespace Symfony\Component\Security\Core\Authentication;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 /**
  * The default implementation of the authentication trust resolver.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since symfony/security-core 5.1
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
+    public function __construct(bool $triggerDeprecation = true)
+    {
+        if ($triggerDeprecation) {
+            trigger_deprecation('symfony/security-core', '5.1', '%s is deprecated.', __CLASS__);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isAnonymous(TokenInterface $token = null)
     {
+        trigger_deprecation('symfony/security-core', '5.1', 'The %s is deprecated, use %s::isGranted("IS_ANONYMOUS") instead.', __CLASS__, AuthorizationChecker::class);
+
         if (null === $token) {
             return false;
         }
@@ -39,6 +51,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
      */
     public function isRememberMe(TokenInterface $token = null)
     {
+        trigger_deprecation('symfony/security-core', '5.1', 'The %s is deprecated, use %s::isGranted("IS_REMEMBERED") instead.', __CLASS__, AuthorizationChecker::class);
+
         if (null === $token) {
             return false;
         }
@@ -51,6 +65,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
      */
     public function isFullFledged(TokenInterface $token = null)
     {
+        trigger_deprecation('symfony/security-core', '5.1', 'The %s is deprecated, use %s::isGranted("IS_AUTHENTICATED_FULLY") instead.', __CLASS__, AuthorizationChecker::class);
+
         if (null === $token) {
             return false;
         }

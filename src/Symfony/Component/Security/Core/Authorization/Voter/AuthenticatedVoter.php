@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverTrait;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -35,9 +38,13 @@ class AuthenticatedVoter implements VoterInterface
 
     private $authenticationTrustResolver;
 
-    public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
+    public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver = null)
     {
-        $this->authenticationTrustResolver = $authenticationTrustResolver;
+        if (null !== $authenticationTrustResolver) {
+            trigger_deprecation('symfony/security-core', '5.1', 'Passing instance of "%s" as first argument to "%s" is deprecated.', AuthenticationTrustResolverInterface::class, __CLASS__);
+
+            $this->authenticationTrustResolver = $authenticationTrustResolver;
+        }
     }
 
     /**
@@ -46,6 +53,7 @@ class AuthenticatedVoter implements VoterInterface
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
+
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
@@ -57,30 +65,33 @@ class AuthenticatedVoter implements VoterInterface
             }
 
             $result = VoterInterface::ACCESS_DENIED;
+            if (null === $token) {
+                return $result;
+            }
 
             if (self::IS_AUTHENTICATED_FULLY === $attribute
-                && $this->authenticationTrustResolver->isFullFledged($token)) {
+                && (null !== $this->authenticationTrustResolver ? $this->authenticationTrustResolver->isFullFledged($token) : $this->isFullyFledged($token))) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_AUTHENTICATED_REMEMBERED === $attribute
-                && ($this->authenticationTrustResolver->isRememberMe($token)
-                    || $this->authenticationTrustResolver->isFullFledged($token))) {
+                && (null !== $this->authenticationTrustResolver ? ($this->authenticationTrustResolver->isRememberMe($token)
+                    || $this->authenticationTrustResolver->isFullFledged($token)) : ($token instanceof RememberMeToken || $this->isFullyFledged($token)))) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute
-                && ($this->authenticationTrustResolver->isAnonymous($token)
+                && (null !== $this->authenticationTrustResolver ? ($this->authenticationTrustResolver->isAnonymous($token)
                     || $this->authenticationTrustResolver->isRememberMe($token)
-                    || $this->authenticationTrustResolver->isFullFledged($token))) {
+                    || $this->authenticationTrustResolver->isFullFledged($token)) : ($token instanceof AnonymousToken || $token instanceof RememberMeToken || $this->isFullyFledged($token)))) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
-            if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
+            if (self::IS_REMEMBERED === $attribute && (null !== $this->authenticationTrustResolver ? $this->authenticationTrustResolver->isRememberMe($token) : $token instanceof RememberMeToken)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
-            if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
+            if (self::IS_ANONYMOUS === $attribute && (null !== $this->authenticationTrustResolver ? $this->authenticationTrustResolver->isAnonymous($token) : $token instanceof AnonymousToken)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
@@ -90,5 +101,10 @@ class AuthenticatedVoter implements VoterInterface
         }
 
         return $result;
+    }
+
+    private function isFullyFledged(TokenInterface $token): bool
+    {
+        return !$token instanceof AnonymousToken && !$token instanceof RememberMeToken;
     }
 }

@@ -57,8 +57,21 @@ class ContextListener extends AbstractListener
     /**
      * @param iterable|UserProviderInterface[] $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, /*AuthenticationTrustResolverInterface */$trustResolver = null, callable $sessionTrackerEnabler = null)
     {
+        if ($trustResolver instanceof AuthenticationTrustResolverInterface) {
+            // old signature
+            trigger_deprecation('symfony/security-core', '5.1', 'Passing an %s as second argument to %s is deprecated.', AuthenticationTrustResolverInterface::class, __CLASS__);
+        } else {
+            // new signature
+            $sessionTrackerEnabler = $trustResolver;
+            $trustResolver = null;
+        }
+
+        if (null !== $sessionTrackerEnabler && !is_callable($sessionTrackerEnabler)) {
+            throw new \InvalidArgumentException(sprintf('Argument 2 of %s must be a callable, %s given.', __METHOD__, is_object($sessionTrackerEnabler) ? get_class($sessionTrackerEnabler) : gettype($sessionTrackerEnabler)));
+        }
+
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
         }
@@ -69,7 +82,7 @@ class ContextListener extends AbstractListener
         $this->logger = $logger;
         $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
 
-        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->trustResolver = $trustResolver;
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
@@ -166,7 +179,7 @@ class ContextListener extends AbstractListener
         $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;
         $token = $this->tokenStorage->getToken();
 
-        if (null === $token || $this->trustResolver->isAnonymous($token)) {
+        if (null === $token || (null !== $this->trustResolver ? $this->trustResolver->isAnonymous($token) : (null !== $token && $token instanceof AnonymousToken))) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }

@@ -63,11 +63,14 @@ class EnumNodeDefinitionTest extends TestCase
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(['foo', 'bar']);
-        $def->setDeprecated('The "%path%" node is deprecated.');
+        $def->setDeprecated('vendor/package', '1.1', 'The "%path%" node is deprecated.');
 
         $node = $def->getNode();
 
         $this->assertTrue($node->isDeprecated());
-        $this->assertSame('The "foo" node is deprecated.', $def->getNode()->getDeprecationMessage($node->getName(), $node->getPath()));
+        $deprecation = $def->getNode()->getDeprecation($node->getName(), $node->getPath());
+        $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
     }
 }

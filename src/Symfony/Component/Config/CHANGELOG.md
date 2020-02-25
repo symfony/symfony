@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * updated the signature of method `NodeDefinition::setDeprecated()` to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `BaseNode::setDeprecated()` to `BaseNode::setDeprecation(string $package, string $version, string $message)`
+ * deprecated passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node
+
 5.0.0
 -----
 

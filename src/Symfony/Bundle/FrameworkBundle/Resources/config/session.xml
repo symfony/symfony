@@ -13,6 +13,12 @@
 
         <service id="session" class="Symfony\Component\HttpFoundation\Session\Session" public="true">
             <argument type="service" id="session.storage" />
+            <argument>null</argument> <!-- AttributeBagInterface -->
+            <argument>null</argument> <!-- FlashBagInterface -->
+            <argument type="collection">
+                <argument type="service" id="session_listener" />
+                <argument>onSessionUsage</argument>
+            </argument>
         </service>
 
         <service id="Symfony\Component\HttpFoundation\Session\SessionInterface" alias="session" />

@@ -244,4 +244,63 @@ class SessionListenerTest extends TestCase
         $this->expectException(UnexpectedSessionUsageException::class);
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
     }
+
+    public function testSessionUsageCallbackWhenDebugAndStateless()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->method('isStarted')->willReturn(true);
+        $session->expects($this->exactly(1))->method('save');
+
+        $requestStack = new RequestStack();
+
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+
+        $requestStack->push(new Request());
+        $requestStack->push($request);
+        $requestStack->push(new Request());
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+        $container->set('request_stack', $requestStack);
+
+        $this->expectException(UnexpectedSessionUsageException::class);
+        (new SessionListener($container, true))->onSessionUsage();
+    }
+
+    public function testSessionUsageCallbackWhenNoDebug()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->method('isStarted')->willReturn(true);
+        $session->expects($this->exactly(0))->method('save');
+
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+
+        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
+        $requestStack->expects($this->never())->method('getMasterRequest')->willReturn($request);
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+        $container->set('request_stack', $requestStack);
+
+        (new SessionListener($container))->onSessionUsage();
+    }
+
+    public function testSessionUsageCallbackWhenNoStateless()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->method('isStarted')->willReturn(true);
+        $session->expects($this->never())->method('save');
+
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
+        $requestStack->push(new Request());
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+        $container->set('request_stack', $requestStack);
+
+        (new SessionListener($container, true))->onSessionUsage();
+    }
 }

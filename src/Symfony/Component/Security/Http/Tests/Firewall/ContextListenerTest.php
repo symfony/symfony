@@ -361,6 +361,23 @@ class ContextListenerTest extends TestCase
         $this->assertSame($usageIndex, $session->getUsageIndex());
     }
 
+    public function testSessionIsNotReported()
+    {
+        $usageReporter = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
+        $usageReporter->expects($this->never())->method('__invoke');
+
+        $session = new Session(new MockArraySessionStorage(), null, null, $usageReporter);
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $tokenStorage = new TokenStorage();
+
+        $listener = new ContextListener($tokenStorage, [], 'context_key', null, null, null, [$tokenStorage, 'getToken']);
+        $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());

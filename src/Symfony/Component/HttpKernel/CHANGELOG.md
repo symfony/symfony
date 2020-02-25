@@ -6,6 +6,7 @@ CHANGELOG
 
  * allowed using public aliases to reference controllers
  * added session usage reporting when the `_stateless` attribute of the request is set to `true`
+ * added `AbstractSessionListener::onSessionUsage()` to report when the session is used while a request is stateless
 
 5.0.0
 -----

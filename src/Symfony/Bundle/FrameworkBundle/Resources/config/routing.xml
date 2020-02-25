@@ -88,7 +88,7 @@
             <argument>%request_listener.https_port%</argument>
             <call method="setParameter">
                 <argument>_functions</argument>
-                <argument type="service" id="router.expression_language_provider" />
+                <argument type="service" id="router.expression_language_provider" on-invalid="ignore" />
             </call>
         </service>
         <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" />

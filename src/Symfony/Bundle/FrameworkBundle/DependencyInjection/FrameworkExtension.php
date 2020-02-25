@@ -874,6 +874,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $enabledLocales]);
         }
 
+        if (!class_exists(ExpressionLanguage::class)) {
+            $container->removeDefinition('router.expression_language_provider');
+        }
+
         $container->setParameter('router.resource', $config['resource']);
         $router = $container->findDefinition('router.default');
         $argument = $router->getArgument(2);

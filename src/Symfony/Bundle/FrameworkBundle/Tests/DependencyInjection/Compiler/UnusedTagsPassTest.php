@@ -41,7 +41,7 @@ class UnusedTagsPassTest extends TestCase
         $this->assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getWhitelistTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-tags-whitelist.php.');
     }
 
-    private function getWhitelistTags()
+    private function getWhitelistTags(): array
     {
         // get tags in UnusedTagsPass
         $target = \dirname(__DIR__, 3).'/DependencyInjection/Compiler/UnusedTagsPass.php';

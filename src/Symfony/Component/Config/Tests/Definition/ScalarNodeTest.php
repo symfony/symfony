@@ -44,10 +44,13 @@ class ScalarNodeTest extends TestCase
     public function testSetDeprecated()
     {
         $childNode = new ScalarNode('foo');
-        $childNode->setDeprecated('"%node%" is deprecated');
+        $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
 
         $this->assertTrue($childNode->isDeprecated());
-        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+        $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);

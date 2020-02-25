@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -31,10 +32,15 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 {
     private $entityManager;
     private $classMetadataFactory;
+    private static $useDeprecatedConstants;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+
+        if (null === self::$useDeprecatedConstants) {
+            self::$useDeprecatedConstants = !class_exists(Types::class);
+        }
     }
 
     /**
@@ -135,11 +141,11 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             switch ($builtinType) {
                 case Type::BUILTIN_TYPE_OBJECT:
                     switch ($typeOfField) {
-                        case DBALType::DATE:
-                        case DBALType::DATETIME:
-                        case DBALType::DATETIMETZ:
+                        case self::$useDeprecatedConstants ? DBALType::DATE : Types::DATE_MUTABLE:
+                        case self::$useDeprecatedConstants ? DBALType::DATETIME : Types::DATETIME_MUTABLE:
+                        case self::$useDeprecatedConstants ? DBALType::DATETIMETZ : Types::DATETIMETZ_MUTABLE:
                         case 'vardatetime':
-                        case DBALType::TIME:
+                        case self::$useDeprecatedConstants ? DBALType::TIME : Types::TIME_MUTABLE:
                             return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
 
                         case 'date_immutable':
@@ -155,11 +161,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     break;
                 case Type::BUILTIN_TYPE_ARRAY:
                     switch ($typeOfField) {
-                        case DBALType::TARRAY:
-                        case DBALType::JSON_ARRAY:
+                        case self::$useDeprecatedConstants ? DBALType::TARRAY : Types::ARRAY:
+                        case 'json_array':
+                        case self::$useDeprecatedConstants ? false : Types::JSON:
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
-                        case DBALType::SIMPLE_ARRAY:
+                        case self::$useDeprecatedConstants ? DBALType::SIMPLE_ARRAY : Types::SIMPLE_ARRAY:
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
                     }
             }
@@ -234,33 +241,33 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     private function getPhpType(string $doctrineType): ?string
     {
         switch ($doctrineType) {
-            case DBALType::SMALLINT:
-            case DBALType::INTEGER:
+            case self::$useDeprecatedConstants ? DBALType::SMALLINT : Types::SMALLINT:
+            case self::$useDeprecatedConstants ? DBALType::INTEGER : Types::INTEGER:
                 return Type::BUILTIN_TYPE_INT;
 
-            case DBALType::FLOAT:
+            case self::$useDeprecatedConstants ? DBALType::FLOAT : Types::FLOAT:
                 return Type::BUILTIN_TYPE_FLOAT;
 
-            case DBALType::BIGINT:
-            case DBALType::STRING:
-            case DBALType::TEXT:
-            case DBALType::GUID:
-            case DBALType::DECIMAL:
+            case self::$useDeprecatedConstants ? DBALType::BIGINT : Types::BIGINT:
+            case self::$useDeprecatedConstants ? DBALType::STRING : Types::STRING:
+            case self::$useDeprecatedConstants ? DBALType::TEXT : Types::TEXT:
+            case self::$useDeprecatedConstants ? DBALType::GUID : Types::GUID:
+            case self::$useDeprecatedConstants ? DBALType::DECIMAL : Types::DECIMAL:
                 return Type::BUILTIN_TYPE_STRING;
 
-            case DBALType::BOOLEAN:
+            case self::$useDeprecatedConstants ? DBALType::BOOLEAN : Types::BOOLEAN:
                 return Type::BUILTIN_TYPE_BOOL;
 
-            case DBALType::BLOB:
+            case self::$useDeprecatedConstants ? DBALType::BLOB : Types::BLOB:
             case 'binary':
                 return Type::BUILTIN_TYPE_RESOURCE;
 
-            case DBALType::OBJECT:
-            case DBALType::DATE:
-            case DBALType::DATETIME:
-            case DBALType::DATETIMETZ:
+            case self::$useDeprecatedConstants ? DBALType::OBJECT : Types::OBJECT:
+            case self::$useDeprecatedConstants ? DBALType::DATE : Types::DATE_MUTABLE:
+            case self::$useDeprecatedConstants ? DBALType::DATETIME : Types::DATETIME_MUTABLE:
+            case self::$useDeprecatedConstants ? DBALType::DATETIMETZ : Types::DATETIMETZ_MUTABLE:
             case 'vardatetime':
-            case DBALType::TIME:
+            case self::$useDeprecatedConstants ? DBALType::TIME : Types::TIME_MUTABLE:
             case 'date_immutable':
             case 'datetime_immutable':
             case 'datetimetz_immutable':
@@ -268,9 +275,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             case 'dateinterval':
                 return Type::BUILTIN_TYPE_OBJECT;
 
-            case DBALType::TARRAY:
-            case DBALType::SIMPLE_ARRAY:
-            case DBALType::JSON_ARRAY:
+            case self::$useDeprecatedConstants ? DBALType::TARRAY : Types::ARRAY:
+            case self::$useDeprecatedConstants ? DBALType::SIMPLE_ARRAY : Types::SIMPLE_ARRAY:
+            case 'json_array':
+            case self::$useDeprecatedConstants ? false : Types::JSON:
                 return Type::BUILTIN_TYPE_ARRAY;
         }
 

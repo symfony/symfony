@@ -74,7 +74,7 @@ class DoctrineDummy
     /**
      * @Column(type="json_array")
      */
-    private $json;
+    private $jsonArray;
 
     /**
      * @Column(type="simple_array")

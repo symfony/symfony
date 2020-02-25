@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-02-21T10:50:21Z
+
+Why adding an IdentityMarshaller in HttpFoundation ?
+
+---------------------------------------------------------------------------
+
+by atailouloute at 2020-02-21T13:38:51Z
+
+> Why adding an IdentityMarshaller in HttpFoundation ?
+
+We had it before in Cache, but it seemed that it will be used only by the `MashallingSessionHandler`
+
+wdyt @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-21T14:04:23Z
+
+Because the only use case is in HttpFoundation, in Cache it is not used and won't ever be.
+
+---------------------------------------------------------------------------
+
+by atailouloute at 2020-02-23T22:08:28Z
+
+> What about adding some base services in framework-bundle to make using this as easy as possible?
+>
+> We could have a `session.marshaller` service that defaults to the IdentityMarshaller, wired to wrap the session handler. Then, when this marshaller service is _not_ decorated, we would remove the wrapper to optimize the handler in a compiler pass. WDYT? Doable?
+>
+> (please update the description of the PR once we have a working way of doing so).
+
+Yes, I already did that, I pushed the changes and updated the description

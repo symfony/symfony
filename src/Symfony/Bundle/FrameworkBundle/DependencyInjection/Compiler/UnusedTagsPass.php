@@ -58,7 +58,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'mime.mime_type_guesser',
         'monolog.logger',
         'notifier.channel',
-        'notifier.transport_factory',
         'property_info.access_extractor',
         'property_info.initializable_extractor',
         'property_info.list_extractor',

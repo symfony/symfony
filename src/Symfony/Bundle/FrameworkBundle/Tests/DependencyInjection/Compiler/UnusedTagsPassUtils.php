@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 
 class UnusedTagsPassUtils
 {
-    public static function getDefinedTags(): array
+    public static function getDefinedTags()
     {
         $tags = [
             'proxy' => true,

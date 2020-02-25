@@ -56,12 +56,18 @@ class Connection implements ResetInterface
     private $schemaSynchronizer;
     private $autoSetup;
 
+    private static $useDeprecatedConstants;
+
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+
+        if (null === self::$useDeprecatedConstants) {
+            self::$useDeprecatedConstants = !class_exists(Types::class);
+        }
     }
 
     public function reset()
@@ -133,12 +139,18 @@ class Connection implements ResetInterface
             $this->configuration['queue_name'],
             $now,
             $availableAt,
-        ], [
+        ], self::$useDeprecatedConstants ? [
             null,
             null,
             null,
             Type::DATETIME,
             Type::DATETIME,
+        ] : [
+            null,
+            null,
+            null,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIME_MUTABLE,
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -181,7 +193,7 @@ class Connection implements ResetInterface
                 $now,
                 $doctrineEnvelope['id'],
             ], [
-                Type::DATETIME,
+                self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE,
             ]);
 
             $this->driverConnection->commit();
@@ -290,9 +302,12 @@ class Connection implements ResetInterface
                 $redeliverLimit,
                 $now,
                 $this->configuration['queue_name'],
-            ], [
+            ], self::$useDeprecatedConstants ? [
                 Type::DATETIME,
                 Type::DATETIME,
+            ] : [
+                Types::DATETIME_MUTABLE,
+                Types::DATETIME_MUTABLE,
             ]);
     }
 
@@ -326,20 +341,20 @@ class Connection implements ResetInterface
     {
         $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
         $table = $schema->createTable($this->configuration['table_name']);
-        $table->addColumn('id', Type::BIGINT)
+        $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
-        $table->addColumn('body', Type::TEXT)
+        $table->addColumn('body', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('headers', Type::TEXT)
+        $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('queue_name', Type::STRING)
+        $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
             ->setNotnull(true);
-        $table->addColumn('created_at', Type::DATETIME)
+        $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('available_at', Type::DATETIME)
+        $table->addColumn('available_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('delivered_at', Type::DATETIME)
+        $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['queue_name']);

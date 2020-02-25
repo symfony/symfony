@@ -12,6 +12,9 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
@@ -442,21 +445,34 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $hostCollection->add('r1', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
         $hostCollection->add('r2', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
 
+        /* test case 14 */
+        $fixedLocaleCollection = new RouteCollection();
+        $routes = new RoutingConfigurator($fixedLocaleCollection, new PhpFileLoader(new FileLocator()), __FILE__, __FILE__);
+        $routes
+            ->collection()
+            ->prefix('/{_locale}')
+            ->add('home', [
+                'fr' => 'accueil',
+                'en' => 'home',
+            ])
+        ;
+
         return [
-           [new RouteCollection(), 'compiled_url_matcher0.php'],
-           [$collection, 'compiled_url_matcher1.php'],
-           [$redirectCollection, 'compiled_url_matcher2.php'],
-           [$rootprefixCollection, 'compiled_url_matcher3.php'],
-           [$headMatchCasesCollection, 'compiled_url_matcher4.php'],
-           [$groupOptimisedCollection, 'compiled_url_matcher5.php'],
-           [$trailingSlashCollection, 'compiled_url_matcher6.php'],
-           [$trailingSlashCollection, 'compiled_url_matcher7.php'],
-           [$unicodeCollection, 'compiled_url_matcher8.php'],
-           [$hostTreeCollection, 'compiled_url_matcher9.php'],
-           [$chunkedCollection, 'compiled_url_matcher10.php'],
-           [$demoCollection, 'compiled_url_matcher11.php'],
-           [$suffixCollection, 'compiled_url_matcher12.php'],
-           [$hostCollection, 'compiled_url_matcher13.php'],
+            [new RouteCollection(), 'compiled_url_matcher0.php'],
+            [$collection, 'compiled_url_matcher1.php'],
+            [$redirectCollection, 'compiled_url_matcher2.php'],
+            [$rootprefixCollection, 'compiled_url_matcher3.php'],
+            [$headMatchCasesCollection, 'compiled_url_matcher4.php'],
+            [$groupOptimisedCollection, 'compiled_url_matcher5.php'],
+            [$trailingSlashCollection, 'compiled_url_matcher6.php'],
+            [$trailingSlashCollection, 'compiled_url_matcher7.php'],
+            [$unicodeCollection, 'compiled_url_matcher8.php'],
+            [$hostTreeCollection, 'compiled_url_matcher9.php'],
+            [$chunkedCollection, 'compiled_url_matcher10.php'],
+            [$demoCollection, 'compiled_url_matcher11.php'],
+            [$suffixCollection, 'compiled_url_matcher12.php'],
+            [$hostCollection, 'compiled_url_matcher13.php'],
+            [$fixedLocaleCollection, 'compiled_url_matcher14.php'],
         ];
     }
 

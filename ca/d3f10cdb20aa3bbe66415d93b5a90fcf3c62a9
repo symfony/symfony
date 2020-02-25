@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-23T09:00:36Z
+
+I saw that you asked for this on Slack: improving the message of an exception is ... an improvement :) As such, this should target master.

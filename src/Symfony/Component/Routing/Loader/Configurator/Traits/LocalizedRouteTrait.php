@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Loader\Configurator\Traits;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * @internal
@@ -64,7 +63,7 @@ trait LocalizedRouteTrait
             $routes->add($name.'.'.$locale, $route = $this->createRoute($path));
             $collection->add($namePrefix.$name.'.'.$locale, $route);
             $route->setDefault('_locale', $locale);
-            $route->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
+            $route->setRequirement('_locale', preg_quote($locale));
             $route->setDefault('_canonical_route', $namePrefix.$name);
         }
 

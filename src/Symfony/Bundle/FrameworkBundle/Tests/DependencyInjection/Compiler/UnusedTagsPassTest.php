@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @requires PHP 7.0
+ */
 class UnusedTagsPassTest extends TestCase
 {
     public function testProcess()

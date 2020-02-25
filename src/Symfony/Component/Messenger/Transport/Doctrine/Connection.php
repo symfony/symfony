@@ -20,6 +20,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -53,12 +54,18 @@ class Connection
     private $schemaSynchronizer;
     private $autoSetup;
 
+    private static $useDeprecatedConstants;
+
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+
+        if (null === self::$useDeprecatedConstants) {
+            self::$useDeprecatedConstants = !class_exists(Types::class);
+        }
     }
 
     public function getConfiguration(): array
@@ -125,12 +132,18 @@ class Connection
             $this->configuration['queue_name'],
             $now,
             $availableAt,
-        ], [
+        ], self::$useDeprecatedConstants ? [
             null,
             null,
             null,
             Type::DATETIME,
             Type::DATETIME,
+        ] : [
+            null,
+            null,
+            null,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIME_MUTABLE,
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -169,7 +182,7 @@ class Connection
                 $now,
                 $doctrineEnvelope['id'],
             ], [
-                Type::DATETIME,
+                self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE,
             ]);
 
             $this->driverConnection->commit();
@@ -278,9 +291,12 @@ class Connection
                 $redeliverLimit,
                 $now,
                 $this->configuration['queue_name'],
-            ], [
+            ], self::$useDeprecatedConstants ? [
                 Type::DATETIME,
                 Type::DATETIME,
+            ] : [
+                Types::DATETIME_MUTABLE,
+                Types::DATETIME_MUTABLE,
             ]);
     }
 
@@ -314,20 +330,20 @@ class Connection
     {
         $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
         $table = $schema->createTable($this->configuration['table_name']);
-        $table->addColumn('id', Type::BIGINT)
+        $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
-        $table->addColumn('body', Type::TEXT)
+        $table->addColumn('body', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('headers', Type::TEXT)
+        $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('queue_name', Type::STRING)
+        $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
             ->setNotnull(true);
-        $table->addColumn('created_at', Type::DATETIME)
+        $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('available_at', Type::DATETIME)
+        $table->addColumn('available_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('delivered_at', Type::DATETIME)
+        $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['queue_name']);

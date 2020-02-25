@@ -71,5 +71,12 @@
 
         <!-- for BC -->
         <service id="session.storage.filesystem" alias="session.storage.mock_file" />
+
+        <service id="session.marshaller" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller" />
+
+        <service id="session.marshalling_handler" decorates="session.handler" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler">
+            <argument type="service" id="session.marshalling_handler.inner" />
+            <argument type="service" id="session.marshaller" />
+        </service>
     </services>
 </container>

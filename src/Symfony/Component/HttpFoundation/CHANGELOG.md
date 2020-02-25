@@ -13,6 +13,7 @@ CHANGELOG
  * added `Request::preferSafeContent()` and `Response::setContentSafe()` to handle "safe" HTTP preference
    according to [RFC 8674](https://tools.ietf.org/html/rfc8674)
  * made the Mime component an optional dependency
+ * added `MarshallingSessionHandler`, `IdentityMarshaller`
 
 5.0.0
 -----

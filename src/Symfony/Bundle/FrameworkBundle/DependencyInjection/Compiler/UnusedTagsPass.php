@@ -23,13 +23,17 @@ class UnusedTagsPass implements CompilerPassInterface
 {
     private $whitelist = [
         'annotations.cached_reader',
+        'auto_alias',
+        'cache.pool',
         'cache.pool.clearer',
+        'config_cache.resource_checker',
         'console.command',
+        'container.env_var_processor',
         'container.hot_path',
         'container.service_locator',
         'container.service_subscriber',
+        'controller.argument_value_resolver',
         'controller.service_arguments',
-        'config_cache.resource_checker',
         'data_collector',
         'form.type',
         'form.type_extension',
@@ -39,7 +43,12 @@ class UnusedTagsPass implements CompilerPassInterface
         'kernel.event_listener',
         'kernel.event_subscriber',
         'kernel.fragment_renderer',
+        'kernel.reset',
         'monolog.logger',
+        'property_info.access_extractor',
+        'property_info.list_extractor',
+        'property_info.type_extractor',
+        'proxy',
         'routing.expression_language_provider',
         'routing.loader',
         'security.expression_language_provider',
@@ -53,8 +62,10 @@ class UnusedTagsPass implements CompilerPassInterface
         'translation.loader',
         'twig.extension',
         'twig.loader',
+        'twig.runtime',
         'validator.constraint_validator',
         'validator.initializer',
+        'workflow.definition',
     ];
 
     public function process(ContainerBuilder $container)

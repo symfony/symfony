@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
  * added "priority" option to annotated routes
  * added argument `$priority` to `RouteCollection::add()`
+ * deprecated the `RouteCompiler::REGEX_DELIMITER` constant
 
 5.0.0
 -----

@@ -97,6 +97,7 @@ return static function (ContainerConfigurator $container) {
                     'session' => service('session')->ignoreOnInvalid(),
                     'initialized_session' => service('session')->ignoreOnUninitialized(),
                     'logger' => service('logger')->ignoreOnInvalid(),
+                    'session_collector' => service('data_collector.request.session_collector')->ignoreOnInvalid(),
                 ]),
                 param('kernel.debug'),
             ])

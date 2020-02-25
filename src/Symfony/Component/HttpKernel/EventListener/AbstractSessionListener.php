@@ -152,6 +152,10 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
+        if ($this->container && $this->container->has('session_collector')) {
+            $this->container->get('session_collector')();
+        }
+
         if (!$requestStack = $this->container && $this->container->has('request_stack') ? $this->container->get('request_stack') : null) {
             return;
         }

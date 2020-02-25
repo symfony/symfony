@@ -86,8 +86,17 @@
             <argument></argument> <!-- scheme -->
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
+            <call method="setParameter">
+                <argument>_functions</argument>
+                <argument type="service" id="router.expression_language_provider" />
+            </call>
         </service>
         <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" />
+
+        <service id="router.expression_language_provider" class="Symfony\Component\Routing\Matcher\ExpressionLanguageProvider">
+            <argument type="tagged_locator" tag="routing.expression_language_function" index-by="function" />
+            <tag name="routing.expression_language_provider" />
+        </service>
 
         <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer">
             <tag name="container.service_subscriber" id="router" />

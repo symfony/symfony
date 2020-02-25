@@ -49,6 +49,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'mime.mime_type_guesser',
         'monolog.logger',
         'proxy',
+        'routing.expression_language_function',
         'routing.expression_language_provider',
         'routing.loader',
         'routing.route_loader',

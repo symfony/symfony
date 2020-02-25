@@ -130,18 +130,19 @@
         </service>
         <service id="Symfony\Component\String\Slugger\SluggerInterface" alias="slugger" />
 
-        <!-- inherit from this service to lazily access env vars -->
-        <service id="getenv" class="Symfony\Component\String\LazyString" abstract="true">
-            <factory class="Symfony\Component\String\LazyString" method="fromCallable" />
-            <argument type="service">
-                <service class="Closure">
-                    <factory class="Closure" method="fromCallable" />
-                    <argument type="collection">
-                        <argument type="service" id="service_container" />
-                        <argument>getEnv</argument>
-                    </argument>
-                </service>
+        <service id="container.getenv" class="Closure">
+            <factory class="Closure" method="fromCallable" />
+            <argument type="collection">
+                <argument type="service" id="service_container" />
+                <argument>getEnv</argument>
             </argument>
+            <tag name="routing.expression_language_function" function="env" />
+        </service>
+
+        <!-- inherit from this service to lazily access env vars -->
+        <service id="container.env" class="Symfony\Component\String\LazyString" abstract="true">
+            <factory class="Symfony\Component\String\LazyString" method="fromCallable" />
+            <argument type="service" id="container.getenv" />
         </service>
     </services>
 </container>

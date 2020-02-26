@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-24T14:39:50Z
+
+What would be the drawback of always allowing the switch? Adding a new option should be thought twice.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-02-24T14:46:03Z
+
+We've discussed a bit about this with @chalasr. It's not easy to provide a satisfying default out-of-the-box
+ to show an explanation about the error to the user anyway. I'd be in favor of always allowing the switch, and this could even be considered a bug fix to me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-25T21:03:52Z
+
+@nicolas-grekas Did you mean 3.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-25T21:29:19Z
+
+3.4 then yes :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-02-26T03:28:11Z
+
+Rebased. Failing build expected with deps=high

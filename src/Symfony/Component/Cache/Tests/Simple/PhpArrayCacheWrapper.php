@@ -22,7 +22,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
         (\Closure::bind(function () use ($key, $value) {
             $this->data[$key] = $value;
             $this->warmUp($this->data);
-            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
+            [$this->keys, $this->values] = eval(substr(file_get_contents($this->file), 6));
         }, $this, PhpArrayCache::class))();
 
         return true;
@@ -38,7 +38,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
                 $this->data[$key] = $value;
             }
             $this->warmUp($this->data);
-            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
+            [$this->keys, $this->values] = eval(substr(file_get_contents($this->file), 6));
         }, $this, PhpArrayCache::class))();
 
         return true;

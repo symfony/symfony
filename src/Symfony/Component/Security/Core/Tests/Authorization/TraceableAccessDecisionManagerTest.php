@@ -40,7 +40,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->with($token, $attributes, $object)
             ->willReturnCallback(function ($token, $attributes, $object) use ($voterVotes, $adm, $result) {
                 foreach ($voterVotes as $voterVote) {
-                    list($voter, $vote) = $voterVote;
+                    [$voter, $vote] = $voterVote;
                     $adm->addVoterVote($voter, $attributes, $vote);
                 }
 

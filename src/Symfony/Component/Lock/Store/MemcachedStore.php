@@ -94,7 +94,7 @@ class MemcachedStore implements StoreInterface
 
         $token = $this->getUniqueToken($key);
 
-        list($value, $cas) = $this->getValueAndCas($key);
+        [$value, $cas] = $this->getValueAndCas($key);
 
         $key->reduceLifetime($ttl);
         // Could happens when we ask a putOff after a timeout but in luck nobody steal the lock
@@ -126,7 +126,7 @@ class MemcachedStore implements StoreInterface
     {
         $token = $this->getUniqueToken($key);
 
-        list($value, $cas) = $this->getValueAndCas($key);
+        [$value, $cas] = $this->getValueAndCas($key);
 
         if ($value !== $token) {
             // we are not the owner of the lock. Nothing to do.

@@ -228,7 +228,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     private function resolveChild(string $name): FormBuilderInterface
     {
-        list($type, $options) = $this->unresolvedChildren[$name];
+        [$type, $options] = $this->unresolvedChildren[$name];
 
         unset($this->unresolvedChildren[$name]);
 

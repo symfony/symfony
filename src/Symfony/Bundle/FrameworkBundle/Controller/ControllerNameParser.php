@@ -58,7 +58,7 @@ class ControllerNameParser
         }
 
         $originalController = $controller;
-        list($bundleName, $controller, $action) = $parts;
+        [$bundleName, $controller, $action] = $parts;
         $controller = str_replace('/', '\\', $controller);
 
         try {

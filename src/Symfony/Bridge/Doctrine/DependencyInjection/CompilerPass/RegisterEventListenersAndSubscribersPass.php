@@ -65,7 +65,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $taggedSubscribers = $this->findAndSortTags($subscriberTag, $container);
 
         foreach ($taggedSubscribers as $taggedSubscriber) {
-            list($id, $tag) = $taggedSubscriber;
+            [$id, $tag] = $taggedSubscriber;
             $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
@@ -84,7 +84,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $listenerRefs = [];
 
         foreach ($taggedListeners as $taggedListener) {
-            list($id, $tag) = $taggedListener;
+            [$id, $tag] = $taggedListener;
             if (!isset($tag['event'])) {
                 throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }

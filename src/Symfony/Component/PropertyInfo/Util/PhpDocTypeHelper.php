@@ -90,7 +90,7 @@ final class PhpDocTypeHelper
         $docType = $docType ?? (string) $type;
 
         if ($type instanceof Collection) {
-            list($phpType, $class) = $this->getPhpTypeAndClass((string) $type->getFqsen());
+            [$phpType, $class] = $this->getPhpTypeAndClass((string) $type->getFqsen());
 
             $key = $this->getTypes($type->getKeyType());
             $value = $this->getTypes($type->getValueType());
@@ -121,7 +121,7 @@ final class PhpDocTypeHelper
         }
 
         $docType = $this->normalizeType($docType);
-        list($phpType, $class) = $this->getPhpTypeAndClass($docType);
+        [$phpType, $class] = $this->getPhpTypeAndClass($docType);
 
         if ('array' === $docType) {
             return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, null, null);

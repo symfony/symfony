@@ -19,7 +19,7 @@ class AbstractFactoryTest extends TestCase
 {
     public function testCreate()
     {
-        list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', [
+        [$container, $authProviderId, $listenerId, $entryPointId] = $this->callFactory('foo', [
             'use_forward' => true,
             'failure_path' => '/foo',
             'success_handler' => 'custom_success_handler',
@@ -61,7 +61,7 @@ class AbstractFactoryTest extends TestCase
             $options['failure_handler'] = $serviceId;
         }
 
-        list($container) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
+        [$container] = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
@@ -99,7 +99,7 @@ class AbstractFactoryTest extends TestCase
             $options['success_handler'] = $serviceId;
         }
 
-        list($container) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
+        [$container] = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
@@ -150,7 +150,7 @@ class AbstractFactoryTest extends TestCase
         $container->register('custom_success_handler');
         $container->register('custom_failure_handler');
 
-        list($authProviderId, $listenerId, $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
+        [$authProviderId, $listenerId, $entryPointId] = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 
         return [$container, $authProviderId, $listenerId, $entryPointId];
     }

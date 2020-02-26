@@ -54,9 +54,9 @@ final class BoundArgument implements ArgumentInterface
     public function setValues(array $values)
     {
         if (5 === \count($values)) {
-            list($this->value, $this->identifier, $this->used, $this->type, $this->file) = $values;
+            [$this->value, $this->identifier, $this->used, $this->type, $this->file] = $values;
         } else {
-            list($this->value, $this->identifier, $this->used) = $values;
+            [$this->value, $this->identifier, $this->used] = $values;
         }
     }
 }

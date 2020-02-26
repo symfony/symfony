@@ -155,7 +155,7 @@ class PhpArrayAdapterWrapper extends PhpArrayAdapter
             $this->keys[$key] = $id = \count($this->values);
             $this->data[$key] = $this->values[$id] = $item->get();
             $this->warmUp($this->data);
-            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
+            [$this->keys, $this->values] = eval(substr(file_get_contents($this->file), 6));
         }, $this, PhpArrayAdapter::class))();
 
         return true;

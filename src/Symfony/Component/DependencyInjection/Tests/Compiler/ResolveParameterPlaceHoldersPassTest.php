@@ -67,7 +67,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
 
     public function testBindingsShouldBeResolved()
     {
-        list($boundValue) = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
+        [$boundValue] = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
 
         $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
     }

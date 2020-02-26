@@ -75,7 +75,7 @@ class LoggerTest extends TestCase
 
         $logger->info('test');
         $this->assertCount(1, $logger->getLogs());
-        list($record) = $logger->getLogs();
+        [$record] = $logger->getLogs();
 
         $this->assertEquals('test', $record['message']);
         $this->assertEquals(Logger::INFO, $record['priority']);

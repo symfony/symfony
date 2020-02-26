@@ -49,7 +49,7 @@ class Registry
     {
         $matched = [];
 
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 $matched[] = $workflow;
             }
@@ -78,7 +78,7 @@ class Registry
     public function all($subject): array
     {
         $matched = [];
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($supportStrategy->supports($workflow, $subject)) {
                 $matched[] = $workflow;
             }

@@ -22,7 +22,7 @@ class WebProcessorTest extends TestCase
 {
     public function testUsesRequestServerData()
     {
-        list($event, $server) = $this->createRequestEvent();
+        [$event, $server] = $this->createRequestEvent();
 
         $processor = new WebProcessor();
         $processor->onKernelRequest($event);
@@ -39,7 +39,7 @@ class WebProcessorTest extends TestCase
     public function testUseRequestClientIp()
     {
         Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_ALL);
-        list($event, $server) = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
+        [$event, $server] = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
 
         $processor = new WebProcessor();
         $processor->onKernelRequest($event);
@@ -61,7 +61,7 @@ class WebProcessorTest extends TestCase
             $this->markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
         }
 
-        list($event, $server) = $this->createRequestEvent();
+        [$event, $server] = $this->createRequestEvent();
 
         $processor = new WebProcessor(['url', 'referrer']);
         $processor->onKernelRequest($event);

@@ -65,12 +65,12 @@ class StaticPrefixCollection
      */
     public function addRoute(string $prefix, $route)
     {
-        list($prefix, $staticPrefix) = $this->getCommonPrefix($prefix, $prefix);
+        [$prefix, $staticPrefix] = $this->getCommonPrefix($prefix, $prefix);
 
         for ($i = \count($this->items) - 1; 0 <= $i; --$i) {
             $item = $this->items[$i];
 
-            list($commonPrefix, $commonStaticPrefix) = $this->getCommonPrefix($prefix, $this->prefixes[$i]);
+            [$commonPrefix, $commonStaticPrefix] = $this->getCommonPrefix($prefix, $this->prefixes[$i]);
 
             if ($this->prefix === $commonPrefix) {
                 // the new route and a previous one have no common prefix, let's see if they are exclusive to each others
@@ -104,8 +104,8 @@ class StaticPrefixCollection
             } else {
                 // the new route and a previous one have a common prefix, let's merge them
                 $child = new self($commonPrefix);
-                list($child->prefixes[0], $child->staticPrefixes[0]) = $child->getCommonPrefix($this->prefixes[$i], $this->prefixes[$i]);
-                list($child->prefixes[1], $child->staticPrefixes[1]) = $child->getCommonPrefix($prefix, $prefix);
+                [$child->prefixes[0], $child->staticPrefixes[0]] = $child->getCommonPrefix($this->prefixes[$i], $this->prefixes[$i]);
+                [$child->prefixes[1], $child->staticPrefixes[1]] = $child->getCommonPrefix($prefix, $prefix);
                 $child->items = [$this->items[$i], $route];
 
                 $this->staticPrefixes[$i] = $commonStaticPrefix;

@@ -92,7 +92,7 @@ class LogoutUrlGenerator
      */
     private function generateLogoutUrl(?string $key, int $referenceType): string
     {
-        list($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager) = $this->getListener($key);
+        [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager] = $this->getListener($key);
 
         if (null === $logoutPath) {
             throw new \LogicException('Unable to generate the logout URL without a path.');
@@ -154,7 +154,7 @@ class LogoutUrlGenerator
         }
 
         // Fetch from injected current firewall information, if possible
-        list($key, $context) = $this->currentFirewall;
+        [$key, $context] = $this->currentFirewall;
 
         if (isset($this->listeners[$key])) {
             return $this->listeners[$key];

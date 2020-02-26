@@ -71,7 +71,7 @@ class SessionController implements ContainerAwareInterface
         $session = $request->getSession();
 
         if ($session->getFlashBag()->has('notice')) {
-            list($output) = $session->getFlashBag()->get('notice');
+            [$output] = $session->getFlashBag()->get('notice');
         } else {
             $output = 'No flash was set.';
         }

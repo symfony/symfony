@@ -108,6 +108,15 @@ interface SessionInterface
     public function get(string $name, $default = null);
 
     /**
+     * Returns and then removes an attribute.
+     *
+     * @param mixed $default The default value if not found
+     *
+     * @return mixed
+     */
+    public function pull(string $name, $default = null);
+
+    /**
      * Sets an attribute.
      *
      * @param mixed $value

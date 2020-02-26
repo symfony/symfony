@@ -107,6 +107,14 @@ class SessionTest extends TestCase
         $this->assertEquals(1, $this->session->get('foo', 1));
     }
 
+    public function testPull()
+    {
+        $this->session->set('foo', 'bar');
+
+        $this->assertEquals('bar', $this->session->pull('foo'));
+        $this->assertNull($this->session->get('foo')); // Check that the key has been removed from the session
+    }
+
     /**
      * @dataProvider setProvider
      */

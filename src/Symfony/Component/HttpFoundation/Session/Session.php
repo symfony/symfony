@@ -71,6 +71,17 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
+    public function pull(string $name, $default = null)
+    {
+        $res = $this->get($name, $default);
+        $this->remove($name);
+
+        return $res;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set(string $name, $value)
     {
         $this->getAttributeBag()->set($name, $value);

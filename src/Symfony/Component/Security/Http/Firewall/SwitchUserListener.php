@@ -134,7 +134,8 @@ class SwitchUserListener implements ListenerInterface
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // User already switched, exit before seamlessly switching to another user
+            $token = $this->attemptExitUser($request);
         }
 
         if (false === $this->accessDecisionManager->decide($token, [$this->role])) {
@@ -152,7 +153,7 @@ class SwitchUserListener implements ListenerInterface
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken());
+        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $token);
 
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
 

@@ -33,15 +33,15 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserCannotSwitchToOther()
+    public function testSwitchedUserCanSwitchToOther()
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_1');
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_2');
 
-        $this->assertEquals(500, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_2', $client->getProfile()->getCollector('security')->getUser());
     }
 
     public function testSwitchedUserExit()

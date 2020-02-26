@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\FormFieldRegistry;
 
@@ -979,5 +980,31 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertEquals($form->getPhpValues(), ['example' => '']);
+    }
+
+    public function testGetReference()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form>
+                    <textarea name="foo[collection][0][bar]">item 0</textarea>
+                </form>
+            </html>'
+        );
+
+        $formNode = $dom->getElementsByTagName('form')->item(0);
+        $form = new Form($formNode, 'http://example.com');
+
+        $collection = &$form->getReference('foo[collection]');
+
+        $item1 = new \DOMElement('textarea', 'item 1');
+        $formNode->appendChild($item1);
+
+        $collection[] = [
+            'bar' => new TextareaFormField($item1),
+        ];
+
+        $this->assertSame('item 1', $form->get('foo[collection][1][bar]')->getValue());
     }
 }

@@ -6,6 +6,7 @@ CHANGELOG
 
 * Added an internal cache layer on top of the CssSelectorConverter
 * Added `UriResolver` to resolve an URI according to a base URI
+* Added the `Form::getReference()` method to get a field value by reference
 
 5.0.0
 -----

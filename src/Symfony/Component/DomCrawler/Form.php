@@ -282,6 +282,11 @@ class Form extends Link implements \ArrayAccess
         return $this->fields->get($name);
     }
 
+    public function &getReference(string $name)
+    {
+        return $this->fields->get($name);
+    }
+
     /**
      * Sets a named field.
      */

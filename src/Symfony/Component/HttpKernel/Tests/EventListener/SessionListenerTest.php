@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
+use Symfony\Component\HttpKernel\Exception\UnexpectedSessionUsageException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SessionListenerTest extends TestCase
@@ -177,5 +179,69 @@ class SessionListenerTest extends TestCase
 
         $this->assertTrue($response->headers->has('Expires'));
         $this->assertLessThanOrEqual((new \DateTime('now', new \DateTimeZone('UTC'))), (new \DateTime($response->headers->get('Expires'))));
+    }
+
+    public function testSessionUsageExceptionIfStatelessAndSessionUsed()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+
+        $listener = new SessionListener($container, true);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->expectException(UnexpectedSessionUsageException::class);
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new Response()));
+    }
+
+    public function testSessionUsageLogIfStatelessAndSessionUsed()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+
+        $logger = $this->getMockBuilder(LoggerInterface::class)->disableOriginalConstructor()->getMock();
+        $logger->expects($this->exactly(1))->method('warning');
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+        $container->set('logger', $logger);
+
+        $listener = new SessionListener($container, false);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new Response()));
+    }
+
+    public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->method('isStarted')->willReturn(true);
+        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(1))->method('save');
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+
+        $listener = new SessionListener($container, true);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $response = new Response();
+        $this->expectException(UnexpectedSessionUsageException::class);
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
     }
 }

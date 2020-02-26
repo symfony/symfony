@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Exception\UnexpectedSessionUsageException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -41,10 +42,12 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
     protected $container;
     private $sessionUsageStack = [];
+    private $debug;
 
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(ContainerInterface $container = null, bool $debug = false)
     {
         $this->container = $container;
+        $this->debug = $debug;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -82,16 +85,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
-            if ($autoCacheControl) {
-                $response
-                    ->setExpires(new \DateTime())
-                    ->setPrivate()
-                    ->setMaxAge(0)
-                    ->headers->addCacheControlDirective('must-revalidate');
-            }
-        }
-
         if ($session->isStarted()) {
             /*
              * Saves the session, in case it is still open, before sending the response/headers.
@@ -119,6 +112,30 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
              * it is saved will just restart it.
              */
             $session->save();
+        }
+
+        if ($session instanceof Session ? $session->getUsageIndex() === end($this->sessionUsageStack) : !$session->isStarted()) {
+            return;
+        }
+
+        if ($autoCacheControl) {
+            $response
+                ->setExpires(new \DateTime())
+                ->setPrivate()
+                ->setMaxAge(0)
+                ->headers->addCacheControlDirective('must-revalidate');
+        }
+
+        if (!$event->getRequest()->attributes->get('_stateless', false)) {
+            return;
+        }
+
+        if ($this->debug) {
+            throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
+        }
+
+        if ($this->container->has('logger')) {
+            $this->container->get('logger')->warning('Session was used while the request was declared stateless.');
         }
     }
 

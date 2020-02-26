@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2020-02-15T12:26:41Z
+
+One thing I'm wondering, should we need the `DisableableSessionProxy` or could we use directly `Session` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-15T12:53:10Z
+
+The request attribute is a nice idea.
+For the implementation, I'd like to propose another approach: the AbstractSessionListener could check the session usage index and report back when a stateless route increments the index, wdyt?
+That would not be enough to know where the session was used, but that could be improved separately when resolving https://github.com/orgs/symfony/projects/1#card-30499423
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-02-15T14:26:40Z
+
+Yes it could be great, I'll give it a try
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-02-16T09:47:45Z
+
+I had tried this approach but something came up to me.
+Using this implementation, I think that we won't be able to prevent session start and usage as we are just reporting back. Therefore maybe session data could have been accessed or updated even if we report back session usage.
+Do you see ?
+But maybe I didn't get fully what you wanted to mean
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-02-18T07:58:15Z
+
+@nicolas-grekas I updated code according to your approach.
+Indeed the code is much cleaner, thanks !
+
+But what should we do when session is used in a stateless mode ? Should we throw an exception ? Just log it ? Or even make that behavior configurable ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-18T08:22:57Z
+
+Throw when no logger is passed, log when one is - and pass one when kernel.debug=false in the DI extension?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-02-18T12:28:32Z
+
+Ok, so now if debug is enabled, this will throw an exception. If not, it'll log a warning.

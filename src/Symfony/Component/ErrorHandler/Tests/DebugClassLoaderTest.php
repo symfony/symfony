@@ -325,6 +325,7 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $this->assertSame([
+            'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticReturningMethod()".',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::sameLineInterfaceMethodNoBraces()".',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::newLineInterfaceMethod()": Some description!',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::newLineInterfaceMethodNoBraces()": Description.',

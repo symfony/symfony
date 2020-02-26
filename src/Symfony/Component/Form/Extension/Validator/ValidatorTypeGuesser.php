@@ -43,8 +43,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
-        return $this->guess($class, $property, function (Constraint $constraint) use ($class) {
-            return $this->guessRequiredForConstraint($constraint, $class);
+        return $this->guess($class, $property, function (Constraint $constraint) {
+            return $this->guessRequiredForConstraint($constraint);
         // If we don't find any constraint telling otherwise, we can assume
         // that a field is not required (with LOW_CONFIDENCE)
         }, false);
@@ -168,16 +168,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\NotNull':
             case 'Symfony\Component\Validator\Constraints\NotBlank':
             case 'Symfony\Component\Validator\Constraints\IsTrue':
-                $groups = ['Default'];
-
-                if (\func_num_args() > 1 && $class = func_get_arg(1)) {
-                    $classParts = explode('\\', $class);
-                    $groups[] = end($classParts);
-                }
-
-                if (array_intersect($constraint->groups, $groups)) {
-                    return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
-                }
+                return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
         }
 
         return null;
@@ -272,7 +263,10 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         if ($classMetadata instanceof ClassMetadataInterface && $classMetadata->hasPropertyMetadata($property)) {
             foreach ($classMetadata->getPropertyMetadata($property) as $memberMetadata) {
                 foreach ($memberMetadata->getConstraints() as $constraint) {
-                    if ($guess = $closure($constraint)) {
+                    $groups = [Constraint::DEFAULT_GROUP];
+                    $classParts = explode('\\', $class);
+                    $groups[] = end($classParts);
+                    if (array_intersect($constraint->groups, $groups) && $guess = $closure($constraint)) {
                         $guesses[] = $guess;
                     }
                 }

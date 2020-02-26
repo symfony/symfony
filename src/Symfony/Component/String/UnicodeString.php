@@ -243,7 +243,7 @@ class UnicodeString extends AbstractUnicodeString
                 $tail = substr($tail, \strlen($slice) + \strlen($from));
             }
 
-            $str->string = $result .= $tail;
+            $str->string = $result.$tail;
             normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
 
             if (false === $str->string) {

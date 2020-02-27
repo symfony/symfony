@@ -1028,7 +1028,7 @@ HTML;
         $this->assertEquals('2', $elementsInBetween->eq(0)->text());
 
         /**
-         * Using last element as stating point
+         * Using last element as stating point.
          */
         $startElement = $crawler->filter('#five');
         $finalElement = $crawler->filter('#three')->getNode(0);
@@ -1078,7 +1078,7 @@ HTML;
         $this->assertEquals('4', $elementsInBetween->eq(0)->text());
 
         /**
-         * Using first element as stating point
+         * Using first element as stating point.
          */
         $startElement = $crawler->filter('#one');
         $finalElement = $crawler->filter('#three')->getNode(0);

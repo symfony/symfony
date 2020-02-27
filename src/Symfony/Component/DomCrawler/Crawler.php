@@ -471,7 +471,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns the next siblings nodes of the current selection
      * until a provided node. Excluding current and final node.
      *
-     * @param \DOMNode $finalNode
+     * @param \DOMNode $finalNode Final sibling node.
      * @return static
      *
      * @throws \InvalidArgumentException
@@ -488,7 +488,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $nodes = [];
         $siblingIndex = 0;
 
-        while($siblingIndex < $siblingCount){
+        while ($siblingIndex < $siblingCount) {
             $siblingNode = $siblings->eq($siblingIndex)->getNode(0);
 
             if ($siblingNode === $finalNode) {
@@ -496,7 +496,7 @@ class Crawler implements \Countable, \IteratorAggregate
             }
 
             $nodes[] = $siblingNode;
-            $siblingIndex++;
+            ++$siblingIndex;
         }
 
         return $this->createSubCrawler($nodes);
@@ -522,7 +522,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns the previous siblings nodes of the current selection
      * until a provided node. Excluding current and final node.
      *
-     * @param \DOMNode $finalNode
+     * @param \DOMNode $finalNode Final sibling node.
      * @return static
      *
      * @throws \InvalidArgumentException
@@ -539,7 +539,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $nodes = [];
         $siblingIndex = 0;
 
-        while($siblingIndex < $siblingCount){
+        while ($siblingIndex < $siblingCount) {
             $siblingNode = $siblings->eq($siblingIndex)->getNode(0);
 
             if ($siblingNode === $finalNode) {
@@ -547,7 +547,7 @@ class Crawler implements \Countable, \IteratorAggregate
             }
 
             $nodes[] = $siblingNode;
-            $siblingIndex++;
+            ++$siblingIndex;
         }
 
         return $this->createSubCrawler($nodes);

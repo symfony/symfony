@@ -1004,6 +1004,38 @@ HTML;
         }
     }
 
+    public function testNextUntil()
+    {
+        $html = <<<"HTML"
+        <html>
+            <body>
+                <ul id='list'>
+                    <li id='one'>1</li>
+                    <li id='two'>2</li>
+                    <li id='three'>3</li>
+                    <li id='four'>4</li>
+                    <li id='five'>5</li>
+                </ul>
+            </body>
+        </div>
+        HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $startElement = $crawler->filter('#one');
+        $finalElement = $crawler->filter('#five')->getNode(0);
+        $elementsInBetween = $startElement->nextUntil($finalElement);
+        $this->assertEquals(3, $elementsInBetween->count());
+        $this->assertEquals('2', $elementsInBetween->eq(0)->text());
+
+        /**
+         * Using last element as stating point
+         */
+        $startElement = $crawler->filter('#five');
+        $finalElement = $crawler->filter('#three')->getNode(0);
+        $elementsInBetween = $startElement->nextUntil($finalElement);
+        $this->assertEquals(0, $elementsInBetween->count());
+    }
+
     public function testPreviousAll()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(2);

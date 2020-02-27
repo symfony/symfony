@@ -519,6 +519,41 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns the previous siblings nodes of the current selection
+     * until a provided node. Excluding current and final node.
+     *
+     * @param \DOMNode $finalNode
+     * @return static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function previousUntil(\DOMNode $finalNode): self
+    {
+        if (!$this->nodes) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $siblings = $this->previousAll();
+        $siblingCount = $siblings->count();
+
+        $nodes = [];
+        $siblingIndex = 0;
+
+        while($siblingIndex < $siblingCount){
+            $siblingNode = $siblings->eq($siblingIndex)->getNode(0);
+
+            if ($siblingNode === $finalNode) {
+                break;
+            }
+
+            $nodes[] = $siblingNode;
+            $siblingIndex++;
+        }
+
+        return $this->createSubCrawler($nodes);
+    }
+
+    /**
      * Returns the parents nodes of the current selection.
      *
      * @return static

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-26T11:04:51Z
+
+Can you please add a test case that showcases this capability?
+There is a drawback for DX here: IDEs won't be able to provide autocompletion anymore. How bad is that?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-26T17:00:35Z
+
+> IDEs won't be able to provide autocompletion anymore. How bad is that?
+
+I noticed this PHPDoc problem thanks to a PHPStorm warning: `Expected parameter of type 'array', '\Symfony\Component\DomCrawler\Field\FormField' provided`. We can't keep supporting autocompletion and fix the false warning.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-27T06:03:44Z
+
+IMHO, autocompletion wins over IDE false warnings.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-27T06:37:33Z
+
+Actually I tested it and autocompletion still works. The result is considered `FormField` OR `array`. So there is autocompletion for `FormField` method and no warning if used as array.

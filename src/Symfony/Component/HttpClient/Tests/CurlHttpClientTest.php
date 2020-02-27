@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Psr\Log\AbstractLogger;
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -151,6 +152,54 @@ class CurlHttpClientTest extends HttpClientTestCase
         static::$vulcainStarted = true;
 
         return $client;
+    }
+
+    public function testClosedResourceOnStream()
+    {
+        $body = \fopen('php://temp', 'rw+');
+        fwrite($body, 'some content');
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('PUT', 'http://localhost:8057/103', ['body' => $body]);
+        \fclose($body);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('The body resource has been closed while processing "http://localhost:8057/103"');
+
+        foreach ($client->stream($response) as $chunk) {
+
+        }
+    }
+
+    public function testClosedResourceOnDestruct()
+    {
+        $body = \fopen('php://temp', 'rw+');
+        fwrite($body, 'some content');
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('PUT', 'http://localhost:8057/103', ['body' => $body]);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('The body resource has been closed while processing "http://localhost:8057/103"');
+
+        $client->stream($response);
+        \fclose($body);
+        unset($response);
+    }
+
+    public function testClosedResourceOnFetch()
+    {
+        $body = \fopen('php://temp', 'rw+');
+        fwrite($body, 'some content');
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('PUT', 'http://localhost:8057/103', ['body' => $body]);
+        \fclose($body);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('The body resource has been closed while processing "http://localhost:8057/103"');
+
+        $response->getStatusCode();
     }
 }
 

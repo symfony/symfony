@@ -119,6 +119,9 @@ final class CurlResponse implements ResponseInterface
 
         // Schedule the request in a non-blocking way
         $multi->openHandles[$id] = [$ch, $options];
+        if (is_resource($options['body'] ?? null)) {
+            $multi->openResources[$id] = [$ch, $options['body']];
+        }
         curl_multi_add_handle($multi->handle, $ch);
     }
 
@@ -200,7 +203,7 @@ final class CurlResponse implements ResponseInterface
     private function close(): void
     {
         $this->inflate = null;
-        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
+        unset($this->multi->openHandles[$this->id], $this->multi->openResources[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_setopt($this->handle, CURLOPT_PRIVATE, '_0');
 
         if (self::$performing) {
@@ -253,8 +256,7 @@ final class CurlResponse implements ResponseInterface
 
         try {
             self::$performing = true;
-            $active = 0;
-            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+            self::multiExec($multi);
 
             while ($info = curl_multi_info_read($multi->handle)) {
                 $result = $info['result'];
@@ -280,6 +282,36 @@ final class CurlResponse implements ResponseInterface
             }
         } finally {
             self::$performing = false;
+        }
+    }
+
+
+    private static function multiExec(CurlClientState $multi): void
+    {
+        $active = 0;
+
+        if (!$multi->openResources) {
+            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+            return;
+        }
+
+        set_error_handler(static function ($t, $m) use ($multi) {
+            foreach ($multi->openResources as [$ch, $resource]){
+                if (gettype($resource) === 'resource (closed)') {
+                    $multi->handlesActivity[(int) $ch][] = null;
+                    $multi->handlesActivity[(int) $ch][] = new TransportException(sprintf('The body resource has been closed while processing "%s".', curl_getinfo($ch, CURLINFO_EFFECTIVE_URL)));
+
+                    curl_setopt_array($ch, [
+                        CURLOPT_INFILE => null,
+                    ]);
+                }
+            }
+        });
+
+        try {
+            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+        } finally {
+            restore_error_handler();
         }
     }
 

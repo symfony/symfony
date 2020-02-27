@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Component\HttpClient\Internal\PushedResponse;
 use Symfony\Component\HttpClient\Response\CurlResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Component\String\Exception\RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -322,10 +323,38 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of CurlResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
-        $active = 0;
-        while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+        self::multiExec($this->multi);
 
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
+    }
+
+    private static function multiExec(CurlClientState $multi): void
+    {
+        $active = 0;
+
+        if (!$multi->openResources) {
+            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+            return;
+        }
+
+        set_error_handler(static function ($t, $m) use ($multi) {
+            foreach ($multi->openResources as [$ch, $resource]){
+                if (gettype($resource) === 'resource (closed)') {
+                    $multi->handlesActivity[(int) $ch][] = null;
+                    $multi->handlesActivity[(int) $ch][] = new TransportException(sprintf('The body resource has been closed while processing "%s".', curl_getinfo($ch, CURLINFO_EFFECTIVE_URL)));
+
+                    curl_setopt_array($ch, [
+                        CURLOPT_INFILE => null,
+                    ]);
+                }
+            }
+        });
+
+        try {
+            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function reset()
@@ -345,8 +374,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 curl_multi_setopt($this->multi->handle, CURLMOPT_PUSHFUNCTION, null);
             }
 
-            $active = 0;
-            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+            self::multiExec($this->multi);
         }
 
         foreach ($this->multi->openHandles as [$ch]) {

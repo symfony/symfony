@@ -84,15 +84,6 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function guessRequiredProviderWithGroup()
-    {
-        return [
-            [new NotBlank(['groups' => ['Default']]), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new NotBlank(['groups' => ['ValidatorTypeGuesserTest_TestClass']]), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new NotBlank(['groups' => ['foo']]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
-        ];
-    }
-
     /**
      * @dataProvider guessRequiredProviderWithGroup
      */
@@ -102,6 +93,15 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, $constraint);
 
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
+    }
+
+    public function guessRequiredProviderWithGroup()
+    {
+        return [
+            [new NotBlank(['groups' => ['Default']]), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
+            [new NotBlank(['groups' => ['ValidatorTypeGuesserTest_TestClass']]), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
+            [new NotBlank(['groups' => ['foo']]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+        ];
     }
 
     public function testGuessRequiredReturnsFalseForUnmappedProperties()

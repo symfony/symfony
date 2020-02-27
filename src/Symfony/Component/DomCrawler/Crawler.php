@@ -471,13 +471,13 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns the next siblings nodes of the current selection
      * until a provided node. Excluding current and final node.
      *
-     * @param \DOMNode $finalNode Final sibling node.
+     * @param \DOMNode $finalNode Final sibling node
+     *
      * @return static
      *
      * @throws \InvalidArgumentException
      */
-    public function nextUntil(\DOMNode $finalNode): self
-    {
+    public function nextUntil(\DOMNode $finalNode){
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
@@ -522,12 +522,13 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns the previous siblings nodes of the current selection
      * until a provided node. Excluding current and final node.
      *
-     * @param \DOMNode $finalNode Final sibling node.
+     * @param \DOMNode $finalNode Final sibling node
+     *
      * @return static
      *
      * @throws \InvalidArgumentException
      */
-    public function previousUntil(\DOMNode $finalNode): self
+    public function previousUntil(\DOMNode $finalNode)
     {
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');

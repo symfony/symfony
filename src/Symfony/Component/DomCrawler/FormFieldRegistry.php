@@ -70,7 +70,7 @@ class FormFieldRegistry
      *
      * @param string $name The fully qualified name of the field
      *
-     * @return mixed The value of the field
+     * @return FormField|FormField[]|FormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

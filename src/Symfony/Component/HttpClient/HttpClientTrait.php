@@ -271,8 +271,31 @@ trait HttpClientTrait
             return http_build_query($body, '', '&', PHP_QUERY_RFC1738);
         }
 
+        if (\is_string($body)) {
+            return $body;
+        }
+
+        $generatorToCallable = static function (\Generator $body): \Closure {
+            return static function () use ($body) {
+                while ($body->valid()) {
+                    $chunk = $body->current();
+                    $body->next();
+
+                    if ('' !== $chunk) {
+                        return $chunk;
+                    }
+                }
+
+                return '';
+            };
+        };
+
+        if ($body instanceof \Generator) {
+            return $generatorToCallable($body);
+        }
+
         if ($body instanceof \Traversable) {
-            $body = function () use ($body) { yield from $body; };
+            return $generatorToCallable((static function ($body) { yield from $body; })($body));
         }
 
         if ($body instanceof \Closure) {
@@ -281,24 +304,14 @@ trait HttpClientTrait
 
             if ($r->isGenerator()) {
                 $body = $body(self::$CHUNK_SIZE);
-                $body = function () use ($body) {
-                    while ($body->valid()) {
-                        $chunk = $body->current();
-                        $body->next();
 
-                        if ('' !== $chunk) {
-                            return $chunk;
-                        }
-                    }
-
-                    return '';
-                };
+                return $generatorToCallable($body);
             }
 
             return $body;
         }
 
-        if (!\is_string($body) && !\is_array(@stream_get_meta_data($body))) {
+        if (!\is_array(@stream_get_meta_data($body))) {
             throw new InvalidArgumentException(sprintf('Option "body" must be string, stream resource, iterable or callable, %s given.', \is_resource($body) ? get_resource_type($body) : \gettype($body)));
         }
 

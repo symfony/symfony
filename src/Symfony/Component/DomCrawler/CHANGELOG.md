@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+* Added `Crawler::previousUntil()` function for sibling navigation
+* Added `Crawler::nextUntil()` function for sibling navigation
+
 5.1.0
 -----
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
+use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
@@ -41,6 +42,8 @@ class GetAttrNodeTest extends AbstractNodeTest
 
             ['$foo->foo(["b" => "a", 0 => "b"])', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
             ['$foo[$index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['(\is_object($foo) ? $foo->bar : null)', new GetAttrNode(new NameNode('foo'), new ConstantNode('bar'), new ArgumentsNode(), GetAttrNode::PROPERTY_CALL, true), ['foo' => new Obj()]],
+            ['(\is_object($foo) && \is_callable([$foo, "bar"])) ? $foo->bar() : null', new GetAttrNode(new NameNode('foo'), new ConstantNode('bar'), new ArgumentsNode(), GetAttrNode::METHOD_CALL, true), ['foo' => new Obj()]]
         ];
     }
 

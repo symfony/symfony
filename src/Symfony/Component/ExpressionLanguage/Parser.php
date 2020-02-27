@@ -337,6 +337,15 @@ class Parser
                 $token = $this->stream->current;
                 $this->stream->next();
 
+                $safeNavigation = false;
+
+                // Check for safe navigation operator
+                if ('?' === $token->value) {
+                    $safeNavigation = true;
+                    $token = $this->stream->current;
+                    $this->stream->next();
+                }
+
                 if (
                     Token::NAME_TYPE !== $token->type
                     &&
@@ -368,7 +377,11 @@ class Parser
                     $type = Node\GetAttrNode::PROPERTY_CALL;
                 }
 
-                $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
+                if ($node instanceof Node\GetAttrNode && $node->isSafeNavigationEnabled()) {
+                    $safeNavigation = true;
+                }
+
+                $node = new Node\GetAttrNode($node, $arg, $arguments, $type, $safeNavigation);
             } elseif ('[' === $token->value) {
                 $this->stream->next();
                 $arg = $this->parseExpression();

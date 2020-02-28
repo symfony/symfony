@@ -49,3 +49,8 @@ Routing
  * Removed `RouteCollectionBuilder`.
  * Added argument `$priority` to `RouteCollection::add()`
  * Removed the `RouteCompiler::REGEX_DELIMITER` constant
+
+Security
+--------
+
+ * Removed `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute

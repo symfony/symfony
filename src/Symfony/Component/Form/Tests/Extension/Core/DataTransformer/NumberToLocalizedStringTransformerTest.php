@@ -370,7 +370,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertSame($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformDoesNotRoundIfNoScale()

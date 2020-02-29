@@ -66,7 +66,7 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualifed name and its children.
      *
-     * @return mixed The value of the field
+     * @return FormField|FormField[]|FormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

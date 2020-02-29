@@ -279,7 +279,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
                     break;
             }
 
-            $number /= $roundingCoef;
+            $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
         }
 
         return $number;

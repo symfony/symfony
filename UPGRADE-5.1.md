@@ -61,6 +61,25 @@ Routing
  * Added argument `$priority` to `RouteCollection::add()`
  * Deprecated the `RouteCompiler::REGEX_DELIMITER` constant
 
+Security
+--------
+
+ * Deprecated `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute.
+
+   *before*
+   ```twig
+   {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+       <a href="">Exit impersonation</a>
+   {% endif %}
+   ```
+
+   *after*
+   ```twig
+   {% if is_granted('IS_IMPERSONATOR') %}
+       <a href="">Exit impersonation</a>
+   {% endif %}
+   ```
+
 Yaml
 ----
 

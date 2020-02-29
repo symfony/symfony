@@ -7,6 +7,36 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.38 (2020-02-29)
+
+ * bug #35781 [Form] NumberToLocalizedStringTransformer return int if scale = 0 (VincentLanglet)
+ * bug #35846 [Serializer] prevent method calls on null values (xabbuh)
+ * bug #35839 [Security] Allow switching to another user when already switched (chalasr)
+ * bug #35817 [DoctrineBridge] Use new Types::* constants and support new json type (fancyweb)
+ * bug #35707 [ExpressionLanguage] Fixed collisions of character operators with object properties (Andrej-in-ua)
+ * bug #35794 [DoctrineBridge][DoctrineExtractor] Fix indexBy with custom and some core types (fancyweb)
+ * bug #35787 [PhpUnitBridge] Use trait instead of extending deprecated class (marcello-moenkemeyer)
+ * bug #35792 [Security] Prevent TypeError in case RememberMetoken has no attached user (nikophil)
+ * bug #35772 [Config] don't throw on missing excluded paths (nicolas-grekas)
+ * bug #35774 [Ldap] force default network timeout (nicolas-grekas)
+ * bug #35702 [VarDumper] fixed DateCaster not displaying additional fields (Makdessi Alex)
+ * bug #35722 [HttpKernel] Set previous exception when rethrown from controller resolver (danut007ro)
+ * bug #35718 [HttpKernel] fix registering DebugHandlersListener regardless of the PHP_SAPI (nicolas-grekas)
+ * bug #35693 [Finder] Fix unix root dir issue (chr-hertel)
+ * bug #35696 [Console] Don't load same-namespace alternatives on exact match (chalasr)
+ * bug #35605 [HttpFoundation][FrameworkBundle] fix support for samesite in session cookies (fabpot)
+ * bug #35609 [DoctrineBridge] Fixed submitting ids with query limit or offset (HeahDude)
+ * bug #34123 [Form] Fix handling of empty_data's \Closure value in Date/Time form types (yceruto)
+ * bug #35546 [Validator] check for __get method existence if property is uninitialized (alekitto)
+ * bug #35332 [Yaml][Inline] Fail properly on empty object tag and empty const tag (fancyweb)
+ * bug #35489 [PhpUnitBridge] Fix running skipped tests expecting only deprecations (chalasr)
+ * bug #35161 [FrameworkBundle] Check non-null type for numeric type (Arman-Hosseini)
+ * bug #34059 [DomCrawler] Skip disabled fields processing in Form (sbogx)
+ * bug #34114 [Console] SymonfyStyle - Check value isset to avoid PHP notice (leevigraham)
+ * bug #35557 [Config] dont catch instances of Error (nicolas-grekas)
+ * bug #35532 [Validator] fix access to uninitialized property when getting value (greedyivan)
+ * bug #35305 [HttpKernel] Fix stale-if-error behavior, add tests (mpdude)
+
 * 3.4.37 (2020-01-21)
 
  * bug #35065 [Security] Use supportsClass in addition to UnsupportedUserException (linaori)

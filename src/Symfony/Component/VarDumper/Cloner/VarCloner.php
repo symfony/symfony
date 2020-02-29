@@ -28,7 +28,6 @@ class VarCloner extends AbstractCloner
         $pos = 0;                       // Number of cloned items past the minimum depth
         $refsCounter = 0;               // Hard references counter
         $queue = [[$var]];    // This breadth-first queue is the return value
-        $indexedArrays = [];       // Map of queue indexes that hold numerically indexed arrays
         $hardRefs = [];            // Map of original zval ids to stub objects
         $objRefs = [];             // Map of original object handles to their stub object counterpart
         $objects = [];             // Keep a ref to objects to ensure their handle cannot be reused while cloning

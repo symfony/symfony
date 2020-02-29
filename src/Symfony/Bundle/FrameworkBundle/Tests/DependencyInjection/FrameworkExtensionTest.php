@@ -629,6 +629,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('redis://127.0.0.1:6379/messages', $transportArguments[0]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+
+        $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
+        $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
+        $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
+        $this->assertSame(100, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(3));
+
+        $this->assertEquals(new Reference('messenger.transport.failed'), $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0));
     }
 
     public function testMessengerRouting()

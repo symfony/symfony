@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -368,7 +369,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $removeEmptyTags = $this->context[self::REMOVE_EMPTY_TAGS] ?? $this->defaultContext[self::REMOVE_EMPTY_TAGS] ?? false;
         $encoderIgnoredNodeTypes = $this->context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
 
-        if (\is_array($data) || ($data instanceof \Traversable && !$this->serializer->supportsNormalization($data, $this->format))) {
+        if (\is_array($data) || ($data instanceof \Traversable && (null === $this->serializer || !$this->serializer->supportsNormalization($data, $this->format)))) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
                 if (0 === strpos($key, '@') && $this->isElementNameValid($attributeName = substr($key, 1))) {
@@ -407,6 +408,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         if (\is_object($data)) {
+            if (null === $this->serializer) {
+                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used with object data.', __METHOD__));
+            }
+
             $data = $this->serializer->normalize($data, $this->format, $this->context);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $xmlRootNodeName);
@@ -469,6 +474,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (\is_object($val)) {
+            if (null === $this->serializer) {
+                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used with object data.', __METHOD__));
+            }
+
             return $this->selectNodeType($node, $this->serializer->normalize($val, $this->format, $this->context));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);

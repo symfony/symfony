@@ -81,9 +81,7 @@
             <tag name="kernel.reset" method="reset" />
         </service>
 
-        <service id="messenger.transport.sqs.factory" class="Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory">
-            <tag name="messenger.transport_factory" />
-        </service>
+        <service id="messenger.transport.sqs.factory" class="Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory"/>
 
         <!-- retry -->
         <service id="messenger.retry_strategy_locator">

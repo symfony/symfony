@@ -414,6 +414,7 @@
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="failure-transport" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -444,10 +445,19 @@
     <xsd:complexType name="messenger_transport">
         <xsd:sequence>
             <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="retry-strategy" type="messenger_retry_strategy" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="serializer" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_retry_strategy">
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="max-retries" type="xsd:integer" />
+        <xsd:attribute name="delay" type="xsd:integer" />
+        <xsd:attribute name="multiplier" type="xsd:float" />
+        <xsd:attribute name="max-delay" type="xsd:float" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_bus">

@@ -43,6 +43,7 @@ class PhpFileLoaderTest extends TestCase
         foreach ($routes as $route) {
             $this->assertSame('/blog/{slug}', $route->getPath());
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertTrue($route->getDefault('_stateless'));
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
@@ -109,9 +110,11 @@ class PhpFileLoaderTest extends TestCase
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
         $localeRoute->setDefault('_locale', 'g_locale');
         $localeRoute->setDefault('_format', 'g_format');
+        $localeRoute->setDefault('_stateless', true);
         $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
         $formatRoute->setDefault('_locale', 'g_locale');
         $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('_stateless', true);
         $formatRoute->setDefault('specific', 'imported');
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.php'));
@@ -172,7 +175,7 @@ class PhpFileLoaderTest extends TestCase
             ->setCondition('abc')
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(['_controller' => 'foo:act'])
+            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
             ->setRequirements(['id' => '\d+'])

@@ -17,7 +17,6 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * XmlFileLoader loads XML routing files.
@@ -299,6 +298,15 @@ class XmlFileLoader extends FileLoader
         }
         if ($node->hasAttribute('utf8')) {
             $options['utf8'] = XmlUtils::phpize($node->getAttribute('utf8'));
+        }
+        if ($stateless = $node->getAttribute('stateless')) {
+            if (isset($defaults['_stateless'])) {
+                $name = $node->hasAttribute('id') ? sprintf('"%s"', $node->getAttribute('id')) : sprintf('the "%s" tag', $node->tagName);
+
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for %s.', $path, $name));
+            }
+
+            $defaults['_stateless'] = XmlUtils::phpize($stateless);
         }
 
         return [$defaults, $requirements, $options, $condition, $paths, $prefixes];

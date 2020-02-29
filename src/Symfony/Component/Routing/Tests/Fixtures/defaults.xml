@@ -4,5 +4,5 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="defaults" path="/defaults" locale="en" format="html" />
+    <route id="defaults" path="/defaults" locale="en" format="html" stateless="true" />
 </routes>

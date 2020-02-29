@@ -160,4 +160,16 @@ trait RouteTrait
 
         return $this;
     }
+
+    /**
+     * Adds the "_stateless" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function stateless(bool $stateless = true): self
+    {
+        $this->route->addDefaults(['_stateless' => $stateless]);
+
+        return $this;
+    }
 }

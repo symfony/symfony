@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  */
 class AuthenticatorManagerListener extends AbstractListener
 {
-    private $authenticationManager;
+    private $authenticatorManager;
     private $authenticatorHandler;
     private $authenticators;
     protected $providerKey;
@@ -45,7 +45,7 @@ class AuthenticatorManagerListener extends AbstractListener
      */
     public function __construct(AuthenticationManagerInterface $authenticationManager, AuthenticatorHandler $authenticatorHandler, iterable $authenticators, string $providerKey, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null)
     {
-        $this->authenticationManager = $authenticationManager;
+        $this->authenticatorManager = $authenticationManager;
         $this->authenticatorHandler = $authenticatorHandler;
         $this->authenticators = $authenticators;
         $this->providerKey = $providerKey;
@@ -157,7 +157,7 @@ class AuthenticatorManagerListener extends AbstractListener
             }
             // pass the token into the AuthenticationManager system
             // this indirectly calls AuthenticatorManager::authenticate()
-            $token = $this->authenticationManager->authenticate($token);
+            $token = $this->authenticatorManager->authenticate($token);
 
             if (null !== $this->logger) {
                 $this->logger->info('Authenticator successful!', ['token' => $token, 'authenticator' => \get_class($authenticator)]);

@@ -40,14 +40,16 @@ class AuthenticatorManager implements AuthenticationManagerInterface
     private $authenticators;
     private $eventDispatcher;
     private $eraseCredentials;
+    private $providerKey;
 
     /**
      * @param AuthenticatorInterface[] $authenticators The authenticators, with keys that match what's passed to AuthenticatorManagerListener
      */
-    public function __construct(iterable $authenticators, EventDispatcherInterface $eventDispatcher, bool $eraseCredentials = true)
+    public function __construct(iterable $authenticators, EventDispatcherInterface $eventDispatcher, string $providerKey, bool $eraseCredentials = true)
     {
         $this->authenticators = $authenticators;
         $this->eventDispatcher = $eventDispatcher;
+        $this->providerKey = $providerKey;
         $this->eraseCredentials = $eraseCredentials;
     }
 

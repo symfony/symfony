@@ -23,6 +23,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -278,19 +279,16 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $mapDef->replaceArgument(0, ServiceLocatorTagPass::register($container, $contextRefs));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
 
-        // add authentication providers to authentication manager
-        $authenticationProviders = array_map(function ($id) {
-            return new Reference($id);
-        }, array_unique($authenticationProviders));
-        $authenticationManagerId = 'security.authentication.manager.provider';
-        if ($this->authenticatorManagerEnabled) {
-            $authenticationManagerId = 'security.authentication.manager.authenticator';
-            $container->setAlias('security.authentication.manager', new Alias($authenticationManagerId));
+        if (!$this->authenticatorManagerEnabled) {
+            // add authentication providers to authentication manager
+            $authenticationProviders = array_map(function ($id) {
+                return new Reference($id);
+            }, array_unique($authenticationProviders));
+
+            $container
+                ->getDefinition('security.authentication.manager')
+                ->replaceArgument(0, new IteratorArgument($authenticationProviders));
         }
-        $container
-            ->getDefinition($authenticationManagerId)
-            ->replaceArgument(0, new IteratorArgument($authenticationProviders))
-        ;
 
         // register an autowire alias for the UserCheckerInterface if no custom user checker service is configured
         if (!$customUserChecker) {
@@ -441,17 +439,28 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
 
         if ($this->authenticatorManagerEnabled) {
+            // authenticator manager
+            $authenticators = array_map(function ($id) {
+                return new Reference($id);
+            }, $firewallAuthenticationProviders);
+            $container
+                ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authentication.manager.authenticator'))
+                ->replaceArgument(0, $authenticators)
+            ;
+
+            $managerLocator = $container->getDefinition('security.authenticator.managers_locator');
+            $managerLocator->replaceArgument(0, array_merge($managerLocator->getArgument(0), [$id => new ServiceClosureArgument(new Reference($managerId))]));
+
             // authenticator manager listener
             $container
                 ->setDefinition('security.firewall.authenticator.'.$id.'.locator', new ChildDefinition('security.firewall.authenticator.locator'))
-                ->setArguments([array_map(function ($id) {
-                    return new Reference($id);
-                }, $firewallAuthenticationProviders)])
+                ->setArguments([$authenticators])
                 ->addTag('container.service_locator')
             ;
 
             $container
                 ->setDefinition('security.firewall.authenticator.'.$id, new ChildDefinition('security.firewall.authenticator'))
+                ->replaceArgument(0, new Reference($managerId))
                 ->replaceArgument(2, new Reference('security.firewall.authenticator.'.$id.'.locator'))
                 ->replaceArgument(3, $id)
             ;

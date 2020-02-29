@@ -6,13 +6,28 @@
     <services>
         <!-- Manager -->
 
-        <service id="security.authentication.manager.authenticator" class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager">
+        <service id="security.authentication.manager.authenticator"
+                 class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager"
+                 abstract="true"
+        >
             <argument type="abstract">authenticators</argument>
             <argument type="service" id="event_dispatcher" />
             <argument>%security.authentication.manager.erase_credentials%</argument>
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
             </call>
+        </service>
+
+        <service id="security.authenticator.managers_locator"
+                 class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <argument type="collection" />
+        </service>
+
+        <service id="security.authentication.manager"
+                 class="Symfony\Bundle\SecurityBundle\Security\FirewallAwareAuthenticatorManager">
+            <argument type="service" id="security.firewall.map" />
+            <argument type="service" id="security.authenticator.managers_locator" />
+            <argument type="service" id="request_stack" />
         </service>
         <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
 
@@ -35,7 +50,7 @@
                  class="Symfony\Bundle\SecurityBundle\EventListener\LazyAuthenticatorManagerListener"
                  abstract="true">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.authentication.manager" />
+            <argument type="abstract">authenticator manager</argument>
             <argument type="service" id="security.authenticator_handler" />
             <argument/> <!-- authenticator locator -->
             <argument/> <!-- provider key -->

@@ -191,7 +191,12 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         } elseif ($value instanceof Parameter) {
             $value = $this->container->getParameter($value);
         } elseif ($value instanceof Expression) {
-            $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this->container]);
+            try {
+                $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this->container]);
+            } catch (\Exception $e) {
+                // If a service from the expression cannot be fetched from the container, we skip the validation.
+                return;
+            }
         } elseif (\is_string($value)) {
             if ('%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
                 // Only array parameters are not inlined when dumped.

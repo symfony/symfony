@@ -67,13 +67,9 @@
             <argument type="tagged_iterator" tag="messenger.transport_factory" />
         </service>
 
-        <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
-            <tag name="messenger.transport_factory" />
-        </service>
+        <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory"/>
 
-        <service id="messenger.transport.redis.factory" class="Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory">
-            <tag name="messenger.transport_factory" />
-        </service>
+        <service id="messenger.transport.redis.factory" class="Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory"/>
 
         <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">
             <tag name="messenger.transport_factory" />

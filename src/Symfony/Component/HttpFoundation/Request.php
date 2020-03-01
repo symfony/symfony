@@ -1021,7 +1021,7 @@ class Request
      */
     public function getUri()
     {
-        if (null !== $qs = $this->getQueryString()) {
+        if (null !== ($qs = $this->getQueryString())) {
             $qs = '?'.$qs;
         }
 
@@ -1300,7 +1300,7 @@ class Request
     public function getFormat(?string $mimeType)
     {
         $canonicalMimeType = null;
-        if (false !== $pos = strpos($mimeType, ';')) {
+        if (false !== ($pos = strpos($mimeType, ';'))) {
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 
@@ -1557,7 +1557,7 @@ class Request
      */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
-        if (null !== $this->preferredFormat || null !== $this->preferredFormat = $this->getRequestFormat(null)) {
+        if (null !== $this->preferredFormat || null !== ($this->preferredFormat = $this->getRequestFormat(null))) {
             return $this->preferredFormat;
         }
 
@@ -1793,12 +1793,12 @@ class Request
             $requestUri = '/'.$requestUri;
         }
 
-        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
+        if ($baseUrl && null !== ($prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl))) {
             // full $baseUrl matches
             return $prefix;
         }
 
-        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.\DIRECTORY_SEPARATOR).'/')) {
+        if ($baseUrl && null !== ($prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.\DIRECTORY_SEPARATOR).'/'))) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/'.\DIRECTORY_SEPARATOR);
         }
@@ -1817,7 +1817,7 @@ class Request
         // If using mod_rewrite or ISAPI_Rewrite strip the script filename
         // out of baseUrl. $pos !== 0 makes sure it is not matching a value
         // from PATH_INFO or QUERY_STRING
-        if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
+        if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== ($pos = strpos($requestUri, $baseUrl))) && 0 !== $pos) {
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
         }
 
@@ -1862,7 +1862,7 @@ class Request
         }
 
         // Remove the query string from REQUEST_URI
-        if (false !== $pos = strpos($requestUri, '?')) {
+        if (false !== ($pos = strpos($requestUri, '?'))) {
             $requestUri = substr($requestUri, 0, $pos);
         }
         if ('' !== $requestUri && '/' !== $requestUri[0]) {

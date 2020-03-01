@@ -32,7 +32,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @final
  * @experimental in 5.1
  */
-class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements PasswordAuthenticatedInterface
+class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements PasswordAuthenticatedInterface, CsrfProtectedAuthenticatorInterface
 {
     use TargetPathTrait;
 
@@ -113,17 +113,15 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements P
         return $this->userProvider->loadUserByUsername($credentials['username']);
     }
 
-    /* @todo How to do CSRF protection?
-    public function checkCredentials($credentials, UserInterface $user): bool
+    public function getCsrfTokenId(): string
     {
-        if (null !== $this->csrfTokenManager) {
-            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $credentials['csrf_token']))) {
-                throw new InvalidCsrfTokenException('Invalid CSRF token.');
-            }
-        }
+        return $this->options['csrf_token_id'];
+    }
 
-        return $this->checkPassword($credentials, $user);
-    }*/
+    public function getCsrfToken($credentials): ?string
+    {
+        return $credentials['csrf_token'];
+    }
 
     public function createAuthenticatedToken(UserInterface $user, $providerKey): TokenInterface
     {

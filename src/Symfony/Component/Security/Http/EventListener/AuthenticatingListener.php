@@ -41,7 +41,7 @@ class AuthenticatingListener implements EventSubscriberInterface
             $user = $event->getUser();
             $event->setCredentialsValid($this->encoderFactory->getEncoder($user)->isPasswordValid(
                 $user->getPassword(),
-                $authenticator->getPassword($event->getPreAuthenticatedToken()->getCredentials()),
+                $authenticator->getPassword($event->getCredentials()),
                 $user->getSalt()
             ));
 
@@ -58,7 +58,7 @@ class AuthenticatingListener implements EventSubscriberInterface
         }
 
         if ($authenticator instanceof CustomAuthenticatedInterface) {
-            $event->setCredentialsValid($authenticator->checkCredentials($event->getPreAuthenticatedToken()->getCredentials(), $event->getUser()));
+            $event->setCredentialsValid($authenticator->checkCredentials($event->getCredentials(), $event->getUser()));
 
             return;
         }

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 /**
  * A base class to make form login authentication easier!
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+ * @author Ryan Weaver <ryan@symfonycasts.com>
  *
  * @experimental in 5.1
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\GuardHandler;
+use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -47,7 +47,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->with($this->equalTo($loginEvent), $this->equalTo(SecurityEvents::INTERACTIVE_LOGIN))
         ;
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $handler->authenticateWithToken($this->token, $this->request);
     }
 
@@ -60,7 +60,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->with($this->request, $this->token, $providerKey)
             ->willReturn($response);
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationSuccess($this->token, $this->request, $this->guardAuthenticator, $providerKey);
         $this->assertSame($response, $actualResponse);
     }
@@ -79,7 +79,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->with($this->request, $authException)
             ->willReturn($response);
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, 'firewall_provider_key');
         $this->assertSame($response, $actualResponse);
     }
@@ -100,7 +100,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->with($this->request, $authException)
             ->willReturn($response);
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, $actualProviderKey);
         $this->assertSame($response, $actualResponse);
     }
@@ -124,7 +124,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->method('setToken')
             ->with($this->token);
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $handler->authenticateWithToken($this->token, $this->request);
     }
 
@@ -136,7 +136,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->method('onAuthentication')
             ->with($this->request, $this->token);
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
         $handler->authenticateWithToken($this->token, $this->request);
     }
@@ -148,7 +148,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->sessionStrategy->expects($this->never())
             ->method('onAuthentication');
 
-        $handler = new GuardHandler($this->tokenStorage, $this->dispatcher, ['some_provider_key']);
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['some_provider_key']);
         $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
         $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
     }

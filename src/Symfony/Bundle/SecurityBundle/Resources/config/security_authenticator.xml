@@ -6,16 +6,16 @@
     <services>
         <!-- Manager -->
 
-        <service id="security.authentication.manager.authenticator"
+        <service id="security.authenticator.manager"
                  class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager"
                  abstract="true"
         >
             <argument type="abstract">authenticators</argument>
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="event_dispatcher" />
+            <argument type="abstract">provider key</argument>
+            <argument type="service" id="logger" on-invalid="null" />
             <argument>%security.authentication.manager.erase_credentials%</argument>
-            <call method="setEventDispatcher">
-                <argument type="service" id="event_dispatcher" />
-            </call>
         </service>
 
         <service id="security.authenticator.managers_locator"
@@ -23,39 +23,22 @@
             <argument type="collection" />
         </service>
 
-        <service id="security.authentication.manager"
-                 class="Symfony\Bundle\SecurityBundle\Security\FirewallAwareAuthenticatorManager">
+        <service id="security.user_authenticator"
+                 class="Symfony\Bundle\SecurityBundle\Security\UserAuthenticator">
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="security.authenticator.managers_locator" />
             <argument type="service" id="request_stack" />
         </service>
+        <service id="Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface" alias="security.user_authenticator" />
+
+        <service id="security.authentication.manager"
+                 class="Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager"/>
         <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
 
-        <service id="security.authenticator_handler"
-                 class="Symfony\Component\Security\Http\Authentication\AuthenticatorHandler"
-        >
-            <argument type="service" id="security.token_storage" />
-            <argument type="service" id="event_dispatcher" on-invalid="null" />
-            <argument /> <!-- stateless firewall keys -->
-            <call method="setSessionAuthenticationStrategy">
-                <argument type="service" id="security.authentication.session_strategy" />
-            </call>
-        </service>
-
-        <service id="security.firewall.authenticator.locator"
-                 class="Symfony\Component\DependencyInjection\ServiceLocator"
-                 abstract="true" />
-
         <service id="security.firewall.authenticator"
-                 class="Symfony\Bundle\SecurityBundle\EventListener\LazyAuthenticatorManagerListener"
+                 class="Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener"
                  abstract="true">
-            <tag name="monolog.logger" channel="security" />
             <argument type="abstract">authenticator manager</argument>
-            <argument type="service" id="security.authenticator_handler" />
-            <argument/> <!-- authenticator locator -->
-            <argument/> <!-- provider key -->
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <!-- Listeners -->
@@ -73,6 +56,12 @@
         <service id="security.listener.user_checker" class="Symfony\Component\Security\Http\EventListener\UserCheckerListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="Symfony\Component\Security\Core\User\UserCheckerInterface" />
+        </service>
+
+        <service id="security.listener.session" class="Symfony\Component\Security\Http\EventListener\SessionStrategyListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="security.authentication.session_strategy" />
+            <argument type="abstract">stateless firewall keys</argument>
         </service>
 
         <service id="security.listener.remember_me"

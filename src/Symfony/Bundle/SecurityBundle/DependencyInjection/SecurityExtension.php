@@ -156,8 +156,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(2, $this->statelessFirewallKeys);
 
         if ($this->authenticatorManagerEnabled) {
-            $container->getDefinition('security.authenticator_handler')
-                ->replaceArgument(2, $this->statelessFirewallKeys);
+            $container->getDefinition(SessionListener::class)
+                ->replaceArgument(1, $this->statelessFirewallKeys);
         }
 
         if ($config['encoders']) {
@@ -444,8 +444,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 return new Reference($id);
             }, $firewallAuthenticationProviders);
             $container
-                ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authentication.manager.authenticator'))
+                ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
                 ->replaceArgument(0, $authenticators)
+                ->replaceArgument(3, $id)
+                ->addTag('monolog.logger', ['channel' => 'security'])
             ;
 
             $managerLocator = $container->getDefinition('security.authenticator.managers_locator');
@@ -453,16 +455,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             // authenticator manager listener
             $container
-                ->setDefinition('security.firewall.authenticator.'.$id.'.locator', new ChildDefinition('security.firewall.authenticator.locator'))
-                ->setArguments([$authenticators])
-                ->addTag('container.service_locator')
-            ;
-
-            $container
                 ->setDefinition('security.firewall.authenticator.'.$id, new ChildDefinition('security.firewall.authenticator'))
                 ->replaceArgument(0, new Reference($managerId))
-                ->replaceArgument(2, new Reference('security.firewall.authenticator.'.$id.'.locator'))
-                ->replaceArgument(3, $id)
             ;
 
             $listeners[] = new Reference('security.firewall.authenticator.'.$id);

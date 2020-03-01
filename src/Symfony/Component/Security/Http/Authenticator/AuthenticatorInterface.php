@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * The interface for all authenticators.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+ * @author Ryan Weaver <ryan@symfonycasts.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
@@ -32,6 +32,8 @@ interface AuthenticatorInterface
      * Does the authenticator support the given Request?
      *
      * If this returns false, the authenticator will be skipped.
+     *
+     * Returning null means authenticate() can be called lazily when accessing the token storage.
      */
     public function supports(Request $request): ?bool;
 

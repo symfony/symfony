@@ -19,14 +19,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 class VerifyAuthenticatorCredentialsEvent extends Event
 {
     private $authenticator;
-    private $preAuthenticatedToken;
     private $user;
+    private $credentials;
     private $credentialsValid = false;
 
-    public function __construct(AuthenticatorInterface $authenticator, TokenInterface $preAuthenticatedToken, ?UserInterface $user)
+    public function __construct(AuthenticatorInterface $authenticator, $credentials, ?UserInterface $user)
     {
         $this->authenticator = $authenticator;
-        $this->preAuthenticatedToken = $preAuthenticatedToken;
+        $this->credentials = $credentials;
         $this->user = $user;
     }
 
@@ -35,9 +35,9 @@ class VerifyAuthenticatorCredentialsEvent extends Event
         return $this->authenticator;
     }
 
-    public function getPreAuthenticatedToken(): TokenInterface
+    public function getCredentials()
     {
-        return $this->preAuthenticatedToken;
+        return $this->credentials;
     }
 
     public function getUser(): ?UserInterface

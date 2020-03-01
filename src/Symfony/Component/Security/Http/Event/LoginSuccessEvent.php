@@ -50,13 +50,18 @@ class LoginSuccessEvent extends Event
         return $this->request;
     }
 
-    public function getResponse(): ?Response
-    {
-        return $this->response;
-    }
-
     public function getProviderKey(): string
     {
         return $this->providerKey;
+    }
+
+    public function setResponse(?Response $response): void
+    {
+        $this->response = $response;
+    }
+
+    public function getResponse(): ?Response
+    {
+        return $this->response;
     }
 }

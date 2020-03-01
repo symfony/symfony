@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationToken;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
@@ -53,7 +53,7 @@ class GuardAuthenticationListenerTest extends TestCase
 
         // a clone of the token that should be created internally
         $uniqueGuardKey = 'my_firewall_0';
-        $nonAuthedToken = new PreAuthenticationToken($credentials, $uniqueGuardKey);
+        $nonAuthedToken = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
 
         $this->authenticationManager
             ->expects($this->once())
@@ -267,7 +267,7 @@ class GuardAuthenticationListenerTest extends TestCase
             ->getMock();
 
         $this->guardAuthenticatorHandler = $this->getMockBuilder(
-            'Symfony\Component\Security\Guard\GuardHandler'
+            'Symfony\Component\Security\Guard\GuardAuthenticatorHandler'
         )
             ->disableOriginalConstructor()
             ->getMock();

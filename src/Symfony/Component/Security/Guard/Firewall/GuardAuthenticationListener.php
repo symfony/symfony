@@ -19,8 +19,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\GuardHandler;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationToken as GuardPreAuthenticationGuardToken;
+use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken as GuardPreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -45,7 +45,7 @@ class GuardAuthenticationListener extends AbstractListener
      * @param string                            $providerKey         The provider (i.e. firewall) key
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
-    public function __construct(GuardHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -121,7 +121,7 @@ class GuardAuthenticationListener extends AbstractListener
     protected function executeGuardAuthenticators(array $guardAuthenticators, RequestEvent $event): void
     {
         foreach ($guardAuthenticators as $key => $guardAuthenticator) {
-            $uniqueGuardKey = $this->providerKey.'_'.$key;;
+            $uniqueGuardKey = $this->providerKey.'_'.$key;
 
             $this->executeGuardAuthenticator($uniqueGuardKey, $guardAuthenticator, $event);
 

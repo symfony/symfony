@@ -36,12 +36,11 @@ class PasswordMigratingListener implements EventSubscriberInterface
             return;
         }
 
-        $token = $event->getPreAuthenticatedToken();
-        if (null !== $password = $authenticator->getPassword($token->getCredentials())) {
+        if (null !== $password = $authenticator->getPassword($event->getCredentials())) {
             return;
         }
 
-        $user = $token->getUser();
+        $user = $event->getUser();
         if (!$user instanceof UserInterface) {
             return;
         }

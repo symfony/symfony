@@ -80,6 +80,8 @@ Security
    {% endif %}
    ```
 
+ * Deprecated `PlaintextPasswordEncoder`. Using the `UserPasswordEncoder` or any other the provided `Symfony\Component\Security\Core\Encoder`'s is highly recommended.
+
 Yaml
 ----
 

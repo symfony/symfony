@@ -321,20 +321,14 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
             $container->removeDefinition('cache.messenger.restart_workers_signal');
 
-            if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(AmqpTransportFactory::class)) {
-                if (class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.amqp.factory')->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class);
-                } else {
-                    $container->removeDefinition('messenger.transport.amqp.factory');
-                }
+            if ($container->hasDefinition('messenger.transport.amqp.factory') && class_exists(AmqpTransportFactory::class)) {
+                $container->getDefinition('messenger.transport.amqp.factory')
+                    ->addTag('messenger.transport_factory');
             }
 
-            if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(RedisTransportFactory::class)) {
-                if (class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.redis.factory')->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class);
-                } else {
-                    $container->removeDefinition('messenger.transport.redis.factory');
-                }
+            if ($container->hasDefinition('messenger.transport.redis.factory') && class_exists(RedisTransportFactory::class)) {
+                $container->getDefinition('messenger.transport.redis.factory')
+                    ->addTag('messenger.transport_factory');
             }
         }
 
@@ -1612,6 +1606,14 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('messenger.xml');
+
+        if (class_exists(AmqpTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
+        }
+
+        if (class_exists(RedisTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
+        }
 
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);

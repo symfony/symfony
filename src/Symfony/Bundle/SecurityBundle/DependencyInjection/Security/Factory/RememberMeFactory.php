@@ -139,12 +139,14 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
-            ->scalarNode('catch_exceptions')->defaultTrue()->end()
+            ->booleanNode('catch_exceptions')->defaultTrue()->end()
         ;
 
         foreach ($this->options as $name => $value) {
             if (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
+            } elseif (\is_int($value)) {
+                $builder->integerNode($name)->defaultValue($value);
             } else {
                 $builder->scalarNode($name)->defaultValue($value);
             }

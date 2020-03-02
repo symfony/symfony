@@ -372,7 +372,7 @@
            </trans-unit>
            <trans-unit id="96">
                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-               <target>Số lượng các phần tử trong bộ sưu tập này nên là bội số của {{compared_value}}.</target>
+               <target>Số lượng các phần tử trong bộ sưu tập này nên là bội số của {{ compared_value }}.</target>
            </trans-unit>
         </body>
     </file>

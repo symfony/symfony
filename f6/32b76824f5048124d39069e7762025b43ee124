@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-30T17:09:59Z
+
+Now with fixed redirection logic (not reusing the existing one from Amp because we want a different behavior that is consistent with curl+native)
+I also added todo notes, which could be questions for you @kelunik :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-03T17:43:05Z
+
+The PR is now completed. It passes the full test suite, including the HTTP/2 PUSH tests. I'm pretty much impressed by how well this went.
+
+This means we'll soon have two implementations fully compatible with HTTP/2 \o/
+The Amp one is slower (at least without nghttp2 through FFI) but contrary to the curl-based one, it deals with `Vary` headers of pushed responses. Something that needs to be fixed on `CurlHttpClient` (but non-trivial IIRC).
+
+Kudos @kelunik et al.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-07T22:00:33Z
+
+@kelunik I'm spotting that HTTP/2 is slow because of the `LimitedConnectionPool`, which limits to 6 *streams* in practice. How can I achieve 6 *connections* per host max with H2 enabled?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-08T13:43:41Z
+
+Reported as https://github.com/amphp/http-client/issues/246
+
+> which limits to 6 streams in practice. How can I achieve 6 connections per host max with H2 enabled
+
+actually, this was not correct.
+What happens is that 6 connections are opened, but then streams are not multiplexed.
+When I force one single connection, even in H2, requests are run one after the other:
+
+```
+$client = new \Symfony\Component\HttpClient\AmpHttpClient(['http_version' => 2], null, 1);
+
+for ($i = 0; $i < 379; ++$i) {
+    $uri = "https://http2.akamai.com/demo/tile-$i.png";
+    $responses[] = $client->request('GET', $uri);
+}
+
+foreach ($client->stream($responses) as $response => $chunk) {
+    if ($chunk->isLast()) {
+        echo '.';
+        // a $response completed
+    } else {
+        // a $response's got network activity or timeout
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-29T12:03:39Z
+
+PR is ready for final review!

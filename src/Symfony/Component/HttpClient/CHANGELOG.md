@@ -4,8 +4,9 @@ CHANGELOG
 5.1.0
 -----
 
-* added `NoPrivateNetworkHttpClient` decorator
-* added `LoggerAwareInterface` to `ScopingHttpClient` and `TraceableHttpClient`
+ * added `NoPrivateNetworkHttpClient` decorator
+ * added `AmpHttpClient`, a portable HTTP/2 implementation based on Amp
+ * added `LoggerAwareInterface` to `ScopingHttpClient` and `TraceableHttpClient`
 
 4.4.0
 -----

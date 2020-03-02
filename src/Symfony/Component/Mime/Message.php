@@ -23,6 +23,7 @@ class Message extends RawMessage
 {
     private $headers;
     private $body;
+    private $messageId;
 
     public function __construct(Headers $headers = null, AbstractPart $body = null)
     {
@@ -36,6 +37,10 @@ class Message extends RawMessage
 
         if (null !== $this->body) {
             $this->body = clone $this->body;
+        }
+
+        if (null !== $this->messageId) {
+            $this->messageId = clone $this->messageId;
         }
     }
 
@@ -128,24 +133,28 @@ class Message extends RawMessage
 
     public function generateMessageId(): string
     {
-        if ($this->headers->has('Sender')) {
-            $sender = $this->headers->get('Sender')->getAddress();
-        } elseif ($this->headers->has('From')) {
-            $sender = $this->headers->get('From')->getAddresses()[0];
-        } else {
-            throw new LogicException('An email must have a "From" or a "Sender" header to compute a Messsage ID.');
+        if (null === $this->messageId) {
+            if ($this->headers->has('Sender')) {
+                $sender = $this->headers->get('Sender')->getAddress();
+            } elseif ($this->headers->has('From')) {
+                $sender = $this->headers->get('From')->getAddresses()[0];
+            } else {
+                throw new LogicException('An email must have a "From" or a "Sender" header to compute a Messsage ID.');
+            }
+
+            $this->messageId = bin2hex(random_bytes(16)).strstr($sender->getAddress(), '@');
         }
 
-        return bin2hex(random_bytes(16)).strstr($sender->getAddress(), '@');
+        return $this->messageId;
     }
 
     public function __serialize(): array
     {
-        return [$this->headers, $this->body];
+        return [$this->headers, $this->body, $this->messageId];
     }
 
     public function __unserialize(array $data): void
     {
-        [$this->headers, $this->body] = $data;
+        [$this->headers, $this->body, $this->messageId] = $data;
     }
 }

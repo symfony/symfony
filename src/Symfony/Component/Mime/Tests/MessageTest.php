@@ -147,4 +147,12 @@ EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
     }
+
+    public function testMessageIdShouldBeSame()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]);
+
+        $this->assertEquals($message->generateMessageId(), $message->generateMessageId());
+    }
 }

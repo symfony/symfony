@@ -13,10 +13,14 @@ namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead.', PlaintextPasswordEncoder::class, UserPasswordEncoder::class), E_USER_DEPRECATED);
+
 /**
  * PlaintextPasswordEncoder does not do any encoding.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.1, use another included encoder instead. I.e. Symfony\Component\Security\Core\Encoder\UserPasswordEncoder.
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {

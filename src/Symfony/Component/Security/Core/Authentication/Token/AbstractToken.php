@@ -31,7 +31,7 @@ abstract class AbstractToken implements TokenInterface
     private $attributes = [];
 
     /**
-     * @param (RoleInterface|string)[] $roles An array of roles
+     * @param (Role|string)[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
@@ -41,7 +41,7 @@ abstract class AbstractToken implements TokenInterface
             if (\is_string($role)) {
                 $role = new Role($role);
             } elseif (!$role instanceof RoleInterface) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, Role instances or RoleInterface instances, but got %s.', \gettype($role)));
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, Role instances, but got %s.', \gettype($role)));
             }
 
             $this->roles[] = $role;
@@ -81,7 +81,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function setUser($user)
     {
-        if (!($user instanceof UserInterface || (\is_object($user) && method_exists($user, '__toString')) || \is_string($user))) {
+        if (!($user instanceof UserInterface || \is_string($user) || \is_callable([$user, '__toString']))) {
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
         }
 

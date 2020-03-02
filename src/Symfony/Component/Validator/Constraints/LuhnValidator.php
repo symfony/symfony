@@ -48,7 +48,7 @@ class LuhnValidator extends ConstraintValidator
 
         // Work with strings only, because long numbers are represented as floats
         // internally and don't work with strlen()
-        if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_string($value) && !\is_callable([$value, '__toString'])) {
             throw new UnexpectedTypeException($value, 'string');
         }
 

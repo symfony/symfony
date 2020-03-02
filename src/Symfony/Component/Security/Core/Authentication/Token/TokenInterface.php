@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * TokenInterface is the interface for the user authentication information.
@@ -47,8 +48,7 @@ interface TokenInterface extends \Serializable
     /**
      * Returns a user representation.
      *
-     * @return string|object Can be a UserInterface instance, an object implementing a __toString method,
-     *                       or the username as a regular string
+     * @return string|\Stringable|UserInterface
      *
      * @see AbstractToken::setUser()
      */
@@ -60,7 +60,7 @@ interface TokenInterface extends \Serializable
      * The user can be a UserInterface instance, or an object implementing
      * a __toString method or the username as a regular string.
      *
-     * @param string|object $user The user
+     * @param string|\Stringable|UserInterface $user
      *
      * @throws \InvalidArgumentException
      */

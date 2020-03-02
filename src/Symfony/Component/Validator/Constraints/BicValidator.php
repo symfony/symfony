@@ -35,6 +35,10 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
+        if (!is_scalar($value) && !\is_callable([$value, '__toString'])) {
+            throw new UnexpectedTypeException($value, 'string');
+        }
+
         $canonicalize = str_replace(' ', '', $value);
 
         // the bic must be either 8 or 11 characters long

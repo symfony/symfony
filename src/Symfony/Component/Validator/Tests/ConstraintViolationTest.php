@@ -108,4 +108,37 @@ EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testPrivateToString()
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->markTestSkipped('__toString() must be public in PHP 8');
+        }
+
+        $this->expectException(\TypeError::class);
+        new ConstraintViolation(
+            new PrivateToString(),
+            '',
+            [],
+            'Root',
+            'property.path',
+            null
+        );
+    }
+}
+
+if (\PHP_VERSION_ID < 80000) {
+    @eval('
+    namespace Symfony\Component\Validator\Tests;
+
+    class PrivateToString
+    {
+        private function __toString()
+        {
+        }
+    }
+    ');
 }

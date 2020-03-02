@@ -16,7 +16,7 @@ namespace Symfony\Component\String;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class LazyString implements \JsonSerializable
+class LazyString implements \Stringable, \JsonSerializable
 {
     private $value;
 
@@ -90,6 +90,9 @@ class LazyString implements \JsonSerializable
         return $value;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         if (\is_string($this->value)) {

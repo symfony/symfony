@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * Token representing a user who temporarily impersonates another one.
  *
@@ -21,10 +23,9 @@ class SwitchUserToken extends UsernamePasswordToken
     private $originalToken;
 
     /**
-     * @param string|object $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed         $credentials This usually is the password of the user
-     * @param string        $providerKey The provider key
-     * @param string[]      $roles       An array of roles
+     * @param string|\Stringable|UserInterface $user
+     * @param mixed                            $credentials
+     * @param string[]                         $roles
      *
      * @throws \InvalidArgumentException
      */

@@ -233,7 +233,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return;
         }
 
-        if ('string' === $type && method_exists($class, '__toString')) {
+        if ('string' === $type && \is_callable([$class, '__toString'])) {
             return;
         }
 

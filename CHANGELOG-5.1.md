@@ -9,4 +9,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 5.1.0 (TBD)
 
- * feature # [Security] deprecate plaintext password encoder (jrushlow)
+ * feature #35929 [Security] deprecate plaintext password encoder (jrushlow)

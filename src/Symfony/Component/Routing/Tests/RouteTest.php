@@ -271,4 +271,65 @@ class RouteTest extends TestCase
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleDefaultWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getDefault('_locale'));
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame('fr', $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleDefaultWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getDefault('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame($expected, $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleRequirementWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getRequirement('_locale'));
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame('fr', $route->getRequirement('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleRequirementWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getRequirement('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame($expected, $route->getRequirement('_locale'));
+    }
+
+    public function provideNonLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))],
+            [(new Route('/foo'))->setDefault('_locale', 'en')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'foobar')],
+        ];
+    }
+
+    public function provideLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en')],
+        ];
+    }
 }

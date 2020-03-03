@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+/**
+ * A Vote is returned by a Voter and contains the access (granted, abstain or denied). It can also contains a reason
+ * explaining the why of the access which has been decided.
+ *
+ * @author Dany Maillard <danymaillard93b@gmail.com>
+ */
 final class Vote
 {
     use AccessTrait;
@@ -18,6 +24,9 @@ final class Vote
     private $reason;
     private $parameters;
 
+    /**
+     * @param int $access One of the VoterInterface::ACCESS_* constants
+     */
     private function __construct(int $access, string $reason = '', array $parameters = [])
     {
         $this->access = $access;

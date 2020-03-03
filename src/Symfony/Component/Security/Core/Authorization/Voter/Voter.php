@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 abstract class Voter implements VoterInterface
 {
@@ -89,7 +90,7 @@ abstract class Voter implements VoterInterface
      *
      * @param mixed $subject
      *
-     * @return bool|Vote
+     * @return bool|Vote Returning a boolean is deprecated since Symfony 5.1. Return a Vote object instead.
      */
     abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
 }

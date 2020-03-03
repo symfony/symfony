@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+/**
+ * @author Dany Maillard <danymaillard93b@gmail.com>
+ */
 trait AccessTrait
 {
-    /** @var int */
+    /** @var int One of the VoterInterface::ACCESS_* constants */
     protected $access;
 
     public function getAccess(): int

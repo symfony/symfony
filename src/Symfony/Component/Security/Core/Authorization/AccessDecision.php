@@ -16,6 +16,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+/**
+ * An AccessDecision is returned by an AccessDecisionManager and contains the access verdict and all the related votes.
+ *
+ * @author Dany Maillard <danymaillard93b@gmail.com>
+ */
 final class AccessDecision
 {
     use AccessTrait;
@@ -23,17 +28,27 @@ final class AccessDecision
     /** @var Vote[] */
     private $votes = [];
 
+    /**
+     * @param int    $access One of the VoterInterface::ACCESS_* constants
+     * @param Vote[] $votes
+     */
     private function __construct(int $access, array $votes = [])
     {
         $this->access = $access;
         $this->votes = $votes;
     }
 
+    /**
+     * @param Vote[] $votes
+     */
     public static function createGranted(array $votes = []): self
     {
         return new self(VoterInterface::ACCESS_GRANTED, $votes);
     }
 
+    /**
+     * @param Vote[] $votes
+     */
     public static function createDenied(array $votes = []): self
     {
         return new self(VoterInterface::ACCESS_DENIED, $votes);

@@ -356,7 +356,7 @@
                                                     unknown ({{ voter_detail['vote'].access }})
                                                 {% endif %}
                                             </td>
-                                            <td class="font-normal text-small">{{ voter_detail['vote'].reason }}</td>
+                                            <td class="font-normal text-small">{{ voter_detail['vote'].reason|default('~') }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

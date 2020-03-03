@@ -190,4 +190,13 @@ class CheckboxTypeTest extends BaseTypeTest
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
+
+    public function testSubmitNullIsEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $form->submit(null);
+
+        $this->assertTrue($form->isEmpty());
+    }
 }

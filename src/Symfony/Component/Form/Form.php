@@ -725,7 +725,9 @@ class Form implements \IteratorAggregate, FormInterface
             // arrays, countables
             ((\is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === \count($this->modelData)) ||
             // traversables that are not countable
-            ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
+            ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData)) ||
+            // @internal - Do not rely on it, it will be removed in Symfony 5.1.
+            (false === $this->modelData && $this->config->getAttribute('_false_is_empty'));
     }
 
     /**

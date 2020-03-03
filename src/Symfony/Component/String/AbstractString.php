@@ -255,6 +255,14 @@ abstract class AbstractString implements \JsonSerializable
     }
 
     /**
+     * @param string|string[] $needle
+     */
+    public function containsAny($needle): bool
+    {
+        return null !== $this->indexOf($needle);
+    }
+
+    /**
      * @param string|string[] $suffix
      */
     public function endsWith($suffix): bool

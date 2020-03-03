@@ -32,7 +32,7 @@ final class Vote
 
     public static function createGranted(string $reason, array $parameters = []): self
     {
-        return new self(VoterInterface::ACCESS_DENIED, $reason, $parameters);
+        return new self(VoterInterface::ACCESS_GRANTED, $reason, $parameters);
     }
 
     public static function createAbstrain(string $reason, array $parameters = []): self

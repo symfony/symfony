@@ -477,7 +477,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException
      */
-    public function nextUntil(\DOMNode $finalNode){
+    public function nextUntil(\DOMNode $finalNode)
+    {
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }

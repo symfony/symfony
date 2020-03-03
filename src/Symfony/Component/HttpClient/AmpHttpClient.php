@@ -138,7 +138,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         if ($responses instanceof AmpResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of AmpResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of AmpResponse objects, %s given.', __METHOD__, get_debug_type($responses)));
         }
 
         return new ResponseStream(AmpResponse::stream($responses, $timeout));

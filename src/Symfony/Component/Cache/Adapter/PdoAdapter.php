@@ -82,7 +82,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         } elseif (\is_string($connOrDsn)) {
             $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, \is_object($connOrDsn) ? \get_class($connOrDsn) : \gettype($connOrDsn)));
+            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
         }
 
         $this->table = isset($options['db_table']) ? $options['db_table'] : $this->table;

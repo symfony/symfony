@@ -125,7 +125,7 @@ class FormValidator extends ConstraintValidator
             if ($childrenSynchronized) {
                 $clientDataAsString = is_scalar($form->getViewData())
                     ? (string) $form->getViewData()
-                    : \gettype($form->getViewData());
+                    : get_debug_type($form->getViewData());
 
                 $failure = $form->getTransformationFailure();
 

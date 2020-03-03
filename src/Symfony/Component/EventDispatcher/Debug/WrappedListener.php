@@ -43,7 +43,7 @@ final class WrappedListener
         $this->stoppedPropagation = false;
 
         if (\is_array($listener)) {
-            $this->name = \is_object($listener[0]) ? \get_class($listener[0]) : $listener[0];
+            $this->name = \is_object($listener[0]) ? get_debug_type($listener[0]) : $listener[0];
             $this->pretty = $this->name.'::'.$listener[1];
         } elseif ($listener instanceof \Closure) {
             $r = new \ReflectionFunction($listener);
@@ -58,7 +58,7 @@ final class WrappedListener
         } elseif (\is_string($listener)) {
             $this->pretty = $this->name = $listener;
         } else {
-            $this->name = \get_class($listener);
+            $this->name = get_debug_type($listener);
             $this->pretty = $this->name.'::__invoke';
         }
 

@@ -67,8 +67,8 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons(): array
     {
         return [
-            [3, '3', 2, '2', 'integer'],
-            [2, '2', 2, '2', 'integer'],
+            [3, '3', 2, '2', 'int'],
+            [2, '2', 2, '2', 'int'],
             [new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],

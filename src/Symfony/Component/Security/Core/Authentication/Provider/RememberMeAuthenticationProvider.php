@@ -52,7 +52,7 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         $user = $token->getUser();
 
         if (!$token->getUser() instanceof UserInterface) {
-            throw new LogicException(sprintf('Method "%s::getUser()" must return a "%s" instance, "%s" returned.', \get_class($token), UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
+            throw new LogicException(sprintf('Method "%s::getUser()" must return a "%s" instance, "%s" returned.', get_debug_type($token), UserInterface::class, get_debug_type($user)));
         }
 
         $this->userChecker->checkPreAuth($user);

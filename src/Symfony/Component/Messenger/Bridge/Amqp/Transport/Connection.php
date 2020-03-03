@@ -249,7 +249,7 @@ class Connection
             }
 
             if (!is_numeric($arguments[$key])) {
-                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", "%s" given.', $key, \gettype($arguments[$key])));
+                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", "%s" given.', $key, get_debug_type($arguments[$key])));
             }
 
             $arguments[$key] = (int) $arguments[$key];

@@ -91,6 +91,6 @@ abstract class AbstractConfigurator
                 }
         }
 
-        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', \is_object($value) ? \get_class($value) : \gettype($value)));
+        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
     }
 }

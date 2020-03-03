@@ -37,7 +37,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
         } elseif ($middlewareIterator instanceof MiddlewareInterface) {
             $this->stack->stack[] = $middlewareIterator;
         } elseif (!is_iterable($middlewareIterator)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be iterable of "%s", "%s" given.', __METHOD__, MiddlewareInterface::class, \is_object($middlewareIterator) ? \get_class($middlewareIterator) : \gettype($middlewareIterator)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be iterable of "%s", "%s" given.', __METHOD__, MiddlewareInterface::class, get_debug_type($middlewareIterator)));
         } else {
             $this->stack->iterator = (function () use ($middlewareIterator) {
                 yield from $middlewareIterator;

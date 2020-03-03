@@ -67,7 +67,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsWhenPassingNullToRequiredArgument()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -245,7 +245,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -288,7 +288,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -376,7 +376,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -564,7 +564,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessThrowsOnIterableTypeWhenScalarPassed()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "int" passed.');
 
         $container = new ContainerBuilder();
 

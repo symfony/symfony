@@ -28,7 +28,7 @@ class LazyString implements \Stringable, \JsonSerializable
     public static function fromCallable($callback, ...$arguments): self
     {
         if (!\is_callable($callback) && !(\is_array($callback) && isset($callback[0]) && $callback[0] instanceof \Closure && 2 >= \count($callback))) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a callable or a [Closure, method] lazy-callable, "%s" given.', __METHOD__, \gettype($callback)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a callable or a [Closure, method] lazy-callable, "%s" given.', __METHOD__, get_debug_type($callback)));
         }
 
         $lazyString = new static();
@@ -57,7 +57,7 @@ class LazyString implements \Stringable, \JsonSerializable
     public static function fromStringable($value): self
     {
         if (!self::isStringable($value)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a scalar or a stringable object, "%s" given.', __METHOD__, \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a scalar or a stringable object, "%s" given.', __METHOD__, get_debug_type($value)));
         }
 
         if (\is_object($value)) {
@@ -143,7 +143,7 @@ class LazyString implements \Stringable, \JsonSerializable
         }
 
         if (\is_array($callback)) {
-            $class = \is_object($callback[0]) ? \get_class($callback[0]) : $callback[0];
+            $class = \is_object($callback[0]) ? get_debug_type($callback[0]) : $callback[0];
             $method = $callback[1];
         } elseif ($callback instanceof \Closure) {
             $r = new \ReflectionFunction($callback);
@@ -155,12 +155,8 @@ class LazyString implements \Stringable, \JsonSerializable
             $class = $class->name;
             $method = $r->name;
         } else {
-            $class = \get_class($callback);
+            $class = get_debug_type($callback);
             $method = '__invoke';
-        }
-
-        if (isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00")) {
-            $class = (get_parent_class($class) ?: key(class_implements($class))).'@anonymous';
         }
 
         return $class.'::'.$method;

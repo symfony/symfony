@@ -63,7 +63,7 @@ final class TelegramTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
         $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);

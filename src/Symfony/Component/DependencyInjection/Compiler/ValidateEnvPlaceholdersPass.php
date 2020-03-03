@@ -52,7 +52,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                 $values = [];
                 if (false === $i = strpos($env, ':')) {
                     $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::$typeFixtures['string'];
-                    $defaultType = null !== $default ? self::getType($default) : 'string';
+                    $defaultType = null !== $default ? get_debug_type($default) : 'string';
                     $values[$defaultType] = $default;
                 } else {
                     $prefix = substr($env, 0, $i);
@@ -98,19 +98,5 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         } finally {
             $this->extensionConfig = [];
         }
-    }
-
-    private static function getType($value): string
-    {
-        switch ($type = \gettype($value)) {
-            case 'boolean':
-                return 'bool';
-            case 'double':
-                return 'float';
-            case 'integer':
-                return 'int';
-        }
-
-        return $type;
     }
 }

@@ -44,7 +44,7 @@ class Caster
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject(object $obj, string $class, bool $hasDebugInfo = false): array
+    public static function castObject(object $obj, string $class, bool $hasDebugInfo = false, string $debugClass = null): array
     {
         if ($hasDebugInfo) {
             try {
@@ -63,6 +63,7 @@ class Caster
 
         if ($a) {
             static $publicProperties = [];
+            $debugClass = $debugClass ?? get_debug_type($obj);
 
             $i = 0;
             $prefixedKeys = [];
@@ -76,8 +77,8 @@ class Caster
                     if (!isset($publicProperties[$class][$k])) {
                         $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
                     }
-                } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
-                    $prefixedKeys[$i] = "\0".(get_parent_class($class) ?: key(class_implements($class))).'@anonymous'.strrchr($k, "\0");
+                } elseif ($debugClass !== $class && 1 === strpos($k, $class)) {
+                    $prefixedKeys[$i] = "\0".$debugClass.strrchr($k, "\0");
                 }
                 ++$i;
             }

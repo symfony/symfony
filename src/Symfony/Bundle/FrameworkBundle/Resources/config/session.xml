@@ -36,12 +36,12 @@
         </service>
 
         <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBag">
-            <factory service="session" method="getFlashBag"/>
+            <factory service="session" method="getFlashBag" />
         </service>
         <service id="Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface" alias="session.flash_bag" />
 
         <service id="session.attribute_bag" class="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag">
-            <factory service="session" method="getAttributeBag"/>
+            <factory service="session" method="getAttributeBag" />
         </service>
 
         <service id="session.storage.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage">

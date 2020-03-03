@@ -50,7 +50,7 @@ class EncoderFactory implements EncoderFactoryInterface
         }
 
         if (null === $encoderKey) {
-            throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', \is_object($user) ? \get_class($user) : $user));
+            throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', \is_object($user) ? get_debug_type($user) : $user));
         }
 
         if (!$this->encoders[$encoderKey] instanceof PasswordEncoderInterface) {

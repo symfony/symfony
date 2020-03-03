@@ -58,7 +58,7 @@ class EmailChannel implements ChannelInterface
         if ($email instanceof Email) {
             if (!$email->getFrom()) {
                 if (null === $this->from) {
-                    throw new LogicException(sprintf('To send the "%s" notification by email, you should either configure a global "from" or set it in the "asEmailMessage()" method.', \get_class($notification)));
+                    throw new LogicException(sprintf('To send the "%s" notification by email, you should either configure a global "from" or set it in the "asEmailMessage()" method.', get_debug_type($notification)));
                 }
 
                 $email->from($this->from);

@@ -41,7 +41,7 @@ abstract class AbstractStaticOption
     final public function __construct($formType, $option, $vary = null)
     {
         if (!$formType instanceof FormTypeInterface && !$formType instanceof FormTypeExtensionInterface) {
-            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', FormTypeInterface::class, FormTypeExtensionInterface::class, \is_object($formType) ? \get_class($formType) : \gettype($formType)));
+            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', FormTypeInterface::class, FormTypeExtensionInterface::class, get_debug_type($formType)));
         }
 
         $hash = CachingFactoryDecorator::generateHash([static::class, $formType, $vary]);

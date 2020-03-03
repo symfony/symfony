@@ -58,7 +58,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "double" given to "env(FLOATISH)".');
+        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "float" given to "env(FLOATISH)".');
 
         $container = new ContainerBuilder();
         $container->setParameter('env(FLOATISH)', 3.2);

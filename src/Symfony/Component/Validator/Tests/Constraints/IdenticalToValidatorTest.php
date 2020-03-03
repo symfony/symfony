@@ -86,7 +86,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons(): array
     {
         return [
-            [1, '1', 2, '2', 'integer'],
+            [1, '1', 2, '2', 'int'],
             [2, '2', '2', '"2"', 'string'],
             ['22', '"22"', '333', '"333"', 'string'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'],

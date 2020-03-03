@@ -210,7 +210,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private function vote(VoterInterface $voter, TokenInterface $token, $subject, array $attributes): Vote
     {
         if (\is_int($vote = $voter->vote($token, $subject, $attributes))) {
-            trigger_deprecation('symfony/security', 5.1, 'Returning an int from the "%s::vote()" method is deprecated. Return a "" object instead.', \get_class($this->voter), Vote::class);
+            trigger_deprecation('symfony/security', 5.1, 'Returning an int from the "%s::vote()" method is deprecated. Return a "%s" object instead.', \get_class($this->voter), Vote::class);
             $vote = Vote::create($vote);
         }
 

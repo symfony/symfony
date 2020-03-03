@@ -66,7 +66,7 @@ abstract class Voter implements VoterInterface
     }
 
     /**
-     * Creates an denied vote.
+     * Creates a denied vote.
      */
     public function deny(string $reason = '', array $parameters = []): Vote
     {

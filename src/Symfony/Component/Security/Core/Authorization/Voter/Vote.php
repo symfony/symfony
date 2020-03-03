@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-class Vote
+final class Vote
 {
     use AccessTrait;
 

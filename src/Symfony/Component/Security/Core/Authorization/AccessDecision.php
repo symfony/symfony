@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AccessDecision
+final class AccessDecision
 {
     use AccessTrait;
 

@@ -50,7 +50,7 @@ abstract class Voter implements VoterInterface
     }
 
     /**
-     * Creates an granted vote.
+     * Creates a granted vote.
      */
     public function grant(string $reason = '', array $parameters = []): Vote
     {

@@ -120,6 +120,11 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected function getFoo4Service()
     {
-        return $this->privates['foo4'] = new \stdClass();
+        $this->throw('BOOM');
+    }
+
+    protected function throw($message)
+    {
+        throw new RuntimeException($message);
     }
 }

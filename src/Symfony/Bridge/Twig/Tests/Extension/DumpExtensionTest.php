@@ -100,7 +100,7 @@ class DumpExtensionTest extends TestCase
             [
                 ['foo' => 'bar'],
                 [],
-                "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-note>array:1</span> [<samp>\n"
+                "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>\n"
                 ."  \"<span class=sf-dump-key>foo</span>\" => \"<span class=sf-dump-str title=\"3 characters\">bar</span>\"\n"
                 ."</samp>]\n"
                 ."</pre><script>Sfdump(\"sf-dump\")</script>\n",

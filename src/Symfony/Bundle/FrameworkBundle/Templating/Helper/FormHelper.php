@@ -243,9 +243,9 @@ class FormHelper extends Helper
     public function formEncodeCurrency($text, $widget = '')
     {
         if ('UTF-8' === $charset = $this->getCharset()) {
-            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         } else {
-            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = htmlentities($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $text = iconv('UTF-8', $charset, $text);
             $widget = iconv('UTF-8', $charset, $widget);
         }

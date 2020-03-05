@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by jrushlow at 2020-03-04T12:25:03Z
+
+Oops, had this ready yesterday but forgot to hit the submit button. ~I choose the master branch as I didn't think this warranted a merge in earlier branches. If that would be more appropriate, let me know and I'll change it..~
+
+Thanks for the feed back in the previous PR & issue
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-03-04T12:54:48Z
+
+> Oops, had this ready yesterday but forgot to hit the submit button. I choose the master branch as I didn't think this warranted a merge in earlier branches. If that would be more appropriate, let me know and I'll change it..
+>
+> Thanks for the feed back in the previous PR & issue
+
+@jrushlow the PR should target the lowest maintained symfony branch where this should be applied :wink: So would be good to rebase it and change the target to 3.4
+
+https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Security/Core/Encoder/PlaintextPasswordEncoder.php#L17
+
+The maintainers will then merge this fix into the upper version branches

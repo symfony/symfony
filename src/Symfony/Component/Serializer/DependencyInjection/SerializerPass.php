@@ -50,11 +50,39 @@ class SerializerPass implements CompilerPassInterface
 
         $serializerDefinition = $container->getDefinition($this->serializerService);
         $serializerDefinition->replaceArgument(0, $normalizers);
+        $this->addDefaultContextParameter($normalizers, $container);
 
         if (!$encoders = $this->findAndSortTaggedServices($this->encoderTag, $container)) {
             throw new RuntimeException(sprintf('You must tag at least one service as "%s" to use the "%s" service.', $this->encoderTag, $this->serializerService));
         }
 
         $serializerDefinition->replaceArgument(1, $encoders);
+        $this->addDefaultContextParameter($encoders, $container);
+    }
+
+    private function addDefaultContextParameter($services, $container)
+    {
+        foreach ($services as $service) {
+            $definition = $container->getDefinition($service);
+            if (!$definition->isAutowired()) {
+                continue;
+            }
+
+            if (null === $class = $definition->getClass()) {
+                continue;
+            }
+
+            $reflection = new \ReflectionClass($class);
+
+            if (null === $constructor = $reflection->getConstructor()) {
+                continue;
+            }
+
+            foreach ($constructor->getParameters() as $arg) {
+                if ('defaultContext' === $arg->name) {
+                    $definition->setArgument('$defaultContext', '%serializer.default_context%');
+                }
+            }
+        }
     }
 }

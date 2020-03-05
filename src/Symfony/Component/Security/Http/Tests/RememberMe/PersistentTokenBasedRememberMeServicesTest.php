@@ -85,7 +85,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willReturn(new PersistentToken('fooclass', 'fooname', 'fooseries', 'foovalue', new \DateTime()))
+            ->willReturn(new PersistentToken('fooclass', 'fooname', 'fooseries', $this->generateHash('foovalue'), new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -142,7 +142,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', 'foovalue', new \DateTime('yesterday')))
+            ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', $this->generateHash('foovalue'), new \DateTime('yesterday')))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -150,7 +150,11 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
-    public function testAutoLogin()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testAutoLogin(bool $hashTokenValue)
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
@@ -172,11 +176,12 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
 
         $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenValue = $hashTokenValue ? $this->generateHash('foovalue') : 'foovalue';
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'foovalue', new \DateTime()))
+            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', $tokenValue, new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -337,5 +342,10 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         ;
 
         return $provider;
+    }
+
+    protected function generateHash(string $tokenValue): string
+    {
+        return 'sha256_'.hash_hmac('sha256', $tokenValue, $this->getService()->getSecret());
     }
 }

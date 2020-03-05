@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-03-04T13:39:19Z
+
+Seems to work but...
+- There are no TypedReference anymore. It may or may not matter.
+- Reflection are reloaded everytime rather than at first time needed. Worst case is two calls to `$container->getReflectionClass()`, `$container->getParameterBag()->resolveValue()`. It should not matter much.
+- `$index` will always have a value: line 89 - 91 are redundant. This will cause all service iterables to have service id as key (assuming they don't have a better key). Most of the complexity behind last implementation was to keep behavior the same as far as key goes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-04T13:49:35Z
+
+Thanks for the review
+
+> There are no TypedReference anymore. It may or may not matter.
+
+Yep, doesn't matter.
+
+> Reflection are reloaded everytime
+
+`$container->getReflectionClass()` already has a cache
+
+> $index will always have a value: line 89 - 91 are redundant
+
+nope, see line 70
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-03-04T14:01:30Z
+
+> nope, see line 70
+
+Doh! Everything seems good.

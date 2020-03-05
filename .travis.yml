@@ -57,7 +57,7 @@ before_install:
       sudo wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
       echo "deb http://packages.couchbase.com/ubuntu xenial xenial/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
       sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev libcouchbase-dev zlib1g-dev
+      sudo apt install -y libcouchbase-dev librabbitmq-dev libsodium-dev php-uuid zlib1g-dev
 
     - |
       # Start Couchbase

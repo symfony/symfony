@@ -1527,6 +1527,8 @@ class FrameworkExtension extends Extension
             $defaultContext += ['max_depth_handler' => new Reference($config['max_depth_handler'])];
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(6, $defaultContext);
         }
+
+        $container->setParameter('serializer.default_context', $config['default_context'] ?? []);
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, XmlFileLoader $loader)

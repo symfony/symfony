@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * Tests for the SerializerPass class.
@@ -67,5 +68,18 @@ class SerializerPassTest extends TestCase
         ];
         $this->assertEquals($expected, $definition->getArgument(0));
         $this->assertEquals($expected, $definition->getArgument(1));
+    }
+
+    public function testServiceHasDefaultContextParameterArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('serializer')->setClass(ObjectNormalizer::class)->setArguments([null, null, null, null, null, null, null])->addTag('serializer.normalizer')->addTag('serializer.encoder');
+        $definition->setAutowired(true);
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertEquals('%serializer.default_context%', $definition->getArgument('$defaultContext'));
     }
 }

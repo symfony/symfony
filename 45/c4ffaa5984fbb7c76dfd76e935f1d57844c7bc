@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-04T13:17:48Z
+
+You need random data in the hash (nonce) to make the secret unknowable.
+I would use the password API or the libsodium API for this use case.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-04T13:20:19Z
+
+SHA256 seems good enough as per https://github.com/symfony/symfony/issues/27910#issuecomment-419451167
+
+---------------------------------------------------------------------------
+
+by guillbdx at 2020-03-04T16:08:26Z
+
+> Don't miss adding some tests :)
+
+I've updated `PersistentTokenBasedRememberMeServicesTest`, so it now uses tokens with hashed values.
+I also annotated the `testAutoLogin` test to be run twice: once with a hashed token value, and once with a clear token value, to make sure the old way keeps working.

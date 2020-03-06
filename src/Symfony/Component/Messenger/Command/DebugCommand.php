@@ -80,12 +80,20 @@ EOF
 
             $tableRows = [];
             foreach ($handlersByMessage as $message => $handlers) {
+                if ($description = self::getClassDescription($message)) {
+                    $tableRows[] = [sprintf('<comment>%s</>', $description)];
+                }
+
                 $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
                     $tableRows[] = [
                         sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
                     ];
+                    if ($handlerDescription = self::getClassDescription($handler[0])) {
+                        $tableRows[] = [sprintf('               <comment>%s</>', $handlerDescription)];
+                    }
                 }
+                $tableRows[] = [''];
             }
 
             if ($tableRows) {
@@ -112,5 +120,21 @@ EOF
         }
 
         return ' (when '.implode(', ', $optionsMapping).')';
+    }
+
+    private static function getClassDescription(string $class): string
+    {
+        try {
+            $r = new \ReflectionClass($class);
+
+            if ($docComment = $r->getDocComment()) {
+                $docComment = preg_split('#\n\s*\*\s*[\n@]#', substr($docComment, 3, -2), 2)[0];
+
+                return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
+            }
+        } catch (\ReflectionException $e) {
+        }
+
+        return '';
     }
 }

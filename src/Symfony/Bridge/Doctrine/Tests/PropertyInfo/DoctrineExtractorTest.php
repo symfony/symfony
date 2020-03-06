@@ -182,7 +182,7 @@ class DoctrineExtractorTest extends TestCase
         ];
 
         if (class_exists(Types::class)) {
-            $provider[] = ['json', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)]];
+            $provider[] = ['json', null];
         }
 
         return $provider;

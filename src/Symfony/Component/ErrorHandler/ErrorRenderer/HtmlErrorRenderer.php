@@ -66,9 +66,13 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(\Throwable $exception): FlattenException
     {
-        $exception = FlattenException::createFromThrowable($exception, null, [
-            'Content-Type' => 'text/html; charset='.$this->charset,
-        ]);
+        $headers = ['Content-Type' => 'text/html; charset='.$this->charset];
+        if (\is_bool($this->debug) ? $this->debug : ($this->debug)($exception)) {
+            $headers['X-Debug-Exception'] = rawurlencode($exception->getMessage());
+            $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
+        }
+
+        $exception = FlattenException::createFromThrowable($exception, null, $headers);
 
         return $exception->setAsString($this->renderException($exception));
     }

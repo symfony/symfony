@@ -53,14 +53,21 @@ class SerializerErrorRenderer implements ErrorRendererInterface
      */
     public function render(\Throwable $exception): FlattenException
     {
-        $flattenException = FlattenException::createFromThrowable($exception);
+        $headers = [];
+        $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
+        if ($debug) {
+            $headers['X-Debug-Exception'] = rawurlencode($exception->getMessage());
+            $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
+        }
+
+        $flattenException = FlattenException::createFromThrowable($exception, null, $headers);
 
         try {
             $format = \is_string($this->format) ? $this->format : ($this->format)($flattenException);
 
             return $flattenException->setAsString($this->serializer->serialize($flattenException, $format, [
                 'exception' => $exception,
-                'debug' => \is_bool($this->debug) ? $this->debug : ($this->debug)($exception),
+                'debug' => $debug,
             ]));
         } catch (NotEncodableValueException $e) {
             return $this->fallbackErrorRenderer->render($exception);

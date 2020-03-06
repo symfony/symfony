@@ -11,8 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\LogicalAnd;
 use PHPUnit\Framework\Constraint\LogicalNot;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Test\Constraint as BrowserKitConstraint;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,12 +30,12 @@ trait BrowserKitAssertionsTrait
 {
     public static function assertResponseIsSuccessful(string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseIsSuccessful(), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseIsSuccessful(), $message);
     }
 
     public static function assertResponseStatusCodeSame(int $expectedCode, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
     }
 
     public static function assertResponseRedirects(string $expectedLocation = null, int $expectedCode = null, string $message = ''): void
@@ -46,42 +48,42 @@ trait BrowserKitAssertionsTrait
             $constraint = LogicalAnd::fromConstraints($constraint, new ResponseConstraint\ResponseStatusCodeSame($expectedCode));
         }
 
-        self::assertThat(self::getResponse(), $constraint, $message);
+        self::assertThatForResponse($constraint, $message);
     }
 
     public static function assertResponseHasHeader(string $headerName, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHasHeader($headerName), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseHasHeader($headerName), $message);
     }
 
     public static function assertResponseNotHasHeader(string $headerName, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasHeader($headerName)), $message);
+        self::assertThatForResponse(new LogicalNot(new ResponseConstraint\ResponseHasHeader($headerName)), $message);
     }
 
     public static function assertResponseHeaderSame(string $headerName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue), $message);
     }
 
     public static function assertResponseHeaderNotSame(string $headerName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
+        self::assertThatForResponse(new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
     }
 
     public static function assertResponseHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
     }
 
     public static function assertResponseNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasCookie($name, $path, $domain)), $message);
+        self::assertThatForResponse(new LogicalNot(new ResponseConstraint\ResponseHasCookie($name, $path, $domain)), $message);
     }
 
     public static function assertResponseCookieValueSame(string $name, string $expectedValue, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(self::getResponse(), LogicalAnd::fromConstraints(
+        self::assertThatForResponse(LogicalAnd::fromConstraints(
             new ResponseConstraint\ResponseHasCookie($name, $path, $domain),
             new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain)
         ), $message);
@@ -122,6 +124,21 @@ trait BrowserKitAssertionsTrait
         }
 
         self::assertThat(self::getRequest(), $constraint, $message);
+    }
+
+    public static function assertThatForResponse(Constraint $constraint, string $message = ''): void
+    {
+        try {
+            self::assertThat(self::getResponse(), $constraint, $message);
+        } catch (ExpectationFailedException $exception) {
+            if (($serverExceptionMessage = self::getResponse()->headers->get('X-Debug-Exception'))
+                && ($serverExceptionFile = self::getResponse()->headers->get('X-Debug-Exception-File'))) {
+                $serverExceptionFile = explode(':', $serverExceptionFile);
+                $exception->__construct($exception->getMessage(), $exception->getComparisonFailure(), new \ErrorException(rawurldecode($serverExceptionMessage), 0, 1, rawurldecode($serverExceptionFile[0]), $serverExceptionFile[1]), $exception->getPrevious());
+            }
+
+            throw $exception;
+        }
     }
 
     private static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser

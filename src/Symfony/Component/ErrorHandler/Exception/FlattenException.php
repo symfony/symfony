@@ -206,7 +206,7 @@ class FlattenException extends LegacyFlattenException
         return $this;
     }
 
-    public function getCode(): int
+    public function getCode()
     {
         return $this->code;
     }

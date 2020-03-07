@@ -209,12 +209,12 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     public function testDivisibleBy()
     {
         $constraint = new Count([
-            'divisibleBy' => 123,
+            'divisibleBy' => 3,
             'divisibleByMessage' => 'foo {{ compared_value }}',
         ]);
 
         $this->expectValidateValue(0, 3, [new DivisibleBy([
-            'value' => 123,
+            'value' => 3,
             'message' => 'foo {{ compared_value }}',
         ])], $this->group);
 

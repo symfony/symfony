@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Tests\Authentication\Authenticator;
+namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -14,12 +14,10 @@ use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 
 class HttpBasicAuthenticatorTest extends TestCase
 {
-    /** @var UserProviderInterface|MockObject */
     private $userProvider;
-    /** @var EncoderFactoryInterface|MockObject */
     private $encoderFactory;
-    /** @var PasswordEncoderInterface|MockObject */
     private $encoder;
+    private $authenticator;
 
     protected function setUp(): void
     {
@@ -30,17 +28,18 @@ class HttpBasicAuthenticatorTest extends TestCase
             ->expects($this->any())
             ->method('getEncoder')
             ->willReturn($this->encoder);
+
+        $this->authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
     }
 
-    public function testValidUsernameAndPasswordServerParameters()
+    public function testExtractCredentialsAndUserFromRequest()
     {
         $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $authenticator = new HttpBasicAuthenticator('test', $this->userProvider, $this->encoderFactory);
-        $credentials = $authenticator->getCredentials($request);
+        $credentials = $this->authenticator->getCredentials($request);
         $this->assertEquals([
             'username' => 'TheUsername',
             'password' => 'ThePassword',
@@ -55,53 +54,20 @@ class HttpBasicAuthenticatorTest extends TestCase
             ->with('TheUsername')
             ->willReturn($mockedUser);
 
-        $user = $authenticator->getUser($credentials, $this->userProvider);
+        $user = $this->authenticator->getUser($credentials);
         $this->assertSame($mockedUser, $user);
 
-        $this->encoder
-            ->expects($this->any())
-            ->method('isPasswordValid')
-            ->with('ThePassword', 'ThePassword', null)
-            ->willReturn(true);
-
-        $checkCredentials = $authenticator->checkCredentials($credentials, $user);
-        $this->assertTrue($checkCredentials);
+        $this->assertEquals('ThePassword', $this->authenticator->getPassword($credentials));
     }
 
-    /** @dataProvider provideInvalidPasswords */
-    public function testInvalidPassword($presentedPassword, $exceptionMessage)
-    {
-        $authenticator = new HttpBasicAuthenticator('test', $this->userProvider, $this->encoderFactory);
-
-        $this->encoder
-            ->expects($this->any())
-            ->method('isPasswordValid')
-            ->willReturn(false);
-
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage($exceptionMessage);
-
-        $authenticator->checkCredentials([
-            'username' => 'TheUsername',
-            'password' => $presentedPassword,
-        ], $this->getMockBuilder(UserInterface::class)->getMock());
-    }
-
-    public function provideInvalidPasswords()
-    {
-        return [
-            ['InvalidPassword', 'The presented password is invalid.'],
-            ['', 'The presented password cannot be empty.'],
-        ];
-    }
-
-    /** @dataProvider provideMissingHttpBasicServerParameters */
+    /**
+     * @dataProvider provideMissingHttpBasicServerParameters
+     */
     public function testHttpBasicServerParametersMissing(array $serverParameters)
     {
         $request = new Request([], [], [], [], [], $serverParameters);
 
-        $authenticator = new HttpBasicAuthenticator('test', $this->userProvider, $this->encoderFactory);
-        $this->assertFalse($authenticator->supports($request));
+        $this->assertFalse($this->authenticator->supports($request));
     }
 
     public function provideMissingHttpBasicServerParameters()

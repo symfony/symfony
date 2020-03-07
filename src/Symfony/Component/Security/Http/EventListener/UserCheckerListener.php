@@ -23,11 +23,19 @@ class UserCheckerListener implements EventSubscriberInterface
 
     public function preCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
     {
+        if (null === $event->getUser()) {
+            return;
+        }
+
         $this->userChecker->checkPreAuth($event->getUser());
     }
 
     public function postCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
     {
+        if (null === $event->getUser() || !$event->areCredentialsValid()) {
+            return;
+        }
+
         $this->userChecker->checkPostAuth($event->getUser());
     }
 

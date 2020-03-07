@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -33,14 +32,12 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
 {
     private $realmName;
     private $userProvider;
-    private $encoderFactory;
     private $logger;
 
-    public function __construct(string $realmName, UserProviderInterface $userProvider, EncoderFactoryInterface $encoderFactory, ?LoggerInterface $logger = null)
+    public function __construct(string $realmName, UserProviderInterface $userProvider, ?LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
         $this->userProvider = $userProvider;
-        $this->encoderFactory = $encoderFactory;
         $this->logger = $logger;
     }
 

@@ -31,6 +31,10 @@ class VerifyAuthenticatorCredentialsListener implements EventSubscriberInterface
 
     public function onAuthenticating(VerifyAuthenticatorCredentialsEvent $event): void
     {
+        if ($event->areCredentialsValid()) {
+            return;
+        }
+
         $authenticator = $event->getAuthenticator();
         if ($authenticator instanceof PasswordAuthenticatedInterface) {
             // Use the password encoder to validate the credentials

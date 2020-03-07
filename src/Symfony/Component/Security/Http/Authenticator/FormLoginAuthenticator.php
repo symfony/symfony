@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -38,13 +37,11 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements P
 
     private $options;
     private $httpUtils;
-    private $csrfTokenManager;
     private $userProvider;
 
-    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, UserProviderInterface $userProvider, array $options)
+    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, array $options)
     {
         $this->httpUtils = $httpUtils;
-        $this->csrfTokenManager = $csrfTokenManager;
         $this->options = array_merge([
             'username_parameter' => '_username',
             'password_parameter' => '_password',
@@ -75,10 +72,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements P
     public function getCredentials(Request $request): array
     {
         $credentials = [];
-
-        if (null !== $this->csrfTokenManager) {
-            $credentials['csrf_token'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
-        }
+        $credentials['csrf_token'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
         if ($this->options['post_only']) {
             $credentials['username'] = ParameterBagUtils::getParameterBagValue($request->request, $this->options['username_parameter']);

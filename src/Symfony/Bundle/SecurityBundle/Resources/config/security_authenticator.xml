@@ -84,7 +84,6 @@
                  abstract="true">
             <argument type="abstract">realm name</argument>
             <argument type="abstract">user provider</argument>
-            <argument type="service" id="security.encoder_factory" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
@@ -92,7 +91,6 @@
                  class="Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator"
                  abstract="true">
             <argument type="service" id="security.http_utils" />
-            <argument /> <!-- csrf token generator -->
             <argument type="abstract">user provider</argument>
             <argument type="abstract">options</argument>
         </service>

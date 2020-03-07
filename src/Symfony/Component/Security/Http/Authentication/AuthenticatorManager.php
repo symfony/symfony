@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\Token\PreAuthenticationToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -40,8 +39,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    use AuthenticatorManagerTrait;
-
     private $authenticators;
     private $tokenStorage;
     private $eventDispatcher;
@@ -131,7 +128,9 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // lazily (after initialization). This is important for e.g. the AnonymousAuthenticator
             // as its support is relying on the (initialized) token in the TokenStorage.
             if (false === $authenticator->supports($request)) {
-                $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator)]);
+                if (null !== $this->logger) {
+                    $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator)]);
+                }
                 continue;
             }
 
@@ -215,21 +214,14 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', \get_class($authenticator)));
         }
 
-        if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', \get_class($authenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
-        }
-
         $event = new VerifyAuthenticatorCredentialsEvent($authenticator, $credentials, $user);
         $this->eventDispatcher->dispatch($event);
         if (true !== $event->areCredentialsValid()) {
             throw new BadCredentialsException(sprintf('Authentication failed because "%s" did not approve the credentials.', \get_class($authenticator)));
         }
 
-//         turn the UserInterface into a TokenInterface
+        // turn the UserInterface into a TokenInterface
         $authenticatedToken = $authenticator->createAuthenticatedToken($user, $this->providerKey);
-        if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', \get_class($authenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
-        }
 
         if (true === $this->eraseCredentials) {
             $authenticatedToken->eraseCredentials();
@@ -259,21 +251,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         return $loginSuccessEvent->getResponse();
     }
 
-    private function handleAuthenticationFailure(AuthenticationException $exception, TokenInterface $token)
-    {
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($token, $exception), AuthenticationEvents::AUTHENTICATION_FAILURE);
-        }
-
-        $exception->setToken($token);
-
-        throw $exception;
-    }
-
     /**
      * Handles an authentication failure and returns the Response for the authenticator.
      */
-    private function handleAuthenticatorFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator): ?Response
+    private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
         $response = $authenticator->onAuthenticationFailure($request, $authenticationException);
 

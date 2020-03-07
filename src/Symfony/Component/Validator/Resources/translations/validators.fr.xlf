@@ -127,7 +127,7 @@
                 <target>Le téléchargement de ce fichier est impossible.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number.</source>
+                <source>This value should be a valid number or a valid datetime.</source>
                 <target>Cette valeur doit être un nombre.</target>
             </trans-unit>
             <trans-unit id="36">

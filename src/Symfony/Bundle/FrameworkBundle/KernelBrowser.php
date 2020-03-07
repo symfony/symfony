@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\Test\TestBrowserToken;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
@@ -20,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -105,6 +105,31 @@ class KernelBrowser extends HttpKernelBrowser
     public function enableReboot()
     {
         $this->reboot = true;
+    }
+
+    /**
+     * @param UserInterface $user
+     */
+    public function loginUser($user, string $firewallContext = 'main'): self
+    {
+        if (!interface_exists(UserInterface::class)) {
+            throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed.', __METHOD__));
+        }
+
+        if (!$user instanceof UserInterface) {
+            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
+        }
+
+        $token = new TestBrowserToken($user->getRoles(), $user);
+        $token->setAuthenticated(true);
+        $session = $this->getContainer()->get('session');
+        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->getCookieJar()->set($cookie);
+
+        return $this;
     }
 
     /**
@@ -205,18 +230,5 @@ $profilerCode
 EOF;
 
         return $code.$this->getHandleScript();
-    }
-
-    public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
-    {
-        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
-        $session = $this->getContainer()->get('session');
-        $session->set('_security_'.$firewallContext, serialize($token));
-        $session->save();
-
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->getCookieJar()->set($cookie);
-
-        return $this;
     }
 }

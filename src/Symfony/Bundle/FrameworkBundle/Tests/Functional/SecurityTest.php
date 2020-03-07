@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
 
 class SecurityTest extends AbstractWebTestCase
@@ -20,9 +18,9 @@ class SecurityTest extends AbstractWebTestCase
     /**
      * @dataProvider getUsers
      */
-    public function testLoginUser(string $username, ?string $password, array $roles, ?string $firewallContext, string $expectedProviderKey)
+    public function testLoginUser(string $username, array $roles, ?string $firewallContext)
     {
-        $user = new User($username, $password, $roles);
+        $user = new User($username, 'the-password', $roles);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
 
         if (null === $firewallContext) {
@@ -31,27 +29,44 @@ class SecurityTest extends AbstractWebTestCase
             $client->loginUser($user, $firewallContext);
         }
 
-        /** @var SessionInterface $session */
-        $session = $client->getContainer()->get('session');
-        /** @var UsernamePasswordToken $userToken */
-        $userToken = unserialize($session->get('_security_'.$expectedProviderKey));
-
-        $this->assertSame('_security_'.$expectedProviderKey, array_keys($session->all())[0]);
-        $this->assertSame($expectedProviderKey, $userToken->getProviderKey());
-        $this->assertSame($username, $userToken->getUsername());
-        $this->assertSame($password, $userToken->getUser()->getPassword());
-        $this->assertSame($roles, $userToken->getUser()->getRoles());
-
-        $this->assertNotNull($client->getCookieJar()->get('MOCKSESSID'));
+        $client->request('GET', '/'.($firewallContext ?? 'main').'/user_profile');
+        $this->assertEquals('Welcome '.$username.'!', $client->getResponse()->getContent());
     }
 
     public function getUsers()
     {
-        yield ['the-username', 'the-password', ['ROLE_FOO'], null, 'main'];
-        yield ['the-username', 'the-password', ['ROLE_FOO'], 'main', 'main'];
-        yield ['the-username', 'the-password', ['ROLE_FOO'], 'custom_firewall_context', 'custom_firewall_context'];
+        yield ['the-username', ['ROLE_FOO'], null];
+        yield ['the-username', ['ROLE_FOO'], 'main'];
+        yield ['other-username', ['ROLE_FOO'], 'custom'];
 
-        yield ['the-username', null, ['ROLE_FOO'], null, 'main'];
-        yield ['the-username', 'the-password', [], null, 'main'];
+        yield ['the-username', ['ROLE_FOO'], null];
+        yield ['no-role-username', [], null];
+    }
+
+    public function testLoginUserMultipleRequests()
+    {
+        $user = new User('the-username', 'the-password', ['ROLE_FOO']);
+        $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
+        $client->loginUser($user);
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
+    }
+
+    public function testLoginInBetweenRequests()
+    {
+        $user = new User('the-username', 'the-password', ['ROLE_FOO']);
+        $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertTrue($client->getResponse()->isRedirect('http://localhost/login'));
+
+        $client->loginUser($user);
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
     }
 }

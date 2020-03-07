@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -106,7 +107,29 @@ class MarkdownDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
     {
-        throw new LogicException('Using the Markdown format to print the deprecations is not supported.');
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        if (!file_exists($containerDeprecationFilePath)) {
+            throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
+        }
+
+        $logs = unserialize(file_get_contents($containerDeprecationFilePath));
+        if (0 === \count($logs)) {
+            $this->write("## There are no deprecations in the logs!\n");
+
+            return;
+        }
+
+        $formattedLogs = [];
+        $remainingCount = 0;
+        foreach ($logs as $log) {
+            $formattedLogs[] = sprintf("- %sx: \"%s\" in %s:%s\n", $log['count'], $log['message'], $log['file'], $log['line']);
+            $remainingCount += $log['count'];
+        }
+
+        $this->write(sprintf("## Remaining deprecations (%s)\n\n", $remainingCount));
+        foreach ($formattedLogs as $formattedLog) {
+            $this->write($formattedLog);
+        }
     }
 
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])

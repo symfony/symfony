@@ -13,7 +13,7 @@ CHANGELOG
  * The `TemplateController` now accepts context argument
  * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
  * Added tag `routing.expression_language_function` to define functions available in route conditions
- * Added `debug:container --deprecations` command to see compile-time deprecations.
+ * Added `debug:container --deprecations` option to see compile-time deprecations.
 
 5.0.0
 -----

@@ -162,8 +162,8 @@ TXT
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
-        $this->assertContains('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
+        $this->assertStringContainsString('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
     }
 
     public function testGetDeprecationNone()
@@ -182,10 +182,10 @@ TXT
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('[OK] There are no deprecations in the logs!', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
     }
 
-    public function testGetDeprecationNoFile(): void
+    public function testGetDeprecationNoFile()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
         $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.cache_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
@@ -200,22 +200,7 @@ TXT
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('[WARNING] The deprecation file does not exist', $tester->getDisplay());
-    }
-
-    public function testGetDeprecationXml(): void
-    {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
-        $application = new Application(static::$kernel);
-        $application->setAutoExit(false);
-
-        @unlink(static::$container->getParameter('debug.container.dump'));
-
-        $tester = new ApplicationTester($application);
-        $tester->run(['command' => 'debug:container', '--deprecations' => true, '--format' => 'xml']);
-
-        $this->assertSame(1, $tester->getStatusCode());
-        $this->assertContains('Using the XML format to print the deprecations is not supported.', $tester->getDisplay());
+        $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
     public function provideIgnoreBackslashWhenFindingService()

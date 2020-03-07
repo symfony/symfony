@@ -372,7 +372,7 @@ class TextDescriptor extends Descriptor
         $formattedLogs = [];
         $remainingCount = 0;
         foreach ($logs as $log) {
-            $formattedLogs[] = sprintf("%sx: %s \n      in %s:%s", $log['count'], $log['message'], $log['file'], $log['line']);
+            $formattedLogs[] = sprintf("%sx: %s\n      in %s:%s", $log['count'], $log['message'], $log['file'], $log['line']);
             $remainingCount += $log['count'];
         }
         $options['output']->title(sprintf('Remaining deprecations (%s)', $remainingCount));

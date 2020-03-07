@@ -211,6 +211,19 @@ abstract class AbstractDescriptorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider getDeprecationsTestData
+     */
+    public function testGetDeprecations(ContainerBuilder $builder, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $builder, ['deprecations' => true]);
+    }
+
+    public function getDeprecationsTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerDeprecations());
+    }
+
     abstract protected function getDescriptor();
 
     abstract protected function getFormat();

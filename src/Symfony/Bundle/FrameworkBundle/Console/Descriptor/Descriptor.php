@@ -123,7 +123,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = []);
 
-    abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []);
+    abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void;
 
     abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
 

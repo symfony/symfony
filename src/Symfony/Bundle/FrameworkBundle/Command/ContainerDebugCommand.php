@@ -62,16 +62,16 @@ class ContainerDebugCommand extends Command
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Displays environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
-                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'To output the deprecations generated when compiling and warming the cache'),
+                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Displays deprecations generated when compiling and warming up the container'),
             ])
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>
-  
-To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> flag:
-  
+
+To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> option:
+
   <info>php %command.full_name% --deprecations</info>
 
 To get specific information about a service, specify its name:
@@ -187,7 +187,7 @@ EOF
                 $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
                 $errorIo->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
-            } else {
+            } elseif (!$input->getOption('deprecations')) {
                 $errorIo->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
             }
         }

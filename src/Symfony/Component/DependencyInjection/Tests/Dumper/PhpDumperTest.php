@@ -1154,6 +1154,35 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf('stdClass', $container->get('bar'));
     }
 
+    public function testDumpClassDefinedViaEval()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('inline_requires', true);
+        $container
+            ->register('service', \Symfony\Component\DependencyInjection\Tests\Fixtures\MyEvalClass::class)
+            ->setPublic(true)
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumped = $dumper->dump([
+            'as_files' => true,
+            'inline_class_loader_parameter' => 'inline_requires',
+            'file' => self::$fixturesPath.'/MyEvalClass.php',
+        ]);
+
+        foreach ($dumped as $filename => $content) {
+            if ('getServiceService.php' != basename($filename)) {
+                continue;
+            }
+
+            $this->targetDir = self::$fixturesPath;
+            eval('?>'.$content);
+        }
+
+        $this->assertEquals('bar', $container->get('service')->foo());
+    }
+
     public function testUninitializedSyntheticReference()
     {
         $container = new ContainerBuilder();

@@ -7,6 +7,7 @@ CHANGELOG
  * added support to autowire public typed properties in php 7.4
  * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
  * added possibility to define abstract service arguments
+ * allow classes created via eval to be used in the container
 
 5.0.0
 -----

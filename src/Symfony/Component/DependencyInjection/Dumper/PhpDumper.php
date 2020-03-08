@@ -470,6 +470,10 @@ EOF;
             return;
         }
         $file = $r->getFileName();
+        if (') : eval()\'d code' === substr($file, -17)) {
+            // Remove "eval()'d" part of the filename when the class is defined via eval()
+            $file = substr($file, 0, strrpos($file, '(', -17));
+        }
         if (!$file || $this->doExport($file) === $exportedFile = $this->export($file)) {
             return;
         }

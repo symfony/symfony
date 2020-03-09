@@ -613,9 +613,24 @@ YAML;
         $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block_leading_space_in_first_line.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
-    public function testCarriageReturnIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
+    public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
     {
         $this->assertSame("- \"a\\r\\nb\\nc\"\n", $this->dumper->dump(["a\r\nb\nc"], 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
+    public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock()
+    {
+        $expected = <<<'YAML'
+parent:
+    foo: "bar\n\rbaz: qux"
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump([
+            'parent' => [
+                'foo' => "bar\n\rbaz: qux",
+            ],
+        ], 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testZeroIndentationThrowsException()

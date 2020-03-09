@@ -105,6 +105,29 @@ class ServiceValueResolverTest extends TestCase
         $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Referencing a controller as "App\Controller\Mine:method" is deprecated since Symfony 4.1, use "App\Controller\Mine::method" instead.
+     */
+    public function testExistingControllerWithSingleColonTriggersDeprecation()
+    {
+        $resolver = new ServiceValueResolver(new ServiceLocator([
+            'App\\Controller\\Mine:method' => function () {
+                return new ServiceLocator([
+                    'dummy' => function () {
+                        return new DummyService();
+                    },
+                ]);
+            },
+        ]));
+
+        $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine:method']);
+        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+
+        $this->assertTrue($resolver->supports($request, $argument));
+        $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
+    }
+
     public function testErrorIsTruncated()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');

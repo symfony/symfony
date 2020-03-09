@@ -73,6 +73,16 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface
             $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
         }
 
+        if (false !== strpos($controller, ':') && false === strpos($controller, '::')) {
+            $i = strrpos($controller, ':');
+            $controllerName = substr($controller, 0, $i);
+            $methodName = substr($controller, $i + 1);
+            @trigger_error(
+                sprintf('Referencing a controller as "%1$s:%2$s" is deprecated since Symfony 4.1, use "%1$s::%2$s" instead.', $controllerName, $methodName),
+                E_USER_DEPRECATED
+            );
+        }
+
         try {
             yield $this->container->get($controller)->get($argument->getName());
         } catch (RuntimeException $e) {

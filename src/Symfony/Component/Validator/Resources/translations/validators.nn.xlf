@@ -127,7 +127,7 @@
                 <target>Fila kunne ikkje bli lasta opp.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Verdien må vere eit gyldig tal.</target>
             </trans-unit>
             <trans-unit id="36">

@@ -127,7 +127,7 @@
                 <target>Файлът не може да бъде качен.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Стойността трябва да бъде валиден номер.</target>
             </trans-unit>
             <trans-unit id="36">

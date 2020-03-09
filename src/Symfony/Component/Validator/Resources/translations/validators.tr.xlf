@@ -127,7 +127,7 @@
                 <target>Dosya yüklenemiyor.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Bu değer geçerli bir rakam olmalıdır.</target>
             </trans-unit>
             <trans-unit id="36">

@@ -127,7 +127,7 @@
                 <target>De Fichier konnt net eropgeluede ginn.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Dëse Wäert sollt eng gëlteg Zuel sinn.</target>
             </trans-unit>
             <trans-unit id="36">

@@ -127,7 +127,7 @@
                 <target>Die lêer kan nie opgelaai word nie.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Hierdie waarde moet 'n geldige nommer wees.</target>
             </trans-unit>
             <trans-unit id="36">

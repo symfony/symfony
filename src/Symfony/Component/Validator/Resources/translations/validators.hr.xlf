@@ -127,7 +127,7 @@
                 <target>Ova datoteka ne može biti prenesena.</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>Ova vrijednost treba biti ispravan broj.</target>
             </trans-unit>
             <trans-unit id="36">

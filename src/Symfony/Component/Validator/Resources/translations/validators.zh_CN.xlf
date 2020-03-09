@@ -127,7 +127,7 @@
                 <target>无法上传此文件。</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>This value should be a valid number or a valid datetime.</source>
+                <source>This value should be a valid number.</source>
                 <target>该值应该为有效的数字。</target>
             </trans-unit>
             <trans-unit id="36">

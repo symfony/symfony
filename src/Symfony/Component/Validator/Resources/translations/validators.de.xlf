@@ -128,7 +128,7 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>Dieser Wert sollte eine gültige Zahl sein.</target>
+                <target>Dieser Wert sollte eine gültige Zahl oder gültigen Datums- und Zeitangabe sein.</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>

@@ -239,6 +239,54 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertEquals('03:04:00', $form->getViewData());
     }
 
+    public function testSubmitWithoutSecondsAndBrowserAddingSeconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => false,
+        ]);
+
+        $form->submit('03:04:00');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmitWithSecondsAndBrowserAddingMicroseconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ]);
+
+        $form->submit('03:04:00.000');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04:00', $form->getViewData());
+    }
+
+    public function testSubmitWithoutSecondsAndBrowserAddingMicroseconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => false,
+        ]);
+
+        $form->submit('03:04:00.000');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getViewData());
+    }
+
     public function testSetDataWithoutMinutes()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

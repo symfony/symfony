@@ -49,7 +49,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
         $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $this->assertSame(['c1::fooAction'], array_keys($controllers));
+        $this->assertSame(['c1::fooAction', 'c1:fooAction'], array_keys($controllers));
         $this->assertSame(['bar'], array_keys($container->getDefinition((string) $controllers['c1::fooAction']->getValues()[0])->getArgument(0)));
 
         $expectedLog = [
@@ -73,7 +73,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
 
         $this->assertEquals(
-            ['invokable::__invoke', 'invokable'],
+            ['invokable::__invoke', 'invokable:__invoke', 'invokable'],
             array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0))
         );
     }

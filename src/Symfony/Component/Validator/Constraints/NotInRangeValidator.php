@@ -43,7 +43,7 @@ class NotInRangeValidator extends ConstraintValidator
         if (null === $value) {
             return;
         }
-        
+
         if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
             $this->context->buildViolation($constraint->invalidMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
@@ -52,7 +52,7 @@ class NotInRangeValidator extends ConstraintValidator
 
             return;
         }
-        
+
         if (null === $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint)) {
             throw new ConstraintDefinitionException(sprintf('The min value cannot be null in the "%s" constraint.', \get_class($constraint)));
         }

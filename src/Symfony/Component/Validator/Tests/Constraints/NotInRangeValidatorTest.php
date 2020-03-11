@@ -173,7 +173,7 @@ class NotInRangeValidatorTest extends ConstraintValidatorTestCase
 
         return $tests;
     }
-    
+
     public function testNonNumeric()
     {
         $this->validator->validate('abcd', new NotInRange([
@@ -262,12 +262,12 @@ class NotInRangeValidatorTest extends ConstraintValidatorTestCase
             'maxPropertyPath' => 'maxPropertyPath',
         ]));
     }
-    
+
     public function testThrowsOnNullObjectWithDefinedMin()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The max value cannot be null in the "Symfony\Component\Validator\Constraints\NotInRange" constraint.');
-        
+
         $this->setObject(null);
 
         $this->validator->validate(1, new NotInRange([
@@ -301,7 +301,7 @@ class NotInRangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
-    
+
     /**
      * @dataProvider getInvalidDates
      */

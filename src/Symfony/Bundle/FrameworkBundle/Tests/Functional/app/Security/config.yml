@@ -1,0 +1,26 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+security:
+    providers:
+        main:
+            memory:
+                users:
+                    the-username: { password: the-password, roles: ['ROLE_FOO'] }
+                    no-role-username: { password: the-password, roles: [] }
+        custom:
+            memory:
+                users:
+                    other-username: { password: the-password, roles: ['ROLE_FOO'] }
+
+    firewalls:
+        main:
+            pattern: ^/main
+            form_login:
+                check_path: /main/login/check
+            provider: main
+        custom:
+            pattern: ^/custom
+            form_login:
+                check_path: /custom/login/check
+            provider: custom

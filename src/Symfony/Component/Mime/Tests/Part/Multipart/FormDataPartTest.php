@@ -91,4 +91,16 @@ class FormDataPartTest extends TestCase
         $this->assertEquals($foo, $parts[0]->bodyToString());
         $this->assertEquals($bar, $parts[1]->bodyToString());
     }
+
+    public function testBoundaryContentTypeHeader()
+    {
+        $f = new FormDataPart([
+            'file' => new DataPart('data.csv', 'data.csv', 'text/csv'),
+        ]);
+        $headers = $f->getPreparedHeaders()->toArray();
+        $this->assertRegExp(
+            '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
+            $headers[0]
+        );
+    }
 }

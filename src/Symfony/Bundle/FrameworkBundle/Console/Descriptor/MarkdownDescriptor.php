@@ -56,6 +56,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
+            ."\n".'- Priority: '.($route->getPriority() ? $route->getPriority() : '')
             ."\n".'- Class: '.\get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
             ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')

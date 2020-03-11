@@ -27,6 +27,7 @@ class Route implements \Serializable
     private $requirements = [];
     private $options = [];
     private $condition = '';
+    private $priority = 0;
 
     /**
      * @var CompiledRoute|null
@@ -49,8 +50,11 @@ class Route implements \Serializable
      * @param string|string[] $schemes      A required URI scheme or an array of restricted schemes
      * @param string|string[] $methods      A required HTTP method or an array of restricted methods
      * @param string|null     $condition    A condition that should evaluate to true for the route to match
+     * @param int|null        $priority
      */
-    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', $schemes = [], $methods = [], ?string $condition = '')
+    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [],
+                                ?string $host = '', $schemes = [], $methods = [], ?string $condition = '', ?int
+                                $priority = 0)
     {
         $this->setPath($path);
         $this->addDefaults($defaults);
@@ -60,6 +64,7 @@ class Route implements \Serializable
         $this->setSchemes($schemes);
         $this->setMethods($methods);
         $this->setCondition($condition);
+        $this->setPriority($priority);
     }
 
     public function __serialize(): array
@@ -74,6 +79,7 @@ class Route implements \Serializable
             'methods' => $this->methods,
             'condition' => $this->condition,
             'compiled' => $this->compiled,
+            'priority' => $this->priority,
         ];
     }
 
@@ -101,6 +107,7 @@ class Route implements \Serializable
         if (isset($data['compiled'])) {
             $this->compiled = $data['compiled'];
         }
+        $this->priority = $data['priority'] ?? 0;
     }
 
     /**
@@ -502,6 +509,31 @@ class Route implements \Serializable
     public function setCondition(?string $condition)
     {
         $this->condition = (string) $condition;
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the priority.
+     *
+     * @return integer The condition
+     */
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * Sets the condition.
+     *
+     * This method implements a fluent interface.
+     *
+     * @return $this
+     */
+    public function setPriority(?int $priority)
+    {
+        $this->priority = (int) $priority;
         $this->compiled = null;
 
         return $this;

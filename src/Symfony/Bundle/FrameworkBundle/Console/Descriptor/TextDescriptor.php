@@ -64,6 +64,7 @@ class TextDescriptor extends Descriptor
                 $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
+                0 !== $route->getPriority() ? $route->getPriority() : '',
                 $this->formatControllerLink($controller, $route->getPath()),
             ];
 
@@ -97,6 +98,7 @@ class TextDescriptor extends Descriptor
             ['Host Regex', ('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')],
             ['Scheme', ($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')],
             ['Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')],
+            ['Priority', (0 !== $route->getPriority() ? $route->getPriority() : '')],
             ['Requirements', ($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')],
             ['Class', \get_class($route)],
             ['Defaults', $this->formatRouterConfig($route->getDefaults())],

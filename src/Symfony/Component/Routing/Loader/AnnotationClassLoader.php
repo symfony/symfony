@@ -201,7 +201,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         foreach ($paths as $locale => $path) {
-            $route = $this->createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+            $route = $this->createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods,
+                $condition, $priority);
             $this->configureRoute($route, $class, $method, $annot);
             if (0 !== $locale) {
                 $route->setDefault('_locale', $locale);
@@ -325,9 +326,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
         ];
     }
 
-    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
+    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host,
+                                   array $schemes, array $methods, ?string $condition, ?int $priority)
     {
-        return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+        return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition, $priority);
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

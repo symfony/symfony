@@ -209,6 +209,7 @@ class JsonDescriptor extends Descriptor
             'hostRegex' => '' !== $route->getHost() ? $route->compile()->getHostRegex() : '',
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+            'priority' => $route->getPriority() ? $route->getPriority() : '',
             'class' => \get_class($route),
             'defaults' => $route->getDefaults(),
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',

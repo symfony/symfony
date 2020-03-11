@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -49,6 +50,8 @@ require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
 
 class PhpDumperTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -410,10 +413,10 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testAliasesDeprecation()
     {
+        $this->expectDeprecation('The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will be removed in the future.');
         $container = include self::$fixturesPath.'/containers/container_alias_deprecation.php';
         $container->compile();
         $dumper = new PhpDumper($container);
@@ -1192,10 +1195,10 @@ class PhpDumperTest extends TestCase
      * This test checks the trigger of a deprecation note and should not be removed in major releases.
      *
      * @group legacy
-     * @expectedDeprecation The "foo" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testPrivateServiceTriggersDeprecation()
     {
+        $this->expectDeprecation('The "foo" service is deprecated. You should stop using it, as it will be removed in the future.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')
             ->setPublic(false)
@@ -1344,11 +1347,11 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated1" service alias is deprecated. You should stop using it, as it will be removed in the future.
-     * @expectedDeprecation The "deprecated2" service alias is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testMultipleDeprecatedAliasesWorking()
     {
+        $this->expectDeprecation('The "deprecated1" service alias is deprecated. You should stop using it, as it will be removed in the future.');
+        $this->expectDeprecation('The "deprecated2" service alias is deprecated. You should stop using it, as it will be removed in the future.');
         $container = new ContainerBuilder();
         $container->setDefinition('bar', new Definition('stdClass'))->setPublic(true);
         $container->setAlias('deprecated1', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');

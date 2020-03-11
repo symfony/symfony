@@ -226,6 +226,7 @@ class SymfonyTestsListenerTrait
                 if (isset($annotations['method']['expectedDeprecation'])) {
                     self::$expectedDeprecations = $annotations['method']['expectedDeprecation'];
                     self::$previousErrorHandler = set_error_handler([self::class, 'handleError']);
+                    @trigger_error('Since symfony/phpunit-bridge 5.1: Using "@expectedDeprecation" annotations in tests is deprecated, use the "ExpectDeprecationTrait::expectDeprecation()" method instead.', E_USER_DEPRECATED);
                 }
 
                 if ($this->checkNumAssertions) {

@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var ChoiceListFactoryInterface|MockObject
      */
@@ -192,11 +195,10 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     /**
      * @group legacy
-     *
-     * @expectedDeprecation Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don't pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.
      */
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
+        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -295,11 +297,10 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     /**
      * @group legacy
-     *
-     * @expectedDeprecation Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don't pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.
      */
     public function legacyTestLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
+        $this->expectDeprecation('Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.');
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,

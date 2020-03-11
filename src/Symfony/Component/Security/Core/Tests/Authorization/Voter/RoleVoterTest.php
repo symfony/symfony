@@ -12,12 +12,15 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class RoleVoterTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider getVoteTests
      */
@@ -46,10 +49,10 @@ class RoleVoterTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/security-core 5.1: The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.
      */
     public function testDeprecatedRolePreviousAdmin()
     {
+        $this->expectDeprecation('Since symfony/security-core 5.1: The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
         $voter = new RoleVoter();
 
         $voter->vote($this->getTokenWithRoleNames(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), null, ['ROLE_PREVIOUS_ADMIN']);

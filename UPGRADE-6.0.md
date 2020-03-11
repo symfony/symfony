@@ -43,6 +43,11 @@ Messenger
  * Removed RedisExt transport. Run `composer require symfony/redis-messenger` to keep the transport in your application.
  * Use of invalid options in Redis and AMQP connections now throws an error.
 
+PhpUnitBridge
+-------------
+
+ * Removed support for `@expectedDeprecation` annotations, use the `ExpectDeprecationTrait::expectDeprecation()` method instead.
+
 Routing
 -------
 

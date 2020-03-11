@@ -91,7 +91,7 @@ abstract class AbstractMultipartPart extends AbstractPart
     private function getBoundary(): string
     {
         if (null === $this->boundary) {
-            $this->boundary = '_=_symfony_'.time().'_'.bin2hex(random_bytes(16)).'_=_';
+            $this->boundary = '_symfony_'.time().'_'.bin2hex(random_bytes(16)).'_';
         }
 
         return $this->boundary;

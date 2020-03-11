@@ -51,6 +51,9 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
                 }
                 if (!$reason) {
+                    // see Symfony\Component\HttpKernel\Controller\ContainerControllerResolver
+                    $controllers[$id.':'.$action] = $argumentRef;
+
                     if ('__invoke' === $action) {
                         $controllers[$id] = $argumentRef;
                     }

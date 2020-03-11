@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-03-10T16:08:37Z
+
+I would restore the comment `See Symfony\Component\HttpKernel\Controller\ContainerControllerResolver` (just not the `Deprecated since 4.1` part which was wrong)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-10T16:09:59Z
+
+OK, updated.

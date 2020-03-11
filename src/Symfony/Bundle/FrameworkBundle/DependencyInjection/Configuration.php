@@ -688,7 +688,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('enabled_locales')
-                            ->prototype('scalar')
+                            ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
                     ->end()

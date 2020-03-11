@@ -18,7 +18,8 @@ require $vendor.'/vendor/autoload.php';
 (new Application())
     ->register('app')
     ->setCode(function(InputInterface $input, OutputInterface $output) {
-        $output->writeln((new QuestionHelper())->ask($input, $output, new Question('Foo?')));
+        $output->writeln((new QuestionHelper())->ask($input, $output, new Question('Foo?', 'foo')));
+        $output->writeln((new QuestionHelper())->ask($input, $output, new Question('Bar?', 'bar')));
     })
     ->getApplication()
     ->setDefaultCommand('app', true)
@@ -26,3 +27,4 @@ require $vendor.'/vendor/autoload.php';
 ;
 --EXPECT--
 Foo?Hello World
+Bar?bar

@@ -1,0 +1,141 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-03-03T15:33:21Z
+
+Why in the string component ? This is not about performing string manipulation (and if this is just because the uuid itself is taken as a string, that's a bad argument as half of Symfony operates on string data).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-03T15:44:32Z
+
+> Why in the string component ?
+
+Asked by @nicolas-grekas ¯\_(ツ)_/¯
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-03T15:50:44Z
+
+1. I added `public const VARIANT*`
+1. I implemented `\JsonSerializable`
+1. I factorized the check for the extension + fixed the message
+1. I used `@requires function uuid_is_valid` in the test instead of manual code
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-03T20:56:36Z
+
+Given the number of UUID libraries in PHP/Symfony land (ref https://jolicode.com/blog/uuid-generation-in-php ), I would say this topic is oversaturated with libraries already. Is there a major pro for this new class instead of the Pecl extension/Symfony Polyfill or Ramsey UUID?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T21:12:04Z
+
+Where do you see saturation here? pecl is low level: there need to be a value object in our OOP code. polyfill is ... a polyfill, and FFI+libuuid is a POC. Which means there is only one single available (and mainstream) implementation: ramsey/uuid.
+The class proposed here provides the same benefits (a VO), with a very simple implementation.
+Ppl that need to do fancy things with uuid - or that need guaranteed portability to 32b systems, will have to resort to ramsey/uuid. But the rest of the world will be happy to leverage a trivial implem.
+At least I would.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-04T10:12:52Z
+
+I don't like having verbose documentation. In this case, we're going to have to document things like _"If you're going to use UUIDs, install `symfony/string` and - if you don't have the PECL UUID extension installed - also install `symfony/polyfill-uuid`."_. That to me seems verbose as opposite to _"If you're going to use UUIDs, install the `symfony/polyfill-uuid` or the UUID PECL extension"_. Especially since - imho - unlike the String component, this UUID class doesn't add any value on top of the PECL extension/polyfill.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-04T10:22:30Z
+
+> this UUID class doesn't add any value on top of the PECL extension/polyfill
+
+It does provide a lot: e.g a VO integrates with Doctrine types. The pecl extension doesn't.
+
+About the doc for deps, there's nothing specific to this PR... The argument would apply to any new feature with optional deps...
+
+---------------------------------------------------------------------------
+
+by stof at 2020-03-04T11:23:30Z
+
+making it a dedicated `symfony/uuid` component would solve the case of needing uuid support, as the component could have a requirement on `symfony/polyfill-uuid` (as we do in other components when we need `mbstring` for instance).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-05T13:26:03Z
+
+Agreed on the new component proposal.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-03-05T13:51:24Z
+
+did we consider adding polyfill support for ramsey/uuid? esp. since it has 1st class pecl support already:
+
+https://github.com/ramsey/uuid/blob/b31703e7c9752260ddc773c95110294fa9abc5ff/src/FeatureSet.php#L84
+https://github.com/ramsey/uuid/blob/master/src/Generator/PeclUuidNameGenerator.php
+
+> Ppl that need to do fancy things with uuid - or that need guaranteed portability to 32b systems, will have to resort to ramsey/uuid
+
+so, we shouldnt resort to ramsey/uuid for simple/non-fancy uuids? i feel like we're defeating it's UuidInterface + the fact most of the ecosystem is using it already.
+
+> It does provide a lot: e.g a VO integrates with Doctrine types.
+
+so does ramsey/uuid.
+
+im rather skeptical about `vendor-a/uuid` + `vendor-b/uuid` :)
+
+---------------------------------------------------------------------------
+
+by theofidry at 2020-03-06T11:40:24Z
+
+👎
+
+What benefits does it has over `ramsey/uuid`? Sure this one might be a bit simpler, but it's not like `ramsey/uuid` is super complex either and is already very wildly used by the PHP ecosystem with over _90 millions downloads_.
+
+It doesn't feel like this component is needed and really risks to repeat the same problem as with the messaging component: either great a divide or completely absorb other libraries. There might have been more compelling arguments for the messaging component, but is that the case here?
+
+Edit:
+
+I like Symfony to have a solid place in the PHP ecosystem and help it to improve and innovate. I wish to see Symfony pushing for a healthy diverse and welcoming ecosystem and community embracing cooperation, not leverage its popularity to appropriate stuff that it might deem interesting with no regards to others and just create more needless competition, fracturation & friction instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-11T08:58:31Z
+
+What about naming the component `Uid` (original idea from @javiereguiluz)?
+I'm working on a PR to add [`Ulid`](https://github.com/ulid/spec) support and it would fit the component - but maybe not the `Uuid` name of it.
+
+`Uid` would clear that issue, and would also clear the confusion with `ramsey/uuid`-and-the-likes: this component is about unique identifiers of any useful sort. UUID, ULID, maybe more in the future.
+
+I think that could also clear objections expressed in previous comments.
+
+@lyrixx WDYT? Can you update the PR if OK to you?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-03-11T09:13:30Z
+
+I would propose a more "understandable" name like `symfony/unique-identifier` for the component, instead of `uid`
+
+---------------------------------------------------------------------------
+
+by Taluu at 2020-03-11T09:17:08Z
+
+I was thinking the same, but it seems that `Uid` is also understood as "unique identifier" : https://en.wikipedia.org/wiki/UID (See `Unique identification` section).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-11T09:57:42Z
+
+@OskarStark if I need to make the choice, I'd vote for `Uid` - that's way clear enough.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-11T10:10:15Z
+
+Just a random thought: Would the idea of the Uid component be stronger if we add a `UidInterface` contract, that can be used by any unique identifier introduced?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-11T10:19:52Z
+
+@wouterj What would be the interface ?

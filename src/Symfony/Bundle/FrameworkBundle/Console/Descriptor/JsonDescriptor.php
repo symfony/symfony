@@ -29,9 +29,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class JsonDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $data = [];
@@ -42,25 +39,16 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeData($this->getRouteData($route), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeData($this->sortParameters($parameters), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
@@ -128,17 +116,11 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if (!$builder) {
@@ -169,9 +151,6 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->getCallableData($callable), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';

@@ -27,9 +27,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class MarkdownDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $first = true;
@@ -44,9 +41,6 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $output = '- Path: '.$route->getPath()
@@ -66,9 +60,6 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->write("Container parameters\n====================\n");
@@ -77,9 +68,6 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
@@ -176,9 +164,6 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         $output = '- Class: `'.$definition->getClass().'`'
@@ -240,9 +225,6 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         $output = '- Service: `'.$alias.'`'
@@ -264,9 +246,6 @@ class MarkdownDescriptor extends Descriptor
         $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);

@@ -22,7 +22,7 @@ class RangeTest extends TestCase
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range([
-            'max' => 'min',
+            'max' => 'max',
             'maxPropertyPath' => 'maxPropertyPath',
         ]);
     }

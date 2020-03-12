@@ -31,41 +31,26 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class XmlDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $this->writeDocument($this->getRouteCollectionDocument($routes));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeDocument($this->getRouteDocument($route, isset($options['name']) ? $options['name'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeDocument($this->getContainerParametersDocument($parameters));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -75,25 +60,16 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $builder, isset($options['show_arguments']) && $options['show_arguments']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], isset($options['filter']) ? $options['filter'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         $this->writeDocument($this->getContainerDefinitionDocument($definition, isset($options['id']) ? $options['id'] : null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -110,41 +86,26 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, \array_key_exists('event', $options) ? $options['event'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCallable($callable, array $options = [])
     {
         $this->writeDocument($this->getCallableDocument($callable));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $this->writeDocument($this->getContainerParameterDocument($parameter, $options));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
         throw new LogicException('Using the XML format to debug environment variables is not supported.');
     }
 
-    /**
-     * Writes DOM document.
-     */
     private function writeDocument(\DOMDocument $dom)
     {
         $dom->formatOutput = true;

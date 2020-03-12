@@ -43,9 +43,6 @@ class TextDescriptor extends Descriptor
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
@@ -83,9 +80,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $tableHeaders = ['Property', 'Value'];
@@ -112,9 +106,6 @@ class TextDescriptor extends Descriptor
         $table->render();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $tableHeaders = ['Parameter', 'Value'];
@@ -128,9 +119,6 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -147,9 +135,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -171,9 +156,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -263,9 +245,6 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         if (isset($options['id'])) {
@@ -374,9 +353,6 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if ($alias->isPublic()) {
@@ -392,9 +368,6 @@ class TextDescriptor extends Descriptor
         $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $options['output']->table(
@@ -405,9 +378,6 @@ class TextDescriptor extends Descriptor
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
         $dump = new Dumper($this->output);
@@ -470,9 +440,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = \array_key_exists('event', $options) ? $options['event'] : null;
@@ -497,9 +464,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCallable($callable, array $options = [])
     {
         $this->writeText($this->formatCallable($callable), $options);

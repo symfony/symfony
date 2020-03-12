@@ -739,4 +739,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
+
+    public function testExpressionLanguageWithSyntheticService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('synthetic')
+            ->setSynthetic(true);
+        $container->register('baz', \stdClass::class)
+            ->addArgument(new Reference('synthetic'));
+        $container->register('bar', Bar::class)
+            ->addArgument(new Expression('service("baz").getStdClass()'));
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }

@@ -146,7 +146,7 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
-            ->scalarNode('catch_exceptions')->defaultTrue()->end()
+            ->booleanNode('catch_exceptions')->defaultTrue()->end()
         ;
 
         foreach ($this->options as $name => $value) {
@@ -156,6 +156,8 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue($value);
             } elseif (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
+            } elseif (\is_int($value)) {
+                $builder->integerNode($name)->defaultValue($value);
             } else {
                 $builder->scalarNode($name)->defaultValue($value);
             }

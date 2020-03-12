@@ -12,9 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 
 class PriorityTaggedServiceTraitTest extends TestCase
 {
@@ -84,6 +86,50 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $container = new ContainerBuilder();
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
         $this->assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+    }
+
+    public function testOnlyTheFirstNonIndexedTagIsListed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service1')->addTag('my_custom_tag');
+
+        $definition = $container->register('service2', BarTagClass::class);
+        $definition->addTag('my_custom_tag', ['priority' => 100]);
+        $definition->addTag('my_custom_tag', []);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $expected = [
+            new Reference('service2'),
+            new Reference('service1'),
+        ];
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+    }
+
+    public function testOnlyTheIndexedTagsAreListed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service1')->addTag('my_custom_tag', ['foo' => 'bar']);
+
+        $definition = $container->register('service2', BarTagClass::class);
+        $definition->addTag('my_custom_tag', ['priority' => 100]);
+        $definition->addTag('my_custom_tag', ['foo' => 'a']);
+        $definition->addTag('my_custom_tag', ['foo' => 'b', 'priority' => 100]);
+        $definition->addTag('my_custom_tag', ['foo' => 'b']);
+        $definition->addTag('my_custom_tag', []);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo');
+        $expected = [
+            'bar_tag_class' => new Reference('service2'),
+            'b' => new Reference('service2'),
+            'bar' => new Reference('service1'),
+            'a' => new Reference('service2'),
+        ];
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 }
 

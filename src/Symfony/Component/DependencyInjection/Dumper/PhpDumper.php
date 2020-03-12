@@ -799,20 +799,26 @@ EOF;
 EOF;
         }
 
-        $this->serviceCalls = [];
-        $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
+        if ($definition->hasErrors() && $e = $definition->getErrors()) {
+            $this->addThrow = true;
 
-        if ($definition->isDeprecated()) {
-            $code .= sprintf("        trigger_deprecation('', '', %s);\n\n", $this->export($definition->getDeprecationMessage($id)));
+            $code .= sprintf("        \$this->throw(%s);\n", $this->export(reset($e)));
+        } else {
+            $this->serviceCalls = [];
+            $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
+
+            if ($definition->isDeprecated()) {
+                $code .= sprintf("        trigger_deprecation('', '', %s);\n\n", $this->export($definition->getDeprecationMessage($id)));
+            }
+
+            if ($this->getProxyDumper()->isProxyCandidate($definition)) {
+                $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : '$this->factories[%2$s](false)') : '$this->%s(false)';
+                $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
+            }
+
+            $code .= $this->addServiceInclude($id, $definition);
+            $code .= $this->addInlineService($id, $definition);
         }
-
-        if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-            $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : '$this->factories[%2$s](false)') : '$this->%s(false)';
-            $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
-        }
-
-        $code .= $this->addServiceInclude($id, $definition);
-        $code .= $this->addInlineService($id, $definition);
 
         if ($asFile) {
             $code = implode("\n", array_map(function ($line) { return $line ? substr($line, 8) : $line; }, explode("\n", $code)));

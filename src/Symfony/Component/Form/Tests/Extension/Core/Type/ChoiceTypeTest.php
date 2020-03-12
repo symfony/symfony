@@ -2053,7 +2053,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @dataProvider expandedIsEmptyWhenNoRealChoiceIsSelectedProvider
      */
-    public function testExpandedIsEmptyWhenNoRealChoiceIsSelected(bool $expected, $submittedData, bool $multiple, bool $required, $placeholder)
+    public function testExpandedIsEmptyWhenNoRealChoiceIsSelected($expected, $submittedData, $multiple, $required, $placeholder)
     {
         $options = [
             'expanded' => true,

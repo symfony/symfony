@@ -455,10 +455,7 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Unsupported IDN "%s", try enabling the "intl" PHP extension or running "composer require symfony/polyfill-intl-idn".', $host));
             }
 
-            if (false === $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) : strtolower($host)) {
-                throw new InvalidArgumentException(sprintf('Unsupported host in "%s".', $url));
-            }
-
+            $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) ?: strtolower($host) : strtolower($host);
             $host .= $port ? ':'.$port : '';
         }
 

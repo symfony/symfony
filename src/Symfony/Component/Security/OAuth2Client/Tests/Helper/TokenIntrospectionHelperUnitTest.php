@@ -24,7 +24,7 @@ final class TokenIntrospectionHelperUnitTest extends TestCase
     public function testValidTokenCanBeIntrospected()
     {
         $clientMock = new MockHttpClient([
-            new MockResponse(\json_encode([
+            new MockResponse(json_encode([
                 'active' => false,
                 'scope' => 'test',
                 'client_id' => '1234567',

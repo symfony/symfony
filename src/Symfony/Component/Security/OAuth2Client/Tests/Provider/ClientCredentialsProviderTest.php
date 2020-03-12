@@ -41,7 +41,7 @@ final class ClientCredentialsProviderTest extends TestCase
     public function testErrorOnAuthorizationTokenRequest(array $options, string $scope)
     {
         static::expectException(\RuntimeException::class);
-        static::expectExceptionMessage(\sprintf(
+        static::expectExceptionMessage(sprintf(
             'The %s does not support the authorization process, the credentials should be obtained by the client, please refer to https://tools.ietf.org/html/rfc6749#section-4.4.1',
             ClientCredentialsProvider::class
         ));
@@ -83,8 +83,8 @@ final class ClientCredentialsProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
-                    'access_token' => \uniqid(),
+                new MockResponse(json_encode([
+                    'access_token' => uniqid(),
                     'token_type' => 'bearer',
                     'expires_in' => 3600,
                 ]), [
@@ -99,7 +99,7 @@ final class ClientCredentialsProviderTest extends TestCase
 
         $accessToken = $provider->fetchAccessToken([
             'scope' => $scope,
-            'test' => \uniqid(),
+            'test' => uniqid(),
         ]);
 
         static::assertNotNull($accessToken->getTokenValue('access_token'));
@@ -114,8 +114,8 @@ final class ClientCredentialsProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
-                    'access_token' => \uniqid(),
+                new MockResponse(json_encode([
+                    'access_token' => uniqid(),
                     'token_type' => 'bearer',
                     'expires_in' => 3600,
                 ]), [
@@ -131,7 +131,7 @@ final class ClientCredentialsProviderTest extends TestCase
 
         $accessToken = $provider->fetchAccessToken([
             'scope' => $scope,
-            'test' => \uniqid(),
+            'test' => uniqid(),
         ]);
 
         static::assertNotNull($accessToken->getTokenValue('access_token'));

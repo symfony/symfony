@@ -41,7 +41,7 @@ final class ImplicitProviderTest extends TestCase
     public function testErrorOnAuthorizationTokenRequest(array $options, string $code, string $state)
     {
         static::expectException(\RuntimeException::class);
-        static::expectExceptionMessage(\sprintf(
+        static::expectExceptionMessage(sprintf(
             'The %s doesn\'t support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.2',
             ImplicitProvider::class
         ));
@@ -83,7 +83,7 @@ final class ImplicitProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\sprintf('https://bar.com/authenticate?access_token=%s&token_type=valid&state=%s', $code, $state), [
+                new MockResponse(sprintf('https://bar.com/authenticate?access_token=%s&token_type=valid&state=%s', $code, $state), [
                     'response_headers' => [
                         'http_method' => 'GET',
                         'http_code' => 200,

@@ -21,8 +21,6 @@ interface ProviderInterface
 {
     /**
      * Allow to parse the response body and find errors.
-     *
-     * @param ResponseInterface $response
      */
     public function parseResponse(ResponseInterface $response);
 

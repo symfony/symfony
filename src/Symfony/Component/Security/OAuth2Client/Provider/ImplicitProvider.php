@@ -26,10 +26,7 @@ final class ImplicitProvider extends GenericProvider
      */
     public function fetchAuthorizationInformations(array $options, array $headers = [], string $method = 'GET')
     {
-        throw new \RuntimeException(\sprintf(
-            'The %s doesn\'t support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.2',
-            self::class
-        ));
+        throw new \RuntimeException(sprintf('The %s doesn\'t support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.2', self::class));
     }
 
     /**

@@ -28,7 +28,7 @@ final class JWTProvider extends GenericProvider
     public function fetchAuthorizationInformations(array $options, array $headers = [], string $method = 'POST')
     {
         if (!isset($options['iss'], $options['sub'], $options['aud'], $options['exp'])) {
-            throw new InvalidJWTAuthorizationOptions(\sprintf(''));
+            throw new InvalidJWTAuthorizationOptions(sprintf(''));
         }
 
         $body = [
@@ -62,7 +62,7 @@ final class JWTProvider extends GenericProvider
     public function fetchAccessToken(array $options, array $headers = [], string $method = 'GET')
     {
         if (!isset($options['assertion'])) {
-            throw new MissingOptionsException(\sprintf('The assertion query parameters mut be set!'));
+            throw new MissingOptionsException(sprintf('The assertion query parameters mut be set!'));
         }
 
         $query = [
@@ -73,9 +73,7 @@ final class JWTProvider extends GenericProvider
         if (isset($options['client_id']) && \is_string($options['assertion'])) {
             $query['client_id'] = $options['client_id'];
         } elseif (!\is_string($options['assertion'])) {
-            throw new InvalidJWTTokenTypeException(\sprintf(
-                'The given JWT token isn\'t properly typed, given %s', \gettype($options['assertion'])
-            ));
+            throw new InvalidJWTTokenTypeException(sprintf('The given JWT token isn\'t properly typed, given %s', \gettype($options['assertion'])));
         }
 
         if (isset($options['scope'])) {

@@ -41,7 +41,7 @@ final class ResourceOwnerCredentialsProviderTest extends TestCase
     public function testErrorOnAuthorizationTokenRequest(array $options, string $code, array $credentials = [])
     {
         static::expectException(\RuntimeException::class);
-        static::expectExceptionMessage(\sprintf(
+        static::expectExceptionMessage(sprintf(
             'The %s does not support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.3.1',
             ResourceOwnerCredentialsProvider::class
         ));
@@ -83,11 +83,11 @@ final class ResourceOwnerCredentialsProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
+                new MockResponse(json_encode([
                     'access_token' => $code,
                     'token_type' => 'test',
                     'expires_in' => 3600,
-                    'refresh_token' => \uniqid(),
+                    'refresh_token' => uniqid(),
                 ]), [
                     'response_headers' => [
                         'http_method' => 'GET',
@@ -113,18 +113,18 @@ final class ResourceOwnerCredentialsProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
+                new MockResponse(json_encode([
                     'access_token' => $code,
                     'token_type' => 'test',
                     'expires_in' => 3600,
-                    'refresh_token' => \uniqid(),
+                    'refresh_token' => uniqid(),
                 ]), [
                     'response_headers' => [
                         'http_method' => 'GET',
                         'http_code' => 200,
                     ],
                 ]),
-                new MockResponse(\json_encode([
+                new MockResponse(json_encode([
                     'access_token' => $code,
                     'token_type' => 'test',
                     'expires_in' => 1200,

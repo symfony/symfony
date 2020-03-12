@@ -27,7 +27,7 @@ final class ClientProfileLoaderTest extends TestCase
     public function testWrongAccessToken(string $clientProfileUrl, string $accessToken)
     {
         $client = new MockHttpClient([
-            new MockResponse(\json_encode([
+            new MockResponse(json_encode([
                 'error' => 'This access_token seems expired.',
             ]), [
                 'response_headers' => [
@@ -53,7 +53,7 @@ final class ClientProfileLoaderTest extends TestCase
     public function testValidAccessToken(string $clientProfileUrl, string $accessToken)
     {
         $client = new MockHttpClient([
-            new MockResponse(\json_encode([
+            new MockResponse(json_encode([
                 'username' => 'Foo',
                 'email' => 'foo@bar.com',
                 'id' => 123456,
@@ -82,7 +82,7 @@ final class ClientProfileLoaderTest extends TestCase
     {
         yield 'Expired access_token' => [
             'http://api.foo.com/profile/user',
-            \uniqid(),
+            uniqid(),
         ];
     }
 

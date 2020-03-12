@@ -28,10 +28,7 @@ final class ClientCredentialsProvider extends GenericProvider
      */
     public function fetchAuthorizationInformations(array $options, array $headers = [], string $method = 'GET')
     {
-        throw new \RuntimeException(\sprintf(
-            'The %s does not support the authorization process, the credentials should be obtained by the client, please refer to https://tools.ietf.org/html/rfc6749#section-4.4.1',
-            self::class
-        ));
+        throw new \RuntimeException(sprintf('The %s does not support the authorization process, the credentials should be obtained by the client, please refer to https://tools.ietf.org/html/rfc6749#section-4.4.1', self::class));
     }
 
     /**

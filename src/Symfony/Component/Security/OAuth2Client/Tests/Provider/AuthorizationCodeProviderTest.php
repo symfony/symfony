@@ -78,7 +78,7 @@ final class AuthorizationCodeProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\sprintf('https://bar.com/authenticate?code=%s&state=%s', $code, $state), [
+                new MockResponse(sprintf('https://bar.com/authenticate?code=%s&state=%s', $code, $state), [
                     'response_headers' => [
                         'http_method' => 'GET',
                         'http_code' => 200,
@@ -124,19 +124,19 @@ final class AuthorizationCodeProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
+                new MockResponse(json_encode([
                     'access_token' => $code,
                     'token_type' => 'test',
                     'expires_in' => 3600,
-                    'refresh_token' => \uniqid(),
+                    'refresh_token' => uniqid(),
                 ]), [
                     'response_headers' => [
                         'http_method' => 'GET',
                         'http_code' => 200,
                     ],
                 ]),
-                new MockResponse(\json_encode([
-                    'access_token' => \uniqid(),
+                new MockResponse(json_encode([
+                    'access_token' => uniqid(),
                     'token_type' => 'test',
                     'expires_in' => 1200,
                 ]), [
@@ -154,7 +154,7 @@ final class AuthorizationCodeProviderTest extends TestCase
 
         static::assertNotNull($accessToken->getTokenValue('access_token'));
         static::assertNotNull($accessToken->getTokenValue('refresh_token'));
-        static::assertInternalType('int', $accessToken->getTokenValue('expires_in'));
+        static::assertIsInt($accessToken->getTokenValue('expires_in'));
         static::assertSame(3600, $accessToken->getTokenValue('expires_in'));
 
         $refreshedToken = $provider->refreshToken($accessToken->getTokenValue('refresh_token'), 'public');
@@ -171,7 +171,7 @@ final class AuthorizationCodeProviderTest extends TestCase
     {
         $clientMock = new MockHttpClient(
             [
-                new MockResponse(\json_encode([
+                new MockResponse(json_encode([
                     'access_token' => $code,
                     'token_type' => 'test',
                     'expires_in' => 3600,
@@ -190,7 +190,7 @@ final class AuthorizationCodeProviderTest extends TestCase
 
         static::assertNotNull($accessToken->getTokenValue('access_token'));
         static::assertNull($accessToken->getTokenValue('refresh_token'));
-        static::assertInternalType('int', $accessToken->getTokenValue('expires_in'));
+        static::assertIsInt($accessToken->getTokenValue('expires_in'));
     }
 
     public function provideWrongOptions(): \Generator

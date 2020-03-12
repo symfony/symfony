@@ -27,10 +27,7 @@ final class ResourceOwnerCredentialsProvider extends GenericProvider
      */
     public function fetchAuthorizationInformations(array $options, array $headers = [], string $method = 'GET')
     {
-        throw new \RuntimeException(\sprintf(
-            'The %s does not support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.3.1',
-            self::class
-        ));
+        throw new \RuntimeException(sprintf('The %s does not support the authorization process, please refer to https://tools.ietf.org/html/rfc6749#section-4.3.1', self::class));
     }
 
     /**
@@ -41,9 +38,7 @@ final class ResourceOwnerCredentialsProvider extends GenericProvider
     public function fetchAccessToken(array $options, array $headers = [], string $method = 'GET')
     {
         if (!isset($options['username'], $options['password'])) {
-            throw new InvalidRequestException(\sprintf(
-                'The access_token request requires that you provide a username and a password!'
-            ));
+            throw new InvalidRequestException(sprintf('The access_token request requires that you provide a username and a password!'));
         }
 
         $query = [

@@ -77,7 +77,7 @@ abstract class GenericProvider implements ProviderInterface
         foreach ($urls as $key => $url) {
             if (\in_array($key, self::URL_OPTIONS)) {
                 if (!preg_match('~^{http|https}|[\w+.-]+://~', $url)) {
-                    throw new InvalidUrlException(\sprintf('The given URL %s isn\'t a valid one.', $url));
+                    throw new InvalidUrlException(sprintf('The given URL %s isn\'t a valid one.', $url));
                 }
             }
         }
@@ -120,9 +120,7 @@ abstract class GenericProvider implements ProviderInterface
 
         foreach ($matches as $keys => $value) {
             if (\in_array($keys, self::ERROR_OPTIONS)) {
-                throw new InvalidRequestException(
-                    \sprintf('It seems that the request encounter an error %s', $value)
-                );
+                throw new InvalidRequestException(sprintf('It seems that the request encounter an error %s', $value));
             }
         }
 

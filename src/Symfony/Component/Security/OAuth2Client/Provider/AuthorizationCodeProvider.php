@@ -66,9 +66,7 @@ final class AuthorizationCodeProvider extends GenericProvider
     public function fetchAccessToken(array $options, array $headers = [], string $method = 'GET', bool $secured = false)
     {
         if (!isset($options['code'])) {
-            throw new MissingOptionsException(
-                \sprintf('The required options code is missing')
-            );
+            throw new MissingOptionsException(sprintf('The required options code is missing'));
         }
 
         $defaultHeaders = [

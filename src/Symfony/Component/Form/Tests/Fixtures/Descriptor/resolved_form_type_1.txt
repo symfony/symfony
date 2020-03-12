@@ -26,6 +26,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    label                                                 
                                                    label_attr                                            
                                                    label_format                                          
+                                                   label_html                                            
                                                    label_translation_parameters                          
                                                    mapped                                                
                                                    method                                                

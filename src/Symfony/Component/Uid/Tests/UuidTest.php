@@ -116,9 +116,9 @@ class UuidTest extends TestCase
     {
         $uuid = new Uuid(self::A_UUID_V1);
 
-        $this->assertSame(Uuid::VARIANT_DCE, $uuid->getVariant());
-        $this->assertSame(1583245966, $uuid->getTime());
-        $this->assertSame('3499710062d0', $uuid->getMac());
+        $this->assertSame(UUID_VARIANT_DCE, uuid_variant($uuid));
+        $this->assertSame('3499710062d0', uuid_mac($uuid));
+        $this->assertSame(1583245966.746458, $uuid->getTime());
         $this->assertSame(self::A_UUID_V1, (string) $uuid);
     }
 }

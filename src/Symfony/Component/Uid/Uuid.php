@@ -23,11 +23,6 @@ class Uuid implements \JsonSerializable
     public const TYPE_4 = UUID_TYPE_RANDOM;
     public const TYPE_5 = UUID_TYPE_SHA1;
 
-    public const VARIANT_NCS = UUID_VARIANT_NCS;
-    public const VARIANT_DCE = UUID_VARIANT_DCE;
-    public const VARIANT_MICROSOFT = UUID_VARIANT_MICROSOFT;
-    public const VARIANT_OTHER = UUID_VARIANT_OTHER;
-
     private $uuid;
 
     public function __construct(string $uuid = null)
@@ -100,27 +95,23 @@ class Uuid implements \JsonSerializable
         return uuid_type($this->uuid);
     }
 
-    public function getVariant(): int
-    {
-        return uuid_variant($this->uuid);
-    }
-
-    public function getTime(): int
+    public function getTime(): float
     {
         if (self::TYPE_1 !== $t = uuid_type($this->uuid)) {
             throw new \LogicException("UUID of type $t doesn't contain a time.");
         }
 
-        return uuid_time($this->uuid);
-    }
+        $time = '0'.substr($this->uuid, 15, 3).substr($this->uuid, 9, 4).substr($this->uuid, 0, 8);
 
-    public function getMac(): string
-    {
-        if (self::TYPE_1 !== $t = uuid_type($this->uuid)) {
-            throw new \LogicException("UUID of type $t doesn't contain a MAC.");
+        if (\PHP_INT_SIZE >= 8) {
+            return (hexdec($time) - 0x01b21dd213814000) / 10000000;
         }
 
-        return uuid_mac($this->uuid);
+        $time = str_pad(hex2bin($time), 8, "\0", STR_PAD_LEFT);
+        $time = InternalUtil::binaryAdd($time, "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00");
+        $time[0] = $time[0] & "\x7F";
+
+        return InternalUtil::toDecimal($time) / 10000000;
     }
 
     public function __toString(): string

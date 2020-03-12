@@ -33,7 +33,8 @@
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php73": "^1.11"
+        "symfony/polyfill-php73": "^1.11",
+        "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -90,6 +91,7 @@
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
+        "symfony/uid": "self.version",
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
         "symfony/var-exporter": "self.version",

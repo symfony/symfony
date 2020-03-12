@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-05-09T12:45:11Z
+
+As described in #31358 I think it totally make sense to have label_html attribute in it as we also have help_html attribute. :+1: for this.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-05-13T07:50:36Z
+
+@przemyslaw-bogusz the label is also used inside the button example and could contain html there also see: https://github.com/symfony/symfony/pull/31358/files
+
+---------------------------------------------------------------------------
+
+by AndreasA at 2019-05-28T05:51:36Z
+
+Hi, just wondering will this make it into Symfony 4.3?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-05-28T06:45:55Z
+
+@AndreasA I've been busy preparing for SymfonyLive in Warsaw, but that's on the list of my priorities, so I will fix the tests and complete it as soon as I can. However, it doesn't mean it will be automatically approved. If you like the idea, give it a 'thumbs up' or leave a positive comment.
+
+---------------------------------------------------------------------------
+
+by AndreasA at 2019-05-28T09:11:08Z
+
+I think this would be really helpful. Especially in combination with the `label_translation_parameters` it would allow to create terms and condition checkboxes with links in them way easier than it is now.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-06-12T12:56:43Z
+
+@przemyslaw-bogusz the tests seems to fail because $label_html is not define in the form_label.html.php not sure how this happens maybe you can try to debug the tests and try to fix it?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-06-17T07:02:21Z
+
+I've tried a different approach by implementing this feature in `FormType` instead of `BaseType`, but in either case tests keep failing with the same result - variable "label_html" does not exist. Nevertheless, it works in real application with different combinations of field types and themes. Maybe @xabbuh or @chr-hertel could shed some light?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-02-10T19:30:11Z
+
+@xabbuh I have started working on this some time ago, but I had problem with a single space, that which caused the tests to fail. I have fixed this, but there is still some issue with Travis on PHP 7.4. I could really use some help to solve this out, because there are a few people, who like this proposition - #35598.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-02-14T08:00:03Z
+
+@przemyslaw-bogusz I think making sure that the Twig bridge always gets the Form component in version 5.1 or higher should solve it. We would need to make some changes to the Twid bridge's `composer.json` file.
+
+`require-dev`:
+
+```
+"symfony/form": "^5.1"
+```
+
+`conflict`:
+
+```
+"symfony/form": "<5.1"
+```
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-02-14T08:46:53Z
+
+@xabbuh Thanks a lot. That solved the issue. However, now there is a single test in Cache Component failing.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-15T07:22:56Z
+
+It looks like this PR contains not related commits. Can you rebase and force push?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-02-15T20:12:33Z
+
+I have updated the form component changelog. Sorry for the mess with the commits and thanks for the cleanup.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-02-28T05:43:41Z
+
+I removed the CHANGELOG update, and without AppVeyor CI is green again.

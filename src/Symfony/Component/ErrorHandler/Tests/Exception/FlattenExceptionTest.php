@@ -13,6 +13,7 @@ namespace Symfony\Component\ErrorHandler\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Tests\Fixtures\StringErrorCodeException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -184,6 +185,15 @@ class FlattenExceptionTest extends TestCase
     }
 
     /**
+     * @dataProvider stringAndIntDataProvider
+     */
+    public function testCode(\Throwable $exception)
+    {
+        $flattened = FlattenException::createFromThrowable($exception);
+        $this->assertSame($exception->getCode(), $flattened->getCode());
+    }
+
+    /**
      * @dataProvider flattenDataProvider
      */
     public function testToArray(\Throwable $exception, string $expectedClass)
@@ -221,6 +231,14 @@ class FlattenExceptionTest extends TestCase
         return [
             [new \Exception('test', 123), 'Exception'],
             [new \Error('test', 123), 'Error'],
+        ];
+    }
+
+    public function stringAndIntDataProvider(): array
+    {
+        return [
+            [new \Exception('test1', 123)],
+            [new StringErrorCodeException('test2', '42S02')],
         ];
     }
 

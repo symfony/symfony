@@ -703,6 +703,23 @@ abstract class HttpClientTestCase extends TestCase
         $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 1]);
     }
 
+    public function testIdnResolve()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://0-------------------------------------------------------------0.com:8057/', [
+            'resolve' => ['0-------------------------------------------------------------0.com' => '127.0.0.1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response = $client->request('GET', 'http://Bücher.example:8057/', [
+            'resolve' => ['xn--bcher-kva.example' => '127.0.0.1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testNotATimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);

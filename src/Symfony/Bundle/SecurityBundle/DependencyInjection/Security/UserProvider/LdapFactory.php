@@ -48,11 +48,13 @@ class LdapFactory implements UserProviderFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('extra_field')
+            ->fixXmlConfig('default_role')
             ->children()
                 ->scalarNode('service')->isRequired()->cannotBeEmpty()->defaultValue('ldap')->end()
                 ->scalarNode('base_dn')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('search_dn')->end()
-                ->scalarNode('search_password')->end()
+                ->scalarNode('search_dn')->defaultNull()->end()
+                ->scalarNode('search_password')->defaultNull()->end()
                 ->arrayNode('extra_fields')
                     ->prototype('scalar')->end()
                 ->end()

@@ -210,7 +210,10 @@ class FlattenException
         return $this;
     }
 
-    public function getCode(): int
+    /**
+     * @return int|string int most of the time (might be a string with PDOException)
+     */
+    public function getCode()
     {
         return $this->code;
     }

@@ -116,7 +116,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, bool $newline = false, int $options = self::OUTPUT_NORMAL)
+    public function write($messages, bool $newline = false, int $options = 0)
     {
         // do nothing
     }

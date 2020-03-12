@@ -135,7 +135,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, bool $newline = false, int $options = self::OUTPUT_NORMAL)
+    public function write($messages, bool $newline = false, int $options = 0)
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];

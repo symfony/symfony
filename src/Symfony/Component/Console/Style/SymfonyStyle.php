@@ -380,7 +380,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function write($messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
+    public function write($messages, bool $newline = false, int $type = 0)
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];

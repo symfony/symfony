@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-07T12:33:40Z
+
+Thanks for the taking over!
+Features are for the master branch :) Rebase needed
+
+---------------------------------------------------------------------------
+
+by noemi-salaun at 2020-03-07T12:36:21Z
+
+Oh ok, I was targeting the same version as the previous PR but I guess 5.0 was release since ^^
+
+---------------------------------------------------------------------------
+
+by noemi-salaun at 2020-03-07T12:53:15Z
+
+Oh I rebased before switching the targeted branch for this PR, so the CI failed
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-03-07T15:56:58Z
+
+The history of commits is weird, can you take a look for remove the commit alreay merge
+
+---------------------------------------------------------------------------
+
+by noemi-salaun at 2020-03-07T16:56:16Z
+
+I have restarted from Simperfit branch, rebase it on top of master and then cherry pick my commit. I think it should be good now :)
+
+---------------------------------------------------------------------------
+
+by noemi-salaun at 2020-03-10T17:33:43Z
+
+I think @dunglas, @jderusse, @lyrixx, @sroze and @xabbuh were automatically added as reviewer when I strangely rebase between branch 4.4 and master. The PR contained their commit by mistake. But I cannot remove them from the reviewers... I'm sorry for the flood :disappointed:

@@ -42,7 +42,7 @@ class Uuid implements \JsonSerializable
             throw new \InvalidArgumentException(sprintf('Invalid UUID: "%s".', $uuid));
         }
 
-        $this->uuid = $uuid;
+        $this->uuid = strtr($uuid, 'ABCDEF', 'abcdef');
     }
 
     public static function v1(): self
@@ -85,8 +85,15 @@ class Uuid implements \JsonSerializable
         return uuid_is_null($this->uuid);
     }
 
-    public function equals(self $other): bool
+    /**
+     * Returns whether the argument is of class Uuid and contains the same value as the current instance.
+     */
+    public function equals($other): bool
     {
+        if (!$other instanceof self) {
+            return false;
+        }
+
         return 0 === uuid_compare($this->uuid, $other->uuid);
     }
 

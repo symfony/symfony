@@ -94,6 +94,22 @@ class UuidTest extends TestCase
         $this->assertFalse($uuid1->equals($uuid2));
     }
 
+    /**
+     * @dataProvider provideInvalidEqualType
+     */
+    public function testEqualsAgainstOtherType($other)
+    {
+        $this->assertFalse((new Uuid(self::A_UUID_V4))->equals($other));
+    }
+
+    public function provideInvalidEqualType()
+    {
+        yield [null];
+        yield [self::A_UUID_V1];
+        yield [self::A_UUID_V4];
+        yield [new \stdClass()];
+    }
+
     public function testCompare()
     {
         $uuids = [];

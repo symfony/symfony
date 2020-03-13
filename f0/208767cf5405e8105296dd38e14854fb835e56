@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2020-03-06T12:48:08Z
+
+JSON can only be `null|string|number|array|\stdClass` in PHP (classes and interfaces aren't supported). Maybe it is worth it to return this union type instead of nothing?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-10T16:36:05Z
+
+@dunglas That would be `null|string|int|float|array|object` considering the existing built in types in the PropertyInfo Type class. That would still fix the bug however and seems more consistent. Is that alright for you?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-12T15:28:47Z
+
+@nicolas-grekas Does your approval mean you prefer to return nothing?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-12T16:39:10Z
+
+> Does your approval mean you prefer to return nothing?
+
+yes :)

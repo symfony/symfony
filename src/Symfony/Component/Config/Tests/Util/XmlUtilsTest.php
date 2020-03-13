@@ -42,6 +42,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'not_readable.xml');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
+            chmod($fixtures.'not_readable.xml', 0644);
             $this->assertStringContainsString('is not readable', $e->getMessage());
         }
 
@@ -49,7 +50,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid.xml');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('ERROR 77', $e->getMessage());
+            $this->assertStringContainsString('ERROR ', $e->getMessage());
         }
 
         try {

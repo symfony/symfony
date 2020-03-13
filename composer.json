@@ -34,6 +34,7 @@
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.11",
+        "symfony/polyfill-php80": "^1.15",
         "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {

@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -63,10 +64,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     {
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($user, $this->providerKey);
-        // authenticate this in the system
-        $this->saveAuthenticatedToken($token, $request);
 
-        // return the success metric
+        // authenticate this in the system
         return $this->handleAuthenticationSuccess($token, $request, $authenticator);
     }
 
@@ -161,10 +160,6 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 throw new \UnexpectedValueException(sprintf('The return value of "%1$s::getCredentials()" must not be null. Return false from "%1$s::supports()" instead.', \get_class($authenticator)));
             }
 
-            if (null !== $this->logger) {
-                $this->logger->debug('Passing token information to the AuthenticatorManager', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
-            }
-
             // authenticate the credentials (e.g. check password)
             $token = $this->authenticateViaAuthenticator($authenticator, $credentials);
 
@@ -172,15 +167,19 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 $this->logger->info('Authenticator successful!', ['token' => $token, 'authenticator' => \get_class($authenticator)]);
             }
 
-            // sets the token on the token storage, etc
-            $this->saveAuthenticatedToken($token, $request);
-        } catch (AuthenticationException $e) {
-            // oh no! Authentication failed!
-
-            if (null !== $this->logger) {
-                $this->logger->info('Authenticator failed.', ['exception' => $e, 'authenticator' => \get_class($authenticator)]);
+            // success! (sets the token on the token storage, etc)
+            $response = $this->handleAuthenticationSuccess($token, $request, $authenticator);
+            if ($response instanceof Response) {
+                return $response;
             }
 
+            if (null !== $this->logger) {
+                $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator)]);
+            }
+
+            return null;
+        } catch (AuthenticationException $e) {
+            // oh no! Authentication failed!
             $response = $this->handleAuthenticationFailure($e, $request, $authenticator);
             if ($response instanceof Response) {
                 return $response;
@@ -188,22 +187,6 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
             return null;
         }
-
-        // success!
-        $response = $this->handleAuthenticationSuccess($token, $request, $authenticator);
-        if ($response instanceof Response) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Authenticator set success response.', ['response' => $response, 'authenticator' => \get_class($authenticator)]);
-            }
-
-            return $response;
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator)]);
-        }
-
-        return null;
     }
 
     private function authenticateViaAuthenticator(AuthenticatorInterface $authenticator, $credentials): TokenInterface
@@ -234,19 +217,17 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         return $authenticatedToken;
     }
 
-    private function saveAuthenticatedToken(TokenInterface $authenticatedToken, Request $request)
+    private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
         $this->tokenStorage->setToken($authenticatedToken);
 
-        $loginEvent = new InteractiveLoginEvent($request, $authenticatedToken);
-        $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
-    }
+        $response = $authenticator->onAuthenticationSuccess($request, $authenticatedToken, $this->providerKey);
+        if ($authenticator instanceof InteractiveAuthenticatorInterface && $authenticator->isInteractive()) {
+            $loginEvent = new InteractiveLoginEvent($request, $authenticatedToken);
+            $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
+        }
 
-    private function handleAuthenticationSuccess(TokenInterface $token, Request $request, AuthenticatorInterface $authenticator): ?Response
-    {
-        $response = $authenticator->onAuthenticationSuccess($request, $token, $this->providerKey);
-
-        $this->eventDispatcher->dispatch($loginSuccessEvent = new LoginSuccessEvent($authenticator, $token, $request, $response, $this->providerKey));
+        $this->eventDispatcher->dispatch($loginSuccessEvent = new LoginSuccessEvent($authenticator, $authenticatedToken, $request, $response, $this->providerKey));
 
         return $loginSuccessEvent->getResponse();
     }
@@ -256,7 +237,14 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
      */
     private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
+        if (null !== $this->logger) {
+            $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator)]);
+        }
+
         $response = $authenticator->onAuthenticationFailure($request, $authenticationException);
+        if (null !== $response && null !== $this->logger) {
+            $this->logger->debug('The "{authenticator}" authenticator set the failure response.', ['authenticator' => \get_class($authenticator)]);
+        }
 
         $this->eventDispatcher->dispatch($loginFailureEvent = new LoginFailureEvent($authenticationException, $authenticator, $request, $response, $this->providerKey));
 

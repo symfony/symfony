@@ -66,12 +66,12 @@ class AnonymousAuthenticator implements AuthenticatorInterface, CustomAuthentica
         return new AnonymousToken($this->secret, 'anon.', []);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
-        return null;
+        return null; // let the original request continue
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return null;
     }

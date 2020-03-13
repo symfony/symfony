@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
  *
  * @final
  */
-class RememberMeAuthenticator implements AuthenticatorInterface, CustomAuthenticatedInterface
+class RememberMeAuthenticator implements InteractiveAuthenticatorInterface, CustomAuthenticatedInterface
 {
     private $rememberMeServices;
     private $secret;
@@ -97,6 +97,11 @@ class RememberMeAuthenticator implements AuthenticatorInterface, CustomAuthentic
         return new RememberMeToken($user, $providerKey, $this->secret);
     }
 
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    {
+        return null; // let the original request continue
+    }
+
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $this->rememberMeServices->loginFail($request, $exception);
@@ -104,8 +109,8 @@ class RememberMeAuthenticator implements AuthenticatorInterface, CustomAuthentic
         return null;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function isInteractive(): bool
     {
-        return null;
+        return true;
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -28,7 +27,7 @@ class UsernamePasswordToken extends AbstractToken
      * @param string|\Stringable|UserInterface $user        The username (like a nickname, email address, etc.) or a UserInterface instance
      * @param mixed                            $credentials
      * @param string                           $providerKey
-     * @param (Role|string)[]                  $roles
+     * @param string[]                         $roles
      *
      * @throws \InvalidArgumentException
      */

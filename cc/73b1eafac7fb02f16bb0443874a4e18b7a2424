@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-13T13:58:33Z
+
+Why not, but I have an issue now:
+
+```php
+$uuid = new Uuid(UUID_A);
+
+$uuid->equald(new Uuid(UUID_A)); // <- this will return true
+$uuid->equald(UUID_A); // But this will return false
+```
+
+Nothing in the API nor PHP doc tells about this behavior.
+
+The question is:
+> What do we want?
+
+It should be clarified somewhere

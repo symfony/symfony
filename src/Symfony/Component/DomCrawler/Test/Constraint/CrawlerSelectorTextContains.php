@@ -45,7 +45,12 @@ final class CrawlerSelectorTextContains extends Constraint
             return false;
         }
 
-        return false !== mb_strpos($crawler->text(null, false), $this->expectedText);
+        foreach($crawler->getIterator() as $node){
+            if(false !== mb_strpos($node->nodeValue, $this->expectedText)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

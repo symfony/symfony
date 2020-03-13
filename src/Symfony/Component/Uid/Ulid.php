@@ -53,10 +53,10 @@ class Ulid implements \JsonSerializable
         return $ulid[0] <= '7';
     }
 
-    public static function fromBinary(string $ulid): self
+    public static function fromString(string $ulid): self
     {
         if (16 !== \strlen($ulid)) {
-            throw new \InvalidArgumentException('Invalid binary ULID.');
+            return new static($ulid);
         }
 
         $ulid = bin2hex($ulid);

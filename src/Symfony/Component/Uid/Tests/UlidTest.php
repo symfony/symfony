@@ -46,7 +46,7 @@ class UlidTest extends TestCase
         $ulid = new Ulid('3zzzzzzzzzzzzzzzzzzzzzzzzz');
         $this->assertSame('7fffffffffffffffffffffffffffffff', bin2hex($ulid->toBinary()));
 
-        $this->assertTrue($ulid->equals(Ulid::fromBinary(hex2bin('7fffffffffffffffffffffffffffffff'))));
+        $this->assertTrue($ulid->equals(Ulid::fromString(hex2bin('7fffffffffffffffffffffffffffffff'))));
     }
 
     /**

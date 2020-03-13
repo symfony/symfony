@@ -88,6 +88,22 @@ class ObjectsProvider
         ];
     }
 
+    public static function getContainerDeprecations()
+    {
+        $builderWithDeprecations = new ContainerBuilder();
+        $builderWithDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithDeprecations->setParameter('kernel.container_class', 'KernelContainerWith');
+
+        $builderWithoutDeprecations = new ContainerBuilder();
+        $builderWithoutDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithoutDeprecations->setParameter('kernel.container_class', 'KernelContainerWithout');
+
+        return [
+            'deprecations' => $builderWithDeprecations,
+            'deprecations_empty' => $builderWithoutDeprecations,
+        ];
+    }
+
     public static function getContainerBuilders()
     {
         $builder1 = new ContainerBuilder();

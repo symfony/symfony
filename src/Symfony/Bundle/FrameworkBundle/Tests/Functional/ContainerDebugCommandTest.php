@@ -136,6 +136,73 @@ TXT
         $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
     }
 
+    public function testGetDeprecation()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.cache_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        touch($path);
+        file_put_contents($path, serialize([[
+            'type' => 16384,
+            'message' => 'The "Symfony\Bundle\FrameworkBundle\Controller\Controller" class is deprecated since Symfony 4.2, use Symfony\Bundle\FrameworkBundle\Controller\AbstractController instead.',
+            'file' => '/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php',
+            'line' => 17,
+            'trace' => [[
+                'file' => '/home/hamza/projet/contrib/sf/src/Controller/DefaultController.php',
+                'line' => 9,
+                'function' => 'spl_autoload_call',
+            ]],
+            'count' => 1,
+        ]]));
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        @unlink(static::$container->getParameter('debug.container.dump'));
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--deprecations' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
+        $this->assertStringContainsString('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
+    }
+
+    public function testGetDeprecationNone()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.cache_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        touch($path);
+        file_put_contents($path, serialize([]));
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        @unlink(static::$container->getParameter('debug.container.dump'));
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--deprecations' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
+    }
+
+    public function testGetDeprecationNoFile()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.cache_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        @unlink($path);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        @unlink(static::$container->getParameter('debug.container.dump'));
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--deprecations' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
+    }
+
     public function provideIgnoreBackslashWhenFindingService()
     {
         return [

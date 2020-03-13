@@ -1,0 +1,1 @@
+a:2:{i:0;a:6:{s:4:"type";i:16384;s:7:"message";s:25:"Some deprecation message.";s:4:"file";s:22:"/path/to/some/file.php";s:4:"line";i:39;s:5:"trace";a:0:{}s:5:"count";i:3;}i:1;a:6:{s:4:"type";i:16384;s:7:"message";s:29:"An other deprecation message.";s:4:"file";s:26:"/path/to/an/other/file.php";s:4:"line";i:25;s:5:"trace";a:0:{}s:5:"count";i:2;}}

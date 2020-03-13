@@ -47,12 +47,13 @@ final class CrawlerSelectorAttributeValueSame extends Constraint
             return false;
         }
 
-        foreach($crawler->getIterator() as $node){
+        foreach ($crawler->getIterator() as $node) {
             $attrValue = $node->hasAttribute($this->attribute) ? trim($node->getAttribute($this->attribute)) : null;
-            if ($this->expectedText === $attrValue){
+            if ($this->expectedText === $attrValue) {
                 return true;
             }
         }
+
         return false;
     }
 

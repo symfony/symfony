@@ -16,7 +16,7 @@ namespace Symfony\Component\String;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class LazyString implements \JsonSerializable
+class LazyString implements \Stringable, \JsonSerializable
 {
     private $value;
 
@@ -50,14 +50,14 @@ class LazyString implements \JsonSerializable
     }
 
     /**
-     * @param object|string|int|float|bool $value A scalar or an object that implements the __toString() magic method
+     * @param string|int|float|bool|\Stringable $value
      *
      * @return static
      */
     public static function fromStringable($value): self
     {
         if (!self::isStringable($value)) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be a scalar or an object that implements the __toString() magic method, %s given.', __METHOD__, \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be a scalar or a stringable object, %s given.', __METHOD__, \is_object($value) ? \get_class($value) : \gettype($value)));
         }
 
         if (\is_object($value)) {
@@ -75,7 +75,7 @@ class LazyString implements \JsonSerializable
      */
     final public static function isStringable($value): bool
     {
-        return \is_string($value) || $value instanceof self || (\is_object($value) ? \is_callable([$value, '__toString']) : is_scalar($value));
+        return \is_string($value) || $value instanceof self || (\is_object($value) ? method_exists($value, '__toString') : is_scalar($value));
     }
 
     /**
@@ -90,6 +90,9 @@ class LazyString implements \JsonSerializable
         return $value;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         if (\is_string($this->value)) {

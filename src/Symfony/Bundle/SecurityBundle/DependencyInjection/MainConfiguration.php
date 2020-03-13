@@ -296,7 +296,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
-                    ->booleanNode('stateless')->defaultValue(false)->end()
+                    ->booleanNode('stateless')->defaultFalse()->end()
                 ->end()
             ->end()
         ;

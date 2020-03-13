@@ -28,6 +28,12 @@ class Uuid implements \JsonSerializable
     public const VARIANT_MICROSOFT = UUID_VARIANT_MICROSOFT;
     public const VARIANT_OTHER = UUID_VARIANT_OTHER;
 
+    // https://tools.ietf.org/html/rfc4122#section-4.1.4
+    // 0x01b21dd213814000 is the number of 100-ns intervals between the
+    // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
+    private const TIME_OFFSET_INT = 0x01b21dd213814000;
+    private const TIME_OFFSET_COM = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
+
     private $uuid;
 
     public function __construct(string $uuid = null)
@@ -105,13 +111,23 @@ class Uuid implements \JsonSerializable
         return uuid_variant($this->uuid);
     }
 
-    public function getTime(): int
+    public function getTime(): float
     {
         if (self::TYPE_1 !== $t = uuid_type($this->uuid)) {
             throw new \LogicException("UUID of type $t doesn't contain a time.");
         }
 
-        return uuid_time($this->uuid);
+        $time = '0'.substr($this->uuid, 15, 3).substr($this->uuid, 9, 4).substr($this->uuid, 0, 8);
+
+        if (\PHP_INT_SIZE >= 8) {
+            return (hexdec($time) - self::TIME_OFFSET_INT) / 10000000;
+        }
+
+        $time = str_pad(hex2bin($time), 8, "\0", STR_PAD_LEFT);
+        $time = InternalUtil::binaryAdd($time, self::TIME_OFFSET_COM);
+        $time[0] = $time[0] & "\x7F";
+
+        return InternalUtil::toDecimal($time) / 10000000;
     }
 
     public function getMac(): string

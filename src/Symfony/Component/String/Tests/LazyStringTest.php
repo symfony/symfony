@@ -107,8 +107,5 @@ class LazyStringTest extends TestCase
         $this->assertFalse(LazyString::isStringable([]));
         $this->assertFalse(LazyString::isStringable(STDIN));
         $this->assertFalse(LazyString::isStringable(new \StdClass()));
-        if (\PHP_VERSION_ID < 80000) {
-            $this->assertFalse(LazyString::isStringable(@eval('return new class() {private function __toString() {}};')));
-        }
     }
 }

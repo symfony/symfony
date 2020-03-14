@@ -4,6 +4,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Http\Authenticator\AbstractPreAuthenticatedAuthenticator;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 
 /**
@@ -23,7 +24,7 @@ class UserCheckerListener implements EventSubscriberInterface
 
     public function preCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
     {
-        if (null === $event->getUser()) {
+        if (null === $event->getUser() || $event->getAuthenticator() instanceof AbstractPreAuthenticatedAuthenticator) {
             return;
         }
 

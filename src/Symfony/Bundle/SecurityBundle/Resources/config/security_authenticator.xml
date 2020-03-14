@@ -10,6 +10,7 @@
                  class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager"
                  abstract="true"
         >
+            <tag name="monolog.logger" channel="security" />
             <argument type="abstract">authenticators</argument>
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="event_dispatcher" />
@@ -82,6 +83,7 @@
         <service id="security.authenticator.http_basic"
                  class="Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator"
                  abstract="true">
+            <tag name="monolog.logger" channel="security" />
             <argument type="abstract">realm name</argument>
             <argument type="abstract">user provider</argument>
             <argument type="service" id="logger" on-invalid="null" />
@@ -110,6 +112,29 @@
             <argument type="service" id="security.token_storage" />
             <argument type="abstract">options</argument>
             <argument type="service" id="security.authentication.session_strategy" />
+        </service>
+
+        <service id="security.authenticator.x509"
+                 class="Symfony\Component\Security\Http\Authenticator\X509Authenticator"
+                 abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="abstract">user provider</argument>
+            <argument type="service" id="security.token_storage"/>
+            <argument type="abstract">firewall name</argument>
+            <argument type="abstract">user key</argument>
+            <argument type="abstract">credentials key</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authenticator.remote_user"
+                 class="Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator"
+                 abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="abstract">user provider</argument>
+            <argument type="service" id="security.token_storage"/>
+            <argument type="abstract">firewall name</argument>
+            <argument type="abstract">user key</argument>
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

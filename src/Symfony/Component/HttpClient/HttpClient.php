@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class HttpClient
 {
     /**
-     * @param array $defaultOptions     Default requests' options
+     * @param array $defaultOptions     Default request's options
      * @param int   $maxHostConnections The maximum number of connections to a single host
      * @param int   $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *

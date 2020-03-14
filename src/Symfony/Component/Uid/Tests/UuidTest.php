@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\NullUuid;
+use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
@@ -146,11 +146,11 @@ class UuidTest extends TestCase
         $this->assertSame([$a, $b, $c, $d], $uuids);
     }
 
-    public function testNullUuid()
+    public function testNilUuid()
     {
         $uuid = Uuid::fromString('00000000-0000-0000-0000-000000000000');
 
-        $this->assertInstanceOf(NullUuid::class, $uuid);
+        $this->assertInstanceOf(NilUuid::class, $uuid);
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
     }
 }

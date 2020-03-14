@@ -121,7 +121,7 @@ class Ulid implements \JsonSerializable
             base_convert(substr($time, 6, 4), 32, 16)
         );
 
-        return InternalUtil::toDecimal(hex2bin($time)) / 1000;
+        return BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10) / 1000;
     }
 
     public function __toString(): string
@@ -163,7 +163,7 @@ class Ulid implements \JsonSerializable
         if (\PHP_INT_SIZE >= 8) {
             $time = base_convert($time, 10, 32);
         } else {
-            $time = bin2hex(InternalUtil::toBinary($time));
+            $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
             $time = sprintf('%s%04s%04s',
                 base_convert(substr($time, 0, 2), 16, 32),
                 base_convert(substr($time, 2, 5), 16, 32),

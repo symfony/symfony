@@ -18,6 +18,7 @@ use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
+use Symfony\Component\Uid\UuidV6;
 
 class UuidTest extends TestCase
 {
@@ -71,6 +72,18 @@ class UuidTest extends TestCase
         $uuid = Uuid::v5(new UuidV4(self::A_UUID_V4), 'the name');
 
         $this->assertInstanceOf(UuidV5::class, $uuid);
+    }
+
+    public function testV6()
+    {
+        $uuid = Uuid::v6();
+
+        $this->assertInstanceOf(UuidV6::class, $uuid);
+
+        $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
+
+        $this->assertSame(85916308548.27832, $uuid->getTime());
+        $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
     public function testBinary()

@@ -49,6 +49,7 @@ class Uuid implements \JsonSerializable
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);
             case UuidV5::TYPE: return new UuidV5($uuid);
+            case UuidV6::TYPE: return new UuidV6($uuid);
             case NullUuid::TYPE: return new NullUuid();
             case self::TYPE: return new self($uuid);
         }
@@ -74,6 +75,11 @@ class Uuid implements \JsonSerializable
     final public static function v5(self $namespace, string $name): UuidV5
     {
         return new UuidV5(uuid_generate_sha1($namespace->uuid, $name));
+    }
+
+    final public static function v6(): UuidV6
+    {
+        return new UuidV6();
     }
 
     public static function isValid(string $uuid): bool

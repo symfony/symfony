@@ -23,11 +23,6 @@ class Uuid implements \JsonSerializable
     public const TYPE_4 = UUID_TYPE_RANDOM;
     public const TYPE_5 = UUID_TYPE_SHA1;
 
-    public const VARIANT_NCS = UUID_VARIANT_NCS;
-    public const VARIANT_DCE = UUID_VARIANT_DCE;
-    public const VARIANT_MICROSOFT = UUID_VARIANT_MICROSOFT;
-    public const VARIANT_OTHER = UUID_VARIANT_OTHER;
-
     // https://tools.ietf.org/html/rfc4122#section-4.1.4
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
@@ -111,11 +106,6 @@ class Uuid implements \JsonSerializable
     public function getType(): int
     {
         return uuid_type($this->uuid);
-    }
-
-    public function getVariant(): int
-    {
-        return uuid_variant($this->uuid);
     }
 
     public function getTime(): float

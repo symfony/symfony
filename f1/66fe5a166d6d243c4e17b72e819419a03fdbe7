@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-11T13:03:20Z
+
+What does it fix?
+
+---------------------------------------------------------------------------
+
+by guillbdx at 2020-03-11T13:05:22Z
+
+Description updated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-11T13:11:14Z
+
+As far as I know, the current chars used in the boundary are correct, so I would prefer that we fix the root cause instead.
+
+---------------------------------------------------------------------------
+
+by guillbdx at 2020-03-11T13:38:38Z
+
+Yes, after checking, the chars are correct, and the quotes should not cause any problem at all, that's even a recommandation:
+
+> The grammar for parameters on the Content-type field is such that it is often necessary to enclose the boundary parameter values in quotes on the Content-type line.  This is not always necessary, but never hurts.
+https://tools.ietf.org/html/rfc2046#section-5.1.1
+
+So I assume the root cause is API side in the ticket #35443 and there's not much we can do.
+
+---------------------------------------------------------------------------
+
+by n3o77 at 2020-03-12T15:02:34Z
+
+I think the actual problem here is that the boundary is only put in quotes in the header but not the parts in the message (as described here: https://github.com/symfony/symfony/issues/35443#issuecomment-581433914 )
+
+---------------------------------------------------------------------------
+
+by guillbdx at 2020-03-12T16:05:36Z
+
+@n3o77 It's normal, quotes are only for the parameter value in the header: https://tools.ietf.org/html/rfc2046#section-5.1.1
+
+Anyway, this PR should fix this interoperability issue.

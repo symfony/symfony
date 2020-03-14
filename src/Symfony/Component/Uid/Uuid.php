@@ -121,10 +121,10 @@ class Uuid implements \JsonSerializable
         }
 
         $time = str_pad(hex2bin($time), 8, "\0", STR_PAD_LEFT);
-        $time = InternalUtil::binaryAdd($time, self::TIME_OFFSET_COM);
+        $time = BinaryUtil::add($time, self::TIME_OFFSET_COM);
         $time[0] = $time[0] & "\x7F";
 
-        return InternalUtil::toDecimal($time) / 10000000;
+        return BinaryUtil::toBase($time, BinaryUtil::BASE10) / 10000000;
     }
 
     public function getMac(): string

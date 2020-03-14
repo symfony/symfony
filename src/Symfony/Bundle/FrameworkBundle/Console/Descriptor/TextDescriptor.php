@@ -50,7 +50,7 @@ class TextDescriptor extends Descriptor
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
 
-        $tableHeaders = ['Name', 'Method', 'Scheme', 'Host', 'Path'];
+        $tableHeaders = ['Name', 'Method', 'Scheme', 'Host', 'Priority', 'Path'];
         if ($showControllers) {
             $tableHeaders[] = 'Controller';
         }

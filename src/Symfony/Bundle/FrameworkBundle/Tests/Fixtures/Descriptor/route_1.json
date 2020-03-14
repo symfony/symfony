@@ -5,6 +5,7 @@
     "hostRegex": "#HOST_REGEX#",
     "scheme": "http|https",
     "method": "GET|HEAD",
+    "priority": 2,
     "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",
     "defaults": {
         "name": "Joseph"

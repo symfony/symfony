@@ -8,6 +8,7 @@
 | Host Regex   | #HOST_REGEX#                                                      |
 | Scheme       | http|https                                                        |
 | Method       | GET|HEAD                                                          |
+| Priority     | 2                                                                 |
 | Requirements | name: [a-z]+                                                      |
 | Class        | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub |
 | Defaults     | name: Joseph                                                      |

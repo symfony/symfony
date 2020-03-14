@@ -12,7 +12,12 @@
 namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\NullUuid;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV1;
+use Symfony\Component\Uid\UuidV3;
+use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV5;
 
 class UuidTest extends TestCase
 {
@@ -24,12 +29,12 @@ class UuidTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid UUID: "this is not a uuid".');
 
-        new Uuid('this is not a uuid');
+        Uuid::fromString('this is not a uuid');
     }
 
     public function testConstructorWithValidUuid()
     {
-        $uuid = new Uuid(self::A_UUID_V4);
+        $uuid = new UuidV4(self::A_UUID_V4);
 
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
         $this->assertSame('"'.self::A_UUID_V4.'"', json_encode($uuid));
@@ -39,56 +44,56 @@ class UuidTest extends TestCase
     {
         $uuid = Uuid::v1();
 
-        $this->assertSame(Uuid::TYPE_1, $uuid->getType());
+        $this->assertInstanceOf(UuidV1::class, $uuid);
+
+        $uuid = new UuidV1(self::A_UUID_V1);
+
+        $this->assertSame(1583245966.746458, $uuid->getTime());
+        $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
     public function testV3()
     {
-        $uuid = Uuid::v3(new Uuid(self::A_UUID_V4), 'the name');
+        $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');
 
-        $this->assertSame(Uuid::TYPE_3, $uuid->getType());
+        $this->assertInstanceOf(UuidV3::class, $uuid);
     }
 
     public function testV4()
     {
         $uuid = Uuid::v4();
 
-        $this->assertSame(Uuid::TYPE_4, $uuid->getType());
+        $this->assertInstanceOf(UuidV4::class, $uuid);
     }
 
     public function testV5()
     {
-        $uuid = Uuid::v5(new Uuid(self::A_UUID_V4), 'the name');
+        $uuid = Uuid::v5(new UuidV4(self::A_UUID_V4), 'the name');
 
-        $this->assertSame(Uuid::TYPE_5, $uuid->getType());
+        $this->assertInstanceOf(UuidV5::class, $uuid);
     }
 
     public function testBinary()
     {
-        $uuid = new Uuid(self::A_UUID_V4);
+        $uuid = new UuidV4(self::A_UUID_V4);
+        $uuid = Uuid::fromString($uuid->toBinary());
 
-        $this->assertSame(self::A_UUID_V4, (string) Uuid::fromBinary($uuid->toBinary()));
+        $this->assertInstanceOf(UuidV4::class, $uuid);
+        $this->assertSame(self::A_UUID_V4, (string) $uuid);
     }
 
     public function testIsValid()
     {
         $this->assertFalse(Uuid::isValid('not a uuid'));
         $this->assertTrue(Uuid::isValid(self::A_UUID_V4));
-    }
-
-    public function testIsNull()
-    {
-        $uuid = new Uuid(self::A_UUID_V1);
-        $this->assertFalse($uuid->isNull());
-
-        $uuid = new Uuid('00000000-0000-0000-0000-000000000000');
-        $this->assertTrue($uuid->isNull());
+        $this->assertFalse(UuidV4::isValid(self::A_UUID_V1));
+        $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
     public function testEquals()
     {
-        $uuid1 = new Uuid(self::A_UUID_V1);
-        $uuid2 = new Uuid(self::A_UUID_V4);
+        $uuid1 = new UuidV1(self::A_UUID_V1);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
 
         $this->assertTrue($uuid1->equals($uuid1));
         $this->assertFalse($uuid1->equals($uuid2));
@@ -99,7 +104,7 @@ class UuidTest extends TestCase
      */
     public function testEqualsAgainstOtherType($other)
     {
-        $this->assertFalse((new Uuid(self::A_UUID_V4))->equals($other));
+        $this->assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
     }
 
     public function provideInvalidEqualType()
@@ -128,12 +133,11 @@ class UuidTest extends TestCase
         $this->assertSame([$a, $b, $c, $d], $uuids);
     }
 
-    public function testExtraMethods()
+    public function testNullUuid()
     {
-        $uuid = new Uuid(self::A_UUID_V1);
+        $uuid = Uuid::fromString('00000000-0000-0000-0000-000000000000');
 
-        $this->assertSame(1583245966.746458, $uuid->getTime());
-        $this->assertSame('3499710062d0', $uuid->getMac());
-        $this->assertSame(self::A_UUID_V1, (string) $uuid);
+        $this->assertInstanceOf(NullUuid::class, $uuid);
+        $this->assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
     }
 }

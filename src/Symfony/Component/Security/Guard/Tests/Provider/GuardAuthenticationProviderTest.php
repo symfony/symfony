@@ -170,9 +170,7 @@ class GuardAuthenticationProviderTest extends TestCase
     {
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
-        $this->preAuthenticationToken = $this->getMockBuilder(
-            'Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken'
-        )
+        $this->preAuthenticationToken = $this->getMockBuilder('Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken')
             ->disableOriginalConstructor()
             ->getMock();
     }

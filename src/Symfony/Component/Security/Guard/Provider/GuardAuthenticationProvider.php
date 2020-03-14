@@ -26,7 +26,6 @@ use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * Responsible for accepting the PreAuthenticationGuardToken and calling
@@ -39,12 +38,11 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * @var AuthenticatorInterface[]
      */
-    private $authenticators;
+    private $guardAuthenticators;
     private $userProvider;
     private $providerKey;
     private $userChecker;
     private $passwordEncoder;
-    private $rememberMeServices;
 
     /**
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
@@ -52,7 +50,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
     {
-        $this->authenticators = $guardAuthenticators;
+        $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
         $this->userChecker = $userChecker;
@@ -98,27 +96,14 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             throw new AuthenticationException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators of provider "%s".', $token->getGuardProviderKey(), $this->providerKey));
         }
 
-        return $this->authenticateViaGuard($guardAuthenticator, $token, $this->providerKey);
+        return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
-    public function supports(TokenInterface $token)
-    {
-        if ($token instanceof PreAuthenticationGuardToken) {
-            return null !== $this->findOriginatingAuthenticator($token);
-        }
-
-        return $token instanceof GuardTokenInterface;
-    }
-
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
-    {
-        $this->rememberMeServices = $rememberMeServices;
-    }
-
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token): GuardTokenInterface
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
+
         if (null === $user) {
             throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
         }
@@ -135,14 +120,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
         }
-
         if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
             $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
         }
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface
-        $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $providerKey);
+        $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
             throw new \UnexpectedValueException(sprintf('The "%s::createAuthenticatedToken()" method must return a TokenInterface. You returned "%s".', get_debug_type($guardAuthenticator), get_debug_type($authenticatedToken)));
         }
@@ -152,18 +136,29 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
     private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token): ?AuthenticatorInterface
     {
-        // find the *one* Authenticator that this token originated from
-        foreach ($this->authenticators as $key => $authenticator) {
-            // get a key that's unique to *this* authenticator
-            // this MUST be the same as AuthenticatorManagerListener
-            $uniqueAuthenticatorKey = $this->providerKey.'_'.$key;
+        // find the *one* GuardAuthenticator that this token originated from
+        foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
+            // get a key that's unique to *this* guard authenticator
+            // this MUST be the same as GuardAuthenticationListener
+            $uniqueGuardKey = $this->providerKey.'_'.$key;
 
-            if ($uniqueAuthenticatorKey === $token->getGuardProviderKey()) {
-                return $authenticator;
+            if ($uniqueGuardKey === $token->getGuardProviderKey()) {
+                return $guardAuthenticator;
             }
         }
 
-        // no matching authenticator found
+        // no matching authenticator found - but there will be multiple GuardAuthenticationProvider
+        // instances that will be checked if you have multiple firewalls.
+
         return null;
+    }
+
+    public function supports(TokenInterface $token)
+    {
+        if ($token instanceof PreAuthenticationGuardToken) {
+            return null !== $this->findOriginatingAuthenticator($token);
+        }
+
+        return $token instanceof GuardTokenInterface;
     }
 }

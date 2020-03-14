@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken as GuardPreAuthenticationGuardToken;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -37,7 +37,7 @@ class GuardAuthenticationListener extends AbstractListener
     private $guardHandler;
     private $authenticationManager;
     private $providerKey;
-    private $authenticators;
+    private $guardAuthenticators;
     private $logger;
     private $rememberMeServices;
 
@@ -54,7 +54,7 @@ class GuardAuthenticationListener extends AbstractListener
         $this->guardHandler = $guardHandler;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
-        $this->authenticators = $guardAuthenticators;
+        $this->guardAuthenticators = $guardAuthenticators;
         $this->logger = $logger;
     }
 
@@ -66,23 +66,24 @@ class GuardAuthenticationListener extends AbstractListener
         if (null !== $this->logger) {
             $context = ['firewall_key' => $this->providerKey];
 
-            if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
-                $context['authenticators'] = \count($this->authenticators);
+            if ($this->guardAuthenticators instanceof \Countable || \is_array($this->guardAuthenticators)) {
+                $context['authenticators'] = \count($this->guardAuthenticators);
             }
 
             $this->logger->debug('Checking for guard authentication credentials.', $context);
         }
 
         $guardAuthenticators = [];
-        foreach ($this->authenticators as $key => $authenticator) {
+
+        foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
             if (null !== $this->logger) {
-                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Checking support on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
             }
 
-            if ($authenticator->supports($request)) {
-                $guardAuthenticators[$key] = $authenticator;
+            if ($guardAuthenticator->supports($request)) {
+                $guardAuthenticators[$key] = $guardAuthenticator;
             } elseif (null !== $this->logger) {
-                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Guard authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
             }
         }
 
@@ -104,23 +105,9 @@ class GuardAuthenticationListener extends AbstractListener
         $guardAuthenticators = $request->attributes->get('_guard_authenticators');
         $request->attributes->remove('_guard_authenticators');
 
-        $this->executeGuardAuthenticators($guardAuthenticators, $event);
-    }
-
-    /**
-     * Should be called if this listener will support remember me.
-     */
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
-    {
-        $this->rememberMeServices = $rememberMeServices;
-    }
-
-    /**
-     * @param AuthenticatorInterface[] $guardAuthenticators
-     */
-    protected function executeGuardAuthenticators(array $guardAuthenticators, RequestEvent $event): void
-    {
         foreach ($guardAuthenticators as $key => $guardAuthenticator) {
+            // get a key that's unique to *this* guard authenticator
+            // this MUST be the same as GuardAuthenticationProvider
             $uniqueGuardKey = $this->providerKey.'_'.$key;
 
             $this->executeGuardAuthenticator($uniqueGuardKey, $guardAuthenticator, $event);
@@ -151,7 +138,7 @@ class GuardAuthenticationListener extends AbstractListener
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = new GuardPreAuthenticationGuardToken($credentials, $uniqueGuardKey, $this->providerKey);
+            $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
 
             if (null !== $this->logger) {
                 $this->logger->debug('Passing guard token information to the GuardAuthenticationProvider', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
@@ -200,12 +187,20 @@ class GuardAuthenticationListener extends AbstractListener
         $this->triggerRememberMe($guardAuthenticator, $request, $token, $response);
     }
 
-    protected function triggerRememberMe($guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    /**
+     * Should be called if this listener will support remember me.
+     */
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
-        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof CoreAuthenticatorInterface) {
-            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
-        }
+        $this->rememberMeServices = $rememberMeServices;
+    }
 
+    /**
+     * Checks to see if remember me is supported in the authenticator and
+     * on the firewall. If it is, the RememberMeServicesInterface is notified.
+     */
+    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember me skipped: it is not configured for the firewall.', ['authenticator' => \get_class($guardAuthenticator)]);

@@ -266,9 +266,7 @@ class GuardAuthenticationListenerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->guardAuthenticatorHandler = $this->getMockBuilder(
-            'Symfony\Component\Security\Guard\GuardAuthenticatorHandler'
-        )
+        $this->guardAuthenticatorHandler = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorHandler')
             ->disableOriginalConstructor()
             ->getMock();
 

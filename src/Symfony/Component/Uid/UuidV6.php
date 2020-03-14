@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid;
 
 /**
- * A v6 UUID is lexicographically sortable and contains a 60-bit timestamp and 63 extra unique bits.
+ * A v6 UUID is lexicographically sortable and contains a 60-bit timestamp and 62 extra unique bits.
  *
  * @experimental in 5.1
  *
@@ -32,7 +32,7 @@ class UuidV6 extends Uuid
     {
         if (null === $uuid) {
             $uuid = uuid_create(UUID_TYPE_TIME);
-            $this->uuid = substr($uuid, 15, 3).substr($uuid, 9, 4).$uuid[0].'-'.substr($uuid, 1, 4).'-6'.substr($uuid, 5, 3).substr($uuid, 18);
+            $this->uid = substr($uuid, 15, 3).substr($uuid, 9, 4).$uuid[0].'-'.substr($uuid, 1, 4).'-6'.substr($uuid, 5, 3).substr($uuid, 18);
         } else {
             parent::__construct($uuid);
         }
@@ -40,7 +40,7 @@ class UuidV6 extends Uuid
 
     public function getTime(): float
     {
-        $time = '0'.substr($this->uuid, 0, 8).substr($this->uuid, 9, 4).substr($this->uuid, 15, 3);
+        $time = '0'.substr($this->uid, 0, 8).substr($this->uid, 9, 4).substr($this->uid, 15, 3);
 
         if (\PHP_INT_SIZE >= 8) {
             return (hexdec($time) - self::TIME_OFFSET_INT) / 10000000;
@@ -55,6 +55,6 @@ class UuidV6 extends Uuid
 
     public function getNode(): string
     {
-        return substr($this->uuid, 24);
+        return substr($this->uid, 24);
     }
 }

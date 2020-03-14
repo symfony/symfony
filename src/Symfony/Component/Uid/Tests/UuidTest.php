@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\NilUuid;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
@@ -93,6 +94,26 @@ class UuidTest extends TestCase
 
         $this->assertInstanceOf(UuidV4::class, $uuid);
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
+    }
+
+    public function testFromUlid()
+    {
+        $ulid = new Ulid();
+        $uuid = Uuid::fromString($ulid);
+
+        $this->assertSame((string) $ulid, $uuid->toBase32());
+        $this->assertSame((string) $uuid, $uuid->toRfc4122());
+        $this->assertTrue($uuid->equals(Uuid::fromString($ulid)));
+    }
+
+    public function testBase58()
+    {
+        $uuid = new NilUuid();
+        $this->assertSame('1111111111111111111111', $uuid->toBase58());
+
+        $uuid = Uuid::fromString("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF");
+        $this->assertSame('YcVfxkQb6JRzqk5kF2tNLv', $uuid->toBase58());
+        $this->assertTrue($uuid->equals(Uuid::fromString('YcVfxkQb6JRzqk5kF2tNLv')));
     }
 
     public function testIsValid()

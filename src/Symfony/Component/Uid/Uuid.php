@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class Uuid implements \JsonSerializable
+class Uuid extends AbstractUid
 {
     protected const TYPE = UUID_TYPE_DEFAULT;
 
@@ -24,23 +24,31 @@ class Uuid implements \JsonSerializable
 
     public function __construct(string $uuid)
     {
-        if (static::TYPE !== uuid_type($uuid)) {
+        $type = uuid_type($uuid);
+
+        if (false === $type || UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        $this->uuid = strtr($uuid, 'ABCDEF', 'abcdef');
+        $this->uid = strtr($uuid, 'ABCDEF', 'abcdef');
     }
 
     /**
      * @return static
      */
-    public static function fromString(string $uuid): self
+    public static function fromString(string $uuid): parent
     {
-        if (16 === \strlen($uuid)) {
-            $uuid = uuid_unparse($uuid);
+        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
+            $uuid = BinaryUtil::fromBase($uuid, BinaryUtil::BASE58);
         }
 
-        if (__CLASS__ !== static::class) {
+        if (16 === \strlen($uuid)) {
+            $uuid = uuid_unparse($uuid);
+        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
+            $uuid = (new Ulid($uuid))->toRfc4122();
+        }
+
+        if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
             return new static($uuid);
         }
 
@@ -51,10 +59,9 @@ class Uuid implements \JsonSerializable
             case UuidV5::TYPE: return new UuidV5($uuid);
             case UuidV6::TYPE: return new UuidV6($uuid);
             case NilUuid::TYPE: return new NilUuid();
-            case self::TYPE: return new self($uuid);
         }
 
-        throw new \InvalidArgumentException(sprintf('Invalid UUID: "%s".', $uuid));
+        return new self($uuid);
     }
 
     final public static function v1(): UuidV1
@@ -64,7 +71,7 @@ class Uuid implements \JsonSerializable
 
     final public static function v3(self $namespace, string $name): UuidV3
     {
-        return new UuidV3(uuid_generate_md5($namespace->uuid, $name));
+        return new UuidV3(uuid_generate_md5($namespace->uid, $name));
     }
 
     final public static function v4(): UuidV4
@@ -74,7 +81,7 @@ class Uuid implements \JsonSerializable
 
     final public static function v5(self $namespace, string $name): UuidV5
     {
-        return new UuidV5(uuid_generate_sha1($namespace->uuid, $name));
+        return new UuidV5(uuid_generate_sha1($namespace->uid, $name));
     }
 
     final public static function v6(): UuidV6
@@ -93,33 +100,20 @@ class Uuid implements \JsonSerializable
 
     public function toBinary(): string
     {
-        return uuid_parse($this->uuid);
+        return uuid_parse($this->uid);
     }
 
-    /**
-     * Returns whether the argument is of class Uuid and contains the same value as the current instance.
-     */
-    public function equals($other): bool
+    public function toRfc4122(): string
     {
-        if (!$other instanceof self) {
-            return false;
+        return $this->uid;
+    }
+
+    public function compare(parent $other): int
+    {
+        if (false !== $cmp = uuid_compare($this->uid, $other->uid)) {
+            return $cmp;
         }
 
-        return 0 === uuid_compare($this->uuid, $other->uuid);
-    }
-
-    public function compare(self $other): int
-    {
-        return uuid_compare($this->uuid, $other->uuid);
-    }
-
-    public function __toString(): string
-    {
-        return $this->uuid;
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->uuid;
+        return parent::compare($other);
     }
 }

@@ -20,17 +20,15 @@ namespace Symfony\Component\Uid;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Ulid implements \JsonSerializable
+class Ulid extends AbstractUid
 {
     private static $time = -1;
     private static $rand = [];
 
-    private $ulid;
-
     public function __construct(string $ulid = null)
     {
         if (null === $ulid) {
-            $this->ulid = self::generate();
+            $this->uid = self::generate();
 
             return;
         }
@@ -39,7 +37,7 @@ class Ulid implements \JsonSerializable
             throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
         }
 
-        $this->ulid = strtr($ulid, 'abcdefghjkmnpqrstvwxyz', 'ABCDEFGHJKMNPQRSTVWXYZ');
+        $this->uid = strtr($ulid, 'abcdefghjkmnpqrstvwxyz', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }
 
     public static function isValid(string $ulid): bool
@@ -55,8 +53,17 @@ class Ulid implements \JsonSerializable
         return $ulid[0] <= '7';
     }
 
-    public static function fromString(string $ulid): self
+    /**
+     * {@inheritdoc}
+     */
+    public static function fromString(string $ulid): parent
     {
+        if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {
+            $ulid = Uuid::fromString($ulid)->toBinary();
+        } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
+            $ulid = BinaryUtil::fromBase($ulid, BinaryUtil::BASE58);
+        }
+
         if (16 !== \strlen($ulid)) {
             return new static($ulid);
         }
@@ -75,9 +82,9 @@ class Ulid implements \JsonSerializable
         return new self(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
     }
 
-    public function toBinary()
+    public function toBinary(): string
     {
-        $ulid = strtr($this->ulid, 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
+        $ulid = strtr($this->uid, 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
         $ulid = sprintf('%02s%05s%05s%05s%05s%05s%05s',
             base_convert(substr($ulid, 0, 2), 32, 16),
@@ -92,26 +99,14 @@ class Ulid implements \JsonSerializable
         return hex2bin($ulid);
     }
 
-    /**
-     * Returns whether the argument is of class Ulid and contains the same value as the current instance.
-     */
-    public function equals($other): bool
+    public function toBase32(): string
     {
-        if (!$other instanceof self) {
-            return false;
-        }
-
-        return $this->ulid === $other->ulid;
-    }
-
-    public function compare(self $other): int
-    {
-        return $this->ulid <=> $other->ulid;
+        return $this->uid;
     }
 
     public function getTime(): float
     {
-        $time = strtr(substr($this->ulid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
+        $time = strtr(substr($this->uid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
         if (\PHP_INT_SIZE >= 8) {
             return hexdec(base_convert($time, 32, 16)) / 1000;
@@ -124,16 +119,6 @@ class Ulid implements \JsonSerializable
         );
 
         return BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10) / 1000;
-    }
-
-    public function __toString(): string
-    {
-        return $this->ulid;
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->ulid;
     }
 
     private static function generate(): string

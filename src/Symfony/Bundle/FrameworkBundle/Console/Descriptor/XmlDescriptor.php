@@ -195,6 +195,9 @@ class XmlDescriptor extends Descriptor
             $methodXML->appendChild(new \DOMText($method));
         }
 
+        $routeXML->appendChild($priorityXML = $dom->createElement('priority'));
+        $priorityXML->appendChild(new \DOMText($route->getPriority()));
+
         if ($route->getDefaults()) {
             $routeXML->appendChild($defaultsXML = $dom->createElement('defaults'));
             foreach ($route->getDefaults() as $attribute => $value) {

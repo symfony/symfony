@@ -6,6 +6,7 @@
   <scheme>https</scheme>
   <method>PUT</method>
   <method>POST</method>
+  <priority>1</priority>
   <options>
     <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
     <option key="opt1">val1</option>

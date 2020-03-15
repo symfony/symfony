@@ -130,7 +130,7 @@ final class CacheItem implements ItemInterface
                 throw new InvalidArgumentException('Cache tag length must be greater than zero.');
             }
             if (false !== strpbrk($tag, self::RESERVED_CHARACTERS)) {
-                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters %s', $tag, self::RESERVED_CHARACTERS));
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters %s.', $tag, self::RESERVED_CHARACTERS));
             }
             $this->newMetadata[self::METADATA_TAGS][$tag] = $tag;
         }
@@ -174,7 +174,7 @@ final class CacheItem implements ItemInterface
             throw new InvalidArgumentException('Cache key length must be greater than zero.');
         }
         if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
-            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters %s', $key, self::RESERVED_CHARACTERS));
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters %s.', $key, self::RESERVED_CHARACTERS));
         }
 
         return $key;

@@ -37,7 +37,7 @@ class RoutableMessageBus implements MessageBusInterface
     public function dispatch($envelope, array $stamps = []): Envelope
     {
         if (!$envelope instanceof Envelope) {
-            throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
+            throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope.');
         }
 
         /** @var BusNameStamp|null $busNameStamp */

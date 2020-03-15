@@ -994,13 +994,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $id = (string) $id;
 
-<<<<<<< HEAD
         if ('' === $id || '\\' === $id[-1] || \strlen($id) !== strcspn($id, "\0\r\n'")) {
-            throw new InvalidArgumentException(sprintf('Invalid service id: "%s"', $id));
-=======
-        if ('' === $id || '\\' === substr($id, -1) || \strlen($id) !== strcspn($id, "\0\r\n'")) {
             throw new InvalidArgumentException(sprintf('Invalid service id: "%s".', $id));
->>>>>>> 3.4
         }
 
         unset($this->aliasDefinitions[$id], $this->removedIds[$id]);

@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class NullUuid extends Uuid
+class NilUuid extends Uuid
 {
     protected const TYPE = UUID_TYPE_NULL;
 

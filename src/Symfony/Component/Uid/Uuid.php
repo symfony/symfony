@@ -50,7 +50,7 @@ class Uuid implements \JsonSerializable
             case UuidV4::TYPE: return new UuidV4($uuid);
             case UuidV5::TYPE: return new UuidV5($uuid);
             case UuidV6::TYPE: return new UuidV6($uuid);
-            case NullUuid::TYPE: return new NullUuid();
+            case NilUuid::TYPE: return new NilUuid();
             case self::TYPE: return new self($uuid);
         }
 

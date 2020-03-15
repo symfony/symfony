@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-14T17:07:16Z
+
+👎  I disagree with this. We use PHP ... so `null` is natural and `nil` is alien to us.
+
+The fact that the RFC uses that terminology is not enough reason for me. The RFC also uses "node" instead of "mac address" ... and we don't comply with the RFC and keep calling it "mac address".
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-03-14T17:15:38Z
+
+> The fact that the RFC uses that terminology is not enough reason for me.
+
+for me it was actually + the fact you get a slightly more relevant search result
+
+Agree it's minor.. and if both are considerable equal in practice im fine with "wont fix"
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-14T17:25:31Z
+
+This is worth considering as this is what the RFC uses, thanks for raising the point. I'm also thinking our community is not used to "nil" so it could create confusion where "null" wouldn't. Dunno if others agree?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-03-14T18:56:08Z
+
+See also https://english.stackexchange.com/questions/61363/are-nil-and-null-interchangeable, esp.:
+
+> Nil means zero or nought
+> Null means nothing or empty
+
+given "a nil/null uuid" is _something_, it made me lean towards "nil" being the better name
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-14T23:09:58Z
+
+I agree with @ro0NL here. The `null` we as PHP developers know is not a zero or an empty string, it's the non-existence of a value. So the null in `NullUuid` does not relate to the null we know in PHP.
+
+In Symfony's Notifier component, such a class is called `NoRecipient` (and not `NullRecipient`).
+
+I think it makes sense to follow the RFC here 👍
+
+_(Yet, if I'm completely honest, we use [the `Null` prefix in many other classes](https://user-images.githubusercontent.com/749025/76692020-06c24300-6651-11ea-9d2a-7f764d0f437b.png))_

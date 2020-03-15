@@ -60,8 +60,6 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
-
             $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) use ($options) {
                 $data = $e->getData();
                 if ($data && preg_match('/^(?P<hours>\d{2}):(?P<minutes>\d{2})(?::(?P<seconds>\d{2})(?:\.\d+)?)?$/', $data, $matches)) {
@@ -86,6 +84,8 @@ class TimeType extends AbstractType
                     }
                 });
             }
+
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = [
                 'error_bubbling' => true,

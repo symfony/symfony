@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-15T09:23:01Z
+
+About 6% of the exception messages did not have a dot at the end of the exception message.

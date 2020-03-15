@@ -83,7 +83,7 @@ class Configuration
 
         foreach ($verboseOutput as $group => $status) {
             if (!isset($this->verboseOutput[$group])) {
-                throw new \InvalidArgumentException(sprintf('Unsupported verbosity group "%s", expected one of "%s"', $group, implode('", "', array_keys($this->verboseOutput))));
+                throw new \InvalidArgumentException(sprintf('Unsupported verbosity group "%s", expected one of "%s".', $group, implode('", "', array_keys($this->verboseOutput))));
             }
             $this->verboseOutput[$group] = (bool) $status;
         }
@@ -162,7 +162,7 @@ class Configuration
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
             if (!\in_array($key, ['max', 'disabled', 'verbose', 'quiet'], true)) {
-                throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s"', $key));
+                throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s".', $key));
             }
         }
 

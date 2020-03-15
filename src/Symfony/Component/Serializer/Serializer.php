@@ -186,7 +186,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     {
         if (isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
-                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given)', $type, \is_object($data) ? \get_class($data) : \gettype($data)));
+                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, \is_object($data) ? \get_class($data) : \gettype($data)));
             }
 
             return $data;

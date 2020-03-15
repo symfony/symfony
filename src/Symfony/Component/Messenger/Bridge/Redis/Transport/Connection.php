@@ -62,11 +62,11 @@ class Connection
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
         if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s.', $redis->getLastError()));
         }
 
         if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s.', $redis->getLastError()));
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];

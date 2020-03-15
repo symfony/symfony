@@ -106,7 +106,7 @@ EOF
         $filter = $input->getOption('filter');
 
         if (null !== $name && [] === $this->getFilesystemLoaders()) {
-            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s"', FilesystemLoader::class));
+            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
         switch ($input->getOption('format')) {

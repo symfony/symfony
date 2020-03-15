@@ -117,7 +117,7 @@ trait MemcachedTrait
 
                     if (isset($query['host'])) {
                         if (!\is_array($hosts = $query['host'])) {
-                            throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $dsn));
+                            throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s.', $dsn));
                         }
                         foreach ($hosts as $host => $weight) {
                             if (false === $port = strrpos($host, ':')) {

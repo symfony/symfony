@@ -145,7 +145,7 @@ EOF
 
         foreach ($steps as $step) {
             if (!\array_key_exists($step, $config)) {
-                throw new LogicException(sprintf('Unable to find configuration for "%s.%s"', $alias, $path));
+                throw new LogicException(sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
             }
 
             $config = $config[$step];

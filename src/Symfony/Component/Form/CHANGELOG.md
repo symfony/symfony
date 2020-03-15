@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added `collection_entry` block prefix to `CollectionType` entries
  * Added a `choice_filter` option to `ChoiceType`
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
  * Added a `ChoiceList` facade to leverage explicit choice list caching based on options

@@ -54,7 +54,7 @@ final class PropertyWriteInfo
     public function getName(): string
     {
         if (null === $this->name) {
-            throw new \LogicException("Calling getName() when having a mutator of type {$this->type} is not tolerated");
+            throw new \LogicException("Calling getName() when having a mutator of type {$this->type} is not tolerated.");
         }
 
         return $this->name;
@@ -68,7 +68,7 @@ final class PropertyWriteInfo
     public function getAdderInfo(): self
     {
         if (null === $this->adderInfo) {
-            throw new \LogicException("Calling getAdderInfo() when having a mutator of type {$this->type} is not tolerated");
+            throw new \LogicException("Calling getAdderInfo() when having a mutator of type {$this->type} is not tolerated.");
         }
 
         return $this->adderInfo;
@@ -82,7 +82,7 @@ final class PropertyWriteInfo
     public function getRemoverInfo(): self
     {
         if (null === $this->removerInfo) {
-            throw new \LogicException("Calling getRemoverInfo() when having a mutator of type {$this->type} is not tolerated");
+            throw new \LogicException("Calling getRemoverInfo() when having a mutator of type {$this->type} is not tolerated.");
         }
 
         return $this->removerInfo;
@@ -91,7 +91,7 @@ final class PropertyWriteInfo
     public function getVisibility(): string
     {
         if (null === $this->visibility) {
-            throw new \LogicException("Calling getVisibility() when having a mutator of type {$this->type} is not tolerated");
+            throw new \LogicException("Calling getVisibility() when having a mutator of type {$this->type} is not tolerated.");
         }
 
         return $this->visibility;
@@ -100,7 +100,7 @@ final class PropertyWriteInfo
     public function isStatic(): bool
     {
         if (null === $this->static) {
-            throw new \LogicException("Calling isStatic() when having a mutator of type {$this->type} is not tolerated");
+            throw new \LogicException("Calling isStatic() when having a mutator of type {$this->type} is not tolerated.");
         }
 
         return $this->static;

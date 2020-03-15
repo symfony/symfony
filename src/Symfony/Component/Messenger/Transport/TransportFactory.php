@@ -47,7 +47,7 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/redis-messenger" to install Redis transport.';
         }
 
-        throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".%s', $dsn, $packageSuggestion));
+        throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".%s.', $dsn, $packageSuggestion));
     }
 
     public function supports(string $dsn, array $options): bool

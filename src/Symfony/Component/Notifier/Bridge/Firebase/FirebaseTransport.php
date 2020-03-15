@@ -62,7 +62,7 @@ final class FirebaseTransport extends AbstractTransport
             $options['to'] = $message->getRecipientId();
         }
         if (null === $options['to']) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set', __CLASS__));
+            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
         $options['notification'] = $options['notification'] ?? [];
         $options['notification']['body'] = $message->getSubject();

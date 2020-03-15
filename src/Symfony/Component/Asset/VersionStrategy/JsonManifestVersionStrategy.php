@@ -59,7 +59,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
 
             $this->manifestData = json_decode(file_get_contents($this->manifestPath), true);
             if (0 < json_last_error()) {
-                throw new \RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s" - %s', $this->manifestPath, json_last_error_msg()));
+                throw new \RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s" - %s.', $this->manifestPath, json_last_error_msg()));
             }
         }
 

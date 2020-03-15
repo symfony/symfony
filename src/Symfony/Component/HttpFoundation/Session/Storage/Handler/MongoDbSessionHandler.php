@@ -74,11 +74,11 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         }
 
         if (!($mongo instanceof \MongoDB\Client || $mongo instanceof \MongoClient || $mongo instanceof \Mongo)) {
-            throw new \InvalidArgumentException('MongoClient or Mongo instance required');
+            throw new \InvalidArgumentException('MongoClient or Mongo instance required.');
         }
 
         if (!isset($options['database']) || !isset($options['collection'])) {
-            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
+            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler.');
         }
 
         $this->mongo = $mongo;

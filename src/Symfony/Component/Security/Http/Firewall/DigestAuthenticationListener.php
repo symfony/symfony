@@ -94,7 +94,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $user = $this->provider->loadUserByUsername($digestAuth->getUsername());
 
             if (null === $user) {
-                throw new AuthenticationServiceException('Digest User provider returned null, which is an interface contract violation');
+                throw new AuthenticationServiceException('Digest User provider returned null, which is an interface contract violation.');
             }
 
             $serverDigestMd5 = $digestAuth->calculateServerDigest($user->getPassword(), $request->getMethod());
@@ -199,11 +199,11 @@ class DigestData
     public function validateAndDecode($entryPointKey, $expectedRealm)
     {
         if ($keys = array_diff(['username', 'realm', 'nonce', 'uri', 'response'], array_keys($this->elements))) {
-            throw new BadCredentialsException(sprintf('Missing mandatory digest value; received header "%s" (%s)', $this->header, implode(', ', $keys)));
+            throw new BadCredentialsException(sprintf('Missing mandatory digest value; received header "%s" (%s).', $this->header, implode(', ', $keys)));
         }
 
         if ('auth' === $this->elements['qop'] && !isset($this->elements['nc'], $this->elements['cnonce'])) {
-            throw new BadCredentialsException(sprintf('Missing mandatory digest value; received header "%s"', $this->header));
+            throw new BadCredentialsException(sprintf('Missing mandatory digest value; received header "%s".', $this->header));
         }
 
         if ($expectedRealm !== $this->elements['realm']) {

@@ -68,7 +68,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
         if (!\is_array($callback) || 2 !== \count($callback)) {
-            throw new \InvalidArgumentException('Expected an ["service", "method"] argument');
+            throw new \InvalidArgumentException('Expected an ["service", "method"] argument.');
         }
 
         $this->listenerIds[$eventName][] = [$callback[0], $callback[1], $priority];

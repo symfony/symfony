@@ -97,7 +97,7 @@ class File extends \SplFileInfo
         $renamed = rename($this->getPathname(), $target);
         restore_error_handler();
         if (!$renamed) {
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error)));
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
         }
 
         @chmod($target, 0666 & ~umask());
@@ -109,10 +109,10 @@ class File extends \SplFileInfo
     {
         if (!is_dir($directory)) {
             if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
-                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
+                throw new FileException(sprintf('Unable to create the "%s" directory.', $directory));
             }
         } elseif (!is_writable($directory)) {
-            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
+            throw new FileException(sprintf('Unable to write in the "%s" directory.', $directory));
         }
 
         $target = rtrim($directory, '/\\').\DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));

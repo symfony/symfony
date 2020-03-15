@@ -1201,7 +1201,7 @@ class FrameworkExtension extends Extension
             if ($container->fileExists($dir)) {
                 $dirs[] = $dir;
             } else {
-                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
+                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory.', $dir));
             }
         }
 
@@ -1629,7 +1629,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition = new Reference($storeDefinitionId);
                         break;
                     default:
-                        throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s"', $storeDsn, $resourceName));
+                        throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s".', $storeDsn, $resourceName));
                 }
 
                 $storeDefinitions[] = $storeDefinition;

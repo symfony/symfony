@@ -895,7 +895,7 @@ EOTXT
             $callable = $definition->getFactory();
             if (\is_array($callable)) {
                 if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
-                    throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s)', $callable[1] ?: 'n/a'));
+                    throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $callable[1] ?: 'n/a'));
                 }
 
                 if ($callable[0] instanceof Reference
@@ -1701,7 +1701,7 @@ EOF;
 
                 if (\is_array($factory)) {
                     if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $factory[1])) {
-                        throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s)', $factory[1] ?: 'n/a'));
+                        throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $factory[1] ?: 'n/a'));
                     }
 
                     $class = $this->dumpValue($factory[0]);
@@ -1722,7 +1722,7 @@ EOF;
                     }
                 }
 
-                throw new RuntimeException('Cannot dump definition because of invalid factory');
+                throw new RuntimeException('Cannot dump definition because of invalid factory.');
             }
 
             $class = $value->getClass();
@@ -1785,7 +1785,7 @@ EOF;
             return sprintf('${($_ = %s) && false ?: "_"}', $class);
         }
         if (0 !== strpos($class, "'") || !preg_match('/^\'(?:\\\{2})?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(?:\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
-            throw new RuntimeException(sprintf('Cannot dump definition because of invalid class name (%s)', $class ?: 'n/a'));
+            throw new RuntimeException(sprintf('Cannot dump definition because of invalid class name (%s).', $class ?: 'n/a'));
         }
 
         $class = substr(str_replace('\\\\', '\\', $class), 1, -1);

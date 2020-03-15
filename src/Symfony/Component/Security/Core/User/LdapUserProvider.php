@@ -81,7 +81,7 @@ class LdapUserProvider implements UserProviderInterface
         }
 
         if ($count > 1) {
-            throw new UsernameNotFoundException('More than one user found');
+            throw new UsernameNotFoundException('More than one user found.');
         }
 
         $entry = $entries[0];

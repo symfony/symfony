@@ -39,7 +39,7 @@ abstract class WebTestCase extends KernelTestCase
             if (class_exists(Client::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
             }
-            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit"');
+            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
         }
 
         $client->setServerParameters($server);

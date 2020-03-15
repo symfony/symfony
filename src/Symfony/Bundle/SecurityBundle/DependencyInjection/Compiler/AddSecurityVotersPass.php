@@ -38,7 +38,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
 
         $voters = $this->findAndSortTaggedServices('security.voter', $container);
         if (!$voters) {
-            throw new LogicException('No security voters found. You need to tag at least one with "security.voter"');
+            throw new LogicException('No security voters found. You need to tag at least one with "security.voter".');
         }
 
         foreach ($voters as $voter) {

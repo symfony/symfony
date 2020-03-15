@@ -199,7 +199,7 @@ class OutputFormatterTest extends TestCase
     /**
      * @group legacy
      * @dataProvider provideInlineStyleTagsWithUnknownOptions
-     * @expectedDeprecation Unknown style options are deprecated since Symfony 3.2 and will be removed in 4.0. Exception "Invalid option specified: "%s". Expected one of (bold, underscore, blink, reverse, conceal)".
+     * @expectedDeprecation Unknown style options are deprecated since Symfony 3.2 and will be removed in 4.0. Exception "Invalid option specified: "%s". Expected one of (bold, underscore, blink, reverse, conceal).".
      */
     public function testInlineStyleOptionsUnknownAreDeprecated($tag, $option)
     {

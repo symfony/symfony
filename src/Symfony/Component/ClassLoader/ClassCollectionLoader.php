@@ -63,7 +63,7 @@ class ClassCollectionLoader
 
         // cache the core classes
         if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
+            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s".', $cacheDir));
         }
         $cacheDir = rtrim(realpath($cacheDir) ?: $cacheDir, '/'.\DIRECTORY_SEPARATOR);
         $cache = $cacheDir.'/'.$name.$extension;
@@ -133,7 +133,7 @@ class ClassCollectionLoader
         // cache the core classes
         $cacheDir = \dirname($cache);
         if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
+            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s".', $cacheDir));
         }
 
         $spacesRegex = '(?:\s*+(?:(?:\#|//)[^\n]*+\n|/\*(?:(?<!\*/).)++)?+)*+';
@@ -336,7 +336,7 @@ REGEX;
             try {
                 $reflectionClass = new \ReflectionClass($class);
             } catch (\ReflectionException $e) {
-                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+                throw new \InvalidArgumentException(sprintf('Unable to load class "%s".', $class));
             }
 
             $map = array_merge($map, self::getClassHierarchy($reflectionClass));

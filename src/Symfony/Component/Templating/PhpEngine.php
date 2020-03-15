@@ -134,10 +134,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         unset($template, $parameters);
 
         if (isset($this->evalParameters['this'])) {
-            throw new \InvalidArgumentException('Invalid parameter (this)');
+            throw new \InvalidArgumentException('Invalid parameter (this).');
         }
         if (isset($this->evalParameters['view'])) {
-            throw new \InvalidArgumentException('Invalid parameter (view)');
+            throw new \InvalidArgumentException('Invalid parameter (view).');
         }
 
         // the view variable is exposed to the require file below

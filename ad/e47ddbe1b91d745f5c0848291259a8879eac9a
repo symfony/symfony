@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-14T17:10:28Z
+
+I don't know the future plans of this component (will we keep adding other popular UIDs?) but this doesn't look future-proof to me. Any method that we add here could look outdated or unused in other future UID generators.
+
+This reminds me to the `salt` property of password encoders. It was obvious to add it to an interface because every encoder uses it ... until some stopped using it and the interface no longer looked good for modern encoders.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-14T17:30:32Z
+
+All serious id schemes use 128-bit identifiers, which is wide enough to deal with any use cases for the foreseeable future. Then, base58, base32, uuid-format are 3 widely used representation of 128-bit numbers. They fit various needs: 58 bit for compactness, 32 bit for case insensitivity, uuid-format for interop with e.g. DB storages.
+
+My opinion is that all three of them are generic enough to land in the component.
+
+Your comparison with salted-encoders is good: we *did* add them to the component because that's what ppl were widely using at the time. We don't know the future but we know these encoding schemes are widely used and have good reasons to remain so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-14T18:08:49Z
+
+> will we keep adding other popular UIDs?
+
+UUIDv6 would make sense. I'm not sure about others. I think we should work on integrating with Doctrine before considering other schemes. Then future will tell, there are no plans...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-15T08:07:42Z
+
+Can you rebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-15T08:56:53Z
+
+Now rebased.

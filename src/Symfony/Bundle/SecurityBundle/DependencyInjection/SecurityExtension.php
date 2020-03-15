@@ -650,7 +650,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $name;
         }
 
-        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider', $name));
+        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider.', $name));
     }
 
     private function getUserProviderId(string $name): string

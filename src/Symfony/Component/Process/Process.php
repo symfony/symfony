@@ -260,7 +260,7 @@ class Process implements \IteratorAggregate
     public function start(callable $callback = null/*, array $env = [*/)
     {
         if ($this->isRunning()) {
-            throw new RuntimeException('Process is already running');
+            throw new RuntimeException('Process is already running.');
         }
         if (2 <= \func_num_args()) {
             $env = func_get_arg(1);
@@ -375,7 +375,7 @@ class Process implements \IteratorAggregate
     public function restart(callable $callback = null/*, array $env = []*/)
     {
         if ($this->isRunning()) {
-            throw new RuntimeException('Process is already running');
+            throw new RuntimeException('Process is already running.');
         }
         $env = 1 < \func_num_args() ? func_get_arg(1) : null;
 
@@ -409,7 +409,7 @@ class Process implements \IteratorAggregate
         if (null !== $callback) {
             if (!$this->processPipes->haveReadSupport()) {
                 $this->stop(0);
-                throw new \LogicException('Pass the callback to the Process::start method or enableOutput to use a callback with Process::wait');
+                throw new \LogicException('Pass the callback to the Process::start method or enableOutput to use a callback with Process::wait.');
             }
             $this->callback = $this->buildCallback($callback);
         }

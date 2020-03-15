@@ -78,7 +78,7 @@ final class CacheItem implements CacheItemInterface
         } elseif ($expiration instanceof \DateTimeInterface) {
             $this->expiry = (int) $expiration->format('U');
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', \is_object($expiration) ? \get_class($expiration) : \gettype($expiration)));
+            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given.', \is_object($expiration) ? \get_class($expiration) : \gettype($expiration)));
         }
 
         return $this;
@@ -98,7 +98,7 @@ final class CacheItem implements CacheItemInterface
         } elseif (\is_int($time)) {
             $this->expiry = $time + time();
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', \is_object($time) ? \get_class($time) : \gettype($time)));
+            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given.', \is_object($time) ? \get_class($time) : \gettype($time)));
         }
 
         return $this;
@@ -120,16 +120,16 @@ final class CacheItem implements CacheItemInterface
         }
         foreach ($tags as $tag) {
             if (!\is_string($tag)) {
-                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given', \is_object($tag) ? \get_class($tag) : \gettype($tag)));
+                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given.', \is_object($tag) ? \get_class($tag) : \gettype($tag)));
             }
             if (isset($this->tags[$tag])) {
                 continue;
             }
             if ('' === $tag) {
-                throw new InvalidArgumentException('Cache tag length must be greater than zero');
+                throw new InvalidArgumentException('Cache tag length must be greater than zero.');
             }
             if (false !== strpbrk($tag, '{}()/\@:')) {
-                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()/\@:', $tag));
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()/\@:.', $tag));
             }
             $this->tags[$tag] = $tag;
         }
@@ -159,13 +159,13 @@ final class CacheItem implements CacheItemInterface
     public static function validateKey($key)
     {
         if (!\is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', \is_object($key) ? \get_class($key) : \gettype($key)));
+            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', \is_object($key) ? \get_class($key) : \gettype($key)));
         }
         if ('' === $key) {
-            throw new InvalidArgumentException('Cache key length must be greater than zero');
+            throw new InvalidArgumentException('Cache key length must be greater than zero.');
         }
         if (false !== strpbrk($key, '{}()/\@:')) {
-            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters {}()/\@:', $key));
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters {}()/\@:.', $key));
         }
 
         return $key;

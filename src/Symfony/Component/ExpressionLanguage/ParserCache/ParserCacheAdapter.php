@@ -67,7 +67,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function getItems(array $keys = [])
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -75,7 +75,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function hasItem($key)
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -83,7 +83,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function clear()
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -91,7 +91,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -99,7 +99,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function deleteItems(array $keys)
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -107,7 +107,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
@@ -115,6 +115,6 @@ class ParserCacheAdapter implements CacheItemPoolInterface
      */
     public function commit()
     {
-        throw new \BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented.');
     }
 }

@@ -48,7 +48,7 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
         }
         if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\Client && !$redisClient instanceof RedisProxy) {
-            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($redisClient) ? \get_class($redisClient) : \gettype($redisClient)));
+            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given.', __METHOD__, \is_object($redisClient) ? \get_class($redisClient) : \gettype($redisClient)));
         }
         $this->redis = $redisClient;
     }
@@ -73,7 +73,7 @@ trait RedisTrait
     public static function createConnection($dsn, array $options = [])
     {
         if (0 !== strpos($dsn, 'redis://')) {
-            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://"', $dsn));
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://".', $dsn));
         }
         $params = preg_replace_callback('#^redis://(?:(?:[^:@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m[1])) {
@@ -83,10 +83,10 @@ trait RedisTrait
             return 'file://';
         }, $dsn);
         if (false === $params = parse_url($params)) {
-            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s.', $dsn));
         }
         if (!isset($params['host']) && !isset($params['path'])) {
-            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s.', $dsn));
         }
         if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
             $params['dbindex'] = $m[1];
@@ -108,7 +108,7 @@ trait RedisTrait
         }
         $params += $options + self::$defaultConnectionOptions;
         if (null === $params['class'] && !\extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
-            throw new CacheException(sprintf('Cannot find the "redis" extension, and "predis/predis" is not installed: %s', $dsn));
+            throw new CacheException(sprintf('Cannot find the "redis" extension, and "predis/predis" is not installed: %s.', $dsn));
         }
         $class = null === $params['class'] ? (\extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
@@ -120,7 +120,7 @@ trait RedisTrait
                 try {
                     @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], $params['persistent_id'], $params['retry_interval']);
                 } catch (\RedisException $e) {
-                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e->getMessage(), $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s.', $e->getMessage(), $dsn));
                 }
 
                 set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
@@ -128,7 +128,7 @@ trait RedisTrait
                 restore_error_handler();
                 if (!$isConnected) {
                     $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $error, $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s.', $error, $dsn));
                 }
 
                 if ((null !== $auth && !$redis->auth($auth))
@@ -136,7 +136,7 @@ trait RedisTrait
                     || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
-                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s.', $e, $dsn));
                 }
 
                 return true;
@@ -153,9 +153,9 @@ trait RedisTrait
             $params['password'] = $auth;
             $redis = new $class((new Factory())->create($params));
         } elseif (class_exists($class, false)) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis" or "Predis\Client"', $class));
+            throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis" or "Predis\Client".', $class));
         } else {
-            throw new InvalidArgumentException(sprintf('Class "%s" does not exist', $class));
+            throw new InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
         return $redis;

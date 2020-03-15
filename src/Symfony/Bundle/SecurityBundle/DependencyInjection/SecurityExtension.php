@@ -387,7 +387,7 @@ class SecurityExtension extends Extension
             }
 
             if (isset($this->logoutOnUserChangeByContextKey[$contextKey]) && $this->logoutOnUserChangeByContextKey[$contextKey][1] !== $logoutOnUserChange) {
-                throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s"', $this->logoutOnUserChangeByContextKey[$contextKey][0], $id, $contextKey));
+                throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s".', $this->logoutOnUserChangeByContextKey[$contextKey][0], $id, $contextKey));
             }
 
             $this->logoutOnUserChangeByContextKey[$contextKey] = [$id, $logoutOnUserChange];
@@ -701,7 +701,7 @@ class SecurityExtension extends Extension
             return $name;
         }
 
-        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider', $name));
+        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider.', $name));
     }
 
     private function getUserProviderId($name)

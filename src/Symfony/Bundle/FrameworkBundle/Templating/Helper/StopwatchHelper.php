@@ -43,6 +43,6 @@ class StopwatchHelper extends Helper
             return \call_user_func_array([$this->stopwatch, $method], $arguments);
         }
 
-        throw new \BadMethodCallException(sprintf('Method "%s" of Stopwatch does not exist', $method));
+        throw new \BadMethodCallException(sprintf('Method "%s" of Stopwatch does not exist.', $method));
     }
 }

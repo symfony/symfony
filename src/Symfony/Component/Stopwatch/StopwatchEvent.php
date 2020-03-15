@@ -238,7 +238,7 @@ class StopwatchEvent
     private function formatTime($time)
     {
         if (!is_numeric($time)) {
-            throw new \InvalidArgumentException('The time must be a numerical value');
+            throw new \InvalidArgumentException('The time must be a numerical value.');
         }
 
         return round($time, 1);

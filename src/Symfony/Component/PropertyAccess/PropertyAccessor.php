@@ -267,7 +267,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $type = substr($message, 2 + $j, strpos($message, ' given', $j) - $j - 2);
             $message = substr($message, $pos, $j - $pos);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', $message, 'NULL' === $type ? 'null' : $type), 0, $previous);
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given.', $message, 'NULL' === $type ? 'null' : $type), 0, $previous);
         }
     }
 
@@ -591,7 +591,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex($zval, $index, $value)
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, \get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
         }
 
         $zval[self::REF][$index] = $value;

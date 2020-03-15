@@ -152,7 +152,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (\in_array($value, ['NaN', 'NAN', 'nan'], true)) {
-            throw new TransformationFailedException('"NaN" is not a valid number');
+            throw new TransformationFailedException('"NaN" is not a valid number.');
         }
 
         $position = 0;
@@ -183,7 +183,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if ($result >= PHP_INT_MAX || $result <= -PHP_INT_MAX) {
-            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
+            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like.');
         }
 
         $result = $this->castParsedValue($result);
@@ -204,7 +204,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $remainder = trim($remainder, " \t\n\r\0\x0b\xc2\xa0");
 
             if ('' !== $remainder) {
-                throw new TransformationFailedException(sprintf('The number contains unrecognized characters: "%s"', $remainder));
+                throw new TransformationFailedException(sprintf('The number contains unrecognized characters: "%s".', $remainder));
             }
         }
 

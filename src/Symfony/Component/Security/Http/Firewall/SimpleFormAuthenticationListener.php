@@ -54,7 +54,7 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = [], LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenManagerInterface $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
-            throw new \InvalidArgumentException('Missing simple authenticator');
+            throw new \InvalidArgumentException('Missing simple authenticator.');
         }
 
         $this->simpleAuthenticator = $simpleAuthenticator;

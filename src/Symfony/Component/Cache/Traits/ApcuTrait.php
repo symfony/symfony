@@ -29,7 +29,7 @@ trait ApcuTrait
     private function init($namespace, $defaultLifetime, $version)
     {
         if (!static::isSupported()) {
-            throw new CacheException('APCu is not enabled');
+            throw new CacheException('APCu is not enabled.');
         }
         if ('cli' === \PHP_SAPI) {
             ini_set('apc.use_request_time', 0);

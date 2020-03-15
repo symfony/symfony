@@ -374,7 +374,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                     break;
 
                 default:
-                    throw new \RuntimeException(sprintf('Unexpected Stub type: %s', $item->type));
+                    throw new \RuntimeException(sprintf('Unexpected Stub type: %s.', $item->type));
             }
         } elseif ('array' === $type) {
             $dumper->enterHash($cursor, Cursor::HASH_INDEXED, 0, false);

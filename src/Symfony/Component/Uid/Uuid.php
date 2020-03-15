@@ -20,8 +20,6 @@ class Uuid extends AbstractUid
 {
     protected const TYPE = UUID_TYPE_DEFAULT;
 
-    protected $uuid;
-
     public function __construct(string $uuid)
     {
         $type = uuid_type($uuid);

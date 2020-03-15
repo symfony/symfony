@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added XSD for configuration
  * Added security configuration for priority-based access decision strategy
 
 5.0.0

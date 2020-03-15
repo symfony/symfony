@@ -88,6 +88,7 @@ trait MicroKernelTrait
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', [
+                'secret' => '%env(APP_SECRET)%',
                 'router' => [
                     'resource' => 'kernel::loadRoutes',
                     'type' => 'service',
@@ -108,7 +109,6 @@ trait MicroKernelTrait
 
             $container->addObjectResource($this);
             $container->fileExists($this->getProjectDir().'/config/bundles.php');
-            $container->setParameter('kernel.secret', '%env(APP_SECRET)%');
 
             try {
                 $this->configureContainer($container, $loader);

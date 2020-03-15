@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\UuidV4;
 
 class UlidTest extends TestCase
 {
@@ -47,6 +48,28 @@ class UlidTest extends TestCase
         $this->assertSame('7fffffffffffffffffffffffffffffff', bin2hex($ulid->toBinary()));
 
         $this->assertTrue($ulid->equals(Ulid::fromString(hex2bin('7fffffffffffffffffffffffffffffff'))));
+    }
+
+    public function testFromUuid()
+    {
+        $uuid = new UuidV4();
+
+        $ulid = Ulid::fromString($uuid);
+
+        $this->assertSame($uuid->toBase32(), (string) $ulid);
+        $this->assertSame($ulid->toBase32(), (string) $ulid);
+        $this->assertSame((string) $uuid, $ulid->toRfc4122());
+        $this->assertTrue($ulid->equals(Ulid::fromString($uuid)));
+    }
+
+    public function testBase58()
+    {
+        $ulid = new Ulid('00000000000000000000000000');
+        $this->assertSame('1111111111111111111111', $ulid->toBase58());
+
+        $ulid = Ulid::fromString("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF");
+        $this->assertSame('YcVfxkQb6JRzqk5kF2tNLv', $ulid->toBase58());
+        $this->assertTrue($ulid->equals(Ulid::fromString('YcVfxkQb6JRzqk5kF2tNLv')));
     }
 
     /**

@@ -105,7 +105,7 @@ class EmailValidator extends ConstraintValidator
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {
             if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
+                throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0.');
             }
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();

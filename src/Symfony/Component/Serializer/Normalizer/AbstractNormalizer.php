@@ -327,7 +327,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return $circularReferenceHandler($object, $format, $context);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d).', \get_class($object), $this->circularReferenceLimit));
     }
 
     /**
@@ -524,7 +524,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         try {
             if (null !== $parameter->getClass()) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $parameter->getClass(), self::class));
+                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer.', $parameter->getClass(), self::class));
                 }
                 $parameterClass = $parameter->getClass()->getName();
                 $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName, $format));

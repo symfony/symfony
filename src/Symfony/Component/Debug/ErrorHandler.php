@@ -226,14 +226,14 @@ class ErrorHandler
             if (!\is_array($log)) {
                 $log = [$log];
             } elseif (!\array_key_exists(0, $log)) {
-                throw new \InvalidArgumentException('No logger provided');
+                throw new \InvalidArgumentException('No logger provided.');
             }
             if (null === $log[0]) {
                 $this->loggedErrors &= ~$type;
             } elseif ($log[0] instanceof LoggerInterface) {
                 $this->loggedErrors |= $type;
             } else {
-                throw new \InvalidArgumentException('Invalid logger provided');
+                throw new \InvalidArgumentException('Invalid logger provided.');
             }
             $this->loggers[$type] = $log + $prev[$type];
 

@@ -180,7 +180,7 @@ abstract class FileLoader extends BaseFileLoader
                 $prefixLen = \strlen($resource->getPrefix());
 
                 if ($excludePrefix && 0 !== strpos($excludePrefix, $resource->getPrefix())) {
-                    throw new InvalidArgumentException(sprintf('Invalid "exclude" pattern when importing classes for "%s": make sure your "exclude" pattern (%s) is a subset of the "resource" pattern (%s)', $namespace, $excludePattern, $pattern));
+                    throw new InvalidArgumentException(sprintf('Invalid "exclude" pattern when importing classes for "%s": make sure your "exclude" pattern (%s) is a subset of the "resource" pattern (%s).', $namespace, $excludePattern, $pattern));
                 }
             }
 

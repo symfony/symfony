@@ -43,7 +43,7 @@ class MemcachedStore implements StoreInterface
     public function __construct(\Memcached $memcached, int $initialTtl = 300)
     {
         if (!static::isSupported()) {
-            throw new InvalidArgumentException('Memcached extension is required');
+            throw new InvalidArgumentException('Memcached extension is required.');
         }
 
         if ($initialTtl < 1) {

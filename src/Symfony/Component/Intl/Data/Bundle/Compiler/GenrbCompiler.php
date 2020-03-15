@@ -37,7 +37,7 @@ class GenrbCompiler implements BundleCompilerInterface
         exec('which '.$genrb, $output, $status);
 
         if (0 !== $status) {
-            throw new RuntimeException(sprintf('The command "%s" is not installed', $genrb));
+            throw new RuntimeException(sprintf('The command "%s" is not installed.', $genrb));
         }
 
         $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;

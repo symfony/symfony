@@ -202,7 +202,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($stack as $attribute => $attributeValue) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
+                throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
             }
 
             $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute, $format)), $class, $format, $context);
@@ -446,7 +446,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
+                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer.', $attribute, $class));
                 }
 
                 $childContext = $this->createChildContext($context, $attribute, $format);

@@ -105,7 +105,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser()', \get_class($guardAuthenticator)));
+            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser().', \get_class($guardAuthenticator)));
         }
 
         if (!$user instanceof UserInterface) {

@@ -132,7 +132,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetSet($name, $value)
     {
-        throw new BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported.');
     }
 
     /**

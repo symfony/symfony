@@ -37,7 +37,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
         }
 
         if (!is_dir($savePath) && !@mkdir($savePath, 0777, true) && !is_dir($savePath)) {
-            throw new \RuntimeException(sprintf('Session Storage was not able to create directory "%s"', $savePath));
+            throw new \RuntimeException(sprintf('Session Storage was not able to create directory "%s".', $savePath));
         }
 
         $this->savePath = $savePath;
@@ -87,7 +87,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     public function save()
     {
         if (!$this->started) {
-            throw new \RuntimeException('Trying to save a session that was not started yet or was already closed');
+            throw new \RuntimeException('Trying to save a session that was not started yet or was already closed.');
         }
 
         $data = $this->data;

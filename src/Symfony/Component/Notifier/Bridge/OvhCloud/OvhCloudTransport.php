@@ -56,7 +56,7 @@ final class OvhCloudTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
         }
 
         $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);

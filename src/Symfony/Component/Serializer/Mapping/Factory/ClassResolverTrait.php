@@ -40,7 +40,7 @@ trait ClassResolverTrait
         }
 
         if (!\is_object($value)) {
-            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s".', \gettype($value)));
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s".', get_debug_type($value)));
         }
 
         return \get_class($value);

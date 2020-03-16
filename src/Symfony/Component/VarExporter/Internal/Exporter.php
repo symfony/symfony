@@ -271,7 +271,7 @@ class Exporter
             return self::exportHydrator($value, $indent, $subIndent);
         }
 
-        throw new \UnexpectedValueException(sprintf('Cannot export value of type "%s".', \is_object($value) ? \get_class($value) : \gettype($value)));
+        throw new \UnexpectedValueException(sprintf('Cannot export value of type "%s".', get_debug_type($value)));
     }
 
     private static function exportRegistry(Registry $value, string $indent, string $subIndent): string

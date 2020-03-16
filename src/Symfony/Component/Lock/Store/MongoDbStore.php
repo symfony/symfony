@@ -133,7 +133,7 @@ class MongoDbStore implements BlockingStoreInterface
 
             $this->uri = $mongo;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, \is_object($mongo) ? \get_class($mongo) : \gettype($mongo)));
+            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, get_debug_type($mongo)));
         }
 
         if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {

@@ -349,7 +349,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function readIndex(array $zval, $index): array
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_debug_type($zval[self::VALUE])));
         }
 
         $result = self::$resultProto;
@@ -457,7 +457,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex(array $zval, $index, $value)
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_debug_type($zval[self::VALUE])));
         }
 
         $zval[self::REF][$index] = $value;
@@ -497,7 +497,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
             }
 
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, \get_class($object)));
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
         }
     }
 

@@ -174,7 +174,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public function addConstraint(Constraint $constraint)
     {
         if (!\in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets())) {
-            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', \get_class($constraint)));
+            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', get_debug_type($constraint)));
         }
 
         if ($constraint instanceof Traverse) {

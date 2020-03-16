@@ -52,19 +52,19 @@ abstract class ObjectLoader extends Loader
         $loaderObject = $this->getObject($parts[0]);
 
         if (!\is_object($loaderObject)) {
-            throw new \TypeError(sprintf('"%s:getObject()" must return an object: "%s" returned.', static::class, \gettype($loaderObject)));
+            throw new \TypeError(sprintf('"%s:getObject()" must return an object: "%s" returned.', static::class, get_debug_type($loaderObject)));
         }
 
         if (!\is_callable([$loaderObject, $method])) {
-            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, \get_class($loaderObject), $resource));
+            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, get_debug_type($loaderObject), $resource));
         }
 
         $routeCollection = $loaderObject->$method($this);
 
         if (!$routeCollection instanceof RouteCollection) {
-            $type = \is_object($routeCollection) ? \get_class($routeCollection) : \gettype($routeCollection);
+            $type = get_debug_type($routeCollection);
 
-            throw new \LogicException(sprintf('The "%s::%s()" method must return a RouteCollection: "%s" returned.', \get_class($loaderObject), $method, $type));
+            throw new \LogicException(sprintf('The "%s::%s()" method must return a RouteCollection: "%s" returned.', get_debug_type($loaderObject), $method, $type));
         }
 
         // make the object file tracked so that if it changes, the cache rebuilds

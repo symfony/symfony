@@ -77,7 +77,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             return;
         }
         if (!\is_string($propertyPath)) {
-            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s".', \is_object($propertyPath) ? \get_class($propertyPath) : \gettype($propertyPath)));
+            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s".', get_debug_type($propertyPath)));
         }
 
         if ('' === $propertyPath) {

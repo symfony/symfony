@@ -707,7 +707,7 @@ class YamlFileLoaderTest extends TestCase
     public function testEmptyDefaultsThrowsClearException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Service "_defaults" key must be an array, "NULL" given in ".+bad_empty_defaults\.yml"\./');
+        $this->expectExceptionMessageRegExp('/Service "_defaults" key must be an array, "null" given in ".+bad_empty_defaults\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_defaults.yml');
@@ -716,7 +716,7 @@ class YamlFileLoaderTest extends TestCase
     public function testEmptyInstanceofThrowsClearException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Service "_instanceof" key must be an array, "NULL" given in ".+bad_empty_instanceof\.yml"\./');
+        $this->expectExceptionMessageRegExp('/Service "_instanceof" key must be an array, "null" given in ".+bad_empty_instanceof\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_instanceof.yml');

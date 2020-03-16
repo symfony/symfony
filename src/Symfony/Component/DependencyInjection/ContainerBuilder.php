@@ -1131,7 +1131,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             if (!\is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', \get_class($service)));
+                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
             }
 
             $callable($service);
@@ -1390,7 +1390,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         $completed = true;
                     } else {
                         if (!\is_string($resolved) && !is_numeric($resolved)) {
-                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type "%s" inside string value "%s".', $env, \gettype($resolved), $this->resolveEnvPlaceholders($value)));
+                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type "%s" inside string value "%s".', $env, get_debug_type($resolved), $this->resolveEnvPlaceholders($value)));
                         }
                         $value = str_ireplace($placeholder, $resolved, $value);
                     }

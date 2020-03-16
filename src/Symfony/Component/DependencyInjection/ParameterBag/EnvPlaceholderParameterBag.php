@@ -48,7 +48,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
-                throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', \gettype($defaultValue), $name));
+                throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));
             }
 
             $uniqueName = md5($name.'_'.self::$counter++);
@@ -147,7 +147,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
         foreach ($this->envPlaceholders as $env => $placeholders) {
             if ($this->has($name = "env($env)") && null !== ($default = $this->parameters[$name]) && !\is_string($default)) {
-                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, "%s" given.', $env, \gettype($default)));
+                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, "%s" given.', $env, get_debug_type($default)));
             }
         }
     }

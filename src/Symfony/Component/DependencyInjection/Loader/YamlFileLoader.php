@@ -213,7 +213,7 @@ class YamlFileLoader extends FileLoader
             unset($content['services']['_instanceof']);
 
             if (!\is_array($instanceof)) {
-                throw new InvalidArgumentException(sprintf('Service "_instanceof" key must be an array, "%s" given in "%s".', \gettype($instanceof), $file));
+                throw new InvalidArgumentException(sprintf('Service "_instanceof" key must be an array, "%s" given in "%s".', get_debug_type($instanceof), $file));
             }
             $this->instanceof = [];
             $this->isLoadingInstanceof = true;
@@ -247,7 +247,7 @@ class YamlFileLoader extends FileLoader
         unset($content['services']['_defaults']);
 
         if (!\is_array($defaults)) {
-            throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', \gettype($defaults), $file));
+            throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', get_debug_type($defaults), $file));
         }
 
         foreach ($defaults as $key => $default) {
@@ -339,7 +339,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (!\is_array($service)) {
-            throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but "%s" found for service "%s" in "%s". Check your YAML syntax.', \gettype($service), $id, $file));
+            throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but "%s" found for service "%s" in "%s". Check your YAML syntax.', get_debug_type($service), $id, $file));
         }
 
         $this->checkDefinition($id, $service, $file);
@@ -465,7 +465,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service['calls'] as $k => $call) {
                 if (!\is_array($call) && (!\is_string($k) || !$call instanceof TaggedValue)) {
-                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s": expected map or array, "%s" given in "%s".', $id, $call instanceof TaggedValue ? '!'.$call->getTag() : \gettype($call), $file));
+                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s": expected map or array, "%s" given in "%s".', $id, $call instanceof TaggedValue ? '!'.$call->getTag() : get_debug_type($call), $file));
                 }
 
                 if (\is_string($k)) {

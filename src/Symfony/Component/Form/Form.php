@@ -357,11 +357,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $dataClass = $this->config->getDataClass();
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                $actualType = \is_object($viewData)
-                    ? 'an instance of class '.\get_class($viewData)
-                    : 'a(n) '.\gettype($viewData);
+                $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be an instance of class '.$dataClass.', but is '.$actualType.'. You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms '.$actualType.' to an instance of '.$dataClass.'.');
+                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
             }
         }
 

@@ -122,7 +122,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testConstructor()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "integer" given.');
+        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "int" given.');
 
         new NoPrivateNetworkHttpClient(new MockHttpClient(), 3);
     }

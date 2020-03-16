@@ -65,7 +65,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
         foreach ($this->providers as $provider) {
             if (!$provider instanceof AuthenticationProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', \get_class($provider)));
+                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', get_debug_type($provider)));
             }
 
             if (!$provider->supports($token)) {

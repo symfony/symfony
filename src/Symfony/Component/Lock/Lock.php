@@ -70,7 +70,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
         try {
             if ($blocking) {
                 if (!$this->store instanceof BlockingStoreInterface) {
-                    throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', \get_class($this->store)));
+                    throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', get_debug_type($this->store)));
                 }
                 $this->store->waitAndSave($this->key);
             } else {

@@ -434,7 +434,7 @@ class OptionsResolver implements Options
         }
 
         if (!\is_string($deprecationMessage) && !$deprecationMessage instanceof \Closure) {
-            throw new InvalidArgumentException(sprintf('Invalid type for deprecation message argument, expected string or \Closure, but got "%s".', \gettype($deprecationMessage)));
+            throw new InvalidArgumentException(sprintf('Invalid type for deprecation message argument, expected string or \Closure, but got "%s".', get_debug_type($deprecationMessage)));
         }
 
         // ignore if empty string
@@ -929,7 +929,7 @@ class OptionsResolver implements Options
             }
 
             if (!\is_array($value)) {
-                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $this->formatOptions([$option]), $this->formatValue($value), $this->formatTypeOf($value)));
+                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $this->formatOptions([$option]), $this->formatValue($value), get_debug_type($value)));
             }
 
             // The following section must be protected from cyclic calls.
@@ -1059,7 +1059,7 @@ class OptionsResolver implements Options
                 $this->calling[$option] = true;
                 try {
                     if (!\is_string($deprecationMessage = $deprecationMessage($this, $value))) {
-                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', \gettype($deprecationMessage)));
+                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', get_debug_type($deprecationMessage)));
                     }
                 } finally {
                     unset($this->calling[$option]);
@@ -1120,7 +1120,7 @@ class OptionsResolver implements Options
         }
 
         if (!$invalidTypes || $level > 0) {
-            $invalidTypes[$this->formatTypeOf($value)] = true;
+            $invalidTypes[get_debug_type($value)] = true;
         }
 
         return false;
@@ -1184,18 +1184,6 @@ class OptionsResolver implements Options
         }
 
         return \count($this->defaults);
-    }
-
-    /**
-     * Returns a string representation of the type of the value.
-     *
-     * @param mixed $value The value to return the type of
-     *
-     * @return string The type of the value
-     */
-    private function formatTypeOf($value): string
-    {
-        return \is_object($value) ? \get_class($value) : \gettype($value);
     }
 
     /**

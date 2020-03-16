@@ -194,7 +194,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 foreach (\is_array($e) ? $e : array_keys($values) as $id) {
                     $ok = false;
                     $v = $values[$id];
-                    $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                    $type = get_debug_type($v);
                     $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
                     CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
                 }
@@ -218,7 +218,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     continue;
                 }
                 $ok = false;
-                $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                $type = get_debug_type($v);
                 $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
                 CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
             }

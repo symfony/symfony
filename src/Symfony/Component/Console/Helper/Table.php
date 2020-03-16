@@ -218,7 +218,7 @@ class Table
     public function setColumnMaxWidth(int $columnIndex, int $width): self
     {
         if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
-            throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, \get_class($this->output->getFormatter())));
+            throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, get_debug_type($this->output->getFormatter())));
         }
 
         $this->columnMaxWidths[$columnIndex] = $width;
@@ -606,7 +606,7 @@ class Table
         $unmergedRows = [];
         foreach ($rows[$line] as $column => $cell) {
             if (null !== $cell && !$cell instanceof TableCell && !is_scalar($cell) && !(\is_object($cell) && method_exists($cell, '__toString'))) {
-                throw new InvalidArgumentException(sprintf('A cell must be a TableCell, a scalar or an object implementing "__toString()", "%s" given.', \gettype($cell)));
+                throw new InvalidArgumentException(sprintf('A cell must be a TableCell, a scalar or an object implementing "__toString()", "%s" given.', get_debug_type($cell)));
             }
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;

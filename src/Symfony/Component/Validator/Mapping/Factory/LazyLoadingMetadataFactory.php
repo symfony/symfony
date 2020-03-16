@@ -72,7 +72,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     public function getMetadataFor($value)
     {
         if (!\is_object($value) && !\is_string($value)) {
-            throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: "%s".', \gettype($value)));
+            throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: "%s".', get_debug_type($value)));
         }
 
         $class = ltrim(\is_object($value) ? \get_class($value) : $value, '\\');

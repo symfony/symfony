@@ -49,7 +49,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
         foreach ($adapters as $adapter) {
             if (!$adapter instanceof CacheItemPoolInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', \get_class($adapter), CacheItemPoolInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
             }
 
             if ($adapter instanceof AdapterInterface) {

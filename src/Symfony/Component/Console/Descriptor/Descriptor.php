@@ -55,7 +55,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeApplication($object, $options);
                 break;
             default:
-                throw new InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
+                throw new InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
     }
 

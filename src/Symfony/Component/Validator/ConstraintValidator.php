@@ -58,7 +58,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function formatTypeOf($value)
     {
-        return \is_object($value) ? \get_class($value) : \gettype($value);
+        return get_debug_type($value);
     }
 
     /**

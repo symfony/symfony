@@ -67,8 +67,8 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons(): array
     {
         return [
-            [3, '3', 3, '3', 'integer'],
-            ['2', '"2"', 2, '2', 'integer'],
+            [3, '3', 3, '3', 'int'],
+            ['2', '"2"', 2, '2', 'int'],
             ['a', '"a"', 'a', '"a"', 'string'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],

@@ -38,7 +38,7 @@ class WeekToArrayTransformer implements DataTransformerInterface
         }
 
         if (!\is_string($value)) {
-            throw new TransformationFailedException(sprintf('Value is expected to be a string but was "%s".', \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new TransformationFailedException(sprintf('Value is expected to be a string but was "%s".', get_debug_type($value)));
         }
 
         if (0 === preg_match('/^(?P<year>\d{4})-W(?P<week>\d{2})$/', $value, $matches)) {
@@ -68,7 +68,7 @@ class WeekToArrayTransformer implements DataTransformerInterface
         }
 
         if (!\is_array($value)) {
-            throw new TransformationFailedException(sprintf('Value is expected to be an array, but was "%s".', \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new TransformationFailedException(sprintf('Value is expected to be an array, but was "%s".', get_debug_type($value)));
         }
 
         if (!\array_key_exists('year', $value)) {
@@ -88,11 +88,11 @@ class WeekToArrayTransformer implements DataTransformerInterface
         }
 
         if (!\is_int($value['year'])) {
-            throw new TransformationFailedException(sprintf('Year is expected to be an integer, but was "%s".', \is_object($value['year']) ? \get_class($value['year']) : \gettype($value['year'])));
+            throw new TransformationFailedException(sprintf('Year is expected to be an integer, but was "%s".', get_debug_type($value['year'])));
         }
 
         if (!\is_int($value['week'])) {
-            throw new TransformationFailedException(sprintf('Week is expected to be an integer, but was "%s".', \is_object($value['week']) ? \get_class($value['week']) : \gettype($value['week'])));
+            throw new TransformationFailedException(sprintf('Week is expected to be an integer, but was "%s".', get_debug_type($value['week'])));
         }
 
         // The 28th December is always in the last week of the year

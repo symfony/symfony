@@ -161,11 +161,11 @@ class ControllerResolver implements ControllerResolverInterface
             $availableMethods = $this->getClassMethodsWithoutMagicMethods($callable);
             $alternativeMsg = $availableMethods ? sprintf(' or use one of the available methods: "%s"', implode('", "', $availableMethods)) : '';
 
-            return sprintf('Controller class "%s" cannot be called without a method name. You need to implement "__invoke"%s.', \get_class($callable), $alternativeMsg);
+            return sprintf('Controller class "%s" cannot be called without a method name. You need to implement "__invoke"%s.', get_debug_type($callable), $alternativeMsg);
         }
 
         if (!\is_array($callable)) {
-            return sprintf('Invalid type for controller given, expected string, array or object, got "%s".', \gettype($callable));
+            return sprintf('Invalid type for controller given, expected string, array or object, got "%s".', get_debug_type($callable));
         }
 
         if (!isset($callable[0]) || !isset($callable[1]) || 2 !== \count($callable)) {
@@ -178,7 +178,7 @@ class ControllerResolver implements ControllerResolverInterface
             return sprintf('Class "%s" does not exist.', $controller);
         }
 
-        $className = \is_object($controller) ? \get_class($controller) : $controller;
+        $className = \is_object($controller) ? get_debug_type($controller) : $controller;
 
         if (method_exists($controller, $method)) {
             return sprintf('Method "%s" on class "%s" should be public and non-abstract.', $method, $className);

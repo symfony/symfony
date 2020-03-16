@@ -351,7 +351,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             try {
                 $serialized = serialize($value);
             } catch (\Exception $e) {
-                $type = \is_object($value) ? \get_class($value) : \gettype($value);
+                $type = get_debug_type($value);
                 $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
 

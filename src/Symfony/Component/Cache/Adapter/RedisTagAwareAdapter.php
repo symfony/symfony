@@ -72,7 +72,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getConnection() instanceof ClusterInterface && !$redisClient->getConnection() instanceof PredisCluster) {
-            throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, \get_class($redisClient->getConnection())));
+            throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redisClient->getConnection())));
         }
 
         if (\defined('Redis::OPT_COMPRESSION') && ($redisClient instanceof \Redis || $redisClient instanceof \RedisArray || $redisClient instanceof \RedisCluster)) {

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T19:14:01Z
+
+/cc @keradus maybe php-cs-fixer might benefit from a rule here :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2020-03-03T19:49:41Z
+
+hey @nicolas-grekas ,
+I raised a Feature Request in PHP CS Fixer repo in your name: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4862
+
+(Same time, I must warn you that it will not be the top prio right away on my list, so don't hesitate to help on your own ;) )
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-16T13:32:45Z
+
+@nicolas-grekas Sorry to inform you that I've ruined your PR...

@@ -95,6 +95,6 @@ class StoreFactory
                 return new ZookeeperStore(ZookeeperStore::createConnection($connection));
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));
+        throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));
     }
 }

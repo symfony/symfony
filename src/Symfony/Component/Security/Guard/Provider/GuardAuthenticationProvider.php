@@ -105,20 +105,20 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser().', \get_class($guardAuthenticator)));
+            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', \get_class($guardAuthenticator)));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
+            throw new \UnexpectedValueException(sprintf('The "%s::getUser()" method must return a UserInterface. You returned "%s".', \get_class($guardAuthenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
         }
 
         $this->userChecker->checkPreAuth($user);
         if (true !== $checkCredentialsResult = $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
             if (false !== $checkCredentialsResult) {
-                @trigger_error(sprintf('%s::checkCredentials() must return a boolean value. You returned %s. This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.', \get_class($guardAuthenticator), \is_object($checkCredentialsResult) ? \get_class($checkCredentialsResult) : \gettype($checkCredentialsResult)), E_USER_DEPRECATED);
+                @trigger_error(sprintf('"%s::checkCredentials()" must return a boolean value. You returned "%s". This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.', \get_class($guardAuthenticator), \is_object($checkCredentialsResult) ? \get_class($checkCredentialsResult) : \gettype($checkCredentialsResult)), E_USER_DEPRECATED);
             }
 
-            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', \get_class($guardAuthenticator)));
+            throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', \get_class($guardAuthenticator)));
         }
         if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
             $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
@@ -128,7 +128,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         // turn the UserInterface into a TokenInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
+            throw new \UnexpectedValueException(sprintf('The "%s::createAuthenticatedToken()" method must return a TokenInterface. You returned "%s".', \get_class($guardAuthenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
         }
 
         return $authenticatedToken;

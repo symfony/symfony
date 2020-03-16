@@ -41,21 +41,21 @@ trait PhpArrayTrait
     {
         if (file_exists($this->file)) {
             if (!is_file($this->file)) {
-                throw new InvalidArgumentException(sprintf('Cache path exists and is not a file: %s.', $this->file));
+                throw new InvalidArgumentException(sprintf('Cache path exists and is not a file: "%s".', $this->file));
             }
 
             if (!is_writable($this->file)) {
-                throw new InvalidArgumentException(sprintf('Cache file is not writable: %s.', $this->file));
+                throw new InvalidArgumentException(sprintf('Cache file is not writable: "%s".', $this->file));
             }
         } else {
             $directory = \dirname($this->file);
 
             if (!is_dir($directory) && !@mkdir($directory, 0777, true)) {
-                throw new InvalidArgumentException(sprintf('Cache directory does not exist and cannot be created: %s.', $directory));
+                throw new InvalidArgumentException(sprintf('Cache directory does not exist and cannot be created: "%s".', $directory));
             }
 
             if (!is_writable($directory)) {
-                throw new InvalidArgumentException(sprintf('Cache directory is not writable: %s.', $directory));
+                throw new InvalidArgumentException(sprintf('Cache directory is not writable: "%s".', $directory));
             }
         }
 
@@ -81,7 +81,7 @@ EOF;
                 try {
                     $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
+                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
                 }
             } elseif (\is_string($value)) {
                 // Wrap "N;" in a closure to not confuse it with an encoded `null`
@@ -90,7 +90,7 @@ EOF;
                 }
                 $value = var_export($value, true);
             } elseif (!is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, \gettype($value)));
             } else {
                 $value = var_export($value, true);
             }

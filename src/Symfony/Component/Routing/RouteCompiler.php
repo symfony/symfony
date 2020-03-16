@@ -147,7 +147,7 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             if (\strlen($varName) > self::VARIABLE_MAXIMUM_LENGTH) {
-                throw new \DomainException(sprintf('Variable name "%s" cannot be longer than %s characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
+                throw new \DomainException(sprintf('Variable name "%s" cannot be longer than %d characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
             }
 
             if ($isSeparator && $precedingText !== $precedingChar) {

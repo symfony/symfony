@@ -1372,7 +1372,7 @@ EOF;
 
         foreach ($this->container->getParameterBag()->all() as $key => $value) {
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
-                throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: %s.', $resolvedKey));
+                throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: "%s".', $resolvedKey));
             }
             $export = $this->exportParameters([$value]);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);

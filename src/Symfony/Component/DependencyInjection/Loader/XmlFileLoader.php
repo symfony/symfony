@@ -171,7 +171,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($defaults['tags'] as $tag) {
             if ('' === $tag->getAttribute('name')) {
-                throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in %s must be a non-empty string.', $file));
+                throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in "%s" must be a non-empty string.', $file));
             }
         }
 
@@ -344,7 +344,7 @@ class XmlFileLoader extends FileLoader
             }
 
             if ('' === $tag->getAttribute('name')) {
-                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', (string) $service->getAttribute('id'), $file));
+                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
             }
 
             $definition->addTag($tag->getAttribute('name'), $parameters);
@@ -395,7 +395,7 @@ class XmlFileLoader extends FileLoader
         try {
             $dom = XmlUtils::loadFile($file, [$this, 'validateSchema']);
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to parse file "%s": %s.', $file, $e->getMessage()), $e->getCode(), $e);
+            throw new InvalidArgumentException(sprintf('Unable to parse file "%s": "%s".', $file, $e->getMessage()), $e->getCode(), $e);
         }
 
         $this->validateExtensions($dom, $file);
@@ -678,7 +678,7 @@ EOF
             // can it be handled by an extension?
             if (!$this->container->hasExtension($node->namespaceURI)) {
                 $extensionNamespaces = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getNamespace(); }, $this->container->getExtensions()));
-                throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s.', $node->tagName, $file, $node->namespaceURI, $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'));
+                throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $node->tagName, $file, $node->namespaceURI, $extensionNamespaces ? implode('", "', $extensionNamespaces) : 'none'));
             }
         }
     }

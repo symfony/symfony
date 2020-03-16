@@ -184,7 +184,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if (!is_scalar($env)) {
-            throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to %s.', $name, $prefix));
+            throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
 
         if ('string' === $prefix) {
@@ -231,7 +231,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             if (null !== $env && !\is_array($env)) {
-                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, %s given.', $name, \gettype($env)));
+                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, "%s" given.', $name, \gettype($env)));
             }
 
             return $env;

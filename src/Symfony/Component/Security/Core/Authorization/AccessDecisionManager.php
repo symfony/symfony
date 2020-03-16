@@ -58,7 +58,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         if (\count($attributes) > 1) {
-            @trigger_error(sprintf('Passing more than one Security attribute to %s() is deprecated since Symfony 4.4. Use multiple decide() calls or the expression language (e.g. "is_granted(...) or is_granted(...)") instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing more than one Security attribute to "%s()" is deprecated since Symfony 4.4. Use multiple "decide()" calls or the expression language (e.g. "is_granted(...) or is_granted(...)") instead.', __METHOD__), E_USER_DEPRECATED);
         }
 
         return $this->{$this->strategy}($token, $attributes, $object);

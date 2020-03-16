@@ -857,7 +857,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
-            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use %s().', __METHOD__));
+            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use "%s()".', __METHOD__));
         }
 
         if (!ApcuAdapter::isSupported()) {

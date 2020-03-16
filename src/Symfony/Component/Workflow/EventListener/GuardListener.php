@@ -83,7 +83,7 @@ class GuardListener
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
-            throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
+            throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow "%s".', $event->getWorkflowName()));
         }
 
         if (method_exists($token, 'getRoleNames')) {

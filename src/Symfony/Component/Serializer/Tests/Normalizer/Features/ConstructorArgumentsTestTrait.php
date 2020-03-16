@@ -55,7 +55,7 @@ trait ConstructorArgumentsTestTrait
         $normalizer = $this->getDenormalizerForConstructArguments();
 
         $this->expectException(MissingConstructorArgumentsException::class);
-        $this->expectExceptionMessage('Cannot create an instance of '.ConstructorArgumentsObject::class.' from serialized data because its constructor requires parameter "bar" to be present.');
+        $this->expectExceptionMessage('Cannot create an instance of "'.ConstructorArgumentsObject::class.'" from serialized data because its constructor requires parameter "bar" to be present.');
         $normalizer->denormalize($data, ConstructorArgumentsObject::class);
     }
 }

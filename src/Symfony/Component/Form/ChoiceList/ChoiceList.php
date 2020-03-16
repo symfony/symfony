@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\ChoiceList;
 
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceAttr;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceValue;
@@ -64,6 +65,16 @@ final class ChoiceList
     public static function value($formType, $value, $vary = null): ChoiceValue
     {
         return new ChoiceValue($formType, $value, $vary);
+    }
+
+    /**
+     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
+     * @param callable                                     $filter   Any pseudo callable to filter a choice list
+     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the callback
+     */
+    public static function filter($formType, $filter, $vary = null): ChoiceFilter
+    {
+        return new ChoiceFilter($formType, $filter, $vary);
     }
 
     /**

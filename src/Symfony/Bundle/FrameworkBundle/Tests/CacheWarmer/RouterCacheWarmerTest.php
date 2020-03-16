@@ -40,7 +40,7 @@ class RouterCacheWarmerTest extends TestCase
         $containerMock->expects($this->any())->method('get')->with('router')->willReturn($routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($containerMock);
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('cannot be warmed up because it does not implement Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface');
+        $this->expectExceptionMessage('cannot be warmed up because it does not implement "Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface"');
         $routerCacheWarmer->warmUp('/tmp');
     }
 }

@@ -47,7 +47,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
             return;
         }
 
-        throw new \LogicException(sprintf('The router %s cannot be warmed up because it does not implement %s.', \get_class($router), WarmableInterface::class));
+        throw new \LogicException(sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', \get_class($router), WarmableInterface::class));
     }
 
     /**

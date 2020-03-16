@@ -179,7 +179,7 @@ class HttpClientTraitTest extends TestCase
     public function testInvalidAuthBearerOption()
     {
         $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, object given.');
+        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, "object" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
@@ -249,7 +249,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizePeerFingerprintTypeException()
     {
         $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, object given.');
+        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "object" given.');
         $fingerprint = new \stdClass();
 
         $this->normalizePeerFingerprint($fingerprint);

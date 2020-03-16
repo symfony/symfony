@@ -52,7 +52,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
     public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, int $level = Logger::DEBUG, bool $bubble = true)
     {
         if (!interface_exists(HttpClientInterface::class)) {
-            throw new \LogicException(sprintf('The %s handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
         parent::__construct($level, $bubble);

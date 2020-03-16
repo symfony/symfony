@@ -325,7 +325,7 @@ class DateType extends AbstractType
 
         $resolver->setNormalizer('html5', function (Options $options, $html5) {
             if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {
-                throw new LogicException(sprintf('Cannot use the "format" option of %s when the "html5" option is enabled.', self::class));
+                throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
             }
 
             return $html5;

@@ -60,7 +60,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         if (\count($attributes) > 1) {
-            throw new InvalidArgumentException(sprintf('Passing more than one Security attribute to %s() is not supported.', __METHOD__));
+            throw new InvalidArgumentException(sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
         }
 
         return $this->{$this->strategy}($token, $attributes, $object);

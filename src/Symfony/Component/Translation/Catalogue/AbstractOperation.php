@@ -91,7 +91,7 @@ abstract class AbstractOperation implements OperationInterface
     public function getMessages(string $domain)
     {
         if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: %s.', $domain));
+            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain]['all'])) {
@@ -107,7 +107,7 @@ abstract class AbstractOperation implements OperationInterface
     public function getNewMessages(string $domain)
     {
         if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: %s.', $domain));
+            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain]['new'])) {
@@ -123,7 +123,7 @@ abstract class AbstractOperation implements OperationInterface
     public function getObsoleteMessages(string $domain)
     {
         if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: %s.', $domain));
+            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain]['obsolete'])) {

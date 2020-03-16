@@ -235,7 +235,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if ($responses instanceof NativeResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of NativeResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of NativeResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
         return new ResponseStream(NativeResponse::stream($responses, $timeout));
@@ -255,7 +255,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         while ('' !== $data = $body(self::$CHUNK_SIZE)) {
             if (!\is_string($data)) {
-                throw new TransportException(sprintf('Return value of the "body" option callback must be string, %s returned.', \gettype($data)));
+                throw new TransportException(sprintf('Return value of the "body" option callback must be string, "%s" returned.', \gettype($data)));
             }
 
             $result .= $data;

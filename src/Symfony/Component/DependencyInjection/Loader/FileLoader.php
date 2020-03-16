@@ -57,7 +57,7 @@ abstract class FileLoader extends BaseFileLoader
         if ($ignoreNotFound = 'not_found' === $ignoreErrors) {
             $args[2] = false;
         } elseif (!\is_bool($ignoreErrors)) {
-            throw new \TypeError(sprintf('Invalid argument $ignoreErrors provided to %s::import(): boolean or "not_found" expected, %s given.', static::class, \gettype($ignoreErrors)));
+            throw new \TypeError(sprintf('Invalid argument $ignoreErrors provided to "%s::import()": boolean or "not_found" expected, "%s" given.', static::class, \gettype($ignoreErrors)));
         }
 
         try {
@@ -90,10 +90,10 @@ abstract class FileLoader extends BaseFileLoader
     public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
     {
         if ('\\' !== substr($namespace, -1)) {
-            throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": %s.', $namespace));
+            throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
         }
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
-            throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: %s.', $namespace));
+            throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: "%s".', $namespace));
         }
 
         $classes = $this->findClasses($namespace, $resource, (array) $exclude);

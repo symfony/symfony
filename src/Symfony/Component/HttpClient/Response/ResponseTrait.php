@@ -161,7 +161,7 @@ trait ResponseTrait
         }
 
         if (!\is_array($content)) {
-            throw new JsonException(sprintf('JSON content was expected to decode to an array, %s returned for "%s".', \gettype($content), $this->getInfo('url')));
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned for "%s".', \gettype($content), $this->getInfo('url')));
         }
 
         if (null !== $this->content) {

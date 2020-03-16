@@ -157,7 +157,7 @@ class MessengerPassTest extends TestCase
     public function testProcessTagWithUnknownBus()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler": bus "unknown_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: command_bus).');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler": bus "unknown_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: "command_bus").');
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
 
         $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', ['bus' => 'unknown_bus']);

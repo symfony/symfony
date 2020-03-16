@@ -50,7 +50,7 @@ class DoctrineFooType extends Type
             return null;
         }
         if (!$value instanceof Foo) {
-            throw new ConversionException(sprintf('Expected %s, got %s', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', \gettype($value)));
+            throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', \gettype($value)));
         }
 
         return $foo->bar;

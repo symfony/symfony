@@ -390,7 +390,7 @@ class RouterTest extends TestCase
     public function testExceptionOnNonStringParameter()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.');
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "object".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
@@ -405,7 +405,7 @@ class RouterTest extends TestCase
     public function testExceptionOnNonStringParameterWithSfContainer()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.');
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "object".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));

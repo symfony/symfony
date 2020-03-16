@@ -184,7 +184,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if (!is_scalar($env)) {
-            throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to %s.', $name, $prefix));
+            throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
 
         if ('string' === $prefix) {
@@ -231,7 +231,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             if (null !== $env && !\is_array($env)) {
-                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, %s given.', $name, \gettype($env)));
+                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, "%s" given.', $name, \gettype($env)));
             }
 
             return $env;
@@ -244,7 +244,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Invalid URL in env var "%s".', $name));
             }
             if (!isset($parsedEnv['scheme'], $parsedEnv['host'])) {
-                throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, %s given.', $name, $env));
+                throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, "%s" given.', $name, $env));
             }
             $parsedEnv += [
                 'port' => null,

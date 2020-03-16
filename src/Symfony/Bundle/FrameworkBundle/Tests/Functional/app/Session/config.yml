@@ -5,3 +5,7 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController:
         tags:
             - { name: controller.service_arguments, action: indexAction, argument: handler, id: fragment.handler }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InjectedFlashbagSessionController:
+        autowire: true
+        tags: ['controller.service_arguments']

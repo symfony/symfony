@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Messenger\Exception\TransportException;
  */
 class ConnectionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public static function setUpBeforeClass(): void
     {
         $redis = Connection::fromDsn('redis://localhost/queue');
@@ -109,11 +112,11 @@ class ConnectionTest extends TestCase
     }
 
     /**
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.
      * @group legacy
      */
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.');
         Connection::fromDsn('redis://localhost/queue?foo=bar');
     }
 

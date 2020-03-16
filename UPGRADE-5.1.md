@@ -54,6 +54,11 @@ Notifier
  * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
    methods' `$transport` argument was removed.
 
+PhpUnitBridge
+-------------
+
+ * Deprecated the `@expectedDeprecation` annotation, use the `ExpectDeprecationTrait::expectDeprecation()` method instead.
+
 Routing
 -------
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
@@ -23,6 +24,8 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class ConnectionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private const DEFAULT_EXCHANGE_NAME = 'messages';
 
     public function testItCannotBeConstructedWithAWrongDsn()
@@ -104,37 +107,37 @@ class ConnectionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.
      */
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.');
         Connection::fromDsn('amqp://host?foo=bar');
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.
      */
     public function testDeprecationIfInvalidOptionIsPassedAsArgument()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.');
         Connection::fromDsn('amqp://host', ['foo' => 'bar']);
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid queue option(s) "foo" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated.
      */
     public function testDeprecationIfInvalidQueueOptionIsPassed()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid queue option(s) "foo" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated.');
         Connection::fromDsn('amqp://host', ['queues' => ['queueName' => ['foo' => 'bar']]]);
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid exchange option(s) "foo" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated.
      */
     public function testDeprecationIfInvalidExchangeOptionIsPassed()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid exchange option(s) "foo" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated.');
         Connection::fromDsn('amqp://host', ['exchange' => ['foo' => 'bar']]);
     }
 

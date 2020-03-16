@@ -14,6 +14,8 @@ namespace Symfony\Component\Uid;
 /**
  * A v6 UUID is lexicographically sortable and contains a 60-bit timestamp and 62 extra unique bits.
  *
+ * Use UidFactory::uuidV6() to compute one.
+ *
  * @experimental in 5.1
  *
  * @author Nicolas Grekas <p@tchwork.com>
@@ -27,16 +29,6 @@ class UuidV6 extends Uuid
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
     private const TIME_OFFSET_INT = 0x01b21dd213814000;
     private const TIME_OFFSET_COM = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
-
-    public function __construct(string $uuid = null)
-    {
-        if (null === $uuid) {
-            $uuid = uuid_create(UUID_TYPE_TIME);
-            $this->uid = substr($uuid, 15, 3).substr($uuid, 9, 4).$uuid[0].'-'.substr($uuid, 1, 4).'-6'.substr($uuid, 5, 3).substr($uuid, 18);
-        } else {
-            parent::__construct($uuid);
-        }
-    }
 
     public function getTime(): float
     {

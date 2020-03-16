@@ -124,6 +124,7 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\UidFactory;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -174,6 +175,11 @@ class FrameworkExtension extends Extension
 
         if (interface_exists(PsrEventDispatcherInterface::class)) {
             $container->setAlias(PsrEventDispatcherInterface::class, 'event_dispatcher');
+        }
+
+        if (!class_exists(UidFactory::class)) {
+            $container->getDefinition('uid.factory')
+                ->addError('You cannot use the "uid.factory" service since the Uid component is not installed. Try running "composer require symfony/uid".');
         }
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);

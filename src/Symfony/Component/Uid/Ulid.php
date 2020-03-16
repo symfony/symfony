@@ -14,6 +14,8 @@ namespace Symfony\Component\Uid;
 /**
  * A ULID is lexicographically sortable and contains a 48-bit timestamp and 80-bit of crypto-random entropy.
  *
+ * Use UidFactory::ulid() to compute one.
+ *
  * @see https://github.com/ulid/spec
  *
  * @experimental in 5.1
@@ -25,14 +27,8 @@ class Ulid extends AbstractUid
     private static $time = '';
     private static $rand = [];
 
-    public function __construct(string $ulid = null)
+    public function __construct(string $ulid)
     {
-        if (null === $ulid) {
-            $this->uid = self::generate();
-
-            return;
-        }
-
         if (!self::isValid($ulid)) {
             throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
         }
@@ -121,13 +117,28 @@ class Ulid extends AbstractUid
         return BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10) / 1000;
     }
 
-    private static function generate(): string
+    /**
+     * @internal
+     */
+    public static function generate(callable $timeSource = null, callable $randomSource = null): string
     {
-        $time = microtime(false);
-        $time = substr($time, 11).substr($time, 2, 3);
+        if (!$timeSource) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        } elseif (!is_numeric($time = $timeSource()) || 8 > \strlen($time)) {
+            throw new \LogicException('The time source must return the time as a decimal string of tenth of microseconds.');
+        } else {
+            $time = substr($time, 0, -4);
+        }
 
-        if ($time !== self::$time) {
-            $r = unpack('nr1/nr2/nr3/nr4/nr', random_bytes(10));
+        if (self::$time < $time = sprintf('%016s', $time)) {
+            if (!$randomSource) {
+                $r = random_bytes(10);
+            } elseif (!\is_string($r = $randomSource(10)) || 10 !== \strlen($r)) {
+                throw new \LogicException('The random source must return 10 bytes.');
+            }
+
+            $r = unpack('nr1/nr2/nr3/nr4/nr', $r);
             $r['r1'] |= ($r['r'] <<= 4) & 0xF0000;
             $r['r2'] |= ($r['r'] <<= 4) & 0xF0000;
             $r['r3'] |= ($r['r'] <<= 4) & 0xF0000;

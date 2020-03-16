@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * A v5 UUID contains a SHA1 hash of another UUID and a name.
  *
- * Use Uuid::v5() to compute one.
+ * Use UidFactory::uuidV5() to compute one.
  *
  * @experimental in 5.1
  *

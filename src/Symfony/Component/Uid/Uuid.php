@@ -67,31 +67,6 @@ class Uuid extends AbstractUid
         return new self($uuid);
     }
 
-    final public static function v1(): UuidV1
-    {
-        return new UuidV1();
-    }
-
-    final public static function v3(self $namespace, string $name): UuidV3
-    {
-        return new UuidV3(uuid_generate_md5($namespace->uid, $name));
-    }
-
-    final public static function v4(): UuidV4
-    {
-        return new UuidV4();
-    }
-
-    final public static function v5(self $namespace, string $name): UuidV5
-    {
-        return new UuidV5(uuid_generate_sha1($namespace->uid, $name));
-    }
-
-    final public static function v6(): UuidV6
-    {
-        return new UuidV6();
-    }
-
     public static function isValid(string $uuid): bool
     {
         if (__CLASS__ === static::class) {

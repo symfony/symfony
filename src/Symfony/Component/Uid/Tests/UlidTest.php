@@ -12,8 +12,8 @@
 namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UidFactory;
 use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\UuidV4;
 
 class UlidTest extends TestCase
 {
@@ -22,8 +22,8 @@ class UlidTest extends TestCase
      */
     public function testGenerate()
     {
-        $a = new Ulid();
-        $b = new Ulid();
+        $a = (new UidFactory())->ulid();
+        $b = (new UidFactory())->ulid();
 
         $this->assertSame(0, strncmp($a, $b, 20));
         $a = base_convert(strtr(substr($a, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
@@ -52,7 +52,7 @@ class UlidTest extends TestCase
 
     public function testFromUuid()
     {
-        $uuid = new UuidV4();
+        $uuid = (new UidFactory())->uuidV4();
 
         $ulid = Ulid::fromString($uuid);
 
@@ -78,7 +78,7 @@ class UlidTest extends TestCase
     public function testGetTime()
     {
         $time = microtime(false);
-        $ulid = new Ulid();
+        $ulid = (new UidFactory())->ulid();
         $time = substr($time, 11).substr($time, 1, 4);
 
         $this->assertSame((float) $time, $ulid->getTime());
@@ -92,8 +92,8 @@ class UlidTest extends TestCase
 
     public function testEquals()
     {
-        $a = new Ulid();
-        $b = new Ulid();
+        $a = (new UidFactory())->ulid();
+        $b = (new UidFactory())->ulid();
 
         $this->assertTrue($a->equals($a));
         $this->assertFalse($a->equals($b));
@@ -105,15 +105,15 @@ class UlidTest extends TestCase
      */
     public function testCompare()
     {
-        $a = new Ulid();
-        $b = new Ulid();
+        $a = (new UidFactory())->ulid();
+        $b = (new UidFactory())->ulid();
 
         $this->assertSame(0, $a->compare($a));
         $this->assertLessThan(0, $a->compare($b));
         $this->assertGreaterThan(0, $b->compare($a));
 
         usleep(1001);
-        $c = new Ulid();
+        $c = (new UidFactory())->ulid();
 
         $this->assertLessThan(0, $b->compare($c));
         $this->assertGreaterThan(0, $c->compare($b));

@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Uid;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\NilUuid;
-use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\UidFactory;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
@@ -44,7 +44,7 @@ class UuidTest extends TestCase
 
     public function testV1()
     {
-        $uuid = Uuid::v1();
+        $uuid = (new UidFactory())->uuidV1();
 
         $this->assertInstanceOf(UuidV1::class, $uuid);
 
@@ -56,28 +56,28 @@ class UuidTest extends TestCase
 
     public function testV3()
     {
-        $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');
+        $uuid = (new UidFactory())->uuidV3(Uuid::fromString(self::A_UUID_V4), 'the name');
 
         $this->assertInstanceOf(UuidV3::class, $uuid);
     }
 
     public function testV4()
     {
-        $uuid = Uuid::v4();
+        $uuid = (new UidFactory())->uuidV4();
 
         $this->assertInstanceOf(UuidV4::class, $uuid);
     }
 
     public function testV5()
     {
-        $uuid = Uuid::v5(new UuidV4(self::A_UUID_V4), 'the name');
+        $uuid = (new UidFactory())->uuidV5(Uuid::fromString(self::A_UUID_V4), 'the name');
 
         $this->assertInstanceOf(UuidV5::class, $uuid);
     }
 
     public function testV6()
     {
-        $uuid = Uuid::v6();
+        $uuid = (new UidFactory())->uuidV6();
 
         $this->assertInstanceOf(UuidV6::class, $uuid);
 
@@ -98,7 +98,7 @@ class UuidTest extends TestCase
 
     public function testFromUlid()
     {
-        $ulid = new Ulid();
+        $ulid = (new UidFactory())->ulid();
         $uuid = Uuid::fromString($ulid);
 
         $this->assertSame((string) $ulid, $uuid->toBase32());

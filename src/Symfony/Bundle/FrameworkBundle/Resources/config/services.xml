@@ -144,5 +144,8 @@
             <factory class="Symfony\Component\String\LazyString" method="fromCallable" />
             <argument type="service" id="container.getenv" />
         </service>
+
+        <service id="uid.factory" class="Symfony\Component\Uid\UidFactory" />
+        <service id="Symfony\Component\Uid\UidFactory" alias="uid.factory" />
     </services>
 </container>

@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * A v3 UUID contains an MD5 hash of another UUID and a name.
  *
- * Use Uuid::v3() to compute one.
+ * Use UidFactory::uuidV3() to compute one.
  *
  * @experimental in 5.1
  *

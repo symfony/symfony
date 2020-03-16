@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-03T14:39:56Z
+
+> Just asking: why is the parameter string|string[] $needle instead of ...string $needles ?
+
+I think it's to pass directly (without alteration) the method argument to `indexOf`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T14:51:42Z
+
+> instead of ...string $needles
+
+Clearly, for consistency.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-03-06T16:28:07Z
+
+`containsAny('string')` is a step back compared to `contains('string')` IMHO.
+
+in this case does `contains(string $needle) + containsAny(array $needles)` makes sense?
+
+assuming we dont ever need `containsAll(array $needles)`. But if so, it's still possible ... (`containsAny('string') + containsAll('string')` would be another step back)
+
+alternatively, shouldnt we advice to compose any/all logic in userland based on `contains('string')`, it's not like `contains('a') || contains('b')` is that bad actually ;) (same for `contains('a') && contains('b')`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-07T09:01:08Z
+
+> containsAny('string') is a step back compared to contains('string') IMHO.
+> in this case does contains(string $needle) + containsAny(array $needles) makes sense?
+
+3 extra letters adding clarity win over a new method to me, especially considering that the class is already a collection of methods. We shouldn't inflate contains*() method in comparison to the other ones.
+
+> it's not like contains('a') || contains('b') is that bad actually
+
+You should have a look again at the full interface of the class: several methods already support `string|string[]`. Not doing so for "contains" would be inconsistent.
+
+Doing so is consistent, and useful.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-07T10:28:39Z
+
+Note that I'm fine naming this method `contains()` if that's the broader consensus. Please advise.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-07T11:20:07Z
+
+I think that `contains()` is ambiguous. I will look at it and always wonder ... is it *"contains all"* or *"contains any"* ? 🤔
+
+this is the same problem we suffered for years with the `is_granted(array $roles)` method ... is it *"all roles required"* or *"any role required"* ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-03-07T11:29:00Z
+
+there's `before/after()` assuming OR already, is it less ambigious? is contains() specifically the confusing case ... thus worth a containsAny, but not before/afterAny? Is that inconsistent? if so, why dont we mind being inconsistent with `contains(string $needle)` also then?
+
+long term, are we really, really, sure about a defacto standard String component/API... without a `contains` method :hear_no_evil:
+
+do we really mind adding N*3 methods (single, any, all) IF the case is ambiguous, in favor of clear behavior + type info... is it worth this debate we have?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-13T11:32:23Z
+
+Apparently ppl don't have an issue with before/after. I suppose that's because nobody expects a "beforeAny" or "afterAny". That wouldn't mean anything useful and it intuitively is a beforeAll and afterAll.
+
+the discussion proves that "contains" can be confusing.
+
+I'm therefor confirming that I definitely also prefer `containsAny()`.
+
+Thanks for raising the point.

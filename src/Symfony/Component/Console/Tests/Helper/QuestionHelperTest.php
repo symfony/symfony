@@ -696,7 +696,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -704,7 +704,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
@@ -712,7 +712,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
 

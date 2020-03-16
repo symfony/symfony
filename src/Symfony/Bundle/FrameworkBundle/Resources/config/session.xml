@@ -13,8 +13,6 @@
 
         <service id="session" class="Symfony\Component\HttpFoundation\Session\Session" public="true">
             <argument type="service" id="session.storage" />
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="Symfony\Component\HttpFoundation\Session\SessionInterface" alias="session" />
@@ -37,10 +35,14 @@
             <argument type="service" id="session.storage.metadata_bag" />
         </service>
 
-        <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBag" />
+        <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBag">
+            <factory service="session" method="getFlashBag"/>
+        </service>
         <service id="Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface" alias="session.flash_bag" />
 
-        <service id="session.attribute_bag" class="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag" />
+        <service id="session.attribute_bag" class="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag">
+            <factory service="session" method="getAttributeBag"/>
+        </service>
 
         <service id="session.storage.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage">
             <argument>%kernel.cache_dir%/sessions</argument>

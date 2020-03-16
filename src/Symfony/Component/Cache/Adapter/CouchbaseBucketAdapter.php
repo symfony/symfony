@@ -62,7 +62,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         if (\is_string($servers)) {
             $servers = [$servers];
         } elseif (!\is_array($servers)) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be array or string, %s given.', __METHOD__, \gettype($servers)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be array or string, "%s" given.', __METHOD__, \gettype($servers)));
         }
 
         if (!static::isSupported()) {
@@ -83,7 +83,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
             foreach ($servers as $dsn) {
                 if (0 !== strpos($dsn, 'couchbase:')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: %s does not start with "couchbase:".', $dsn));
+                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $dsn));
                 }
 
                 preg_match($dsnPattern, $dsn, $matches);

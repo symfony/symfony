@@ -41,7 +41,7 @@ class FirewallContext
             $this->logoutListener = $logoutListener;
             $this->config = $config;
         } else {
-            throw new \InvalidArgumentException(sprintf('Argument 3 passed to %s() must be instance of %s or null, %s given.', __METHOD__, LogoutListener::class, \is_object($logoutListener) ? \get_class($logoutListener) : \gettype($logoutListener)));
+            throw new \InvalidArgumentException(sprintf('Argument 3 passed to "%s()" must be instance of "%s" or null, "%s" given.', __METHOD__, LogoutListener::class, \is_object($logoutListener) ? \get_class($logoutListener) : \gettype($logoutListener)));
         }
     }
 

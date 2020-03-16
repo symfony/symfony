@@ -1681,7 +1681,7 @@ class Process implements \IteratorAggregate
     private function requireProcessIsStarted($functionName)
     {
         if (!$this->isStarted()) {
-            throw new LogicException(sprintf('Process must be started before calling %s.', $functionName));
+            throw new LogicException(sprintf('Process must be started before calling "%s()".', $functionName));
         }
     }
 
@@ -1695,7 +1695,7 @@ class Process implements \IteratorAggregate
     private function requireProcessIsTerminated($functionName)
     {
         if (!$this->isTerminated()) {
-            throw new LogicException(sprintf('Process must be terminated before calling %s.', $functionName));
+            throw new LogicException(sprintf('Process must be terminated before calling "%s()".', $functionName));
         }
     }
 

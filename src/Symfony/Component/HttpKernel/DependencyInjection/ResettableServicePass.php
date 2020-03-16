@@ -46,7 +46,7 @@ class ResettableServicePass implements CompilerPassInterface
             $attributes = $tags[0];
 
             if (!isset($attributes['method'])) {
-                throw new RuntimeException(sprintf('Tag %s requires the "method" attribute to be set.', $this->tagName));
+                throw new RuntimeException(sprintf('Tag "%s" requires the "method" attribute to be set.', $this->tagName));
             }
 
             $methods[$id] = $attributes['method'];

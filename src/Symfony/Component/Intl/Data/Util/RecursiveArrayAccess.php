@@ -36,7 +36,7 @@ class RecursiveArrayAccess
                 }
             }
 
-            throw new OutOfBoundsException(sprintf('The index %s does not exist.', $index));
+            throw new OutOfBoundsException(sprintf('The index "%s" does not exist.', $index));
         }
 
         return $array;

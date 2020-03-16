@@ -524,7 +524,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAmbiguousChoiceFromChoicelist()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of env_2 or env_3.');
+        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of "env_2" or "env_3".');
         $possibleChoices = [
             'env_1' => 'My first environment',
             'env_2' => 'My environment',
@@ -891,7 +891,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testLegacyAmbiguousChoiceFromChoicelist()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of env_2 or env_3.');
+        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of "env_2" or "env_3".');
         $possibleChoices = [
             'env_1' => 'My first environment',
             'env_2' => 'My environment',

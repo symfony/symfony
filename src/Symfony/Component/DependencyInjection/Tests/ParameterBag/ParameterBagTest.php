@@ -170,7 +170,7 @@ class ParameterBagTest extends TestCase
             $bag->resolveValue('%foo%');
             $this->fail('->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
         } catch (RuntimeException $e) {
-            $this->assertEquals('A string value must be composed of strings and/or numbers, but found parameter "bar" of type array inside string value "a %bar%".', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
+            $this->assertEquals('A string value must be composed of strings and/or numbers, but found parameter "bar" of type "array" inside string value "a %bar%".', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
         }
 
         $bag = new ParameterBag(['foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%']);

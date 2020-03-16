@@ -125,7 +125,7 @@ abstract class KernelTestCase extends TestCase
         if (isset($_SERVER['KERNEL_CLASS']) || isset($_ENV['KERNEL_CLASS'])) {
             $class = isset($_ENV['KERNEL_CLASS']) ? $_ENV['KERNEL_CLASS'] : $_SERVER['KERNEL_CLASS'];
             if (!class_exists($class)) {
-                throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
+                throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the "%s::createKernel()" method.', $class, static::class));
             }
 
             return $class;

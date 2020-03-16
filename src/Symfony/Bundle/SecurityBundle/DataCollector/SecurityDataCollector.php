@@ -121,7 +121,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $extractRoles = function ($role) {
                 if (!$role instanceof RoleInterface && !$role instanceof Role) {
-                    throw new \InvalidArgumentException(sprintf('Roles must be instances of %s or %s (%s given).', RoleInterface::class, Role::class, \is_object($role) ? \get_class($role) : \gettype($role)));
+                    throw new \InvalidArgumentException(sprintf('Roles must be instances of "%s" or "%s" ("%s" given).', RoleInterface::class, Role::class, \is_object($role) ? \get_class($role) : \gettype($role)));
                 }
 
                 return $role->getRole();

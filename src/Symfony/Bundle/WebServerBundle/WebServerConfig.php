@@ -29,7 +29,7 @@ class WebServerConfig
         }
 
         if (null === $file = $this->findFrontController($documentRoot, $env)) {
-            throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
+            throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: "%s").', $documentRoot, implode('", "', $this->getFrontControllerFileNames($env))));
         }
 
         $_ENV['APP_FRONT_CONTROLLER'] = $file;

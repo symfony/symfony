@@ -729,7 +729,7 @@ TABLE;
     public function testThrowsWhenTheCellInAnArray()
     {
         $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing __toString, array given.');
+        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])

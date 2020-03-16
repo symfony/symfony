@@ -41,7 +41,7 @@ abstract class AbstractToken implements TokenInterface
             if (\is_string($role)) {
                 $role = new Role($role);
             } elseif (!$role instanceof RoleInterface) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings or Role instances, but got %s.', \gettype($role)));
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings or Role instances, but got "%s".', \gettype($role)));
             }
 
             $this->roles[] = $role;

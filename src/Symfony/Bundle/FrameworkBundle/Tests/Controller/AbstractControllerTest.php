@@ -46,11 +46,11 @@ class TestAbstractController extends AbstractController
                 continue;
             }
             if (!isset($expected[$id])) {
-                throw new \UnexpectedValueException(sprintf('Service "%s" is not expected, as declared by %s::getSubscribedServices()', $id, AbstractController::class));
+                throw new \UnexpectedValueException(sprintf('Service "%s" is not expected, as declared by "%s::getSubscribedServices()".', $id, AbstractController::class));
             }
             $type = substr($expected[$id], 1);
             if (!$container->get($id) instanceof $type) {
-                throw new \UnexpectedValueException(sprintf('Service "%s" is expected to be an instance of "%s", as declared by %s::getSubscribedServices()', $id, $type, AbstractController::class));
+                throw new \UnexpectedValueException(sprintf('Service "%s" is expected to be an instance of "%s", as declared by "%s::getSubscribedServices()".', $id, $type, AbstractController::class));
             }
         }
 

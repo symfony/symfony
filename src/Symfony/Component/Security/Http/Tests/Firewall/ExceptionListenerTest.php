@@ -86,7 +86,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
         // the exception has been replaced by our LogicException
         $this->assertInstanceOf('LogicException', $event->getException());
-        $this->assertStringEndsWith('start() method must return a Response object (string returned).', $event->getException()->getMessage());
+        $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getException()->getMessage());
     }
 
     /**

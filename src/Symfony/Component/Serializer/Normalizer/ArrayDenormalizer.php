@@ -69,7 +69,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     public function supportsDenormalization($data, $type, $format = null/*, array $context = []*/)
     {
         if (null === $this->serializer) {
-            throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used.', __METHOD__));
+            throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
         $context = \func_num_args() > 3 ? func_get_arg(3) : [];

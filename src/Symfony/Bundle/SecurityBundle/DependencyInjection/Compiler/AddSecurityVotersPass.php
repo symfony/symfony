@@ -51,7 +51,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
 
             if (!method_exists($class, 'vote')) {
                 // in case the vote method is completely missing, to prevent exceptions when voting
-                throw new LogicException(sprintf('%s should implement the %s interface when used as voter.', $class, VoterInterface::class));
+                throw new LogicException(sprintf('"%s" should implement the "%s" interface when used as voter.', $class, VoterInterface::class));
             }
         }
 

@@ -693,7 +693,7 @@ class InlineTest extends TestCase
     public function testNotSupportedMissingValue()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Malformed inline YAML string: {this, is not, supported} at line 1.');
+        $this->expectExceptionMessage('Malformed inline YAML string: "{this, is not, supported}" at line 1.');
         Inline::parse('{this, is not, supported}');
     }
 

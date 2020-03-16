@@ -1306,7 +1306,7 @@ EOF;
 
         foreach ($this->container->getParameterBag()->all() as $key => $value) {
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
-                throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: %s.', $resolvedKey));
+                throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: "%s".', $resolvedKey));
             }
             if ($key !== $lcKey = strtolower($key)) {
                 $normalizedParams[] = sprintf('        %s => %s,', $this->export($lcKey), $this->export($key));

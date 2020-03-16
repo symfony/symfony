@@ -130,7 +130,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testResolveThrowsOnBadDefaultValue()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be scalar or null, array given.');
+        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be scalar or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
         $bag->set('env(ARRAY_VAR)', []);

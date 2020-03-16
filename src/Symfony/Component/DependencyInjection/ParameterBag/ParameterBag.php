@@ -234,7 +234,7 @@ class ParameterBag implements ParameterBagInterface
             $resolved = $this->get($key);
 
             if (!\is_string($resolved) && !is_numeric($resolved)) {
-                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, \gettype($resolved), $value));
+                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type "%s" inside string value "%s".', $key, \gettype($resolved), $value));
             }
 
             $resolved = (string) $resolved;

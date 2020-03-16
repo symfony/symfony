@@ -536,7 +536,7 @@ class YamlFileLoaderTest extends TestCase
     public function testInvalidTagsWithDefaults()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Parameter "tags" must be an array for service "Foo\\\Bar" in .+services31_invalid_tags\.yml\. Check your YAML syntax./');
+        $this->expectExceptionMessageRegExp('/Parameter "tags" must be an array for service "Foo\\\Bar" in ".+services31_invalid_tags\.yml"\. Check your YAML syntax./');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services31_invalid_tags.yml');
     }

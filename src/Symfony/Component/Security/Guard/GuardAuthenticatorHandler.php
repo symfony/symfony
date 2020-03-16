@@ -81,7 +81,7 @@ class GuardAuthenticatorHandler
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object. You returned %s.', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationSuccess()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
     }
 
     /**
@@ -119,7 +119,7 @@ class GuardAuthenticatorHandler
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null or a Response object. You returned %s.', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationFailure()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
     }
 
     /**

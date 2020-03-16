@@ -1439,7 +1439,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         $completed = true;
                     } else {
                         if (!\is_string($resolved) && !is_numeric($resolved)) {
-                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type %s inside string value "%s".', $env, \gettype($resolved), $this->resolveEnvPlaceholders($value)));
+                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type "%s" inside string value "%s".', $env, \gettype($resolved), $this->resolveEnvPlaceholders($value)));
                         }
                         $value = str_ireplace($placeholder, $resolved, $value);
                     }

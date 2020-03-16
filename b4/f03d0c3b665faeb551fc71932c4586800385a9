@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-19T23:07:35Z
+
+I am not sure about this one because what if I want "at least 2" or "at most 3", etc. I think what you want to achieve is a composition of constraints (ref https://github.com/symfony/symfony/issues/35226), right?
+
+When we need a composition of different constraints, shouldn't we create a custom constraint reusing core constraints "in context" instead?
+
+What about maybe finding another name and add an option to choose the number of constraints that must be valid, so it is at least a bit dynamic?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-20T05:53:02Z
+
+Before increasing the complexity we should be sure there is a need for the feature.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-02-22T13:09:15Z
+
+When I started working on this one, I thought about creating a parameter for the number of "internal" constraints, that have to be satisfied. So initially, it was the `AtLeast` constraint. But with all the discussion around color validators, I decided, that a one-of-many variant should cover 99% of cases, in which anyone would ever wanted to use such a constraint. Nevertheless, making it the `AtLeast` constraint with default option set to one, isn't such a bad idea.
+
+By the way, I will add more tests soon.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-23T07:59:25Z
+
+I don't think AtLeast > 1 serves any use case.

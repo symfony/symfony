@@ -25,6 +25,8 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -116,6 +118,28 @@ class PropertyAccessorTest extends TestCase
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->getValue($objectOrArray, $path);
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testGetValueThrowsExceptionIfUninitializedProperty()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should either initialize it or make it nullable using "?string" instead.');
+
+        $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty::getUninitialized()" returned "null", but expected type "array". Have you forgotten to initialize a property or to make the return type nullable using "?array" instead?');
+
+        $this->propertyAccessor->getValue(new UninitializedPrivateProperty(), 'uninitialized');
     }
 
     public function testGetValueThrowsExceptionIfNotArrayAccess()

@@ -12,18 +12,18 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\NativeHttpClient;
 
 class HttpClientTest extends TestCase
 {
     public function testCreateClient()
     {
-        if (\extension_loaded('curl') && ('\\' !== \DIRECTORY_SEPARATOR || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath'))) {
+        if (\extension_loaded('curl') && ('\\' !== \DIRECTORY_SEPARATOR || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath')) && 0x073d00 <= curl_version()['version_number']) {
             $this->assertInstanceOf(CurlHttpClient::class, HttpClient::create());
         } else {
-            $this->assertInstanceOf(NativeHttpClient::class, HttpClient::create());
+            $this->assertInstanceOf(AmpHttpClient::class, HttpClient::create());
         }
     }
 }

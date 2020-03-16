@@ -161,7 +161,9 @@ final class AmpClientState extends ClientState
         };
         $connector->connector = new DnsConnector(new AmpResolver($this->dnsCache));
 
-        $context = (new ConnectContext())->withTlsContext($context);
+        $context = (new ConnectContext())
+            ->withTcpNoDelay()
+            ->withTlsContext($context);
 
         if ($options['bindto']) {
             if (file_exists($options['bindto'])) {

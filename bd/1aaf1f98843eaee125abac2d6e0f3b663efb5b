@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by bendavies at 2020-03-12T17:23:34Z
+
+what about the fact that there is lots of code out there making decisions on `$input->isInteractive()` without using the question helper at all?
+The behavior of all that code is different now.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-03-12T20:35:49Z
+
+Valid point. Can you link some?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-03-12T21:03:41Z
+
+Same argument I made in https://github.com/symfony/symfony/pull/36027#issuecomment-598416428
+
+---------------------------------------------------------------------------
+
+by bendavies at 2020-03-13T09:28:37Z
+
+> Valid point. Can you link some?
+
+There are quite a few.
+https://github.com/symfony/symfony/search?q=isInteractive&type=
+
+I was just greping my vendor folder and there will obviously be third party instances of this too.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-03-13T13:27:54Z
+
+> There are quite a few.
+symfony/symfony/search?q=isInteractive&type=
+
+Thanks for the list. I checked it and none of those commands should break:
+- password encoder: Interactive check is run only when not providing password via argument. Running command in non-interactive shell without providing password doesn't make sense in the first place, but even if you do, result is error, similarly as before.
+- debug:container: it uses question helper as fallback
+- messenger:failed:retry: Again fallback. It doesn't make sense to run this command in non-interactive shell without providing id
+- debug:form : it uses question helper as fallback

@@ -51,7 +51,7 @@ class NotificationEmail extends TemplatedEmail
         }
 
         if ($missingPackages) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the %s Twig extension%s not available; try running "composer require %s".', static::class, implode(' and ', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', implode(' ', array_keys($missingPackages))));
+            throw new \LogicException(sprintf('You cannot use "%s" if the "%s" Twig extension%s not available; try running "composer require "%s"".', static::class, implode('" and "', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', implode(' ', array_keys($missingPackages))));
         }
 
         parent::__construct($headers, $body);

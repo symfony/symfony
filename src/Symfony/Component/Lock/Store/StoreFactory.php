@@ -33,7 +33,7 @@ class StoreFactory
     public static function createStore($connection)
     {
         if (!\is_string($connection) && !\is_object($connection)) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be a string or a connection object, %s given.', __METHOD__, \gettype($connection)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a string or a connection object, "%s" given.', __METHOD__, \gettype($connection)));
         }
 
         switch (true) {
@@ -56,7 +56,7 @@ class StoreFactory
                 return new ZookeeperStore($connection);
 
             case !\is_string($connection):
-                throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
+                throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', \get_class($connection)));
             case 'flock' === $connection:
                 return new FlockStore();
 

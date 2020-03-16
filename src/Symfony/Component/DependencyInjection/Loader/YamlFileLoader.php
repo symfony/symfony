@@ -464,11 +464,11 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service['calls'] as $k => $call) {
                 if (!\is_array($call) && (!\is_string($k) || !$call instanceof TaggedValue)) {
-                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s": expected map or array, %s given in %s.', $id, $call instanceof TaggedValue ? '!'.$call->getTag() : \gettype($call), $file));
+                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s": expected map or array, "%s" given in "%s".', $id, $call instanceof TaggedValue ? '!'.$call->getTag() : \gettype($call), $file));
                 }
 
                 if (\is_string($k)) {
-                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s", did you forgot a leading dash before "%s: ..." in %s?', $id, $k, $file));
+                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s", did you forgot a leading dash before "%s: ..." in "%s"?', $id, $k, $file));
                 }
 
                 if (isset($call['method'])) {
@@ -482,7 +482,7 @@ class YamlFileLoader extends FileLoader
 
                         if ($args instanceof TaggedValue) {
                             if ('returns_clone' !== $args->getTag()) {
-                                throw new InvalidArgumentException(sprintf('Unsupported tag "!%s", did you mean "!returns_clone" for service "%s" in %s?', $args->getTag(), $id, $file));
+                                throw new InvalidArgumentException(sprintf('Unsupported tag "!%s", did you mean "!returns_clone" for service "%s" in "%s"?', $args->getTag(), $id, $file));
                             }
 
                             $returnsClone = true;
@@ -491,7 +491,7 @@ class YamlFileLoader extends FileLoader
                             $returnsClone = false;
                         }
                     } elseif (empty($call[0])) {
-                        throw new InvalidArgumentException(sprintf('Invalid call for service "%s": the method must be defined as the first index of an array or as the only key of a map in %s.', $id, $file));
+                        throw new InvalidArgumentException(sprintf('Invalid call for service "%s": the method must be defined as the first index of an array or as the only key of a map in "%s".', $id, $file));
                     } else {
                         $method = $call[0];
                         $args = $call[1] ?? [];
@@ -690,7 +690,7 @@ class YamlFileLoader extends FileLoader
         try {
             $configuration = $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
         } catch (ParseException $e) {
-            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: %s.', $file, $e->getMessage()), 0, $e);
+            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: "%s".', $file, $e->getMessage()), 0, $e);
         }
 
         return $this->validate($configuration, $file);

@@ -437,7 +437,7 @@ class XmlFileLoader extends FileLoader
         // anonymous services "in the wild"
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
-                throw new InvalidArgumentException(sprintf('Top-level services must have "id" attribute, none found in %s at line %d.', $file, $node->getLineNo()));
+                throw new InvalidArgumentException(sprintf('Top-level services must have "id" attribute, none found in "%s" at line %d.', $file, $node->getLineNo()));
             }
         }
 

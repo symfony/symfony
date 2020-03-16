@@ -22,7 +22,7 @@ class AbstractTypeExtensionTest extends TestCase
     public function testImplementingNeitherGetExtendedTypeNorExtendsTypeThrowsException()
     {
         $this->expectException('Symfony\Component\Form\Exception\LogicException');
-        $this->expectExceptionMessage('You need to implement the static getExtendedTypes() method when implementing the Symfony\Component\Form\FormTypeExtensionInterface in Symfony\Component\Form\Tests\TypeExtensionWithoutExtendedTypes.');
+        $this->expectExceptionMessage('You need to implement the static getExtendedTypes() method when implementing the "Symfony\Component\Form\FormTypeExtensionInterface" in "Symfony\Component\Form\Tests\TypeExtensionWithoutExtendedTypes".');
         $extension = new TypeExtensionWithoutExtendedTypes();
         $extension->getExtendedType();
     }

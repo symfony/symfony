@@ -232,7 +232,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     public function testUnknownModesOnValidateTriggerException()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('The Symfony\Component\Validator\Constraints\Email::$mode parameter value is not valid.');
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Email::$mode" parameter value is not valid.');
         $constraint = new Email();
         $constraint->mode = 'Unknown Mode';
 

@@ -65,7 +65,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
             $event = $eventName ?? new Event();
             $eventName = $swap;
         } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', ContractsEventDispatcherInterface::class, \is_object($event) ? \get_class($event) : \gettype($event)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, "%s" given.', ContractsEventDispatcherInterface::class, \is_object($event) ? \get_class($event) : \gettype($event)));
         }
 
         $listeners = $this->getListeners($eventName);

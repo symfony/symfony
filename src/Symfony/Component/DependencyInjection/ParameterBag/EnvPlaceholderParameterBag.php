@@ -163,7 +163,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
                 $this->parameters[$name] = (string) $default;
             } elseif (null !== $default && !is_scalar($default)) { // !is_string in 5.0
-                //throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, %s given.', $env, \gettype($default)));
+                //throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, "%s" given.', $env, \gettype($default)));
                 throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, "%s" given.', $env, \gettype($default)));
             } elseif (is_scalar($default) && !\is_string($default)) {
                 @trigger_error(sprintf('A non-string default value of env parameter "%s" is deprecated since 4.3, cast it to string instead.', $env), E_USER_DEPRECATED);

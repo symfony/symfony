@@ -113,7 +113,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $customCallback = sprintf('cb_%s', microtime(true));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "on_progress" must be callable, string given.');
+        $this->expectExceptionMessage('Option "on_progress" must be callable, "string" given.');
 
         $client = new NoPrivateNetworkHttpClient(new MockHttpClient());
         $client->request('GET', $url, ['on_progress' => $customCallback]);
@@ -122,7 +122,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testConstructor()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 passed to Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct() must be of the type array, string or null. integer given.');
+        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "integer" given.');
 
         new NoPrivateNetworkHttpClient(new MockHttpClient(), 3);
     }

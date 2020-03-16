@@ -54,7 +54,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     public function __construct(HttpClientInterface $client, $subnets = null)
     {
         if (!(\is_array($subnets) || \is_string($subnets) || null === $subnets)) {
-            throw new \TypeError(sprintf('Argument 2 passed to %s() must be of the type array, string or null. %s given.', __METHOD__, \is_object($subnets) ? \get_class($subnets) : \gettype($subnets)));
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be of the type array, string or null. "%s" given.', __METHOD__, \is_object($subnets) ? \get_class($subnets) : \gettype($subnets)));
         }
 
         if (!class_exists(IpUtils::class)) {
@@ -72,7 +72,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     {
         $onProgress = $options['on_progress'] ?? null;
         if (null !== $onProgress && !\is_callable($onProgress)) {
-            throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, %s given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
+            throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, "%s" given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
         }
 
         $subnets = $this->subnets;

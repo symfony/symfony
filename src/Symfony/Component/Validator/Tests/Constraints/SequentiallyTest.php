@@ -21,7 +21,7 @@ class SequentiallyTest extends TestCase
     public function testRejectNonConstraints()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The value foo is not an instance of Constraint in constraint Symfony\Component\Validator\Constraints\Sequentially');
+        $this->expectExceptionMessage('The value "foo" is not an instance of Constraint in constraint "Symfony\Component\Validator\Constraints\Sequentially"');
         new Sequentially([
             'foo',
         ]);
@@ -30,7 +30,7 @@ class SequentiallyTest extends TestCase
     public function testRejectValidConstraint()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The constraint Valid cannot be nested inside constraint Symfony\Component\Validator\Constraints\Sequentially');
+        $this->expectExceptionMessage('The constraint Valid cannot be nested inside constraint "Symfony\Component\Validator\Constraints\Sequentially"');
         new Sequentially([
             new Valid(),
         ]);

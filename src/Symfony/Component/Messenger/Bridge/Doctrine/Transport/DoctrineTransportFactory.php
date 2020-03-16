@@ -28,7 +28,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
     public function __construct($registry)
     {
         if (!$registry instanceof RegistryInterface && !$registry instanceof ConnectionRegistry) {
-            throw new \TypeError(sprintf('Expected an instance of %s or %s, but got %s.', RegistryInterface::class, ConnectionRegistry::class, \is_object($registry) ? \get_class($registry) : \gettype($registry)));
+            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', RegistryInterface::class, ConnectionRegistry::class, \is_object($registry) ? \get_class($registry) : \gettype($registry)));
         }
 
         $this->registry = $registry;

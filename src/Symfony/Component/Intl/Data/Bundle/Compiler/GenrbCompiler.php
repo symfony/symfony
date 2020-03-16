@@ -55,7 +55,7 @@ class GenrbCompiler implements BundleCompilerInterface
         exec($this->genrb.' --quiet -e UTF-8 -d '.$targetDir.' '.$sourcePath, $output, $status);
 
         if (0 !== $status) {
-            throw new RuntimeException(sprintf('genrb failed with status %d while compiling %s to %s.', $status, $sourcePath, $targetDir));
+            throw new RuntimeException(sprintf('genrb failed with status %d while compiling "%s" to "%s".', $status, $sourcePath, $targetDir));
         }
     }
 }

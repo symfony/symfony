@@ -70,7 +70,7 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (!\in_array($constraint->mode, Email::$validationModes, true)) {
-            throw new \InvalidArgumentException(sprintf('The %s::$mode parameter value is not valid.', \get_class($constraint)));
+            throw new \InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', \get_class($constraint)));
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {

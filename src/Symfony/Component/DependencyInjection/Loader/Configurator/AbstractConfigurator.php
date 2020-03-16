@@ -31,7 +31,7 @@ abstract class AbstractConfigurator
             return $this->{'set'.$method}(...$args);
         }
 
-        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s().', static::class, $method));
+        throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
 
     /**

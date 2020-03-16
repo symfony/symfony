@@ -69,7 +69,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         if (null === $this->serializer) {
-            throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used.', __METHOD__));
+            throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
         return '[]' === substr($type, -2)

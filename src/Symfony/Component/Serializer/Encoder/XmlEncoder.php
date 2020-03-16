@@ -409,7 +409,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         if (\is_object($data)) {
             if (null === $this->serializer) {
-                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used with object data.', __METHOD__));
+                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used with object data.', __METHOD__));
             }
 
             $data = $this->serializer->normalize($data, $this->format, $this->context);
@@ -475,7 +475,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $this->buildXml($node, $val);
         } elseif (\is_object($val)) {
             if (null === $this->serializer) {
-                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow %s() to be used with object data.', __METHOD__));
+                throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used with object data.', __METHOD__));
             }
 
             return $this->selectNodeType($node, $this->serializer->normalize($val, $this->format, $this->context));

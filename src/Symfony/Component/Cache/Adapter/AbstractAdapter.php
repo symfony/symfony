@@ -131,7 +131,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return MemcachedAdapter::createConnection($dsn, $options);
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
+        throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
     }
 
     /**

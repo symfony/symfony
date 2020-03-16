@@ -85,7 +85,7 @@ class Transport
     {
         list($transport, $offset) = $this->parseDsn($dsn);
         if ($offset !== \strlen($dsn)) {
-            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: %s.', substr($dsn, $offset)));
+            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: "%s".', substr($dsn, $offset)));
         }
 
         return $transport;

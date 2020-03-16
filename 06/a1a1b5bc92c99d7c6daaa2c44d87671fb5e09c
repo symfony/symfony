@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-02-15T11:49:39Z
+
+@nicolas-grekas I made the PR on master because I added an option `rounding_mode`.
+
+But I kinda consider as a bug the fact the value is not rounded in `3.4`, `4.4` and `5.0` versions. Should I make a bugfix PR on theses versions with only the round function but no `rounding_mode` parameter ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-02-18T22:36:11Z
+
+If the PR https://github.com/symfony/symfony/pull/35781 is accepted, I'll need to include the same fix.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-03-11T23:38:47Z
+
+@nicolas-grekas @xabbuh Hi ! Is something missing with this PR ? :)

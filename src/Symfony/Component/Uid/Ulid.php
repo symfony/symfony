@@ -22,7 +22,7 @@ namespace Symfony\Component\Uid;
  */
 class Ulid extends AbstractUid
 {
-    private static $time = -1;
+    private static $time = '';
     private static $rand = [];
 
     public function __construct(string $ulid = null)

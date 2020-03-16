@@ -74,7 +74,13 @@ abstract class AbstractUid implements \JsonSerializable
      */
     public function toRfc4122(): string
     {
-        return uuid_unparse($this->toBinary());
+        // don't use uuid_unparse(), it's slower
+        $uuid = bin2hex($this->toBinary());
+        $uuid = substr_replace($uuid, '-', 8, 0);
+        $uuid = substr_replace($uuid, '-', 13, 0);
+        $uuid = substr_replace($uuid, '-', 18, 0);
+
+        return substr_replace($uuid, '-', 23, 0);
     }
 
     /**

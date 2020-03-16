@@ -56,7 +56,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 $resolved = $resolver->resolve($request, $metadata);
 
                 if (!$resolved instanceof \Generator) {
-                    throw new \InvalidArgumentException(sprintf('%s::resolve() must yield at least one value.', \get_class($resolver)));
+                    throw new \InvalidArgumentException(sprintf('"%s::resolve()" must yield at least one value.', \get_class($resolver)));
                 }
 
                 foreach ($resolved as $append) {

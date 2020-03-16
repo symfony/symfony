@@ -200,7 +200,7 @@ class ProcessBuilderTest extends TestCase
     public function testInvalidInput()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Symfony\Component\Process\ProcessBuilder::setInput only accepts strings, Traversable objects or stream resources.');
+        $this->expectExceptionMessage('"Symfony\Component\Process\ProcessBuilder::setInput" only accepts strings, Traversable objects or stream resources.');
         $builder = ProcessBuilder::create();
         $builder->setInput([]);
     }

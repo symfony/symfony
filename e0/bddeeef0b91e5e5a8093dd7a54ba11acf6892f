@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-22T17:31:39Z
+
+Rebased on master, added some more tests and the documentation PR. Ready from my side.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-23T13:07:27Z
+
+Thanks for the review, addressed everything. Added even more tests and fixed one from #30994 with some missing annotations as well.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-02-23T13:42:34Z
+
+I've added a new commit a54f389 which has two benefits:
+ - reduce the complexity in the default factory by encapsulating the logic in the loader decorator (helped me spotting a bug already covered by tests)
+ - lazy filtering, it means that when submitting empty data on optional field the choices won't be loaded or when some data is submitted and valid they will be partially filtered

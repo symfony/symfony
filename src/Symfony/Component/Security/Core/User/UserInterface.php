@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Role\Role;
  *
  * Regardless of how your users are loaded or where they come from (a database,
  * configuration, web service, etc.), you will have a class that implements
- * this interface. Objects that implement this interface are created and 
+ * this interface. Objects that implement this interface are created and
  * loaded by different objects that implement UserProviderInterface.
  *
  * @see UserProviderInterface

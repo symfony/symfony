@@ -153,7 +153,7 @@ class RedisStore implements StoreInterface
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('%s() expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));
+        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

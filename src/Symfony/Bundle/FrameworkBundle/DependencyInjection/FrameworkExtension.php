@@ -1196,7 +1196,7 @@ class FrameworkExtension extends Extension
             if ($container->fileExists($dir)) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
-                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory.', $dir));
+                throw new \UnexpectedValueException(sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
             }
         }
 

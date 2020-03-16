@@ -40,7 +40,7 @@ class TranslatorListener implements EventSubscriberInterface
     public function __construct($translator, RequestStack $requestStack)
     {
         if (!$translator instanceof TranslatorInterface && !$translator instanceof LocaleAwareInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, LocaleAwareInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, LocaleAwareInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
         }
         $this->translator = $translator;
         $this->requestStack = $requestStack;

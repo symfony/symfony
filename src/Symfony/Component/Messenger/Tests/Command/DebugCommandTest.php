@@ -142,7 +142,7 @@ TXT
     public function testExceptionOnUnknownBusArgument()
     {
         $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
-        $this->expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are command_bus, query_bus.');
+        $this->expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are "command_bus", "query_bus".');
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 
         $tester = new CommandTester($command);

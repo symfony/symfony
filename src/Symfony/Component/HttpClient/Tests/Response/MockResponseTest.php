@@ -56,13 +56,13 @@ class MockResponseTest extends TestCase
         yield [
             'content' => '"not an array"',
             'responseHeaders' => [],
-            'message' => 'JSON content was expected to decode to an array, string returned for "https://example.com/file.json".',
+            'message' => 'JSON content was expected to decode to an array, "string" returned for "https://example.com/file.json".',
         ];
 
         yield [
             'content' => '8',
             'responseHeaders' => [],
-            'message' => 'JSON content was expected to decode to an array, integer returned for "https://example.com/file.json".',
+            'message' => 'JSON content was expected to decode to an array, "integer" returned for "https://example.com/file.json".',
         ];
     }
 }

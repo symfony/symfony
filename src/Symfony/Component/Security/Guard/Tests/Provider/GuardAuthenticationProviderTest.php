@@ -121,7 +121,7 @@ class GuardAuthenticationProviderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation %s::checkCredentials() must return a boolean value. You returned NULL. This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.
+     * @expectedDeprecation "%s::checkCredentials()" must return a boolean value. You returned "NULL". This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.
      */
     public function testCheckCredentialsReturningNonTrueFailsAuthentication()
     {

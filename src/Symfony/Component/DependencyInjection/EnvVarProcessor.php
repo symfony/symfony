@@ -244,7 +244,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Invalid URL in env var "%s".', $name));
             }
             if (!isset($parsedEnv['scheme'], $parsedEnv['host'])) {
-                throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, %s given.', $name, $env));
+                throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, "%s" given.', $name, $env));
             }
             $parsedEnv += [
                 'port' => null,

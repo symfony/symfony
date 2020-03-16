@@ -18,6 +18,10 @@ session_setflash:
     path:     /session_setflash/{message}
     defaults: { _controller: TestBundle:Session:setFlash}
 
+injected_flashbag_session_setflash:
+    path:     injected_flashbag/session_setflash/{message}
+    defaults: { _controller: TestBundle:InjectedFlashbagSession:setFlash}
+
 session_showflash:
     path:     /session_showflash
     defaults: { _controller: TestBundle:Session:showFlash}

@@ -11,6 +11,7 @@ CHANGELOG
  * added the `s()` helper method to get either an `UnicodeString` or `ByteString` instance,
    depending of the input string UTF-8 compliancy
  * added `$cut` parameter to `Symfony\Component\String\AbstractString::truncate()`
+ * added `AbstractString::containsAny()`
 
 5.0.0
 -----

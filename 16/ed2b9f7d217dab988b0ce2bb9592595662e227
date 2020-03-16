@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-03-01T14:21:13Z
+
+@nicolas-grekas
+
+> I suppose these don't apply on 5.0? if they do, the PR should target 5.0.
+
+I would like to add tests for the `EmailChannel`, `SmsChannel` and `ChatChannel` here as well, but wanted to wait for #35773 first.
+
+If you are fine with only merging `AbstractChannelTest` and `ChannelPolicyTest` we could indeed target 5.0 for now. Then I could do the tests for `EmailChannel`, `SmsChannel` and `ChatChannel` later or in #35773.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-02T09:29:59Z
+
+Yes please: tests that run on 5.0 should be submitted there. Then tests for new notifiers should go on master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-12T16:19:07Z
+
+(failures unrelated, needs review)

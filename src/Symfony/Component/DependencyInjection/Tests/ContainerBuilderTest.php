@@ -719,7 +719,7 @@ class ContainerBuilderTest extends TestCase
     public function testCompileWithArrayInStringResolveEnv()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type array inside string value "ABC %env(json:ARRAY)%".');
+        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type "array" inside string value "ABC %env(json:ARRAY)%".');
         putenv('ARRAY={"foo":"bar"}');
 
         $container = new ContainerBuilder();

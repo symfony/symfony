@@ -120,7 +120,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
                 if ($response instanceof Response) {
                     $event->setResponse($response);
                 } elseif (null !== $response) {
-                    throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null or a Response object.', \get_class($this->simpleAuthenticator)));
+                    throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationFailure()" method must return null or a Response object.', \get_class($this->simpleAuthenticator)));
                 }
             }
 
@@ -132,7 +132,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             if ($response instanceof Response) {
                 $event->setResponse($response);
             } elseif (null !== $response) {
-                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object.', \get_class($this->simpleAuthenticator)));
+                throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationSuccess()" method must return null or a Response object.', \get_class($this->simpleAuthenticator)));
             }
         }
     }

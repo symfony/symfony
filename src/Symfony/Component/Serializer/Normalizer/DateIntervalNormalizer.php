@@ -67,7 +67,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!\is_string($data)) {
-            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', \gettype($data)));
         }
 
         if (!$this->isISO8601($data)) {

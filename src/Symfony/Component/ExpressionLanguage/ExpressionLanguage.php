@@ -41,7 +41,7 @@ class ExpressionLanguage
                 @trigger_error(sprintf('Passing an instance of %s as constructor argument for %s is deprecated as of 3.2 and will be removed in 4.0. Pass an instance of %s instead.', ParserCacheInterface::class, self::class, CacheItemPoolInterface::class), E_USER_DEPRECATED);
                 $cache = new ParserCacheAdapter($cache);
             } elseif (!$cache instanceof CacheItemPoolInterface) {
-                throw new \InvalidArgumentException(sprintf('Cache argument has to implement %s.', CacheItemPoolInterface::class));
+                throw new \InvalidArgumentException(sprintf('Cache argument has to implement "%s".', CacheItemPoolInterface::class));
             }
         }
 

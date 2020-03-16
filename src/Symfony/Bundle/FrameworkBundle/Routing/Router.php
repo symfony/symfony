@@ -159,7 +159,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
                 return (string) $this->resolve($resolved);
             }
 
-            throw new RuntimeException(sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type %s.', $match[1], $value, \gettype($resolved)));
+            throw new RuntimeException(sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type "%s".', $match[1], $value, \gettype($resolved)));
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);

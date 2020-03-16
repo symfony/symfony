@@ -340,7 +340,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                         if (!\is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
+                            throw new RuntimeException(sprintf('Cannot create an instance of "%s" from serialized data because the variadic parameter "%s" can only accept an array.', $class, $constructorParameter->name));
                         }
 
                         $variadicParameters = [];
@@ -366,7 +366,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
+                    throw new RuntimeException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }
             }
 
@@ -388,7 +388,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         try {
             if (null !== $parameter->getClass()) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer.', $parameter->getClass(), static::class));
+                    throw new LogicException(sprintf('Cannot create an instance of "%s" from serialized data because the serializer inject in "%s" is not a denormalizer.', $parameter->getClass(), static::class));
                 }
                 $parameterClass = $parameter->getClass()->getName();
 

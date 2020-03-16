@@ -96,7 +96,7 @@ class ExpressionLanguageTest extends TestCase
     public function testWrongCacheImplementation()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('Cache argument has to implement Psr\Cache\CacheItemPoolInterface.');
+        $this->expectExceptionMessage('Cache argument has to implement "Psr\Cache\CacheItemPoolInterface".');
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemSpoolInterface')->getMock();
         new ExpressionLanguage($cacheMock);
     }

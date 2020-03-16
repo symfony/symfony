@@ -190,7 +190,7 @@ class MockArraySessionStorage implements SessionStorageInterface
     public function getBag($name)
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface "%s" is not registered.', $name));
         }
 
         if (!$this->started) {

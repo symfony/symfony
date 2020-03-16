@@ -78,7 +78,7 @@ trait MemcachedTrait
         if (\is_string($servers)) {
             $servers = [$servers];
         } elseif (!\is_array($servers)) {
-            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, %s given.', \gettype($servers)));
+            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', \gettype($servers)));
         }
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required.');
@@ -96,7 +96,7 @@ trait MemcachedTrait
                     continue;
                 }
                 if (0 !== strpos($dsn, 'memcached://')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s does not start with "memcached://".', $dsn));
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: "%s" does not start with "memcached://".', $dsn));
                 }
                 $params = preg_replace_callback('#^memcached://(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
                     if (!empty($m[1])) {
@@ -106,10 +106,10 @@ trait MemcachedTrait
                     return 'file://';
                 }, $dsn);
                 if (false === $params = parse_url($params)) {
-                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s.', $dsn));
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: "%s".', $dsn));
                 }
                 if (!isset($params['host']) && !isset($params['path'])) {
-                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s.', $dsn));
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: "%s".', $dsn));
                 }
                 if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
                     $params['weight'] = $m[1];

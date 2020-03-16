@@ -236,7 +236,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, static::class));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your "%s.php" file?', $name, static::class));
         }
 
         if (true === $first) {
@@ -762,10 +762,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         foreach (['cache' => $this->warmupDir ?: $this->getCacheDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n.", $name, $dir));
+                    throw new \RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n.", $name, $dir));
+                throw new \RuntimeException(sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
             }
         }
 

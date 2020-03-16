@@ -936,7 +936,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('foo');
 
         $this->expectException('Symfony\Component\Process\Exception\LogicException');
-        $this->expectExceptionMessage(sprintf('Process must be started before calling %s.', $method));
+        $this->expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
 
         $process->{$method}();
     }

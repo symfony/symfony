@@ -143,7 +143,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testVotingWrongTypeNoVoteMethod()
     {
         $exception = LogicException::class;
-        $message = sprintf('stdClass should implement the %s interface when used as voter.', VoterInterface::class);
+        $message = sprintf('"stdClass" should implement the "%s" interface when used as voter.', VoterInterface::class);
 
         $this->expectException($exception);
         $this->expectExceptionMessage($message);

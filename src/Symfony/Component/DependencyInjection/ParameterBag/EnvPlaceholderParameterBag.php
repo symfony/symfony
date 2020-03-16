@@ -36,7 +36,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
             if (!preg_match('/^(?:\w++:)*+\w++$/', $env)) {
-                throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+                throw new InvalidArgumentException(sprintf('Invalid "%s" name: only "word" characters are allowed.', $name));
             }
 
             if ($this->has($name)) {
@@ -116,7 +116,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
             if (is_numeric($default = $this->parameters[$name])) {
                 $this->parameters[$name] = (string) $default;
             } elseif (null !== $default && !is_scalar($default)) {
-                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, \gettype($default)));
+                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, "%s" given.', $env, \gettype($default)));
             }
         }
     }

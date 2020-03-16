@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
  * Added tag `routing.expression_language_function` to define functions available in route conditions
  * Added `debug:container --deprecations` option to see compile-time deprecations.
+ * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
 
 5.0.0
 -----

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * The `HtmlErrorRenderer` and `SerializerErrorRenderer` add `X-Debug-Exception` and `X-Debug-Exception-File` headers in debug mode.
+
 4.4.0
 -----
 

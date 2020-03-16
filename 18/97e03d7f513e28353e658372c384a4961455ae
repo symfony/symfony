@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by hkdobrev at 2020-03-11T22:57:11Z
+
+I couldn't easily add new tests (it would have been quite ironic to test the deprecation annotation is deprecated using the deprecation method) as `SymfonyListenerTestsTrait` has very little tests itself. Should I just an additional test just for this deprecation which may not cover all of its pre-existing logic?
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2020-03-11T23:48:54Z
+
+@nicolas-grekas
+
+> The Symfony test suite will fail (already fails?) as soon as the annotation is used?
+
+I don't think this is the reason it fails.
+
+Initially, I was thinking I should replace all `@expectedDeprecation` annotations with the new method in the Symfony tests themselves.
+But then I realised when used as separate components, the other ones do not require the PHPUnit Bridge where the trait lives.
+
+However, I now realise the tests are being run only on the whole Symfony repo. And since this annotation is only for the tests, I guess we could replace all such annotations with the method  in the Symfony tests code. Could you confirm this is the case?
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2020-03-12T10:56:51Z
+
+Any pointers on why this job failed? I see one error before the tests: https://travis-ci.org/github/symfony/symfony/jobs/661314551#L9698-L9700
+
+But it seems it has not failed the job. I couldn't find a failing test.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2020-03-13T12:32:00Z
+
+@nicolas-grekas Thank you for patiently walking me through the deprecation process! I looked at some previous deprecations to try to grasp it, but I guess I was looking at a slightly different case in a `x.4.0` release. I hope to be able to help with future deprecations.

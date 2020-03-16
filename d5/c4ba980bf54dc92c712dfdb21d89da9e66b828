@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by tristanbes at 2020-03-03T10:15:04Z
+
+Aweomse, since majority of PaaS outhere have a bad habit of using a really outdated curl version. 🎉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T11:10:07Z
+
+@kelunik the test suite of the Messenger component is failing when using `AmpHttpClient`, with:
+> Idle timeout reached for "http://0.0.0.0:9494/messages".
+
+The reproducer is:
+```sh
+docker pull feathj/fake-sqs
+docker run -d -p 9494:9494 --name sqs feathj/fake-sqs
+export MESSENGER_SQS_DSN=sqs://localhost:9494/messages?sslmode=disable
+./phpunit src/Symfony/Component/Messenger/ -v --filter Sqs
+```
+
+At first, I thought the reason was the `0.0.0.0` in the URL, but actually when I force `127.0.0.1` instead, the timeout persists.
+
+The test passes when using the curl or the native client.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T11:18:17Z
+
+The test passes when I use an `UnlimitedConnectionPool` instead of `ConnectionLimitingPool`.
+
+---------------------------------------------------------------------------
+
+by trowski at 2020-03-03T20:19:15Z
+
+@nicolas-grekas Do you still have your benchmarking script handy? I was wondering how the Amp client compares to curl, particularly for a single request and many requests to the same host, both HTTP/1.1 and HTTP/2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-03T20:30:57Z
+
+Sure, here it is.
+On h2, AMP is comparable to Curl.
+On h1.1, AMP looks slower, dunno why.
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$client = new Symfony\Component\HttpClient\AmpHttpClient(['http_version' => 1.1]);
+
+for ($i = 0; $i < 379; ++$i) {
+    $uri = "https://http2.akamai.com/demo/tile-$i.png";
+    $responses[] = $client->request('GET', $uri);
+}
+
+foreach ($client->stream($responses) as $response => $chunk) {
+    if ($chunk->isLast()) {
+        // a $response completed
+        echo '.';
+    } else {
+        // a $response's got network activity or timeout
+    }
+}
+
+echo "\n";
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-13T09:54:29Z
+
+Green.
+
+Status: needs review

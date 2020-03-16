@@ -238,7 +238,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if ($responses instanceof NativeResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of NativeResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of NativeResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
         return new ResponseStream(NativeResponse::stream($responses, $timeout));

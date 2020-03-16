@@ -218,7 +218,7 @@ class GuardAuthenticationListener extends AbstractListener
         }
 
         if (!$response instanceof Response) {
-            throw new \LogicException(sprintf('%s::onAuthenticationSuccess *must* return a Response if you want to use the remember me functionality. Return a Response, or set remember_me to false under the guard configuration.', \get_class($guardAuthenticator)));
+            throw new \LogicException(sprintf('"%s::onAuthenticationSuccess()" *must* return a Response if you want to use the remember me functionality. Return a Response, or set remember_me to false under the guard configuration.', \get_class($guardAuthenticator)));
         }
 
         $this->rememberMeServices->loginSuccess($request, $response, $token);

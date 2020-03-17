@@ -344,6 +344,26 @@ class ContextListenerTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
+    /**
+     * @requires function \Symfony\Component\HttpFoundation\Request::getPreferredFormat
+     */
+    public function testWithPreviousNotStartedSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $usageIndex = $session->getUsageIndex();
+
+        $tokenStorage = new TokenStorage();
+        $listener = new ContextListener($tokenStorage, [], 'context_key', null, null, null, [$tokenStorage, 'getToken']);
+        $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->assertSame($usageIndex, $session->getUsageIndex());
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());

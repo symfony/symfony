@@ -20,7 +20,7 @@ session_setflash:
 
 injected_flashbag_session_setflash:
     path:     injected_flashbag/session_setflash/{message}
-    defaults: { _controller: TestBundle:InjectedFlashbagSession:setFlash}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InjectedFlashbagSessionController::setFlashAction}
 
 session_showflash:
     path:     /session_showflash

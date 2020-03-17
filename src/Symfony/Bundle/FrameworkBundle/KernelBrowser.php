@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Token\TokenInterface;
 
 /**
  * Simulates a browser and makes requests to a Kernel object.
@@ -108,19 +109,22 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * @param UserInterface $user
+     * @param UserInterface|TokenInterface $userOrToken
      */
-    public function loginUser($user, string $firewallContext = 'main'): self
+    public function loginUser($userOrToken, string $firewallContext = 'main'): self
     {
         if (!interface_exists(UserInterface::class)) {
             throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed.', __METHOD__));
         }
 
-        if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
+        if ($userOrToken instanceof UserInterface) {
+            $token = new TestBrowserToken($userOrToken->getRoles(), $userOrToken);
+        } elseif ($userOrToken instanceof TokenInterface) {
+            $token = $userOrToken;
+        } else {
+            throw new \InvalidArgumentException(sprintf('The first argument of "%s" must be instance of "%s" or "%s", "%s" provided.', __METHOD__, UserInterface::class, TokenInterface::class, get_debug_type($userOrToken)));
         }
 
-        $token = new TestBrowserToken($user->getRoles(), $user);
         $token->setAuthenticated(true);
         $session = $this->getContainer()->get('session');
         $session->set('_security_'.$firewallContext, serialize($token));

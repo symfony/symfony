@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-16T13:06:31Z
+
+@javiereguiluz Can you test this one and report?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-16T13:56:43Z
+
+I've just tested this. I added the changes in `CollectionType.php` ... but it didn't work for me. I tried adding `{% block collection_entry_row %} FOO {% endblock %}` and `{% block collection_entry_widget %} FOO {% endblock %}` in my form theme ... but I don't see any difference. What could I be doing wrong? Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-03-16T17:36:32Z
+
+Thanks for the feedback. That is weird I successfully tried with the Symfony demo app using the `fields.html.twig` yesterday. Are you sure there is not dynamic `_field_name_*` template with precedence?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-03-17T08:37:05Z
+
+@HeahDude Can you make fabbot happy? :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-03-17T09:08:13Z
+
+@xabbuh done, I've also updated the changelog.

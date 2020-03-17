@@ -293,7 +293,7 @@ class ProcessTest extends TestCase
     public function testInvalidInput($value)
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.');
+        $this->expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
         $process = $this->getProcess('foo');
         $process->setInput($value);
     }

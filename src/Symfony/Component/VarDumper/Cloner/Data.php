@@ -122,7 +122,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     public function getIterator()
     {
         if (!\is_array($value = $this->getValue())) {
-            throw new \LogicException(sprintf('%s object holds non-iterable type "%s".', self::class, get_debug_type($value)));
+            throw new \LogicException(sprintf('"%s" object holds non-iterable type "%s".', self::class, get_debug_type($value)));
         }
 
         yield from $value;

@@ -108,7 +108,9 @@ use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
@@ -1381,6 +1383,8 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
+            ->replaceArgument(4, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->replaceArgument(5, new Reference(PropertyWriteInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ;
     }
 

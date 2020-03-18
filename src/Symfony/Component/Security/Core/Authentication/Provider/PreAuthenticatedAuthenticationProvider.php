@@ -54,7 +54,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
             throw new BadCredentialsException('No pre-authenticated principal found in request.');
         }
 
-        $user = $this->userProvider->loadUserByUsername($user);
+        $user = $this->userProvider->loadUserByUsername($user instanceof UserInterface ? $user->getUsername() : (string) $user);
 
         $this->userChecker->checkPostAuth($user);
 

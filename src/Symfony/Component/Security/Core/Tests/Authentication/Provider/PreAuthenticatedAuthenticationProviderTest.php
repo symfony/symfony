@@ -13,7 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class PreAuthenticatedAuthenticationProviderTest extends TestCase
 {
@@ -43,6 +47,15 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider();
 
         $provider->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+    }
+
+    public function testAuthenticateWithNonStringUser()
+    {
+        $provider = new PreAuthenticatedAuthenticationProvider(new DummyUserProvider(['foo' => []]), $this->createMock(UserCheckerInterface::class), 'key');
+        $user = new User('foo', null);
+        $token = new PreAuthenticatedToken($user, '', 'key');
+
+        $this->assertInstanceof(PreAuthenticatedToken::class, $provider->authenticate($token));
     }
 
     public function testAuthenticateWhenNoUserIsSet()
@@ -129,5 +142,17 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         }
 
         return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker, 'key');
+    }
+}
+
+class DummyUserProvider extends InMemoryUserProvider
+{
+    public function loadUserByUsername($username)
+    {
+        if (!\is_string($username)) {
+            throw new \TypeError('Username must be a string');
+        }
+
+        return parent::loadUserByUsername($username);
     }
 }

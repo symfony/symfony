@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 class PropertyAccessorBuilderTest extends TestCase
 {
@@ -61,6 +63,26 @@ class PropertyAccessorBuilderTest extends TestCase
         $cacheItemPool = new ArrayAdapter();
         $this->builder->setCacheItemPool($cacheItemPool);
         $this->assertEquals($cacheItemPool, $this->builder->getCacheItemPool());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
+    }
+
+    public function testUseReadInfoExtractor()
+    {
+        $readInfoExtractor = $this->createMock(PropertyReadInfoExtractorInterface::class);
+
+        $this->builder->setReadInfoExtractor($readInfoExtractor);
+
+        $this->assertSame($readInfoExtractor, $this->builder->getReadInfoExtractor());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
+    }
+
+    public function testUseWriteInfoExtractor()
+    {
+        $writeInfoExtractor = $this->createMock(PropertyWriteInfoExtractorInterface::class);
+
+        $this->builder->setWriteInfoExtractor($writeInfoExtractor);
+
+        $this->assertSame($writeInfoExtractor, $this->builder->getWriteInfoExtractor());
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
     }
 }

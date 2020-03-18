@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added @QueryParam annotation to read query string from request
+
 5.1.0
 -----
 

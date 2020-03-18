@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-03-17T12:37:46Z
+
+This pollutes the codebase... :disappointed:
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2020-03-17T12:42:47Z
+
+Is there a way to provide a "default" preloading script for all packages (that will execute these `class_exists()` calls) and generate a preloading script that would load all available preloading scripts in Symfony packages? This would allow to decouple the preloading from the classes themselves.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-17T13:06:26Z
+
+> This pollutes the codebase... disappointed
+
+see the description why this is needed.
+
+> Is there a way to provide a "default" preloading script for all packages
+
+That's not possible, because the list of classes that need to be preloaded is conditional: vendor/ containing a package doesn't mean in any way it's going to be used at runtime. Putting the `class_exists()` calls in each files is what makes the list conditional - with the DI container in control of what is actually wired.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-03-17T13:11:52Z
+
+Yeah, I know it's necessary to fix the preload, but is this really worth it?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-03-17T13:13:14Z
+
+What I mean is, even if the preload is not perfect, it's not fundamentally broken, even if the performance is not as good as it could be.
+
+Is getting preload working such a priority that it's worth peppering these all over the codebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-17T13:14:38Z
+
+@teohhanhui the numbers speak by themselves I think...
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2020-03-17T17:46:54Z
+
+The `class_exists` call does not give many explicit info about why adding these lines is required for the preloading to do it's job.
+
+Would introducing a new trait method to provide additional context via the method's name and phpdoc provide the same performance boost?
+
+```php
+trait PreloaderTrait {
+    public function preload(string ... $classNames): void
+    {
+        foreach($classNames as $className) {
+            class_exists($className);
+        }
+    }
+}
+```
+
+```php
+use Symfony\PreloaderTrait;
+
+preload(
+    FilesystemCache::class,
+    CoreExtension::class,
+    EscaperExtension::class,
+    OptimizerExtension::class,
+    StagingExtension::class,
+    ExtensionSet::class
+);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-17T18:12:47Z
+
+> But once this PHP feature has matured one can safely remove these extra lines of code.
+
+Actually not: this will remain and should become a new practice: we'll have to tell somewhere which classes are always needed by the implementations.
+
+Here are the options:
+1. in a separate file. For Symfony that'd typically mean in service definitions. Using a tag looks the most sensible, thus [this project card](https://github.com/orgs/symfony/projects/1#card-34708807).
+2. in the very same file as the implementation using `class_exists()` (what this PR does)
+3. in the very same file as the implementation, but using a convention (e.g. docblock annotations on the classes, or a special `private const OPCACHE_PRELOAD = [TheClasses::class, etc.]`, or similar.
+
+`3.` might sound nice to most, but requires coordination in the PHP ecosystem: every project needs to embrace the convention or it will not work.
+`2.` just works everywhere, no need for any special coordination in the ecosystem
+`1.` is a band-aid we're going to need to take over packages that won't do `2.` (or `3.` if it becomes a thing).
+
+@rvanlaak this doesn't work, we need code that *runs* - a trait doesn't "run".
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-03-17T18:19:42Z
+
+The `class_exists` option seems the least maintainable, and is arguably also not PSR-1 compliant:
+
+> Files SHOULD either declare symbols (classes, functions, constants, etc.) or cause side-effects (e.g. generate output, change .ini settings, etc.) but SHOULD NOT do both.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-17T18:23:12Z
+
+The `class_exists` option seems the most maintainable to me. Same locality, greatest portability.
+
+---------------------------------------------------------------------------
+
+by ludofleury at 2020-03-17T19:07:24Z
+
+Impressive performance. at +50% it worth the maintenance cost. Hands down.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-17T19:54:18Z
+
+Now with this comment before all calls:
+`// Help opcache.preload discover always-needed symbols`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-17T20:17:34Z
+
+:+1:
+
+The comments sure are helpful
+
+---------------------------------------------------------------------------
+
+by Plopix at 2020-03-18T06:09:43Z
+
++1 for me as well.
++50% !? Almost everything is justified for +50% perfs! And few lines to declare stuff are definitely worth it.
+
+As usual: thanks a lot!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-18T07:45:58Z
+
+Thanks Nicolas! This is truly impressive!
+
+Just asking: have you tried these changes in the Symfony Demo app? Should we expect similar ~50% performance improvements? Thanks!

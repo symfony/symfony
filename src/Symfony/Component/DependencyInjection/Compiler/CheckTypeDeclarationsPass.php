@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -207,7 +206,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 if ('' === preg_replace('/'.$envPlaceholderUniquePrefix.'_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
                     try {
                         $value = $this->container->resolveEnvPlaceholders($value, true);
-                    } catch (EnvNotFoundException | RuntimeException $e) {
+                    } catch (\Exception $e) {
                         // If an env placeholder cannot be resolved, we skip the validation.
                         return;
                     }
@@ -250,7 +249,11 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return;
         }
 
-        if ('iterable' === $type && (\is_array($value) || is_subclass_of($class, \Traversable::class))) {
+        if ('iterable' === $type && (\is_array($value) || 'array' === $class || is_subclass_of($class, \Traversable::class))) {
+            return;
+        }
+
+        if ($type === $class) {
             return;
         }
 

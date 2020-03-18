@@ -19,10 +19,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(RedirectableCompiledUrlMatcher::class);
+class_exists(Route::class);
 
 /**
  * This Router creates the Loader only when the cache is empty.

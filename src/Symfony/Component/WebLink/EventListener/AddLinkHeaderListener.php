@@ -17,6 +17,9 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(HttpHeaderSerializer::class);
+
 /**
  * Adds the Link HTTP header to the response.
  *

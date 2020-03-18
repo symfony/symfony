@@ -13,4 +13,14 @@ class Foo
     {
         return new Bar($stdClass);
     }
+
+    public static function createCallable(): callable
+    {
+        return function() {};
+    }
+
+    public static function createArray(): array
+    {
+        return [];
+    }
 }

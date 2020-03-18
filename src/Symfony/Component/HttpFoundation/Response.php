@@ -476,6 +476,16 @@ class Response
     }
 
     /**
+     * Sets the response status code.
+     *
+     * @final
+     */
+    public function getStatusText(int $code): ?string
+    {
+        return self::$statusTexts[$code] ?? null;
+    }
+
+    /**
      * Sets the response charset.
      *
      * @return $this

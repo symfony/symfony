@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
@@ -67,5 +68,8 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.transport_factory.smtp', EsmtpTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory', ['priority' => -100])
-    ;
+
+        ->set('mailer.transport_factory.native', NativeTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory');
 };

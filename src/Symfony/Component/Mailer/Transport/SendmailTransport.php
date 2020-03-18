@@ -27,6 +27,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * It is advised to use -bs mode since error reporting with -t mode is not
  * possible.
  *
+ * Transport can be instanciated through SendmailTransportFactory or NativeTransportFactory:
+ *
+ * - SendmailTransportFactory to use most common sendmail path and recommanded options
+ * - NativeTransportFactory when configuration is set via php.ini
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Corbyn
  */

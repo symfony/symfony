@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
@@ -162,5 +163,7 @@ class Transport
         yield new SendmailTransportFactory($dispatcher, $client, $logger);
 
         yield new EsmtpTransportFactory($dispatcher, $client, $logger);
+
+        yield new NativeTransportFactory($dispatcher, $client, $logger);
     }
 }

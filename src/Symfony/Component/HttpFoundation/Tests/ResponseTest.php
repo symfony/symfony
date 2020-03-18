@@ -1037,7 +1037,11 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response('foo');
 
-        $this->assertSame('Continue', $response->getStatusText(Response::HTTP_CONTINUE));
+        $this->assertSame(
+            Response::$statusTexts[Response::HTTP_CONTINUE],
+            $response->getStatusText(Response::HTTP_CONTINUE)
+        );
+
         $this->assertNull($response->getStatusText(0));
     }
 

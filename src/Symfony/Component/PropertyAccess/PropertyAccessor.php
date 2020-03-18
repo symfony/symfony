@@ -22,6 +22,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
@@ -389,14 +390,33 @@ class PropertyAccessor implements PropertyAccessorInterface
             $name = $access->getName();
             $type = $access->getType();
 
-            if (PropertyReadInfo::TYPE_METHOD === $type) {
-                $result[self::VALUE] = $object->$name();
-            } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                $result[self::VALUE] = $object->$name;
+            try {
+                if (PropertyReadInfo::TYPE_METHOD === $type) {
+                    try {
+                        $result[self::VALUE] = $object->$name();
+                    } catch (\TypeError $e) {
+                        if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of the type (\w+), null returned$/', preg_quote(\get_class($object)), $name)), $e->getMessage(), $matches)) {
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Have you forgotten to initialize a property or to make the return type nullable using "?%3$s" instead?', \get_class($object), $name, $matches[1]), 0, $e);
+                        }
 
-                if (isset($zval[self::REF]) && $access->canBeReference()) {
-                    $result[self::REF] = &$object->$name;
+                        throw $e;
+                    }
+                } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                    $result[self::VALUE] = $object->$name;
+
+                    if (isset($zval[self::REF]) && $access->canBeReference()) {
+                        $result[self::REF] = &$object->$name;
+                    }
                 }
+            } catch (\Error $e) {
+                // handle uninitialized properties in PHP >= 7.4
+                if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
+                    $r = new \ReflectionProperty($matches[1], $matches[2]);
+
+                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%3$s". You should either initialize it or make it nullable using "?%3$s" instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
+                }
+
+                throw $e;
             }
         } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
             $result[self::VALUE] = $object->$property;

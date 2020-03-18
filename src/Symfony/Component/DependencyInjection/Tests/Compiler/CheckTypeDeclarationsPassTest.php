@@ -536,6 +536,42 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessFactoryForTypeSameAsClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'callable')
+            ->setFactory([
+                new Reference('foo'),
+                'createCallable',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setCallable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessFactoryForIterableTypeAndArrayClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'array')
+            ->setFactory([
+                new Reference('foo'),
+                'createArray',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setIterable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault()
     {
         $container = new ContainerBuilder();

@@ -17,6 +17,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandle
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(MetadataBag::class);
+class_exists(StrictSessionHandler::class);
+class_exists(SessionHandlerProxy::class);
+
 /**
  * This provides a base class for session attribute storage.
  *

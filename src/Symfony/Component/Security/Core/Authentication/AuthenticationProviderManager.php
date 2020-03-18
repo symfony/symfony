@@ -21,6 +21,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(AuthenticationEvents::class);
+class_exists(AuthenticationFailureEvent::class);
+class_exists(AuthenticationSuccessEvent::class);
+
 /**
  * AuthenticationProviderManager uses a list of AuthenticationProviderInterface
  * instances to authenticate a Token.

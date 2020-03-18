@@ -16,6 +16,9 @@ use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(IntlFormatter::class);
+
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */

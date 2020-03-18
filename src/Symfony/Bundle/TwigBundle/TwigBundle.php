@@ -20,6 +20,20 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Twig\Cache\FilesystemCache;
+use Twig\Extension\CoreExtension;
+use Twig\Extension\EscaperExtension;
+use Twig\Extension\OptimizerExtension;
+use Twig\Extension\StagingExtension;
+use Twig\ExtensionSet;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(FilesystemCache::class);
+class_exists(CoreExtension::class);
+class_exists(EscaperExtension::class);
+class_exists(OptimizerExtension::class);
+class_exists(StagingExtension::class);
+class_exists(ExtensionSet::class);
 
 /**
  * Bundle.

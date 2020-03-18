@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(InvalidArgumentException::class);
+
 /**
  * An implementation of CacheInterface for PSR-6 CacheItemPoolInterface classes.
  *

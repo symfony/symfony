@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(RequestEvent::class);
+
 /**
  * @deprecated
  *

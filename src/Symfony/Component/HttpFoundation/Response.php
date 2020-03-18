@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ResponseHeaderBag::class);
+
 /**
  * Response represents an HTTP response.
  *

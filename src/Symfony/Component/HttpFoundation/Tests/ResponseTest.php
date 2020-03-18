@@ -1033,6 +1033,14 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
     }
 
+    public function testGetStatusText()
+    {
+        $response = new Response('foo');
+
+        $this->assertSame('Continue', $response->getStatusText(Response::HTTP_CONTINUE));
+        $this->assertNull($response->getStatusText(0));
+    }
+
     public function testSetContentSafe()
     {
         $response = new Response();

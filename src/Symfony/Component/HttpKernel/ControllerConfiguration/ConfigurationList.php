@@ -15,7 +15,11 @@ class ConfigurationList implements \Countable, \IteratorAggregate
 
     public function add(ConfigurationInterface $configuration): self
     {
-        $this->configurations[] = $configuration;
+        if (isset($this->configurations[$configuration->getUniqueName()])) {
+            throw new \LogicException(sprintf('Multiples "%s" configurations are not allowed', $configuration->getUniqueName()));
+        }
+
+        $this->configurations[$configuration->getUniqueName()] = $configuration;
 
         return $this;
     }

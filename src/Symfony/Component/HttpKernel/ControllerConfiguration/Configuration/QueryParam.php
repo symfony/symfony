@@ -43,4 +43,9 @@ class QueryParam extends ConfigurationAnnotation
     {
         return $this->argumentName;
     }
+
+    public function getUniqueName(): string
+    {
+        return static::class.'.'.$this->argumentName;
+    }
 }

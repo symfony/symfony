@@ -33,4 +33,11 @@ class AnnotatedController
     {
         return new Response($foo.'.'.$bar);
     }
+
+    /**
+     * @QueryParam("foo")
+     */
+    public function duplicatedQueryParamConfiguration(string $foo): void
+    {
+    }
 }

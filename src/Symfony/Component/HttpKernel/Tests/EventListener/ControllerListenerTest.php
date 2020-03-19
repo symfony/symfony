@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AnnotatedController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 
-class AnnotatedControllerListenerTest extends TestCase
+class ControllerListenerTest extends TestCase
 {
     private $listener;
     private $reader;
@@ -24,20 +24,20 @@ class AnnotatedControllerListenerTest extends TestCase
 
     public function testOnController()
     {
-        $request = new Request();
-
-        $kernel = new KernelForTest('test', true);
-        $event = new ControllerEvent(
-            $kernel,
-            [new AnnotatedController(), 'queryParam'],
-            $request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
+        $event = $this->createControllerEvent([new AnnotatedController(), 'queryParam']);
+        $request = $event->getRequest();
 
         $this->listener->onController($event);
 
         $this->assertTrue($request->attributes->has('_configurations'));
         $this->assertCount(2, $request->attributes->get('_configurations'));
+    }
+
+    public function testOnControllerWithDuplicatedQueryParam()
+    {
+        $this->expectException(\LogicException::class);
+        $event = $this->createControllerEvent([new AnnotatedController(), 'duplicatedQueryParamConfiguration']);
+        $this->listener->onController($event);
     }
 
     private function createControllerEvent(callable $controller): ControllerEvent

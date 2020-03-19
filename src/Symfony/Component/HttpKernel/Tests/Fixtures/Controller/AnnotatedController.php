@@ -25,4 +25,12 @@ class AnnotatedController
     {
         return new Response($foo.'.'.$bar);
     }
+
+    /**
+     * @QueryParam("bar")
+     */
+    public function queryParamWithNullableValues(string $foo, ?string $bar): Response
+    {
+        return new Response($foo.'.'.$bar);
+    }
 }

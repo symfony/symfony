@@ -27,7 +27,7 @@ class ConfigurationList implements \Countable, \IteratorAggregate
 
     public function first(): ?ConfigurationInterface
     {
-        return reset($this->configurations) ?? null;
+        return empty($this->configurations) ? null : reset($this->configurations);
     }
 
     public function count(): int

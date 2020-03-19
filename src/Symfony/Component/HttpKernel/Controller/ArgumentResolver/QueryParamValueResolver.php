@@ -18,21 +18,21 @@ final class QueryParamValueResolver implements ArgumentValueResolverInterface
         }
 
         /** @var QueryParam $configuration */
-        $configuration = $this->getConfigurationsForArgument($request, $argument);
+        $configuration = $this->getConfigurationForArgument($request, $argument);
 
         return null !== $configuration
             && !$argument->isVariadic()
-            && ($request->query->has($configuration->getName()) || $argument->hasDefaultValue());
+            && ($request->query->has($configuration->getName()) || $argument->hasDefaultValue() || $argument->isNullable());
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        $configuration = $this->getConfigurationsForArgument($request, $argument);
+        $configuration = $this->getConfigurationForArgument($request, $argument);
         $defaultValue = $argument->hasDefaultValue() ? $argument->getDefaultValue() : null;
         yield $request->query->get($configuration->getName(), $defaultValue);
     }
 
-    private function getConfigurationsForArgument(Request $request, ArgumentMetadata $argument): ?ConfigurationInterface
+    private function getConfigurationForArgument(Request $request, ArgumentMetadata $argument): ?ConfigurationInterface
     {
         /** @var ConfigurationList $configurations */
         $configurations = $request->attributes->get('_configurations');

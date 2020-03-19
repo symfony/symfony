@@ -307,6 +307,18 @@ class ArgumentResolverTest extends TestCase
         $this->assertEquals(['foo', 'bar'], self::$resolver->getArguments($request, $controller));
     }
 
+    public function testGetQueryParamWithNullableValues()
+    {
+        $request = Request::create('/?foo=foo');
+        $request->attributes->set('_configurations', new ConfigurationList([
+            new QueryParam(['value' => 'foo']),
+            new QueryParam(['value' => 'bar']),
+        ]));
+        $controller = [new AnnotatedController(), 'queryParamWithNullableValues'];
+
+        $this->assertEquals(['foo', null], self::$resolver->getArguments($request, $controller));
+    }
+
     public function __invoke($foo, $bar = null)
     {
     }

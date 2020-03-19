@@ -1,8 +1,6 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\ControllerConfiguration\Configuration;
-
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationInterface;
+namespace Symfony\Component\HttpKernel\Controller\Configuration;
 
 abstract class ConfigurationAnnotation implements ConfigurationInterface
 {

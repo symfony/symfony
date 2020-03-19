@@ -1,6 +1,8 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\ControllerConfiguration;
+namespace Symfony\Component\HttpKernel\Controller;
+
+use Symfony\Component\HttpKernel\Controller\Configuration\ConfigurationInterface;
 
 class ConfigurationList implements \Countable, \IteratorAggregate
 {

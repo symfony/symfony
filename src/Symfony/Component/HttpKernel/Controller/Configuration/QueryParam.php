@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\ControllerConfiguration\Configuration;
+namespace Symfony\Component\HttpKernel\Controller\Configuration;
 
 /**
  * @Annotation

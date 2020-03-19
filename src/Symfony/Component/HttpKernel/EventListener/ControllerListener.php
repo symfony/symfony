@@ -4,8 +4,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationInterface;
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationList;
+use Symfony\Component\HttpKernel\Controller\Configuration\ConfigurationInterface;
+use Symfony\Component\HttpKernel\Controller\ConfigurationList;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 

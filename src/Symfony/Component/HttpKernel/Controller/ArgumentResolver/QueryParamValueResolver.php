@@ -4,9 +4,9 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerConfiguration\Configuration\QueryParam;
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationInterface;
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationList;
+use Symfony\Component\HttpKernel\Controller\Configuration\ConfigurationInterface;
+use Symfony\Component\HttpKernel\Controller\Configuration\QueryParam;
+use Symfony\Component\HttpKernel\Controller\ConfigurationList;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 final class QueryParamValueResolver implements ArgumentValueResolverInterface

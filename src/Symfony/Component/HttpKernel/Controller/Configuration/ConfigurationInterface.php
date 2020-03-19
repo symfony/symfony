@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\ControllerConfiguration;
+namespace Symfony\Component\HttpKernel\Controller\Configuration;
 
 interface ConfigurationInterface
 {

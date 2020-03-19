@@ -3,7 +3,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\ControllerConfiguration\Configuration\QueryParam;
+use Symfony\Component\HttpKernel\Controller\Configuration\QueryParam;
 
 /**
  * @QueryParam("foo")

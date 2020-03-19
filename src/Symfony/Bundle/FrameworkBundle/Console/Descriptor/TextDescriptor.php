@@ -82,6 +82,11 @@ class TextDescriptor extends Descriptor
 
     protected function describeRoute(Route $route, array $options = [])
     {
+        $defaults = $route->getDefaults();
+        if (isset($defaults['_controller'])) {
+            $defaults['_controller'] = $this->formatControllerLink($defaults['_controller'], $this->formatCallable($defaults['_controller']));
+        }
+
         $tableHeaders = ['Property', 'Value'];
         $tableRows = [
             ['Route Name', isset($options['name']) ? $options['name'] : ''],
@@ -93,7 +98,7 @@ class TextDescriptor extends Descriptor
             ['Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')],
             ['Requirements', ($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')],
             ['Class', \get_class($route)],
-            ['Defaults', $this->formatRouterConfig($route->getDefaults())],
+            ['Defaults', $this->formatRouterConfig($defaults)],
             ['Options', $this->formatRouterConfig($route->getOptions())],
         ];
 

@@ -46,6 +46,17 @@ class Range extends Constraint
     public $max;
     public $maxPropertyPath;
 
+    // BC layer, to be removed in 5.0
+    /**
+     * @internal
+     */
+    public $deprecatedMinMessageSet = false;
+
+    /**
+     * @internal
+     */
+    public $deprecatedMaxMessageSet = false;
+
     public function __construct($options = null)
     {
         if (\is_array($options)) {
@@ -59,6 +70,15 @@ class Range extends Constraint
 
             if ((isset($options['minPropertyPath']) || isset($options['maxPropertyPath'])) && !class_exists(PropertyAccess::class)) {
                 throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
+            }
+
+            if (isset($options['min']) && isset($options['max'])) {
+                $this->deprecatedMinMessageSet = isset($options['minMessage']);
+                $this->deprecatedMaxMessageSet = isset($options['maxMessage']);
+
+                if ($this->deprecatedMinMessageSet || $this->deprecatedMaxMessageSet) {
+                    @trigger_error('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', E_USER_DEPRECATED);
+                }
             }
         }
 

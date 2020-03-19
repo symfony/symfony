@@ -88,11 +88,24 @@ class RangeValidator extends ConstraintValidator
         $hasUpperLimit = null !== $max;
 
         if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
-            $violationBuilder = $this->context->buildViolation($constraint->notInRangeMessage)
+            $message = $constraint->notInRangeMessage;
+            $code = Range::NOT_IN_RANGE_ERROR;
+
+            if ($value < $min && $constraint->deprecatedMinMessageSet) {
+                $message = $constraint->minMessage;
+                $code = Range::TOO_LOW_ERROR;
+            }
+
+            if ($value > $max && $constraint->deprecatedMaxMessageSet) {
+                $message = $constraint->maxMessage;
+                $code = Range::TOO_HIGH_ERROR;
+            }
+
+            $violationBuilder = $this->context->buildViolation($message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
                 ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE))
-                ->setCode(Range::NOT_IN_RANGE_ERROR);
+                ->setCode($code);
 
             if (null !== $constraint->maxPropertyPath) {
                 $violationBuilder->setParameter('{{ max_limit_path }}', $constraint->maxPropertyPath);

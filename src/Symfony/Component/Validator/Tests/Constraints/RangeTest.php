@@ -40,4 +40,43 @@ class RangeTest extends TestCase
         $this->expectExceptionMessage('No default option is configured');
         new Range('value');
     }
+
+    public function provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(): array
+    {
+        return [
+            [['min' => 1, 'max' => 10, 'minMessage' => 'my_min_message'], true, false],
+            [['min' => 1, 'max' => 10, 'maxMessage' => 'my_max_message'], false, true],
+            [['min' => 1, 'max' => 10, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message'], true, true],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/validator 4.4: minMessage and maxMessage are deprecated when min and max options are set together. Use notInRangeMessage instead.
+     * @dataProvider provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet
+     */
+    public function testDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(array $options, bool $expectedDeprecatedMinMessageSet, bool $expectedDeprecatedMaxMessageSet)
+    {
+        $sut = new Range($options);
+        $this->assertEquals($expectedDeprecatedMinMessageSet, $sut->deprecatedMinMessageSet);
+        $this->assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);
+    }
+
+    public function provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(): array
+    {
+        return [
+            [['min' => 1, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message']],
+            [['max' => 10, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message']],
+            [['min' => 1, 'max' => 10, 'notInRangeMessage' => 'my_message']],
+        ];
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     * @dataProvider provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet
+     */
+    public function testDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(array $options)
+    {
+        new Range($options);
+    }
 }

@@ -24,9 +24,20 @@ class AnnotatedControllerListenerTest extends TestCase
 
     public function testOnController()
     {
-        $event = $this->createControllerEvent([new AnnotatedController(), 'queryParamAction']);
+        $request = new Request();
+
+        $kernel = new KernelForTest('test', true);
+        $event = new ControllerEvent(
+            $kernel,
+            [new AnnotatedController(), 'queryParamAction'],
+            $request,
+            HttpKernelInterface::MASTER_REQUEST
+        );
+
         $this->listener->onController($event);
-        $this->assertCount(2, $event->getConfigurations());
+
+        $this->assertTrue($request->attributes->has('_configurations'));
+        $this->assertCount(2, $request->attributes->get('_configurations'));
     }
 
     private function createControllerEvent(callable $controller): ControllerEvent

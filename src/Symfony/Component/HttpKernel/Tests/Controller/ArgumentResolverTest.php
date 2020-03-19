@@ -19,7 +19,10 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerConfiguration\Configuration\QueryParam;
+use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationList;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AnnotatedController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
@@ -278,6 +281,18 @@ class ArgumentResolverTest extends TestCase
         $controller = [$this, 'controllerWithExtendingSession'];
 
         self::$resolver->getArguments($request, $controller);
+    }
+
+    public function testGetQueryParam()
+    {
+        $request = Request::create('/?foo=foo&bar=bar');
+        $request->attributes->set('_configurations', new ConfigurationList([
+            new QueryParam(['value' => 'foo']),
+            new QueryParam(['value' => 'bar']),
+        ]));
+        $controller = [new AnnotatedController(), 'queryParamAction'];
+
+        $this->assertEquals(['foo', 'bar'], self::$resolver->getArguments($request, $controller));
     }
 
     public function __invoke($foo, $bar = null)

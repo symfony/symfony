@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParamValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
@@ -91,6 +92,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
             new SessionValueResolver(),
             new DefaultValueResolver(),
             new VariadicValueResolver(),
+            new QueryParamValueResolver(),
         ];
     }
 }

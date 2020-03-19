@@ -2,14 +2,22 @@
 
 namespace Symfony\Component\HttpKernel\ControllerConfiguration\Configuration;
 
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationInterface;
-
 /**
  * @Annotation
  */
 class QueryParam extends ConfigurationAnnotation
 {
+    private $argumentName;
     private $name;
+
+    public function __construct(array $values)
+    {
+        parent::__construct($values);
+
+        if (null === $this->name) {
+            $this->name = $this->argumentName;
+        }
+    }
 
     public function getName()
     {
@@ -23,11 +31,16 @@ class QueryParam extends ConfigurationAnnotation
 
     public function setValue(string $value): void
     {
-        $this->setName($value);
+        $this->setArgumentName($value);
     }
 
-    public function getTarget(): array
+    public function setArgumentName(string $argumentName): void
     {
-        return [ConfigurationInterface::TARGET_CLASS, ConfigurationInterface::TARGET_ARGUMENTS];
+        $this->argumentName = $argumentName;
+    }
+
+    public function getArgumentName()
+    {
+        return $this->argumentName;
     }
 }

@@ -2,34 +2,41 @@
 
 namespace Symfony\Component\HttpKernel\ControllerConfiguration;
 
-class ConfigurationList implements \Countable
+class ConfigurationList implements \Countable, \IteratorAggregate
 {
     private $configurations = [];
-    private $targetConfigurations = [];
 
-    public function add(ConfigurationInterface $configuration): void
+    public function __construct(array $configurations = [])
     {
-        $this->configurations[] = $configuration;
-        foreach ($configuration->getTarget() as $target) {
-            if (!isset($this->targetConfigurations[$target])) {
-                $this->targetConfigurations[$target] = [];
-            }
-
-            $this->targetConfigurations[$target][] = $configuration;
+        foreach ($configurations as $configuration) {
+            $this->add($configuration);
         }
     }
 
-    public function forTarget(string $target): array
+    public function add(ConfigurationInterface $configuration): self
     {
-        if (!isset($this->targetConfigurations[$target])) {
-            return [];
-        }
+        $this->configurations[] = $configuration;
 
-        return $this->targetConfigurations[$target];
+        return $this;
+    }
+
+    public function filter(callable $filter): self
+    {
+        return new static(array_filter($this->configurations, $filter));
+    }
+
+    public function first(): ?ConfigurationInterface
+    {
+        return reset($this->configurations) ?? null;
     }
 
     public function count(): int
     {
         return \count($this->configurations);
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->configurations);
     }
 }

@@ -48,7 +48,7 @@ class ControllerListener implements EventSubscriberInterface
         $this->appendConfigurations($configurations, $this->reader->getClassAnnotations($reflectionObject));
         $this->appendConfigurations($configurations, $this->reader->getMethodAnnotations($reflectionMethod));
 
-        $event->setConfigurations($configurations);
+        $event->getRequest()->attributes->set('_configurations', $configurations);
     }
 
     private function appendConfigurations(ConfigurationList $configurations, array $annotations): void

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Event;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\ControllerConfiguration\ConfigurationList;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -29,14 +28,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 final class ControllerEvent extends KernelEvent
 {
     private $controller;
-    private $configurations;
 
     public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 
         $this->setController($controller);
-        $this->setConfigurations(new ConfigurationList());
     }
 
     public function getController(): callable
@@ -47,15 +44,5 @@ final class ControllerEvent extends KernelEvent
     public function setController(callable $controller): void
     {
         $this->controller = $controller;
-    }
-
-    public function setConfigurations(ConfigurationList $configurations): void
-    {
-        $this->configurations = $configurations;
-    }
-
-    public function getConfigurations(): ConfigurationList
-    {
-        return $this->configurations;
     }
 }

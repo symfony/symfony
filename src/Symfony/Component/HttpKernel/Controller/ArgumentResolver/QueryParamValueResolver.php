@@ -17,19 +17,22 @@ final class QueryParamValueResolver implements ArgumentValueResolverInterface
             return false;
         }
 
-        return 1 === $this->getConfigurationsForArgument($request, $argument)->count();
+        /** @var QueryParam $configuration */
+        $configuration = $this->getConfigurationsForArgument($request, $argument);
+
+        return null !== $configuration
+            && !$argument->isVariadic()
+            && ($request->query->has($configuration->getName()) || $argument->hasDefaultValue());
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        $configuration = $this->getConfigurationsForArgument($request, $argument)->first();
-
-        // todo validate query param constraints
-
-        yield $request->query->get($configuration->getName());
+        $configuration = $this->getConfigurationsForArgument($request, $argument);
+        $defaultValue = $argument->hasDefaultValue() ? $argument->getDefaultValue() : null;
+        yield $request->query->get($configuration->getName(), $defaultValue);
     }
 
-    private function getConfigurationsForArgument(Request $request, ArgumentMetadata $argument): ConfigurationList
+    private function getConfigurationsForArgument(Request $request, ArgumentMetadata $argument): ?ConfigurationInterface
     {
         /** @var ConfigurationList $configurations */
         $configurations = $request->attributes->get('_configurations');
@@ -38,6 +41,6 @@ final class QueryParamValueResolver implements ArgumentValueResolverInterface
             return $configuration instanceof QueryParam && $configuration->getArgumentName() === $argument->getName();
         });
 
-        return $configuration;
+        return $configuration->first();
     }
 }

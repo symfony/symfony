@@ -29,7 +29,7 @@ class AnnotatedControllerListenerTest extends TestCase
         $kernel = new KernelForTest('test', true);
         $event = new ControllerEvent(
             $kernel,
-            [new AnnotatedController(), 'queryParamAction'],
+            [new AnnotatedController(), 'queryParam'],
             $request,
             HttpKernelInterface::MASTER_REQUEST
         );

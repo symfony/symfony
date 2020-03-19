@@ -290,7 +290,19 @@ class ArgumentResolverTest extends TestCase
             new QueryParam(['value' => 'foo']),
             new QueryParam(['value' => 'bar']),
         ]));
-        $controller = [new AnnotatedController(), 'queryParamAction'];
+        $controller = [new AnnotatedController(), 'queryParam'];
+
+        $this->assertEquals(['foo', 'bar'], self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetQueryParamWithDefaultValues()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('_configurations', new ConfigurationList([
+            new QueryParam(['value' => 'foo']),
+            new QueryParam(['value' => 'bar']),
+        ]));
+        $controller = [new AnnotatedController(), 'queryParamWithDefaultValues'];
 
         $this->assertEquals(['foo', 'bar'], self::$resolver->getArguments($request, $controller));
     }

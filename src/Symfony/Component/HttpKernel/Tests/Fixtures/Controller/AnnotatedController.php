@@ -13,7 +13,15 @@ class AnnotatedController
     /**
      * @QueryParam("bar")
      */
-    public function queryParamAction(string $foo, string $bar): Response
+    public function queryParam(string $foo, string $bar): Response
+    {
+        return new Response($foo.'.'.$bar);
+    }
+
+    /**
+     * @QueryParam("bar")
+     */
+    public function queryParamWithDefaultValues(string $foo = 'foo', string $bar = 'bar'): Response
     {
         return new Response($foo.'.'.$bar);
     }

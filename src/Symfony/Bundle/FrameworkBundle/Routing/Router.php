@@ -15,6 +15,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\CompatibilityServiceSubscriberInterface as ServiceSubscriberInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -71,6 +73,16 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
             $this->resolveParameters($this->collection);
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
+
+            try {
+                $containerFile = ($this->paramFetcher)('kernel.cache_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
+                if (file_exists($containerFile)) {
+                    $this->collection->addResource(new FileResource($containerFile));
+                } else {
+                    $this->collection->addResource(new FileExistenceResource($containerFile));
+                }
+            } catch (ParameterNotFoundException $exception) {
+            }
         }
 
         return $this->collection;

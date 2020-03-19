@@ -21,14 +21,15 @@ class CrawlerSelectorTextContainsTest extends TestCase
 {
     public function testConstraint(): void
     {
-        $constraint = new CrawlerSelectorTextContains('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
+        $constraint = new CrawlerSelectorTextContains('table td', 'Foo');
+        $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Bar</td></tr><tr><td>Foobar</td></tr>'), '', true));
+        $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Foobar</td></tr><tr><td>Bar</td></tr>'), '', true));
         $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"title\" with content containing \"Foo\".\n", TestFailure::exceptionToString($e));
+            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"table td\" with content containing \"Foo\".\n", TestFailure::exceptionToString($e));
 
             return;
         }

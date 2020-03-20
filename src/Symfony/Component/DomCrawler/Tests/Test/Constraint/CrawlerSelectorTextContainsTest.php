@@ -24,7 +24,7 @@ class CrawlerSelectorTextContainsTest extends TestCase
         $constraint = new CrawlerSelectorTextContains('table td', 'Foo');
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Bar</td></tr><tr><td>Foobar</td></tr>'), '', true));
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Foobar</td></tr><tr><td>Bar</td></tr>'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><body><table><tr><td>Fuubar</td></tr><tr><td>Bar</td></tr>'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));

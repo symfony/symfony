@@ -24,7 +24,7 @@ class CrawlerSelectorAttributeValueSameTest extends TestCase
         $constraint = new CrawlerSelectorAttributeValueSame('input[name^="username"]', 'value', 'Fabien');
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username1" value="Fabien"><input type="text" name="username2" value="Kim">'), '', true));
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username1" value="Kim"><input type="text" name="username2" value="Fabien">'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username1" value="Kim"><input type="text" name="username2" value="Jean">'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));

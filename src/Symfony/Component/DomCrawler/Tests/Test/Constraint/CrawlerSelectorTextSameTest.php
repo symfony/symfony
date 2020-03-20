@@ -24,7 +24,7 @@ class CrawlerSelectorTextSameTest extends TestCase
         $constraint = new CrawlerSelectorTextSame('table td', 'Foo');
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Foo</td></tr><tr><td>Foobar</td></tr>'), '', true));
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><table><tr><td>Foobar</td></tr><tr><td>Foo</td></tr>'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><body><table><tr><td>Foobar</td></tr><tr><td>Bar</td></tr>'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));

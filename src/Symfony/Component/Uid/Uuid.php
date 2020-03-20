@@ -41,7 +41,12 @@ class Uuid extends AbstractUid
         }
 
         if (16 === \strlen($uuid)) {
-            $uuid = uuid_unparse($uuid);
+            // don't use uuid_unparse(), it's slower
+            $uuid = bin2hex($uuid);
+            $uuid = substr_replace($uuid, '-', 8, 0);
+            $uuid = substr_replace($uuid, '-', 13, 0);
+            $uuid = substr_replace($uuid, '-', 18, 0);
+            $uuid = substr_replace($uuid, '-', 23, 0);
         } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
             $uuid = (new Ulid($uuid))->toRfc4122();
         }

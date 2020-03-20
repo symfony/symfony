@@ -39,6 +39,11 @@ HttpFoundation
    `__construct()` instead)
  * Made the Mime component an optional dependency
 
+Mailer
+------
+
+ * Deprecated passing Mailgun headers without their "h:" prefix.
+
 Messenger
 ---------
 

@@ -58,8 +58,17 @@ class MailgunApiTransportTest extends TestCase
     public function testCustomHeader()
     {
         $json = json_encode(['foo' => 'bar']);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+
         $email = new Email();
         $email->getHeaders()->addTextHeader('X-Mailgun-Variables', $json);
+        $email->getHeaders()->addTextHeader('h:foo', 'foo-value');
+        $email->getHeaders()->addTextHeader('t:text', 'text-value');
+        $email->getHeaders()->addTextHeader('o:deliverytime', $deliveryTime);
+        $email->getHeaders()->addTextHeader('v:version', 'version-value');
+        $email->getHeaders()->addTextHeader('template', 'template-value');
+        $email->getHeaders()->addTextHeader('recipient-variables', 'recipient-variables-value');
+        $email->getHeaders()->addTextHeader('amp-html', 'amp-html-value');
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
@@ -69,6 +78,43 @@ class MailgunApiTransportTest extends TestCase
 
         $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
         $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+
+        $this->assertArrayHasKey('h:foo', $payload);
+        $this->assertEquals('foo-value', $payload['h:foo']);
+        $this->assertArrayHasKey('t:text', $payload);
+        $this->assertEquals('text-value', $payload['t:text']);
+        $this->assertArrayHasKey('o:deliverytime', $payload);
+        $this->assertEquals($deliveryTime, $payload['o:deliverytime']);
+        $this->assertArrayHasKey('v:version', $payload);
+        $this->assertEquals('version-value', $payload['v:version']);
+        $this->assertArrayHasKey('template', $payload);
+        $this->assertEquals('template-value', $payload['template']);
+        $this->assertArrayHasKey('recipient-variables', $payload);
+        $this->assertEquals('recipient-variables-value', $payload['recipient-variables']);
+        $this->assertArrayHasKey('amp-html', $payload);
+        $this->assertEquals('amp-html-value', $payload['amp-html']);
+    }
+
+    /**
+     * @legacy
+     */
+    public function testPrefixHeaderWithH()
+    {
+        $json = json_encode(['foo' => 'bar']);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('bar', 'bar-value');
+
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('h:bar', $payload, 'We should prefix headers with "h:" to keep BC');
+        $this->assertEquals('bar-value', $payload['h:bar']);
     }
 
     public function testSend()
@@ -130,7 +176,7 @@ class MailgunApiTransportTest extends TestCase
             ->text('Hello There!');
 
         $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        $this->expectExceptionMessage('Unable to send an email: "i\'m a teapot" (code 418).');
         $transport->send($mail);
     }
 

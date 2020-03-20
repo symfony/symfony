@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.1.0
+
+ * Not prefixing headers with "h:" is deprecated.
+
 4.4.0
 -----
 

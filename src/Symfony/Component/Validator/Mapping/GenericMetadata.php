@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\DisableAutoMapping;
 use Symfony\Component\Validator\Constraints\EnableAutoMapping;
+use Symfony\Component\Validator\Constraints\DisableOverridingPropertyConstraints;
+use Symfony\Component\Validator\Constraints\EnableOverridingPropertyConstraints;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -89,6 +91,21 @@ class GenericMetadata implements MetadataInterface
     public $autoMappingStrategy = AutoMappingStrategy::NONE;
 
     /**
+     * The strategy for merging/overriding property constraints, when extending class that has property constraints.
+     *
+     * By default, property constraints in a child class are merged with property constraints of a parent class.
+     *
+     * @var int
+     *
+     * @see OverridingPropertyConstraintsStrategy
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getOverridingPropertyConstraintsStrategy()} instead.
+     */
+    public $overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::NONE;
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -101,6 +118,7 @@ class GenericMetadata implements MetadataInterface
             'cascadingStrategy',
             'traversalStrategy',
             'autoMappingStrategy',
+            'overridingPropertyConstraintsStrategy'
         ];
     }
 
@@ -155,6 +173,13 @@ class GenericMetadata implements MetadataInterface
 
         if ($constraint instanceof DisableAutoMapping || $constraint instanceof EnableAutoMapping) {
             $this->autoMappingStrategy = $constraint instanceof EnableAutoMapping ? AutoMappingStrategy::ENABLED : AutoMappingStrategy::DISABLED;
+
+            // The constraint is not added
+            return $this;
+        }
+
+        if ($constraint instanceof EnableOverridingPropertyConstraints || $constraint instanceof DisableOverridingPropertyConstraints) {
+            $this->overridingPropertyConstraintsStrategy = $constraint instanceof EnableOverridingPropertyConstraints ? OverridingPropertyConstraintsStrategy::ENABLED : OverridingPropertyConstraintsStrategy::DISABLED;
 
             // The constraint is not added
             return $this;
@@ -235,5 +260,13 @@ class GenericMetadata implements MetadataInterface
     public function getAutoMappingStrategy(): int
     {
         return $this->autoMappingStrategy;
+    }
+
+    /**
+     * @see OverridingPropertyConstraintsStrategy
+     */
+    public function getOverridingPropertyConstraintsStrategy(): int
+    {
+        return $this->overridingPropertyConstraintsStrategy;
     }
 }

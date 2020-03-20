@@ -13,8 +13,12 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\DisableOverridingPropertyConstraints;
+use Symfony\Component\Validator\Constraints\EnableOverridingPropertyConstraints;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\OverridingPropertyConstraintsStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
@@ -310,4 +314,194 @@ class ClassMetadataTest extends TestCase
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
+    
+    public function testOverrideConstraintsIfOverridingEnabledInProperty()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+        
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+        
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testOverrideConstraintsIfOverridingEnabledInPropertyAndDisabledInClass()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addConstraint(new DisableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addConstraint(new DisableOverridingPropertyConstraints());
+        $expectedMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testOverrideConstraintsIfOverridingEnabledInClass()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $expectedMetadata->getPropertyMetadata('example')[0]->overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::ENABLED;
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testOverrideConstraintsIfOverridingEnabledInClassAndDisabledInParentClass()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addConstraint(new DisableOverridingPropertyConstraints());
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $expectedMetadata->getPropertyMetadata('example')[0]->overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::ENABLED;
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testOverrideConstraintsIfOverridingEnabledInParentClass()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $expectedMetadata->overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::ENABLED;
+        $expectedMetadata->getPropertyMetadata('example')[0]->overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::ENABLED;
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testOverrideConstraintsIfOverridingEnabledInParentClassProperty()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $expectedMetadata->getPropertyMetadata('example')[0]->overridingPropertyConstraintsStrategy = OverridingPropertyConstraintsStrategy::ENABLED;
+
+        $this->assertEquals($expectedMetadata, $childMetadata);
+    }
+
+    public function testMergeConstraintsIfOverridingEnabledInClassAndDisabledInProperty()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->addPropertyConstraint('example', new DisableOverridingPropertyConstraints());
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $childConstraints = [];
+        foreach ($childMetadata->getPropertyMetadata('example') as $member) {
+            $childConstraints[] = $member->getConstraints()[0];
+        }
+        
+        $expectedConstraints = [
+            new GreaterThan(['value' => 1, 'groups' => ['Default', 'ChildClass']]),
+            new GreaterThan(['value' => 0, 'groups' => ['Default', 'ParentClass', 'ChildClass']]),
+        ];
+
+        $this->assertEquals($expectedConstraints, $childConstraints);
+    }
+
+    public function testMergeConstraintsIfOverridingEnabledInParentClassAndDisabledInChildClass()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addConstraint(new EnableOverridingPropertyConstraints());
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addConstraint(new DisableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $childConstraints = [];
+        foreach ($childMetadata->getPropertyMetadata('example') as $member) {
+            $childConstraints[] = $member->getConstraints()[0];
+        }
+
+        $expectedConstraints = [
+            new GreaterThan(['value' => 1, 'groups' => ['Default', 'ChildClass']]),
+            new GreaterThan(['value' => 0, 'groups' => ['Default', 'ParentClass', 'ChildClass']]),
+        ];
+
+        $this->assertEquals($expectedConstraints, $childConstraints);
+    }
+
+    public function testMergeConstraintsIfOverridingEnabledInParentClassPropertyAndDisabledInChildClassProperty()
+    {
+        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
+        $parentMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
+        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
+
+        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
+        $childMetadata->addPropertyConstraint('example', new DisableOverridingPropertyConstraints());
+        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
+        $childMetadata->mergeConstraints($parentMetadata);
+
+        $childConstraints = [];
+        foreach ($childMetadata->getPropertyMetadata('example') as $member) {
+            $childConstraints[] = $member->getConstraints()[0];
+        }
+
+        $expectedConstraints = [
+            new GreaterThan(['value' => 1, 'groups' => ['Default', 'ChildClass']]),
+            new GreaterThan(['value' => 0, 'groups' => ['Default', 'ParentClass', 'ChildClass']]),
+        ];
+
+        $this->assertEquals($expectedConstraints, $childConstraints);
+    }
+}
+
+class ParentClass
+{
+    public $example = 0;
+}
+
+class ChildClass extends ParentClass
+{
+    public $example = 1;    // overrides parent property of same name
 }

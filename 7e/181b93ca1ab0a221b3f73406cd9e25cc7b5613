@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by l-vo at 2020-03-20T08:59:41Z
+
+Added `$this->formatValue` to safely handle `$defaults['_controller']` if not a string

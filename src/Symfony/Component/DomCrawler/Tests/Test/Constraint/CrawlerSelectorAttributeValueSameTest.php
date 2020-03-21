@@ -11,28 +11,22 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorAttributeValueSame;
 
-class CrawlerSelectorAttributeValueSameTest extends TestCase
+class CrawlerSelectorAttributeValueSameTest extends AbstractConstraintTest
 {
-    public function testConstraint(): void
+    protected $errorMessage = 'Failed asserting that the Crawler has a node matching selector "input[name="username"]" with attribute "value" of value "Fabien".';
+
+    protected function setUp(): void
     {
-        $constraint = new CrawlerSelectorAttributeValueSame('input[name="username"]', 'value', 'Fabien');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->constraint = new CrawlerSelectorAttributeValueSame('input[name="username"]', 'value', 'Fabien');
+    }
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head><title>Bar'));
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"input[name=\"username\"]\" with attribute \"value\" of value \"Fabien\".\n", TestFailure::exceptionToString($e));
+    public function provideConstraintData()
+    {
+        yield ['<input type="text" name="username" value="Fabien">', true];
 
-            return;
-        }
-
-        $this->fail();
+        yield ['<input type="text" name="username" value="Wouter">', false];
+        yield ['<h1>Bar</h1>', false];
     }
 }

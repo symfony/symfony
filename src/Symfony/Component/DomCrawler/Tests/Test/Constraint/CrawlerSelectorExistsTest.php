@@ -11,29 +11,21 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorExists;
 
-class CrawlerSelectorExistsTest extends TestCase
+class CrawlerSelectorExistsTest extends AbstractConstraintTest
 {
-    public function testConstraint(): void
+    protected $errorMessage = 'Failed asserting that the Crawler matches selector "p".';
+
+    protected function setUp(): void
     {
-        $constraint = new CrawlerSelectorExists('title');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
-        $constraint = new CrawlerSelectorExists('h1');
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
+        $this->constraint = new CrawlerSelectorExists('p');
+    }
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head><title>'));
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler matches selector \"h1\".\n", TestFailure::exceptionToString($e));
-
-            return;
-        }
-
-        $this->fail();
+    public function provideConstraintData()
+    {
+        yield ['<p/>', true];
+        yield ['<p>Foo</p>', true];
+        yield ['<h1>Foo</h1>', false];
     }
 }

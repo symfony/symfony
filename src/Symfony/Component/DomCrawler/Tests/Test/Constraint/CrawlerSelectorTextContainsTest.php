@@ -11,28 +11,23 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorTextContains;
 
-class CrawlerSelectorTextContainsTest extends TestCase
+class CrawlerSelectorTextContainsTest extends AbstractConstraintTest
 {
-    public function testConstraint(): void
+    protected $errorMessage = 'Failed asserting that the Crawler has a node matching selector "p" with content containing "Foo".';
+
+    protected function setUp(): void
     {
-        $constraint = new CrawlerSelectorTextContains('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->constraint = new CrawlerSelectorTextContains('p', 'Foo');
+    }
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head><title>Bar'));
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"title\" with content containing \"Foo\".\n", TestFailure::exceptionToString($e));
+    public function provideConstraintData()
+    {
+        yield ['<p>Foo</p>', true];
+        yield ['<p>Foobar</p>', true];
 
-            return;
-        }
-
-        $this->fail();
+        yield ['<p>Bar</p>', false];
+        yield ['<h1>Foo</h1>', false];
     }
 }

@@ -310,7 +310,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         if ($source->isGroupSequenceProvider()) {
             $this->setGroupSequenceProvider(true);
         }
-        
+
         if (OverridingPropertyConstraintsStrategy::NONE === $this->getOverridingPropertyConstraintsStrategy()) {
             $this->overridingPropertyConstraintsStrategy = $source->getOverridingPropertyConstraintsStrategy();
         }
@@ -321,14 +321,14 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
         foreach ($source->getConstrainedProperties() as $property) {
             $strategy = null;
-            
+
             foreach ($this->getPropertyMetadata($property) as $childMember) {
                 // overriding is enabled in property
                 if (OverridingPropertyConstraintsStrategy::ENABLED === $strategy = $childMember->getOverridingPropertyConstraintsStrategy()) {
                     continue 2;
                 }
             }
-            
+
             foreach ($source->getPropertyMetadata($property) as $member) {
                 // property is overridden, but property constraints strategy is not set explicitly in property
                 if (OverridingPropertyConstraintsStrategy::NONE === $strategy) {
@@ -345,7 +345,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                         continue 2;
                     }
                 }
-                
+
                 $member = clone $member;
 
                 foreach ($member->getConstraints() as $constraint) {

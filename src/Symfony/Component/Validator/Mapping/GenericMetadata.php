@@ -13,8 +13,8 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\DisableAutoMapping;
-use Symfony\Component\Validator\Constraints\EnableAutoMapping;
 use Symfony\Component\Validator\Constraints\DisableOverridingPropertyConstraints;
+use Symfony\Component\Validator\Constraints\EnableAutoMapping;
 use Symfony\Component\Validator\Constraints\EnableOverridingPropertyConstraints;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -118,7 +118,7 @@ class GenericMetadata implements MetadataInterface
             'cascadingStrategy',
             'traversalStrategy',
             'autoMappingStrategy',
-            'overridingPropertyConstraintsStrategy'
+            'overridingPropertyConstraintsStrategy',
         ];
     }
 

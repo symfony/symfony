@@ -27,7 +27,7 @@ final class OverridingPropertyConstraintsStrategy
      * In case of class, inherit strategy from parent class.
      */
     public const NONE = 0;
-    
+
     /**
      * Specifies that class' property constraints should be merged with constraints of a parent class.
      */

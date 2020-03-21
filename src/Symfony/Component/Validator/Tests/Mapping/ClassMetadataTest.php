@@ -13,9 +13,9 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\DisableOverridingPropertyConstraints;
 use Symfony\Component\Validator\Constraints\EnableOverridingPropertyConstraints;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\OverridingPropertyConstraintsStrategy;
@@ -314,17 +314,17 @@ class ClassMetadataTest extends TestCase
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
-    
+
     public function testOverrideConstraintsIfOverridingEnabledInProperty()
     {
         $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
         $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
-        
+
         $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
         $childMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
         $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
         $childMetadata->mergeConstraints($parentMetadata);
-        
+
         $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
         $expectedMetadata->addPropertyConstraint('example', new EnableOverridingPropertyConstraints());
         $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
@@ -438,7 +438,7 @@ class ClassMetadataTest extends TestCase
         foreach ($childMetadata->getPropertyMetadata('example') as $member) {
             $childConstraints[] = $member->getConstraints()[0];
         }
-        
+
         $expectedConstraints = [
             new GreaterThan(['value' => 1, 'groups' => ['Default', 'ChildClass']]),
             new GreaterThan(['value' => 0, 'groups' => ['Default', 'ParentClass', 'ChildClass']]),

@@ -25,6 +25,7 @@ class CrawlerSelectorTextSameTest extends AbstractConstraintTest
     public function provideConstraintData()
     {
         yield ['<p>Foo</p>', true];
+        yield ['<p>Bar</p><p>Foo</p>', true];
 
         yield ['<p>Bar</p>', false];
     }

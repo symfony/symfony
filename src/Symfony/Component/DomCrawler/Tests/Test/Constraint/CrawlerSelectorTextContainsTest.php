@@ -26,6 +26,7 @@ class CrawlerSelectorTextContainsTest extends AbstractConstraintTest
     {
         yield ['<p>Foo</p>', true];
         yield ['<p>Foobar</p>', true];
+        yield ['<p>Bar</p><p>Foo</p>', true];
 
         yield ['<p>Bar</p>', false];
         yield ['<h1>Foo</h1>', false];

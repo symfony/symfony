@@ -90,6 +90,10 @@
         </service>
         <service id="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" alias="security.authentication_utils" />
 
+        <service id="security.event_dispatcher.event_bubbling_listener" class="Symfony\Bundle\SecurityBundle\EventListener\FirewallEventBubblingListener" abstract="true">
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager">
             <argument type="collection" />

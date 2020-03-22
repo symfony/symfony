@@ -61,7 +61,7 @@ class RegisterListenersPass implements CompilerPassInterface
         } else {
             $aliases = [];
         }
-        $definition = $container->findDefinition($this->dispatcherService);
+        $globalDispatcherDefinition = $container->findDefinition($this->dispatcherService);
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
             foreach ($events as $event) {
@@ -90,7 +90,12 @@ class RegisterListenersPass implements CompilerPassInterface
                     }
                 }
 
-                $definition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
+                $dispatcherDefinition = $globalDispatcherDefinition;
+                if (isset($event['dispatcher'])) {
+                    $dispatcherDefinition = $container->getDefinition($event['dispatcher']);
+                }
+
+                $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
 
                 if (isset($this->hotPathEvents[$event['event']])) {
                     $container->getDefinition($id)->addTag($this->hotPathTagName);
@@ -100,7 +105,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $extractingDispatcher = new ExtractingEventDispatcher();
 
-        foreach ($container->findTaggedServiceIds($this->subscriberTag, true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->subscriberTag, true) as $id => $tags) {
             $def = $container->getDefinition($id);
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
@@ -114,12 +119,27 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             $class = $r->name;
 
+            $dispatcherDefinitions = [];
+            foreach ($tags as $attributes) {
+                if (!isset($attributes['dispatcher']) || isset($dispatcherDefinitions[$attributes['dispatcher']])) {
+                    continue;
+                }
+
+                $dispatcherDefinitions[] = $container->getDefinition($attributes['dispatcher']);
+            }
+
+            if ([] === $dispatcherDefinitions) {
+                $dispatcherDefinitions = [$globalDispatcherDefinition];
+            }
+
             ExtractingEventDispatcher::$aliases = $aliases;
             ExtractingEventDispatcher::$subscriber = $class;
             $extractingDispatcher->addSubscriber($extractingDispatcher);
             foreach ($extractingDispatcher->listeners as $args) {
                 $args[1] = [new ServiceClosureArgument(new Reference($id)), $args[1]];
-                $definition->addMethodCall('addListener', $args);
+                foreach ($dispatcherDefinitions as $dispatcherDefinition) {
+                    $dispatcherDefinition->addMethodCall('addListener', $args);
+                }
 
                 if (isset($this->hotPathEvents[$args[0]])) {
                     $container->getDefinition($id)->addTag($this->hotPathTagName);

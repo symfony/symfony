@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Bundle\SecurityBundle\Security\LegacyLogoutHandlerListener;
 use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
@@ -307,6 +309,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $config->replaceArgument(5, $defaultProvider);
 
+        // Register Firewall-specific event dispatcher
+        $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
+        $container->register($firewallEventDispatcherId, EventDispatcher::class);
+        $container->setDefinition($firewallEventDispatcherId.'.event_bubbling_listener', new ChildDefinition('security.event_dispatcher.event_bubbling_listener'))
+            ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+
         // Register listeners
         $listeners = [];
         $listenerKeys = [];
@@ -334,44 +342,50 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (isset($firewall['logout'])) {
             $logoutListenerId = 'security.logout_listener.'.$id;
             $logoutListener = $container->setDefinition($logoutListenerId, new ChildDefinition('security.logout_listener'));
+            $logoutListener->replaceArgument(2, new Reference($firewallEventDispatcherId));
             $logoutListener->replaceArgument(3, [
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ]);
 
-            // add logout success handler
+            // add default logout listener
             if (isset($firewall['logout']['success_handler'])) {
+                // deprecated, to be removed in Symfony 6.0
                 $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
+                $container->register('security.logout.listener.legacy_success_listener.'.$id, LegacyLogoutHandlerListener::class)
+                    ->setArguments([new Reference($logoutSuccessHandlerId)])
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             } else {
-                $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
-                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new ChildDefinition('security.logout.success_handler'));
-                $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
+                $logoutSuccessListenerId = 'security.logout.listener.default.'.$id;
+                $container->setDefinition($logoutSuccessListenerId, new ChildDefinition('security.logout.listener.default'))
+                    ->replaceArgument(1, $firewall['logout']['target'])
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             }
-            $logoutListener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
             if (isset($firewall['logout']['csrf_token_generator'])) {
                 $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
-            // add session logout handler
+            // add session logout listener
             if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
-                $logoutListener->addMethodCall('addHandler', [new Reference('security.logout.handler.session')]);
+                $container->setDefinition('security.logout.listener.session.'.$id, new ChildDefinition('security.logout.listener.session'))
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             }
 
-            // add cookie logout handler
+            // add cookie logout listener
             if (\count($firewall['logout']['delete_cookies']) > 0) {
-                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
-                $cookieHandler = $container->setDefinition($cookieHandlerId, new ChildDefinition('security.logout.handler.cookie_clearing'));
-                $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
-
-                $logoutListener->addMethodCall('addHandler', [new Reference($cookieHandlerId)]);
+                $container->setDefinition('security.logout.listener.cookie_clearing.'.$id, new ChildDefinition('security.logout.listener.cookie_clearing'))
+                    ->addArgument($firewall['logout']['delete_cookies'])
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             }
 
-            // add custom handlers
-            foreach ($firewall['logout']['handlers'] as $handlerId) {
-                $logoutListener->addMethodCall('addHandler', [new Reference($handlerId)]);
+            // add custom listeners (deprecated)
+            foreach ($firewall['logout']['handlers'] as $i => $handlerId) {
+                $container->register('security.logout.listener.legacy_handler.'.$i, LegacyLogoutHandlerListener::class)
+                    ->addArgument(new Reference($handlerId))
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
             }
 
             // register with LogoutUrlGenerator

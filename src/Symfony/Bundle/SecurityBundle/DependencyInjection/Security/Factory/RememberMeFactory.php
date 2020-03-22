@@ -15,8 +15,10 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 
 class RememberMeFactory implements SecurityFactoryInterface
 {
@@ -53,13 +55,6 @@ class RememberMeFactory implements SecurityFactoryInterface
         } else {
             $templateId = 'security.authentication.rememberme.services.simplehash';
             $rememberMeServicesId = $templateId.'.'.$id;
-        }
-
-        if ($container->hasDefinition('security.logout_listener.'.$id)) {
-            $container
-                ->getDefinition('security.logout_listener.'.$id)
-                ->addMethodCall('addHandler', [new Reference($rememberMeServicesId)])
-            ;
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new ChildDefinition($templateId));
@@ -115,6 +110,11 @@ class RememberMeFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
         $listener->replaceArgument(5, $config['catch_exceptions']);
+
+        // remember-me logout listener
+        $container->setDefinition('security.logout.listener.remember_me.'.$id, new Definition(RememberMeLogoutListener::class))
+            ->addArgument(new Reference($rememberMeServicesId))
+            ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$id]);
 
         return [$authProviderId, $listenerId, $defaultEntryPoint];
     }

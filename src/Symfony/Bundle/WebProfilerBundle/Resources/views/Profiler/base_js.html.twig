@@ -444,6 +444,8 @@
                             return;
                         }
 
+                        var toolbarPosition = (getPreference('toolbarPosition') || 'bottom').replace('toolbarPosition-', '');
+
                         if (getPreference('toolbar/displayState') == 'none') {
                             document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'none';
                             document.getElementById('sfToolbarClearer-' + newToken).style.display = 'none';
@@ -452,6 +454,8 @@
                             document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'block';
                             document.getElementById('sfToolbarClearer-' + newToken).style.display = 'block';
                             document.getElementById('sfMiniToolbar-' + newToken).style.display = 'none';
+
+                            document.getElementById('sfToolbarMainContent-' + newToken).classList.add('sf-toolbar--' + toolbarPosition);
                         }
 
                         /* Handle toolbar-info position */
@@ -459,6 +463,36 @@
                         for (i = 0; i < toolbarBlocks.length; ++i) {
                             toolbarBlocks[i].onmouseover = function () {
                                 var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
+
+                                if ('right' === toolbarPosition || 'left' === toolbarPosition) {
+                                    var pageHeight = window.innerHeight;
+                                    var elementHeight = toolbarInfo.offsetHeight;
+                                    var topValue = (elementHeight + this.offsetTop) - pageHeight;
+                                    var bottomValue = (elementHeight + (pageHeight - this.offsetTop)) - pageHeight;
+
+                                    /* Reset right and left value, useful on window resize */
+                                    toolbarInfo.style.top = '';
+                                    toolbarInfo.style.bottom = '';
+                                    toolbarInfo.style.right = '';
+                                    toolbarInfo.style.left = '';
+
+                                    if (elementHeight > pageHeight || topValue < 0) {
+                                        toolbarInfo.style.top = 0;
+                                    } else if (topValue > 0 && bottomValue > 0) {
+                                        toolbarInfo.style.bottom = (bottomValue * -1) + 'px';
+                                    } else {
+                                        toolbarInfo.style.bottom = 0;
+                                    }
+
+                                    if ('right' === toolbarPosition) {
+                                        toolbarInfo.style.right = '36px';
+                                    } else {
+                                        toolbarInfo.style.left = '36px';
+                                    }
+
+                                    return;
+                                }
+
                                 var pageWidth = document.body.clientWidth;
                                 var elementWidth = toolbarInfo.offsetWidth;
                                 var leftValue = (elementWidth + this.offsetLeft) - pageWidth;
@@ -470,8 +504,7 @@
 
                                 if (elementWidth > pageWidth) {
                                     toolbarInfo.style.left = 0;
-                                }
-                                else if (leftValue > 0 && rightValue > 0) {
+                                } else if (leftValue > 0 && rightValue > 0) {
                                     toolbarInfo.style.right = (rightValue * -1) + 'px';
                                 } else if (leftValue < 0) {
                                     toolbarInfo.style.left = 0;

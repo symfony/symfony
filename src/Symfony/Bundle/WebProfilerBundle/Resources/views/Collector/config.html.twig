@@ -19,9 +19,7 @@
     {% endif %}
 
     {% set icon %}
-        <span class="sf-toolbar-label">
-            {{ include('@WebProfiler/Icon/symfony.svg') }}
-        </span>
+        {{ include('@WebProfiler/Icon/symfony.svg') }}
         <span class="sf-toolbar-value">{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
     {% endset %}
 

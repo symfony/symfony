@@ -416,9 +416,6 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 .sf-toolbar-icon .sf-toolbar-value {
     display: none;
 }
-.sf-toolbar-block-config .sf-toolbar-icon .sf-toolbar-label {
-    display: inline-block;
-}
 
 /* Legacy Design - these styles are maintained to make old panels look
    a bit better on the new toolbar */
@@ -432,8 +429,46 @@ div.sf-toolbar .sf-toolbar-block a:hover {
     color: #FFF;
 }
 
-@media (min-width: 768px) {
+.sf-toolbar--left,
+.sf-toolbar--right {
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    padding: 36px 0 0 0;
+}
 
+.sf-toolbar--left {
+    left: 0;
+    right: auto;
+}
+
+.sf-toolbar--right {
+    left: auto;
+    right: 0;
+}
+
+.sf-toolbar--left .sf-toolbar-block,
+.sf-toolbar--right .sf-toolbar-block {
+    float: none;
+    max-width: none;
+}
+
+.sf-toolbar--left .sf-toolbar-info,
+.sf-toolbar--right .sf-toolbar-info {
+    bottom: auto;
+}
+
+.sf-toolbar--left .sf-toolbar-icon .sf-toolbar-label,
+.sf-toolbar--right .sf-toolbar-icon .sf-toolbar-value {
+    display: none;
+}
+
+.sf-toolbar--left .sf-toolbar-block-request .sf-toolbar-status,
+.sf-toolbar--right .sf-toolbar-block-request .sf-toolbar-status {
+    padding: 0 7px;
+}
+
+@media (min-width: 768px) {
     .sf-toolbar-icon .sf-toolbar-label,
     .sf-toolbar-icon .sf-toolbar-value {
         display: inline;
@@ -443,8 +478,8 @@ div.sf-toolbar .sf-toolbar-block a:hover {
     .sf-toolbar-block .sf-toolbar-icon svg {
         top: 6px;
     }
-    .sf-toolbar-block-time .sf-toolbar-icon svg,
-    .sf-toolbar-block-memory .sf-toolbar-icon svg {
+    .sf-toolbar--bottom .sf-toolbar-block-time .sf-toolbar-icon svg,
+    .sf-toolbar--bottom .sf-toolbar-block-memory .sf-toolbar-icon svg {
         display: none;
     }
     .sf-toolbar-block-time .sf-toolbar-icon svg + span,
@@ -452,7 +487,7 @@ div.sf-toolbar .sf-toolbar-block a:hover {
         margin-left: 0;
     }
 
-    .sf-toolbar-block .sf-toolbar-icon {
+    .sf-toolbar--bottom .sf-toolbar-block .sf-toolbar-icon {
         padding: 0 10px;
     }
     .sf-toolbar-block-time .sf-toolbar-icon {

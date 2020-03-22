@@ -133,6 +133,18 @@
             <input class="config-option" type="radio" name="width" value="dark" id="settings-width-full">
             <label for="settings-width-full">Full-page</label>
             <p class="form-help">Dynamic page width. As wide as the browser window.</p>
+
+            <h4>Toolbar position</h4>
+            <p class="form-help">Choice toolbar position. Classic bottom position will apply by default.</p>
+
+            <input class="config-option" type="radio" name="toolbarPosition" value="bottom" id="settings-toolbarPosition-bottom">
+            <label for="settings-toolbarPosition-bottom">Bottom</label>
+
+            <input class="config-option" type="radio" name="toolbarPosition" value="left" id="settings-toolbarPosition-left">
+            <label for="settings-toolbarPosition-left">Left</label>
+
+            <input class="config-option" type="radio" name="toolbarPosition" value="right" id="settings-toolbarPosition-right">
+            <label for="settings-toolbarPosition-right">Right</label>
         </div>
     </div>
 </div>
@@ -142,7 +154,7 @@
     let configOptions = document.querySelectorAll('.config-option');
     let oppositeValues = { 'light': 'dark', 'dark': 'light', 'normal': 'full', 'full': 'normal' };
     [...configOptions].forEach(option => {
-        option.addEventListener('click', function (event) {
+        option.addEventListener('click', function () {
             let optionParts = option.id.split('-');
             let optionName = optionParts[1];
             let optionValue = optionParts[2];
@@ -156,7 +168,7 @@
     let openModalButton = document.getElementById('open-settings');
     let modalWindow = document.getElementById('profiler-settings');
     let closeModalButton = document.getElementsByClassName('close-modal')[0];
-    let modalWrapper = document.getElementsByClassName('modal-wrap')[0]
+    let modalWrapper = document.getElementsByClassName('modal-wrap')[0];
 
     openModalButton.addEventListener('click', function(event) {
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/theme') || 'theme-light')).checked = 'checked';

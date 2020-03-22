@@ -100,6 +100,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             ->replace('@', $separator.'at'.$separator)
             ->replace('&', $separator.'and'.$separator)
             ->replaceMatches('/[^A-Za-z0-9]++/', $separator)
+            ->replaceMatches("/$separator\w{1}$separator/", $separator)
             ->trim($separator)
         ;
     }

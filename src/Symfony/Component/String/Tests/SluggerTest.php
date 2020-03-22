@@ -35,10 +35,11 @@ class SluggerTest extends TestCase
             ['symfony@symfony.com', 'en', 'symfony-at-symfony-com'],
             ['Dieser Wert sollte größer oder gleich', 'de', 'Dieser-Wert-sollte-groesser-oder-gleich'],
             ['Dieser Wert sollte größer oder gleich', 'de_AT', 'Dieser-Wert-sollte-groesser-oder-gleich'],
-            ['Αυτή η τιμή πρέπει να είναι ψευδής', 'el', 'Avti-i-timi-prepi-na-inai-psevdhis'],
+            ['Αυτή η τιμή πρέπει να είναι ψευδής', 'el', 'Avti-timi-prepi-na-inai-psevdhis'],
             ['该变量的值应为', 'zh', 'gai-bian-liang-de-zhi-ying-wei'],
             ['該變數的值應為', 'zh_TW', 'gai-bian-shu-de-zhi-ying-wei'],
             ['Wôrķšƥáçè ~~sèťtïñğš~~', 'C', 'Workspace-settings'],
+            ['Pantalon d\'été', 'fr', 'Pantalon-ete'],
         ];
     }
 

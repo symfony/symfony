@@ -19,10 +19,10 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class AtLeastOneOf extends Composite
 {
-    public const AT_LEAST_ONE_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';
+    public const AT_LEAST_ONE_OF_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';
 
     protected static $errorNames = [
-        self::AT_LEAST_ONE_ERROR => 'AT_LEAST_ONE_ERROR',
+        self::AT_LEAST_ONE_OF_ERROR => 'AT_LEAST_ONE_OF_ERROR',
     ];
 
     public $constraints = [];

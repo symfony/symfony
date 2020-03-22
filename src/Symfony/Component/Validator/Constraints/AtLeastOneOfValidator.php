@@ -54,7 +54,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation(implode('', $messages))
-            ->setCode(AtLeastOneOf::AT_LEAST_ONE_ERROR)
+            ->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)
             ->addViolation()
         ;
     }

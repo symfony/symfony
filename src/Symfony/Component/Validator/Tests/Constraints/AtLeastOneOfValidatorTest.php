@@ -106,7 +106,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($value, $atLeastOneOf);
 
-        $this->buildViolation(implode('', $message))->setCode(AtLeastOneOf::AT_LEAST_ONE_ERROR)->assertRaised();
+        $this->buildViolation(implode('', $message))->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
     }
 
     /**
@@ -124,7 +124,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($value, $atLeastOneOf);
 
-        $this->buildViolation('foo')->setCode(AtLeastOneOf::AT_LEAST_ONE_ERROR)->assertRaised();
+        $this->buildViolation('foo')->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
     }
 
     public function getInvalidCombinations()

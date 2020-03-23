@@ -127,7 +127,7 @@ class GuardAuthenticatorHandler
 
     private function migrateSession(Request $request, TokenInterface $token, ?string $providerKey)
     {
-        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession() || \in_array($providerKey, $this->statelessProviderKeys, true)) {
+        if (\in_array($providerKey, $this->statelessProviderKeys, true) || !$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
 

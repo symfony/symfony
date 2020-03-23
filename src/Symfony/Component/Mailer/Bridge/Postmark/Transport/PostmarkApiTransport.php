@@ -54,7 +54,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['Message'], $result['ErrorCode']), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %d).', $result['Message'], $result['ErrorCode']), $response);
         }
 
         $sentMessage->setMessageId($result['MessageID']);

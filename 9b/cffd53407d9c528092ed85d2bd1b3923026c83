@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-23T12:00:46Z
+
+good catch :)
+`src/Symfony/Bundle/FrameworkBundle/CHANGELOG.md` has the same typo, can you fix it please?

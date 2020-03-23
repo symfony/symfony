@@ -27,6 +27,12 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     {
         parent::setUp();
 
+        // Normalize intl. configuration settings.
+        if (\extension_loaded('intl')) {
+            $this->iniSet('intl.use_exceptions', 0);
+            $this->iniSet('intl.error_level', 0);
+        }
+
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '57.1');
 
@@ -333,5 +339,45 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd HH:mm:ss');
         $transformer->reverseTransform('20107-03-21 12:34:56');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.error_level', E_WARNING);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithExceptions()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.use_exceptions', 1);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.use_exceptions', 1);
+        $this->iniSet('intl.error_level', E_WARNING);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
     }
 }

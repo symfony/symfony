@@ -363,8 +363,6 @@ class ErrorHandlerTest extends TestCase
         $handler = new ErrorHandler();
         $handler->setDefaultLogger($logger);
         @$handler->handleError(E_USER_DEPRECATED, 'Foo deprecation', __FILE__, __LINE__, []);
-
-        restore_error_handler();
     }
 
     /**
@@ -618,6 +616,10 @@ class ErrorHandlerTest extends TestCase
 
     public function testAssertQuietEval()
     {
+        if ('-1' === ini_get('zend.assertions')) {
+            $this->markTestSkipped('zend.assertions is forcibly disabled');
+        }
+
         $ini = [
             ini_set('zend.assertions', 1),
             ini_set('assert.active', 1),

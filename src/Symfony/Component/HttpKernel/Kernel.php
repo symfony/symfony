@@ -38,9 +38,6 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
-// Help opcache.preload discover always-needed symbols
-class_exists(ConfigCache::class);
-
 /**
  * The Kernel is the heart of the Symfony system.
  *
@@ -452,47 +449,20 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         try {
             is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
 
-            if ($lock = fopen($cachePath, 'w')) {
-                chmod($cachePath, 0666 & ~umask());
+            if ($lock = fopen($cachePath.'.lock', 'w')) {
                 flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
 
                 if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
                     fclose($lock);
-                } else {
-                    $cache = new class($cachePath, $this->debug) extends ConfigCache {
-                        public $lock;
+                    $lock = null;
+                } elseif (!\is_object($this->container = include $cachePath)) {
+                    $this->container = null;
+                } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
+                    flock($lock, LOCK_UN);
+                    fclose($lock);
+                    $this->container->set('kernel', $this);
 
-                        public function write(string $content, array $metadata = null)
-                        {
-                            rewind($this->lock);
-                            ftruncate($this->lock, 0);
-                            fwrite($this->lock, $content);
-
-                            if (null !== $metadata) {
-                                file_put_contents($this->getPath().'.meta', serialize($metadata));
-                                @chmod($this->getPath().'.meta', 0666 & ~umask());
-                            }
-
-                            if (\function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
-                                @opcache_invalidate($this->getPath(), true);
-                            }
-                        }
-
-                        public function release()
-                        {
-                            flock($this->lock, LOCK_UN);
-                            fclose($this->lock);
-                        }
-                    };
-                    $cache->lock = $lock;
-
-                    if (!\is_object($this->container = include $cachePath)) {
-                        $this->container = null;
-                    } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
-                        $this->container->set('kernel', $this);
-
-                        return;
-                    }
+                    return;
                 }
             }
         } catch (\Throwable $e) {
@@ -556,8 +526,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-        if (method_exists($cache, 'release')) {
-            $cache->release();
+
+        if ($lock) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
         }
 
         $this->container = require $cachePath;

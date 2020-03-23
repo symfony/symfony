@@ -153,6 +153,22 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
     }
 
+    public function testSessionIsNotInstantiatedOnStatelessFirewall()
+    {
+        $sessionFactory = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+
+        $sessionFactory->expects($this->never())
+            ->method('__invoke');
+
+        $this->request->setSessionFactory($sessionFactory);
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['stateless_provider_key']);
+        $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
+        $handler->authenticateWithToken($this->token, $this->request, 'stateless_provider_key');
+    }
+
     protected function setUp(): void
     {
         $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();

@@ -37,6 +37,19 @@ final class SlackSectionBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
+    public function field(string $text, bool $markdown = true): self
+    {
+        $this->options['fields'][] = [
+            'type' => $markdown ? 'mrkdwn' : 'plain_text',
+            'text' => $text,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function accessory(SlackBlockElementInterface $element): self
     {
         $this->options['accessory'] = $element->toArray();

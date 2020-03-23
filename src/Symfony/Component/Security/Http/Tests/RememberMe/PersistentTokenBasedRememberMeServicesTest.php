@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -268,7 +269,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessSetsCookieWhenLoggedInWithNonRememberMeTokenInterfaceImplementation()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true]);
+        $service = $this->getService(null, ['name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'samesite' => Cookie::SAMESITE_STRICT, 'lifetime' => 3600, 'always_remember_me' => true]);
         $request = new Request();
         $response = new Response();
 
@@ -305,6 +306,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
         $this->assertEquals('myfoodomain.foo', $cookie->getDomain());
         $this->assertEquals('/foo/path', $cookie->getPath());
+        $this->assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
     }
 
     protected function encodeCookie(array $parts)

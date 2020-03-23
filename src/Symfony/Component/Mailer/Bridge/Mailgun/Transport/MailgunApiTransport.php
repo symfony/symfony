@@ -67,10 +67,10 @@ class MailgunApiTransport extends AbstractApiTransport
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $response->getStatusCode()), $response);
+                throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $result['message'], $response->getStatusCode()), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->getContent(false), $response->getStatusCode()), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $response->getStatusCode()), $response);
         }
 
         $sentMessage->setMessageId($result['id']);
@@ -128,7 +128,17 @@ class MailgunApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['h:'.$name] = $header->getBodyAsString();
+            // Check if it is a valid prefix or header name according to Mailgun API
+            $prefix = substr($name, 0, 2);
+            if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
+                $headerName = $name;
+            } else {
+                // fallback to prefix with "h:" to not break BC
+                $headerName = 'h:'.$name;
+                @trigger_error(sprintf('Not prefixing the Mailgun header name with "h:" is deprecated since Symfony  5.1. Use header name "%s" instead.', $headerName), E_USER_DEPRECATED);
+            }
+
+            $payload[$headerName] = $header->getBodyAsString();
         }
 
         return $payload;

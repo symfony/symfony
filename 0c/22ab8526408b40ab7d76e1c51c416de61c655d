@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-03-20T19:06:51Z
+
+How to set header without prefix?
+
+As it was mentioned in the original issue, `t:version` and `t:text` mean nothing without the `template` header.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-20T20:47:41Z
+
+Ooops. I forgot those.
+
+Is “template” and “amp-html” the only two ‘non-prefixed’ headers?
+
+I think I’ll make an exception for those two then.
+
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-03-21T07:44:59Z
+
+> Is “template” and “amp-html” the only two ‘non-prefixed’ headers?
+
+`recipient-variables`, as well.
+
+The current solution requires update every time new headers are added to Mailgun, as the current history of Mailgun tells us that this happens after a while.
+
+It is just a matter of time before the same issue reappears.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-22T13:47:10Z
+
+Thank you @greedyivan for the review.
+
+I've deprecated passing a header without the "h:" prefix. So we need to "keep up to date" with Mailguns API until Symfony 6.0.

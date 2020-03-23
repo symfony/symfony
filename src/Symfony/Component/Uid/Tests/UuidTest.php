@@ -59,6 +59,7 @@ class UuidTest extends TestCase
         $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');
 
         $this->assertInstanceOf(UuidV3::class, $uuid);
+        $this->assertSame('8dac64d3-937a-3e7c-aa1d-d5d6c06a61f5', (string) $uuid);
     }
 
     public function testV4()
@@ -70,9 +71,10 @@ class UuidTest extends TestCase
 
     public function testV5()
     {
-        $uuid = Uuid::v5(new UuidV4(self::A_UUID_V4), 'the name');
+        $uuid = Uuid::v5(new UuidV4('ec07aa88-f84e-47b9-a581-1c6b30a2f484'), 'the name');
 
         $this->assertInstanceOf(UuidV5::class, $uuid);
+        $this->assertSame('851def0c-b9c7-55aa-a991-130e769ec0a9', (string) $uuid);
     }
 
     public function testV6()

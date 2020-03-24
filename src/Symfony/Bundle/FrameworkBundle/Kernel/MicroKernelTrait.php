@@ -142,6 +142,10 @@ trait MicroKernelTrait
             }
 
             $container->setAlias(static::class, 'kernel')->setPublic(true);
+
+            if (!$container->hasParameter('container.dumper.inline_factories')) {
+                $container->setParameter('container.dumper.inline_factories', false);
+            }
         });
     }
 

@@ -65,6 +65,8 @@ Messenger
  * Removed Doctrine transport. Run `composer require symfony/doctrine-messenger` to keep the transport in your application.
  * Removed RedisExt transport. Run `composer require symfony/redis-messenger` to keep the transport in your application.
  * Use of invalid options in Redis and AMQP connections now throws an error.
+ * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
+ * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
 
 PhpUnitBridge
 -------------

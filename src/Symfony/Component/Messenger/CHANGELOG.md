@@ -7,6 +7,7 @@ CHANGELOG
 * Moved AmqpExt transport to package `symfony/amqp-messenger`. All classes in `Symfony\Component\Messenger\Transport\AmqpExt` have been moved to `Symfony\Component\Messenger\Bridge\Amqp\Transport`
 * Moved Doctrine transport to package `symfony/doctrine-messenger`. All classes in `Symfony\Component\Messenger\Transport\Doctrine` have been moved to `Symfony\Component\Messenger\Bridge\Doctrine\Transport`
 * Moved RedisExt transport to package `symfony/redis-messenger`. All classes in `Symfony\Component\Messenger\Transport\RedisExt` have been moved to `Symfony\Component\Messenger\Bridge\Redis\Transport`
+* Added support for passing a `\Throwable` argument to `RetryStrategyInterface` methods. This allows to define strategies based on the reason of the handling failure.
 
 5.0.0
 -----

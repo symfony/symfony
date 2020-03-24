@@ -54,6 +54,7 @@ FrameworkBundle
  * Deprecated passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
  * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
  * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
+ * Deprecated the `AbstractController::renderView()` method in favor of `AbstractController::renderTemplate()`
 
 HttpFoundation
 --------------

@@ -239,22 +239,34 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a rendered view.
+     *
+     * @deprecated since Symfony 5.1, use renderTemplate() instead.
      */
     protected function renderView(string $view, array $parameters = []): string
     {
-        if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
-        }
+        trigger_deprecation('symfony/framework-bundle', '5.1', 'The "%s" method is deprecated, use "renderTemplate()" instead.', __METHOD__);
 
-        return $this->container->get('twig')->render($view, $parameters);
+        return $this->renderTemplate($view, $parameters);
     }
 
     /**
-     * Renders a view.
+     * Returns a rendered template.
      */
-    protected function render(string $view, array $parameters = [], Response $response = null): Response
+    protected function renderTemplate(string $templateName, array $parameters = []): string
     {
-        $content = $this->renderView($view, $parameters);
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderTemplate()" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+        }
+
+        return $this->container->get('twig')->render($templateName, $parameters);
+    }
+
+    /**
+     * Renders a template.
+     */
+    protected function render(string $templateName, array $parameters = [], Response $response = null): Response
+    {
+        $content = $this->renderTemplate($templateName, $parameters);
 
         if (null === $response) {
             $response = new Response();
@@ -266,9 +278,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Streams a view.
+     * Streams a template.
      */
-    protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
+    protected function stream(string $templatePath, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
         if (!$this->container->has('twig')) {
             throw new \LogicException('You can not use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
@@ -276,8 +288,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
         $twig = $this->container->get('twig');
 
-        $callback = function () use ($twig, $view, $parameters) {
-            $twig->display($view, $parameters);
+        $callback = function () use ($twig, $templatePath, $parameters) {
+            $twig->display($templatePath, $parameters);
         };
 
         if (null === $response) {

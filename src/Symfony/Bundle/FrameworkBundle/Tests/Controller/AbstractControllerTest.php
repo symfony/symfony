@@ -369,7 +369,7 @@ class AbstractControllerTest extends TestCase
         $controller->denyAccessUnlessGranted('foo');
     }
 
-    public function testRenderViewTwig()
+    public function testRenderTemplateTwig()
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
@@ -380,7 +380,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals('bar', $controller->renderView('foo'));
+        $this->assertEquals('bar', $controller->renderTemplate('foo'));
     }
 
     public function testRenderTwig()

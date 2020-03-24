@@ -61,11 +61,11 @@ class TextDescriptor extends Descriptor
                 $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $this->formatControllerLink($controller, $route->getPath()),
+                $this->formatControllerLink($controller, $route->getPath(), $options['container'] ?? null),
             ];
 
             if ($showControllers) {
-                $row[] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller)) : '';
+                $row[] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller), $options['container'] ?? null) : '';
             }
 
             $tableRows[] = $row;
@@ -84,7 +84,7 @@ class TextDescriptor extends Descriptor
     {
         $defaults = $route->getDefaults();
         if (isset($defaults['_controller'])) {
-            $defaults['_controller'] = $this->formatControllerLink($defaults['_controller'], $this->formatCallable($defaults['_controller']));
+            $defaults['_controller'] = $this->formatControllerLink($defaults['_controller'], $this->formatCallable($defaults['_controller']), $options['container'] ?? null);
         }
 
         $tableHeaders = ['Property', 'Value'];
@@ -528,7 +528,7 @@ class TextDescriptor extends Descriptor
         return trim($configAsString);
     }
 
-    private function formatControllerLink($controller, string $anchorText): string
+    private function formatControllerLink($controller, string $anchorText, callable $getContainer = null): string
     {
         if (null === $this->fileLinkFormatter) {
             return $anchorText;
@@ -549,7 +549,23 @@ class TextDescriptor extends Descriptor
                 $r = new \ReflectionFunction($controller);
             }
         } catch (\ReflectionException $e) {
-            return $anchorText;
+            $id = $controller;
+            $method = '__invoke';
+
+            if ($pos = strpos($controller, '::')) {
+                $id = substr($controller, 0, $pos);
+                $method = substr($controller, $pos + 2);
+            }
+
+            if (!$getContainer || !($container = $getContainer()) || !$container->has($id)) {
+                return $anchorText;
+            }
+
+            try {
+                $r = new \ReflectionMethod($container->findDefinition($id)->getClass(), $method);
+            } catch (\ReflectionException $e) {
+                return $anchorText;
+            }
         }
 
         $fileLink = $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());

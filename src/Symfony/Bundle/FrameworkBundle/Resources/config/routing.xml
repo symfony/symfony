@@ -101,6 +101,7 @@
         <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer">
             <tag name="container.service_subscriber" id="router" />
             <tag name="kernel.cache_warmer" />
+            <tag name="container.no_preload" />
             <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
 

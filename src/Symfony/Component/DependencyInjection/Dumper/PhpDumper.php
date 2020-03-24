@@ -78,6 +78,7 @@ class PhpDumper extends Dumper
     private $namespace;
     private $asFiles;
     private $hotPathTag;
+    private $preloadTags;
     private $inlineFactories;
     private $inlineRequires;
     private $inlinedRequires = [];
@@ -143,6 +144,7 @@ class PhpDumper extends Dumper
             'as_files' => false,
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
+            'preload_tags' => ['container.preload', 'container.no_preload'],
             'inline_factories_parameter' => 'container.dumper.inline_factories',
             'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
             'preload_classes' => [],
@@ -154,6 +156,7 @@ class PhpDumper extends Dumper
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
+        $this->preloadTags = $options['preload_tags'];
         $this->inlineFactories = $this->asFiles && $options['inline_factories_parameter'] && (!$this->container->hasParameter($options['inline_factories_parameter']) || $this->container->getParameter($options['inline_factories_parameter']));
         $this->inlineRequires = $options['inline_class_loader_parameter'] && ($this->container->hasParameter($options['inline_class_loader_parameter']) ? $this->container->getParameter($options['inline_class_loader_parameter']) : (\PHP_VERSION_ID < 70400 || $options['debug']));
         $this->serviceLocatorTag = $options['service_locator_tag'];
@@ -571,7 +574,7 @@ EOF;
             $lineage = [];
             foreach ($this->inlinedDefinitions as $def) {
                 if (!$def->isDeprecated()) {
-                    foreach ($this->getClasses($def) as $class) {
+                    foreach ($this->getClasses($def, $cId) as $class) {
                         $this->collectLineage($class, $lineage);
                     }
                 }
@@ -583,7 +586,7 @@ EOF;
                     && $this->container->has($id)
                     && $this->isTrivialInstance($def = $this->container->findDefinition($id))
                 ) {
-                    foreach ($this->getClasses($def) as $class) {
+                    foreach ($this->getClasses($def, $cId) as $class) {
                         $this->collectLineage($class, $lineage);
                     }
                 }
@@ -838,9 +841,9 @@ EOF;
             if ($definition->isDeprecated()) {
                 $deprecation = $definition->getDeprecation($id);
                 $code .= sprintf("        trigger_deprecation(%s, %s, %s);\n\n", $this->export($deprecation['package']), $this->export($deprecation['version']), $this->export($deprecation['message']));
-            } else {
+            } elseif (!$definition->hasTag($this->preloadTags[1])) {
                 foreach ($this->inlinedDefinitions as $def) {
-                    foreach ($this->getClasses($def) as $class) {
+                    foreach ($this->getClasses($def, $id) as $class) {
                         $this->preload[$class] = $class;
                     }
                 }
@@ -1003,10 +1006,10 @@ EOTXT
         foreach ($definitions as $id => $definition) {
             if (!$definition->isSynthetic()) {
                 $services[$id] = $this->addService($id, $definition);
-            } else {
+            } elseif (!$definition->hasTag($this->preloadTags[1])) {
                 $services[$id] = null;
 
-                foreach ($this->getClasses($definition) as $class) {
+                foreach ($this->getClasses($definition, $id) as $class) {
                     $this->preload[$class] = $class;
                 }
             }
@@ -1385,7 +1388,7 @@ EOF;
             $inlinedDefinitions = $this->getDefinitionsFromArguments([$definition]);
 
             foreach ($inlinedDefinitions as $def) {
-                foreach ($this->getClasses($def) as $class) {
+                foreach ($this->getClasses($def, $id) as $class) {
                     $this->collectLineage($class, $lineage);
                 }
             }
@@ -2112,11 +2115,19 @@ EOF;
         return null;
     }
 
-    private function getClasses(Definition $definition): array
+    private function getClasses(Definition $definition, string $id): array
     {
         $classes = [];
 
         while ($definition instanceof Definition) {
+            foreach ($definition->getTag($this->preloadTags[0]) as $tag) {
+                if (!isset($tag['class'])) {
+                    throw new InvalidArgumentException(sprintf('Missing attribute "class" on tag "%s" for service "%s".', $this->preloadTags[0], $id));
+                }
+
+                $classes[] = trim($tag['class'], '\\');
+            }
+
             $classes[] = trim($definition->getClass(), '\\');
             $factory = $definition->getFactory();
 

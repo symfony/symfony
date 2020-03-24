@@ -45,6 +45,7 @@ class ProjectServiceContainer extends Container
             'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
+            'preload_sidekick' => 'getPreloadSidekickService',
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
@@ -357,6 +358,16 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
 
         return $instance;
+    }
+
+    /**
+     * Gets the public 'preload_sidekick' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getPreloadSidekickService()
+    {
+        return $this->services['preload_sidekick'] = new \stdClass();
     }
 
     /**

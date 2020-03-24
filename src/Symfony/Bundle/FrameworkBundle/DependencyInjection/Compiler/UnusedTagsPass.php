@@ -32,6 +32,8 @@ class UnusedTagsPass implements CompilerPassInterface
         'container.env_var_loader',
         'container.env_var_processor',
         'container.hot_path',
+        'container.no_preload',
+        'container.preload',
         'container.reversible',
         'container.service_locator',
         'container.service_locator_context',

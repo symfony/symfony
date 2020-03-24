@@ -14,6 +14,9 @@ namespace Symfony\Component\ExpressionLanguage;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ParsedExpression::class);
+
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
  *

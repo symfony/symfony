@@ -36,6 +36,7 @@ digraph sc {
   node_tagged_iterator [label="tagged_iterator\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_runtime_error [label="runtime_error\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_errored_definition [label="errored_definition\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_preload_sidekick [label="preload_sidekick\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];

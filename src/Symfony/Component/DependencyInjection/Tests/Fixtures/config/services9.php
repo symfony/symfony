@@ -134,6 +134,10 @@ return function (ContainerConfigurator $c) {
         ->args([new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)])
         ->public();
     $s->set('errored_definition', 'stdClass')->private();
+    $s->set('preload_sidekick', 'stdClass')
+        ->tag('container.preload', ['class' => 'Some\Sidekick1'])
+        ->tag('container.preload', ['class' => 'Some\Sidekick2'])
+        ->public();
 
     $s->alias('alias_for_foo', 'foo')->private()->public();
     $s->alias('alias_for_alias', ref('alias_for_foo'));

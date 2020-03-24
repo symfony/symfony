@@ -187,4 +187,9 @@ $container->register('runtime_error', 'stdClass')
 $container->register('errored_definition', 'stdClass')
     ->addError('Service "errored_definition" is broken.');
 
+$container->register('preload_sidekick', 'stdClass')
+    ->setPublic(true)
+    ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
+    ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
+
 return $container;

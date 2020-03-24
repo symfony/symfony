@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
@@ -68,14 +69,18 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             $processor = new Processor();
 
             foreach ($extensions as $name => $extension) {
-                if (!$extension instanceof ConfigurationExtensionInterface || !$config = array_filter($container->getExtensionConfig($name))) {
+                if (!($extension instanceof ConfigurationExtensionInterface || $extension instanceof ConfigurationInterface)
+                    || !$config = array_filter($container->getExtensionConfig($name))
+                ) {
                     // this extension has no semantic configuration or was not called
                     continue;
                 }
 
                 $config = $resolvingBag->resolveValue($config);
 
-                if (null === $configuration = $extension->getConfiguration($config, $container)) {
+                if ($extension instanceof ConfigurationInterface) {
+                    $configuration = $extension;
+                } elseif (null === $configuration = $extension->getConfiguration($config, $container)) {
                     continue;
                 }
 

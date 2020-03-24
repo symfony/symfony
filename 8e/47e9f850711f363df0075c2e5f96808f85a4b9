@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T16:05:00Z
+
+Could you please fill in the PR template in the description? If this is a bug, the PR should target the lowest branch where the bung is found (see PR description templates for details). A test case would be nice also. Thanks.
+
+---------------------------------------------------------------------------
+
+by popnikos at 2019-12-15T16:10:13Z
+
+I will add tests in the next few days
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-10T11:54:03Z
+
+@popnikos Do you have time to add some tests?
+
+---------------------------------------------------------------------------
+
+by popnikos at 2020-01-10T17:33:14Z
+
+Sorry but I cannot spend sole times right now.
+I will try next week.
+
+Le ven. 10 janv. 2020 à 12:54, Fabien Potencier <notifications@github.com>
+a écrit :
+
+> @popnikos <https://github.com/popnikos> Do you have time to add some
+> tests?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/34984?email_source=notifications&email_token=AE6ECQGMBTZ6AUBNZFOH4G3Q5BOV3A5CNFSM4J3AOKB2YY3PNVWWK3TUL52HS4DFVREXG43VMVBW63LNMVXHJKTDN5WW2ZLOORPWSZGOEITWGVA#issuecomment-573006676>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AE6ECQC6E7QLBH24ITGWNXTQ5BOV3ANCNFSM4J3AOKBQ>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by popnikos at 2020-03-22T14:28:11Z
+
+@xabbuh I met some difficulties with my github to modify my branch and have wrongly done modification on my master (popnikos/symfony github repo) and just use a merge master into my patch-1 branch (the one attached to this PR)
+
+Could you please validate it anyway (because dthe `fabbot.io` consider this as an issue)?

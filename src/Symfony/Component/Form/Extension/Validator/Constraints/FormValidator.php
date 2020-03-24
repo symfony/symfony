@@ -148,6 +148,7 @@ class FormValidator extends ConstraintValidator
             $this->context->setConstraint($formConstraint);
             $this->context->buildViolation($config->getOption('extra_fields_message', ''))
                 ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
+                ->setPlural(\count($form->getExtraData()))
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)
                 ->addViolation();

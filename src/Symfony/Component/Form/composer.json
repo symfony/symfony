@@ -49,6 +49,7 @@
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
         "symfony/translation": "<4.4",
+        "symfony/translation-contracts": "<1.1.7",
         "symfony/twig-bridge": "<4.4"
     },
     "suggest": {

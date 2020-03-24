@@ -59,6 +59,7 @@ class AmqpSender implements SenderInterface
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
         if ($amqpReceivedStamp instanceof AmqpReceivedStamp) {
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope($amqpReceivedStamp->getAmqpEnvelope(), $amqpStamp);
+            $encodedMessage['headers']['Origin-Queue'] = $amqpReceivedStamp->getQueueName();
         }
 
         try {

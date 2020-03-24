@@ -31,6 +31,7 @@ class Connection
         'x-max-priority',
         'x-message-ttl',
     ];
+    private const DEFAULT_EXCHANGE = '';
 
     private $connectionOptions;
     private $exchangeOptions;
@@ -213,14 +214,24 @@ class Connection
      */
     private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
     {
-        $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
+        if ($this->shouldSetup()) {
+            $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
+        }
 
-        $this->setupDelay($delay, $routingKey);
+        $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
+        $originQueue = $headers['Origin-Queue'] ?? null;
+
+        $queue = $this->createDelayQueue($delay, $originQueue, $routingKey);
+        $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
+
+        if (!$this->useDefaultExchangeForDelay()) {
+            $queue->bind($this->connectionOptions['delay']['exchange_name'], $queue->getName());
+        }
 
         $this->publishOnExchange(
             $this->getDelayExchange(),
             $body,
-            $this->getRoutingKeyForDelay($delay, $routingKey),
+            $queue->getName(),
             $headers,
             $amqpStamp
         );
@@ -240,15 +251,11 @@ class Connection
         );
     }
 
-    private function setupDelay(int $delay, ?string $routingKey)
+    private function setupDelayExchange()
     {
-        if ($this->shouldSetup()) {
-            $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
+        if (!$this->useDefaultExchangeForDelay()) {
+            $this->getDelayExchange()->declareExchange();
         }
-
-        $queue = $this->createDelayQueue($delay, $routingKey);
-        $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
-        $queue->bind($this->connectionOptions['delay']['exchange_name'], $this->getRoutingKeyForDelay($delay, $routingKey));
     }
 
     private function getDelayExchange(): \AMQPExchange
@@ -272,34 +279,41 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay, ?string $routingKey): \AMQPQueue
+    private function createDelayQueue(int $delay, ?string $originQueue, ?string $routingKey): \AMQPQueue
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
-        $queue->setName(str_replace(
-            ['%delay%', '%exchange_name%', '%routing_key%'],
-            [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
-            $this->connectionOptions['delay']['queue_name_pattern']
-        ));
+
+        if ($originQueue === null) {
+            $dlExchange = $this->exchangeOptions['name'];
+            $dlRoutingKey = $routingKey ?? '';
+            $dlQueueName = $this->getRoutingKeyForDelay($delay, $routingKey);
+        } else {
+            $dlExchange = self::DEFAULT_EXCHANGE;
+            $dlRoutingKey = $originQueue;
+            $dlQueueName = $this->getRoutingKeyForDelay($delay, $originQueue);
+        }
+
+        $queue->setName($dlQueueName);
         $queue->setFlags(AMQP_DURABLE);
         $queue->setArguments([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
             'x-expires' => $delay + 10000,
-            'x-dead-letter-exchange' => $this->exchangeOptions['name'],
+            'x-dead-letter-exchange' => $dlExchange,
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
-            'x-dead-letter-routing-key' => $routingKey ?? '',
+            'x-dead-letter-routing-key' => $dlRoutingKey,
         ]);
 
         return $queue;
     }
 
-    private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey): string
+    private function getRoutingKeyForDelay(int $delay, ?string $routingKey): string
     {
         return str_replace(
             ['%delay%', '%exchange_name%', '%routing_key%'],
-            [$delay, $this->exchangeOptions['name'], $finalRoutingKey ?? ''],
+            [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         );
     }
@@ -348,7 +362,7 @@ class Connection
     public function setup(): void
     {
         $this->setupExchangeAndQueues();
-        $this->getDelayExchange()->declareExchange();
+        $this->setupDelayExchange();
     }
 
     private function setupExchangeAndQueues(): void
@@ -469,5 +483,10 @@ class Connection
     private function getRoutingKeyForMessage(?AmqpStamp $amqpStamp): ?string
     {
         return (null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null) ?? $this->getDefaultPublishRoutingKey();
+    }
+
+    private function useDefaultExchangeForDelay(): bool
+    {
+        return $this->connectionOptions['delay']['exchange_name'] === self::DEFAULT_EXCHANGE;
     }
 }

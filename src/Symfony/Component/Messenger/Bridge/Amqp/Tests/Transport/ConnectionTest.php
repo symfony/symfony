@@ -486,6 +486,7 @@ class ConnectionTest extends TestCase
             $this->createMock(\AMQPExchange::class),
             $delayExchange = $this->createMock(\AMQPExchange::class)
         ));
+        $delayQueue->method('getName')->willReturn('delay_messages__5000');
 
         $delayQueue->expects($this->once())->method('setName')->with('delay_messages__5000');
         $delayQueue->expects($this->once())->method('setArguments')->with([
@@ -520,6 +521,7 @@ class ConnectionTest extends TestCase
             $this->createMock(\AMQPExchange::class),
             $delayExchange = $this->createMock(\AMQPExchange::class)
         ));
+        $delayQueue->method('getName')->willReturn('delay_messages__120000');
 
         $connectionOptions = [
             'retry' => [
@@ -660,6 +662,7 @@ class ConnectionTest extends TestCase
             $this->createMock(\AMQPExchange::class),
             $delayExchange = $this->createMock(\AMQPExchange::class)
         ));
+        $delayQueue->method('getName')->willReturn('delay_messages_routing_key_120000');
 
         $connectionOptions = [
             'retry' => [

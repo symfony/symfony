@@ -35,9 +35,9 @@ class UuidNormalizer implements NormalizerInterface, DenormalizerInterface, Cach
 
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        $r = new \ReflectionClass($type);
+        $class = new \ReflectionClass($type);
 
-        return $r->isSubclassOf(Uuid::class);
+        return $class->isSubclassOf(Uuid::class);
     }
 
     public function hasCacheableSupportsMethod(): bool

@@ -382,7 +382,7 @@ class Connection
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
 
-        if ($originQueue === null) {
+        if (null === $originQueue) {
             $dlExchange = $this->exchangeOptions['name'];
             $dlRoutingKey = $routingKey ?? '';
             $dlQueueName = $this->getRoutingKeyForDelay($delay, $routingKey);
@@ -598,7 +598,7 @@ class Connection
 
     private function useDefaultExchangeForDelay(): bool
     {
-        return $this->connectionOptions['delay']['exchange_name'] === self::DEFAULT_EXCHANGE;
+        return self::DEFAULT_EXCHANGE === $this->connectionOptions['delay']['exchange_name'];
     }
 }
 class_alias(Connection::class, \Symfony\Component\Messenger\Transport\AmqpExt\Connection::class);

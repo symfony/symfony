@@ -106,7 +106,7 @@ class EsmtpTransport extends SmtpTransport
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
-        if (!$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $capabilities)) {
+        if ($stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
 
             if (!$stream->startTLS()) {

@@ -278,7 +278,7 @@ EOF;
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
-        // the offset where the return value is appended below, with indendation
+        // the offset where the return value is appended below, with indentation
         $retOffset = 12 + \strlen($code);
 
         // optimize parameters array

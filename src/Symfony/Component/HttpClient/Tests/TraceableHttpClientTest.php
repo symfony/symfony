@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class TraceableHttpClientTest extends TestCase
 {
@@ -79,5 +81,19 @@ class TraceableHttpClientTest extends TestCase
         $sut->request('GET', 'https://example.com/foo/bar');
         $sut->reset();
         $this->assertCount(0, $sut->getTracedRequests());
+    }
+
+    public function testStream()
+    {
+        TestHttpServer::start();
+
+        $sut = new TraceableHttpClient(new NativeHttpClient());
+        $chunked = $sut->request('GET', 'http://localhost:8057/chunked');
+        $chunks = [];
+        foreach ($sut->stream($chunked) as $response) {
+            $chunks[] = $response->getContent();
+        }
+        $this->assertGreaterThan(1, \count($chunks));
+        $this->assertSame('Symfony is awesome!', implode('', $chunks));
     }
 }

@@ -67,18 +67,18 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         if ($responses instanceof TraceableResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
+            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
         return $this->client->stream(\Closure::bind(static function () use ($responses) {
             foreach ($responses as $k => $r) {
                 if (!$r instanceof TraceableResponse) {
-                    throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($r)));
+                    throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($r)));
                 }
 
                 yield $k => $r->response;
             }
-        }, null, TraceableResponse::class), $timeout);
+        }, null, TraceableResponse::class)(), $timeout);
     }
 
     public function getTracedRequests(): array

@@ -291,6 +291,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
      * Store an array of cached values.
      *
      * @param array $values The cached values
+     *
+     * @return string[] A list of classes to preload on PHP 7.4+
      */
     public function warmUp(array $values)
     {
@@ -314,6 +316,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
             }
         }
 
+        $preload = [];
         $dumpedValues = '';
         $dumpedMap = [];
         $dump = <<<'EOF'
@@ -334,7 +337,7 @@ EOF;
                 $value = "'N;'";
             } elseif (\is_object($value) || \is_array($value)) {
                 try {
-                    $value = VarExporter::export($value, $isStaticValue);
+                    $value = VarExporter::export($value, $isStaticValue, $preload);
                 } catch (\Exception $e) {
                     throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
                 }
@@ -376,6 +379,8 @@ EOF;
         unset(self::$valuesCache[$this->file]);
 
         $this->initialize();
+
+        return $preload;
     }
 
     /**

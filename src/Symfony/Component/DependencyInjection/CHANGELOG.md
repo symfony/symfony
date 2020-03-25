@@ -12,6 +12,7 @@ CHANGELOG
  * updated the signature of method `DeprecateTrait::deprecate()` to `DeprecateTrait::deprecation(string $package, string $version, string $message)`
  * deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
    configure them explicitly instead
+ * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
 
 5.0.0
 -----

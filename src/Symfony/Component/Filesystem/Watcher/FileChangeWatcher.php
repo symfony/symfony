@@ -32,7 +32,7 @@ final class FileChangeWatcher implements WatcherInterface
         $resource = $this->locator->locate($path);
 
         if (!$resource) {
-            throw new \InvalidArgumentException(sprintf('%s is not a valid path to watch', \gettype($path)));
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid path to watch.', \gettype($path)));
         }
 
         $run = true;

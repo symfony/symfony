@@ -25,7 +25,7 @@ final class INotifyWatcher implements WatcherInterface
         $inotifyInit = inotify_init();
 
         if (false === $inotifyInit) {
-            throw new IOException('Unable initialize inotify', 0, null, $path);
+            throw new IOException('Unable initialize inotify.', 0, null, $path);
         }
 
         stream_set_blocking($inotifyInit, false);

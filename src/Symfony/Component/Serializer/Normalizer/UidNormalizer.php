@@ -16,7 +16,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
             throw new InvalidArgumentException('The object must be an instance of "\Symfony\Component\Uid\Uuid".');
         }
 
-        return (string)$object;
+        return (string) $object;
     }
 
     public function supportsNormalization($data, string $format = null)
@@ -37,9 +37,13 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
 
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        $class = new \ReflectionClass($type);
+        try {
+            $class = new \ReflectionClass($type);
+        } catch (\ReflectionException $exception) {
+            return false;
+        }
 
-        return $class->isSubclassOf(AbstractUid::class);
+        return $class->isSubclassOf(AbstractUid::class) || AbstractUid::class === $class->getName();
     }
 
     public function hasCacheableSupportsMethod(): bool

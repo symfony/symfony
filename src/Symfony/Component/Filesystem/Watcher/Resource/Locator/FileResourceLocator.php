@@ -22,7 +22,7 @@ use Symfony\Component\Finder\Finder;
  *
  * @internal
  */
-class FileResourceLocator
+final class FileResourceLocator
 {
     public function locate($path): ?ResourceInterface
     {

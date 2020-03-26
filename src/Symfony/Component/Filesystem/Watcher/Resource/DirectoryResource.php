@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Watcher\FileChangeEvent;
  *
  * @internal
  */
-class DirectoryResource implements ResourceInterface
+final class DirectoryResource implements ResourceInterface
 {
     private $dir;
 

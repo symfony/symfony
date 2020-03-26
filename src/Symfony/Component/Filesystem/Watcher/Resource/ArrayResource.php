@@ -16,7 +16,7 @@ namespace Symfony\Component\Filesystem\Watcher\Resource;
  *
  * @internal
  */
-class ArrayResource implements ResourceInterface
+final class ArrayResource implements ResourceInterface
 {
     /**
      * @var ResourceInterface[]

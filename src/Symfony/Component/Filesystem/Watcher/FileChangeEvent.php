@@ -14,7 +14,7 @@ namespace Symfony\Component\Filesystem\Watcher;
 /**
  * @author Pierre du Plessis <pdples@gmail.com>
  */
-class FileChangeEvent
+final class FileChangeEvent
 {
     public const FILE_CHANGED = 1;
     public const FILE_DELETED = 2;

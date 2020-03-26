@@ -18,9 +18,9 @@ use Symfony\Component\Filesystem\Exception\IOException;
  *
  * @internal
  */
-class INotifyWatcher implements WatcherInterface
+final class INotifyWatcher implements WatcherInterface
 {
-    public function watch($path, callable $callback, float $timeout = null)
+    public function watch($path, callable $callback, float $timeout = null): void
     {
         $inotifyInit = inotify_init();
 
@@ -90,7 +90,7 @@ class INotifyWatcher implements WatcherInterface
         }
     }
 
-    private function scanPath($path)
+    private function scanPath($path): iterable
     {
         foreach (glob($path, GLOB_ONLYDIR) as $directory) {
             yield $directory;

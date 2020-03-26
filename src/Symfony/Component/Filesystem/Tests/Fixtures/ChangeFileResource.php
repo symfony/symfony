@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Watcher\Resource\ResourceInterface;
 /**
  * @author Pierre du Plessis <pdples@gmail.com>
  */
-class ChangeFileResource implements ResourceInterface
+final class ChangeFileResource implements ResourceInterface
 {
     private $path;
 

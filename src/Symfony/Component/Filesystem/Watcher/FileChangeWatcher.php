@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Watcher\Resource\Locator\FileResourceLocator;
  *
  * @internal
  */
-class FileChangeWatcher implements WatcherInterface
+final class FileChangeWatcher implements WatcherInterface
 {
     private $locator;
 
@@ -27,7 +27,7 @@ class FileChangeWatcher implements WatcherInterface
         $this->locator = new FileResourceLocator();
     }
 
-    public function watch($path, callable $callback, float $timeout = null)
+    public function watch($path, callable $callback, float $timeout = null): void
     {
         $resource = $this->locator->locate($path);
 

@@ -4,13 +4,15 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Uid\AbstractUid;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
-class UuidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     public function normalize($object, string $format = null, array $context = [])
     {
-        if (!$object instanceof Uuid) {
+        if (!$object instanceof AbstractUid) {
             throw new InvalidArgumentException('The object must be an instance of "\Symfony\Component\Uid\Uuid".');
         }
 
@@ -19,25 +21,25 @@ class UuidNormalizer implements NormalizerInterface, DenormalizerInterface, Cach
 
     public function supportsNormalization($data, string $format = null)
     {
-        return $data instanceof Uuid;
+        return $data instanceof AbstractUid;
     }
 
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
-            $uuid = Uuid::fromString($data);
+            $uid = Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
-            throw new NotNormalizableValueException('The data is not a valid UUID string representation.');
+            throw new NotNormalizableValueException('The data is not a valid UUID or ULID string representation.');
         }
 
-        return $uuid;
+        return $uid;
     }
 
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         $class = new \ReflectionClass($type);
 
-        return $class->isSubclassOf(Uuid::class);
+        return $class->isSubclassOf(AbstractUid::class);
     }
 
     public function hasCacheableSupportsMethod(): bool

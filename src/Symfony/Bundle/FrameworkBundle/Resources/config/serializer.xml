@@ -70,7 +70,7 @@
             <tag name="serializer.normalizer" priority="-890" />
         </service>
 
-        <service id="serializer.normalizer.uuid" class="Symfony\Component\Serializer\Normalizer\UuidNormalizer">
+        <service id="serializer.normalizer.uid" class="Symfony\Component\Serializer\Normalizer\UidNormalizer">
             <argument>%kernel.debug%</argument>
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-90" />

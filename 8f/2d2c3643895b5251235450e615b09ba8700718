@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-25T10:25:39Z
+
+IIRC, we should submit translations on older maintained branch (3.4 ATM), shouldn't?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-03-25T10:26:53Z
+
+@lyrixx yes, @nicolas-grekas asked me to open it against `master` so that the PR can be used to demonstrate the translation process during the online conference on Friday

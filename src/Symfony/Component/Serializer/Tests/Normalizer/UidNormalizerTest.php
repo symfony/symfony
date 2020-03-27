@@ -12,6 +12,7 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class UidNormalizerTest extends TestCase
 {
@@ -59,6 +60,12 @@ class UidNormalizerTest extends TestCase
         } else {
             $this->assertEquals($uuidString, $this->normalizer->normalize(Uuid::fromString($uuidString)));
         }
+    }
+
+    public function testNormalizeForNonUid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->normalizer->normalize(new \stdClass());
     }
 
     /**

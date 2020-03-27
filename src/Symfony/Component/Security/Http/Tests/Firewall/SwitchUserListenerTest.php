@@ -315,7 +315,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($replacedToken, $this->tokenStorage->getToken());
     }
 
-    public function testSwitchtUserThrowsAuthenticationExceptionIfNoCurrentToken()
+    public function testSwitchUserThrowsAuthenticationExceptionIfNoCurrentToken()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
         $this->tokenStorage->setToken(null);

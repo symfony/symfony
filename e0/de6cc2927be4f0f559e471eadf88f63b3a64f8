@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by l-vo at 2020-03-26T16:14:47Z
+
+> (once fabbot's patch is applied)
+
+It's a false positive; isn't it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-26T16:19:30Z
+
+Not sure - at least it's not wrong to add the double quotes. Adding them will prevent this from being reported again and again.

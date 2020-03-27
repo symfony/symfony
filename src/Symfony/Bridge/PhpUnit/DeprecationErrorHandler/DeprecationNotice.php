@@ -23,7 +23,7 @@ final class DeprecationNotice
      */
     private $countsByCaller = [];
 
-    public function addObjectOccurence($class, $method)
+    public function addObjectOccurrence($class, $method)
     {
         if (!isset($this->countsByCaller["$class::$method"])) {
             $this->countsByCaller["$class::$method"] = 0;
@@ -32,7 +32,7 @@ final class DeprecationNotice
         ++$this->count;
     }
 
-    public function addProceduralOccurence()
+    public function addProceduralOccurrence()
     {
         ++$this->count;
     }

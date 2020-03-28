@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by phucwan91 at 2020-03-27T11:02:59Z
+
+FYI, the issue https://github.com/symfony/symfony/issues/27257 is completely the same as the current issue (https://github.com/symfony/symfony/issues/36157)
+so I'm sure this PR can solved the both issues :grin:

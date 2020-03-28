@@ -43,11 +43,13 @@
 
         <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBag">
             <factory service="session" method="getFlashBag" />
+            <deprecated package="symfony/framework-bundle" version="5.1">The "%service_id%" service is deprecated, use "$session->getFlashBag()" instead.</deprecated>
         </service>
         <service id="Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface" alias="session.flash_bag" />
 
         <service id="session.attribute_bag" class="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag">
             <factory service="session" method="getAttributeBag" />
+            <deprecated package="symfony/framework-bundle" version="5.1">The "%service_id%" service is deprecated, use "$session->getAttributeBag()" instead.</deprecated>
         </service>
 
         <service id="session.storage.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage">

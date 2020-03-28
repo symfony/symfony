@@ -10,9 +10,9 @@ final class DeprecationNoticeTest extends TestCase
     public function testItGroupsByCaller()
     {
         $notice = new DeprecationNotice();
-        $notice->addObjectOccurence('MyAction', '__invoke');
-        $notice->addObjectOccurence('MyAction', '__invoke');
-        $notice->addObjectOccurence('MyOtherAction', '__invoke');
+        $notice->addObjectOccurrence('MyAction', '__invoke');
+        $notice->addObjectOccurrence('MyAction', '__invoke');
+        $notice->addObjectOccurrence('MyOtherAction', '__invoke');
 
         $countsByCaller = $notice->getCountsByCaller();
 
@@ -23,13 +23,13 @@ final class DeprecationNoticeTest extends TestCase
         $this->assertSame(1, $countsByCaller['MyOtherAction::__invoke']);
     }
 
-    public function testItCountsBothTypesOfOccurences()
+    public function testItCountsBothTypesOfOccurrences()
     {
         $notice = new DeprecationNotice();
-        $notice->addObjectOccurence('MyAction', '__invoke');
+        $notice->addObjectOccurrence('MyAction', '__invoke');
         $this->assertSame(1, $notice->count());
 
-        $notice->addProceduralOccurence();
+        $notice->addProceduralOccurrence();
         $this->assertSame(2, $notice->count());
     }
 }

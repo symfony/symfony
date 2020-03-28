@@ -15,6 +15,7 @@ use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
@@ -95,5 +96,39 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
     public function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('sendgrid+api', 'default')];
+    }
+
+    /**
+     * @dataProvider fromMultiplePortsDsnProvider
+     */
+    public function testDsnPortAssignment(string $dsn, int $port): void
+    {
+        $transport = Transport::fromDsn($dsn);
+
+        $this->assertInstanceOf(SendgridSmtpTransport::class, $transport);
+        $this->assertEquals($port, $transport->getStream()->getPort());
+    }
+
+    public function fromMultiplePortsDsnProvider(): iterable
+    {
+        yield [
+            'sendgrid+smtp://apikey:SG.redacted@smtp.sendgrid.com:25',
+            25,
+        ];
+
+        yield [
+            'sendgrid+smtp://apikey:SG.redacted@smtp.sendgrid.com:587',
+            587,
+        ];
+
+        yield [
+            'sendgrid+smtp://apikey:SG.redacted@smtp.sendgrid.com:2525',
+            2525,
+        ];
+
+        yield [
+            'sendgrid+smtp://apikey:SG.redacted@smtps.sendgrid.com:465',
+            465,
+        ];
     }
 }

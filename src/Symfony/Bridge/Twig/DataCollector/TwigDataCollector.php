@@ -64,6 +64,8 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     {
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = [];
+        $this->data['global_variables'] = [];
+        $this->data['template_variables'] = [];
 
         if (null === $this->twig) {
             return;
@@ -87,6 +89,10 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             }
         };
         $templateFinder($this->profile);
+
+        foreach ($this->twig->mergeGlobals() as $twigGlobalKey => $twigGlobalValue) {
+            $this->data['global_variables'][$twigGlobalKey] = $this->cloneVar($twigGlobalValue);
+        }
     }
 
     public function getTime()
@@ -102,6 +108,16 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function getTemplatePaths()
     {
         return $this->data['template_paths'];
+    }
+
+    public function getGlobalVariables()
+    {
+        return $this->data['global_variables'];
+    }
+
+    public function getTemplateVariables()
+    {
+        return $this->data['template_variables'];
     }
 
     public function getTemplates()

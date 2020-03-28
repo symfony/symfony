@@ -45,71 +45,145 @@
             <p>No Twig templates were rendered for this request.</p>
         </div>
     {% else %}
-        <h2>Twig Metrics</h2>
+        <div class="sf-tabs">
+            <div class="tab">
+                <h3 class="tab-title">Twig Metrics</h3>
 
-        <div class="metrics">
-            <div class="metric">
-                <span class="value">{{ '%0.0f'|format(collector.time) }} <span class="unit">ms</span></span>
-                <span class="label">Render time</span>
+                <div class="tab-content">
+                    <h2>Metrics</h2>
+
+                    <div class="metrics">
+                        <div class="metric">
+                            <span class="value">{{ '%0.0f'|format(collector.time) }} <span class="unit">ms</span></span>
+                            <span class="label">Render time</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="value">{{ collector.templatecount }}</span>
+                            <span class="label">Template calls</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="value">{{ collector.blockcount }}</span>
+                            <span class="label">Block calls</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="value">{{ collector.macrocount }}</span>
+                            <span class="label">Macro calls</span>
+                        </div>
+                    </div>
+
+                    <p class="help">
+                        Render time includes sub-requests rendering time (if any).
+                    </p>
+
+                    <h2>Rendered Templates</h2>
+
+                    <table id="twig-table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Template Name &amp; Path</th>
+                            <th class="num-col" scope="col">Render Count</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for template, count in collector.templates %}
+                            <tr>
+                                {%- set file = collector.templatePaths[template]|default(false) -%}
+                                {%- set link = file ? file|file_link(1) : false -%}
+                                <td>
+                                    <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                                    {% if link %}
+                                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                                        <div>
+                                            <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                                {{ file|file_relative|default(file) }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        {{ template }}
+                                    {% endif %}
+                                </td>
+                                <td class="font-normal num-col">{{ count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h2>Rendering Call Graph</h2>
+
+                    <div id="twig-dump">
+                        {{ collector.htmlcallgraph }}
+                    </div>
+                </div>
             </div>
 
-            <div class="metric">
-                <span class="value">{{ collector.templatecount }}</span>
-                <span class="label">Template calls</span>
-            </div>
+            <div class="tab">
+                <h3 class="tab-title">Twig Variables</h3>
 
-            <div class="metric">
-                <span class="value">{{ collector.blockcount }}</span>
-                <span class="label">Block calls</span>
-            </div>
+                <div class="tab-content">
+                    <h2>Globals</h2>
 
-            <div class="metric">
-                <span class="value">{{ collector.macrocount }}</span>
-                <span class="label">Macro calls</span>
-            </div>
-        </div>
-
-        <p class="help">
-            Render time includes sub-requests rendering time (if any).
-        </p>
-
-        <h2>Rendered Templates</h2>
-
-        <table id="twig-table">
-            <thead>
-            <tr>
-                <th scope="col">Template Name &amp; Path</th>
-                <th class="num-col" scope="col">Render Count</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for template, count in collector.templates %}
-                <tr>
-                    {%- set file = collector.templatePaths[template]|default(false) -%}
-                    {%- set link = file ? file|file_link(1) : false -%}
-                    <td>
-                        <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
-                        {% if link %}
-                            <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
-                            <div>
-                                <a class="text-muted" href="{{ link }}" title="{{ file }}">
-                                    {{ file|file_relative|default(file) }}
-                                </a>
-                            </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, value in collector.globalVariables %}
+                            <tr>
+                                <th class="key">{{ key }}</th>
+                                <td>{{ profiler_dump(value) }}</td>
+                            </tr>
                         {% else %}
-                            {{ template }}
-                        {% endif %}
-                    </td>
-                    <td class="font-normal num-col">{{ count }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                            <tr>
+                                <th>No global variables</th>
+                                <td>-</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
-        <h2>Rendering Call Graph</h2>
+                    <h2>Templates</h2>
 
-        <div id="twig-dump">
-            {{ collector.htmlcallgraph }}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Template</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for template, variables in collector.templateVariables %}
+                            {% for key, value in variables %}
+                                <tr>
+                                    <th class="key">{{ template }}</th>
+                                    <dt>{{ key }}</dt>
+                                    <td>{{ profiler_dump(value) }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <th>No templates variables</th>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <th>No templates variables</th>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
         </div>
     {% endif %}
 {% endblock %}

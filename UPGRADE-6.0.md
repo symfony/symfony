@@ -36,6 +36,11 @@ HttpFoundation
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
 
+HttpKernel
+----------
+
+ * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
+
 Messenger
 ---------
 

@@ -152,7 +152,7 @@ class RouterListener implements EventSubscriberInterface
                         'Lang disabled. Throwing NotFoundHttpException'
                     );
                 }
-                throw new NotFoundHttpException('This language is currently disabled');
+                throw new NotFoundHttpException('This language is currently disabled.');
             }
 
             $request->attributes->add($parameters);

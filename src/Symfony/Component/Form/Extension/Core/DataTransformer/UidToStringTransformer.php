@@ -20,7 +20,7 @@ class UidToStringTransformer implements DataTransformerInterface
     public function transform($uid)
     {
         if (null === $uid) {
-            return null;
+            return '';
         }
 
         if (!$uid instanceof AbstractUid) {

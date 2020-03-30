@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-03-30T08:59:25Z
+
+I am not sure I understand how this is related to #35899. Whitespaces were not normalizes before either, were they?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-30T09:05:09Z
+
+That's because we merged the patch in 5.0, where the default is now `true`.
+The patch is still good for 4.4 because this won't break any existing test cases.

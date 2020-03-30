@@ -32,72 +32,30 @@ class UidValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (\in_array(Uid::TYPE_ULID, $constraint->types, true) && \in_array(Uid::TYPE_UUID, $constraint->types, true)) {
-            if (Ulid::isValid($value)) {
+        foreach ($constraint->types as $type) {
+            if (Uid::UUID_V1 === $type && UuidV1::isValid($value)) {
                 return;
             }
-
-            if (!Uuid::isValid($value)) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uid::INVALID_UID_ERROR)
-                    ->addViolation();
-
+            if (Uid::UUID_V3 === $type && UuidV3::isValid($value)) {
                 return;
             }
-
-            $this->validateUuidForVersions($value, $constraint);
-
-            return;
-        }
-
-        if (\in_array(Uid::TYPE_ULID, $constraint->types, true)) {
-            if (!Ulid::isValid($value)) {
-                $this->context->buildViolation($constraint->ulidMessage)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uid::INVALID_ULID_ERROR)
-                    ->addViolation();
-            }
-
-            return;
-        }
-
-        if (!Uuid::isValid($value)) {
-            $this->context->buildViolation($constraint->uuidMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Uid::INVALID_UUID_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
-        $this->validateUuidForVersions($value, $constraint);
-
-    }
-
-    public function validateUuidForVersions(string $value, Uid $constraint): void
-    {
-        foreach ($constraint->versions as $version) {
-            if (Uid::V1 === $version && UuidV1::isValid($value)) {
+            if (Uid::UUID_V4 === $type && UuidV4::isValid($value)) {
                 return;
             }
-            if (Uid::V3 === $version && UuidV3::isValid($value)) {
+            if (Uid::UUID_V5 === $type && UuidV5::isValid($value)) {
                 return;
             }
-            if (Uid::V4 === $version && UuidV4::isValid($value)) {
+            if (Uid::UUID_V6 === $type && UuidV6::isValid($value)) {
                 return;
             }
-            if (Uid::V5 === $version && UuidV5::isValid($value)) {
-                return;
-            }
-            if (Uid::V6 === $version && UuidV6::isValid($value)) {
+            if (Uid::ULID === $type && Ulid::isValid($value)) {
                 return;
             }
         }
 
-        $this->context->buildViolation($constraint->versionsMessage)
+        $this->context->buildViolation($constraint->message)
             ->setParameter('{{ value }}', $this->formatValue($value))
-            ->setCode(Uid::INVALID_VERSIONS_ERROR)
+            ->setCode(Uid::INVALID_UID_ERROR)
             ->addViolation();
     }
 }

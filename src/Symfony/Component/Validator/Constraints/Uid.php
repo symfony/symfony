@@ -12,19 +12,17 @@ class Uid extends Constraint
 {
 
     const INVALID_UID_ERROR  = '34fd666d-3eb6-4f82-9965-fa7decd445d0';
-    const INVALID_ULID_ERROR = '043e05d2-9dbe-4fea-bde7-e697eca5f644';
-    const INVALID_UUID_ERROR = '83448083-aac9-4f70-9fcc-505fb32fa6b4';
-    const INVALID_VERSIONS_ERROR = '2cfab2d7-9d3d-4f24-b5c5-6d07d8526cc0';
 
     protected static $errorNames = [
         self::INVALID_UID_ERROR => 'INVALID_UID_ERROR',
-        self::INVALID_ULID_ERROR => 'INVALID_ULID_ERROR',
-        self::INVALID_UUID_ERROR => 'INVALID_UUID_ERROR',
-        self::INVALID_VERSIONS_ERROR => 'INVALID_VERSIONS_ERROR',
     ];
 
-    public const TYPE_UUID = 'UUID';
-    public const TYPE_ULID = 'ULID';
+    public const UUID_V1 = 'UUID_V1';
+    public const UUID_V3 = 'UUID_V3';
+    public const UUID_V4 = 'UUID_V4';
+    public const UUID_V5 = 'UUID_V5';
+    public const UUID_V6 = 'UUID_V6';
+    public const ULID = 'ULID';
 
     /**
      * @var string[]
@@ -32,51 +30,26 @@ class Uid extends Constraint
      * @internal
      */
     public static $availableTypes = [
-        self::TYPE_UUID,
-        self::TYPE_ULID,
+        self::UUID_V1,
+        self::UUID_V3,
+        self::UUID_V4,
+        self::UUID_V5,
+        self::UUID_V6,
+        self::ULID,
     ];
 
-    public const V1 = 1;
-    public const V3 = 3;
-    public const V4 = 4;
-    public const V5 = 5;
-    public const V6 = 6;
+    public $message = 'This value is not valid.';
 
     /**
      * @var int[]
-     *
-     * @internal
-     */
-    public static $availableVersions = [
-        self::V1,
-        self::V3,
-        self::V4,
-        self::V5,
-        self::V6,
-    ];
-
-    public $message = 'This is neither a valid UUID nor ULID.';
-    public $ulidMessage = 'This is not a valid ULID.';
-    public $uuidMessage = 'This is not a valid UUID.';
-    public $versionsMessage = 'This UUID does not match expected versions.';
-
-    /**
-     * @var string
      */
     public $types = [
-        self::TYPE_ULID,
-        self::TYPE_UUID,
-    ];
-
-    /**
-     * @var int[]
-     */
-    public $versions = [
-        self::V1,
-        self::V3,
-        self::V4,
-        self::V5,
-        self::V6,
+        self::UUID_V1,
+        self::UUID_V3,
+        self::UUID_V4,
+        self::UUID_V5,
+        self::UUID_V6,
+        self::ULID,
     ];
 
     public $normalizer;
@@ -93,17 +66,6 @@ class Uid extends Constraint
                     throw new InvalidArgumentException('The "types" parameter is not valid.');
                 }
             }, $options['types']);
-        }
-
-        if (\is_array($options) && \array_key_exists('versions', $options)) {
-            if (!\is_array($options['versions'])) {
-                throw new InvalidArgumentException('The "versions" parameter should be an array.');
-            }
-            array_map(function($value) {
-                if (!\in_array($value, self::$availableVersions, true)) {
-                    throw new InvalidArgumentException('The "versions" parameter is not valid.');
-                }
-            }, $options['versions']);
         }
 
         parent::__construct($options);

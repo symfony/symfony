@@ -23,33 +23,41 @@ class Uid extends Constraint
         self::INVALID_VERSIONS_ERROR => 'INVALID_VERSIONS_ERROR',
     ];
 
-    const TYPE_UUID = 'UUID';
-    const TYPE_ULID = 'ULID';
-
-    const V1 = 1;
-    const V3 = 3;
-    const V4 = 4;
-    const V5 = 5;
-    const V6 = 6;
+    public const TYPE_UUID = 'UUID';
+    public const TYPE_ULID = 'ULID';
 
     /**
-     * @var string
+     * @var string[]
+     *
+     * @internal
      */
+    public static $availableTypes = [
+        self::TYPE_UUID,
+        self::TYPE_ULID,
+    ];
+
+    public const V1 = 1;
+    public const V3 = 3;
+    public const V4 = 4;
+    public const V5 = 5;
+    public const V6 = 6;
+
+    /**
+     * @var int[]
+     *
+     * @internal
+     */
+    public static $availableVersions = [
+        self::V1,
+        self::V3,
+        self::V4,
+        self::V5,
+        self::V6,
+    ];
+
     public $message = 'This is neither a valid UUID nor ULID.';
-
-    /**
-     * @var string
-     */
     public $ulidMessage = 'This is not a valid ULID.';
-
-    /**
-     * @var string
-     */
     public $uuidMessage = 'This is not a valid UUID.';
-
-    /**
-     * @var string
-     */
     public $versionsMessage = 'This UUID does not match expected versions.';
 
     /**
@@ -72,6 +80,8 @@ class Uid extends Constraint
 
     public function __construct($options = null)
     {
+
+
         parent::__construct($options);
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

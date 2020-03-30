@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\UidToStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Uid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UidType extends AbstractType
 {
@@ -22,7 +22,7 @@ class UidType extends AbstractType
     {
         $resolver->setDefaults([
             'constraints' => [
-                new Uid()
+                new Assert\Uid()
             ],
         ]);
     }

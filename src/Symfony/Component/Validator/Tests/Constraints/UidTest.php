@@ -21,20 +21,6 @@ class UidTest extends TestCase
         $uid = new Uid(['types' => ['foo']]);
     }
 
-    public function testNotArrayVersionsTriggersException()
-    {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('The "versions" parameter should be an array.');
-        $uid = new Uid(['versions' => 'foo']);
-    }
-
-    public function testInvalidVersionTriggerException()
-    {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('The "versions" parameter is not valid.');
-        $uid = new Uid(['versions' => [7]]);
-    }
-
     public function testNormalizerCanBeSet()
     {
         $email = new Uid(['normalizer' => 'trim']);

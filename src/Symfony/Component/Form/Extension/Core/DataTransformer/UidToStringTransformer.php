@@ -13,14 +13,14 @@ class UidToStringTransformer implements DataTransformerInterface
     /**
      * @param AbstractUid $uid An \AbstractUid object
      *
-     * @return string A string representation of UUID or a ULID
+     * @return string|null A string representation of UUID or a ULID
      *
      * @throws TransformationFailedException If the given value is not a \AbstractUid
      */
     public function transform($uid)
     {
         if (null === $uid) {
-            return '';
+            return null;
         }
 
         if (!$uid instanceof AbstractUid) {

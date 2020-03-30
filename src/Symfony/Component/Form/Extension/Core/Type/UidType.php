@@ -12,7 +12,7 @@ class UidType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(new UidToStringTransformer());
+        $builder->addViewTransformer(new UidToStringTransformer());
     }
 
     /**

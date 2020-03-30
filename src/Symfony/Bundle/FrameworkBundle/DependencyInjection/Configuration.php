@@ -492,14 +492,14 @@ class Configuration implements ConfigurationInterface
                                     ->beforeNormalization()
                                         ->ifArray()
                                         ->then(function ($langs) {
-                                            foreach ($langs as $key=>$lang) {
+                                            foreach ($langs as $key => $lang) {
                                                 if (is_numeric($key)) {
                                                     $arrayLangs[] = ['lang' => $lang];
                                                 } else {
-                                                    $arrayLangs[] = array_merge(['lang' => $key],$lang??[]);
+                                                    $arrayLangs[] = array_merge(['lang' => $key], $lang ?? []);
                                                 }
-
                                             }
+
                                             return $arrayLangs;
                                         })
                                     ->end()

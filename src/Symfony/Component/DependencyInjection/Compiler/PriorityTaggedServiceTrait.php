@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Trait that allows a generic method to find and sort service by priority option in the tag.
@@ -55,41 +56,51 @@ trait PriorityTaggedServiceTrait
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
             $defaultPriority = null;
             $defaultIndex = null;
+            $class = $container->getDefinition($serviceId)->getClass();
+            $class = $container->getParameterBag()->resolveValue($class) ?: null;
 
             foreach ($attributes as $attribute) {
                 $index = $priority = null;
 
                 if (isset($attribute['priority'])) {
                     $priority = $attribute['priority'];
-                } elseif (null === $defaultPriority && $defaultPriorityMethod) {
-                    $defaultPriority = PriorityTaggedServiceUtil::getDefaultPriority($container, $serviceId, $defaultPriorityMethod, $tagName);
+                } elseif (null === $defaultPriority && $defaultPriorityMethod && $class) {
+                    $defaultPriority = PriorityTaggedServiceUtil::getDefaultPriority($container, $serviceId, $class, $defaultPriorityMethod, $tagName);
                 }
                 $priority = $priority ?? $defaultPriority ?? $defaultPriority = 0;
 
                 if (null === $indexAttribute && !$needsIndexes) {
-                    $services[] = [$priority, ++$i, null, $serviceId];
+                    $services[] = [$priority, ++$i, null, $serviceId, null];
                     continue 2;
                 }
 
                 if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
                     $index = $attribute[$indexAttribute];
-                } elseif (null === $defaultIndex && $defaultIndexMethod) {
-                    $defaultIndex = PriorityTaggedServiceUtil::getDefaultIndex($container, $serviceId, $defaultIndexMethod, $tagName, $indexAttribute);
+                } elseif (null === $defaultIndex && $defaultIndexMethod && $class) {
+                    $defaultIndex = PriorityTaggedServiceUtil::getDefaultIndex($container, $serviceId, $class, $defaultIndexMethod, $tagName, $indexAttribute);
                 }
                 $index = $index ?? $defaultIndex ?? $defaultIndex = $serviceId;
 
-                $services[] = [$priority, ++$i, $index, $serviceId];
+                $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }
         }
 
         uasort($services, static function ($a, $b) { return $b[0] <=> $a[0] ?: $a[1] <=> $b[1]; });
 
         $refs = [];
-        foreach ($services as [, , $index, $serviceId]) {
-            if (null === $index) {
-                $refs[] = new Reference($serviceId);
+        foreach ($services as [, , $index, $serviceId, $class]) {
+            if (!$class) {
+                $reference = new Reference($serviceId);
+            } elseif ($index === $serviceId) {
+                $reference = new TypedReference($serviceId, $class);
             } else {
-                $refs[$index] = new Reference($serviceId);
+                $reference = new TypedReference($serviceId, $class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $index);
+            }
+
+            if (null === $index) {
+                $refs[] = $reference;
+            } else {
+                $refs[$index] = $reference;
             }
         }
 
@@ -105,11 +116,8 @@ class PriorityTaggedServiceUtil
     /**
      * Gets the index defined by the default index method.
      */
-    public static function getDefaultIndex(ContainerBuilder $container, string $serviceId, string $defaultIndexMethod, string $tagName, string $indexAttribute): ?string
+    public static function getDefaultIndex(ContainerBuilder $container, string $serviceId, string $class, string $defaultIndexMethod, string $tagName, string $indexAttribute): ?string
     {
-        $class = $container->getDefinition($serviceId)->getClass();
-        $class = $container->getParameterBag()->resolveValue($class) ?: null;
-
         if (!($r = $container->getReflectionClass($class)) || !$r->hasMethod($defaultIndexMethod)) {
             return null;
         }
@@ -134,11 +142,8 @@ class PriorityTaggedServiceUtil
     /**
      * Gets the priority defined by the default priority method.
      */
-    public static function getDefaultPriority(ContainerBuilder $container, string $serviceId, string $defaultPriorityMethod, string $tagName): ?int
+    public static function getDefaultPriority(ContainerBuilder $container, string $serviceId, string $class, string $defaultPriorityMethod, string $tagName): ?int
     {
-        $class = $container->getDefinition($serviceId)->getClass();
-        $class = $container->getParameterBag()->resolveValue($class) ?: null;
-
         if (!($r = $container->getReflectionClass($class)) || !$r->hasMethod($defaultPriorityMethod)) {
             return null;
         }

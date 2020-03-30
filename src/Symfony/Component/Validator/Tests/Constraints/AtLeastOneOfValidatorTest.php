@@ -37,6 +37,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     protected function createValidator()
     {
         return new AtLeastOneOfValidator();
+        
     }
 
     /**

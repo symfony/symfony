@@ -22,6 +22,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
@@ -125,6 +126,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new WorkflowGuardListenerPass());
         $container->addCompilerPass(new ResettableServicePass());
+        $container->addCompilerPass(new SessionPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);

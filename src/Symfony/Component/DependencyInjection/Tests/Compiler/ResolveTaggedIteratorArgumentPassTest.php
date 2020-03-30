@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -50,7 +51,7 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $properties = $container->getDefinition('service_c')->getProperties();
 
         $expected = new TaggedIteratorArgument('foo', 'key');
-        $expected->setValues(['1' => new Reference('service_a'), '2' => new Reference('service_b')]);
+        $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass')]);
         $this->assertEquals($expected, $properties['foos']);
     }
 }

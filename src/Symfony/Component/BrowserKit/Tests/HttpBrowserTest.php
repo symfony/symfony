@@ -134,6 +134,28 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
+    public function testMultiPartRequestWithAdditionalParameters()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'baz']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', ['bar' => 'baz'], [
+            'file1' => $this->getUploadedFile('file1'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithAdditionalParametersOfTheSameName()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToNotSendRequestWithFiles($client, ['baz']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', ['file1' => 'baz'], [
+            'file1' => $this->getUploadedFile('file1'),
+        ]);
+    }
+
     private function uploadFile(string $data): string
     {
         $path = tempnam(sys_get_temp_dir(), 'http');
@@ -161,6 +183,24 @@ class HttpBrowserTest extends AbstractBrowserTest
                 $body = implode('', iterator_to_array($options['body'], false));
                 foreach ($fileContents as $content) {
                     $this->assertStringContainsString($content, $body);
+                }
+
+                return true;
+            }))
+            ->willReturn($this->createMock(ResponseInterface::class));
+    }
+
+    protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents)
+    {
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
+                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                $this->assertInstanceOf('\Generator', $options['body']);
+                $body = implode('', iterator_to_array($options['body'], false));
+                foreach ($fileContents as $content) {
+                    $this->assertStringNotContainsString($content, $body);
                 }
 
                 return true;

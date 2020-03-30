@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
@@ -149,6 +150,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new SessionPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);

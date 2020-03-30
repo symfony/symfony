@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
 {
@@ -122,10 +123,10 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo');
         $expected = [
-            'bar_tag_class' => new Reference('service2'),
-            'b' => new Reference('service2'),
+            'bar_tag_class' => new TypedReference('service2', BarTagClass::class),
+            'b' => new TypedReference('service2', BarTagClass::class),
             'bar' => new Reference('service1'),
-            'a' => new Reference('service2'),
+            'a' => new TypedReference('service2', BarTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));

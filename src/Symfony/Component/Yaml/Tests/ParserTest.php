@@ -1899,7 +1899,7 @@ YAML
         $this->parser->parse('!!iterator foo');
     }
 
-    public function testExceptionWhenUsingUnsuportedBuiltInTags()
+    public function testExceptionWhenUsingUnsupportedBuiltInTags()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $this->expectExceptionMessage('The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").');

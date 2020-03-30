@@ -7,6 +7,28 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.39 (2020-03-30)
+
+ * bug #36216 [Validator] Assert Valid with many groups (phucwan91)
+ * bug #36222 [Console] Fix OutputStream for PHP 7.4 (guillbdx)
+ * bug #36175 [Security/Http] Remember me: allow to set the samesite cookie flag (dunglas)
+ * bug #36173 [Http Foundation] Fix clear cookie samesite (guillbdx)
+ * bug #36176 [Security] Check if firewall is stateless before checking for session/previous session (koenreiniers)
+ * bug #36149 [Form] Support customized intl php.ini settings (jorrit)
+ * bug #36172 [Debug] fix for PHP 7.3.16+/7.4.4+ (nicolas-grekas)
+ * bug #36141 Prevent warning in proc_open() (BenMorel)
+ * bug #36121 [VarDumper] fix side-effect by not using mt_rand() (nicolas-grekas)
+ * bug #36073 [PropertyAccess][DX] Improved errors when reading uninitialized properties (HeahDude)
+ * bug #36063 [FrameworkBundle] start session on flashbag injection (William Arslett)
+ * bug #36020 [Form] ignore microseconds submitted by Edge (xabbuh)
+ * bug #36041 fix import from config file using type: glob (Tobion)
+ * bug #35987 [DoctrineBridge][DoctrineExtractor] Fix wrong guessed type for "json" type (fancyweb)
+ * bug #35938 [Form] Handle false as empty value on expanded choices (fancyweb)
+ * bug #36004 [Yaml] fix dumping strings containing CRs (xabbuh)
+ * bug #35982 [DI] Fix XmlFileLoader bad error message (przemyslaw-bogusz)
+ * bug #35937 Revert "bug symfony#28179 [DomCrawler] Skip disabled fields processing in Form" (dmaicher)
+ * bug #35910 [SecurityBundle] Minor fixes in configuration tree builder (HeahDude)
+
 * 3.4.38 (2020-02-29)
 
  * bug #35781 [Form] NumberToLocalizedStringTransformer return int if scale = 0 (VincentLanglet)

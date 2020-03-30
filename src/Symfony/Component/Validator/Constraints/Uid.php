@@ -63,7 +63,10 @@ class Uid extends Constraint
     /**
      * @var string
      */
-    public $type = null;
+    public $types = [
+        self::TYPE_ULID,
+        self::TYPE_UUID,
+    ];
 
     /**
      * @var int[]
@@ -81,6 +84,27 @@ class Uid extends Constraint
     public function __construct($options = null)
     {
 
+        if (\is_array($options) && \array_key_exists('types', $options)) {
+            if (!\is_array($options['types'])) {
+                throw new InvalidArgumentException('The "types" parameter should be an array.');
+            }
+            array_map(function($value) {
+                if (!\in_array($value, self::$availableTypes, true)) {
+                    throw new InvalidArgumentException('The "types" parameter is not valid.');
+                }
+            }, $options['types']);
+        }
+
+        if (\is_array($options) && \array_key_exists('versions', $options)) {
+            if (!\is_array($options['versions'])) {
+                throw new InvalidArgumentException('The "versions" parameter should be an array.');
+            }
+            array_map(function($value) {
+                if (!\in_array($value, self::$availableVersions, true)) {
+                    throw new InvalidArgumentException('The "versions" parameter is not valid.');
+                }
+            }, $options['versions']);
+        }
 
         parent::__construct($options);
 

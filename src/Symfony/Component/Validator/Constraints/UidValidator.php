@@ -32,7 +32,7 @@ class UidValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (null === $constraint->type) {
+        if (\in_array(Uid::TYPE_ULID, $constraint->types, true) && \in_array(Uid::TYPE_UUID, $constraint->types, true)) {
             if (Ulid::isValid($value)) {
                 return;
             }
@@ -51,7 +51,7 @@ class UidValidator extends ConstraintValidator
             return;
         }
 
-        if (Uid::TYPE_ULID === $constraint->type) {
+        if (\in_array(Uid::TYPE_ULID, $constraint->types, true)) {
             if (!Ulid::isValid($value)) {
                 $this->context->buildViolation($constraint->ulidMessage)
                     ->setParameter('{{ value }}', $this->formatValue($value))

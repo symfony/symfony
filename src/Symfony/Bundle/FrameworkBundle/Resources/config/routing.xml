@@ -113,6 +113,10 @@
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument>%kernel.project_dir%</argument>
             <argument>%kernel.debug%</argument>
+            <argument>%router_listener.langs_disabled%</argument>
+            <call method="setRouter">
+                <argument type="service" id="router.default" />
+            </call>
         </service>
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\RedirectController" public="true">

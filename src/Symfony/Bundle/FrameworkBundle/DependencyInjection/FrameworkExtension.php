@@ -902,6 +902,10 @@ class FrameworkExtension extends Extension
         $requestContext->replaceArgument(2, $config['context']['host']);
         $requestContext->replaceArgument(3, $config['context']['scheme']);
 
+        if ($config['langs']['disabled']) {
+            $container->setParameter('router_listener.langs_disabled', $config['langs']['disabled']);
+        }
+
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)

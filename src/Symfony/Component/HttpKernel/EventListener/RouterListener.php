@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
@@ -48,6 +50,8 @@ class RouterListener implements EventSubscriberInterface
     private $requestStack;
     private $projectDir;
     private $debug;
+    private $langsDisabled;
+    private $router;
 
     /**
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher    The Url or Request matcher
@@ -116,11 +120,39 @@ class RouterListener implements EventSubscriberInterface
 
             if (null !== $this->logger) {
                 $this->logger->info('Matched route "{route}".', [
-                    'route' => isset($parameters['_route']) ? $parameters['_route'] : 'n/a',
+                    'route' => $parameters['_route'] ?? 'n/a',
                     'route_parameters' => $parameters,
                     'request_uri' => $request->getUri(),
                     'method' => $request->getMethod(),
                 ]);
+            }
+
+            if (\array_key_exists($parameters['_locale'] ?? '', $this->langsDisabled)) {
+                $langOrigin = $parameters['_locale'];
+                $langDestination = $this->langsDisabled[$langOrigin]['redirect_to'] ?? '';
+                $http_code = $this->langsDisabled[$langOrigin]['http_code'];
+
+                if ($langOrigin !== $langDestination) {
+                    if (!empty($langDestination)) {
+                        $url = $this->router->generate($parameters['_route'], ['_locale' => $langDestination]);
+
+                        if (null !== $this->logger) {
+                            $this->logger->info(
+                                'Lang disabled. Redirecting to'.$url
+                            );
+                        }
+
+                        $response = new RedirectResponse($url, $http_code);
+                        $event->setResponse($response);
+                    }
+                }
+
+                if (null !== $this->logger) {
+                    $this->logger->info(
+                        'Lang disabled. Throwing NotFoundHttpException'
+                    );
+                }
+                throw new NotFoundHttpException('This language is currently disabled');
             }
 
             $request->attributes->add($parameters);
@@ -171,5 +203,10 @@ class RouterListener implements EventSubscriberInterface
         include \dirname(__DIR__).'/Resources/welcome.html.php';
 
         return new Response(ob_get_clean(), Response::HTTP_NOT_FOUND);
+    }
+
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
     }
 }

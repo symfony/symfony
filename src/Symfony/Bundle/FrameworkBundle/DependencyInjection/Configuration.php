@@ -482,6 +482,41 @@ class Configuration implements ConfigurationInterface
                             ->defaultTrue()
                         ->end()
                         ->booleanNode('utf8')->defaultNull()->end()
+                        ->arrayNode('langs')
+                            ->canBeEnabled()
+                            ->info('langs routing information')
+                            ->children()
+                                ->arrayNode('disabled')
+                                    ->canBeEnabled()
+                                    ->info('langs disabled')
+                                    ->beforeNormalization()
+                                        ->ifArray()
+                                        ->then(function ($langs) {
+                                            foreach ($langs as $key=>$lang) {
+                                                if (is_numeric($key)) {
+                                                    $arrayLangs[] = ['lang' => $lang];
+                                                } else {
+                                                    $arrayLangs[] = array_merge(['lang' => $key],$lang??[]);
+                                                }
+
+                                            }
+                                            return $arrayLangs;
+                                        })
+                                    ->end()
+                                    ->beforeNormalization()
+                                        ->ifString()
+                                        ->then(function ($lang) { return [['lang' => $lang]]; })
+                                    ->end()
+                                    ->useAttributeAsKey('lang')
+                                    ->prototype('array')
+                                        ->children()
+                                            ->scalarNode('http_code')->defaultValue(404)->end()
+                                            ->scalarNode('redirect_to')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('context')
                             ->info('The request context used to generate URLs in a non-HTTP context')
                             ->addDefaultsIfNotSet()

@@ -383,8 +383,8 @@ class XmlDescriptor extends Descriptor
             } elseif (\is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 
-                foreach ($this->getArgumentNodes($argument, $dom) as $childArgumenXML) {
-                    $argumentXML->appendChild($childArgumenXML);
+                foreach ($this->getArgumentNodes($argument, $dom) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
                 }
             } else {
                 $argumentXML->appendChild(new \DOMText($argument));

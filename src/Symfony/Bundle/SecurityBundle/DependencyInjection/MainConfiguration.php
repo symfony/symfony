@@ -244,6 +244,8 @@ class MainConfiguration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('path')->defaultNull()->end()
                                 ->scalarNode('domain')->defaultNull()->end()
+                                ->scalarNode('secure')->defaultFalse()->end()
+                                ->scalarNode('samesite')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()

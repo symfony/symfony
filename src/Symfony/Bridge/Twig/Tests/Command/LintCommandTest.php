@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
 
 class LintCommandTest extends TestCase
 {
@@ -67,6 +68,34 @@ class LintCommandTest extends TestCase
     }
 
     /**
+     * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as legacy.
+     *
+     * @group legacy
+     */
+    public function testLintFileWithNotReportedDeprecation()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('{{ foo|deprecated_filter }}');
+
+        $ret = $tester->execute(['filename' => [$filename]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('OK in', trim($tester->getDisplay()));
+    }
+
+    public function testLintFileWithReportedDeprecation()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('{{ foo|deprecated_filter }}');
+
+        $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
+        $this->assertRegExp('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
+    }
+
+    /**
      * @group tty
      */
     public function testLintDefaultPaths()
@@ -80,7 +109,12 @@ class LintCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $command = new LintCommand(new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/')));
+        $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
+        $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
+            return $v;
+        }, ['deprecated' => true]));
+
+        $command = new LintCommand($environment);
 
         $application = new Application();
         $application->add($command);

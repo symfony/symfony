@@ -7,6 +7,18 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.7 (2020-03-30)
+
+ * security #cve-2020-5255 [HttpFoundation] Do not set the default Content-Type based on the Accept header (yceruto)
+ * security #cve-2020-5275 [Security] Fix access_control behavior with unanimous decision strategy (chalasr)
+ * bug #36262 [DI] fix generating TypedReference from PriorityTaggedServiceTrait (nicolas-grekas)
+ * bug #36252 [Security/Http] Allow setting cookie security settings for delete_cookies (wouterj)
+ * bug #36261 [FrameworkBundle] revert to legacy wiring of the session when circular refs are detected (nicolas-grekas)
+ * bug #36259 [DomCrawler] Fix BC break in assertions breaking Panther (dunglas)
+ * bug #36181 [BrowserKit] fixed missing post request parameters in file uploads (codebay)
+ * bug #36216 [Validator] Assert Valid with many groups (phucwan91)
+ * bug #36222 [Console] Fix OutputStream for PHP 7.4 (guillbdx)
+
 * 4.4.6 (2020-03-27)
 
  * bug #36169 [HttpKernel] fix locking for PHP 7.4+ (nicolas-grekas)

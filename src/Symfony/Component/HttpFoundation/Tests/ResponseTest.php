@@ -500,12 +500,25 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('content-type'));
     }
 
+    /**
+     * Same URL cannot produce different Content-Type based on the value of the Accept header,
+     * unless explicitly stated in the response object.
+     */
+    public function testPrepareDoesNotSetContentTypeBasedOnRequestAcceptHeader()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/json');
+        $response->prepare($request);
+
+        $this->assertSame('text/html; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
     public function testPrepareSetContentType()
     {
         $response = new Response('foo');
         $request = Request::create('/');
         $request->setRequestFormat('json');
-        $request->headers->remove('accept');
 
         $response->prepare($request);
 

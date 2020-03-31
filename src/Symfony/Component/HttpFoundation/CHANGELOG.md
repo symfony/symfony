@@ -14,6 +14,7 @@ CHANGELOG
    according to [RFC 8674](https://tools.ietf.org/html/rfc8674)
  * made the Mime component an optional dependency
  * added `MarshallingSessionHandler`, `IdentityMarshaller`
+ * made `Session` accept a callback to report when the session is being used
 
 5.0.0
 -----

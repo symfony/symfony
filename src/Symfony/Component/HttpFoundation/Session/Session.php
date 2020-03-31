@@ -35,10 +35,12 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $attributeName;
     private $data = [];
     private $usageIndex = 0;
+    private $usageReporter;
 
-    public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
+    public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, callable $usageReporter = null)
     {
         $this->storage = $storage ?: new NativeSessionStorage();
+        $this->usageReporter = $usageReporter;
 
         $attributes = $attributes ?: new AttributeBag();
         $this->attributeName = $attributes->getName();
@@ -153,6 +155,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     {
         if ($this->isStarted()) {
             ++$this->usageIndex;
+            if ($this->usageReporter && 0 <= $this->usageIndex) {
+                ($this->usageReporter)();
+            }
         }
         foreach ($this->data as &$data) {
             if (!empty($data)) {
@@ -229,6 +234,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     public function getMetadataBag()
     {
         ++$this->usageIndex;
+        if ($this->usageReporter && 0 <= $this->usageIndex) {
+            ($this->usageReporter)();
+        }
 
         return $this->storage->getMetadataBag();
     }
@@ -238,7 +246,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function registerBag(SessionBagInterface $bag)
     {
-        $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex));
+        $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex, $this->usageReporter));
     }
 
     /**

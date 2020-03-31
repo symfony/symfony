@@ -96,11 +96,14 @@ class ContextListener extends AbstractListener
 
         if (null !== $session) {
             $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+            $usageIndexReference = PHP_INT_MIN;
             $sessionId = $request->cookies->get($session->getName());
             $token = $session->get($this->sessionKey);
 
             if ($this->sessionTrackerEnabler && \in_array($sessionId, [true, $session->getId()], true)) {
                 $usageIndexReference = $usageIndexValue;
+            } else {
+                $usageIndexReference = $usageIndexReference - PHP_INT_MIN + $usageIndexValue;
             }
         }
 

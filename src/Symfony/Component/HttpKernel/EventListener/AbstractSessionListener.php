@@ -146,6 +146,37 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
     }
 
+    public function onSessionUsage(): void
+    {
+        if (!$this->debug) {
+            return;
+        }
+
+        if (!$requestStack = $this->container && $this->container->has('request_stack') ? $this->container->get('request_stack') : null) {
+            return;
+        }
+
+        $stateless = false;
+        $clonedRequestStack = clone $requestStack;
+        while (null !== ($request = $clonedRequestStack->pop()) && !$stateless) {
+            $stateless = $request->attributes->get('_stateless');
+        }
+
+        if (!$stateless) {
+            return;
+        }
+
+        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $requestStack->getCurrentRequest()->getSession()) {
+            return;
+        }
+
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
+        throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [

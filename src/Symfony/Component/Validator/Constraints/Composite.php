@@ -81,7 +81,7 @@ abstract class Composite extends Constraint
     }
 
     /**
-     * Add groups if the case, to a constraint
+     * Add groups if the case, to a constraint.
      *
      * @param array $nestedConstraints
      */
@@ -101,7 +101,7 @@ abstract class Composite extends Constraint
     }
 
     /**
-     * Create groups for contraints
+     * Create groups for contraints.
      *
      * @param array $nestedConstraints
      * @param string $compositeOption
@@ -120,7 +120,7 @@ abstract class Composite extends Constraint
     }
 
     /**
-     * Transform constrain in a object
+     * Transform constrain in a object.
      *
      * @param array $nestedConstraints
      */

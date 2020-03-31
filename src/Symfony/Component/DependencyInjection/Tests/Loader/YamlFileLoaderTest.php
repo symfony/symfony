@@ -213,7 +213,29 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
-        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
+        $deprecation = $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar');
+        $this->assertSame($message, $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option is deprecated.
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option is deprecated.
+     */
+    public function testDeprecatedAliasesWithoutPackageAndVersion()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('deprecated_alias_definitions_without_package_and_version.yml');
+
+        $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
+        $message = 'The "alias_for_foobar" service alias is deprecated.';
+        $deprecation = $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar');
+        $this->assertSame($message, $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     public function testFactorySyntaxError()
@@ -376,7 +398,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
 
         $message = 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('deprecated_service')->getDeprecationMessage('deprecated_service'));
+        $this->assertSame($message, $container->getDefinition('deprecated_service')->getDeprecation('deprecated_service')['message']);
     }
 
     public function testAutowire()

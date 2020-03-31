@@ -97,7 +97,12 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
-            $code .= sprintf("        deprecated: %s\n", $this->dumper->dump($definition->getDeprecationMessage('%service_id%')));
+            $code .= "        deprecated:\n";
+            foreach ($definition->getDeprecation('%service_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $code .= sprintf("            %s: %s\n", $key, $this->dumper->dump($value));
+                }
+            }
         }
 
         if ($definition->isAutowired()) {
@@ -162,7 +167,17 @@ class YamlDumper extends Dumper
 
     private function addServiceAlias(string $alias, Alias $id): string
     {
-        $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
+        $deprecated = '';
+
+        if ($id->isDeprecated()) {
+            $deprecated = "        deprecated:\n";
+
+            foreach ($id->getDeprecation('%alias_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $deprecated .= sprintf("            %s: %s\n", $key, $value);
+                }
+            }
+        }
 
         if ($id->isPrivate()) {
             return sprintf("    %s: '@%s'\n%s", $alias, $id, $deprecated);

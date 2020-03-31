@@ -11,7 +11,7 @@ return function (ContainerConfigurator $c) {
         ->autoconfigure()
         ->exclude(['../Prototype/OtherDir', '../Prototype/BadClasses', '../Prototype/SinglyImplementedInterface'])
         ->factory('f')
-        ->deprecate('%service_id%')
+        ->deprecate('vendor/package', '1.1', '%service_id%')
         ->args([0])
         ->args([1])
         ->autoconfigure(false)

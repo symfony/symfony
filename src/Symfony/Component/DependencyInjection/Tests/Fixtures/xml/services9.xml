@@ -97,7 +97,7 @@
     <service id="decorator_service" class="stdClass" public="true" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" public="true" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="deprecated_service" class="stdClass" public="true">
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
@@ -114,7 +114,7 @@
     </service>
     <service id="factory_simple" class="SimpleFactoryClass" public="false">
       <argument>foo</argument>
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
     <service id="factory_service_simple" class="Bar" public="true">
       <factory service="factory_simple" method="getInstance"/>

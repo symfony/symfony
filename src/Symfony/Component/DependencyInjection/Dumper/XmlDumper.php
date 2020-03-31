@@ -179,8 +179,11 @@ class XmlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecation('%service_id%')['message']));
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }
@@ -225,8 +228,11 @@ class XmlDumper extends Dumper
         }
 
         if ($id->isDeprecated()) {
+            $deprecation = $id->getDeprecation('%alias_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($id->getDeprecationMessage('%alias_id%')));
+            $deprecated->setAttribute('message', $deprecation['message']);
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }

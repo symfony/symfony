@@ -7,6 +7,9 @@ CHANGELOG
  * added support to autowire public typed properties in php 7.4
  * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
  * added possibility to define abstract service arguments
+ * updated the signature of method `Definition::setDeprecated()` to `Definition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `Alias::setDeprecated()` to `Alias::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `DeprecateTrait::deprecate()` to `DeprecateTrait::deprecation(string $package, string $version, string $message)`
 
 5.0.0
 -----

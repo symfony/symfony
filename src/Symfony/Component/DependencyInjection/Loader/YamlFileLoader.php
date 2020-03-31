@@ -358,7 +358,17 @@ class YamlFileLoader extends FileLoader
                 }
 
                 if ('deprecated' === $key) {
-                    $alias->setDeprecated(true, $value);
+                    $deprecation = \is_array($value) ? $value : ['message' => $value];
+
+                    if (!isset($deprecation['package'])) {
+                        trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "package" of the "deprecated" option is deprecated.');
+                    }
+
+                    if (!isset($deprecation['version'])) {
+                        trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "version" of the "deprecated" option is deprecated.');
+                    }
+
+                    $alias->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
                 }
             }
 
@@ -435,7 +445,17 @@ class YamlFileLoader extends FileLoader
         }
 
         if (\array_key_exists('deprecated', $service)) {
-            $definition->setDeprecated(true, $service['deprecated']);
+            $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
+
+            if (!isset($deprecation['package'])) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "package" of the "deprecated" option is deprecated.');
+            }
+
+            if (!isset($deprecation['version'])) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Not setting the attribute "version" of the "deprecated" option is deprecated.');
+            }
+
+            $definition->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
         }
 
         if (isset($service['factory'])) {

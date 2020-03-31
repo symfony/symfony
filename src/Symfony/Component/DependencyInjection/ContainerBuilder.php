@@ -568,7 +568,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $alias = $this->aliasDefinitions[$id];
 
             if ($alias->isDeprecated()) {
-                trigger_deprecation('', '', $alias->getDeprecationMessage($id));
+                $deprecation = $alias->getDeprecation($id);
+                trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
             }
 
             return $this->doGet((string) $alias, $invalidBehavior, $inlineServices, $isConstructorArgument);
@@ -1037,7 +1038,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($definition->isDeprecated()) {
-            trigger_deprecation('', '', $definition->getDeprecationMessage($id));
+            $deprecation = $definition->getDeprecation($id);
+            trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
 
         if ($tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator) || $proxy instanceof RealServiceInstantiator) {

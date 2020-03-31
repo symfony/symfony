@@ -45,7 +45,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.iSxuxv5' => true,
+            '.service_locator.VAwNRfI' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,

@@ -226,11 +226,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      *
-     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
+     * @deprecated Since vendor/package 1.1: The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getDeprecatedServiceService()
     {
-        trigger_deprecation('', '', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
+        trigger_deprecation('vendor/package', '1.1', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
 
         return $this->services['deprecated_service'] = new \stdClass();
     }
@@ -448,11 +448,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \SimpleFactoryClass
      *
-     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
+     * @deprecated Since vendor/package 1.1: The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getFactorySimpleService()
     {
-        trigger_deprecation('', '', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
+        trigger_deprecation('vendor/package', '1.1', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
 
         return new \SimpleFactoryClass('foo');
     }

@@ -83,7 +83,9 @@ abstract class Composite extends Constraint
     /**
      * Add groups if the case, to a constraint.
      *
-     * @param array $nestedConstraints
+     * @param [] $nestedConstraints
+     *
+     * @throws ConstraintDefinitionException If $excessGroups > 0
      */
     private function addGroupsToConstraints(array $nestedConstraints)
     {
@@ -103,8 +105,7 @@ abstract class Composite extends Constraint
     /**
      * Create groups for contraints.
      *
-     * @param array $nestedConstraints
-     * @param string $compositeOption
+     * @param [] $nestedConstraints
      */
     private function createGroups(array $nestedConstraints, string $compositeOption)
     {
@@ -122,7 +123,9 @@ abstract class Composite extends Constraint
     /**
      * Transform constrain in a object.
      *
-     * @param array $nestedConstraints
+     * @param [] $nestedConstraints
+     *
+     * @throws ConstraintDefinitionException If is not a object or instance of Valid
      */
     private function constraintsToObject(array $nestedConstraints)
     {

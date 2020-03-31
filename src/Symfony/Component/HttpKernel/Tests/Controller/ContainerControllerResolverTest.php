@@ -19,6 +19,10 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/http-kernel 5.1: Referencing controllers with a single colon is deprecated. Use "foo::action" instead.
+     */
     public function testGetControllerServiceWithSingleColon()
     {
         $service = new ControllerTestService('foo');
@@ -145,7 +149,6 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         return [
             ['\\'.ControllerTestService::class.'::action'],
-            ['\\'.ControllerTestService::class.':action'],
         ];
     }
 

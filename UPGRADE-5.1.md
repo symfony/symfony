@@ -46,6 +46,11 @@ HttpFoundation
    `__construct()` instead)
  * Made the Mime component an optional dependency
 
+HttpKernel
+----------
+
+ * Deprecated support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
+
 Mailer
 ------
 

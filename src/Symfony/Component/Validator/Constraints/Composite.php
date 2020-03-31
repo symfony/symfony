@@ -68,7 +68,7 @@ abstract class Composite extends Constraint
         }
 
         $this->constraintsToObject($nestedConstraints);
-        
+
         if (!property_exists($this, 'groups')) {
             $this->createGroups($nestedConstraints, $compositeOption);
             $this->$compositeOption = $nestedConstraints;
@@ -79,15 +79,15 @@ abstract class Composite extends Constraint
         $this->addGroupsToConstraints($nestedConstraints);
         $this->$compositeOption = $nestedConstraints;
     }
-    
+
     /**
-     * Add groups if the case, to a constraint 
+     * Add groups if the case, to a constraint
      *
      * @param array $nestedConstraints
      */
     private function addGroupsToConstraints(array $nestedConstraints)
     {
-        foreach ($nestedConstraints as $constraint) {    
+        foreach ($nestedConstraints as $constraint) {
             if (property_exists($constraint, 'groups')) {
                 $excessGroups = array_diff($constraint->groups, $this->groups);
 
@@ -97,9 +97,9 @@ abstract class Composite extends Constraint
             } else {
                 $constraint->groups = $this->groups;
             }
-        }    
+        }
     }
-    
+
     /**
      * Create groups for contraints
      *
@@ -118,7 +118,7 @@ abstract class Composite extends Constraint
 
         $this->groups = array_keys($mergedGroups);
     }
-    
+
     /**
      * Transform constrain in a object
      *
@@ -126,7 +126,7 @@ abstract class Composite extends Constraint
      */
     private function constraintsToObject(array $nestedConstraints)
     {
-        foreach ($nestedConstraints as $constraint) {    
+        foreach ($nestedConstraints as $constraint) {
             if (!$constraint instanceof Constraint) {
                 if (\is_object($constraint)) {
                     $constraint = \get_class($constraint);
@@ -138,7 +138,7 @@ abstract class Composite extends Constraint
             if ($constraint instanceof Valid) {
                 throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint "%s". You can only declare the Valid constraint directly on a field or method.', static::class));
             }
-        }    
+        }
     }
 
     /**

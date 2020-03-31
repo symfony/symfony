@@ -67,7 +67,66 @@ abstract class Composite extends Constraint
             $nestedConstraints = [$nestedConstraints];
         }
 
+        $this->constraintsToObject($nestedConstraints);
+        
+        if (!property_exists($this, 'groups')) {
+            $this->createGroups($nestedConstraints, $compositeOption);
+            $this->$compositeOption = $nestedConstraints;
+
+            return;
+        }
+
+        $this->addGroupsToConstraints($nestedConstraints);
+        $this->$compositeOption = $nestedConstraints;
+    }
+    
+    /**
+     * Add groups if the case, to a constraint 
+     *
+     * @param array $nestedConstraints
+     */
+    private function addGroupsToConstraints(array $nestedConstraints)
+    {
+        foreach ($nestedConstraints as $constraint) {    
+            if (property_exists($constraint, 'groups')) {
+                $excessGroups = array_diff($constraint->groups, $this->groups);
+
+                if (\count($excessGroups) > 0) {
+                    throw new ConstraintDefinitionException(sprintf('The group(s) "%s" passed to the constraint "%s" should also be passed to its containing constraint "%s".', implode('", "', $excessGroups), get_debug_type($constraint), static::class));
+                }
+            } else {
+                $constraint->groups = $this->groups;
+            }
+        }    
+    }
+    
+    /**
+     * Create groups for contraints
+     *
+     * @param array $nestedConstraints
+     * @param string $compositeOption
+     */
+    private function createGroups(array $nestedConstraints, string $compositeOption)
+    {
+        $mergedGroups = [];
+
         foreach ($nestedConstraints as $constraint) {
+            foreach ($constraint->groups as $group) {
+                $mergedGroups[$group] = true;
+            }
+        }
+
+        $this->groups = array_keys($mergedGroups);
+    }
+    
+    /**
+     * Transform constrain in a object
+     *
+     * @param array $nestedConstraints
+     */
+    private function constraintsToObject(array $nestedConstraints)
+    {
+        foreach ($nestedConstraints as $constraint) {    
             if (!$constraint instanceof Constraint) {
                 if (\is_object($constraint)) {
                     $constraint = \get_class($constraint);
@@ -79,36 +138,7 @@ abstract class Composite extends Constraint
             if ($constraint instanceof Valid) {
                 throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint "%s". You can only declare the Valid constraint directly on a field or method.', static::class));
             }
-        }
-
-        if (!property_exists($this, 'groups')) {
-            $mergedGroups = [];
-
-            foreach ($nestedConstraints as $constraint) {
-                foreach ($constraint->groups as $group) {
-                    $mergedGroups[$group] = true;
-                }
-            }
-
-            $this->groups = array_keys($mergedGroups);
-            $this->$compositeOption = $nestedConstraints;
-
-            return;
-        }
-
-        foreach ($nestedConstraints as $constraint) {
-            if (property_exists($constraint, 'groups')) {
-                $excessGroups = array_diff($constraint->groups, $this->groups);
-
-                if (\count($excessGroups) > 0) {
-                    throw new ConstraintDefinitionException(sprintf('The group(s) "%s" passed to the constraint "%s" should also be passed to its containing constraint "%s".', implode('", "', $excessGroups), get_debug_type($constraint), static::class));
-                }
-            } else {
-                $constraint->groups = $this->groups;
-            }
-        }
-
-        $this->$compositeOption = $nestedConstraints;
+        }    
     }
 
     /**

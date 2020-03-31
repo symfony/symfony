@@ -12,9 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -23,7 +26,7 @@ use Symfony\Component\HttpKernel\Kernel;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AppKernel extends Kernel
+class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {
     private $varDir;
     private $testCase;
@@ -105,5 +108,33 @@ class AppKernel extends Kernel
         }
 
         return parent::getContainer();
+    }
+
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder('foo');
+        $rootNode = $treeBuilder->getRootNode();
+        $rootNode->children()->scalarNode('foo')->defaultValue('bar')->end()->end();
+
+        return $treeBuilder;
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+    }
+
+    public function getNamespace()
+    {
+        return '';
+    }
+
+    public function getXsdValidationBasePath()
+    {
+        return false;
+    }
+
+    public function getAlias()
+    {
+        return 'foo';
     }
 }

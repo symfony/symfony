@@ -32,7 +32,7 @@ class EnvelopeListener implements EventSubscriberInterface
     public function __construct($sender = null, array $recipients = null)
     {
         if (null !== $sender) {
-            $this->sender = Address::create($sender);
+            $this->sender = Address::fromString($sender);
         }
         if (null !== $recipients) {
             $this->recipients = Address::createArray($recipients);

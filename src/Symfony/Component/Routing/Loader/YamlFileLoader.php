@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
@@ -28,6 +29,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
+    use HostTrait;
     use LocalizedRouteTrait;
     use PrefixTrait;
 
@@ -137,14 +139,17 @@ class YamlFileLoader extends FileLoader
             $defaults['_stateless'] = $config['stateless'];
         }
 
-        $route = $this->createLocalizedRoute($collection, $name, $config['path']);
-        $route->addDefaults($defaults);
-        $route->addRequirements($requirements);
-        $route->addOptions($options);
-        $route->setHost($config['host'] ?? '');
-        $route->setSchemes($config['schemes'] ?? []);
-        $route->setMethods($config['methods'] ?? []);
-        $route->setCondition($config['condition'] ?? null);
+        $routes = $this->createLocalizedRoute($collection, $name, $config['path']);
+        $routes->addDefaults($defaults);
+        $routes->addRequirements($requirements);
+        $routes->addOptions($options);
+        $routes->setSchemes($config['schemes'] ?? []);
+        $routes->setMethods($config['methods'] ?? []);
+        $routes->setCondition($config['condition'] ?? null);
+
+        if (isset($config['host'])) {
+            $this->addHost($routes, $config['host']);
+        }
     }
 
     /**
@@ -198,7 +203,7 @@ class YamlFileLoader extends FileLoader
             $this->addPrefix($subCollection, $prefix, $trailingSlashOnRoot);
 
             if (null !== $host) {
-                $subCollection->setHost($host);
+                $this->addHost($subCollection, $host);
             }
             if (null !== $condition) {
                 $subCollection->setCondition($condition);

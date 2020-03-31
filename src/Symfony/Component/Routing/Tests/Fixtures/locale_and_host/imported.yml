@@ -1,0 +1,18 @@
+---
+imported:
+    controller: ImportedController::someAction
+    path:
+        nl: /voorbeeld
+        en: /example
+    host:
+        nl: www.custom.nl
+        en: www.custom.com
+
+imported_not_localized:
+    controller: ImportedController::someAction
+    path: /here
+
+imported_single_host:
+    controller: ImportedController::someAction
+    path: /here_again
+    host: www.custom.com

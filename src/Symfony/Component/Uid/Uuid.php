@@ -76,12 +76,8 @@ class Uuid extends AbstractUid
     {
         // don't use uuid_generate_md5(), some versions are buggy
         $uuid = md5(hex2bin(str_replace('-', '', $namespace->uid)).$name, true);
-        $uuid[8] = $uuid[8] & "\x3F" | "\x80";
-        $uuid = substr_replace(bin2hex($uuid), '-', 8, 0);
-        $uuid = substr_replace($uuid, '-3', 13, 1);
-        $uuid = substr_replace($uuid, '-', 18, 0);
 
-        return new UuidV3(substr_replace($uuid, '-', 23, 0));
+        return new UuidV3(self::format($uuid, '-3'));
     }
 
     final public static function v4(): UuidV4
@@ -93,12 +89,8 @@ class Uuid extends AbstractUid
     {
         // don't use uuid_generate_sha1(), some versions are buggy
         $uuid = substr(sha1(hex2bin(str_replace('-', '', $namespace->uid)).$name, true), 0, 16);
-        $uuid[8] = $uuid[8] & "\x3F" | "\x80";
-        $uuid = substr_replace(bin2hex($uuid), '-', 8, 0);
-        $uuid = substr_replace($uuid, '-5', 13, 1);
-        $uuid = substr_replace($uuid, '-', 18, 0);
 
-        return new UuidV5(substr_replace($uuid, '-', 23, 0));
+        return new UuidV5(self::format($uuid, '-5'));
     }
 
     final public static function v6(): UuidV6
@@ -132,5 +124,15 @@ class Uuid extends AbstractUid
         }
 
         return parent::compare($other);
+    }
+
+    private static function format(string $uuid, string $version): string
+    {
+        $uuid[8] = $uuid[8] & "\x3F" | "\x80";
+        $uuid = substr_replace(bin2hex($uuid), '-', 8, 0);
+        $uuid = substr_replace($uuid, $version, 13, 1);
+        $uuid = substr_replace($uuid, '-', 18, 0);
+
+        return substr_replace($uuid, '-', 23, 0);
     }
 }

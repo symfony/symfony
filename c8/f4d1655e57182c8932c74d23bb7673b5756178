@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-25T13:26:56Z
+
+(oh, and please mind tests :) )
+
+---------------------------------------------------------------------------
+
+by atailouloute at 2020-02-25T20:55:07Z
+
+@nicolas-grekas PR is ready for another review
+
+I did the changes you suggested + I added tests (now all tests with `@group legacy` are related to the old/deprecated way of using `->setDeprecated`, so they will be removed in 6.0)

@@ -450,6 +450,8 @@ class Application implements ResetInterface
      * If the command is not enabled it will not be added.
      *
      * @return Command|null The registered command if enabled or null
+     *
+     * @throws LogicException When command name is not defined
      */
     public function add(Command $command)
     {

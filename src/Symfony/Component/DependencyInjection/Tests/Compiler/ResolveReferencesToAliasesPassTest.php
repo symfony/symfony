@@ -89,13 +89,13 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      */
     public function testDeprecationNoticeWhenReferencedByAlias()
     {
-        $this->expectDeprecation('The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
+        $this->expectDeprecation('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
 
         $alias = new Alias('deprecated_foo_alias');
@@ -109,13 +109,13 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      */
     public function testDeprecationNoticeWhenReferencedByDefinition()
     {
-        $this->expectDeprecation('The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
+        $this->expectDeprecation('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('foo_aliased', $aliasDeprecated);
 
         $container

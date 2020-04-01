@@ -230,7 +230,7 @@ class XmlDumper extends Dumper
         if ($id->isDeprecated()) {
             $deprecation = $id->getDeprecation('%alias_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->setAttribute('message', $deprecation['message']);
+            $deprecated->appendChild($this->document->createTextNode($deprecation['message']));
             $deprecated->setAttribute('package', $deprecation['package']);
             $deprecated->setAttribute('version', $deprecation['version']);
 

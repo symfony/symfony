@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;/**
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter; /**
  * Converts between objects with getter and setter methods and arrays.
  * The normalization process looks at all public methods and calls the ones
  * which have a name starting with get and take no parameters. The result is a
@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  * setter method exists for any of the properties. If a setter exists it is
  * called with the property value. No automatic denormalization of the value
  * takes place.
+ *
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

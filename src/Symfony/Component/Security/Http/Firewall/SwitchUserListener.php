@@ -168,7 +168,7 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
 
             try {
                 $this->provider->loadUserByUsername($nonExistentUsername);
-            } catch (AuthenticationException $e) {
+            } catch (\Exception $e) {
             }
         } catch (AuthenticationException $e) {
             $this->provider->loadUserByUsername($currentUsername);

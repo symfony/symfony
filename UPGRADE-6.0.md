@@ -35,6 +35,7 @@ FrameworkBundle
 
  * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
  * The "framework.router.utf8" configuration option defaults to `true`
+ * Removed `session.attribute_bag` service and `session.flash_bag` service.
 
 HttpFoundation
 --------------

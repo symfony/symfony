@@ -17,6 +17,7 @@ CHANGELOG
  * Added `debug:container --deprecations` option to see compile-time deprecations.
  * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
  * Added ability for `config:dump-reference` and `debug:config` to dump and debug kernel container extension configuration.
+ * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
 
 5.0.0
 -----

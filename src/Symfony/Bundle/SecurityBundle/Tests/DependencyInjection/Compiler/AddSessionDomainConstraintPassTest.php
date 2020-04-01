@@ -12,10 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
 
 class AddSessionDomainConstraintPassTest extends TestCase
@@ -147,6 +151,9 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
         $pass = new AddSessionDomainConstraintPass();
         $pass->process($container);
+
+        $container->setDefinition('.service_subscriber.fallback_container', new Definition(Container::class));
+        $container->setAlias(ContainerInterface::class, new Alias('.service_subscriber.fallback_container', false));
 
         return $container;
     }

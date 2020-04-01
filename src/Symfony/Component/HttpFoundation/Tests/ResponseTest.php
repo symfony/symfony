@@ -659,6 +659,19 @@ class ResponseTest extends ResponseTestCase
 
         $response->setCache(['immutable' => false]);
         $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
+
+        $directives = ['proxy_revalidate', 'must_revalidate', 'no_cache', 'no_store', 'no_transform'];
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => true]);
+
+            $this->assertTrue($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => false]);
+
+            $this->assertFalse($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
     }
 
     public function testSendContent()

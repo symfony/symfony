@@ -227,7 +227,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                trigger_deprecation('', '', $child->getDeprecationMessage($name, $this->getPath()));
+                $deprecation = $child->getDeprecation($name, $this->getPath());
+                trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
             }
 
             try {

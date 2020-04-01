@@ -35,7 +35,7 @@ abstract class BaseNode implements NodeInterface
     protected $finalValidationClosures = [];
     protected $allowOverwrite = true;
     protected $required = false;
-    protected $deprecationMessage = null;
+    protected $deprecation = [];
     protected $equivalentValues = [];
     protected $attributes = [];
     protected $pathSeparator;
@@ -198,12 +198,41 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets this node as deprecated.
      *
+     * @param string $package The name of the composer package that is triggering the deprecation
+     * @param string $version The version of the package that introduced the deprecation
+     * @param string $message The deprecation message to use
+     *
      * You can use %node% and %path% placeholders in your message to display,
      * respectively, the node name and its complete path.
      */
-    public function setDeprecated(?string $message)
+    public function setDeprecated(?string $package/*, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
     {
-        $this->deprecationMessage = $message;
+        $args = \func_get_args();
+
+        if (\func_num_args() < 2) {
+            trigger_deprecation('symfony/config', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
+
+            if (!isset($args[0])) {
+                trigger_deprecation('symfony/config', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
+
+                $this->deprecation = [];
+
+                return;
+            }
+
+            $message = (string) $args[0];
+            $package = $version = '';
+        } else {
+            $package = (string) $args[0];
+            $version = (string) $args[1];
+            $message = (string) ($args[2] ?? 'The child node "%node%" at path "%path%" is deprecated.');
+        }
+
+        $this->deprecation = [
+            'package' => $package,
+            'version' => $version,
+            'message' => $message,
+        ];
     }
 
     /**
@@ -249,7 +278,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function isDeprecated()
     {
-        return null !== $this->deprecationMessage;
+        return (bool) $this->deprecation;
     }
 
     /**
@@ -259,10 +288,27 @@ abstract class BaseNode implements NodeInterface
      * @param string $path the path of the node
      *
      * @return string
+     *
+     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
      */
     public function getDeprecationMessage(string $node, string $path)
     {
-        return strtr($this->deprecationMessage, ['%node%' => $node, '%path%' => $path]);
+        trigger_deprecation('symfony/config', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
+
+        return $this->getDeprecation($node, $path)['message'];
+    }
+
+    /**
+     * @param string $node The configuration node name
+     * @param string $path The path of the node
+     */
+    public function getDeprecation(string $node, string $path): array
+    {
+        return [
+            'package' => $this->deprecation['package'] ?? '',
+            'version' => $this->deprecation['version'] ?? '',
+            'message' => strtr($this->deprecation['message'] ?? '', ['%node%' => $node, '%path%' => $path]),
+        ];
     }
 
     /**

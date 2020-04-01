@@ -1,6 +1,13 @@
 UPGRADE FROM 5.0 to 5.1
 =======================
 
+Config
+------
+
+ * The signature of method `NodeDefinition::setDeprecated()` has been updated to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`.
+ * The signature of method `BaseNode::setDeprecated()` has been updated to `BaseNode::setDeprecation(string $package, string $version, string $message)`.
+ * Passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node is deprecated
+
 Console
 -------
 

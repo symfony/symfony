@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by warslett at 2020-03-31T20:31:35Z
+
+rebased to resolve conflicts
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T20:38:33Z
+
+Actually, please rebase again to account for #35778, thanks :)
+
+---------------------------------------------------------------------------
+
+by warslett at 2020-03-31T21:20:18Z
+
+@nicolas-grekas rebased and now using new deprecated attributes. Nice feature @atailouloute

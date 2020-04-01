@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2020-02-26T21:14:20Z
+
+Will there be a replacement option?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-26T21:23:41Z
+
+Yes, you would have to define those aliases in your project.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-26T21:24:34Z
+
+> However, that means we will have to reintroduce code to hook the global service container in our own code base since some part rely on it (eg: FWB AbstractController::setContainer)
+
+I'm not sure what you mean here: AbstractController is a service subscriber, it doesn't use the main container.
+
+Looks good to me otherwise (I didn't review the details yet.)
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2020-02-26T21:29:33Z
+
+>
+>
+> Yes, you would have to define those aliases in your project.
+
+So, please show me a small example because I'm not sure of these changes ... and if it works, why remove it?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-02-26T21:34:45Z
+
+> I'm not sure what you mean here: AbstractController is a service subscriber, it doesn't use the main container.
+
+Indeed, that's a bad example 😅 What I mean is that our own code (untested code since all tests passes) might rely on those aliases and we will need to fix that.
+
+> So, please show me a small example because I'm not sure of these changes ...
+
+For example, in YAML:
+```yaml
+Psr\Container\ContainerInterface:
+    alias: "service_container"
+```
+Check https://symfony.com/doc/current/service_container/alias_private.html#aliasing.
+
+> and if it works, why remove it?
+
+For the reasons I described in the PR description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-27T10:12:51Z
+
+> What I mean is that our own code (untested code since all tests passes) might rely on those aliases and we will need to fix that
+
+That shouldn't be the case - we don't use autowiring in core. Did you find any?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T20:01:25Z
+
+Rebase needed.
+Ping @symfony/mergers meanwhile.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-01T06:34:43Z
+
+TODO: waiting for https://github.com/symfony/symfony/pull/36295 because tests can't pass atm.

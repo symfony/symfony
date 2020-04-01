@@ -14,6 +14,10 @@
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
                 <target>Le jeton CSRF est invalide. Veuillez renvoyer le formulaire.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Cette valeur n'est pas une couleur HTML5 valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

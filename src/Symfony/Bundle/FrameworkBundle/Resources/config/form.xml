@@ -74,6 +74,10 @@
             <tag name="form.type" />
             <argument type="service" id="translator" on-invalid="ignore" />
         </service>
+        <service id="form.type.color" class="Symfony\Component\Form\Extension\Core\Type\ColorType">
+            <tag name="form.type" />
+            <argument type="service" id="translator" on-invalid="ignore" />
+        </service>
 
         <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />

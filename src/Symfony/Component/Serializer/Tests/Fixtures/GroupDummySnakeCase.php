@@ -4,6 +4,9 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/**
+ * @author Laurent Masforné <l.masforne@gmail.com>
+ */
 class GroupDummySnakeCase
 {
     /**

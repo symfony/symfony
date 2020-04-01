@@ -61,6 +61,7 @@ class ReflectionExtractorTest extends TestCase
                 'realParent',
                 'xTotals',
                 'YT',
+                'date',
                 'c',
                 'd',
                 'e',
@@ -96,6 +97,7 @@ class ReflectionExtractorTest extends TestCase
                 'foo4',
                 'foo5',
                 'files',
+                'date',
                 'c',
                 'd',
                 'e',
@@ -156,6 +158,8 @@ class ReflectionExtractorTest extends TestCase
             ['staticSetter', null],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')]],
             ['realParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')]],
+            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
+            ['dates', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class))]],
         ];
     }
 

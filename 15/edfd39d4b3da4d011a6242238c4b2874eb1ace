@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-26T15:33:02Z
+
+The driver/authenticator should be updated instead to me - it should throw an AuthenticationException
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-03-27T17:53:02Z
+
+This does not feel right.  `DriverException` could mean virtually anything. The database could be down, the table structure could be broken, … Those are hard errors that I would expect to result in an HTTP 500 error.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-27T18:02:00Z
+
+Should we narrow to some specific error codes then?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-03-27T18:02:02Z
+
+That's indeed a good point. What about moving the `try` `catch` to that particular statement in `SwitchUserListener` instead?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-27T18:03:13Z
+
+> That's indeed a good point. What about moving the try catch to that particular statement in SwitchUserListener instead?
+
+That's what I did in the first place, until Nicolas' comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-27T18:30:07Z
+
+> That's what I did in the first place, until Nicolas' comment.
+
+I confirm: the issue is in the Doctrine bridge, not in the `SwitchUserListener` (which doesn't know anything bout databases.)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-27T19:15:23Z
+
+Hmm, I would prefer to change this inner `catch()` to catch all exceptions:
+
+https://github.com/symfony/symfony/blob/e0de6cc2927be4f0f559e471eadf88f63b3a64f8/src/Symfony/Component/Security/Http/Firewall/SwitchUserListener.php#L156-L167
+
+Putting this in the `EntityUserProvider` is too generic, as @derrabus pointed out. The doctrine error can be anything and we only want to ignore these errors for the fake username.
+
+The first `loadUserByUsername` call does only catch authentication exceptions. Thus any db error other than invalid username type is already catched by the first call. The second call thus only fail when the username is of the wrong type afaics.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T18:31:32Z
+
+> The first loadUserByUsername call does only catch authentication exceptions. Thus any db error other than invalid username type is already catched by the first call. The second call thus only fail when the username is of the wrong type afaics.
+
+OK, good argument! Let's revert to your initial proposal then @fancyweb, and sorry for the confusion :)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-01T09:20:36Z
+
+I reverted to the initial change (on 4.4). Sorry for the massive ping 😅

@@ -341,6 +341,12 @@ class FormTypeTest extends BaseTypeTest
         $this->factory->create(static::TESTED_TYPE, null, ['attr' => '']);
     }
 
+    public function testActionCannotBeNull()
+    {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->factory->create(static::TESTED_TYPE, null, ['action' => null]);
+    }
+
     public function testNameCanBeEmptyString()
     {
         $form = $this->factory->createNamed('', static::TESTED_TYPE);

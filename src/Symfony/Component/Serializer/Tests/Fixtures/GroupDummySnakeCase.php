@@ -7,7 +7,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class GroupDummySnakeCase
 {
     /**
-     * @Groups({"b", "c", "name_converter"})
+     * @Groups({"name_converter"})
      */
     protected $snake_case;
 

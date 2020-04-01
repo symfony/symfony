@@ -11,15 +11,13 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-/**
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;/**
  * Converts between objects with getter and setter methods and arrays.
- *
  * The normalization process looks at all public methods and calls the ones
  * which have a name starting with get and take no parameters. The result is a
  * map from property names (method name stripped of the get prefix and converted
  * to lower case) to property values. Property values are normalized through the
  * serializer.
- *
  * The denormalization first looks at the constructor of the given class to see
  * if any of the parameters have the same name as one of the properties. The
  * constructor is then called with all parameters or an exception is thrown if
@@ -28,7 +26,6 @@ namespace Symfony\Component\Serializer\Normalizer;
  * setter method exists for any of the properties. If a setter exists it is
  * called with the property value. No automatic denormalization of the value
  * takes place.
- *
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -138,6 +135,14 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $haser = 'has'.$ucfirsted;
         if (\is_callable([$object, $haser])) {
             return $object->$haser();
+        }
+
+        $camelCaseToSnakeCaseConverter = new CamelCaseToSnakeCaseNameConverter();
+        $camelCaseAttribute = $camelCaseToSnakeCaseConverter->denormalize($ucfirsted);
+        $getter = 'get'.ucfirst($camelCaseAttribute);
+
+        if (\is_callable([$object, $getter])) {
+            return $object->$getter();
         }
 
         return null;

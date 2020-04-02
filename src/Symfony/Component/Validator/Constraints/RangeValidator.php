@@ -44,17 +44,24 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
+        $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint);
+        $max = $this->getLimit($constraint->maxPropertyPath, $constraint->max, $constraint);
+
         if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
-            $this->context->buildViolation($constraint->invalidMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setCode(Range::INVALID_CHARACTERS_ERROR)
-                ->addViolation();
+            if ($this->isParsableDatetimeString($min) && $this->isParsableDatetimeString($max)) {
+                $this->context->buildViolation($constraint->invalidDateTimeMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setCode(Range::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
+            } else {
+                $this->context->buildViolation($constraint->invalidMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setCode(Range::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
+            }
 
             return;
         }
-
-        $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint);
-        $max = $this->getLimit($constraint->maxPropertyPath, $constraint->max, $constraint);
 
         // Convert strings to DateTimes if comparing another DateTime
         // This allows to compare with any date/time value supported by
@@ -181,5 +188,24 @@ class RangeValidator extends ConstraintValidator
         }
 
         return $this->propertyAccessor;
+    }
+
+    private function isParsableDatetimeString($boundary): bool
+    {
+        if (null === $boundary) {
+            return true;
+        }
+
+        if (!\is_string($boundary)) {
+            return false;
+        }
+
+        try {
+            new \DateTime($boundary);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }

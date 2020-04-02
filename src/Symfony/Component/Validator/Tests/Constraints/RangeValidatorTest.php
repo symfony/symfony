@@ -379,13 +379,102 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNonNumeric()
     {
-        $this->validator->validate('abcd', new Range([
+        $constraint = new Range([
             'min' => 10,
             'max' => 20,
-            'invalidMessage' => 'myMessage',
-        ]));
+        ]);
 
-        $this->buildViolation('myMessage')
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMaxNull()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMaxAndMinNull()
+    {
+        $constraint = new Range([
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMin()
+    {
+        $constraint = new Range([
+            'min' => 'March 40, 2014',
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+            'max' => 'March 50, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 40, 2014',
+            'max' => 'March 50, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
             ->setCode(Range::INVALID_CHARACTERS_ERROR)
             ->assertRaised();

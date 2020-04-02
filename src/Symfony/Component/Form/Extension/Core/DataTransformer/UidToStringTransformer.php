@@ -44,8 +44,7 @@ class UidToStringTransformer implements DataTransformerInterface
      *
      * @return AbstractUid|null An instance of AbstractUid
      *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       or could not be transformed
+     * @throws TransformationFailedException If the given value is not a string, or could not be transformed
      */
     public function reverseTransform($value)
     {

@@ -27,7 +27,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
     public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof AbstractUid) {
-            throw new InvalidArgumentException('The object must be an instance of "\Symfony\Component\Uid\Uuid".');
+            throw new InvalidArgumentException('The object must be an instance of "\Symfony\Component\Uid\AbstractUid".');
         }
 
         return (string) $object;

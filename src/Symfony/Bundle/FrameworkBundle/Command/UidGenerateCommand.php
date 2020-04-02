@@ -7,6 +7,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
@@ -66,6 +67,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        if (!class_exists(AbstractUid::class)) {
+            throw new \RuntimeException('Unable to execute this command as the Symfony Uid Component is not installed.');
+        }
 
         $type = $input->getArgument('type') ? strtolower($input->getArgument('type')) : null;
         $namespace = $input->getArgument('namespace');

@@ -16,6 +16,7 @@ CHANGELOG
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Added a `rounding_mode` option for the PercentType and correctly round the value when submitted
+ * Added `UidToStringTransformer` and `UidType`
 
 5.0.0
 -----

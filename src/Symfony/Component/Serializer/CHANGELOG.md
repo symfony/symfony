@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support for scalar values denormalization
  * added support for `\stdClass` to `ObjectNormalizer`
+ * added `UidNormalizer`
 
 5.0.0
 -----

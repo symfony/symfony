@@ -2,9 +2,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
@@ -12,7 +10,6 @@ use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -20,10 +17,6 @@ class UidValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        if (!class_exists(AbstractUid::class)) {
-            throw new LogicException('Unable to use the UID validator, as Symfony Uid component is not installed.');
-        }
-
         if (!$constraint instanceof Uid) {
             throw new UnexpectedTypeException($constraint, Uid::class);
         }

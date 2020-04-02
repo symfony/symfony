@@ -2,8 +2,10 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @Annotation
@@ -56,6 +58,9 @@ class Uid extends Constraint
 
     public function __construct($options = null)
     {
+        if (!class_exists(AbstractUid::class)) {
+            throw new LogicException('Unable to use the UID Constraint, as Symfony Uid component is not installed.');
+        }
 
         if (\is_array($options) && \array_key_exists('types', $options)) {
             if (!\is_array($options['types'])) {

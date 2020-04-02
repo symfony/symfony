@@ -61,7 +61,7 @@ class UidValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Uid([
             'message' => 'myMessage',
-            'types' => [Uid::UUID_V3]
+            'types' => [Uid::UUID_V3],
         ]);
 
         $this->validator->validate($value, $constraint);

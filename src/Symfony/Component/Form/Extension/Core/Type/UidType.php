@@ -31,7 +31,7 @@ class UidType extends AbstractType
     {
         $resolver->setDefaults([
             'constraints' => [
-                new Assert\Uid()
+                new Assert\Uid(),
             ],
         ]);
     }

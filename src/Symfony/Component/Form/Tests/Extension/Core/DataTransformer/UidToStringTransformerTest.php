@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;

@@ -21,8 +21,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 class Uid extends Constraint
 {
-
-    const INVALID_UID_ERROR  = '34fd666d-3eb6-4f82-9965-fa7decd445d0';
+    const INVALID_UID_ERROR = '34fd666d-3eb6-4f82-9965-fa7decd445d0';
 
     protected static $errorNames = [
         self::INVALID_UID_ERROR => 'INVALID_UID_ERROR',
@@ -75,7 +74,7 @@ class Uid extends Constraint
             if (!\is_array($options['types'])) {
                 throw new InvalidArgumentException('The "types" parameter should be an array.');
             }
-            array_map(function($value) {
+            array_map(function ($value) {
                 if (!\in_array($value, self::$availableTypes, true)) {
                     throw new InvalidArgumentException('The "types" parameter is not valid.');
                 }

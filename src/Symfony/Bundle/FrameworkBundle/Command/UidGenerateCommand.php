@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -87,7 +87,7 @@ EOF
 
         if (null === $type || !\in_array($type, self::$types, true)) {
             $type = $io->ask('Type/version of the UID. Available values are '.implode(', ', self::$types).'.', null, function ($type) {
-                $type = \strtolower($type);
+                $type = strtolower($type);
                 if (!\in_array($type, self::$types, true)) {
                     throw new \RuntimeException('Available values are '.implode(', ', self::$types).'.');
                 }
@@ -97,7 +97,7 @@ EOF
         }
 
         if (\in_array($type, [self::UUID_3, self::UUID_5], true) && (null === $namespace || !Uuid::isValid($namespace))) {
-            $namespace = $io->ask('Please enter a valid namespace:', null, function($namespace) {
+            $namespace = $io->ask('Please enter a valid namespace:', null, function ($namespace) {
                 if (null === $namespace || !Uuid::isValid($namespace)) {
                     throw new \RuntimeException('This is not a valid namespace.');
                 }

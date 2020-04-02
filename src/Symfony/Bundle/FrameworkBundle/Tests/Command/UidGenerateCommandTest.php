@@ -16,7 +16,6 @@ class UidGenerateCommandTest extends TestCase
         $tester->execute(['type' => '1']);
         $this->assertRegExp('/[a-f\d]{8}\-[a-f\d]{4}\-1[a-f\d]{3}\-[a-f\d]{4}\-[a-f\d]{8}/i', $tester->getDisplay());
 
-
         $tester->execute(['type' => '3', 'namespace' => 'a1dc606e-741b-11ea-aa36-99e245e7882b', 'name' => 'foo']);
         $this->assertStringContainsString('ad4ab486-b67f-3d46-881f-21f03d27a68b', $tester->getDisplay());
 

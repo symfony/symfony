@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
@@ -12,7 +13,6 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class UidNormalizerTest extends TestCase
 {

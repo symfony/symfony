@@ -10,6 +10,11 @@ use Symfony\Component\Uid\Uuid;
 
 class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
+     */
     public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof AbstractUid) {
@@ -19,11 +24,19 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
         return (string) $object;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof AbstractUid;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws NotNormalizableValueException
+     */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
@@ -35,6 +48,9 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
         return $uid;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         try {
@@ -46,6 +62,9 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
         return $class->isSubclassOf(AbstractUid::class) || AbstractUid::class === $class->getName();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

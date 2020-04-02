@@ -52,6 +52,10 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $server['SERVER_PORT'] = $uri->getPort();
             $server['REQUEST_URI'] = $uri->getPath();
             $server['QUERY_STRING'] = $uri->getQuery();
+
+            if ('https' === $uri->getScheme()) {
+                $server['HTTPS'] = 'on';
+            }
         }
 
         $server['REQUEST_METHOD'] = $psrRequest->getMethod();

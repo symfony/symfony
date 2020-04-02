@@ -29,6 +29,11 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private $file;
 
     /**
+     * @var array|false|null
+     */
+    private $resources;
+
+    /**
      * @var iterable|ResourceCheckerInterface[]
      */
     private $resourceCheckers;
@@ -76,21 +81,15 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
-        $metadata = $this->getMetaFile();
+        $resources = $this->getResources();
 
-        if (!is_file($metadata)) {
-            return false;
-        }
-
-        $meta = $this->safelyUnserialize($metadata);
-
-        if (false === $meta) {
+        if (null === $resources) {
             return false;
         }
 
         $time = filemtime($this->file);
 
-        foreach ($meta as $resource) {
+        foreach ($resources as $resource) {
             /* @var ResourceInterface $resource */
             foreach ($this->resourceCheckers as $checker) {
                 if (!$checker->supports($resource)) {
@@ -184,5 +183,24 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     public static function handleUnserializeCallback($class)
     {
         trigger_error('Class not found: '.$class);
+    }
+
+    /**
+     * Returns the associated resources that are monitored by this cache.
+     */
+    public function getResources(): ?iterable
+    {
+        if (null === $this->resources) {
+            $meta = $this->getMetaFile();
+
+            $this->resources = is_file($meta)
+                ? $this->safelyUnserialize($meta)
+                : false;
+        }
+
+        // Keep using false above, so that the "could not load cache" and "cache not yet initialized"
+        // cases can be differentiated.
+        // But only expose null or the resources.
+        return $this->resources ?: null;
     }
 }

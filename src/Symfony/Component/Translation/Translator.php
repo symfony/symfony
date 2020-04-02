@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
@@ -289,7 +290,18 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         }
 
         /* Read catalogue from cache. */
-        $this->catalogues[$locale] = include $cache->getPath();
+        /** @var MessageCatalogue $catalogue */
+        $catalogue = include $cache->getPath();
+
+        if ($cache instanceof ResourceCheckerConfigCache && $catalogue instanceof CachedMessageCatalogue) {
+            $catalogue->setCachedResourcesLoader(
+                function () use ($cache) {
+                    return $cache->getResources() ?? [];
+                }
+            );
+        }
+
+        $this->catalogues[$locale] = $catalogue;
     }
 
     private function dumpCatalogue(string $locale, ConfigCacheInterface $cache): void
@@ -300,9 +312,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $content = sprintf(<<<EOF
 <?php
 
-use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\CachedMessageCatalogue;
 
-\$catalogue = new MessageCatalogue('%s', %s);
+\$catalogue = new CachedMessageCatalogue('%s', %s);
 
 %s
 return \$catalogue;

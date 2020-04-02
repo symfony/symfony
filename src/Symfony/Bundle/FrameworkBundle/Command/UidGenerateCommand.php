@@ -90,7 +90,7 @@ EOF
         if (\in_array($type, [self::UUID_3, self::UUID_5], true) && (null === $namespace || !Uuid::isValid($namespace))) {
             $namespace = $io->ask('Please enter a valid namespace:', null, function($namespace) {
                 if (null === $namespace || !Uuid::isValid($namespace)) {
-                    throw new \RuntimeException('This is not a valid namespace');
+                    throw new \RuntimeException('This is not a valid namespace.');
                 }
 
                 return $namespace;

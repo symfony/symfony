@@ -1491,6 +1491,16 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
     }
 
+    public function testForcePrependNormalizerWithoutAnySetPreviously()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
+            return 'normalized-'.$value;
+        }, true);
+
+        $this->assertEquals(['foo' => 'normalized-bar'], $this->resolver->resolve());
+    }
+
     public function testForcePrependNormalizerClosure()
     {
         // defined by superclass

@@ -468,6 +468,8 @@ class ErrorHandler
                 return true;
             }
         } else {
+            $this->handleTriggerDeprecationFunction(debug_backtrace(0), $type, $file, $line);
+
             $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
 
             if ($throw || $this->tracedErrors & $type) {
@@ -731,6 +733,27 @@ class ErrorHandler
             new UndefinedMethodErrorEnhancer(),
             new ClassNotFoundErrorEnhancer(),
         ];
+    }
+
+    /**
+     * Replaces the error file and the error line by the ones that called the "trigger_deprecation" function.
+     */
+    private function handleTriggerDeprecationFunction(array $backtrace, int $type, string &$file, int &$line): void
+    {
+        if (E_USER_DEPRECATED !== $type) {
+            return;
+        }
+
+        for ($i = 0; isset($backtrace[$i]); ++$i) {
+            if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
+                if ('trigger_deprecation' === $backtrace[$offset = $i + 1]['function'] ?? null) {
+                    $file = $backtrace[$offset]['file'];
+                    $line = $backtrace[$offset]['line'];
+                }
+
+                break;
+            }
+        }
     }
 
     /**

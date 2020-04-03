@@ -401,6 +401,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function getCacheKey($format, array $context)
     {
         unset($context['cache_key']); // avoid artificially different keys
+
+        if (interface_exists(\Throwable::class)) {
+            try {
+                return md5($format.serialize([
+                        'context' => $context,
+                        'ignored' => $this->ignoredAttributes,
+                        'camelized' => $this->camelizedAttributes,
+                    ]));
+            } catch (\Throwable $exception) {
+                // The context cannot be serialized, skip the cache
+                return false;
+            }
+        }
+
         try {
             return md5($format.serialize([
                 'context' => $context,

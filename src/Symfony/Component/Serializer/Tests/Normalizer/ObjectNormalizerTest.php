@@ -565,8 +565,7 @@ class ObjectNormalizerTest extends TestCase
             'bar' => null,
         ];
 
-        $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => function () {
-        }]));
+        $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => new NotSerializable()]));
     }
 
     public function testMaxDepth()
@@ -1100,5 +1099,17 @@ class ObjectWithUpperCaseAttributeNames
     public function getFoo()
     {
         return $this->Foo;
+    }
+}
+
+class NotSerializable
+{
+    public function __sleep()
+    {
+        if (class_exists(\Error::class)) {
+            throw new \Error('not serializable');
+        }
+
+        throw new \Exception('not serializable');
     }
 }

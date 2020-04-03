@@ -401,8 +401,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
-        $this->expectValidateAt(0, 'data', $object, new GroupSequence(['group1', 'group2']));
-        $this->expectValidateAt(1, 'data', $object, new GroupSequence(['group1', 'group2']));
+        $this->expectValidateAt(0, 'data', $object, 'group1');
+        $this->expectValidateAt(1, 'data', $object, 'group2');
 
         $this->validator->validate($form, new Form());
 
@@ -756,6 +756,39 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame('data[field2]', $context->getViolations()[1]->getPropertyPath());
     }
 
+    public function testCompositeConstraintValidatedInSequence()
+    {
+        $form = $this->getCompoundForm([], [
+            'constraints' => [
+                new Collection([
+                    'field1' => new NotBlank([
+                        'groups' => ['field1'],
+                    ]),
+                    'field2' => new NotBlank([
+                        'groups' => ['field2'],
+                    ]),
+                ]),
+            ],
+            'validation_groups' => new GroupSequence(['field1', 'field2']),
+        ])
+            ->add($this->getForm('field1'))
+            ->add($this->getForm('field2'))
+        ;
+
+        $form->submit([
+            'field1' => '',
+            'field2' => '',
+        ]);
+
+        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+
+        $this->assertCount(1, $context->getViolations());
+        $this->assertSame('This value should not be blank.', $context->getViolations()[0]->getMessage());
+        $this->assertSame('data[field1]', $context->getViolations()[0]->getPropertyPath());
+    }
+
     protected function createValidator()
     {
         return new FormValidator();
@@ -784,7 +817,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     private function getCompoundForm($data, array $options = [])
     {
-        return $this->getBuilder('name', \get_class($data), $options)
+        return $this->getBuilder('name', \is_object($data) ? \get_class($data) : null, $options)
             ->setData($data)
             ->setCompound(true)
             ->setDataMapper(new PropertyPathMapper())

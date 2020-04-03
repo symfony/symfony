@@ -117,6 +117,7 @@
         <xsd:attribute name="metadata-update-threshold" type="xsd:nonNegativeInteger" />
         <xsd:attribute name="sid-length" type="sid_length" />
         <xsd:attribute name="sid-bits-per-character" type="sid_bits_per_character" />
+        <xsd:attribute name="strict-stateless" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="request">

@@ -972,6 +972,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.save_path', $config['save_path']);
 
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
+
+        $container->setParameter('session.strict_stateless', $config['strict_stateless']);
     }
 
     private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

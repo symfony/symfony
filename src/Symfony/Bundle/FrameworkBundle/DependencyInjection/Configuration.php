@@ -540,6 +540,7 @@ class Configuration implements ConfigurationInterface
                             ->min(4)
                             ->max(6)
                         ->end()
+                        ->booleanNode('strict_stateless')->defaultValue('%kernel.debug%')->end()
                     ->end()
                 ->end()
             ->end()

@@ -41,6 +41,7 @@ $container->loadFromExtension('framework', [
         'sid_length' => 22,
         'sid_bits_per_character' => 4,
         'save_path' => '/path/to/sessions',
+        'strict_stateless' => true,
     ],
     'assets' => [
         'version' => 'v1',

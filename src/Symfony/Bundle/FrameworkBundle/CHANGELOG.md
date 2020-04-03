@@ -18,6 +18,7 @@ CHANGELOG
  * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
  * Added ability for `config:dump-reference` and `debug:config` to dump and debug kernel container extension configuration.
  * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
+ * Added `session.strict_statless` option to configure the strictness of stateless reporting
 
 5.0.0
 -----

@@ -78,7 +78,7 @@
                 <argument key="initialized_session" type="service" id="session" on-invalid="ignore_uninitialized" />
                 <argument key="logger" type="service" id="logger" on-invalid="ignore" />
             </argument>
-            <argument>%kernel.debug%</argument>
+            <argument>%session.strict_stateless%</argument>
         </service>
 
         <!-- for BC -->

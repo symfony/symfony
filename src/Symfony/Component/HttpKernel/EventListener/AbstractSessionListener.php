@@ -42,12 +42,12 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
     protected $container;
     private $sessionUsageStack = [];
-    private $debug;
+    private $strictStatelessReport;
 
-    public function __construct(ContainerInterface $container = null, bool $debug = false)
+    public function __construct(ContainerInterface $container = null, bool $strictStatelessReport = false)
     {
         $this->container = $container;
-        $this->debug = $debug;
+        $this->strictStatelessReport = $strictStatelessReport;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -130,7 +130,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if ($this->debug) {
+        if ($this->strictStatelessReport) {
             throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
         }
 
@@ -148,7 +148,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
     public function onSessionUsage(): void
     {
-        if (!$this->debug) {
+        if (!$this->strictStatelessReport) {
             return;
         }
 

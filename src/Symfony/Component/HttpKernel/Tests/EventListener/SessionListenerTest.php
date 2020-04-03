@@ -181,7 +181,7 @@ class SessionListenerTest extends TestCase
         $this->assertLessThanOrEqual((new \DateTime('now', new \DateTimeZone('UTC'))), (new \DateTime($response->headers->get('Expires'))));
     }
 
-    public function testSessionUsageExceptionIfStatelessAndSessionUsed()
+    public function testSessionUsageExceptionWhenStrictStatelessAndSessionUsed()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
@@ -200,7 +200,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new Response()));
     }
 
-    public function testSessionUsageLogIfStatelessAndSessionUsed()
+    public function testSessionUsageLogWhenNotStrictStatelessAndSessionUsed()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
@@ -245,7 +245,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
     }
 
-    public function testSessionUsageCallbackWhenDebugAndStateless()
+    public function testSessionUsageCallbackWhenStrictAndStateless()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->method('isStarted')->willReturn(true);
@@ -268,7 +268,7 @@ class SessionListenerTest extends TestCase
         (new SessionListener($container, true))->onSessionUsage();
     }
 
-    public function testSessionUsageCallbackWhenNoDebug()
+    public function testSessionUsageCallbackWhenNotStrict()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->method('isStarted')->willReturn(true);

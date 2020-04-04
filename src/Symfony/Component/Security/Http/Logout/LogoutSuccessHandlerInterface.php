@@ -28,7 +28,7 @@ trigger_deprecation('symfony/security-http', '5.1', 'The "%s" interface is depre
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @deprecated since Symfony 5.1.
+ * @deprecated since Symfony 5.1
  */
 interface LogoutSuccessHandlerInterface
 {

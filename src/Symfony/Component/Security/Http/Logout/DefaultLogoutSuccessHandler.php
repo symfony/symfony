@@ -23,7 +23,7 @@ trigger_deprecation('symfony/security-http', '5.1', 'The "%s" class is deprecate
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
  *
- * @deprecated since version 5.1
+ * @deprecated since Symfony 5.1
  */
 class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {

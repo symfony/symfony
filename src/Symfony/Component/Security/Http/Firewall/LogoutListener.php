@@ -74,7 +74,7 @@ class LogoutListener extends AbstractListener
     }
 
     /**
-     * @deprecated since version 5.1
+     * @deprecated since Symfony 5.1
      */
     public function addHandler(LogoutHandlerInterface $handler)
     {

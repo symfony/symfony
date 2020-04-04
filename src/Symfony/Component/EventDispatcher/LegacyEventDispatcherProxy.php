@@ -20,7 +20,7 @@ trigger_deprecation('symfony/event-dispatcher', '5.1', '%s is deprecated, use th
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @deprecated since Symfony 5.1.
+ * @deprecated since Symfony 5.1
  */
 final class LegacyEventDispatcherProxy
 {

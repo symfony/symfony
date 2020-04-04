@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T18:22:36Z
+
+I was wondering about `CompiledUrlMatcher`. It's mentioned on `create_framework/routing.rst`, but https://symfony.com/doc/current/routing.html doesn't link to it, isn't it? Is this something that needs to be improved?

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2020-04-03T13:06:50Z
+
+To be honest, I'm not sure if what you describe in the description is a bug or not, because when using typed properties, you must always initialize the property, either in its definition of in the constructor, that's the spirit of this feature. However, your patch is legit, because according to the Doctrine documentation:
+
+> If you intend to serialize (and unserialize) entity instances that still hold references to proxy objects you may run into problems with private properties because of technical limitations. Proxy objects implement __sleep and it is not possible for __sleep to return names of private properties in parent classes.
+
+`object_to_populate` likely contains a Doctrine entity, so we must not serialize it (+ it's useless to serialize it).
+
+Could you add a test to prevent regressions? (Just testing than putting something to serializable such as a closure in `object_to_populate` will be enough, no need for a Doctrine entity).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-04-03T13:11:02Z
+
+Also, there is probably something to fix in Doctrine too. Our call to `serialize()` is already in a try/catch block. Doctrine shouldn't generate uncatchable errors like that.
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2020-04-03T13:45:23Z
+
+It cannot really tested since serializing a closure will throw an exception, not an error (and the exception is catched).
+And there is already a test in `ObjectNormalizerTest` to test this behavior (`testNormalizeNotSerializableContext`).
+
+---------------------------------------------------------------------------
+
+by 2ec0b4 at 2020-04-03T13:55:06Z
+
+Pay attention to the destination branch: symfony:3.4 here, but the initial issue https://github.com/symfony/symfony/issues/35574 is about symfony:4.4. This should be applied on several versions?
+
+I reproduce this behavior on SF 4.4 here: https://github.com/doctrine/common/issues/886#issuecomment-602842408
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-04-03T14:02:06Z
+
+@alanpoulain for the test you can do the like it that: https://github.com/symfony/symfony/pull/36336/files#diff-e6bd6c603753788029968840196a888cR395
+
+@2ec0b4 patches are merged to upper branches, it will be fixed in 3.4 and all superior versions.

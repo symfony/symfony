@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-03-27T18:43:56Z
+
+_Please note that the fabbot exception message error is a false-positive_
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2020-04-02T01:50:25Z
+
++1
+
+I've never understood why the security component uses Handlers instead of events. I'd love to see it using events for everything. For example:
+
+LogoutEvent -> Replaces the need to override the logout handler
+AuthenticationFailureEvent -> Replaces the need to override the authentication failure handler
+AuthenticationSuccessEvent -> Replaces the need to override the authentication success handler

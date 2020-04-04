@@ -26,26 +26,29 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 class RememberMeListener implements EventSubscriberInterface
 {
     private $rememberMeServices;
-    private $providerKey;
     private $logger;
 
-    public function __construct(RememberMeServicesInterface $rememberMeServices, string $providerKey, ?LoggerInterface $logger = null)
+    public function __construct(RememberMeServicesInterface $rememberMeServices, ?LoggerInterface $logger = null)
     {
         $this->rememberMeServices = $rememberMeServices;
-        $this->providerKey = $providerKey;
         $this->logger = $logger;
     }
 
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
     {
-        if (!$this->isRememberMeEnabled($event->getProviderKey(), $event->getAuthenticator())) {
+        $authenticator = $event->getAuthenticator();
+        if (!$authenticator instanceof RememberMeAuthenticatorInterface || !$authenticator->supportsRememberMe()) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($authenticator)]);
+            }
+
             return;
         }
 
         if (null === $event->getResponse()) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: the authenticator did not set a success response.', ['authenticator' => \get_class($event->getAuthenticator())]);
+                $this->logger->debug('Remember me skipped: the authenticator did not set a success response.', ['authenticator' => \get_class($authenticator)]);
             }
 
             return;
@@ -56,29 +59,7 @@ class RememberMeListener implements EventSubscriberInterface
 
     public function onFailedLogin(LoginFailureEvent $event): void
     {
-        if (!$this->isRememberMeEnabled($event->getProviderKey())) {
-            return;
-        }
-
         $this->rememberMeServices->loginFail($event->getRequest(), $event->getException());
-    }
-
-    private function isRememberMeEnabled(string $providerKey, ?AuthenticatorInterface $authenticator = null): bool
-    {
-        if ($providerKey !== $this->providerKey) {
-            // This listener is created for a different firewall.
-            return false;
-        }
-
-        if (null !== $authenticator && (!$authenticator instanceof RememberMeAuthenticatorInterface || !$authenticator->supportsRememberMe())) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($authenticator)]);
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     public static function getSubscribedEvents(): array

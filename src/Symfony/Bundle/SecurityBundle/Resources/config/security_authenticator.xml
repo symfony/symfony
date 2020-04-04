@@ -59,8 +59,9 @@
             <argument type="service" id="Symfony\Component\Security\Core\User\UserCheckerInterface" />
         </service>
 
-        <service id="security.listener.session" class="Symfony\Component\Security\Http\EventListener\SessionStrategyListener">
-            <tag name="kernel.event_subscriber" />
+        <service id="security.listener.session"
+                 class="Symfony\Component\Security\Http\EventListener\SessionStrategyListener"
+                 abstract="true">
             <argument type="service" id="security.authentication.session_strategy" />
             <argument type="abstract">stateless firewall keys</argument>
         </service>

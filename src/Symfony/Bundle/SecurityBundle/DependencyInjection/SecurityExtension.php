@@ -156,8 +156,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(2, $this->statelessFirewallKeys);
 
         if ($this->authenticatorManagerEnabled) {
-            $container->getDefinition(SessionListener::class)
-                ->replaceArgument(1, $this->statelessFirewallKeys);
+            foreach ($this->statelessFirewallKeys as $statelessFirewallId) {
+                $container
+                    ->setDefinition('security.listener.session.'.$statelessFirewallId, new ChildDefinition('security.listener.session'))
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$statelessFirewallId]);
+            }
         }
 
         if ($config['encoders']) {
@@ -446,6 +449,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container
                 ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
                 ->replaceArgument(0, $authenticators)
+                ->replaceArgument(2, new Reference($firewallEventDispatcherId))
                 ->replaceArgument(3, $id)
                 ->addTag('monolog.logger', ['channel' => 'security'])
             ;

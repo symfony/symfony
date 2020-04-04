@@ -218,9 +218,8 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
     {
         $container
             ->setDefinition('security.listener.remember_me.'.$id, new ChildDefinition('security.listener.remember_me'))
-            ->addTag('kernel.event_subscriber')
+            ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$id])
             ->replaceArgument(0, new Reference($rememberMeServicesId))
-            ->replaceArgument(1, $id)
         ;
 
         $container

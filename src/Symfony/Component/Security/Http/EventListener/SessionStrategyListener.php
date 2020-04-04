@@ -28,21 +28,18 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 class SessionStrategyListener implements EventSubscriberInterface
 {
     private $sessionAuthenticationStrategy;
-    private $statelessProviderKeys;
 
-    public function __construct(SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy, array $statelessProviderKeys = [])
+    public function __construct(SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy)
     {
         $this->sessionAuthenticationStrategy = $sessionAuthenticationStrategy;
-        $this->statelessProviderKeys = $statelessProviderKeys;
     }
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
     {
         $request = $event->getRequest();
         $token = $event->getAuthenticatedToken();
-        $providerKey = $event->getProviderKey();
 
-        if (!$request->hasSession() || !$request->hasPreviousSession() || \in_array($providerKey, $this->statelessProviderKeys, true)) {
+        if (!$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
 

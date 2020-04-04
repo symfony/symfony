@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-01T15:36:26Z
+
+Should we also allow `null`? The `action` attribute is optional for forms, right? So maybe we could pass `null` to tell Symfony to not add it.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-04-01T15:43:47Z
+
+I'm not sure because by default we have an empty string : https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/Type/FormType.php#L191-L193
+Infact, I had `null` in one of my forms and it causes a typing error not very clear to identify where the problem comes from.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-04-02T12:05:37Z
+
+@HeahDude done 😉
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-02T14:57:37Z
+
+Side note: this should target 3.4 as bug fix IMO
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-04-02T15:05:52Z
+
+@HeahDude I don't know, it could be cause a BC no ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-02T15:08:52Z
+
+The BC break would also happen in master, every bug fix is some kind of BC break since it changes a wrong behavior. The question is do we consider it a bug? I do, but I also agree that casting null to string should be ok. Though, targeting master would mean deprecating passing null first in 5.1, and throw an exception in 6.0 only.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-04-02T15:17:30Z
+
++1 for 3.4 as bugfix

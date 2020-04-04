@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T19:02:18Z
+
+Why didn't we go with the option of adding the argument to the existing interface, with a proper BC layer? It would make sense to me, don't you think so?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-01T12:21:07Z
+
+Replacing the concrete method by a virtual one until 6.0? Our BC promise needs a patch :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-01T13:39:10Z
+
+@chalasr no need: just adding an `@param` annotation is enough, alongside with:
+- a commented argument on the signature,
+- all implementations updated accordingly (in a similar way for non-final/internal classes)
+- notes in UPGRADE-5.1/6.0.md + CHANGELOG
+
+@Braxilior up to do it ?
+
+---------------------------------------------------------------------------
+
+by Braxilior at 2020-04-01T15:12:49Z
+
+yes 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-04-02T10:25:26Z
+
+@chalasr i do think the BC promise needs a patch in general. See https://github.com/symfony/symfony-docs/issues/10504 for reference :)

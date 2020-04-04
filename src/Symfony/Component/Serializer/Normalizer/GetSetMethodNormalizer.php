@@ -139,7 +139,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         }
 
         $camelCaseToSnakeCaseConverter = new CamelCaseToSnakeCaseNameConverter();
-        $camelCaseAttribute = $camelCaseToSnakeCaseConverter->denormalize($ucfirsted);
+        $camelCaseAttribute = $camelCaseToSnakeCaseConverter->denormalize($attribute);
         $getter = 'get'.ucfirst($camelCaseAttribute);
 
         if (\is_callable([$object, $getter])) {

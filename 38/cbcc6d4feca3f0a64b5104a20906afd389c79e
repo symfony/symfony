@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-03T15:14:18Z
+
+> setToken(null) is called in ContextListener
+
+Can't we make setToken increment the tracker *when $token is not null*?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-03T16:00:33Z
+
+> Can't we make setToken increment the tracker when $token is not null?
+
+I just tried this (as it sounds like a nice solution), but without calling `getToken()` the `TokenStorage::initializer()` isn't called. This means `ContextListener` isn't called and thus usage tracking is not enabled in the `UsageTrackingTokenStorage`. So this can be fixed by also injecting the `sessionTrackerEnabler` in `UsageTrackingTokenStorage`. Is that preferred? (it seems a bit off, as it's then getting a closure injected call its own method)
+
+Allowing `setToken()` to call the `initializer` before setting the token would completely remove the lazy feature (as `setToken(null)` is always called).

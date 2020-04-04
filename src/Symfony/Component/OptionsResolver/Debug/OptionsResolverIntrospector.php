@@ -100,8 +100,20 @@ class OptionsResolverIntrospector
      * @return string|\Closure
      *
      * @throws NoConfigurationException on no configured deprecation
+     *
+     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
      */
     public function getDeprecationMessage(string $option)
+    {
+        trigger_deprecation('symfony/options-resolver', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
+
+        return $this->getDeprecation($option)['message'];
+    }
+
+    /**
+     * @throws NoConfigurationException on no configured deprecation
+     */
+    public function getDeprecation(string $option): array
     {
         return ($this->get)('deprecated', $option, sprintf('No deprecation was set for the "%s" option.', $option));
     }

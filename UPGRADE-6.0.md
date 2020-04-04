@@ -7,6 +7,7 @@ Config
  * The signature of method `NodeDefinition::setDeprecated()` has been updated to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`.
  * The signature of method `BaseNode::setDeprecated()` has been updated to `BaseNode::setDeprecation(string $package, string $version, string $message)`.
  * Passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node is not supported anymore.
+ * Removed `BaseNode::getDeprecationMessage()`, use `BaseNode::getDeprecation()` instead.
 
 Console
 -------
@@ -21,6 +22,8 @@ DependencyInjection
  * The signature of method `DeprecateTrait::deprecate()` has been updated to `DeprecateTrait::deprecation(string $package, string $version, string $message)`.
  * Removed the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
    configure them explicitly instead.
+ * Removed `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead.
+ * Removed `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead.
 
 Dotenv
 ------
@@ -68,6 +71,12 @@ Messenger
  * Use of invalid options in Redis and AMQP connections now throws an error.
  * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
+
+OptionsResolver
+---------------
+
+ * The signature of method `OptionsResolver::setDeprecated()` has been updated to `OptionsResolver::setDeprecated(string $option, string $package, string $version, $message)`.
+ * Removed `OptionsResolverIntrospector::getDeprecationMessage()`, use `OptionsResolverIntrospector::getDeprecation()` instead.
 
 PhpUnitBridge
 -------------

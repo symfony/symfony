@@ -14,6 +14,8 @@ CHANGELOG
    configure them explicitly instead
  * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
  * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
+ * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
 
 5.0.0
 -----

@@ -58,7 +58,9 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             $event->setForRetry();
 
             ++$retryCount;
-            $delay = $retryStrategy->getWaitingTime($envelope);
+
+            $delay = $retryStrategy->getWaitingTime($envelope, $throwable);
+
             if (null !== $this->logger) {
                 $this->logger->error('Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
             }
@@ -103,7 +105,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             return false;
         }
 
-        return $retryStrategy->isRetryable($envelope);
+        return $retryStrategy->isRetryable($envelope, $e);
     }
 
     private function getRetryStrategyForTransport(string $alias): ?RetryStrategyInterface

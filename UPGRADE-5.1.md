@@ -73,6 +73,8 @@ Messenger
  * Deprecated Doctrine transport. It has moved to a separate package. Run `composer require symfony/doctrine-messenger` to use the new classes.
  * Deprecated RedisExt transport. It has moved to a separate package. Run `composer require symfony/redis-messenger` to use the new classes.
  * Deprecated use of invalid options in Redis and AMQP connections.
+ * Deprecated *not* declaring a `\Throwable` argument in `RetryStrategyInterface::isRetryable()`
+ * Deprecated *not* declaring a `\Throwable` argument in `RetryStrategyInterface::getWaitingTime()`
 
 Notifier
 --------

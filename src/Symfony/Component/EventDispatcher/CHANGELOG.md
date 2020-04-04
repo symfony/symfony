@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * The `LegacyEventDispatcherProxy` class has been deprecated.
+ * Added an optional `dispatcher` attribute to the listener and subscriber tags in `RegisterListenerPass`.
 
 5.0.0
 -----

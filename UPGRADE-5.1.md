@@ -115,6 +115,9 @@ Security
    {% endif %}
    ```
 
+ * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
+ * Deprecated `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
+
 Yaml
 ----
 

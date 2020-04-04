@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
@@ -205,7 +206,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
-                    ->scalarNode('success_handler')->end()
+                    ->scalarNode('success_handler')->setDeprecated(sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
                 ->end()
                 ->fixXmlConfig('delete_cookie')
@@ -230,7 +231,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('handler')
                 ->children()
                     ->arrayNode('handlers')
-                        ->prototype('scalar')->end()
+                        ->prototype('scalar')->setDeprecated(sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->end()
                 ->end()
             ->end()

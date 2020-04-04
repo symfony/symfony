@@ -163,6 +163,14 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $stringCollection->children[1]);
     }
 
+    public function testDenormalizeNotSerializableObjectToPopulate()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $normalizedData = $normalizer->denormalize(['foo' => 'foo'], Dummy::class, null, [AbstractObjectNormalizer::OBJECT_TO_POPULATE => new NotSerializable()]);
+
+        $this->assertSame('foo', $normalizedData->foo);
+    }
+
     private function getDenormalizerForStringCollection()
     {
         $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
@@ -377,5 +385,17 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
+    }
+}
+
+class NotSerializable
+{
+    public function __sleep()
+    {
+        if (class_exists(\Error::class)) {
+            throw new \Error('not serializable');
+        }
+
+        throw new \Exception('not serializable');
     }
 }

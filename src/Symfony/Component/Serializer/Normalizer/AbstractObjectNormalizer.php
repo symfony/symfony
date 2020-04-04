@@ -400,6 +400,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getCacheKey($format, array $context)
     {
+        unset($context[self::OBJECT_TO_POPULATE]);
         unset($context['cache_key']); // avoid artificially different keys
         try {
             return md5($format.serialize([

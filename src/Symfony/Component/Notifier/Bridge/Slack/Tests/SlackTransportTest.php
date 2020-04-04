@@ -29,17 +29,17 @@ final class SlackTransportTest extends TestCase
     public function testToStringContainsProperties(): void
     {
         $host = 'testHost';
-        $channel = 'testChannel';
+        $path = 'testPath';
 
-        $transport = new SlackTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport($path, $this->createMock(HttpClientInterface::class));
         $transport->setHost('testHost');
 
-        $this->assertSame(sprintf('slack://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame(sprintf('slack://%s/%s', $host, $path), (string) $transport);
     }
 
     public function testSupportsChatMessage(): void
     {
-        $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport('testPath', $this->createMock(HttpClientInterface::class));
 
         $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
@@ -49,7 +49,7 @@ final class SlackTransportTest extends TestCase
     {
         $this->expectException(LogicException::class);
 
-        $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport('testPath', $this->createMock(HttpClientInterface::class));
 
         $transport->send($this->createMock(MessageInterface::class));
     }
@@ -70,7 +70,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('testPath', $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -78,7 +78,7 @@ final class SlackTransportTest extends TestCase
     public function testSendWithErrorResponseThrows(): void
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessageRegExp('/testErrorCode/');
+        $this->expectExceptionMessage('testErrorCode');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -87,21 +87,20 @@ final class SlackTransportTest extends TestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['error' => 'testErrorCode']));
+            ->willReturn('testErrorCode');
 
         $client = new MockHttpClient(static function () use ($response): ResponseInterface {
             return $response;
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('testPath', $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithOptions(): void
     {
-        $token = 'testToken';
-        $channel = 'testChannel';
+        $path = 'testPath';
         $message = 'testMessage';
 
         $response = $this->createMock(ResponseInterface::class);
@@ -112,9 +111,9 @@ final class SlackTransportTest extends TestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => true]));
+            ->willReturn('ok');
 
-        $expectedBody = sprintf('token=%s&channel=%s&text=%s', $token, $channel, $message);
+        $expectedBody = json_encode(['text' => $message]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
             $this->assertSame($expectedBody, $options['body']);
@@ -122,15 +121,14 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = new SlackTransport($path, $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithNotification(): void
     {
-        $token = 'testToken';
-        $channel = 'testChannel';
+        $host = 'testHost';
         $message = 'testMessage';
 
         $response = $this->createMock(ResponseInterface::class);
@@ -141,16 +139,14 @@ final class SlackTransportTest extends TestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => true]));
+            ->willReturn('ok');
 
         $notification = new Notification($message);
         $chatMessage = ChatMessage::fromNotification($notification);
         $options = SlackOptions::fromNotification($notification);
 
-        $expectedBody = http_build_query([
-            'blocks' => $options->toArray()['blocks'],
-            'token' => $token,
-            'channel' => $channel,
+        $expectedBody = json_encode([
+            'blocks' => json_decode($options->toArray()['blocks'], true),
             'text' => $message,
         ]);
 
@@ -160,7 +156,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = new SlackTransport($host, $client);
 
         $transport->send($chatMessage);
     }
@@ -173,15 +169,14 @@ final class SlackTransportTest extends TestCase
             return $this->createMock(ResponseInterface::class);
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('testHost', $client);
 
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWith200ResponseButNotOk(): void
     {
-        $token = 'testToken';
-        $channel = 'testChannel';
+        $host = 'testChannel';
         $message = 'testMessage';
 
         $this->expectException(TransportException::class);
@@ -194,9 +189,9 @@ final class SlackTransportTest extends TestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => false, 'error' => 'testErrorCode']));
+            ->willReturn('testErrorCode');
 
-        $expectedBody = sprintf('token=%s&channel=%s&text=%s', $token, $channel, $message);
+        $expectedBody = json_encode(['text' => $message]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
             $this->assertSame($expectedBody, $options['body']);
@@ -204,7 +199,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = new SlackTransport($host, $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }

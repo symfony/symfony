@@ -23,26 +23,28 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class SlackTransportFactory extends AbstractTransportFactory
 {
+    public const SCHEME = 'slack';
+
     /**
      * @return SlackTransport
      */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $accessToken = $this->getUser($dsn);
-        $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('slack' === $scheme) {
-            return (new SlackTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        if (self::SCHEME === $scheme) {
+            $path = ltrim($dsn->getPath(), '/');
+
+            return (new SlackTransport($path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
-        throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, self::SCHEME, $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['slack'];
+        return [self::SCHEME];
     }
 }

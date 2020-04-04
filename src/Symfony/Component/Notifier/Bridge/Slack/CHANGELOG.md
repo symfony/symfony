@@ -5,3 +5,8 @@ CHANGELOG
 -----
 
  * Added the bridge
+
+5.1.0
+-----
+
+ * Support sending messages using Incoming Webhooks

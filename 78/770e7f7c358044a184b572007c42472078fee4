@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-10T17:27:02Z
+
+How can we test this? There are some functional tests in this area, could be a fit?
+
+---------------------------------------------------------------------------
+
+by Guite at 2020-02-10T20:13:01Z
+
+@nicolas-grekas added a test case to `NativeSessionStorageTest`
+
+---------------------------------------------------------------------------
+
+by Guite at 2020-02-11T07:38:08Z
+
+FYI: appveyor failed because of `Symfony\Component\Process\Tests\ProcessTest::testStartIsNonBlocking`: `Failed asserting that 1.6472308635712 is less than 0.4.`
+
+This seems not related, but flaky.

@@ -13,8 +13,12 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
@@ -309,5 +313,37 @@ class ClassMetadataTest extends TestCase
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
+    }
+
+    /**
+     * @requires PHP < 7.4
+     */
+    public function testCascadeConstraintIsNotAvailable()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Constraints\Cascade" requires PHP 7.4.');
+
+        $metadata->addConstraint(new Cascade());
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testCascadeConstraint()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(4, $metadata->properties);
+        $this->assertSame([
+            'requiredChild',
+            'optionalChild',
+            'staticChild',
+            'children',
+        ], $metadata->getConstrainedProperties());
     }
 }

@@ -32,6 +32,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * added a `Cascade` constraint to ease validating typed nested objects
  * added the `Hostname` constraint and validator
  * added the `alpha3` option to the `Country` and `Language` constraints
  * allow to define a reusable set of constraints by extending the `Compound` constraint

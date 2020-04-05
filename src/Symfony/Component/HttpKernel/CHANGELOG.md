@@ -4,6 +4,8 @@ CHANGELOG
 5.1.0
 -----
 
+ * made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+;
+   not returning an array is deprecated
  * deprecated support for `service:action` syntax to reference controllers, use `serviceOrFqcn::method` instead
  * allowed using public aliases to reference controllers
  * added session usage reporting when the `_stateless` attribute of the request is set to `true`

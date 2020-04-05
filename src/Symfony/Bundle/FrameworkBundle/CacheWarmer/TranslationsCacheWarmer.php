@@ -35,6 +35,8 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[]
      */
     public function warmUp(string $cacheDir)
     {
@@ -43,8 +45,10 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         }
 
         if ($this->translator instanceof WarmableInterface) {
-            $this->translator->warmUp($cacheDir);
+            return (array) $this->translator->warmUp($cacheDir);
         }
+
+        return [];
     }
 
     /**

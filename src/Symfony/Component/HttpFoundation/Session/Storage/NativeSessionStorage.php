@@ -213,8 +213,10 @@ class NativeSessionStorage implements SessionStorageInterface
             return false;
         }
 
-        if (null !== $lifetime) {
+        if (null !== $lifetime && $lifetime != ini_get('session.cookie_lifetime')) {
+            $this->save();
             ini_set('session.cookie_lifetime', $lifetime);
+            $this->start();
         }
 
         if ($destroy) {

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonLoginFactory extends AbstractFactory
+class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
     public function __construct()
     {
@@ -95,5 +95,19 @@ class JsonLoginFactory extends AbstractFactory
         $container->setDefinition($listenerId, $listener);
 
         return $listenerId;
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    {
+        $authenticatorId = 'security.authenticator.json_login.'.$id;
+        $options = array_intersect_key($config, $this->options);
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.json_login'))
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(2, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)) : null)
+            ->replaceArgument(3, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $id, $config)) : null)
+            ->replaceArgument(4, $options);
+
+        return $authenticatorId;
     }
 }

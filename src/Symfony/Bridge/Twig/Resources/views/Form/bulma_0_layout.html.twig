@@ -1,0 +1,98 @@
+{% use "form_div_layout.html.twig" %}
+
+{%- block form_widget_compound -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' columns is-multiline')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        {%- if form is rootform -%}
+            {{ form_errors(form) }}
+        {%- endif -%}
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock form_widget_compound -%}
+
+{% block form_widget_simple -%}
+    {% if errors|length > 0 -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-danger')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block form_row -%}
+    <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' column is-' ~ column_is|default(6))|trim})} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, {attr: {'class': 'input'}}) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row %}
+
+{% block form_label -%}
+    {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' label')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_label %}
+
+{% block textarea_row -%}
+    {% set column_is = 12 %}
+    {{- block('form_row') }}
+{%- endblock textarea_row %}
+
+{%- block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' textarea')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    <div class="select is-fullwidth">
+        {{- parent() -}}
+    </div>
+{%- endblock choice_widget_collapsed -%}
+
+{% block choice_widget -%}
+    {% set type_class = multiple == true and expanded == true ? 'checkbox' : 'radio' %}
+
+    <div class="control">
+        {% for child_value, child in form %}
+            <label class="{{type_class}}">
+                {{ form_widget(child) }}
+                {% if choice_translation_domain is same as(false) %}
+                    child.vars.label
+                {% else %}
+                    {{child.vars.label|trans({}, choice_translation_domain)}}
+                {% endif %}
+            </label>
+        {% endfor %}
+    </div>
+{%- endblock choice_widget %}
+
+{%- block file_row -%}
+    {% set onChange = "document.getElementById('" ~ id ~ "_file_name').innerHTML = this.value;" %}
+    <div class="column is-6">
+        <div class="field">
+            <div class="file has-name">
+                {{- form_errors(form) -}}
+                <label class="file-label">
+                    {{- form_widget(form, {attr: {'class': 'file-input', 'onchange': onChange }}) -}}
+                    <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">
+                                {{- form_label(form) -}}
+                            </span>
+                        </span>
+                    <span class="file-name" id="{{ id ~ '_file_name'}}"></span>
+                </label>
+                {{- form_errors(form) -}}
+            </div>
+        </div>
+    </div>
+{%- endblock file_row -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- for error in errors -%}
+            <div class="help is-danger">{{ error.message }}</div>
+        {%- endfor -%}
+    {%- endif -%}
+{%- endblock form_errors -%}

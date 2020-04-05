@@ -1,5 +1,6 @@
 CHANGELOG
 =========
+ * added form theme for [bulma.io](https://bulma.io/)
 
 4.4.0
 -----

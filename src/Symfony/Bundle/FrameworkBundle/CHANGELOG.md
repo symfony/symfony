@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added link to source for controllers registered as named services
  * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)
  * Added `Routing\Loader` and `Routing\Loader\Configurator` namespaces to ease defining routes with default controllers
  * Added the `framework.router.context` configuration node to configure the `RequestContext`

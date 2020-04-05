@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-03-04T05:38:16Z
+
+I'm pretty sure that the rewind calls are not there by mistake.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T20:01:03Z
+
+I'm still pushing for this PR to be merged.

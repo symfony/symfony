@@ -15,6 +15,7 @@ CHANGELOG
  * made the Mime component an optional dependency
  * added `MarshallingSessionHandler`, `IdentityMarshaller`
  * made `Session` accept a callback to report when the session is being used
+ * Add support for all core cache control directives
 
 5.0.0
 -----

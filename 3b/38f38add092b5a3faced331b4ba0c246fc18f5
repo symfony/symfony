@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2020-03-25T09:02:10Z
+
+So `class_exists` is no longer needed in favor of `container.preload` tag do add classes to `*.preload.php` dumped file ?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-03-25T17:05:27Z
+
+@michaljusiega AFAIU, the class_exists were solving 2 issues:
+
+- discovery of classes to be preloaded
+- compatibility with preloading is some specific cases related to anonymous classes which break if the class is not loaded
+
+This PR provides an alternative solution to the first issue (though `class_exists` will still work). For the second problem, `class_exists` is still the proper solution IMO, as that's not about the Symfony preload dumper by itself, but about compat with preloading.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-25T17:42:10Z
+
+I updated the PR to now also provide a `container.no_preload` tag.
+I added it to eg. console commands.
+
+@michaljusiega: what @stof said: `class_exists()` are better options for portability and for locality. `container.preload` serves adding preloading info to third party packages that don't (want to) use `class_exists()`, and also in programmatic situations where a bundle's logic might known better about fine grained preloading, depending on the configuration.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2020-03-25T17:48:47Z
+
+@nicolas-grekas, @stof I understand. Thanks!

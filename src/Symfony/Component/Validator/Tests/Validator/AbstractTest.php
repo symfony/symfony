@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -23,6 +24,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Tests\Fixtures\CascadedChild;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
@@ -495,6 +498,85 @@ abstract class AbstractTest extends AbstractValidatorTest
 
         /* @var ConstraintViolationInterface[] $violations */
         $this->assertCount(0, $violations);
+    }
+
+    public function testReferenceCascadeDisabledByDefault()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $this->fail('Should not be called');
+        };
+
+        $this->referenceMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testReferenceCascadeEnabledIgnoresUntyped()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addConstraint(new Cascade());
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $this->fail('Should not be called');
+        };
+
+        $this->referenceMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testTypedReferenceCascadeEnabled()
+    {
+        $entity = new CascadingEntity();
+        $entity->requiredChild = new CascadedChild();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->buildViolation('Invalid child')
+                ->atPath('name')
+                ->addViolation()
+            ;
+        };
+
+        $cascadingMetadata = new ClassMetadata(CascadingEntity::class);
+        $cascadingMetadata->addConstraint(new Cascade());
+
+        $cascadedMetadata = new ClassMetadata(CascadedChild::class);
+        $cascadedMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $this->metadataFactory->addMetadata($cascadingMetadata);
+        $this->metadataFactory->addMetadata($cascadedMetadata);
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertInstanceOf(Callback::class, $violations->get(0)->getConstraint());
     }
 
     public function testAddCustomizedViolation()

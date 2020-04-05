@@ -128,7 +128,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 $dispatcherDefinitions[] = $container->getDefinition($attributes['dispatcher']);
             }
 
-            if ([] === $dispatcherDefinitions) {
+            if (!$dispatcherDefinitions) {
                 $dispatcherDefinitions = [$globalDispatcherDefinition];
             }
 

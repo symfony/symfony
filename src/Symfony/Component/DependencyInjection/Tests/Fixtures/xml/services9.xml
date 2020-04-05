@@ -148,6 +148,10 @@
       <argument type="service" id="errored_definition"/>
     </service>
     <service id="errored_definition" class="stdClass"/>
+    <service id="preload_sidekick" class="stdClass" public="true">
+      <tag name="container.preload" class="Some\Sidekick1"/>
+      <tag name="container.preload" class="Some\Sidekick2"/>
+    </service>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false">
       <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>

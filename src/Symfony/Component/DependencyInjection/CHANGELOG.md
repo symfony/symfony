@@ -13,6 +13,7 @@ CHANGELOG
  * deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
    configure them explicitly instead
  * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
+ * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
 
 5.0.0
 -----

@@ -191,3 +191,9 @@ services:
         public: true
     errored_definition:
         class: stdClass
+    preload_sidekick:
+        class: stdClass
+        tags:
+            - {name: container.preload, class: 'Some\Sidekick1'}
+            - {name: container.preload, class: 'Some\Sidekick2'}
+        public: true

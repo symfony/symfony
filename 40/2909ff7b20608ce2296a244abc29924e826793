@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by azjezz at 2020-03-31T20:10:13Z
+
+Added tests and a changelog entry.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T20:15:34Z
+
+@azjezz thanks. What about https://github.com/symfony/symfony/pull/35748#discussion_r401165779 ?

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added `RemoteJsonManifestVersionStrategy` to download manifest over HTTP.
+
 4.2.0
 -----
 

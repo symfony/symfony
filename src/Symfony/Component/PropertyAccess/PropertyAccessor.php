@@ -385,7 +385,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } catch (\TypeError $e) {
                     // handle uninitialized properties in PHP >= 7
                     if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of the type (\w+), null returned$/', preg_quote(\get_class($object)), $access[self::ACCESS_NAME])), $e->getMessage(), $matches)) {
-                        throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Have you forgotten to initialize a property or to make the return type nullable using "?%3$s" instead?', \get_class($object), $access[self::ACCESS_NAME], $matches[1]), 0, $e);
+                        throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', \get_class($object), $access[self::ACCESS_NAME], $matches[1]), 0, $e);
                     }
 
                     throw $e;
@@ -418,7 +418,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
                 $r = new \ReflectionProperty($matches[1], $matches[2]);
 
-                throw new AccessException(sprintf('The property "%s::$%s" is not readable because it is typed "%3$s". You should either initialize it or make it nullable using "?%3$s" instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
+                throw new AccessException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
             }
 
             throw $e;

@@ -210,4 +210,12 @@ class Dummy extends ParentDummy
     public function getYT()
     {
     }
+
+    public function setDate(\DateTime $date)
+    {
+    }
+
+    public function addDate(\DateTime $date)
+    {
+    }
 }

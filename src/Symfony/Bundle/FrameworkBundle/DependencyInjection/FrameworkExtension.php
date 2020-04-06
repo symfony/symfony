@@ -996,6 +996,10 @@ class FrameworkExtension extends Extension
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
         }
 
+        if (false !== $config['cache_version']) {
+            $defaultVersion = $this->decorateVersionStrategyWithCache($container, $defaultVersion);
+        }
+
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
@@ -1011,6 +1015,9 @@ class FrameworkExtension extends Extension
                 $format = $package['version_format'] ?: $config['version_format'];
                 $version = isset($package['version']) ? $package['version'] : null;
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
+                if (false !== $package['cache_version']) {
+                    $version = $this->decorateVersionStrategyWithCache($container, $version);
+                }
             }
 
             $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
@@ -1071,6 +1078,16 @@ class FrameworkExtension extends Extension
         }
 
         return new Reference('assets.empty_version_strategy');
+    }
+
+    private function decorateVersionStrategyWithCache(ContainerBuilder $container, Reference $reference): Reference
+    {
+        $cachedReference = new Reference($reference.'.cached');
+        $cached = new ChildDefinition('assets.cached_version_strategy');
+        $cached->replaceArgument(0, $reference);
+        $container->setDefinition($cachedReference, $cached);
+
+        return $cachedReference;
     }
 
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale)

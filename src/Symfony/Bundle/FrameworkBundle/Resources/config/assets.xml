@@ -55,5 +55,10 @@
             <argument /> <!-- manifest url -->
             <argument type="service" id="http_client" />
         </service>
+
+        <service id="assets.cached_version_strategy" class="Symfony\Component\Asset\VersionStrategy\CachedVersionStrategy" abstract="true">
+            <argument /> <!-- decorated version strategy -->
+            <argument type="service" id="cache.assets" />
+        </service>
     </services>
 </container>

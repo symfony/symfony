@@ -15,6 +15,10 @@
             <argument type="service" id="cache.app" />
         </service>
 
+        <service id="cache.assets" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
         <service id="cache.system" parent="cache.adapter.system" public="true">
             <tag name="cache.pool" />
         </service>

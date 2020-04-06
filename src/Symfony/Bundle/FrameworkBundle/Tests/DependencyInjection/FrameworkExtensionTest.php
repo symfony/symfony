@@ -535,7 +535,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount(7, $packages);
+        $this->assertCount(8, $packages);
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
@@ -561,6 +561,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.remote_json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
+
+        $package = $container->getDefinition($packages['cached']);
+        $versionStrategy = $container->getDefinition($package->getArgument(1));
+        $this->assertSame('assets.cached_version_strategy', $versionStrategy->getParent());
     }
 
     public function testAssetsDefaultVersionStrategyAsService()

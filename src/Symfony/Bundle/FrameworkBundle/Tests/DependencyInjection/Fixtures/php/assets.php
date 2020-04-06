@@ -30,6 +30,10 @@ $container->loadFromExtension('framework', [
             'remote_manifest' => [
                 'json_manifest_path' => 'https://cdn.example.com/manifest.json',
             ],
+            'cached' => [
+                'json_manifest_path' => 'https://cdn.example.com/manifest.json',
+                'cache_version' => true,
+            ],
         ],
     ],
 ]);

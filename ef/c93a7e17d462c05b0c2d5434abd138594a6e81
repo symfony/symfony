@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-04-02T12:16:08Z
+
+the message could be simply `You should initialize it or declare a default value`. Welcome to php74 :grin:
+
+advertising to make it nullable is not a Symfony concern IMHO, but rather a business one.
+
+---------------------------------------------------------------------------
+
+by lmasforne at 2020-04-02T14:44:05Z
+
+@ro0NL i'm ok with you but if that could help people to debug quickly their codes, i'm ok to improve message of the exception ;)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-04-05T09:28:02Z
+
+I agree with @ro0NL, we shouldn't encourage people to make the property nullable for no reasons (it defects the new typed properties feature). Could you update the message as suggested by Roland?
+
+---------------------------------------------------------------------------
+
+by lmasforne at 2020-04-05T10:16:36Z
+
+Yep no problem ;) it's done @dunglas

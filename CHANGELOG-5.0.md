@@ -266,7 +266,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #34802 [Security] Check UserInterface::getPassword is not null before calling needsRehash (dbrekelmans)
  * bug #34788 [SecurityBundle] Properly escape regex in AddSessionDomainConstraintPass (fancyweb)
  * bug #34859 [SecurityBundle] Fix TokenStorage::reset not called in stateless firewall (jderusse)
- * bug #34827 [HttpFoundation] get currently session.gc_maxlifetime if ttl doesnt exists (rafaeltovar)
+ * bug #34827 [HttpFoundation] get currently session.gc_maxlifetime if ttl doesn't exists (rafaeltovar)
  * bug #34755 [FrameworkBundle] resolve service locators in `debug:*` commands (nicolas-grekas)
  * bug #34832 [Validator] Allow underscore character "_" in URL username and password (romainneutron)
  * bug #34765 [DoctrineBridge] Removed QueryBuilder type hint in getLoader() (HeahDude)

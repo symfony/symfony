@@ -126,7 +126,7 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueThrowsExceptionIfUninitializedProperty()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
-        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should either initialize it or make it nullable using "?string" instead.');
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
 
         $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
     }

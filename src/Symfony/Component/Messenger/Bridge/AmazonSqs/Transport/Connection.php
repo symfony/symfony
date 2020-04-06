@@ -105,6 +105,9 @@ class Connection
             $configuration['endpoint'] = sprintf('https://sqs.%s.amazonaws.com', $configuration['region']);
         } else {
             $configuration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
+            if (preg_match(';sqs.(.+).amazonaws.com;', $parsedUrl['host'], $matches)) {
+                $configuration['region'] = $matches[1];
+            }
             unset($query['sslmode']);
         }
 

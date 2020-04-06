@@ -115,7 +115,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             throw new InvalidArgumentException(sprintf('The "%s" given in the default context is not callable.', self::MAX_DEPTH_HANDLER));
         }
 
-        $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS]);
+        $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS, self::OBJECT_TO_POPULATE]);
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
 
@@ -618,7 +618,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             unset($context[$key]);
         }
         unset($context[self::EXCLUDE_FROM_CACHE_KEY]);
-        unset($context[self::OBJECT_TO_POPULATE]);
         unset($context['cache_key']); // avoid artificially different keys
 
         try {

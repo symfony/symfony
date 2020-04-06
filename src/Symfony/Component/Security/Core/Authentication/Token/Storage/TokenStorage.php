@@ -45,6 +45,11 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
      */
     public function setToken(TokenInterface $token = null)
     {
+        if ($token) {
+            // ensure any initializer is called
+            $this->getToken();
+        }
+
         $this->initializer = null;
         $this->token = $token;
     }

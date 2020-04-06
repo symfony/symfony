@@ -315,19 +315,20 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition(string $id, $service, string $file, array $defaults)
+    private function parseDefinition(string $id, $service, string $file, array $defaults, bool $return = false)
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
         }
 
         if (\is_string($service) && 0 === strpos($service, '@')) {
-            $this->container->setAlias($id, $alias = new Alias(substr($service, 1)));
+            $alias = new Alias(substr($service, 1));
+
             if (isset($defaults['public'])) {
                 $alias->setPublic($defaults['public']);
             }
 
-            return;
+            return $return ? $alias : $this->container->setAlias($id, $alias);
         }
 
         if (\is_array($service) && $this->isUsingShortSyntax($service)) {
@@ -342,10 +343,52 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but "%s" found for service "%s" in "%s". Check your YAML syntax.', get_debug_type($service), $id, $file));
         }
 
+        if (isset($service['stack'])) {
+            if (!\is_array($service['stack'])) {
+                throw new InvalidArgumentException(sprintf('A stack must be an array of definitions, "%s" given for service "%s" in "%s". Check your YAML syntax.', get_debug_type($service), $id, $file));
+            }
+
+            $stack = [];
+
+            foreach ($service['stack'] as $k => $frame) {
+                if (\is_array($frame) && 1 === \count($frame) && !isset(self::$serviceKeywords[key($frame)])) {
+                    $frame = [
+                        'class' => key($frame),
+                        'arguments' => current($frame),
+                    ];
+                }
+
+                if (\is_array($frame) && isset($frame['stack'])) {
+                    throw new InvalidArgumentException(sprintf('Service stack "%s" cannot contain another stack in "%s".', $id, $file));
+                }
+
+                $definition = $this->parseDefinition($id.'" at index "'.$k, $frame, $file, $defaults, true);
+
+                if ($definition instanceof Definition) {
+                    $definition->setInstanceofConditionals($this->instanceof);
+                }
+
+                $stack[$k] = $definition;
+            }
+
+            if ($diff = array_diff(array_keys($service), ['stack', 'public', 'deprecated'])) {
+                throw new InvalidArgumentException(sprintf('Invalid attribute "%s"; supported ones are "public" and "deprecated" for service "%s" in "%s". Check your YAML syntax.', implode('", "', $diff), $id, $file));
+            }
+
+            $service = [
+                'parent' => '',
+                'arguments' => $stack,
+                'tags' => ['container.stack'],
+                'public' => $service['public'] ?? null,
+                'deprecated' => $service['deprecated'] ?? null,
+            ];
+        }
+
         $this->checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
-            $this->container->setAlias($id, $alias = new Alias($service['alias']));
+            $alias = new Alias($service['alias']);
+
             if (isset($service['public'])) {
                 $alias->setPublic($service['public']);
             } elseif (isset($defaults['public'])) {
@@ -372,7 +415,7 @@ class YamlFileLoader extends FileLoader
                 }
             }
 
-            return;
+            return $return ? $alias : $this->container->setAlias($id, $alias);
         }
 
         if ($this->isLoadingInstanceof) {
@@ -426,7 +469,7 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
-        if (\array_key_exists('deprecated', $service)) {
+        if (isset($service['deprecated'])) {
             $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
 
             if (!isset($deprecation['package'])) {
@@ -599,6 +642,14 @@ class YamlFileLoader extends FileLoader
 
         if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {
             throw new InvalidArgumentException(sprintf('A "resource" attribute must be set when the "namespace" attribute is set for service "%s" in "%s". Check your YAML syntax.', $id, $file));
+        }
+
+        if ($return) {
+            if (\array_key_exists('resource', $service)) {
+                throw new InvalidArgumentException(sprintf('Invalid "resource" attribute found for service "%s" in "%s". Check your YAML syntax.', $id, $file));
+            }
+
+            return $definition;
         }
 
         if (\array_key_exists('resource', $service)) {

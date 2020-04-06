@@ -112,12 +112,12 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    private function parseDefinitions(\DOMDocument $xml, string $file, array $defaults)
+    private function parseDefinitions(\DOMDocument $xml, string $file, Definition $defaults)
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
 
-        if (false === $services = $xpath->query('//container:services/container:service|//container:services/container:prototype')) {
+        if (false === $services = $xpath->query('//container:services/container:service|//container:services/container:prototype|//container:services/container:stack')) {
             return;
         }
         $this->setCurrentDir(\dirname($file));
@@ -126,12 +126,34 @@ class XmlFileLoader extends FileLoader
         $this->isLoadingInstanceof = true;
         $instanceof = $xpath->query('//container:services/container:instanceof');
         foreach ($instanceof as $service) {
-            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, []));
+            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, new Definition()));
         }
 
         $this->isLoadingInstanceof = false;
         foreach ($services as $service) {
-            if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
+            if ('stack' === $service->tagName) {
+                $service->setAttribute('parent', '-');
+                $definition = $this->parseDefinition($service, $file, $defaults)
+                    ->setTags(array_merge_recursive(['container.stack' => [[]]], $defaults->getTags()))
+                ;
+                $this->setDefinition($id = (string) $service->getAttribute('id'), $definition);
+                $stack = [];
+
+                foreach ($this->getChildren($service, 'service') as $k => $frame) {
+                    $k = $frame->getAttribute('id') ?: $k;
+                    $frame->setAttribute('id', $id.'" at index "'.$k);
+
+                    if ($alias = $frame->getAttribute('alias')) {
+                        $this->validateAlias($frame, $file);
+                        $stack[$k] = new Reference($alias);
+                    } else {
+                        $stack[$k] = $this->parseDefinition($frame, $file, $defaults)
+                            ->setInstanceofConditionals($this->instanceof);
+                    }
+                }
+
+                $definition->setArguments($stack);
+            } elseif (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 if ('prototype' === $service->tagName) {
                     $excludes = array_column($this->getChildren($service, 'exclude'), 'nodeValue');
                     if ($service->hasAttribute('exclude')) {
@@ -148,51 +170,24 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    /**
-     * Get service defaults.
-     */
-    private function getServiceDefaults(\DOMDocument $xml, string $file): array
+    private function getServiceDefaults(\DOMDocument $xml, string $file): Definition
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
 
         if (null === $defaultsNode = $xpath->query('//container:services/container:defaults')->item(0)) {
-            return [];
+            return new Definition();
         }
 
-        $bindings = [];
-        foreach ($this->getArgumentsAsPhp($defaultsNode, 'bind', $file) as $argument => $value) {
-            $bindings[$argument] = new BoundArgument($value, true, BoundArgument::DEFAULTS_BINDING, $file);
-        }
+        $defaultsNode->setAttribute('id', '<defaults>');
 
-        $defaults = [
-            'tags' => $this->getChildren($defaultsNode, 'tag'),
-            'bind' => $bindings,
-        ];
-
-        foreach ($defaults['tags'] as $tag) {
-            if ('' === $tag->getAttribute('name')) {
-                throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in "%s" must be a non-empty string.', $file));
-            }
-        }
-
-        if ($defaultsNode->hasAttribute('autowire')) {
-            $defaults['autowire'] = XmlUtils::phpize($defaultsNode->getAttribute('autowire'));
-        }
-        if ($defaultsNode->hasAttribute('public')) {
-            $defaults['public'] = XmlUtils::phpize($defaultsNode->getAttribute('public'));
-        }
-        if ($defaultsNode->hasAttribute('autoconfigure')) {
-            $defaults['autoconfigure'] = XmlUtils::phpize($defaultsNode->getAttribute('autoconfigure'));
-        }
-
-        return $defaults;
+        return $this->parseDefinition($defaultsNode, $file, new Definition());
     }
 
     /**
      * Parses an individual Definition.
      */
-    private function parseDefinition(\DOMElement $service, string $file, array $defaults): ?Definition
+    private function parseDefinition(\DOMElement $service, string $file, Definition $defaults): ?Definition
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
@@ -200,8 +195,8 @@ class XmlFileLoader extends FileLoader
             $this->container->setAlias((string) $service->getAttribute('id'), $alias = new Alias($alias));
             if ($publicAttr = $service->getAttribute('public')) {
                 $alias->setPublic(XmlUtils::phpize($publicAttr));
-            } elseif (isset($defaults['public'])) {
-                $alias->setPublic($defaults['public']);
+            } elseif ($defaults->getChanges()['public'] ?? false) {
+                $alias->setPublic($defaults->isPublic());
             }
 
             if ($deprecated = $this->getChildren($service, 'deprecated')) {
@@ -231,16 +226,11 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        if (isset($defaults['public'])) {
-            $definition->setPublic($defaults['public']);
+        if ($defaults->getChanges()['public'] ?? false) {
+            $definition->setPublic($defaults->isPublic());
         }
-        if (isset($defaults['autowire'])) {
-            $definition->setAutowired($defaults['autowire']);
-        }
-        if (isset($defaults['autoconfigure'])) {
-            $definition->setAutoconfigured($defaults['autoconfigure']);
-        }
-
+        $definition->setAutowired($defaults->isAutowired());
+        $definition->setAutoconfigured($defaults->isAutoconfigured());
         $definition->setChanges([]);
 
         foreach (['class', 'public', 'shared', 'synthetic', 'abstract'] as $key) {
@@ -324,10 +314,6 @@ class XmlFileLoader extends FileLoader
 
         $tags = $this->getChildren($service, 'tag');
 
-        if (!empty($defaults['tags'])) {
-            $tags = array_merge($tags, $defaults['tags']);
-        }
-
         foreach ($tags as $tag) {
             $parameters = [];
             foreach ($tag->attributes as $name => $node) {
@@ -349,16 +335,17 @@ class XmlFileLoader extends FileLoader
             $definition->addTag($tag->getAttribute('name'), $parameters);
         }
 
+        $definition->setTags(array_merge_recursive($definition->getTags(), $defaults->getTags()));
+
         $bindings = $this->getArgumentsAsPhp($service, 'bind', $file);
         $bindingType = $this->isLoadingInstanceof ? BoundArgument::INSTANCEOF_BINDING : BoundArgument::SERVICE_BINDING;
         foreach ($bindings as $argument => $value) {
             $bindings[$argument] = new BoundArgument($value, true, $bindingType, $file);
         }
 
-        if (isset($defaults['bind'])) {
-            // deep clone, to avoid multiple process of the same instance in the passes
-            $bindings = array_merge(unserialize(serialize($defaults['bind'])), $bindings);
-        }
+        // deep clone, to avoid multiple process of the same instance in the passes
+        $bindings = array_merge(unserialize(serialize($defaults->getBindings())), $bindings);
+
         if ($bindings) {
             $definition->setBindings($bindings);
         }
@@ -443,7 +430,7 @@ class XmlFileLoader extends FileLoader
         // resolve definitions
         uksort($definitions, 'strnatcmp');
         foreach (array_reverse($definitions) as $id => list($domElement, $file)) {
-            if (null !== $definition = $this->parseDefinition($domElement, $file, [])) {
+            if (null !== $definition = $this->parseDefinition($domElement, $file, new Definition())) {
                 $this->setDefinition($id, $definition);
             }
         }

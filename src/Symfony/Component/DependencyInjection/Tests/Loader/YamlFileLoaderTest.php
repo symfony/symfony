@@ -958,4 +958,44 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
     }
+
+    public function testStack()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('stack.yaml');
+
+        $this->assertSame([1, 2], $container->getDefinition('stack_short')->getArguments()[0]->getArguments());
+
+        $container->compile();
+
+        $expected = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'C',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $container->get('stack_a'));
+        $this->assertEquals($expected, $container->get('stack_b'));
+
+        $expected = (object) [
+            'label' => 'Z',
+            'inner' => $expected,
+        ];
+        $this->assertEquals($expected, $container->get('stack_c'));
+
+        $expected = $expected->inner;
+        $expected->label = 'Z';
+        $this->assertEquals($expected, $container->get('stack_d'));
+
+        $expected = (object) [
+            'label' => 'Y',
+            'inner' => $expected,
+        ];
+        $this->assertEquals($expected, $container->get('stack_e'));
+    }
 }

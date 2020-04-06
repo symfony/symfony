@@ -140,7 +140,7 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueThrowsExceptionIfUninitializedProperty()
     {
         $this->expectException(UninitializedPropertyException::class);
-        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should either initialize it or make it nullable using "?string" instead.');
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
 
         $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
     }
@@ -148,7 +148,7 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter()
     {
         $this->expectException(UninitializedPropertyException::class);
-        $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty::getUninitialized()" returned "null", but expected type "array". Have you forgotten to initialize a property or to make the return type nullable using "?array" instead?');
+        $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
         $this->propertyAccessor->getValue(new UninitializedPrivateProperty(), 'uninitialized');
     }

@@ -63,6 +63,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $methodReflectionFlags;
     private $propertyReflectionFlags;
 
+    private $arrayMutatorPrefixesFirst;
+    private $arrayMutatorPrefixesLast;
+
     /**
      * @param string[]|null $mutatorPrefixes
      * @param string[]|null $accessorPrefixes
@@ -76,6 +79,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
+
+        $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
+        $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);
     }
 
     /**
@@ -548,7 +554,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $ucProperty = ucfirst($property);
         $ucSingulars = (array) Inflector::singularize($ucProperty);
 
-        foreach ($this->mutatorPrefixes as $prefix) {
+        $mutatorPrefixes = \in_array($ucProperty, $ucSingulars, true) ? $this->arrayMutatorPrefixesLast : $this->arrayMutatorPrefixesFirst;
+
+        foreach ($mutatorPrefixes as $prefix) {
             $names = [$ucProperty];
             if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
                 $names = array_merge($names, $ucSingulars);

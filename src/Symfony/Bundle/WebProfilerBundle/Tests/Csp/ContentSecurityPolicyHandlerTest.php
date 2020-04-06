@@ -41,7 +41,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         $this->assertFalse($response->headers->has('X-SymfonyProfiler-Style-Nonce'));
 
         foreach ($expectedCsp as $header => $value) {
-            $this->assertSame($value, $response->headers->get($header));
+            $this->assertSame($value, $response->headers->get($header), $header);
         }
     }
 
@@ -131,7 +131,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
                 $this->createRequest(),
                 $this->createResponse(['Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'']),
-                ['Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null],
+                ['Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'; script-src-elem \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src-elem \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'; script-src-elem \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src-elem \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null],
             ],
             [
                 $nonce,

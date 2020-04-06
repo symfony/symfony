@@ -423,9 +423,9 @@ class ContextListenerTest extends TestCase
 
     private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
     {
-        $user = $user ?: new User('foo', 'bar');
+        $tokenUser = $user ?: new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, '', 'context_key', ['ROLE_USER'])));
 
         $request = new Request();
         $request->setSession($session);
@@ -447,6 +447,10 @@ class ContextListenerTest extends TestCase
             $listener->setRememberMeServices($rememberMeServices);
         }
         $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+
+        if (null !== $user) {
+            ++$usageIndex;
+        }
 
         $this->assertSame($usageIndex, $session->getUsageIndex());
         $tokenStorage->getToken();

@@ -100,12 +100,13 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
     public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.form_login.'.$id;
-        $defaultOptions = array_merge($this->defaultSuccessHandlerOptions, $this->options);
-        $options = array_merge($defaultOptions, array_intersect_key($config, $defaultOptions));
+        $options = array_intersect_key($config, $this->options);
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, new Reference($userProviderId))
-            ->replaceArgument(2, $options);
+            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)))
+            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)))
+            ->replaceArgument(4, $options);
 
         return $authenticatorId;
     }

@@ -16,13 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -33,34 +35,32 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements PasswordAuthenticatedInterface, CsrfProtectedAuthenticatorInterface
 {
-    use TargetPathTrait;
-
-    private $options;
     private $httpUtils;
     private $userProvider;
+    private $successHandler;
+    private $failureHandler;
+    private $options;
 
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, array $options)
+    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
     {
         $this->httpUtils = $httpUtils;
+        $this->userProvider = $userProvider;
+        $this->successHandler = $successHandler;
+        $this->failureHandler = $failureHandler;
         $this->options = array_merge([
             'username_parameter' => '_username',
             'password_parameter' => '_password',
-            'csrf_parameter' => '_csrf_token',
-            'csrf_token_id' => 'authenticate',
+            'check_path' => '/login_check',
             'post_only' => true,
 
-            'always_use_default_target_path' => false,
-            'default_target_path' => '/',
-            'login_path' => '/login',
-            'target_path_parameter' => '_target_path',
-            'use_referer' => false,
+            'csrf_parameter' => '_csrf_token',
+            'csrf_token_id' => 'authenticate',
         ], $options);
-        $this->userProvider = $userProvider;
     }
 
-    protected function getLoginUrl(): string
+    protected function getLoginUrl(Request $request): string
     {
-        return $this->options['login_path'];
+        return $this->httpUtils->generateUri($request, $this->options['login_path']);
     }
 
     public function supports(Request $request): bool
@@ -122,36 +122,13 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements P
         return new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
-        return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request, $providerKey));
+        return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
-    private function determineTargetUrl(Request $request, string $providerKey)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
-        if ($this->options['always_use_default_target_path']) {
-            return $this->options['default_target_path'];
-        }
-
-        if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
-            return $targetUrl;
-        }
-
-        if ($targetUrl = $this->getTargetPath($request->getSession(), $providerKey)) {
-            $this->removeTargetPath($request->getSession(), $providerKey);
-
-            return $targetUrl;
-        }
-
-        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
-            if (false !== $pos = strpos($targetUrl, '?')) {
-                $targetUrl = substr($targetUrl, 0, $pos);
-            }
-            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
-                return $targetUrl;
-            }
-        }
-
-        return $this->options['default_target_path'];
+        return $this->failureHandler->onAuthenticationFailure($request, $exception);
     }
 }

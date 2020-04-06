@@ -30,7 +30,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     /**
      * Return the URL to the login page.
      */
-    abstract protected function getLoginUrl(): string;
+    abstract protected function getLoginUrl(Request $request): string;
 
     /**
      * Override to change what happens after a bad username/password is submitted.
@@ -41,7 +41,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
             $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
         }
 
-        $url = $this->getLoginUrl();
+        $url = $this->getLoginUrl($request);
 
         return new RedirectResponse($url);
     }
@@ -52,7 +52,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
      */
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
-        $url = $this->getLoginUrl();
+        $url = $this->getLoginUrl($request);
 
         return new RedirectResponse($url);
     }

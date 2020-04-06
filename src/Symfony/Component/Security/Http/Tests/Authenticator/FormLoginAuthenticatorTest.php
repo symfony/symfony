@@ -17,17 +17,23 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class FormLoginAuthenticatorTest extends TestCase
 {
     private $userProvider;
+    private $successHandler;
+    private $failureHandler;
     private $authenticator;
 
     protected function setUp(): void
     {
         $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
+        $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
 
     /**
@@ -123,7 +129,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     private function setUpAuthenticator(array $options = [])
     {
-        $this->authenticator = new FormLoginAuthenticator(new HttpUtils(), $this->userProvider, $options);
+        $this->authenticator = new FormLoginAuthenticator(new HttpUtils(), $this->userProvider, $this->successHandler, $this->failureHandler, $options);
     }
 
     private function createSession()

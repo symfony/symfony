@@ -95,6 +95,8 @@
                  abstract="true">
             <argument type="service" id="security.http_utils" />
             <argument type="abstract">user provider</argument>
+            <argument type="abstract">authentication success handler</argument>
+            <argument type="abstract">authentication failure handler</argument>
             <argument type="abstract">options</argument>
         </service>
 

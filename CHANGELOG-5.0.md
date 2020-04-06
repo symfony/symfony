@@ -7,6 +7,8 @@ in 5.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.0.0...v5.0.1
 
+ * feature add isin constraints in validator component (lmasforne)
+
 * 5.0.7 (2020-03-30)
 
  * security #cve-2020-5255 [HttpFoundation] Do not set the default Content-Type based on the Accept header (yceruto)
@@ -266,7 +268,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #34802 [Security] Check UserInterface::getPassword is not null before calling needsRehash (dbrekelmans)
  * bug #34788 [SecurityBundle] Properly escape regex in AddSessionDomainConstraintPass (fancyweb)
  * bug #34859 [SecurityBundle] Fix TokenStorage::reset not called in stateless firewall (jderusse)
- * bug #34827 [HttpFoundation] get currently session.gc_maxlifetime if ttl doesnt exists (rafaeltovar)
+ * bug #34827 [HttpFoundation] get currently session.gc_maxlifetime if ttl doesn't exists (rafaeltovar)
  * bug #34755 [FrameworkBundle] resolve service locators in `debug:*` commands (nicolas-grekas)
  * bug #34832 [Validator] Allow underscore character "_" in URL username and password (romainneutron)
  * bug #34765 [DoctrineBridge] Removed QueryBuilder type hint in getLoader() (HeahDude)

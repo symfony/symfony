@@ -672,6 +672,12 @@ class ResponseTest extends ResponseTestCase
 
             $this->assertFalse($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
         }
+
+        $response = new DefaultResponse();
+
+        $options = ['etag' => '"whatever"'];
+        $response->setCache($options);
+        $this->assertSame($response->getEtag(), '"whatever"');
     }
 
     public function testSendContent()

@@ -949,7 +949,7 @@ class Response
      */
     public function setCache(array $options): object
     {
-        if ($diff = array_diff(array_keys($options), array_keys(static::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
+        if ($diff = array_diff(array_keys($options), array_keys(self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
         }
 

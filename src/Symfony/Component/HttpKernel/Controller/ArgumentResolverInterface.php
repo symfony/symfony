@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-
 /**
  * An ArgumentResolverInterface instance knows how to determine the
  * arguments for a specific action.
@@ -22,11 +20,13 @@ use Symfony\Component\HttpFoundation\Request;
 interface ArgumentResolverInterface
 {
     /**
-     * Returns the arguments to pass to the controller.
+     * Returns the arguments to pass to the action.
      *
-     * @return array An array of arguments to pass to the controller
+     * @param mixed $context
+     *
+     * @return array An array of arguments to pass to the action
      *
      * @throws \RuntimeException When no value could be provided for a required argument
      */
-    public function getArguments(Request $request, callable $controller);
+    public function getArguments($context, callable $controller);
 }

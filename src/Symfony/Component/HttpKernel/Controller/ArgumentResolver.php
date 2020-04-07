@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
@@ -43,17 +42,17 @@ final class ArgumentResolver implements ArgumentResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments($context, callable $controller): array
     {
         $arguments = [];
 
         foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller) as $metadata) {
             foreach ($this->argumentValueResolvers as $resolver) {
-                if (!$resolver->supports($request, $metadata)) {
+                if (!$resolver->supports($context, $metadata)) {
                     continue;
                 }
 
-                $resolved = $resolver->resolve($request, $metadata);
+                $resolved = $resolver->resolve($context, $metadata);
 
                 $atLeastOne = false;
                 foreach ($resolved as $append) {

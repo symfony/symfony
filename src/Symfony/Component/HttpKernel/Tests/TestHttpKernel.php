@@ -30,7 +30,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return [$this, 'callController'];
     }
 
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments($request, callable $controller): array
     {
         return [$request];
     }

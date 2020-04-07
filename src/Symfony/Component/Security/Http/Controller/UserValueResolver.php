@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -32,7 +31,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports($context, ArgumentMetadata $argument): bool
     {
         // only security user implementations are supported
         if (UserInterface::class !== $argument->getType()) {
@@ -50,7 +49,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
         return $user instanceof UserInterface;
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve($context, ArgumentMetadata $argument): iterable
     {
         yield $this->tokenStorage->getToken()->getUser();
     }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -35,12 +34,12 @@ final class TraceableValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports($context, ArgumentMetadata $argument): bool
     {
         $method = \get_class($this->inner).'::'.__FUNCTION__;
         $this->stopwatch->start($method, 'controller.argument_value_resolver');
 
-        $return = $this->inner->supports($request, $argument);
+        $return = $this->inner->supports($context, $argument);
 
         $this->stopwatch->stop($method);
 
@@ -50,12 +49,12 @@ final class TraceableValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve($context, ArgumentMetadata $argument): iterable
     {
         $method = \get_class($this->inner).'::'.__FUNCTION__;
         $this->stopwatch->start($method, 'controller.argument_value_resolver');
 
-        yield from $this->inner->resolve($request, $argument);
+        yield from $this->inner->resolve($context, $argument);
 
         $this->stopwatch->stop($method);
     }

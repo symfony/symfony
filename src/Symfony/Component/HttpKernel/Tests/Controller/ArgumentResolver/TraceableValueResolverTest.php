@@ -63,12 +63,12 @@ class TraceableValueResolverTest extends TestCase
 
 class ResolverStub implements ArgumentValueResolverInterface
 {
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports($request, ArgumentMetadata $argument): bool
     {
         return true;
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve($request, ArgumentMetadata $argument): iterable
     {
         yield 'first';
         yield 'second';

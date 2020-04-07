@@ -25,15 +25,21 @@ final class VariadicValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function supports($request, ArgumentMetadata $argument): bool
     {
+        if (!$request instanceof Request) {
+            return false;
+        }
+
         return $argument->isVariadic() && $request->attributes->has($argument->getName());
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param Request $request
      */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve($request, ArgumentMetadata $argument): iterable
     {
         $values = $request->attributes->get($argument->getName());
 

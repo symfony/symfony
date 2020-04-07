@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
@@ -24,14 +23,18 @@ interface ArgumentValueResolverInterface
     /**
      * Whether this resolver can resolve the value for the given ArgumentMetadata.
      *
+     * @param mixed $context
+     *
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument);
+    public function supports($context, ArgumentMetadata $argument);
 
     /**
      * Returns the possible value(s).
      *
+     * @param mixed $context
+     *
      * @return iterable
      */
-    public function resolve(Request $request, ArgumentMetadata $argument);
+    public function resolve($context, ArgumentMetadata $argument);
 }

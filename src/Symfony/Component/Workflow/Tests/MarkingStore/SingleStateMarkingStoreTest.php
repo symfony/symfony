@@ -30,4 +30,17 @@ class SingleStateMarkingStoreTest extends TestCase
 
         $this->assertEquals($marking, $marking2);
     }
+
+    public function testAlmostEmptyPlaceName()
+    {
+        $subject = new \stdClass();
+        $subject->myMarks = 0;
+
+        $markingStore = new SingleStateMarkingStore('myMarks');
+
+        $marking = $markingStore->getMarking($subject);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertCount(1, $marking->getPlaces());
+    }
 }

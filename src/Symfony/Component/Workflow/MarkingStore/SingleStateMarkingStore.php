@@ -44,7 +44,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
     {
         $placeName = $this->propertyAccessor->getValue($subject, $this->property);
 
-        if (!$placeName) {
+        if (null === $placeName) {
             return new Marking();
         }
 

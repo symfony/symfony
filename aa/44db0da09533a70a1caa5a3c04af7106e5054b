@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-04-07T17:59:18Z
+
+should be considered minor when merging rather than bug, as this is a bug in unreleased code only.
+
+---------------------------------------------------------------------------
+
+by driesvints at 2020-04-07T18:16:03Z
+
+Testing failures seem unrelated...

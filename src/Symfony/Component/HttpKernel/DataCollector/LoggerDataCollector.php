@@ -68,18 +68,29 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         if (null !== $this->logger) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
+            $this->data['deprecation_logs'] = $containerDeprecationLogs;
             // get compiler logs later (only when they are needed) to improve performance
             $this->data['compiler_logs'] = [];
             $this->data['compiler_logs_filepath'] = $this->containerPathPrefix.'Compiler.log';
-            $this->data['logs'] = $this->sanitizeLogs(array_merge($this->logger->getLogs($this->currentRequest), $containerDeprecationLogs));
-            $this->data = $this->cloneVar($this->data);
+            $this->data['logs'] = $this->logger->getLogs($this->currentRequest);
+            $this->data['logs_are_processed'] = false;
         }
         $this->currentRequest = null;
     }
 
     public function getLogs()
     {
-        return isset($this->data['logs']) ? $this->data['logs'] : [];
+        if (!isset($this->data['logs'])) {
+            return [];
+        }
+
+        if (false === $this->data['logs_are_processed']) {
+            $this->sanitizeLogs(array_merge($this->data['logs'], $this->data['deprecation_logs']));
+            $this->data['logs_are_processed'] = true;
+            $this->data = $this->cloneVar($this->data);
+        }
+
+        return $this->data['logs'];
     }
 
     public function getPriorities()

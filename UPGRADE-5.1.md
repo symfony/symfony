@@ -7,6 +7,7 @@ Config
  * The signature of method `NodeDefinition::setDeprecated()` has been updated to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`.
  * The signature of method `BaseNode::setDeprecated()` has been updated to `BaseNode::setDeprecation(string $package, string $version, string $message)`.
  * Passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node is deprecated
+ * Deprecated `BaseNode::getDeprecationMessage()`, use `BaseNode::getDeprecation()` instead
 
 Console
 -------
@@ -21,6 +22,8 @@ DependencyInjection
  * The signature of method `DeprecateTrait::deprecate()` has been updated to `DeprecateTrait::deprecation(string $package, string $version, string $message)`.
  * Deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
    configure them explicitly instead.
+ * Deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead.
+ * Deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead.
 
 Dotenv
 ------
@@ -85,6 +88,12 @@ Notifier
    arguments were removed.
  * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
    methods' `$transport` argument was removed.
+
+OptionsResolver
+---------------
+
+ * The signature of method `OptionsResolver::setDeprecated()` has been updated to `OptionsResolver::setDeprecated(string $option, string $package, string $version, $message)`.
+ * Deprecated `OptionsResolverIntrospector::getDeprecationMessage()`, use `OptionsResolverIntrospector::getDeprecation()` instead.
 
 PhpUnitBridge
 -------------

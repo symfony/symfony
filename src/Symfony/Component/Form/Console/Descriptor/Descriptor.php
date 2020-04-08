@@ -129,7 +129,7 @@ abstract class Descriptor implements DescriptorInterface
             'allowedTypes' => 'getAllowedTypes',
             'allowedValues' => 'getAllowedValues',
             'normalizers' => 'getNormalizers',
-            'deprecationMessage' => 'getDeprecationMessage',
+            'deprecation' => 'getDeprecation',
         ];
 
         foreach ($map as $key => $method) {
@@ -140,8 +140,10 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
-        if (isset($definition['deprecationMessage']) && \is_string($definition['deprecationMessage'])) {
-            $definition['deprecationMessage'] = strtr($definition['deprecationMessage'], ['%name%' => $option]);
+        if (isset($definition['deprecation']) && isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
+            $definition['deprecationMessage'] = strtr($definition['deprecation']['message'], ['%name%' => $option]);
+            $definition['deprecationPackage'] = $definition['deprecation']['package'];
+            $definition['deprecationVersion'] = $definition['deprecation']['version'];
         }
 
         return $definition;

@@ -213,6 +213,9 @@ class OptionsResolverIntrospectorTest extends TestCase
         $debug->getNormalizers('foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetDeprecationMessage()
     {
         $resolver = new OptionsResolver();
@@ -223,6 +226,9 @@ class OptionsResolverIntrospectorTest extends TestCase
         $this->assertSame('The option "foo" is deprecated.', $debug->getDeprecationMessage('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetClosureDeprecationMessage()
     {
         $resolver = new OptionsResolver();
@@ -233,6 +239,34 @@ class OptionsResolverIntrospectorTest extends TestCase
         $this->assertSame($closure, $debug->getDeprecationMessage('foo'));
     }
 
+    public function testGetDeprecation()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('foo');
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', 'The option "foo" is deprecated.');
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $this->assertSame([
+            'package' => 'vendor/package',
+            'version' => '1.1',
+            'message' => 'The option "foo" is deprecated.',
+        ], $debug->getDeprecation('foo'));
+    }
+
+    public function testGetClosureDeprecation()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('foo');
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = function (Options $options, $value) {});
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $this->assertSame([
+            'package' => 'vendor/package',
+            'version' => '1.1',
+            'message' => $closure,
+        ], $debug->getDeprecation('foo'));
+    }
+
     public function testGetDeprecationMessageThrowsOnNoConfiguredValue()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
@@ -241,7 +275,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined('foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDeprecationMessage('foo'));
+        $debug->getDeprecation('foo');
     }
 
     public function testGetDeprecationMessageThrowsOnNotDefinedOption()
@@ -251,6 +285,6 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDeprecationMessage('foo'));
+        $debug->getDeprecation('foo');
     }
 }

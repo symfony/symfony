@@ -85,7 +85,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         if (false === $this->data['logs_are_processed']) {
-            $this->sanitizeLogs(array_merge($this->data['logs'], $this->data['deprecation_logs']));
+            $this->data['logs'] = $this->sanitizeLogs(array_merge($this->data['logs'], $this->data['deprecation_logs']));
             $this->data['logs_are_processed'] = true;
             $this->data = $this->cloneVar($this->data);
         }

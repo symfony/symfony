@@ -205,6 +205,17 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(['decorated', 'decorated.pif-pouf', 5, ContainerInterface::IGNORE_ON_INVALID_REFERENCE], $services['decorator_service_with_name_and_priority_and_on_invalid']->getDecoratedService());
     }
 
+    public function testLoadShortSyntax()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_short_syntax.yml');
+        $services = $container->getDefinitions();
+
+        $this->assertSame([1, 2], $services['foo_bar']->getArguments());
+        $this->assertSame(['$a' => 'a', 'App\Foo' => 'foo'], $services['bar_foo']->getArguments());
+    }
+
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();

@@ -7,5 +7,5 @@ use App\BarService;
 return function (ContainerConfigurator $c) {
     $s = $c->services();
     $s->set(BarService::class)
-        ->args([inline('FooClass')]);
+        ->args([service('FooClass')]);
 };

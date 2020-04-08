@@ -127,17 +127,20 @@ class ChildDefinitionTest extends TestCase
         $def->getArgument(1);
     }
 
-    public function testCannotCallSetAutoconfigured()
+    public function testAutoconfigured()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\BadMethodCallException');
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
+
+        $this->assertTrue($def->isAutoconfigured());
     }
 
-    public function testCannotCallSetInstanceofConditionals()
+    public function testInstanceofConditionals()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\BadMethodCallException');
+        $conditionals = ['Foo' => new ChildDefinition('')];
         $def = new ChildDefinition('foo');
-        $def->setInstanceofConditionals(['Foo' => new ChildDefinition('')]);
+        $def->setInstanceofConditionals($conditionals);
+
+        $this->assertSame($conditionals, $def->getInstanceofConditionals());
     }
 }

@@ -16,10 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class FormLoginAuthenticatorTest extends TestCase
@@ -27,11 +31,13 @@ class FormLoginAuthenticatorTest extends TestCase
     private $userProvider;
     private $successHandler;
     private $failureHandler;
+    /** @var FormLoginAuthenticator */
     private $authenticator;
 
     protected function setUp(): void
     {
         $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
         $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
@@ -48,11 +54,11 @@ class FormLoginAuthenticatorTest extends TestCase
             $this->expectExceptionMessage('Invalid username.');
         }
 
-        $request = Request::create('/login_check', 'POST', ['_username' => $username]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 's$cr$t']);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator();
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
     public function provideUsernamesForLength()
@@ -73,7 +79,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
     /**
@@ -88,7 +94,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
     /**
@@ -103,28 +109,53 @@ class FormLoginAuthenticatorTest extends TestCase
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWith__toString($postOnly)
+    public function testHandleNonStringUsernameWithToString($postOnly)
     {
         $usernameObject = $this->getMockBuilder(DummyUserClass::class)->getMock();
         $usernameObject->expects($this->once())->method('__toString')->willReturn('someUsername');
 
-        $request = Request::create('/login_check', 'POST', ['_username' => $usernameObject]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $usernameObject, '_password' => 's$cr$t']);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
     public function postOnlyDataProvider()
     {
         yield [true];
         yield [false];
+    }
+
+    public function testCsrfProtection()
+    {
+        $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['enable_csrf' => true]);
+        $passport = $this->authenticator->authenticate($request);
+        $this->assertTrue($passport->hasBadge(CsrfTokenBadge::class));
+    }
+
+    public function testUpgradePassword()
+    {
+        $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
+        $request->setSession($this->createSession());
+
+        $this->userProvider = $this->createMock([UserProviderInterface::class, PasswordUpgraderInterface::class]);
+        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
+
+        $this->setUpAuthenticator();
+        $passport = $this->authenticator->authenticate($request);
+        $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
+        $badge = $passport->getBadge(PasswordUpgradeBadge::class);
+        $this->assertEquals('s$cr$t', $badge->getPlaintextPassword());
     }
 
     private function setUpAuthenticator(array $options = [])

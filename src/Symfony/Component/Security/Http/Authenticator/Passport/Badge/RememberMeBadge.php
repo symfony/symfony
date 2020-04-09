@@ -9,23 +9,29 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
 /**
- * This interface must be extended if the authenticator supports remember me functionality.
+ * Adds support for remember me to this authenticator.
  *
  * Remember me cookie will be set if *all* of the following are met:
- *  A) SupportsRememberMe() returns true in the successful authenticator
+ *  A) This badge is present in the Passport
  *  B) The remember_me key under your firewall is configured
  *  C) The "remember me" functionality is activated. This is usually
  *      done by having a _remember_me checkbox in your form, but
  *      can be configured by the "always_remember_me" and "remember_me_parameter"
  *      parameters under the "remember_me" firewall key
- *  D) The onAuthenticationSuccess method returns a Response object
+ *  D) The authentication process returns a success Response object
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @final
+ * @experimental in 5.1
  */
-interface RememberMeAuthenticatorInterface
+class RememberMeBadge implements BadgeInterface
 {
-    public function supportsRememberMe(): bool;
+    public function isResolved(): bool
+    {
+        return true; // remember me does not need to be explicitly resolved
+    }
 }

@@ -17,8 +17,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @final
  * @experimental in 5.1
  */
-class AnonymousAuthenticator implements AuthenticatorInterface, CustomAuthenticatedInterface
+class AnonymousAuthenticator implements AuthenticatorInterface
 {
     private $secret;
     private $tokenStorage;
@@ -45,23 +45,12 @@ class AnonymousAuthenticator implements AuthenticatorInterface, CustomAuthentica
         return null === $this->tokenStorage->getToken() ? null : false;
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): PassportInterface
     {
-        return [];
+        return new AnonymousPassport();
     }
 
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        // anonymous users do not have credentials
-        return true;
-    }
-
-    public function getUser($credentials): ?UserInterface
-    {
-        return new User('anon.', null);
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
     {
         return new AnonymousToken($this->secret, 'anon.', []);
     }

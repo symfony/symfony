@@ -89,11 +89,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         return $this->secret;
     }
 
-    public function performLogin(array $cookieParts, Request $request): UserInterface
-    {
-        return $this->processAutoLoginCookie($cookieParts, $request);
-    }
-
     /**
      * Implementation of RememberMeServicesInterface. Detects whether a remember-me
      * cookie was set, decodes it, and hands it to subclasses for further processing.

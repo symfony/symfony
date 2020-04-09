@@ -5,6 +5,7 @@ namespace Symfony\Component\Security\Http\Event;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -19,15 +20,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class VerifyAuthenticatorCredentialsEvent extends Event
 {
     private $authenticator;
-    private $user;
-    private $credentials;
-    private $credentialsValid = false;
+    private $passport;
 
-    public function __construct(AuthenticatorInterface $authenticator, $credentials, ?UserInterface $user)
+    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport)
     {
         $this->authenticator = $authenticator;
-        $this->credentials = $credentials;
-        $this->user = $user;
+        $this->passport = $passport;
     }
 
     public function getAuthenticator(): AuthenticatorInterface
@@ -35,23 +33,8 @@ class VerifyAuthenticatorCredentialsEvent extends Event
         return $this->authenticator;
     }
 
-    public function getCredentials()
+    public function getPassport(): PassportInterface
     {
-        return $this->credentials;
-    }
-
-    public function getUser(): ?UserInterface
-    {
-        return $this->user;
-    }
-
-    public function setCredentialsValid(bool $validated = true): void
-    {
-        $this->credentialsValid = $validated;
-    }
-
-    public function areCredentialsValid(): bool
-    {
-        return $this->credentialsValid;
+        return $this->passport;
     }
 }

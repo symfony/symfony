@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 
@@ -43,7 +44,13 @@ class X509AuthenticatorTest extends TestCase
 
         $request = $this->createRequest($serverVars);
         $this->assertTrue($this->authenticator->supports($request));
-        $this->assertEquals(['username' => $user], $this->authenticator->getCredentials($request));
+
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($user)
+            ->willReturn(new User($user, null));
+
+        $this->authenticator->authenticate($request);
     }
 
     public static function provideServerVars()
@@ -60,7 +67,13 @@ class X509AuthenticatorTest extends TestCase
         $request = $this->createRequest(['SSL_CLIENT_S_DN' => $credentials]);
 
         $this->assertTrue($this->authenticator->supports($request));
-        $this->assertEquals(['username' => $emailAddress], $this->authenticator->getCredentials($request));
+
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($emailAddress)
+            ->willReturn(new User($emailAddress, null));
+
+        $this->authenticator->authenticate($request);
     }
 
     public static function provideServerVarsNoUser()
@@ -89,7 +102,13 @@ class X509AuthenticatorTest extends TestCase
             'TheUserKey' => 'TheUser',
         ]);
         $this->assertTrue($authenticator->supports($request));
-        $this->assertEquals(['username' => 'TheUser'], $authenticator->getCredentials($request));
+
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with('TheUser')
+            ->willReturn(new User('TheUser', null));
+
+        $authenticator->authenticate($request);
     }
 
     public function testAuthenticationCustomCredentialsKey()
@@ -100,7 +119,13 @@ class X509AuthenticatorTest extends TestCase
             'TheCertKey' => 'CN=Sample certificate DN/emailAddress=cert@example.com',
         ]);
         $this->assertTrue($authenticator->supports($request));
-        $this->assertEquals(['username' => 'cert@example.com'], $authenticator->getCredentials($request));
+
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with('cert@example.com')
+            ->willReturn(new User('cert@example.com', null));
+
+        $authenticator->authenticate($request);
     }
 
     private function createRequest(array $server)

@@ -12,9 +12,15 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
 
@@ -28,51 +34,59 @@ class UserCheckerListenerTest extends TestCase
     {
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->listener = new UserCheckerListener($this->userChecker);
-        $this->user = $this->createMock(UserInterface::class);
+        $this->user = new User('test', null);
     }
 
     public function testPreAuth()
     {
         $this->userChecker->expects($this->once())->method('checkPreAuth')->with($this->user);
 
-        $this->listener->preCredentialsVerification($this->createEvent());
+        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent());
     }
 
     public function testPreAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
-        $this->listener->preCredentialsVerification($this->createEvent(true, null));
+        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent($this->createMock(PassportInterface::class)));
+    }
+
+    public function testPreAuthenticatedBadge()
+    {
+        $this->userChecker->expects($this->never())->method('checkPreAuth');
+
+        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent(new SelfValidatingPassport($this->user, [new PreAuthenticatedUserBadge()])));
     }
 
     public function testPostAuthValidCredentials()
     {
         $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user);
 
-        $this->listener->postCredentialsVerification($this->createEvent(true));
-    }
-
-    public function testPostAuthInvalidCredentials()
-    {
-        $this->userChecker->expects($this->never())->method('checkPostAuth')->with($this->user);
-
-        $this->listener->postCredentialsVerification($this->createEvent());
+        $this->listener->postCredentialsVerification($this->createLoginSuccessEvent());
     }
 
     public function testPostAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPostAuth');
 
-        $this->listener->postCredentialsVerification($this->createEvent(true, null));
+        $this->listener->postCredentialsVerification($this->createLoginSuccessEvent($this->createMock(PassportInterface::class)));
     }
 
-    private function createEvent($credentialsValid = false, $customUser = false)
+    private function createVerifyAuthenticatorCredentialsEvent($passport = null)
     {
-        $event = new VerifyAuthenticatorCredentialsEvent($this->createMock(AuthenticatorInterface::class), [], false === $customUser ? $this->user : $customUser);
-        if ($credentialsValid) {
-            $event->setCredentialsValid(true);
+        if (null === $passport) {
+            $passport = new SelfValidatingPassport($this->user);
         }
 
-        return $event;
+        return new VerifyAuthenticatorCredentialsEvent($this->createMock(AuthenticatorInterface::class), $passport);
+    }
+
+    private function createLoginSuccessEvent($passport = null)
+    {
+        if (null === $passport) {
+            $passport = new SelfValidatingPassport($this->user);
+        }
+
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), new Request(), null, 'main');
     }
 }

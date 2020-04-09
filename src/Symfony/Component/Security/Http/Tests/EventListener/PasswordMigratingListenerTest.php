@@ -12,13 +12,17 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 
 class PasswordMigratingListenerTest extends TestCase
@@ -41,23 +45,19 @@ class PasswordMigratingListenerTest extends TestCase
     {
         $this->encoderFactory->expects($this->never())->method('getEncoder');
 
-        $this->listener->onCredentialsVerification($event);
+        $this->listener->onLoginSuccess($event);
     }
 
     public function provideUnsupportedEvents()
     {
-        // unsupported authenticators
-        yield [$this->createEvent($this->createMock(AuthenticatorInterface::class), $this->user)];
-        yield [$this->createEvent($this->createMock([AuthenticatorInterface::class, PasswordAuthenticatedInterface::class]), $this->user)];
+        // no password upgrade badge
+        yield [$this->createEvent(new SelfValidatingPassport($this->createMock(UserInterface::class)))];
 
-        // null password
-        yield [$this->createEvent($this->createAuthenticator(null), $this->user)];
+        // blank password
+        yield [$this->createEvent(new SelfValidatingPassport($this->createMock(UserInterface::class), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
 
         // no user
-        yield [$this->createEvent($this->createAuthenticator('pa$$word'), null)];
-
-        // invalid password
-        yield [$this->createEvent($this->createAuthenticator('pa$$word'), $this->user, false)];
+        yield [$this->createEvent($this->createMock(PassportInterface::class))];
     }
 
     public function testUpgrade()
@@ -70,32 +70,23 @@ class PasswordMigratingListenerTest extends TestCase
 
         $this->user->expects($this->any())->method('getPassword')->willReturn('old-encoded-password');
 
-        $authenticator = $this->createAuthenticator('pa$$word');
-        $authenticator->expects($this->once())
+        $passwordUpgrader = $this->createPasswordUpgrader();
+        $passwordUpgrader->expects($this->once())
             ->method('upgradePassword')
             ->with($this->user, 'new-encoded-password')
         ;
 
-        $event = $this->createEvent($authenticator, $this->user);
-        $this->listener->onCredentialsVerification($event);
+        $event = $this->createEvent(new SelfValidatingPassport($this->user, [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
+        $this->listener->onLoginSuccess($event);
     }
 
-    /**
-     * @return AuthenticatorInterface
-     */
-    private function createAuthenticator($password)
+    private function createPasswordUpgrader()
     {
-        $authenticator = $this->createMock([AuthenticatorInterface::class, PasswordAuthenticatedInterface::class, PasswordUpgraderInterface::class]);
-        $authenticator->expects($this->any())->method('getPassword')->willReturn($password);
-
-        return $authenticator;
+        return $this->createMock(PasswordUpgraderInterface::class);
     }
 
-    private function createEvent($authenticator, $user, $credentialsValid = true)
+    private function createEvent(PassportInterface $passport)
     {
-        $event = new VerifyAuthenticatorCredentialsEvent($authenticator, [], $user);
-        $event->setCredentialsValid($credentialsValid);
-
-        return $event;
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), new Request(), null, 'main');
     }
 }

@@ -16,8 +16,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
@@ -40,24 +43,12 @@ class RememberMeListenerTest extends TestCase
         $this->token = $this->createMock(TokenInterface::class);
     }
 
-    /**
-     * @dataProvider provideUnsupportingAuthenticators
-     */
-    public function testSuccessfulLoginWithoutSupportingAuthenticator($authenticator)
+    public function testSuccessfulLoginWithoutSupportingAuthenticator()
     {
         $this->rememberMeServices->expects($this->never())->method('loginSuccess');
 
-        $event = $this->createLoginSuccessfulEvent('main_firewall', $this->response, $authenticator);
+        $event = $this->createLoginSuccessfulEvent('main_firewall', $this->response, new SelfValidatingPassport(new User('wouter', null)));
         $this->listener->onSuccessfulLogin($event);
-    }
-
-    public function provideUnsupportingAuthenticators()
-    {
-        yield [$this->createMock(AuthenticatorInterface::class)];
-
-        $authenticator = $this->createMock([AuthenticatorInterface::class, RememberMeAuthenticatorInterface::class]);
-        $authenticator->expects($this->any())->method('supportsRememberMe')->willReturn(false);
-        yield [$authenticator];
     }
 
     public function testSuccessfulLoginWithoutSuccessResponse()
@@ -84,14 +75,13 @@ class RememberMeListenerTest extends TestCase
         $this->listener->onFailedLogin($event);
     }
 
-    private function createLoginSuccessfulEvent($providerKey, $response, $authenticator = null)
+    private function createLoginSuccessfulEvent($providerKey, $response, PassportInterface $passport = null)
     {
-        if (null === $authenticator) {
-            $authenticator = $this->createMock([AuthenticatorInterface::class, RememberMeAuthenticatorInterface::class]);
-            $authenticator->expects($this->any())->method('supportsRememberMe')->willReturn(true);
+        if (null === $passport) {
+            $passport = new SelfValidatingPassport(new User('test', null), [new RememberMeBadge()]);
         }
 
-        return new LoginSuccessEvent($authenticator, $this->token, $this->request, $response, $providerKey);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->token, $this->request, $response, $providerKey);
     }
 
     private function createLoginFailureEvent($providerKey)

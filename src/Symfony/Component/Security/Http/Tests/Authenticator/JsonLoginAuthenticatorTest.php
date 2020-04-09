@@ -16,8 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class JsonLoginAuthenticatorTest extends TestCase
@@ -66,39 +68,45 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [Request::create('/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']), false];
     }
 
-    public function testGetCredentials()
+    public function testAuthenticate()
     {
         $this->setUpAuthenticator();
 
+        $this->userProvider->expects($this->once())->method('loadUserByUsername')->with('dunglas')->willReturn(new User('dunglas', 'pa$$'));
+
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $this->assertEquals(['username' => 'dunglas', 'password' => 'foo'], $this->authenticator->getCredentials($request));
+        $passport = $this->authenticator->authenticate($request);
+        $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
-    public function testGetCredentialsCustomPath()
+    public function testAuthenticateWithCustomPath()
     {
         $this->setUpAuthenticator([
             'username_path' => 'authentication.username',
             'password_path' => 'authentication.password',
         ]);
 
+        $this->userProvider->expects($this->once())->method('loadUserByUsername')->with('dunglas')->willReturn(new User('dunglas', 'pa$$'));
+
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"authentication": {"username": "dunglas", "password": "foo"}}');
-        $this->assertEquals(['username' => 'dunglas', 'password' => 'foo'], $this->authenticator->getCredentials($request));
+        $passport = $this->authenticator->authenticate($request);
+        $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
     /**
-     * @dataProvider provideInvalidGetCredentialsData
+     * @dataProvider provideInvalidAuthenticateData
      */
-    public function testGetCredentialsInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
+    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
     {
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
 
         $this->setUpAuthenticator();
 
-        $this->authenticator->getCredentials($request);
+        $this->authenticator->authenticate($request);
     }
 
-    public function provideInvalidGetCredentialsData()
+    public function provideInvalidAuthenticateData()
     {
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']);
         yield [$request, 'Invalid JSON.'];

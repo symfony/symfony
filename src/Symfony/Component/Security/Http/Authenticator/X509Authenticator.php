@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal
+ * @final
  * @experimental in Symfony 5.1
  */
 class X509Authenticator extends AbstractPreAuthenticatedAuthenticator

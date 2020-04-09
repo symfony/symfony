@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -30,6 +31,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_token_id', 'authenticate');
+        $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
     }
 
@@ -61,6 +63,10 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
     protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
     {
+        if ($config['enable_csrf'] ?? false) {
+            throw new InvalidConfigurationException('The "enable_csrf" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "true", use "csrf_token_generator" instead.');
+        }
+
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
@@ -99,6 +105,10 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
     public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
+        if (isset($config['csrf_token_generator'])) {
+            throw new InvalidConfigurationException('The "csrf_token_generator" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "false", use "enable_csrf" instead.');
+        }
+
         $authenticatorId = 'security.authenticator.form_login.'.$id;
         $options = array_intersect_key($config, $this->options);
         $container

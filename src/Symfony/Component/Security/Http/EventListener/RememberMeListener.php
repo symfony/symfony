@@ -4,8 +4,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
@@ -34,13 +33,12 @@ class RememberMeListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
     {
-        $authenticator = $event->getAuthenticator();
-        if (!$authenticator instanceof RememberMeAuthenticatorInterface || !$authenticator->supportsRememberMe()) {
+        $passport = $event->getPassport();
+        if (!$passport->hasBadge(RememberMeBadge::class)) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
             }
 
             return;
@@ -48,7 +46,7 @@ class RememberMeListener implements EventSubscriberInterface
 
         if (null === $event->getResponse()) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: the authenticator did not set a success response.', ['authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Remember me skipped: the authenticator did not set a success response.', ['authenticator' => \get_class($event->getAuthenticator())]);
             }
 
             return;

@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AnonymousAuthenticator;
 
 class AnonymousAuthenticatorTest extends TestCase
@@ -46,14 +45,9 @@ class AnonymousAuthenticatorTest extends TestCase
         yield [false, false];
     }
 
-    public function testAlwaysValidCredentials()
-    {
-        $this->assertTrue($this->authenticator->checkCredentials([], $this->createMock(UserInterface::class)));
-    }
-
     public function testAuthenticatedToken()
     {
-        $token = $this->authenticator->createAuthenticatedToken($this->authenticator->getUser([]), 'main');
+        $token = $this->authenticator->createAuthenticatedToken($this->authenticator->authenticate($this->request), 'main');
 
         $this->assertTrue($token->isAuthenticated());
         $this->assertEquals('anon.', $token->getUser());

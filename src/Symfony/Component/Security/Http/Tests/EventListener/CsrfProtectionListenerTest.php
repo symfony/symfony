@@ -13,10 +13,12 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\CsrfProtectedAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 
@@ -31,11 +33,11 @@ class CsrfProtectionListenerTest extends TestCase
         $this->listener = new CsrfProtectionListener($this->csrfTokenManager);
     }
 
-    public function testNonCsrfProtectedAuthenticator()
+    public function testNoCsrfTokenBadge()
     {
         $this->csrfTokenManager->expects($this->never())->method('isTokenValid');
 
-        $event = $this->createEvent($this->createAuthenticator(false));
+        $event = $this->createEvent($this->createPassport(null));
         $this->listener->verifyCredentials($event);
     }
 
@@ -46,7 +48,7 @@ class CsrfProtectionListenerTest extends TestCase
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(true);
 
-        $event = $this->createEvent($this->createAuthenticator(true), ['_csrf' => 'abc123']);
+        $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
         $this->listener->verifyCredentials($event);
 
         $this->expectNotToPerformAssertions();
@@ -62,28 +64,22 @@ class CsrfProtectionListenerTest extends TestCase
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(false);
 
-        $event = $this->createEvent($this->createAuthenticator(true), ['_csrf' => 'abc123']);
+        $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
         $this->listener->verifyCredentials($event);
     }
 
-    private function createEvent($authenticator, $credentials = null)
+    private function createEvent($passport)
     {
-        return new VerifyAuthenticatorCredentialsEvent($authenticator, $credentials, null);
+        return new VerifyAuthenticatorCredentialsEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }
 
-    private function createAuthenticator($supportsCsrf)
+    private function createPassport(?CsrfTokenBadge $badge)
     {
-        if (!$supportsCsrf) {
-            return $this->createMock(AuthenticatorInterface::class);
+        $passport = new SelfValidatingPassport(new User('wouter', 'pass'));
+        if ($badge) {
+            $passport->addBadge($badge);
         }
 
-        $authenticator = $this->createMock([AuthenticatorInterface::class, CsrfProtectedAuthenticatorInterface::class]);
-        $authenticator->expects($this->any())->method('getCsrfTokenId')->willReturn('authenticator_token_id');
-        $authenticator->expects($this->any())
-            ->method('getCsrfToken')
-            ->with(['_csrf' => 'abc123'])
-            ->willReturn('abc123');
-
-        return $authenticator;
+        return $passport;
     }
 }

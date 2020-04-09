@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Authenticator;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 /**
  * This is an extension of the authenticator interface that must
  * be used by interactive authenticators.

@@ -17,8 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * The RememberMe *Authenticator* performs remember me authentication.
@@ -33,22 +35,19 @@ use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
  *
  * @final
  */
-class RememberMeAuthenticator implements InteractiveAuthenticatorInterface, CustomAuthenticatedInterface
+class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 {
     private $rememberMeServices;
     private $secret;
     private $tokenStorage;
-    private $options = [
-        'secure' => false,
-        'httponly' => true,
-    ];
+    private $options = [];
 
-    public function __construct(AbstractRememberMeServices $rememberMeServices, string $secret, TokenStorageInterface $tokenStorage, array $options)
+    public function __construct(RememberMeServicesInterface $rememberMeServices, string $secret, TokenStorageInterface $tokenStorage, array $options)
     {
         $this->rememberMeServices = $rememberMeServices;
         $this->secret = $secret;
         $this->tokenStorage = $tokenStorage;
-        $this->options = array_merge($this->options, $options);
+        $this->options = $options;
     }
 
     public function supports(Request $request): ?bool
@@ -62,7 +61,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface, Cust
             return false;
         }
 
-        if (!$request->cookies->has($this->options['name'])) {
+        if (isset($this->options['name']) && !$request->cookies->has($this->options['name'])) {
             return false;
         }
 
@@ -70,31 +69,16 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface, Cust
         return null;
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): PassportInterface
     {
-        return [
-            'cookie_parts' => explode(AbstractRememberMeServices::COOKIE_DELIMITER, base64_decode($request->cookies->get($this->options['name']))),
-            'request' => $request,
-        ];
+        $token = $this->rememberMeServices->autoLogin($request);
+
+        return new SelfValidatingPassport($token->getUser());
     }
 
-    /**
-     * @param array $credentials
-     */
-    public function getUser($credentials): ?UserInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
     {
-        return $this->rememberMeServices->performLogin($credentials['cookie_parts'], $credentials['request']);
-    }
-
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        // remember me always is valid (if a user could be found)
-        return true;
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): TokenInterface
-    {
-        return new RememberMeToken($user, $providerKey, $this->secret);
+        return new RememberMeToken($passport->getUser(), $providerKey, $this->secret);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response

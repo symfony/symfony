@@ -21,12 +21,18 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
 /**
@@ -39,7 +45,7 @@ use Symfony\Component\Security\Http\HttpUtils;
  * @final
  * @experimental in 5.1
  */
-class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface, PasswordAuthenticatedInterface
+class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 {
     private $options;
     private $httpUtils;
@@ -71,7 +77,51 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface, Passw
         return true;
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): PassportInterface
+    {
+        $credentials = $this->getCredentials($request);
+        $user = $this->userProvider->loadUserByUsername($credentials['username']);
+        if (!$user instanceof UserInterface) {
+            throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
+        }
+
+        $passport = new Passport($user, new PasswordCredentials($credentials['password']));
+        if ($this->userProvider instanceof PasswordUpgraderInterface) {
+            $passport->addBadge(new PasswordUpgradeBadge($credentials['password'], $this->userProvider));
+        }
+
+        return $passport;
+    }
+
+    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    {
+        return new UsernamePasswordToken($passport->getUser(), null, $providerKey, $passport->getUser()->getRoles());
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    {
+        if (null === $this->successHandler) {
+            return null; // let the original request continue
+        }
+
+        return $this->successHandler->onAuthenticationSuccess($request, $token);
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+        if (null === $this->failureHandler) {
+            return new JsonResponse(['error' => $exception->getMessageKey()], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->failureHandler->onAuthenticationFailure($request, $exception);
+    }
+
+    public function isInteractive(): bool
+    {
+        return true;
+    }
+
+    private function getCredentials(Request $request)
     {
         $data = json_decode($request->getContent());
         if (!$data instanceof \stdClass) {
@@ -104,43 +154,5 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface, Passw
         }
 
         return $credentials;
-    }
-
-    public function getUser($credentials): ?UserInterface
-    {
-        return $this->userProvider->loadUserByUsername($credentials['username']);
-    }
-
-    public function getPassword($credentials): ?string
-    {
-        return $credentials['password'];
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): TokenInterface
-    {
-        return new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
-    {
-        if (null === $this->successHandler) {
-            return null; // let the original request continue
-        }
-
-        return $this->successHandler->onAuthenticationSuccess($request, $token);
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-        if (null === $this->failureHandler) {
-            return new JsonResponse(['error' => $exception->getMessageKey()], JsonResponse::HTTP_UNAUTHORIZED);
-        }
-
-        return $this->failureHandler->onAuthenticationFailure($request, $exception);
-    }
-
-    public function isInteractive(): bool
-    {
-        return true;
     }
 }

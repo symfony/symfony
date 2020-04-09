@@ -4,10 +4,9 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Http\Authenticator\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -24,37 +23,33 @@ class PasswordMigratingListener implements EventSubscriberInterface
         $this->encoderFactory = $encoderFactory;
     }
 
-    public function onCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
+    public function onLoginSuccess(LoginSuccessEvent $event): void
     {
-        if (!$event->areCredentialsValid()) {
-            // Do not migrate password that are not validated
+        $passport = $event->getPassport();
+        if (!$passport instanceof UserPassportInterface || !$passport->hasBadge(PasswordUpgradeBadge::class)) {
             return;
         }
 
-        $authenticator = $event->getAuthenticator();
-        if (!$authenticator instanceof PasswordAuthenticatedInterface || !$authenticator instanceof PasswordUpgraderInterface) {
+        /** @var PasswordUpgradeBadge $badge */
+        $badge = $passport->getBadge(PasswordUpgradeBadge::class);
+        $plaintextPassword = $badge->getPlaintextPassword();
+        $badge->eraseCredentials();
+
+        if ('' === $plaintextPassword) {
             return;
         }
 
-        if (null === $password = $authenticator->getPassword($event->getCredentials())) {
-            return;
-        }
-
-        $user = $event->getUser();
-        if (!$user instanceof UserInterface) {
-            return;
-        }
-
+        $user = $passport->getUser();
         $passwordEncoder = $this->encoderFactory->getEncoder($user);
         if (!$passwordEncoder->needsRehash($user->getPassword())) {
             return;
         }
 
-        $authenticator->upgradePassword($user, $passwordEncoder->encodePassword($password, $user->getSalt()));
+        $badge->getPasswordUpgrader()->upgradePassword($user, $passwordEncoder->encodePassword($plaintextPassword, $user->getSalt()));
     }
 
     public static function getSubscribedEvents(): array
     {
-        return [VerifyAuthenticatorCredentialsEvent::class => ['onCredentialsVerification', -128]];
+        return [LoginSuccessEvent::class => 'onLoginSuccess'];
     }
 }

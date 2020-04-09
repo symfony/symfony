@@ -19,11 +19,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -60,13 +62,16 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->eraseCredentials = $eraseCredentials;
     }
 
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request): ?Response
+    /**
+     * @param BadgeInterface[] $badges Optionally, pass some Passport badges to use for the manual login
+     */
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
         // create an authenticated token for the User
-        $token = $authenticator->createAuthenticatedToken($user, $this->providerKey);
+        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport($user, $badges), $this->providerKey);
 
         // authenticate this in the system
-        return $this->handleAuthenticationSuccess($token, $request, $authenticator);
+        return $this->handleAuthenticationSuccess($token, $passport, $request, $authenticator);
     }
 
     public function supports(Request $request): ?bool
@@ -133,7 +138,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 continue;
             }
 
-            $response = $this->executeAuthenticator($key, $authenticator, $request);
+            $response = $this->executeAuthenticator($authenticator, $request);
             if (null !== $response) {
                 if (null !== $this->logger) {
                     $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', ['authenticator' => \get_class($authenticator)]);
@@ -146,29 +151,35 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         return null;
     }
 
-    private function executeAuthenticator(string $uniqueAuthenticatorKey, AuthenticatorInterface $authenticator, Request $request): ?Response
+    private function executeAuthenticator(AuthenticatorInterface $authenticator, Request $request): ?Response
     {
         try {
-            if (null !== $this->logger) {
-                $this->logger->debug('Calling getCredentials() on authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+            // get the passport from the Authenticator
+            $passport = $authenticator->authenticate($request);
+
+            // check the passport (e.g. password checking)
+            $event = new VerifyAuthenticatorCredentialsEvent($authenticator, $passport);
+            $this->eventDispatcher->dispatch($event);
+
+            // check if all badges are resolved
+            $passport->checkIfCompletelyResolved();
+
+            // create the authenticated token
+            $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->providerKey);
+            if (true === $this->eraseCredentials) {
+                $authenticatedToken->eraseCredentials();
             }
 
-            // allow the authenticator to fetch authentication info from the request
-            $credentials = $authenticator->getCredentials($request);
-
-            if (null === $credentials) {
-                throw new \UnexpectedValueException(sprintf('The return value of "%1$s::getCredentials()" must not be null. Return false from "%1$s::supports()" instead.', \get_class($authenticator)));
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
             }
 
-            // authenticate the credentials (e.g. check password)
-            $token = $this->authenticateViaAuthenticator($authenticator, $credentials);
-
             if (null !== $this->logger) {
-                $this->logger->info('Authenticator successful!', ['token' => $token, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => \get_class($authenticator)]);
             }
 
             // success! (sets the token on the token storage, etc)
-            $response = $this->handleAuthenticationSuccess($token, $request, $authenticator);
+            $response = $this->handleAuthenticationSuccess($authenticatedToken, $passport, $request, $authenticator);
             if ($response instanceof Response) {
                 return $response;
             }
@@ -189,35 +200,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         }
     }
 
-    private function authenticateViaAuthenticator(AuthenticatorInterface $authenticator, $credentials): TokenInterface
-    {
-        // get the user from the Authenticator
-        $user = $authenticator->getUser($credentials);
-        if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', \get_class($authenticator)));
-        }
-
-        $event = new VerifyAuthenticatorCredentialsEvent($authenticator, $credentials, $user);
-        $this->eventDispatcher->dispatch($event);
-        if (true !== $event->areCredentialsValid()) {
-            throw new BadCredentialsException(sprintf('Authentication failed because "%s" did not approve the credentials.', \get_class($authenticator)));
-        }
-
-        // turn the UserInterface into a TokenInterface
-        $authenticatedToken = $authenticator->createAuthenticatedToken($user, $this->providerKey);
-
-        if (true === $this->eraseCredentials) {
-            $authenticatedToken->eraseCredentials();
-        }
-
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
-        }
-
-        return $authenticatedToken;
-    }
-
-    private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, Request $request, AuthenticatorInterface $authenticator): ?Response
+    private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, PassportInterface $passport, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
         $this->tokenStorage->setToken($authenticatedToken);
 
@@ -227,7 +210,11 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
         }
 
-        $this->eventDispatcher->dispatch($loginSuccessEvent = new LoginSuccessEvent($authenticator, $authenticatedToken, $request, $response, $this->providerKey));
+        if ($passport instanceof AnonymousPassport) {
+            return $response;
+        }
+
+        $this->eventDispatcher->dispatch($loginSuccessEvent = new LoginSuccessEvent($authenticator, $passport, $authenticatedToken, $request, $response, $this->firewallName));
 
         return $loginSuccessEvent->getResponse();
     }

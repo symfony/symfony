@@ -18,10 +18,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 
 class AuthenticatorManagerTest extends TestCase
@@ -38,7 +40,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->eventDispatcher = new EventDispatcher();
         $this->request = new Request();
-        $this->user = $this->createMock(UserInterface::class);
+        $this->user = new User('wouter', null);
         $this->token = $this->createMock(TokenInterface::class);
         $this->response = $this->createMock(Response::class);
     }
@@ -73,7 +75,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator(false);
         $this->request->attributes->set('_guard_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->never())->method('getCredentials');
+        $authenticator->expects($this->never())->method('authenticate');
 
         $manager = $this->createManager([$authenticator]);
         $manager->authenticateRequest($this->request);
@@ -88,17 +90,14 @@ class AuthenticatorManagerTest extends TestCase
         $this->request->attributes->set('_guard_authenticators', $authenticators);
         $matchingAuthenticator = $authenticators[$matchingAuthenticatorIndex];
 
-        $authenticators[($matchingAuthenticatorIndex + 1) % 2]->expects($this->never())->method('getCredentials');
+        $authenticators[($matchingAuthenticatorIndex + 1) % 2]->expects($this->never())->method('authenticate');
 
-        $matchingAuthenticator->expects($this->any())->method('getCredentials')->willReturn(['password' => 'pa$$']);
-        $matchingAuthenticator->expects($this->any())->method('getUser')->willReturn($this->user);
+        $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
 
         $listenerCalled = false;
         $this->eventDispatcher->addListener(VerifyAuthenticatorCredentialsEvent::class, function (VerifyAuthenticatorCredentialsEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
-            if ($event->getAuthenticator() === $matchingAuthenticator && $event->getCredentials() === ['password' => 'pa$$'] && $event->getUser() === $this->user) {
+            if ($event->getAuthenticator() === $matchingAuthenticator && $event->getPassport()->getUser() === $this->user) {
                 $listenerCalled = true;
-
-                $event->setCredentialsValid(true);
             }
         });
         $matchingAuthenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
@@ -116,29 +115,12 @@ class AuthenticatorManagerTest extends TestCase
         yield [1];
     }
 
-    public function testUserNotFound()
-    {
-        $authenticator = $this->createAuthenticator();
-        $this->request->attributes->set('_guard_authenticators', [$authenticator]);
-
-        $authenticator->expects($this->any())->method('getCredentials')->willReturn(['username' => 'john']);
-        $authenticator->expects($this->any())->method('getUser')->with(['username' => 'john'])->willReturn(null);
-
-        $authenticator->expects($this->once())
-            ->method('onAuthenticationFailure')
-            ->with($this->request, $this->isInstanceOf(UsernameNotFoundException::class));
-
-        $manager = $this->createManager([$authenticator]);
-        $manager->authenticateRequest($this->request);
-    }
-
     public function testNoCredentialsValidated()
     {
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_guard_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('getCredentials')->willReturn(['username' => 'john']);
-        $authenticator->expects($this->any())->method('getUser')->willReturn($this->user);
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport($this->user, new PasswordCredentials('pass')));
 
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
@@ -156,11 +138,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_guard_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('getCredentials')->willReturn(['username' => 'john']);
-        $authenticator->expects($this->any())->method('getUser')->willReturn($this->user);
-        $this->eventDispatcher->addListener(VerifyAuthenticatorCredentialsEvent::class, function (VerifyAuthenticatorCredentialsEvent $event) {
-            $event->setCredentialsValid(true);
-        });
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
 
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
@@ -194,12 +172,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
         $this->request->attributes->set('_guard_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('getCredentials')->willReturn(['password' => 'pa$$']);
-        $authenticator->expects($this->any())->method('getUser')->willReturn($this->user);
-
-        $this->eventDispatcher->addListener(VerifyAuthenticatorCredentialsEvent::class, function (VerifyAuthenticatorCredentialsEvent $event) {
-            $event->setCredentialsValid(true);
-        });
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);

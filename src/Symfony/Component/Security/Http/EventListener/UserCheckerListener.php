@@ -4,7 +4,9 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Http\Authenticator\AbstractPreAuthenticatedAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 
 /**
@@ -24,29 +26,29 @@ class UserCheckerListener implements EventSubscriberInterface
 
     public function preCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
     {
-        if (null === $event->getUser() || $event->getAuthenticator() instanceof AbstractPreAuthenticatedAuthenticator) {
+        $passport = $event->getPassport();
+        if (!$passport instanceof UserPassportInterface || $passport->hasBadge(PreAuthenticatedUserBadge::class)) {
             return;
         }
 
-        $this->userChecker->checkPreAuth($event->getUser());
+        $this->userChecker->checkPreAuth($passport->getUser());
     }
 
-    public function postCredentialsVerification(VerifyAuthenticatorCredentialsEvent $event): void
+    public function postCredentialsVerification(LoginSuccessEvent $event): void
     {
-        if (null === $event->getUser() || !$event->areCredentialsValid()) {
+        $passport = $event->getPassport();
+        if (!$passport instanceof UserPassportInterface || null === $passport->getUser()) {
             return;
         }
 
-        $this->userChecker->checkPostAuth($event->getUser());
+        $this->userChecker->checkPostAuth($passport->getUser());
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            VerifyAuthenticatorCredentialsEvent::class => [
-                ['preCredentialsVerification', 256],
-                ['preCredentialsVerification', 32]
-            ],
+            VerifyAuthenticatorCredentialsEvent::class => [['preCredentialsVerification', 256]],
+            LoginSuccessEvent::class => ['postCredentialsVerification', 256],
         ];
     }
 }

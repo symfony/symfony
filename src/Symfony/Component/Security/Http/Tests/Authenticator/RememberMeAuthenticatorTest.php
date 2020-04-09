@@ -14,11 +14,13 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class RememberMeAuthenticatorTest extends TestCase
 {
@@ -29,7 +31,7 @@ class RememberMeAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->rememberMeServices = $this->createMock(AbstractRememberMeServices::class);
+        $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorage::class);
         $this->authenticator = new RememberMeAuthenticator($this->rememberMeServices, 's3cr3t', $this->tokenStorage, [
             'name' => '_remember_me_cookie',
@@ -67,22 +69,14 @@ class RememberMeAuthenticatorTest extends TestCase
 
     public function testAuthenticate()
     {
-        $credentials = $this->authenticator->getCredentials($this->request);
-        $this->assertEquals(['part1', 'part2'], $credentials['cookie_parts']);
-        $this->assertSame($this->request, $credentials['request']);
+        $this->rememberMeServices->expects($this->once())
+            ->method('autoLogin')
+            ->with($this->request)
+            ->willReturn(new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));
 
-        $user = $this->createMock(UserInterface::class);
-        $this->rememberMeServices->expects($this->any())
-            ->method('performLogin')
-            ->with($credentials['cookie_parts'], $credentials['request'])
-            ->willReturn($user);
+        $passport = $this->authenticator->authenticate($this->request);
 
-        $this->assertSame($user, $this->authenticator->getUser($credentials));
-    }
-
-    public function testCredentialsAlwaysValid()
-    {
-        $this->assertTrue($this->authenticator->checkCredentials([], $this->createMock(UserInterface::class)));
+        $this->assertSame($user, $passport->getUser());
     }
 
     private function generateCookieValue()

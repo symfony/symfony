@@ -105,7 +105,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     public function testNulledEnvInConfig()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
-        $this->expectExceptionMessageRegexp('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
+        $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
         $container->registerExtension(new EnvExtension());

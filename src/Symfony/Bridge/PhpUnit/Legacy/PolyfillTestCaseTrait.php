@@ -100,6 +100,16 @@ trait PolyfillTestCaseTrait
      *
      * @return void
      */
+    public function expectExceptionMessageMatches($messageRegExp)
+    {
+        $this->expectExceptionMessageRegExp($messageRegExp);
+    }
+
+    /**
+     * @param string $messageRegExp
+     *
+     * @return void
+     */
     public function expectExceptionMessageRegExp($messageRegExp)
     {
         $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionMessageRegExp');

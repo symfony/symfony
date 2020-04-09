@@ -13,6 +13,7 @@ CHANGELOG
  * added support for `\stdClass` to `ObjectNormalizer`
  * added the ability to ignore properties using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Ignore`)
  * added an option to serialize constraint violations payloads (e.g. severity)
+ * added `UidNormalizer`
 
 5.0.0
 -----

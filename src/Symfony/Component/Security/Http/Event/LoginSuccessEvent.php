@@ -31,14 +31,14 @@ class LoginSuccessEvent extends Event
     private $response;
     private $providerKey;
 
-    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $providerKey)
+    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)
     {
         $this->authenticator = $authenticator;
         $this->passport = $passport;
         $this->authenticatedToken = $authenticatedToken;
         $this->request = $request;
         $this->response = $response;
-        $this->providerKey = $providerKey;
+        $this->providerKey = $firewallName;
     }
 
     public function getAuthenticator(): AuthenticatorInterface
@@ -70,7 +70,7 @@ class LoginSuccessEvent extends Event
         return $this->request;
     }
 
-    public function getProviderKey(): string
+    public function getFirewallName(): string
     {
         return $this->providerKey;
     }

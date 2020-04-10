@@ -89,19 +89,19 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return [$authProviderId, $listenerId, $defaultEntryPoint];
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $templateId = $this->generateRememberMeServicesTemplateId($config, $id);
-        $rememberMeServicesId = $templateId.'.'.$id;
+        $templateId = $this->generateRememberMeServicesTemplateId($config, $firewallName);
+        $rememberMeServicesId = $templateId.'.'.$firewallName;
 
         // create remember me services (which manage the remember me cookies)
-        $this->createRememberMeServices($container, $id, $templateId, [new Reference($userProviderId)], $config);
+        $this->createRememberMeServices($container, $firewallName, $templateId, [new Reference($userProviderId)], $config);
 
         // create remember me listener (which executes the remember me services for other authenticators and logout)
-        $this->createRememberMeListener($container, $id, $rememberMeServicesId);
+        $this->createRememberMeListener($container, $firewallName, $rememberMeServicesId);
 
         // create remember me authenticator (which re-authenticates the user based on the remember me cookie)
-        $authenticatorId = 'security.authenticator.remember_me.'.$id;
+        $authenticatorId = 'security.authenticator.remember_me.'.$firewallName;
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.remember_me'))
             ->replaceArgument(0, new Reference($rememberMeServicesId))

@@ -286,7 +286,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             // add authentication providers to authentication manager
             $authenticationProviders = array_map(function ($id) {
                 return new Reference($id);
-            }, array_unique($authenticationProviders));
+            }, array_values(array_unique($authenticationProviders)));
 
             $container
                 ->getDefinition('security.authentication.manager')
@@ -439,9 +439,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewallAuthenticationProviders = [];
         list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
 
-        $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
-
-        if ($this->authenticatorManagerEnabled) {
+        if (!$this->authenticatorManagerEnabled) {
+            $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
+        } else {
             // authenticator manager
             $authenticators = array_map(function ($id) {
                 return new Reference($id);
@@ -535,10 +535,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
                         if (\is_array($authenticators)) {
                             foreach ($authenticators as $i => $authenticator) {
-                                $authenticationProviders[$id.'_'.$key.$i] = $authenticator;
+                                $authenticationProviders[] = $authenticator;
                             }
                         } else {
-                            $authenticationProviders[$id.'_'.$key] = $authenticators;
+                            $authenticationProviders[] = $authenticators;
                         }
 
                         if ($factory instanceof EntryPointFactoryInterface) {
@@ -548,7 +548,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
                         $listeners[] = new Reference($listenerId);
-                        $authenticationProviders[$id.'_'.$key] = $provider;
+                        $authenticationProviders[] = $provider;
                     }
                     $hasListeners = true;
                 }

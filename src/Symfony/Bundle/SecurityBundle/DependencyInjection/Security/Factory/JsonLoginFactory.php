@@ -97,15 +97,15 @@ class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $listenerId;
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
     {
-        $authenticatorId = 'security.authenticator.json_login.'.$id;
+        $authenticatorId = 'security.authenticator.json_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.json_login'))
             ->replaceArgument(1, new Reference($userProviderId))
-            ->replaceArgument(2, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)) : null)
-            ->replaceArgument(3, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $id, $config)) : null)
+            ->replaceArgument(2, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null)
+            ->replaceArgument(3, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null)
             ->replaceArgument(4, $options);
 
         return $authenticatorId;

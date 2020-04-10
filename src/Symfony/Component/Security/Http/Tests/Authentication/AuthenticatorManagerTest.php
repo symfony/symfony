@@ -73,7 +73,7 @@ class AuthenticatorManagerTest extends TestCase
         // means support changed between calling supports() and authenticateRequest()
         // (which is the case with lazy firewalls and e.g. the AnonymousAuthenticator)
         $authenticator = $this->createAuthenticator(false);
-        $this->request->attributes->set('_guard_authenticators', [$authenticator]);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->never())->method('authenticate');
 
@@ -87,7 +87,7 @@ class AuthenticatorManagerTest extends TestCase
     public function testAuthenticateRequest($matchingAuthenticatorIndex)
     {
         $authenticators = [$this->createAuthenticator(0 === $matchingAuthenticatorIndex), $this->createAuthenticator(1 === $matchingAuthenticatorIndex)];
-        $this->request->attributes->set('_guard_authenticators', $authenticators);
+        $this->request->attributes->set('_security_authenticators', $authenticators);
         $matchingAuthenticator = $authenticators[$matchingAuthenticatorIndex];
 
         $authenticators[($matchingAuthenticatorIndex + 1) % 2]->expects($this->never())->method('authenticate');
@@ -118,7 +118,7 @@ class AuthenticatorManagerTest extends TestCase
     public function testNoCredentialsValidated()
     {
         $authenticator = $this->createAuthenticator();
-        $this->request->attributes->set('_guard_authenticators', [$authenticator]);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport($this->user, new PasswordCredentials('pass')));
 
@@ -136,7 +136,7 @@ class AuthenticatorManagerTest extends TestCase
     public function testEraseCredentials($eraseCredentials)
     {
         $authenticator = $this->createAuthenticator();
-        $this->request->attributes->set('_guard_authenticators', [$authenticator]);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
 
@@ -170,7 +170,7 @@ class AuthenticatorManagerTest extends TestCase
     {
         $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
-        $this->request->attributes->set('_guard_authenticators', [$authenticator]);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);

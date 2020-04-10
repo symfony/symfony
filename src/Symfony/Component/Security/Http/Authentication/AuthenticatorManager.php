@@ -47,17 +47,17 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     private $eventDispatcher;
     private $eraseCredentials;
     private $logger;
-    private $providerKey;
+    private $firewallName;
 
     /**
-     * @param AuthenticatorInterface[] $authenticators The authenticators, with their unique providerKey as key
+     * @param AuthenticatorInterface[] $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $providerKey, ?LoggerInterface $logger = null, bool $eraseCredentials = true)
+    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true)
     {
         $this->authenticators = $authenticators;
         $this->tokenStorage = $tokenStorage;
         $this->eventDispatcher = $eventDispatcher;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
         $this->logger = $logger;
         $this->eraseCredentials = $eraseCredentials;
     }
@@ -68,7 +68,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
         // create an authenticated token for the User
-        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport($user, $badges), $this->providerKey);
+        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport($user, $badges), $this->firewallName);
 
         // authenticate this in the system
         return $this->handleAuthenticationSuccess($token, $passport, $request, $authenticator);
@@ -77,27 +77,27 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     public function supports(Request $request): ?bool
     {
         if (null !== $this->logger) {
-            $context = ['firewall_key' => $this->providerKey];
+            $context = ['firewall_key' => $this->firewallName];
 
             if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
                 $context['authenticators'] = \count($this->authenticators);
             }
 
-            $this->logger->debug('Checking for guard authentication credentials.', $context);
+            $this->logger->debug('Checking for authenticator support.', $context);
         }
 
         $authenticators = [];
         $lazy = true;
-        foreach ($this->authenticators as $key => $authenticator) {
+        foreach ($this->authenticators as $authenticator) {
             if (null !== $this->logger) {
-                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
             }
 
             if (false !== $supports = $authenticator->supports($request)) {
-                $authenticators[$key] = $authenticator;
+                $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
             } elseif (null !== $this->logger) {
-                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
             }
         }
 
@@ -105,15 +105,15 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             return false;
         }
 
-        $request->attributes->set('_guard_authenticators', $authenticators);
+        $request->attributes->set('_security_authenticators', $authenticators);
 
         return $lazy ? null : true;
     }
 
     public function authenticateRequest(Request $request): ?Response
     {
-        $authenticators = $request->attributes->get('_guard_authenticators');
-        $request->attributes->remove('_guard_authenticators');
+        $authenticators = $request->attributes->get('_security_authenticators');
+        $request->attributes->remove('_security_authenticators');
         if (!$authenticators) {
             return null;
         }
@@ -126,8 +126,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
      */
     private function executeAuthenticators(array $authenticators, Request $request): ?Response
     {
-        foreach ($authenticators as $key => $authenticator) {
-            // recheck if the authenticator still supports the listener. support() is called
+        foreach ($authenticators as $authenticator) {
+            // recheck if the authenticator still supports the listener. supports() is called
             // eagerly (before token storage is initialized), whereas authenticate() is called
             // lazily (after initialization). This is important for e.g. the AnonymousAuthenticator
             // as its support is relying on the (initialized) token in the TokenStorage.
@@ -135,6 +135,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 if (null !== $this->logger) {
                     $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator)]);
                 }
+
                 continue;
             }
 
@@ -165,7 +166,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $passport->checkIfCompletelyResolved();
 
             // create the authenticated token
-            $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->providerKey);
+            $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->firewallName);
             if (true === $this->eraseCredentials) {
                 $authenticatedToken->eraseCredentials();
             }
@@ -204,7 +205,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     {
         $this->tokenStorage->setToken($authenticatedToken);
 
-        $response = $authenticator->onAuthenticationSuccess($request, $authenticatedToken, $this->providerKey);
+        $response = $authenticator->onAuthenticationSuccess($request, $authenticatedToken, $this->firewallName);
         if ($authenticator instanceof InteractiveAuthenticatorInterface && $authenticator->isInteractive()) {
             $loginEvent = new InteractiveLoginEvent($request, $authenticatedToken);
             $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
@@ -233,7 +234,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->logger->debug('The "{authenticator}" authenticator set the failure response.', ['authenticator' => \get_class($authenticator)]);
         }
 
-        $this->eventDispatcher->dispatch($loginFailureEvent = new LoginFailureEvent($authenticationException, $authenticator, $request, $response, $this->providerKey));
+        $this->eventDispatcher->dispatch($loginFailureEvent = new LoginFailureEvent($authenticationException, $authenticator, $request, $response, $this->firewallName));
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();

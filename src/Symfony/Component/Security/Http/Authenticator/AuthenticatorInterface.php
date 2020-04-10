@@ -63,7 +63,7 @@ interface AuthenticatorInterface
      *
      * @param PassportInterface $passport The passport returned from authenticate()
      */
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface;
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface;
 
     /**
      * Called when authentication executed and was successful!
@@ -74,7 +74,7 @@ interface AuthenticatorInterface
      * If you return null, the current request will continue, and the user
      * will be authenticated. This makes sense, for example, with an API.
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response;
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response;
 
     /**
      * Called when authentication executed, but failed (e.g. wrong username password).

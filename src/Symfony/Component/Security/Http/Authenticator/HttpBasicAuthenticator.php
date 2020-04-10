@@ -82,12 +82,12 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     /**
      * @param Passport $passport
      */
-    public function createAuthenticatedToken(PassportInterface $passport, $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $providerKey, $passport->getUser()->getRoles());
+        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName): ?Response
     {
         return null;
     }

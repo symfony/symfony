@@ -7,24 +7,23 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PostAuthenticationToken extends AbstractToken
 {
-    private $providerKey;
+    private $firewallName;
 
     /**
-     * @param string   $providerKey The provider (firewall) key
-     * @param string[] $roles       An array of roles
+     * @param string[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, string $providerKey, array $roles)
+    public function __construct(UserInterface $user, string $firewallName, array $roles)
     {
         parent::__construct($roles);
 
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey (i.e. firewall key) must not be empty.');
+        if (empty($firewallName)) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->setUser($user);
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
 
         // this token is meant to be used after authentication success, so it is always authenticated
         // you could set it as non authenticated later if you need to
@@ -42,14 +41,9 @@ class PostAuthenticationToken extends AbstractToken
         return [];
     }
 
-    /**
-     * Returns the provider (firewall) key.
-     *
-     * @return string
-     */
-    public function getProviderKey()
+    public function getFirewallName(): string
     {
-        return $this->providerKey;
+        return $this->firewallName;
     }
 
     /**
@@ -57,7 +51,7 @@ class PostAuthenticationToken extends AbstractToken
      */
     public function __serialize(): array
     {
-        return [$this->providerKey, parent::__serialize()];
+        return [$this->firewallName, parent::__serialize()];
     }
 
     /**
@@ -65,7 +59,7 @@ class PostAuthenticationToken extends AbstractToken
      */
     public function __unserialize(array $data): void
     {
-        [$this->providerKey, $parentData] = $data;
+        [$this->firewallName, $parentData] = $data;
         parent::__unserialize($parentData);
     }
 }

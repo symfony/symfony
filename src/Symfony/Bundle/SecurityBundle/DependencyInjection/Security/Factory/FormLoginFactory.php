@@ -103,19 +103,19 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $entryPointId;
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         if (isset($config['csrf_token_generator'])) {
             throw new InvalidConfigurationException('The "csrf_token_generator" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "false", use "enable_csrf" instead.');
         }
 
-        $authenticatorId = 'security.authenticator.form_login.'.$id;
+        $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, new Reference($userProviderId))
-            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)))
-            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)))
+            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
+            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(4, $options);
 
         return $authenticatorId;

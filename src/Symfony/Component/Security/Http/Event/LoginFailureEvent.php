@@ -22,15 +22,15 @@ class LoginFailureEvent extends Event
     private $authenticator;
     private $request;
     private $response;
-    private $providerKey;
+    private $firewallName;
 
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $providerKey)
+    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName)
     {
         $this->exception = $exception;
         $this->authenticator = $authenticator;
         $this->request = $request;
         $this->response = $response;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
     }
 
     public function getException(): AuthenticationException
@@ -43,9 +43,9 @@ class LoginFailureEvent extends Event
         return $this->authenticator;
     }
 
-    public function getProviderKey(): string
+    public function getFirewallName(): string
     {
-        return $this->providerKey;
+        return $this->firewallName;
     }
 
     public function getRequest(): Request

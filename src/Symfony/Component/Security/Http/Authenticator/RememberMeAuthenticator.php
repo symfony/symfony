@@ -76,12 +76,12 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
         return new SelfValidatingPassport($token->getUser());
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
-        return new RememberMeToken($passport->getUser(), $providerKey, $this->secret);
+        return new RememberMeToken($passport->getUser(), $firewallName, $this->secret);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null; // let the original request continue
     }

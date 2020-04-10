@@ -92,12 +92,12 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         return new SelfValidatingPassport($user, [new PreAuthenticatedUserBadge()]);
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
-        return new PreAuthenticatedToken($passport->getUser(), null, $providerKey, $passport->getUser()->getRoles());
+        return new PreAuthenticatedToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null; // let the original request continue
     }

@@ -32,12 +32,12 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
      *
      * @return PostAuthenticationToken
      */
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
         if (!$passport instanceof UserPassportInterface) {
             throw new LogicException(sprintf('Passport does not contain a user, overwrite "createAuthenticatedToken()" in "%s" to create a custom authenticated token.', \get_class($this)));
         }
 
-        return new PostAuthenticationToken($passport->getUser(), $providerKey, $passport->getUser()->getRoles());
+        return new PostAuthenticationToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 }

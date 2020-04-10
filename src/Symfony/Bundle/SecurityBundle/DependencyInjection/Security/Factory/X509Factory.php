@@ -44,9 +44,9 @@ class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInter
         return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
     {
-        $authenticatorId = 'security.authenticator.x509.'.$id;
+        $authenticatorId = 'security.authenticator.x509.'.$firewallName;
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.x509'))
             ->replaceArgument(0, new Reference($userProviderId))

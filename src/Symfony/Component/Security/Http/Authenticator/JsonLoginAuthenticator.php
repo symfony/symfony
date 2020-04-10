@@ -93,12 +93,12 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         return $passport;
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $providerKey, $passport->getUser()->getRoles());
+        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if (null === $this->successHandler) {
             return null; // let the original request continue

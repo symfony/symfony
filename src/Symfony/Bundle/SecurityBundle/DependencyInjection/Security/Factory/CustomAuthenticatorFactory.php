@@ -49,7 +49,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, Secur
         ;
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId): array
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array
     {
         return $config['services'];
     }

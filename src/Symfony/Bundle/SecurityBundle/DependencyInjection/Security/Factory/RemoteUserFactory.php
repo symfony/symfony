@@ -43,9 +43,9 @@ class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
     {
-        $authenticatorId = 'security.authenticator.remote_user.'.$id;
+        $authenticatorId = 'security.authenticator.remote_user.'.$firewallName;
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.remote_user'))
             ->replaceArgument(0, new Reference($userProviderId))

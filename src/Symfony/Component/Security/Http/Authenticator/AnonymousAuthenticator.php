@@ -50,12 +50,12 @@ class AnonymousAuthenticator implements AuthenticatorInterface
         return new AnonymousPassport();
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $providerKey): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
         return new AnonymousToken($this->secret, 'anon.', []);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null; // let the original request continue
     }

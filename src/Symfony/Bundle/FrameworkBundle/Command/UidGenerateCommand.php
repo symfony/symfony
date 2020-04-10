@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -51,6 +52,8 @@ class UidGenerateCommand extends Command
                 new InputArgument('type', InputArgument::REQUIRED, 'The type/version of the generated UID.'),
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'Namespace for UUID V3 and V5 versions.', ''),
                 new InputArgument('name', InputArgument::OPTIONAL, 'Name for UUID V3 and V5 versions.', ''),
+                new InputOption('base32', null, InputOption::VALUE_NONE, 'Use this option to represent the generated UUID/ULID in base 32.'),
+                new InputOption('base58', null, InputOption::VALUE_NONE, 'Use this option to represent the generated UUID/ULID in base 58.')
             ])
             ->setDescription('Generates a UID, that can be either a ULID or a UUID in a given version.')
             ->setHelp(<<<EOF
@@ -104,6 +107,14 @@ EOF
             default:
                 throw new InvalidArgumentException('Invalaible UID type. Available values are '.implode(', ', self::$types).'.');
                 break;
+        }
+
+        if ($input->getOption('base32')) {
+            $uid = $uid->toBase32();
+        }
+
+        if ($input->getOption('base58')) {
+            $uid = $uid->toBase58();
         }
 
         $output->writeln($uid);

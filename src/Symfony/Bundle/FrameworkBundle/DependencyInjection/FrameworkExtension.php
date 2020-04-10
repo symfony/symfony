@@ -188,6 +188,9 @@ class FrameworkExtension extends Extension
             if (!class_exists(BaseYamlLintCommand::class)) {
                 $container->removeDefinition('console.command.yaml_lint');
             }
+            if (!class_exists(AbstractUid::class)) {
+                $container->removeDefinition('console.command.uid_generate');
+            }
         }
 
         // Load Cache configuration first as it is used by other components
@@ -344,10 +347,6 @@ class FrameworkExtension extends Extension
                     $container->removeDefinition('messenger.transport.redis.factory');
                 }
             }
-        }
-
-        if (!class_exists(AbstractUid::class)) {
-            $container->removeDefinition('console.command.uid_generate');
         }
 
         if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {

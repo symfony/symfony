@@ -124,6 +124,7 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -343,6 +344,10 @@ class FrameworkExtension extends Extension
                     $container->removeDefinition('messenger.transport.redis.factory');
                 }
             }
+        }
+
+        if (!class_exists(AbstractUid::class)) {
+            $container->removeDefinition('console.command.uid_generate');
         }
 
         if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {

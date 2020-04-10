@@ -77,10 +77,6 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!class_exists(AbstractUid::class)) {
-            throw new \RuntimeException('Unable to execute this command as the Symfony Uid Component is not installed.');
-        }
-
         $type = $input->getArgument('type') ? strtolower($input->getArgument('type')) : null;
         $namespace = $input->getArgument('namespace');
         $name = $input->getArgument('name');

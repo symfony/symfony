@@ -20,6 +20,7 @@ class AliasConfigurator extends AbstractServiceConfigurator
 {
     const FACTORY = 'alias';
 
+    use Traits\DeprecateTrait;
     use Traits\PublicTrait;
 
     public function __construct(ServicesConfigurator $parent, Alias $alias)

@@ -96,6 +96,11 @@ EOF
             $value = strtr(substr(base64_encode(random_bytes($random)), 0, $random), '+/', '-_');
         } elseif (!$file = $input->getArgument('file')) {
             $value = $io->askHidden('Please type the secret value');
+
+            if (null === $value) {
+                $io->warning('No value provided: using empty string');
+                $value = '';
+            }
         } elseif ('-' === $file) {
             $value = file_get_contents('php://stdin');
         } elseif (is_file($file) && is_readable($file)) {
@@ -104,12 +109,6 @@ EOF
             throw new \InvalidArgumentException(sprintf('File not found: "%s".', $file));
         } elseif (!is_readable($file)) {
             throw new \InvalidArgumentException(sprintf('File is not readable: "%s".', $file));
-        }
-
-        if (null === $value) {
-            $io->warning('No value provided, aborting.');
-
-            return 1;
         }
 
         if ($vault->generateKeys()) {

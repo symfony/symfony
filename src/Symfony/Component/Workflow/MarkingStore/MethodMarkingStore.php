@@ -56,7 +56,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
 
         $marking = $subject->{$method}();
 
-        if (!$marking) {
+        if (null === $marking) {
             return new Marking();
         }
 

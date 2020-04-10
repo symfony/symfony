@@ -1346,6 +1346,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
     }
 
+    public function testScopedHttpClientWithoutQueryOption()
+    {
+        $container = $this->createContainerFromFile('http_client_scoped_without_query_option');
+
+        $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
+        $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
+    }
+
     public function testHttpClientOverrideDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');

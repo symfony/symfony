@@ -53,7 +53,7 @@ class UidGenerateCommand extends Command
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'Namespace for UUID V3 and V5 versions.', ''),
                 new InputArgument('name', InputArgument::OPTIONAL, 'Name for UUID V3 and V5 versions.', ''),
                 new InputOption('base32', null, InputOption::VALUE_NONE, 'Use this option to represent the generated UUID/ULID in base 32.'),
-                new InputOption('base58', null, InputOption::VALUE_NONE, 'Use this option to represent the generated UUID/ULID in base 58.')
+                new InputOption('base58', null, InputOption::VALUE_NONE, 'Use this option to represent the generated UUID/ULID in base 58.'),
             ])
             ->setDescription('Generates a UID, that can be either a ULID or a UUID in a given version.')
             ->setHelp(<<<EOF
@@ -82,7 +82,7 @@ EOF
         $namespace = $input->getArgument('namespace');
         $name = $input->getArgument('name');
 
-        if (in_array($type, [self::UUID_3, self::UUID_5], true) && !Uuid::isValid($namespace)) {
+        if (\in_array($type, [self::UUID_3, self::UUID_5], true) && !Uuid::isValid($namespace)) {
             throw new InvalidArgumentException('You have to specify a valid namespace as second argument.');
         }
 

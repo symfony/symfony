@@ -78,7 +78,7 @@
 
         <service id="serializer.normalizer.uid" class="Symfony\Component\Serializer\Normalizer\UidNormalizer">
             <!-- Run before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-90" />
+            <tag name="serializer.normalizer" priority="-880" />
         </service>
 
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">

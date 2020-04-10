@@ -64,6 +64,7 @@ Examples:
   <info>php %command.full_name% ulid</info> for generating a ULID.
   <info>php %command.full_name% uuid-1</info> for generating a UUID in version 1.
   <info>php %command.full_name% uuid-3 9b7541de-6f87-11ea-ab3c-9da9a81562fc foo</info> for generating a UUID in version 3.
+  <info>php %command.full_name% uuid-4 --base32</info> for generating a UUID in version 4 represented in base 32.
 
 EOF
             )

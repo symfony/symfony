@@ -62,13 +62,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
      */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        try {
-            $class = new \ReflectionClass($type);
-        } catch (\ReflectionException $exception) {
-            return false;
-        }
-
-        return $class->isSubclassOf(AbstractUid::class) || AbstractUid::class === $class->getName();
+        return is_subclass_of($type, AbstractUid::class) || AbstractUid::class === $type;
     }
 
     /**

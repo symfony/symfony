@@ -355,7 +355,7 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['alias'])) {
             $this->container->setAlias($id, $alias = new Alias($service['alias']));
-            if (\array_key_exists('public', $service)) {
+            if (isset($service['public'])) {
                 $alias->setPublic($service['public']);
             } elseif (isset($defaults['public'])) {
                 $alias->setPublic($defaults['public']);

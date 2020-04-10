@@ -51,7 +51,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
         try {
             $uid = Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
-            throw new NotNormalizableValueException('The data is not a valid UUID or ULID string representation.');
+            throw new NotNormalizableValueException('The data is not a valid '.$type.' string representation.');
         }
 
         return $uid;

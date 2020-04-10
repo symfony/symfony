@@ -1,11 +1,12 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\UidGenerateCommand;
+namespace Symfony\Component\Uid\Tests\Command;
+
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Uid\Command\UidGenerateCommand;
 
 class UidGenerateCommandTest extends TestCase
 {

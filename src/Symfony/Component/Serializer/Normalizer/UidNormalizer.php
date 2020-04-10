@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
@@ -48,6 +49,10 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
+        if (!class_exists(AbstractUid::class)) {
+            throw new LogicException('Unable to execute this command as the Symfony Uid Component is not installed.');
+        }
+
         try {
             $uid = Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {

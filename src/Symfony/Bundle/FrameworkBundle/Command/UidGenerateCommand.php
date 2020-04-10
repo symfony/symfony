@@ -31,7 +31,7 @@ class UidGenerateCommand extends Command
     private const UUID_6 = 'uuid-6';
     private const ULID = 'ulid';
 
-    private static $types = [
+    private const TYPES = [
         self::UUID_1,
         self::UUID_3,
         self::UUID_4,
@@ -45,7 +45,7 @@ class UidGenerateCommand extends Command
      */
     protected function configure()
     {
-        $typesAsString = implode(', ', self::$types);
+        $typesAsString = implode(', ', self::TYPES);
 
         $this
             ->setDefinition([
@@ -83,7 +83,7 @@ EOF
         $name = $input->getArgument('name');
 
         if (\in_array($type, [self::UUID_3, self::UUID_5], true) && !Uuid::isValid($namespace)) {
-            throw new InvalidArgumentException('You have to specify a valid namespace as second argument.');
+            throw new InvalidArgumentException('You must specify a valid namespace as a second argument.');
         }
 
         switch ($type) {
@@ -106,7 +106,7 @@ EOF
                 $uid = new Ulid();
                 break;
             default:
-                throw new InvalidArgumentException('Invalaible UID type. Available values are '.implode(', ', self::$types).'.');
+                throw new InvalidArgumentException('Invalaible UID type. Available values are '.implode(', ', self::TYPES).'.');
                 break;
         }
 

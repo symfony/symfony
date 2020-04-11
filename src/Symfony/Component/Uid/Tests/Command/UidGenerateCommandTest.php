@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\Component\Uid\Tests\Command;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;

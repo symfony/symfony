@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Csrf;
 
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

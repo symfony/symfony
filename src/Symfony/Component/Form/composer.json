@@ -33,9 +33,9 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",
+        "symfony/csrf": "^5.1",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/security-csrf": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0"
     },
@@ -54,7 +54,7 @@
     },
     "suggest": {
         "symfony/validator": "For form validation.",
-        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symfony/csrf": "For protecting forms against CSRF attacks.",
         "symfony/twig-bridge": "For templating with Twig."
     },
     "autoload": {

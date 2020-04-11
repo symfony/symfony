@@ -11,35 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
-/**
- * Generates CSRF tokens.
- *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
- */
-class UriSafeTokenGenerator implements TokenGeneratorInterface
-{
-    private $entropy;
+use Symfony\Component\Csrf\TokenGenerator\UriSafeTokenGenerator as ComponentUriSafeTokenGenerator;
 
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', UriSafeTokenGenerator::class, ComponentUriSafeTokenGenerator::class);
+
+class_exists(ComponentUriSafeTokenGenerator::class);
+
+if (false) {
     /**
-     * Generates URI-safe CSRF tokens.
-     *
-     * @param int $entropy The amount of entropy collected for each token (in bits)
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    public function __construct(int $entropy = 256)
+    class UriSafeTokenGenerator
     {
-        $this->entropy = $entropy;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function generateToken()
-    {
-        // Generate an URI safe base64 encoded string that does not contain "+",
-        // "/" or "=" which need to be URL encoded and make URLs unnecessarily
-        // longer.
-        $bytes = random_bytes($this->entropy / 8);
-
-        return rtrim(strtr(base64_encode($bytes), '+/', '-_'), '=');
     }
 }

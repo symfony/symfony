@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
+namespace Symfony\Component\Csrf\Tests\TokenStorage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
+use Symfony\Component\Csrf\Exception\TokenNotFoundException;
+use Symfony\Component\Csrf\TokenStorage\NativeSessionTokenStorage;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -88,7 +89,7 @@ class NativeSessionTokenStorageTest extends TestCase
 
     public function testGetNonExistingToken()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(TokenNotFoundException::class);
         $this->storage->getToken('token_id');
     }
 

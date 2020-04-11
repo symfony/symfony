@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>

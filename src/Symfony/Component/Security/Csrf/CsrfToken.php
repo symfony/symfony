@@ -11,49 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf;
 
-/**
- * A CSRF token.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-class CsrfToken
-{
-    private $id;
-    private $value;
+use Symfony\Component\Csrf\CsrfToken as ComponentCsrfToken;
 
-    public function __construct(string $id, ?string $value)
-    {
-        $this->id = $id;
-        $this->value = $value ?? '';
-    }
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', CsrfToken::class, ComponentCsrfToken::class);
 
+class_exists(ComponentCsrfToken::class);
+
+if (false) {
     /**
-     * Returns the ID of the CSRF token.
-     *
-     * @return string The token ID
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    public function getId()
+    class CsrfToken
     {
-        return $this->id;
-    }
-
-    /**
-     * Returns the value of the CSRF token.
-     *
-     * @return string The token value
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * Returns the value of the CSRF token.
-     *
-     * @return string The token value
-     */
-    public function __toString()
-    {
-        return $this->value;
     }
 }

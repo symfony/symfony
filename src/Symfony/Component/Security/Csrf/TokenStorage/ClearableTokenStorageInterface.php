@@ -11,13 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
-/**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
- */
-interface ClearableTokenStorageInterface extends TokenStorageInterface
-{
+use Symfony\Component\Csrf\TokenStorage\ClearableTokenStorageInterface as ComponentClearableTokenStorageInterface;
+
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', ClearableTokenStorageInterface::class, ComponentClearableTokenStorageInterface::class);
+
+class_exists(ComponentClearableTokenStorageInterface::class);
+
+if (false) {
     /**
-     * Removes all CSRF tokens.
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    public function clear();
+    interface ClearableTokenStorageInterface
+    {
+    }
 }

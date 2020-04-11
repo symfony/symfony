@@ -130,6 +130,8 @@ Security
 
  * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Deprecated `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
+ * Deprecated the `Symfony\Component\Security\Csrf` component in favor of the `Symfony\Component\Csrf` component. Remove the `symfony/security-csrf` requirement and install `symfony/csrf` instead.
+ * [BC break] `Symfony\Component\Csrf\Exception\TokenNotFoundException` no longer extends from `Symfony\Component\Security\Core\Exception\RuntimeException`.
 
 Yaml
 ----

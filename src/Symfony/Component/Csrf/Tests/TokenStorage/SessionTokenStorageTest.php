@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
+namespace Symfony\Component\Csrf\Tests\TokenStorage;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Csrf\Exception\TokenNotFoundException;
+use Symfony\Component\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -88,13 +89,13 @@ class SessionTokenStorageTest extends TestCase
 
     public function testGetNonExistingTokenFromClosedSession()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(TokenNotFoundException::class);
         $this->storage->getToken('token_id');
     }
 
     public function testGetNonExistingTokenFromActiveSession()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(TokenNotFoundException::class);
         $this->session->start();
         $this->storage->getToken('token_id');
     }

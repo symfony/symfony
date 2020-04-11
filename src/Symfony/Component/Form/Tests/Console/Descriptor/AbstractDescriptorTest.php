@@ -24,7 +24,7 @@ use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Csrf\CsrfTokenManager;
 
 abstract class AbstractDescriptorTest extends TestCase
 {

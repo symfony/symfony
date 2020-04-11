@@ -26,15 +26,14 @@
     },
     "require-dev": {
         "symfony/routing": "^4.4|^5.0",
-        "symfony/security-csrf": "^4.4|^5.0",
+        "symfony/csrf": "^5.1",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.3",
-        "symfony/security-csrf": "<4.4"
+        "symfony/event-dispatcher": "<4.3"
     },
     "suggest": {
-        "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",
+        "symfony/csrf": "For using tokens to protect authentication/logout attempts",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"
     },
     "autoload": {

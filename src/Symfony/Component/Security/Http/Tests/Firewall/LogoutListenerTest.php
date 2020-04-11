@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -194,7 +195,7 @@ class LogoutListenerTest extends TestCase
 
     private function getTokenManager()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        return $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
     }
 
     private function getTokenStorage()

@@ -1,8 +1,8 @@
 {
-    "name": "symfony/security-csrf",
+    "name": "symfony/csrf",
     "type": "library",
-    "description": "Symfony Security Component - CSRF Library",
-    "keywords": [],
+    "description": "A library to generate and validate CSRF tokens",
+    "keywords": ["csrf"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -16,9 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "symfony/csrf": "^5.1",
-        "symfony/deprecation-contracts": "^2.1"
+        "php": "^7.2.5"
     },
     "require-dev": {
         "symfony/http-foundation": "^4.4|^5.0"

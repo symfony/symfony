@@ -41,6 +41,8 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Csrf\CsrfToken;
+use Symfony\Component\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -114,7 +116,6 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -283,7 +284,7 @@ class FrameworkExtension extends Extension
         if (null === $config['csrf_protection']['enabled']) {
             $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
         }
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists('Symfony\Component\Form\Form')) {
@@ -1435,14 +1436,14 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
 
-        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
-            throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed. Try running "composer require symfony/security-csrf".');
+        if (!class_exists(CsrfToken::class)) {
+            throw new LogicException('CSRF support cannot be enabled as the CSRF component is not installed. Try running "composer require symfony/csrf".');
         }
 
         if (!$this->sessionConfigEnabled) {
@@ -1450,7 +1451,7 @@ class FrameworkExtension extends Extension
         }
 
         // Enable services for CSRF protection (even without forms)
-        $loader->load('security_csrf.xml');
+        $loader->load('csrf.xml');
 
         if (!class_exists(CsrfExtension::class)) {
             $container->removeDefinition('twig.extension.security_csrf');

@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Csrf\CsrfTokenManager;
 
 class CsrfValidationListenerTest extends TestCase
 {

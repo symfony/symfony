@@ -11,39 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
-/**
- * Stores CSRF tokens.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-interface TokenStorageInterface
-{
-    /**
-     * Reads a stored CSRF token.
-     *
-     * @return string The stored token
-     *
-     * @throws \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException If the token ID does not exist
-     */
-    public function getToken(string $tokenId);
+use Symfony\Component\Csrf\TokenStorage\TokenStorageInterface as ComponentTokenStorageInterface;
 
-    /**
-     * Stores a CSRF token.
-     */
-    public function setToken(string $tokenId, string $token);
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', TokenStorageInterface::class, ComponentTokenStorageInterface::class);
 
-    /**
-     * Removes a CSRF token.
-     *
-     * @return string|null Returns the removed token if one existed, NULL
-     *                     otherwise
-     */
-    public function removeToken(string $tokenId);
+class_exists(ComponentTokenStorageInterface::class);
 
+if (false) {
     /**
-     * Checks whether a token with the given token ID exists.
-     *
-     * @return bool Whether a token exists with the given ID
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    public function hasToken(string $tokenId);
+    interface TokenStorageInterface
+    {
+    }
 }

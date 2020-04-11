@@ -59,7 +59,7 @@ class AbstractControllerTest extends TestCase
             'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'messenger.default_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
-            'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
+            'security.csrf.token_manager' => '?Symfony\\Component\\Csrf\\CsrfTokenManagerInterface',
         ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');

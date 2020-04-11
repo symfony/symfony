@@ -11,96 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
+use Symfony\Component\Csrf\TokenStorage\SessionTokenStorage as ComponentSessionTokenStorage;
 
-/**
- * Token storage that uses a Symfony Session object.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-class SessionTokenStorage implements ClearableTokenStorageInterface
-{
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', SessionTokenStorage::class, ComponentSessionTokenStorage::class);
+
+class_exists(ComponentSessionTokenStorage::class);
+
+if (false) {
     /**
-     * The namespace used to store values in the session.
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    const SESSION_NAMESPACE = '_csrf';
-
-    private $session;
-    private $namespace;
-
-    /**
-     * Initializes the storage with a Session object and a session namespace.
-     *
-     * @param string $namespace The namespace under which the token is stored in the session
-     */
-    public function __construct(SessionInterface $session, string $namespace = self::SESSION_NAMESPACE)
+    class SessionTokenStorage
     {
-        $this->session = $session;
-        $this->namespace = $namespace;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken(string $tokenId)
-    {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
-        }
-
-        if (!$this->session->has($this->namespace.'/'.$tokenId)) {
-            throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
-        }
-
-        return (string) $this->session->get($this->namespace.'/'.$tokenId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setToken(string $tokenId, string $token)
-    {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
-        }
-
-        $this->session->set($this->namespace.'/'.$tokenId, $token);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasToken(string $tokenId)
-    {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
-        }
-
-        return $this->session->has($this->namespace.'/'.$tokenId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeToken(string $tokenId)
-    {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
-        }
-
-        return $this->session->remove($this->namespace.'/'.$tokenId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clear()
-    {
-        foreach (array_keys($this->session->all()) as $key) {
-            if (0 === strpos($key, $this->namespace.'/')) {
-                $this->session->remove($key);
-            }
-        }
     }
 }

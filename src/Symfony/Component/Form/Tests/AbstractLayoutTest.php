@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
+use Symfony\Component\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -34,7 +35,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         \Locale::setDefault('en');
 
-        $this->csrfTokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        $this->csrfTokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
 
         parent::setUp();
     }

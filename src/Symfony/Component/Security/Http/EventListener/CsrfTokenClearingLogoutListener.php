@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
+use Symfony\Component\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**

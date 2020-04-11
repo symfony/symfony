@@ -7,20 +7,23 @@
     <services>
         <defaults public="false" />
 
-        <service id="security.csrf.token_generator" class="Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" />
+        <service id="security.csrf.token_generator" class="Symfony\Component\Csrf\TokenGenerator\UriSafeTokenGenerator" />
         <service id="Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface" alias="security.csrf.token_generator" />
+        <service id="Symfony\Component\Csrf\TokenGenerator\TokenGeneratorInterface" alias="security.csrf.token_generator" />
 
-        <service id="security.csrf.token_storage" class="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage">
+        <service id="security.csrf.token_storage" class="Symfony\Component\Csrf\TokenStorage\SessionTokenStorage">
             <argument type="service" id="session" />
         </service>
         <service id="Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface" alias="security.csrf.token_storage" />
+        <service id="Symfony\Component\Csrf\TokenStorage\TokenStorageInterface" alias="security.csrf.token_storage" />
 
-        <service id="security.csrf.token_manager" class="Symfony\Component\Security\Csrf\CsrfTokenManager" public="true">
+        <service id="security.csrf.token_manager" class="Symfony\Component\Csrf\CsrfTokenManager" public="true">
             <argument type="service" id="security.csrf.token_generator" />
             <argument type="service" id="security.csrf.token_storage" />
             <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
+        <service id="Symfony\Component\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
 
         <service id="twig.runtime.security_csrf" class="Symfony\Bridge\Twig\Extension\CsrfRuntime">
             <tag name="twig.runtime" />

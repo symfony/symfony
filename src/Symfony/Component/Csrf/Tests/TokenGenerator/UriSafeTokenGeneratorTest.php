@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Csrf\Tests\TokenGenerator;
+namespace Symfony\Component\Csrf\Tests\TokenGenerator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Symfony\Component\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

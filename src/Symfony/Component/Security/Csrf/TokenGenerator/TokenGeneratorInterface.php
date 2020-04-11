@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
-/**
- * Generates CSRF tokens.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-interface TokenGeneratorInterface
-{
+use Symfony\Component\Csrf\TokenGenerator\TokenGeneratorInterface as ComponentTokenGeneratorInterface;
+
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', TokenGeneratorInterface::class, ComponentTokenGeneratorInterface::class);
+
+class_exists(ComponentTokenGeneratorInterface::class);
+
+if (false) {
     /**
-     * Generates a CSRF token.
-     *
-     * @return string The generated CSRF token
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
      */
-    public function generateToken();
+    interface TokenGeneratorInterface
+    {
+    }
 }

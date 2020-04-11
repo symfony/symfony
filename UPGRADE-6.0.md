@@ -98,3 +98,4 @@ Security
  * Removed `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute
  * Removed `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
+ * Removed the `Symfony\Component\Security\Csrf` in favor of the `Symfony\Component\Csrf` component.

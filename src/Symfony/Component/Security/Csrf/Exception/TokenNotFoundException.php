@@ -11,11 +11,17 @@
 
 namespace Symfony\Component\Security\Csrf\Exception;
 
-use Symfony\Component\Security\Core\Exception\RuntimeException;
+use Symfony\Component\Csrf\Exception\TokenNotFoundException as ComponentTokenNotFoundException;
 
-/**
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-class TokenNotFoundException extends RuntimeException
-{
+trigger_deprecation('symfony/security-csrf', '5.1', 'The "%s" class is deprecated, use "%s" instead. The CSRF library has moved to the "symfony/csrf" package, replace the requirement on "symfony/security-csrf" with "symfony/csrf".', TokenNotFoundException::class, ComponentTokenNotFoundException::class);
+
+class_exists(ComponentTokenNotFoundException::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, use symfony/csrf instead.
+     */
+    class TokenNotFoundException
+    {
+    }
 }

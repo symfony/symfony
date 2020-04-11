@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Csrf\CsrfToken;
 
 abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 {

@@ -33,7 +33,6 @@ matrix:
 
 cache:
     directories:
-        - .phpunit
         - php-$MIN_PHP
         - ~/php-ext
 

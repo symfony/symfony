@@ -269,6 +269,7 @@ install:
           export PHP=$1
 
           if [[ !$deps && $PHP = 7.2 ]]; then
+              phpenv global $PHP
               tfold src/Symfony/Component/HttpClient.h2push "$COMPOSER_UP symfony/contracts && ./phpunit install && docker run -it --rm -v $(pwd):/app -v $(phpenv which composer):/usr/local/bin/composer -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push"
           fi
 

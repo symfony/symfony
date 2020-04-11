@@ -141,12 +141,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
         ];
 
-        if (1.0 === (float) $options['http_version']) {
-            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
-        } elseif (1.1 === (float) $options['http_version'] || 'https:' !== $scheme) {
-            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
-        } elseif (\defined('CURL_VERSION_HTTP2') && CURL_VERSION_HTTP2 & self::$curlVersion['features']) {
+        if (\defined('CURL_VERSION_HTTP2') && (CURL_VERSION_HTTP2 & self::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
             $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
+        } elseif (1.0 === (float) $options['http_version']) {
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
+        } elseif (1.1 === (float) $options['http_version']) {
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
         }
 
         if (isset($options['auth_ntlm'])) {

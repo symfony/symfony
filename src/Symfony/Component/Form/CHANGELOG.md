@@ -16,6 +16,7 @@ CHANGELOG
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Added a `rounding_mode` option for the PercentType and correctly round the value when submitted
+ * Deprecated `Symfony\Component\Form\Extension\Validator\Util\ServerParams` in favor of its parent class `Symfony\Component\Form\Util\ServerParams`
 
 5.0.0
 -----

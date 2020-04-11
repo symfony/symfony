@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Validator\Util;
+namespace Symfony\Component\Form\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
+use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

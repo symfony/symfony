@@ -27,6 +27,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class Connection
 {
+    private const AWS_SQS_FIFO_SUFFIX = '.fifo';
+
     private const DEFAULT_OPTIONS = [
         'buffer_size' => 9,
         'wait_time' => 20,
@@ -196,10 +198,16 @@ class Connection
 
     public function setup(): void
     {
-        $this->call($this->configuration['endpoint'], [
+        $parameters = [
             'Action' => 'CreateQueue',
             'QueueName' => $this->configuration['queue_name'],
-        ]);
+        ];
+
+        if ($this->isFifoQueue($this->configuration['queue_name'])) {
+            $parameters['FifoQueue'] = true;
+        }
+
+        $this->call($this->configuration['endpoint'], $parameters);
         $this->queueUrl = null;
 
         $this->configuration['auto_setup'] = false;
@@ -232,17 +240,26 @@ class Connection
         return 0;
     }
 
-    public function send(string $body, array $headers, int $delay = 0): void
+    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
         }
 
-        $this->call($this->getQueueUrl(), [
+        $messageBody = json_encode(['body' => $body, 'headers' => $headers]);
+
+        $parameters = [
             'Action' => 'SendMessage',
-            'MessageBody' => json_encode(['body' => $body, 'headers' => $headers]),
+            'MessageBody' => $messageBody,
             'DelaySeconds' => $delay,
-        ]);
+        ];
+
+        if ($this->isFifoQueue($this->configuration['queue_name'])) {
+            $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
+            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1($messageBody);
+        }
+
+        $this->call($this->getQueueUrl(), $parameters);
     }
 
     public function reset(): void
@@ -361,5 +378,10 @@ class Connection
 
             throw new TransportException($error->Error->Message);
         }
+    }
+
+    private function isFifoQueue(string $queueName): bool
+    {
+        return self::AWS_SQS_FIFO_SUFFIX === substr($queueName, -\strlen(self::AWS_SQS_FIFO_SUFFIX));
     }
 }

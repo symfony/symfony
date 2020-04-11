@@ -12,8 +12,11 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
@@ -31,11 +34,33 @@ class RepeatedType extends AbstractType
             $options['options']['error_bubbling'] = $options['error_bubbling'];
         }
 
+        $submittedData = [];
+
         $builder
             ->addViewTransformer(new ValueToDuplicatesTransformer([
                 $options['first_name'],
                 $options['second_name'],
             ]))
+            ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use (&$submittedData) {
+                $submittedData = $event->getData();
+            })
+            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($options, &$submittedData) {
+                $isEmpty = function (array $data, $key) {
+                    return !isset($data[$key]) || '' === $data[$key] || false === $data[$key] || [] === $data[$key];
+                };
+
+                if ($isEmpty($submittedData, $options['first_name']) && !$isEmpty($submittedData, $options['second_name'])) {
+                    throw new TransformationFailedException(sprintf('The key "%s" should not be empty.', $options['first_name']));
+                }
+
+                if (!$isEmpty($submittedData, $options['first_name']) && $isEmpty($submittedData, $options['second_name'])) {
+                    throw new TransformationFailedException(sprintf('The key "%s" should not be empty.', $options['second_name']));
+                }
+
+                if ($submittedData[$options['first_name']] !== $submittedData[$options['second_name']]) {
+                    throw new TransformationFailedException('All values in the array should be the same.');
+                }
+            })
             ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
             ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
         ;

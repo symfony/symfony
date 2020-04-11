@@ -184,4 +184,32 @@ class RepeatedTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, ['first' => null, 'second' => null]);
     }
+
+    /**
+     * @dataProvider provideNotEqualData
+     */
+    public function testSubmitNotEqualValuesWithNotMappedFields($submittedFirstData, $submittedSecondData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => TextTypeTest::TESTED_TYPE,
+            'first_options' => ['mapped' => false],
+            'second_options' => ['mapped' => false],
+        ]);
+
+        $form->submit(['first' => $submittedFirstData, 'second' => $submittedSecondData]);
+
+        $this->assertSame($submittedFirstData, $form['first']->getViewData());
+        $this->assertSame($submittedSecondData, $form['second']->getViewData());
+        $this->assertFalse($form->isSynchronized());
+        $this->assertNull($form->getData());
+    }
+
+    public function provideNotEqualData()
+    {
+        return [
+            ['foo', 'bar'],
+            ['', 'bar'],
+            ['foo', ''],
+        ];
+    }
 }

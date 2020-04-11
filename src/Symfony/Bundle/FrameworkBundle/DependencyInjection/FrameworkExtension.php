@@ -124,7 +124,7 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Uid\AbstractUid;
+use Symfony\Component\Uid\Command\UidGenerateCommand;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -188,7 +188,7 @@ class FrameworkExtension extends Extension
             if (!class_exists(BaseYamlLintCommand::class)) {
                 $container->removeDefinition('console.command.yaml_lint');
             }
-            if (!class_exists(AbstractUid::class)) {
+            if (!class_exists(UidGenerateCommand::class)) {
                 $container->removeDefinition('console.command.uid_generate');
             }
         }

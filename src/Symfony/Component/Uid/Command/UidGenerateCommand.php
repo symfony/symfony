@@ -73,8 +73,6 @@ EOF
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -106,15 +104,12 @@ EOF
                 $uid = new Ulid();
                 break;
             default:
-                throw new InvalidArgumentException('Invalaible UID type. Available values are '.implode(', ', self::TYPES).'.');
-                break;
+                throw new InvalidArgumentException('Invalid UID type. Available values are '.implode(', ', self::TYPES).'.');
         }
 
         if ($input->getOption('base32')) {
             $uid = $uid->toBase32();
-        }
-
-        if ($input->getOption('base58')) {
+        } elseif ($input->getOption('base58')) {
             $uid = $uid->toBase58();
         }
 

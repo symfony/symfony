@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\StrictTypes;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -213,6 +215,21 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             foreach ($this->getReflectionClass()->getProperties() as $property) {
                 if ($property->hasType() && (('array' === $type = $property->getType()->getName()) || class_exists(($type)))) {
                     $this->addPropertyConstraint($property->getName(), new Valid());
+                }
+            }
+
+            // The constraint is not added
+            return $this;
+        }
+
+        if ($constraint instanceof StrictTypes) {
+            if (\PHP_VERSION_ID < 70400) {
+                throw new ConstraintDefinitionException(sprintf('The constraint "%s" requires PHP 7.4.', StrictTypes::class));
+            }
+
+            foreach ($this->getReflectionClass()->getProperties() as $property) {
+                if ($property->hasType() && !$property->getType()->allowsNull()) {
+                    $this->addPropertyConstraint($property->getName(), new NotNull());
                 }
             }
 

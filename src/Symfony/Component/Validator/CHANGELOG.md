@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * added a `StrictTypes` constraint to ease validating non nullable typed properties
  * added a `Cascade` constraint to ease validating typed nested objects
  * added the `Hostname` constraint and validator
  * added the `alpha3` option to the `Country` and `Language` constraints

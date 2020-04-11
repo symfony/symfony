@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\StrictTypes;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -275,5 +276,47 @@ class RecursiveValidatorTest extends AbstractTest
         $this->assertSame('children[0].name', $violations->get(2)->getPropertyPath());
 
         CascadingEntity::$staticChild = null;
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testValidateWithExplicitCascadeUninitialized()
+    {
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
+            ->addConstraint(new Cascade())
+        );
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
+            ->addPropertyConstraint('name', new NotNull())
+        );
+
+        $entity = new CascadingEntity();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(0, $violations);
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testValidateWithExplicitStrictTypesUninitialized()
+    {
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
+            ->addConstraint(new StrictTypes())
+        );
+
+        $entity = new CascadingEntity();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(3, $violations);
+
+        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
+        $this->assertSame('scalar', $violations->get(0)->getPropertyPath());
+        $this->assertSame('requiredChild', $violations->get(1)->getPropertyPath());
+        $this->assertSame('children', $violations->get(2)->getPropertyPath());
     }
 }

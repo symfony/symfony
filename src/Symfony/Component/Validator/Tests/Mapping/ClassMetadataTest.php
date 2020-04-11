@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
+use Symfony\Component\Validator\Constraints\StrictTypes;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
@@ -343,6 +344,36 @@ class ClassMetadataTest extends TestCase
             'requiredChild',
             'optionalChild',
             'staticChild',
+            'children',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    /**
+     * @requires PHP < 7.4
+     */
+    public function testStrictTypesConstraintIsNotAvailable()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Constraints\StrictTypes" requires PHP 7.4.');
+
+        $metadata->addConstraint(new StrictTypes());
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testStrictTypesConstraint()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $metadata->addConstraint(new StrictTypes());
+
+        $this->assertCount(3, $metadata->properties);
+        $this->assertSame([
+            'scalar',
+            'requiredChild',
             'children',
         ], $metadata->getConstrainedProperties());
     }

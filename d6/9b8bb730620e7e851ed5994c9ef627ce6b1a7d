@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-31T14:07:48Z
+
+For reference purposes, I've look for the APIs for this feature in other projects:
+
+1) Go libraries and .Net libraries have just a few methods:
+
+https://godoc.org/github.com/nsf/termbox-go
+
+```go
+func HideCursor()
+func SetCursor(x, y int)
+```
+
+https://godoc.org/github.com/gdamore/tcell
+
+```go
+func HideCursor()
+func ShowCursor(x int, y int)
+```
+
+.Net (https://msdn.microsoft.com/en-us/library/system.console_methods(v=vs.110).aspx)
+
+```csharp
+SetCursorPosition(Int32, Int32)
+```
+
+And some properties:
+
+```csharp
+CursorLeft
+CursorTop
+CursorVisible
+...
+```
+
+2) On the other hand, JS libraries define a ton of methods:
+
+https://github.com/cronvel/terminal-kit/blob/master/doc/low-level.md#ref.movingCursor
+
+```js
+.saveCursor()
+.restoreCursor()
+.up(int n)
+.down(int n)
+.right(int n)
+.left(int n)
+.nextLine(int n)
+.previousLine(int n)
+.column(int x)
+.scrollUp(int n)
+.scrollDown(int n)
+.scrollingRegion(top, bottom)
+.resetScrollingRegion()
+.moveTo(int x, int y)
+.move(int x, int y)
+.hideCursor()
+.tabSet()
+.tabClear()
+.tabClearAll()
+.forwardTab(int n)
+.backwardTab(int n)
+```
+
+-----
+
+So we need to think if we want a simple (but enough) API or a complex (but useful) API.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-01T06:14:06Z
+
+Also see the HOA Project Console `Cursor` API: https://github.com/hoaproject/Console#cursor
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T12:02:56Z
+
+@pierredup see test failures :) Also, any comment when comparing the proposed API with the linked ones? Do any of them provide any idea to borrow?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2019-02-11T07:39:59Z
+
+I prefer having a few explicit methods (E.G `moveUp`, `moveDown`) instead of just a couple generic methods, so I would much rather go the route of the JS libraries (although not as many methods as they have).
+
+---------------------------------------------------------------------------
+
+by pierredup at 2019-12-10T13:49:56Z
+
+> Can we update QuestionHelper to make it use this for autocompletion?
+
+@chalasr Done
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-03-26T09:15:36Z
+
+I've rebased from master, and updated the Progress bar to use the Cursor class as well.
+
+> Can we also have methods to get the max x and max y of the console
+
+This is currently available in the [Terminal](https://github.com/symfony/symfony/blob/ae35526/src/Symfony/Component/Console/Terminal.php) class for this component, so I'm not sure if it should be in the Cursor class as well
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-27T10:09:54Z
+
+Agree about keeping the terminal size logic in the `Terminal` class.
+@pierredup Some related tests are failing, can you have a look?

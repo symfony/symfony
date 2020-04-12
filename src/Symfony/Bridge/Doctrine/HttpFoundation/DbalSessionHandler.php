@@ -96,7 +96,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
             $stmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $stmt->execute();
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf('Exception was thrown when trying to delete a session: %s.', $e->getMessage()), 0, $e);
+            throw new \RuntimeException('Exception was thrown when trying to delete a session: '.$e->getMessage(), 0, $e);
         }
 
         return true;
@@ -115,7 +115,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
             $stmt->bindValue(':time', time() - $maxlifetime, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf('Exception was thrown when trying to delete expired sessions: %s.', $e->getMessage()), 0, $e);
+            throw new \RuntimeException('Exception was thrown when trying to delete expired sessions: '.$e->getMessage(), 0, $e);
         }
 
         return true;
@@ -142,7 +142,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
             return '';
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf('Exception was thrown when trying to read the session data: %s.', $e->getMessage()), 0, $e);
+            throw new \RuntimeException('Exception was thrown when trying to read the session data: '.$e->getMessage(), 0, $e);
         }
     }
 
@@ -212,7 +212,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 }
             }
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf('Exception was thrown when trying to write the session data: %s.', $e->getMessage()), 0, $e);
+            throw new \RuntimeException('Exception was thrown when trying to write the session data: '.$e->getMessage(), 0, $e);
         }
 
         return true;

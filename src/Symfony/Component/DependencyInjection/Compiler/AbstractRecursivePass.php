@@ -126,7 +126,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $this->currentId, $class));
             }
         } catch (\ReflectionException $e) {
-            throw new RuntimeException(sprintf('Invalid service "%s": %s.', $this->currentId, lcfirst(rtrim($e->getMessage(), '.'))));
+            throw new RuntimeException(sprintf('Invalid service "%s": '.lcfirst($e->getMessage()), $this->currentId));
         }
         if (!$r = $r->getConstructor()) {
             if ($required) {

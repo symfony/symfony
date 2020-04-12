@@ -71,10 +71,10 @@ class EncoderFactory implements EncoderFactoryInterface
             $config = $this->getEncoderConfigFromAlgorithm($config);
         }
         if (!isset($config['class'])) {
-            throw new \InvalidArgumentException(sprintf('"class" must be set in %s.', json_encode($config)));
+            throw new \InvalidArgumentException('"class" must be set in '.json_encode($config));
         }
         if (!isset($config['arguments'])) {
-            throw new \InvalidArgumentException(sprintf('"arguments" must be set in %s.', json_encode($config)));
+            throw new \InvalidArgumentException('"arguments" must be set in '.json_encode($config));
         }
 
         $reflection = new \ReflectionClass($config['class']);

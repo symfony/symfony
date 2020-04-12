@@ -164,7 +164,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', \get_class($data)));
         }
 
-        throw new NotNormalizableValueException(sprintf('An unexpected value could not be normalized: %s.', !\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
+        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
     }
 
     /**

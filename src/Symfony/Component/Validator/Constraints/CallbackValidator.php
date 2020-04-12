@@ -40,7 +40,7 @@ class CallbackValidator extends ConstraintValidator
                 if (isset($method[0]) && \is_object($method[0])) {
                     $method[0] = \get_class($method[0]);
                 }
-                throw new ConstraintDefinitionException(sprintf('%s targeted by Callback constraint is not a valid callable.', json_encode($method)));
+                throw new ConstraintDefinitionException(json_encode($method).' targeted by Callback constraint is not a valid callable.');
             }
 
             \call_user_func($method, $object, $this->context, $constraint->payload);

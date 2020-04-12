@@ -1488,7 +1488,7 @@ EOTXT;
     public function testPreparedCommandWithMissingValue()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, ['bcd' => 'BCD']);
     }
@@ -1496,7 +1496,7 @@ EOTXT;
     public function testPreparedCommandWithNoValues()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, []);
     }

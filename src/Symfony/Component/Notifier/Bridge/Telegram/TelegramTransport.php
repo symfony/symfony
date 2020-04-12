@@ -80,7 +80,7 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Telegram message: %s (%s).', $result['description'], $result['error_code']), $response);
+            throw new TransportException(sprintf('Unable to post the Telegram message: '.$result['description'].' (%s).', $result['error_code']), $response);
         }
     }
 }

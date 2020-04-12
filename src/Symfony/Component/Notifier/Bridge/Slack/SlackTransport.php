@@ -79,12 +79,12 @@ final class SlackTransport extends AbstractTransport
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Slack message: '.$response->getContent(false)), $response);
+            throw new TransportException('Unable to post the Slack message: '.$response->getContent(false), $response);
         }
 
         $result = $response->getContent(false);
         if ('ok' !== $result) {
-            throw new TransportException(sprintf('Unable to post the Slack message: '.$result), $response);
+            throw new TransportException('Unable to post the Slack message: '.$result, $response);
         }
     }
 }

@@ -152,7 +152,7 @@ class EntryManager implements EntryManagerInterface
         }
 
         if (!@ldap_modify_batch($this->getConnectionResource(), $dn, $operationsMapped)) {
-            throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, ldap_error($this->getConnectionResource())), ldap_errno($con));
+            throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": '.ldap_error($this->getConnectionResource()), $dn), ldap_errno($con));
         }
     }
 

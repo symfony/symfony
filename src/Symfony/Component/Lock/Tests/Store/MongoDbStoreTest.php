@@ -20,7 +20,8 @@ use Symfony\Component\Lock\Store\MongoDbStore;
 
 /**
  * @author Joe Bennett <joe@assimtech.com>
- * @requires extension mongodb
+ *
+ * @requires function \MongoDB\Client::__construct
  */
 class MongoDbStoreTest extends AbstractStoreTest
 {

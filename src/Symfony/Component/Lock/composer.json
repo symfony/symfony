@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "doctrine/dbal": "~2.5",
+        "mongodb/mongodb": "~1.1",
         "predis/predis": "~1.0"
     },
     "conflict": {

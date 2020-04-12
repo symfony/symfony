@@ -12,6 +12,7 @@
         <ini name="error_reporting" value="-1" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="MONGODB_HOST" value="localhost" />
         <env name="ZOOKEEPER_HOST" value="localhost" />
     </php>
 

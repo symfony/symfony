@@ -146,7 +146,7 @@ final class SlackTransportTest extends TestCase
         $options = SlackOptions::fromNotification($notification);
 
         $expectedBody = json_encode([
-            'blocks' => json_decode($options->toArray()['blocks'], true),
+            'blocks' => $options->toArray()['blocks'],
             'text' => $message,
         ]);
 

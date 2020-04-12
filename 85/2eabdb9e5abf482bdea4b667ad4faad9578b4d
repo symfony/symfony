@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by birkof at 2020-02-24T08:51:18Z
+
+@chalasr `next` milestone is due by May 31, 2020 and Slack [will not allow to generate](https://api.slack.com/legacy/custom-integrations/legacy-tokens) a new token after May 5th, 2020, so this bridge will become unusable for newcomers.
+
+What is the best approach for this?
+
+---------------------------------------------------------------------------
+
+by birkof at 2020-03-13T19:04:47Z
+
+Updated SlackTransport to use Incoming Webhooks Slack app for sending messages.
+
+---------------------------------------------------------------------------
+
+by birkof at 2020-03-22T21:31:16Z
+
+Tests fixed
+
+---------------------------------------------------------------------------
+
+by birkof at 2020-03-22T21:42:11Z
+
+I have removed the channel & username setup from DSN.
+As specified [here](https://api.slack.com/messaging/webhooks), you cannot override the default channel (chosen by the user who installed your app), username, or icon when you're using Incoming Webhooks to post messages.
+
+---------------------------------------------------------------------------
+
+by birkof at 2020-03-27T17:39:38Z
+
+@Nyholm can you have a look on this? #SymfonyLive :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-12T13:12:09Z
+
+I'm taking over to finish this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-12T13:49:10Z
+
+New usage:
+
+```php
+use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Notifier\Transport;
+
+$dispatcher = new EventDispatcher();
+
+// https://hooks.slack.com/services/T64B39MPG//BABMSGW9C/ZOhzOOo726qazXhJVxRBs2yP
+$slack = Transport::fromDsn('slack://default/T64B39MPG//BABMSGW9C/ZOhzOOo726qazXhJVxRBs2yP', $dispatcher);
+$message = new ChatMessage('Hello!');
+
+$slack->send($message);
+
+// change the recipient
+$options->recipient('T64B39MPG/BMNM4FUA1/98mBsq2VHu1r5gOWG3D2wUdK');
+$slack->send($message);
+```

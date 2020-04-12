@@ -95,7 +95,7 @@ class Cursor
      */
     public function clearOutput()
     {
-        $this->output->write("\x1b[0J", false);
+        $this->output->write("\x1b[0J");
     }
 
     /**
@@ -103,7 +103,7 @@ class Cursor
      */
     public function clearScreen()
     {
-        $this->output->write("\x1b[2J", false);
+        $this->output->write("\x1b[2J");
     }
 
     /**

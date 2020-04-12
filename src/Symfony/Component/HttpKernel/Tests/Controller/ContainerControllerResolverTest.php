@@ -248,7 +248,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
             [
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',
                 \InvalidArgumentException::class,
-                '/.?[cC]ontroller(.*?) for URI "\/" is not callable\.( Expected method(.*) Available methods)?/',
+                '/.?[cC]ontroller(.*?) for URI "\/" is not callable:( Expected method(.*) Available methods)?/',
             ],
         ];
     }

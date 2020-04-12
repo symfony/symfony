@@ -92,7 +92,7 @@ class EntityUserProvider implements UserProviderInterface
 
             $refreshedUser = $repository->find($id);
             if (null === $refreshedUser) {
-                throw new UsernameNotFoundException('User with id '.json_encode($id).' not found.'));
+                throw new UsernameNotFoundException('User with id '.json_encode($id).' not found.');
             }
         }
 

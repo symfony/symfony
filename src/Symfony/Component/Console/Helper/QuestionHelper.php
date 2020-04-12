@@ -353,7 +353,7 @@ class QuestionHelper extends Helper
                 }
             }
 
-            $cursor->clearLine(true);
+            $cursor->clearLineAfter();
 
             if ($numMatches > 0 && -1 !== $ofs) {
                 $cursor->savePosition();

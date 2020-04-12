@@ -72,8 +72,6 @@ class ServicesConfigurator extends AbstractConfigurator
     final public function set(?string $id, string $class = null): ServiceConfigurator
     {
         $defaults = $this->defaults;
-        $allowParent = !$defaults->getChanges() && empty($this->instanceof);
-
         $definition = new Definition();
 
         if (null === $id) {
@@ -92,7 +90,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $definition->setBindings($defaults->getBindings());
         $definition->setChanges([]);
 
-        $configurator = new ServiceConfigurator($this->container, $this->instanceof, $allowParent, $this, $definition, $id, $defaults->getTags(), $this->path);
+        $configurator = new ServiceConfigurator($this->container, $this->instanceof, true, $this, $definition, $id, $defaults->getTags(), $this->path);
 
         return null !== $class ? $configurator->class($class) : $configurator;
     }
@@ -114,9 +112,7 @@ class ServicesConfigurator extends AbstractConfigurator
      */
     final public function load(string $namespace, string $resource): PrototypeConfigurator
     {
-        $allowParent = !$this->defaults->getChanges() && empty($this->instanceof);
-
-        return new PrototypeConfigurator($this, $this->loader, $this->defaults, $namespace, $resource, $allowParent);
+        return new PrototypeConfigurator($this, $this->loader, $this->defaults, $namespace, $resource, true);
     }
 
     /**
@@ -126,10 +122,9 @@ class ServicesConfigurator extends AbstractConfigurator
      */
     final public function get(string $id): ServiceConfigurator
     {
-        $allowParent = !$this->defaults->getChanges() && empty($this->instanceof);
         $definition = $this->container->getDefinition($id);
 
-        return new ServiceConfigurator($this->container, $definition->getInstanceofConditionals(), $allowParent, $this, $definition, $id, []);
+        return new ServiceConfigurator($this->container, $definition->getInstanceofConditionals(), true, $this, $definition, $id, []);
     }
 
     /**

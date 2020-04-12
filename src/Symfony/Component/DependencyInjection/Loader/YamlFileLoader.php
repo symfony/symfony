@@ -378,24 +378,6 @@ class YamlFileLoader extends FileLoader
         if ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
-            if (!empty($this->instanceof)) {
-                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Move your child definitions to a separate file.', $id));
-            }
-
-            foreach ($defaults as $k => $v) {
-                if ('tags' === $k) {
-                    // since tags are never inherited from parents, there is no confusion
-                    // thus we can safely add them as defaults to ChildDefinition
-                    continue;
-                }
-                if ('bind' === $k) {
-                    throw new InvalidArgumentException(sprintf('Attribute "bind" on service "%s" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file.', $id));
-                }
-                if (!isset($service[$k])) {
-                    throw new InvalidArgumentException(sprintf('Attribute "%s" on service "%s" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.', $k, $id));
-                }
-            }
-
             if ('' !== $service['parent'] && '@' === $service['parent'][0]) {
                 throw new InvalidArgumentException(sprintf('The value of the "parent" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['parent'], substr($service['parent'], 1)));
             }
@@ -403,19 +385,19 @@ class YamlFileLoader extends FileLoader
             $definition = new ChildDefinition($service['parent']);
         } else {
             $definition = new Definition();
-
-            if (isset($defaults['public'])) {
-                $definition->setPublic($defaults['public']);
-            }
-            if (isset($defaults['autowire'])) {
-                $definition->setAutowired($defaults['autowire']);
-            }
-            if (isset($defaults['autoconfigure'])) {
-                $definition->setAutoconfigured($defaults['autoconfigure']);
-            }
-
-            $definition->setChanges([]);
         }
+
+        if (isset($defaults['public'])) {
+            $definition->setPublic($defaults['public']);
+        }
+        if (isset($defaults['autowire'])) {
+            $definition->setAutowired($defaults['autowire']);
+        }
+        if (isset($defaults['autoconfigure'])) {
+            $definition->setAutoconfigured($defaults['autoconfigure']);
+        }
+
+        $definition->setChanges([]);
 
         if (isset($service['class'])) {
             $definition->setClass($service['class']);
@@ -612,11 +594,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['autoconfigure'])) {
-            if (!$definition instanceof ChildDefinition) {
-                $definition->setAutoconfigured($service['autoconfigure']);
-            } elseif ($service['autoconfigure']) {
-                throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try setting "autoconfigure: false" for the service.', $id));
-            }
+            $definition->setAutoconfigured($service['autoconfigure']);
         }
 
         if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {

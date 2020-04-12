@@ -24,7 +24,7 @@ class LockHandlerTest extends TestCase
     public function testConstructWhenRepositoryDoesNotExist()
     {
         $this->expectException('Symfony\Component\Filesystem\Exception\IOException');
-        $this->expectExceptionMessage('Failed to create "/a/b/c/d/e": mkdir(): Permission denied.');
+        $this->expectExceptionMessage('Failed to create "/a/b/c/d/e": mkdir(): Permission denied');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }

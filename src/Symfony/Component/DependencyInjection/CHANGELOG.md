@@ -17,6 +17,7 @@ CHANGELOG
  * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
  * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
  * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * deprecated PHP-DSL's `inline()` function, use `service()` instead
 
 5.0.0
 -----

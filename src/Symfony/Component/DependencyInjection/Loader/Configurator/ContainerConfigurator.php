@@ -92,8 +92,20 @@ function ref(string $id): ReferenceConfigurator
 
 /**
  * Creates an inline service.
+ *
+ * @deprecated since Symfony 5.1, use service() instead.
  */
 function inline(string $class = null): InlineServiceConfigurator
+{
+    trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "service()" instead.', __FUNCTION__);
+
+    return new InlineServiceConfigurator(new Definition($class));
+}
+
+/**
+ * Creates an inline service.
+ */
+function service(string $class = null): InlineServiceConfigurator
 {
     return new InlineServiceConfigurator(new Definition($class));
 }

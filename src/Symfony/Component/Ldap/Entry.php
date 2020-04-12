@@ -18,11 +18,16 @@ class Entry
 {
     private $dn;
     private $attributes;
+    private $force_lowercase_attributes;
 
-    public function __construct(string $dn, array $attributes = [])
+    public function __construct(string $dn, array $attributes = [], bool $force_lowercase_attributes = false)
     {
         $this->dn = $dn;
         $this->attributes = $attributes;
+
+        if ($force_lowercase_attributes) {
+          $this->attributes = array_change_key_case($attributes);
+        }
     }
 
     /**

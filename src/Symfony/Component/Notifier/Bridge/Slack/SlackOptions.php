@@ -50,9 +50,6 @@ final class SlackOptions implements MessageOptionsInterface
     public function toArray(): array
     {
         $options = $this->options;
-        if (isset($options['blocks'])) {
-            $options['blocks'] = json_encode($options['blocks']);
-        }
         unset($options['recipient_id']);
 
         return $options;
@@ -65,11 +62,24 @@ final class SlackOptions implements MessageOptionsInterface
 
     /**
      * @return $this
+     *
+     * @deprecated since Symfony 5.1, use recipient() instead.
      */
     public function channel(string $channel): self
     {
-        $this->options['channel'] = $channel;
-        $this->options['recipient_id'] = $channel;
+        trigger_deprecation('symfony/slack-notifier', '5.1', 'The "%s()" method is deprecated, use "recipient()" instead.', __METHOD__);
+
+        return $this;
+    }
+
+    /**
+     * @param string $id The hook id (anything after https://hooks.slack.com/services/)
+     *
+     * @return $this
+     */
+    public function recipient(string $id): self
+    {
+        $this->options['recipient_id'] = $id;
 
         return $this;
     }

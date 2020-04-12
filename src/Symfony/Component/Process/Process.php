@@ -1596,7 +1596,7 @@ class Process implements \IteratorAggregate
     {
         return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {
             if (!isset($env[$matches[1]]) || false === $env[$matches[1]]) {
-                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": %s.', $matches[1], $commandline));
+                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": '.$commandline, $matches[1]));
             }
 
             return $this->escapeArgument($env[$matches[1]]);

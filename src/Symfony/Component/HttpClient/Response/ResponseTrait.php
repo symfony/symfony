@@ -153,11 +153,11 @@ trait ResponseTrait
         try {
             $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
-            throw new JsonException(sprintf('%s for "%s".', $e->getMessage(), $this->getInfo('url')), $e->getCode());
+            throw new JsonException(sprintf($e->getMessage().' for "%s".', $this->getInfo('url')), $e->getCode());
         }
 
         if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
-            throw new JsonException(sprintf('%s for "%s".', json_last_error_msg(), $this->getInfo('url')), json_last_error());
+            throw new JsonException(sprintf(json_last_error_msg().' for "%s".', $this->getInfo('url')), json_last_error());
         }
 
         if (!\is_array($content)) {

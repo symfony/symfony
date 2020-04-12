@@ -96,7 +96,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $e) {
-            throw new $e(sprintf('An error has occurred resolving the options of the form "%s": %s.', \get_class($this->getInnerType()), $e->getMessage()), $e->getCode(), $e);
+            throw new $e(sprintf('An error has occurred resolving the options of the form "%s": '.$e->getMessage(), \get_class($this->getInnerType())), $e->getCode(), $e);
         }
 
         // Should be decoupled from the specific option at some point

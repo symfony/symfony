@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -47,6 +48,7 @@ final class ProgressBar
     private $overwrite = true;
     private $terminal;
     private $previousMessage;
+    private $cursor;
 
     private static $formatters;
     private static $formats;
@@ -78,6 +80,7 @@ final class ProgressBar
         }
 
         $this->startTime = time();
+        $this->cursor = new Cursor($output);
     }
 
     /**
@@ -462,13 +465,12 @@ final class ProgressBar
                     $lines = floor(Helper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
                     $this->output->clear($lines);
                 } else {
-                    // Erase previous lines
                     if ($this->formatLineCount > 0) {
-                        $message = str_repeat("\x1B[1A\x1B[2K", $this->formatLineCount).$message;
+                        $this->cursor->moveUp($this->formatLineCount);
                     }
 
-                    // Move the cursor to the beginning of the line and erase the line
-                    $message = "\x0D\x1B[2K$message";
+                    $this->cursor->moveToColumn(1);
+                    $this->cursor->clearLine();
                 }
             }
         } elseif ($this->step > 0) {

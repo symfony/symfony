@@ -80,7 +80,7 @@ class Serializer implements SerializerInterface
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
         } catch (ExceptionInterface $e) {
-            throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
+            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         return new Envelope($message, $stamps);
@@ -118,7 +118,7 @@ class Serializer implements SerializerInterface
             try {
                 $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
             } catch (ExceptionInterface $e) {
-                throw new MessageDecodingFailedException(sprintf('Could not decode stamp: %s.', $e->getMessage()), $e->getCode(), $e);
+                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             }
         }
         if ($stamps) {

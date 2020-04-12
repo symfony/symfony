@@ -53,7 +53,7 @@ class Collection implements CollectionInterface
         foreach ($searches as $search) {
             $searchCount = ldap_count_entries($con, $search);
             if (false === $searchCount) {
-                throw new LdapException(sprintf('Error while retrieving entry count: %s.', ldap_error($con)));
+                throw new LdapException('Error while retrieving entry count: '.ldap_error($con));
             }
             $count += $searchCount;
         }
@@ -76,7 +76,7 @@ class Collection implements CollectionInterface
             $current = ldap_first_entry($con, $search);
 
             if (false === $current) {
-                throw new LdapException(sprintf('Could not rewind entries array: %s.', ldap_error($con)));
+                throw new LdapException('Could not rewind entries array: '.ldap_error($con));
             }
 
             yield $this->getSingleEntry($con, $current);

@@ -20,10 +20,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
+ * Send messages via Slack using Slack Incoming Webhooks.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Daniel Stancu <birkof@birkof.ro>
  *
  * @internal
+ *
+ * @see https://api.slack.com/messaging/webhooks
  *
  * @experimental in 5.0
  */
@@ -31,13 +35,14 @@ final class SlackTransport extends AbstractTransport
 {
     protected const HOST = 'hooks.slack.com';
 
-    private $path;
+    private $id;
 
-    protected $client;
-
-    public function __construct(string $path, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    /**
+     * @param string $id The hook id (anything after https://hooks.slack.com/services/)
+     */
+    public function __construct(string $id, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
-        $this->path = $path;
+        $this->id = $id;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -45,7 +50,7 @@ final class SlackTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('%s://%s/%s', SlackTransportFactory::SCHEME, $this->getEndpoint(), $this->path);
+        return sprintf('slack://%s/%s', $this->getEndpoint(), $this->id);
     }
 
     public function supports(MessageInterface $message): bool
@@ -53,11 +58,6 @@ final class SlackTransport extends AbstractTransport
         return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof SlackOptions);
     }
 
-    /**
-     * Sending messages using Incoming Webhooks.
-     *
-     * @see https://api.slack.com/messaging/webhooks
-     */
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof ChatMessage) {
@@ -72,23 +72,19 @@ final class SlackTransport extends AbstractTransport
         }
 
         $options = $opts ? $opts->toArray() : [];
-
+        $id = $message->getRecipientId() ?: $this->id;
         $options['text'] = $message->getSubject();
-        $options['blocks'] = isset($options['blocks']) ? json_decode($options['blocks'], true) : null;
-
-        $response = $this->client->request(
-            'POST',
-            sprintf('https://%s/%s', $this->getEndpoint(), $this->path),
-            ['json' => array_filter($options)]
-        );
+        $response = $this->client->request('POST', sprintf('https://%s/services/%s', $this->getEndpoint(), $id), [
+            'json' => array_filter($options),
+        ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(sprintf('Unable to post the Slack message: '.$response->getContent(false)), $response);
         }
 
         $result = $response->getContent(false);
         if ('ok' !== $result) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result), $response);
+            throw new TransportException(sprintf('Unable to post the Slack message: '.$result), $response);
         }
     }
 }

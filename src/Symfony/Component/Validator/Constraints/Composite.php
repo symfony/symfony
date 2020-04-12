@@ -88,7 +88,8 @@ abstract class Composite extends Constraint
                 }
             }
 
-            $this->groups = array_keys($mergedGroups);
+            // prevent empty composite constraint to have empty groups
+            $this->groups = array_keys($mergedGroups) ?: [self::DEFAULT_GROUP];
             $this->$compositeOption = $nestedConstraints;
 
             return;

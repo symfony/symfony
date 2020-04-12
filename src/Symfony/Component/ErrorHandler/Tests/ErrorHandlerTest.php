@@ -652,4 +652,29 @@ class ErrorHandlerTest extends TestCase
         $this->assertSame('warning', $logs[0][0]);
         $this->assertSame('Warning: assert(): assert(false) failed', $logs[0][1]);
     }
+
+    public function testHandleTriggerDeprecation()
+    {
+        try {
+            $handler = ErrorHandler::register();
+            $handler->setDefaultLogger($logger = new BufferingLogger());
+
+            $expectedLine = __LINE__ + 1;
+            trigger_deprecation('foo', '1.2.3', 'bar');
+
+            /** @var \ErrorException $exception */
+            $exception = $logger->cleanLogs()[0][2]['exception'];
+
+            $this->assertSame($expectedLine, $exception->getLine());
+            $this->assertSame(__FILE__, $exception->getFile());
+
+            $frame = $exception->getTrace()[0];
+            $this->assertSame(__CLASS__, $frame['class']);
+            $this->assertSame(__FUNCTION__, $frame['function']);
+            $this->assertSame('->', $frame['type']);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
 }

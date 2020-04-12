@@ -81,13 +81,17 @@ class Cursor
     /**
      * Clears all the output from the current line.
      */
-    public function clearLine(bool $fromCurrentPosition = false)
+    public function clearLine()
     {
-        if (true === $fromCurrentPosition) {
-            $this->output->write("\x1b[K");
-        } else {
-            $this->output->write("\x1b[2K");
-        }
+        $this->output->write("\x1b[2K");
+    }
+
+    /**
+     * Clears all the output from the current line after the current position.
+     */
+    public function clearLineAfter()
+    {
+        $this->output->write("\x1b[K");
     }
 
     /**

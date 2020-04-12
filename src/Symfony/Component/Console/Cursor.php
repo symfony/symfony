@@ -19,7 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Cursor
 {
     private $output;
-
     private $input;
 
     public function __construct(OutputInterface $output, $input = STDIN)
@@ -28,86 +27,114 @@ class Cursor
         $this->input = $input;
     }
 
-    public function moveUp(int $lines = 1)
+    public function moveUp(int $lines = 1): self
     {
         $this->output->write(sprintf("\x1b[%dA", $lines));
+
+        return $this;
     }
 
-    public function moveDown(int $lines = 1)
+    public function moveDown(int $lines = 1): self
     {
         $this->output->write(sprintf("\x1b[%dB", $lines));
+
+        return $this;
     }
 
-    public function moveRight(int $columns = 1)
+    public function moveRight(int $columns = 1): self
     {
         $this->output->write(sprintf("\x1b[%dC", $columns));
+
+        return $this;
     }
 
-    public function moveLeft(int $columns = 1)
+    public function moveLeft(int $columns = 1): self
     {
         $this->output->write(sprintf("\x1b[%dD", $columns));
+
+        return $this;
     }
 
-    public function moveToColumn(int $column)
+    public function moveToColumn(int $column): self
     {
         $this->output->write(sprintf("\x1b[%dG", $column));
+
+        return $this;
     }
 
-    public function moveToPosition(int $column, int $row)
+    public function moveToPosition(int $column, int $row): self
     {
         $this->output->write(sprintf("\x1b[%d;%dH", $row + 1, $column));
+
+        return $this;
     }
 
-    public function savePosition()
+    public function savePosition(): self
     {
         $this->output->write("\x1b7");
+
+        return $this;
     }
 
-    public function restorePosition()
+    public function restorePosition(): self
     {
         $this->output->write("\x1b8");
+
+        return $this;
     }
 
-    public function hide()
+    public function hide(): self
     {
         $this->output->write("\x1b[?25l");
+
+        return $this;
     }
 
-    public function show()
+    public function show(): self
     {
         $this->output->write("\x1b[?25h\x1b[?0c");
+
+        return $this;
     }
 
     /**
      * Clears all the output from the current line.
      */
-    public function clearLine()
+    public function clearLine(): self
     {
         $this->output->write("\x1b[2K");
+
+        return $this;
     }
 
     /**
      * Clears all the output from the current line after the current position.
      */
-    public function clearLineAfter()
+    public function clearLineAfter(): self
     {
         $this->output->write("\x1b[K");
+
+        return $this;
     }
 
     /**
      * Clears all the output from the cursors' current position to the end of the screen.
      */
-    public function clearOutput()
+    public function clearOutput(): self
     {
         $this->output->write("\x1b[0J");
+
+        return $this;
     }
 
     /**
      * Clears the entire screen.
      */
-    public function clearScreen()
+    public function clearScreen(): self
     {
         $this->output->write("\x1b[2J");
+
+        return $this;
     }
 
     /**

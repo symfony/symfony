@@ -70,7 +70,7 @@ final class NexmoTransport extends AbstractTransport
         $result = $response->toArray(false);
         foreach ($result['messages'] as $msg) {
             if ($msg['status'] ?? false) {
-                throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $msg['error-text'], $msg['status']), $response);
+                throw new TransportException(sprintf('Unable to send the SMS: '.$msg['error-text'].' (%s).', $msg['status']), $response);
             }
         }
     }

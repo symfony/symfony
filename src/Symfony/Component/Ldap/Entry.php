@@ -26,7 +26,7 @@ class Entry
         $this->attributes = $attributes;
 
         if ($force_lowercase_attributes) {
-          $this->attributes = array_change_key_case($attributes);
+            $this->attributes = array_change_key_case($attributes);
         }
     }
 

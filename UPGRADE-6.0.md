@@ -42,6 +42,7 @@ Form
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
  * Added the `setIsEmptyCallback()` method to the `FormConfigBuilderInterface`.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.
+ * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
 
 FrameworkBundle
 ---------------

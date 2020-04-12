@@ -44,6 +44,7 @@ Form
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
+ * Using `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class is deprecated, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
 
 FrameworkBundle
 ---------------

@@ -303,7 +303,7 @@ trait MemcachedTrait
             return $result;
         }
 
-        throw new CacheException(sprintf('MemcachedAdapter client error: %s.', strtolower($this->client->getResultMessage())));
+        throw new CacheException('MemcachedAdapter client error: '.strtolower($this->client->getResultMessage()));
     }
 
     private function getClient(): \Memcached

@@ -123,7 +123,7 @@ class Collection implements CollectionInterface
         $attributes = ldap_get_attributes($con, $current);
 
         if (false === $attributes) {
-            throw new LdapException(sprintf('Could not fetch attributes: %s.', ldap_error($con)));
+            throw new LdapException('Could not fetch attributes: '.ldap_error($con));
         }
 
         $attributes = $this->cleanupAttributes($attributes);
@@ -131,7 +131,7 @@ class Collection implements CollectionInterface
         $dn = ldap_get_dn($con, $current);
 
         if (false === $dn) {
-            throw new LdapException(sprintf('Could not fetch DN: %s.', ldap_error($con)));
+            throw new LdapException('Could not fetch DN: '.ldap_error($con));
         }
 
         return new Entry($dn, $attributes);

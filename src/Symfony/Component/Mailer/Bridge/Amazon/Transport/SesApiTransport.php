@@ -65,7 +65,7 @@ class SesApiTransport extends AbstractApiTransport
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %d).', $result->Error->Message, $result->Error->Code), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: '.$result->Error->Message.' (code %d).', $result->Error->Code), $response);
         }
 
         $property = $payload['Action'].'Result';

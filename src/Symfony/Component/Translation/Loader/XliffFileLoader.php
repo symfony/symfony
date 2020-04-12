@@ -58,7 +58,7 @@ class XliffFileLoader implements LoaderInterface
 
         $xliffVersion = XliffUtils::getVersionNumber($dom);
         if ($errors = XliffUtils::validateSchema($dom)) {
-            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: %s.', $resource, XliffUtils::getErrorsAsString($errors)));
+            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: '.XliffUtils::getErrorsAsString($errors), $resource));
         }
 
         if ('1.2' === $xliffVersion) {

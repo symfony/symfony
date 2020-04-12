@@ -79,7 +79,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_add($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not add values to entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)), ldap_errno($con));
+            throw new LdapException(sprintf('Could not add values to entry "%s", attribute %s: '.ldap_error($con), $entry->getDn(), $attribute), ldap_errno($con));
         }
     }
 
@@ -94,7 +94,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_del($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not remove values from entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)), ldap_errno($con));
+            throw new LdapException(sprintf('Could not remove values from entry "%s", attribute %s: '.ldap_error($con), $entry->getDn(), $attribute), ldap_errno($con));
         }
     }
 
@@ -122,7 +122,7 @@ class EntryManager implements EntryManagerInterface
         $rdn = $this->parseRdnFromEntry($entry);
         // deleteOldRdn does not matter here, since the Rdn will not be changing in the move.
         if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
-            throw new LdapException(sprintf('Could not move entry "%s" to "%s": %s.', $entry->getDn(), $newParent, ldap_error($con)), ldap_errno($con));
+            throw new LdapException(sprintf('Could not move entry "%s" to "%s": '.ldap_error($con), $entry->getDn(), $newParent), ldap_errno($con));
         }
     }
 

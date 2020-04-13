@@ -7,7 +7,7 @@ use stdClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator;
 
 return function (ContainerConfigurator $c) {
-    $s = $c->services();
+    $s = $c->services()->defaults()->public();
 
     $s->set('decorated', stdClass::class);
 

@@ -31,13 +31,16 @@ class RepeatedType extends AbstractType
             $options['options']['error_bubbling'] = $options['error_bubbling'];
         }
 
+        // children fields must always be mapped
+        $defaultOptions = ['mapped' => true];
+
         $builder
             ->addViewTransformer(new ValueToDuplicatesTransformer([
                 $options['first_name'],
                 $options['second_name'],
             ]))
-            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
-            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
+            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options'], $defaultOptions))
+            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options'], $defaultOptions))
         ;
     }
 

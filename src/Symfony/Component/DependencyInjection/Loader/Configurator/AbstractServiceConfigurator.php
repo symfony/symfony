@@ -42,7 +42,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     /**
      * Registers a service.
      */
-    final public function set(string $id, string $class = null): ServiceConfigurator
+    final public function set(?string $id, string $class = null): ServiceConfigurator
     {
         $this->__destruct();
 

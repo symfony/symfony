@@ -55,7 +55,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 
         $publicAliases = [];
         foreach ($container->getAliases() as $id => $alias) {
-            if ($alias->isPublic()) {
+            if ($alias->isPublic() && !$alias->isPrivate()) {
                 $publicAliases[(string) $alias][] = $id;
             }
         }

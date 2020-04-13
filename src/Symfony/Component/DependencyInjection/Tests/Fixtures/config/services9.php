@@ -16,8 +16,7 @@ return function (ContainerConfigurator $c) {
     $p->set('foo_class', FooClass::class)
       ->set('foo', 'bar');
 
-    $s = $c->services()->defaults()
-        ->public();
+    $s = $c->services()->defaults()->public();
     $s->set('foo')
         ->args(['foo', ref('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, ref('service_container')])
         ->class(FooClass::class)
@@ -127,12 +126,10 @@ return function (ContainerConfigurator $c) {
         ->tag('foo');
 
     $s->set('tagged_iterator', 'Bar')
-        ->public()
         ->args([tagged_iterator('foo')]);
 
     $s->set('runtime_error', 'stdClass')
-        ->args([new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)])
-        ->public();
+        ->args([new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)]);
     $s->set('errored_definition', 'stdClass')->private();
     $s->set('preload_sidekick', 'stdClass')
         ->tag('container.preload', ['class' => 'Some\Sidekick1'])

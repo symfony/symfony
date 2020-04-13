@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
@@ -76,6 +77,41 @@ class RepeatedTypeTest extends BaseTypeTest
 
         $this->assertFalse($form['first']->isRequired());
         $this->assertFalse($form['second']->isRequired());
+    }
+
+    public function testMappedOverridesDefault()
+    {
+        $form = $this->factory->create(NotMappedType::class);
+        $this->assertFalse($form->getConfig()->getMapped());
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => NotMappedType::class,
+        ]);
+
+        $this->assertTrue($form['first']->getConfig()->getMapped());
+        $this->assertTrue($form['second']->getConfig()->getMapped());
+    }
+
+    /**
+     * @dataProvider notMappedConfigurationKeys
+     */
+    public function testNotMappedInnerIsOverridden($configurationKey)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => TextTypeTest::TESTED_TYPE,
+            $configurationKey => ['mapped' => false],
+        ]);
+
+        $this->assertTrue($form['first']->getConfig()->getMapped());
+        $this->assertTrue($form['second']->getConfig()->getMapped());
+    }
+
+    public function notMappedConfigurationKeys()
+    {
+        return [
+            ['first_options'],
+            ['second_options'],
+        ];
     }
 
     public function testSetInvalidOptions()

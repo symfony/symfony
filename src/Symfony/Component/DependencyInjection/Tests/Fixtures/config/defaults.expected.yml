@@ -18,7 +18,7 @@ services:
         arguments: ['@bar']
     bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
-        public: false
+        public: true
         tags:
             - { name: t, a: b }
         autowire: true

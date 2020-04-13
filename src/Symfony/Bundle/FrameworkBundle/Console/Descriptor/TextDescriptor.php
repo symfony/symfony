@@ -355,7 +355,7 @@ class TextDescriptor extends Descriptor
 
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
-        if ($alias->isPublic()) {
+        if ($alias->isPublic() && !$alias->isPrivate()) {
             $options['output']->comment(sprintf('This service is a <info>public</info> alias for the service <info>%s</info>', (string) $alias));
         } else {
             $options['output']->comment(sprintf('This service is a <comment>private</comment> alias for the service <info>%s</info>', (string) $alias));

@@ -6,12 +6,14 @@ use App\BarService;
 
 return function (ContainerConfigurator $c) {
     $c->services()
-        ->set('bar', 'Class1')
+        ->set('bar', 'Class1')->public()
         ->set(BarService::class)
+            ->public()
             ->abstract(true)
             ->lazy()
         ->set('foo')
             ->parent(BarService::class)
+            ->public()
             ->decorate('bar', 'b', 1)
             ->args([ref('b')])
             ->class('Class2')

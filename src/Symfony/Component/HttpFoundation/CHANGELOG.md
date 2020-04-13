@@ -16,6 +16,8 @@ CHANGELOG
  * added `MarshallingSessionHandler`, `IdentityMarshaller`
  * made `Session` accept a callback to report when the session is being used
  * Add support for all core cache control directives
+ * Added `Symfony\Component\HttpFoundation\InputBag`
+ * Deprecated retrieving non-string values using `InputBag::get()`, use `InputBag::all()` if you need access to the collection of values
 
 5.0.0
 -----

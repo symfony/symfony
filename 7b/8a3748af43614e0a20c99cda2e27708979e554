@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-13T06:24:32Z
+
+Note that I've not fixed all of them, but only the ones related to exception messages. There are false positives that are more complex to fix and I've not done it... yet :)

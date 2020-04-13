@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by biozshock at 2020-04-10T17:15:24Z
+
+Added doc PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-11T19:26:17Z
+
+Wouldn't it make sense to check if we could make the type work with the `mapped` option set to `false`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-11T19:47:23Z
+
+You mean ignoring the option or config setting? It could if we target master with a new feature as the mapping is a requirement for the transformer to do the proper validation. I think that trying to do otherwise will lead to adding unnecessary complexity. Unless you see a simple way to do it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-11T21:27:47Z
+
+What about something like #36430?

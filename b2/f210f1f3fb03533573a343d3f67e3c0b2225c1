@@ -1,0 +1,173 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-13T17:26:34Z
+
+Doesn't the parameter bag have all those fancy `get*()` methods for this purpose?
+
+---------------------------------------------------------------------------
+
+by azjezz at 2019-11-13T17:32:28Z
+
+There's no `getString()` or/and `getArray()` :smile:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-13T17:39:01Z
+
+> There's no `getString()` or `getArray()` 😄
+
+If this is what you're missing, why don't we add those?
+
+---------------------------------------------------------------------------
+
+by azjezz at 2019-11-13T17:45:53Z
+
+> If this is what you're missing, why don't we add those?
+
+because people are already using `get()` as `getString()`, you can check this by a simple search in GitHub : https://github.com/search?l=PHP&q=%24request-%3Equery-%3Eget%28&type=Code
+
+this can ( and already does ) cause issues :
+
+```
+$term = $request->query->get('q');
+if ($term) {
+  $results = $repository->search($term);
+} else {
+  $results = [];
+}
+
+...
+
+class SomethingRepository
+{
+   ....
+   public function search(string $term): array
+```
+
+> app.wip/search?q=foo
+
+works
+
+> app.wip/search?q[]=foo
+
+500 error, should be 400 instead :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-13T17:52:48Z
+
+I understand what you're trying to accomplish. But right now, you're deprecating the only way to access the raw value of an item inside the bag.
+
+---------------------------------------------------------------------------
+
+by azjezz at 2019-11-13T17:56:15Z
+
+It highly unlikely that you would request raw value, not knowing its type. i suppose we can add `getRaw()`, but its possible to access raw value using `$request->query->all()['foo'] ?? $default`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-13T18:03:52Z
+
+> It highly unlikely that you would request raw value, not knowing its type.
+
+It might not be the common case, but it has to remain possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-13T18:06:22Z
+
+Please don't deprecate things that work. Changing for the sake of strictness must be worth the trouble it will incur on the community.
+Here, the solution is known: make a stricter child class and use it when applicable.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2019-11-14T09:58:14Z
+
+@nicolas-grekas @derrabus what are your thoughts about adding more strict validation in the specialized methods like `->getInt()`.
+
+Because right now:
+
+```php
+// URL: /test?a[]=5&a[]=6
+
+assert(1 === $request->getInt("a"));
+```
+
+seems like a bug to me. wdyt?
+
+PS: I am **not** talking about the general `->get()`, only about `->get{Alpha,Digit,..}()`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-17T12:04:59Z
+
+@apfelbox Those methods simply wrap `ext-filter`. I agree that the behavior of that extension is not ideal. A better/stricter input validation layer could be worth investigating.
+
+---------------------------------------------------------------------------
+
+by azjezz at 2019-12-15T18:10:19Z
+
+@nicolas-grekas :+1:, build failure is unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-02-06T19:58:13Z
+
+> i agree that other getters ( e.g getInt ) should be fixed to throw a bad request exception too.
+
+correct me if im wrong, but this PR makes that happen as of 6.0 because Request uses the new InputBag (keeping ParameterBag as-is works for me).
+
+what about adding a deprecation before https://github.com/symfony/symfony/blob/2f1946feab3a3d5cd38152ce8576a8c4b865da92/src/Symfony/Component/HttpFoundation/HeaderBag.php#L202 to notify this will be a different exception in 6.0 ... that should solve all @Tobion's concerns :)
+
+---------------------------------------------------------------------------
+
+by azjezz at 2020-02-06T20:03:37Z
+
+by "getters" i mean the getters in the `InputBag` inherited from `ParameterBag` ( `getInt`, `getFloat`, `getAlnum` ... etc ), the PR scope only covers input values that are usually the result of a form input.
+
+I believe there's many things to fix in the `HttpFoundation` component when it comes to types, but let's go step by step :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-02-06T20:08:57Z
+
+yes but all getters rely on calling `get()`, which is overridden. So those will trigger deprecations too ...
+
+---------------------------------------------------------------------------
+
+by azjezz at 2020-02-06T20:14:51Z
+
+`getBoolean`, `getInt`, `getDigits`, `getAlnum`, `getAlpha` all pass either a string, int, or a boolean to `get` as a default, meaning it won't trigger deprecation for the default value, return value of `get` should be a string ( boolean, and numbers in `$_REQUEST` and other super globals are strings ), so it shouldn't trigger any deprecation if you are getting a number, boolean, .. etc.
+
+however, the deprecation trigger in this case :
+```
+// url : /foo?alpha=[]
+
+$input->getAlpha('alpha');
+```
+
+still stands since it will result in exception in 6.0 :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-07T10:27:38Z
+
+We forgot about the `FILTER_REQUIRE_ARRAY` flag of the `filter()` method. It should not throw a deprecation when in use.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T19:29:54Z
+
+This needs a small rebase. I'm adding the "Ready" label also. This is a PR that improves the overall quality of any apps and should be merged in 5.1 to me. Let's move forward.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-13T19:18:19Z
+
+@azjezz Tests seem to be broken by the changes introduced by this PR.
+
+---------------------------------------------------------------------------
+
+by azjezz at 2020-04-13T20:35:28Z
+
+green :smile: travis failure is unrelated.

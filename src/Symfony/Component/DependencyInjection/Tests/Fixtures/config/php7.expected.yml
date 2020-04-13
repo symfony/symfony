@@ -13,7 +13,6 @@ services:
         arguments: ['@bar']
     bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
-        public: true
         calls:
             - [setFoo, {  }]
 

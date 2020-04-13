@@ -6,7 +6,6 @@ services:
         synthetic: true
     Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
-        public: true
         tags:
             - { name: foo }
             - { name: baz }
@@ -15,7 +14,6 @@ services:
         factory: f
     Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
-        public: true
         tags:
             - { name: foo }
             - { name: baz }

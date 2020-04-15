@@ -6,6 +6,7 @@ CHANGELOG
 
  * added max-items + LRU + max-lifetime capabilities to `ArrayCache`
  * added `CouchbaseBucketAdapter`
+ * added context `cache-adapter` to log messages
 
 5.0.0
 -----

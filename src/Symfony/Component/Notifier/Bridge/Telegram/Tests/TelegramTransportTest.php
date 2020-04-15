@@ -53,7 +53,7 @@ final class TelegramTransportTest extends TestCase
     public function testSendWithErrorResponseThrows(): void
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessageRegExp('/testDescription.+testErrorCode/');
+        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

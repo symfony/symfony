@@ -38,7 +38,7 @@ class VarExporterTest extends TestCase
     public function testFailingSerialization($value)
     {
         $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
-        $this->expectExceptionMessageRegExp('/Type ".*" is not instantiable\./');
+        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
             VarExporter::export($value);

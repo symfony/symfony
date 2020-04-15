@@ -755,7 +755,7 @@ class YamlFileLoader extends FileLoader
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
                     if ($diff = array_diff(array_keys($argument), ['tag', 'index_by', 'default_index_method', 'default_priority_method'])) {
-                        throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "tag", "index_by", "default_index_method", and "default_priority_method".', $value->getTag(), implode('"", "', $diff)));
+                        throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "tag", "index_by", "default_index_method", and "default_priority_method".', $value->getTag(), implode('", "', $diff)));
                     }
 
                     $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null);

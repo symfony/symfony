@@ -63,6 +63,12 @@ class Connection
             throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 
+        foreach (['stream', 'group', 'consumer'] as $key) {
+            if (isset($configuration[$key]) && '' === $configuration[$key]) {
+                throw new InvalidArgumentException(sprintf('"%s" should be configured, got an empty string.', $key));
+            }
+        }
+
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
         $this->group = $configuration['group'] ?? self::DEFAULT_OPTIONS['group'];
         $this->consumer = $configuration['consumer'] ?? self::DEFAULT_OPTIONS['consumer'];
@@ -77,7 +83,7 @@ class Connection
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
 
-        $pathParts = explode('/', $parsedUrl['path'] ?? '');
+        $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
 
         $stream = $pathParts[1] ?? $redisOptions['stream'] ?? null;
         $group = $pathParts[2] ?? $redisOptions['group'] ?? null;

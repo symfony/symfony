@@ -49,4 +49,19 @@ class SluggerTest extends TestCase
         $this->assertSame('hello-world', (string) $slugger->slug('hello world'));
         $this->assertSame('hello_world', (string) $slugger->slug('hello world', '_'));
     }
+
+    public function testSlugCharReplacementLocaleConstruct()
+    {
+        $slugger = new AsciiSlugger('fr', ['fr' => ['&' => 'et', '@' => 'chez']]);
+        $slug = (string) $slugger->slug('toi & moi avec cette adresse slug@test.fr', '_');
+
+        $this->assertSame('toi_et_moi_avec_cette_adresse_slug_chez_test_fr', $slug);
+    }
+
+    public function testSlugCharReplacementLocaleMethod()
+    {
+        $slugger = new AsciiSlugger(null, ['es' => ['&' => 'y', '@' => 'en senal']]);
+        $slug = (string) $slugger->slug('yo & tu a esta dirección slug@test.es', '_', 'es');
+        $this->assertSame('yo_y_tu_a_esta_direccion_slug_en_senal_test_es', $slug);
+    }
 }

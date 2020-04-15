@@ -76,6 +76,14 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithOptionsAndTrailingSlash()
+    {
+        $this->assertEquals(
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+        );
+    }
+
     public function testFromDsnWithTls()
     {
         $redis = $this->createMock(\Redis::class);

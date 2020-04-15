@@ -62,11 +62,17 @@ class Connection
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
         if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s.', $redis->getLastError()));
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 
         if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s.', $redis->getLastError()));
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+        }
+
+        foreach (['stream', 'group', 'consumer'] as $key) {
+            if (isset($configuration[$key]) && '' === $configuration[$key]) {
+                throw new InvalidArgumentException(sprintf('"%s" should be configured, got an empty string.', $key));
+            }
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
@@ -150,7 +156,7 @@ class Connection
                 'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
             ];
 
-            $pathParts = explode('/', $parsedUrl['path'] ?? '');
+            $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
 
             $configuration['stream'] = $pathParts[1] ?? $configuration['stream'];
             $configuration['group'] = $pathParts[2] ?? $configuration['group'];

@@ -27,9 +27,11 @@ class ProjectServiceContainer extends Container
         $this->methodMap = [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'getTestServiceSubscriberService',
             'foo_service' => 'getFooServiceService',
+            'late_alias' => 'getLateAliasService',
         ];
-
-        $this->aliases = [];
+        $this->aliases = [
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestDefinition1' => 'late_alias',
+        ];
     }
 
     public function compile(): void
@@ -45,11 +47,13 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.bPEFRiK' => true,
-            '.service_locator.bPEFRiK.foo_service' => true,
+            '.service_locator.CpwjbIa' => true,
+            '.service_locator.CpwjbIa.foo_service' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestDefinition1' => true,
+            'late_alias' => true,
         ];
     }
 
@@ -75,12 +79,24 @@ class ProjectServiceContainer extends Container
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber', 'getTestServiceSubscriberService', false],
             'bar' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber', 'getTestServiceSubscriberService', false],
             'baz' => ['privates', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition', 'getCustomDefinitionService', false],
+            'late_alias' => ['services', 'late_alias', 'getLateAliasService', false],
         ], [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber',
             'bar' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
             'baz' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
+            'late_alias' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestDefinition1',
         ]))->withContext('foo_service', $this));
+    }
+
+    /**
+     * Gets the public 'late_alias' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1
+     */
+    protected function getLateAliasService()
+    {
+        return $this->services['late_alias'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1();
     }
 
     /**

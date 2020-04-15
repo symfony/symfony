@@ -50,7 +50,7 @@ class ProcessTest extends TestCase
     public function testInvalidCwd()
     {
         $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
-        $this->expectExceptionMessageRegExp('/The provided cwd ".*" does not exist\./');
+        $this->expectExceptionMessageMatches('/The provided cwd ".*" does not exist\./');
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process(['echo', 'test'], __DIR__);

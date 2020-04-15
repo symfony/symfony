@@ -44,7 +44,7 @@ class PhpSerializerTest extends TestCase
     public function testDecodingFailsWithBadFormat()
     {
         $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageRegExp('/Could not decode/');
+        $this->expectExceptionMessageMatches('/Could not decode/');
 
         $serializer = new PhpSerializer();
 
@@ -56,7 +56,7 @@ class PhpSerializerTest extends TestCase
     public function testDecodingFailsWithBadClass()
     {
         $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageRegExp('/class "ReceivedSt0mp" not found/');
+        $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
 
         $serializer = new PhpSerializer();
 

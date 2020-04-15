@@ -191,15 +191,11 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
      */
     public function reset()
     {
-        if (!$this->pool instanceof ResettableInterface) {
-            return;
-        }
-        $event = $this->start(__FUNCTION__);
-        try {
+        if ($this->pool instanceof ResettableInterface) {
             $this->pool->reset();
-        } finally {
-            $event->end = microtime(true);
         }
+
+        $this->clearCalls();
     }
 
     public function getCalls()

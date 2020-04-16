@@ -12,10 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Alias;
 
 class AliasTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $alias = new Alias('foo');
@@ -59,10 +62,11 @@ class AliasTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
      */
     public function testItHasADefaultDeprecationMessage()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
         $alias = new Alias('foo', false);
         $alias->setDeprecated();
 
@@ -72,10 +76,11 @@ class AliasTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
      */
     public function testSetDeprecatedWithoutPackageAndVersion()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
         $def = new Alias('stdClass');
         $def->setDeprecated(true, '%alias_id%');
 
@@ -98,11 +103,12 @@ class AliasTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.
      */
     public function testCanOverrideDeprecation()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Alias::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.');
+
         $alias = new Alias('foo', false);
         $alias->setDeprecated('vendor/package', '1.1', 'The "%alias_id%" is deprecated.');
         $this->assertTrue($alias->isDeprecated());

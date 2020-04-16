@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
@@ -38,6 +39,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class YamlFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -232,11 +235,12 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option is deprecated.
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option is deprecated.
      */
     public function testDeprecatedAliasesWithoutPackageAndVersion()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option is deprecated.');
+
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('deprecated_alias_definitions_without_package_and_version.yml');

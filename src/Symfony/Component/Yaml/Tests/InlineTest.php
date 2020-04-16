@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function setUp(): void
     {
         Inline::initialize(0, 0);
@@ -742,11 +745,11 @@ class InlineTest extends TestCase
      * @dataProvider phpObjectTagWithEmptyValueProvider
      *
      * @group legacy
-     *
-     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.
      */
     public function testPhpObjectWithEmptyValue($expected, $value)
     {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.');
+
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_OBJECT));
     }
 
@@ -766,11 +769,11 @@ class InlineTest extends TestCase
      * @dataProvider phpConstTagWithEmptyValueProvider
      *
      * @group legacy
-     *
-     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.
      */
     public function testPhpConstTagWithEmptyValue($expected, $value)
     {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.');
+
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_CONSTANT));
     }
 

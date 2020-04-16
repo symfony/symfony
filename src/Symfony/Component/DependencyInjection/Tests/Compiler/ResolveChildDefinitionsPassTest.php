@@ -12,12 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -310,11 +313,12 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.
      */
     public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.');
+
         $container = new ContainerBuilder();
         $container->register('deprecated_parent')
             ->setDeprecated(true)

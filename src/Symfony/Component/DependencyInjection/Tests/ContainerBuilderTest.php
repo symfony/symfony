@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -50,6 +51,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testDefaultRegisteredDefinitions()
     {
         $builder = new ContainerBuilder();
@@ -94,10 +97,11 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testCreateDeprecatedService()
     {
+        $this->expectDeprecation('The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.');
+
         $definition = new Definition('stdClass');
         $definition->setDeprecated(true);
 
@@ -293,10 +297,11 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testDeprecatedAlias()
     {
+        $this->expectDeprecation('The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.');
+
         $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
 

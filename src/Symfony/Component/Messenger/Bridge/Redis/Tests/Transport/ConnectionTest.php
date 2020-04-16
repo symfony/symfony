@@ -307,6 +307,21 @@ class ConnectionTest extends TestCase
         $connection->add('1', []);
     }
 
+    public function testDeleteAfterAck()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis); // 1 = always
+        $connection->ack('1');
+    }
+
     public function testLastErrorGetsCleared()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();

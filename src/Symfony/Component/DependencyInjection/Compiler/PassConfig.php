@@ -94,6 +94,7 @@ class PassConfig
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
             new ResolveNoPreloadPass(),
+            new AliasDeprecatedPublicServicesPass(),
         ]];
     }
 

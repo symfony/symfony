@@ -65,7 +65,7 @@ abstract class SMime
     protected function getStreamIterator($stream): iterable
     {
         while (!feof($stream)) {
-            yield fread($stream, 16372);
+            yield str_replace("\n", "\r\n", str_replace("\r\n", "\n", fread($stream, 16372)));
         }
     }
 

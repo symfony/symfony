@@ -22,6 +22,7 @@ env:
         - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
         - MESSENGER_REDIS_DSN=redis://127.0.0.1:7006/messages
         - MESSENGER_SQS_DSN=sqs://localhost:9494/messages?sslmode=disable
+        - MESSENGER_SQS_FIFO_QUEUE_DSN=sqs://localhost:9494/messages.fifo?sslmode=disable
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
 
 matrix:

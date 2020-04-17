@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-15T14:46:43Z
+
+Actually, we could use `get_debug_type()`, that would generate better names for anonymous classes (in case this happens).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-04-15T15:07:04Z
+
+Thank you for the review.
+
+Yes, that is a good idea. I've updated the PR.

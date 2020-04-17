@@ -32,6 +32,8 @@ class MockResponse implements ResponseInterface, StreamableInterface
 
     private $body;
     private $requestOptions = [];
+    private $requestUrl;
+    private $requestMethod;
 
     private static $mainMulti;
     private static $idSequence = 0;
@@ -70,6 +72,22 @@ class MockResponse implements ResponseInterface, StreamableInterface
     public function getRequestOptions(): array
     {
         return $this->requestOptions;
+    }
+
+    /**
+     * Returns the URL used when doing the request.
+     */
+    public function getRequestUrl(): string
+    {
+        return $this->requestUrl;
+    }
+
+    /**
+     * Returns the method used when doing the request.
+     */
+    public function getRequestMethod(): string
+    {
+        return $this->requestMethod;
     }
 
     /**
@@ -122,6 +140,8 @@ class MockResponse implements ResponseInterface, StreamableInterface
 
         if ($mock instanceof self) {
             $mock->requestOptions = $response->requestOptions;
+            $mock->requestMethod = $method;
+            $mock->requestUrl = $url;
         }
 
         self::writeRequest($response, $options, $mock);

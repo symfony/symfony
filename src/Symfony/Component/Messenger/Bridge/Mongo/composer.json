@@ -1,0 +1,35 @@
+{
+    "name": "symfony/mongo-messenger",
+    "type": "symfony-bridge",
+    "description": "Symfony Mongo Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "doctrine/mongodb-odm": "^2.0.0",
+        "symfony/messenger": "^5.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Mongo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.1-dev"
+        }
+    }
+}

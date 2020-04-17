@@ -83,6 +83,7 @@ use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
+use Symfony\Component\Messenger\Bridge\Mongo\Transport\MongoTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -1643,6 +1644,10 @@ class FrameworkExtension extends Extension
 
         if (class_exists(AmazonSqsTransportFactory::class)) {
             $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
+        }
+
+        if (class_exists(MongoTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.mongo.factory')->addTag('messenger.transport_factory');
         }
 
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {

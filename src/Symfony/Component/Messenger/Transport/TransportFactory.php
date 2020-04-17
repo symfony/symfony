@@ -45,6 +45,8 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/doctrine-messenger" to install Doctrine transport.';
         } elseif ('redis://' === substr($dsn, 0, 8)) {
             $packageSuggestion = ' Run "composer require symfony/redis-messenger" to install Redis transport.';
+        } elseif ('mongo://' === substr($dsn, 0, 8)) {
+            $packageSuggestion = ' Run "composer require symfony/mongo-messenger" to install Mongo transport.';
         }
 
         throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".%s.', $dsn, $packageSuggestion));

@@ -1,0 +1,73 @@
+--- src/Symfony/Component/Messenger/Bridge/Mongo/Transport/MongoTransport.php	2020-04-17 12:42:20.787492572 +0000
++++ src/Symfony/Component/Messenger/Bridge/Mongo/Transport/MongoTransport.php	2020-04-17 12:42:23.556376924 +0000
+@@ -50,33 +50,33 @@
+                 'locked' => false,
+                 '$or' => [
+                     [
+-                        'delivered_at' => null
++                        'delivered_at' => null,
+                     ],
+                     [
+                         'delivered_at' => [
+-                            '$lt' => new UTCDateTime($redeliverLimit)
+-                        ]
+-                    ]
++                            '$lt' => new UTCDateTime($redeliverLimit),
++                        ],
++                    ],
+                 ],
+                 'queue_name' => $this->options['queue_name'],
+                 'available_at' => [
+-                    '$lte' => new UTCDateTime($now)
+-                ]
++                    '$lte' => new UTCDateTime($now),
++                ],
+             ],
+             [
+                 '$set' => [
+                     'locked' => true,
+-                    'delivered_at' => new UTCDateTime($now)
+-                ]
++                    'delivered_at' => new UTCDateTime($now),
++                ],
+             ],
+             [
+                 'sort' => [
+-                    'available_at' => 1
+-                ]
++                    'available_at' => 1,
++                ],
+             ]
+         );
+ 
+-        if (!is_array($document)) {
++        if (!\is_array($document)) {
+             return [];
+         }
+ 
+@@ -91,14 +91,11 @@
+         $transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class);
+ 
+         if (!$transportMessageIdStamp instanceof TransportMessageIdStamp) {
+-            throw new LogicException(sprintf(
+-                'No %s found on the Envelope',
+-                TransportMessageIdStamp::class
+-            ));
++            throw new LogicException(sprintf('No "%s" found on the Envelope.', TransportMessageIdStamp::class));
+         }
+ 
+         $this->collection->deleteOne([
+-            '_id' => $transportMessageIdStamp->getId()
++            '_id' => $transportMessageIdStamp->getId(),
+         ]);
+     }
+ 
+@@ -135,7 +132,7 @@
+             'queue_name' => $this->options['queue_name'],
+             'locked' => false,
+             'created_at' => new UTCDateTime($now),
+-            'available_at' => new UTCDateTime($availableAt)
++            'available_at' => new UTCDateTime($availableAt),
+         ];
+ 
+         $this->collection->insertOne($data);

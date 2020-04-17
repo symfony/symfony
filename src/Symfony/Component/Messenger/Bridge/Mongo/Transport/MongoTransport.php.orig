@@ -64,7 +64,7 @@ final class MongoTransport implements TransportInterface, ListableReceiverInterf
                     [
                         'delivered_at' => [
                             '$lt' => new UTCDateTime($redeliverLimit),
-                        ],
+                        ]
                     ],
                 ],
                 'queue_name' => $this->options['queue_name'],

@@ -428,16 +428,12 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
         $cachePath = $cache->getPath();
 
-        // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-        $errorLevel = error_reporting(E_ALL ^ E_WARNING);
-
         try {
-            if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
+            if (\is_object($this->container = $this->includeSafe($cachePath))
                 && (!$this->debug || (self::$freshCache[$cachePath] ?? $cache->isFresh()))
             ) {
                 self::$freshCache[$cachePath] = true;
                 $this->container->set('kernel', $this);
-                error_reporting($errorLevel);
 
                 return;
             }
@@ -455,7 +451,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
                     fclose($lock);
                     $lock = null;
-                } elseif (!\is_object($this->container = include $cachePath)) {
+                } elseif (!\is_object($this->container = $this->includeSafe($cachePath))) {
                     $this->container = null;
                 } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
                     flock($lock, LOCK_UN);
@@ -466,8 +462,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 }
             }
         } catch (\Throwable $e) {
-        } finally {
-            error_reporting($errorLevel);
         }
 
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
@@ -787,6 +781,23 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         gc_mem_caches();
 
         return $output;
+    }
+
+    /**
+     * Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors.
+     *
+     * @return mixed
+     */
+    private function includeSafe(string $path)
+    {
+        $errorLevel = error_reporting(E_ALL ^ E_WARNING);
+        try {
+            $result = include $path;
+        } finally {
+            error_reporting($errorLevel);
+        }
+
+        return $result;
     }
 
     /**

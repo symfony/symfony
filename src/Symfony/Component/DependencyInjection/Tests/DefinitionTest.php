@@ -12,12 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -185,10 +188,11 @@ class DefinitionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
      */
     public function testSetDeprecatedWithoutPackageAndVersion()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
         $def = new Definition('stdClass');
         $def->setDeprecated(true, '%service_id%');
 

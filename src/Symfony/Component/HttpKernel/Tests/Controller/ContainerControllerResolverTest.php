@@ -13,18 +13,22 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/http-kernel 5.1: Referencing controllers with a single colon is deprecated. Use "foo::action" instead.
      */
     public function testGetControllerServiceWithSingleColon()
     {
+        $this->expectDeprecation('Since symfony/http-kernel 5.1: Referencing controllers with a single colon is deprecated. Use "foo::action" instead.');
+
         $service = new ControllerTestService('foo');
 
         $container = $this->createMockContainer();

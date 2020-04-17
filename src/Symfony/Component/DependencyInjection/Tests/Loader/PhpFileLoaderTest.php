@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -103,10 +106,11 @@ class PhpFileLoaderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.
      */
     public function testDeprecatedWithoutPackageAndVersion()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/deprecated_without_package_version.php');

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-16T14:12:48Z
+
+Should be enough to close https://github.com/symfony/symfony/issues/33715.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2020-04-17T06:46:29Z
+
+Fixed tests now, seems the failing ones are unrelated.

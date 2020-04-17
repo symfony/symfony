@@ -96,6 +96,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
@@ -2142,6 +2143,7 @@ class FrameworkExtension extends Extension
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
+            DiscordTransportFactory::class => 'notifier.transport_factory.discord',
         ];
 
         foreach ($classToServices as $class => $service) {

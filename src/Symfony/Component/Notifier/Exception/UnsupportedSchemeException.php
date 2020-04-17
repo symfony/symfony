@@ -82,6 +82,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
             'package' => 'symfony/esendex-notifier',
         ],
+        'discord' => [
+            'class' => Bridge\Discord\DiscordTransportFactory::class,
+            'package' => 'symfony/discord-notifier',
+        ],
     ];
 
     /**

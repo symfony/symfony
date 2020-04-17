@@ -1,0 +1,48 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Notifier\Bridge\Discord;
+
+use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
+use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
+use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Transport\TransportInterface;
+
+/**
+ * @author Mathieu Piot <math.piot@gmail.com>
+ *
+ * @experimental in 5.2
+ */
+final class DiscordTransportFactory extends AbstractTransportFactory
+{
+    /**
+     * @return DiscordTransport
+     */
+    public function create(Dsn $dsn): TransportInterface
+    {
+        $scheme = $dsn->getScheme();
+        $token = $this->getUser($dsn);
+        $channel = $dsn->getOption('channel');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
+        if ('discord' === $scheme) {
+            return (new DiscordTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        }
+
+        throw new UnsupportedSchemeException($dsn, 'discord', $this->getSupportedSchemes());
+    }
+
+    protected function getSupportedSchemes(): array
+    {
+        return ['discord'];
+    }
+}

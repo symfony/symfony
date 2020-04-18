@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-18T15:26:23Z
+
+Hmm, seems like this very minor change introduces a new failing tests (on Travis only, but this time in all jobs, so not related to PHP return typing):
+
+```
+1) Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler\AbstractSessionHandlerTest::testSession with data set #2 ('regenerate')
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+ read\n
+ doRead: abc|i:123;\n
+ read\n
++doRead: abc|i:123;\n
+ \n
+ write\n
+ doWrite: abc|i:123;\n
+
+/home/travis/build/symfony/symfony/src/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/AbstractSessionHandlerTest.php:49
+```
+
+Looking at the test, I can't see `Request` or `InputBag` being used, so I'm again puzzled how this change affects session management. My knowledge of sessions is 0, so I think I need a bit of guidance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-18T18:29:41Z
+
+I'm for using solution 2.
+About the new failure, it's unrelated apparently - must be something else.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-18T19:08:31Z
+
+I suspect the other failure to be related to the just released PHP 7.3.17, and to https://github.com/php/php-src/commit/b510250b8ebe9d90b1db150d7a1edc75893f2e48 specifically.

@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-04-12T13:05:38Z
+
+This solution ruins the fields hierarchy in form errors and returns `[field1].data` instead of `children[field1].data`.
+
+And it does not meet all of the sequence of groups requirements (e.g., when all the groups included in each array are validated). As it described here from `The second point is...`: https://github.com/symfony/symfony/pull/35556#discussion_r379300743
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-12T18:53:10Z
+
+Can you provide a failing test case for what you have in mind?
+
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-04-12T19:03:57Z
+
+> Can you provide a failing test case for what you have in mind?
+
+There is a file with tests for that (https://github.com/symfony/symfony/pull/35556/files, `FormTypeValidatorExtensionTest.php`):
+`FormTypeValidatorExtensionTest::testGroupSequenceWithConstraintsOptionMatrix`
+`FormTypeValidatorExtensionTest::provideGroupsSequenceAndResultData`
+
+All tests will fail because of `children[...].data`.
+And also two with sequence `[['First', 'Second'], 'Third']`
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-15T22:28:17Z
+
+Thanks @greedyivan for the review, I've add a test to cover nested array groups in sequence and push some fixes in 9aa6963.
+
+---------------------------------------------------------------------------
+
+by greedyivan at 2020-04-17T12:39:20Z
+
+All tests from my PR passed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-17T16:46:40Z
+
+Thank you for confirming.

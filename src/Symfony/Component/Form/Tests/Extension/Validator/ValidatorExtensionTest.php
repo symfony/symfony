@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Validator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
@@ -20,6 +22,8 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -49,6 +53,8 @@ class ValidatorExtensionTest extends TestCase
         $this->assertCount(1, $metadata->getConstraints());
         $this->assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
 
+        $this->assertSame(CascadingStrategy::NONE, $metadata->cascadingStrategy);
+        $this->assertSame(TraversalStrategy::IMPLICIT, $metadata->traversalStrategy);
         $this->assertSame(CascadingStrategy::CASCADE, $metadata->getPropertyMetadata('children')[0]->cascadingStrategy);
         $this->assertSame(TraversalStrategy::IMPLICIT, $metadata->getPropertyMetadata('children')[0]->traversalStrategy);
     }
@@ -86,7 +92,53 @@ class ValidatorExtensionTest extends TestCase
         $this->assertFalse($form->get('baz')->isValid());
     }
 
-    private function createForm($type)
+    public function testFieldsValidateInSequence()
+    {
+        $form = $this->createForm(FormType::class, null, [
+            'validation_groups' => new GroupSequence(['group1', 'group2']),
+        ])
+            ->add('foo', TextType::class, [
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
+            ])
+            ->add('bar', TextType::class, [
+                'constraints' => [new NotBlank(['groups' => ['group2']])],
+            ])
+        ;
+
+        $form->submit(['foo' => 'invalid', 'bar' => null]);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+    }
+
+    public function testFieldsValidateInSequenceWithNestedGroupsArray()
+    {
+        $form = $this->createForm(FormType::class, null, [
+            'validation_groups' => new GroupSequence([['group1', 'group2'], 'group3']),
+        ])
+            ->add('foo', TextType::class, [
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
+            ])
+            ->add('bar', TextType::class, [
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group2']])],
+            ])
+            ->add('baz', TextType::class, [
+                'constraints' => [new NotBlank(['groups' => ['group3']])],
+            ])
+        ;
+
+        $form->submit(['foo' => 'invalid', 'bar' => 'invalid', 'baz' => null]);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(2, $errors);
+        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        $this->assertInstanceOf(Length::class, $errors[1]->getCause()->getConstraint());
+    }
+
+    private function createForm($type, $data = null, array $options = [])
     {
         $validator = Validation::createValidatorBuilder()
             ->setMetadataFactory(new LazyLoadingMetadataFactory(new StaticMethodLoader()))
@@ -95,7 +147,7 @@ class ValidatorExtensionTest extends TestCase
         $formFactoryBuilder->addExtension(new ValidatorExtension($validator));
         $formFactory = $formFactoryBuilder->getFormFactory();
 
-        return $formFactory->create($type);
+        return $formFactory->create($type, $data, $options);
     }
 }
 

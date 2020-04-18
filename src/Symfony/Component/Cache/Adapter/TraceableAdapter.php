@@ -244,15 +244,11 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      */
     public function reset()
     {
-        if (!$this->pool instanceof ResetInterface) {
-            return;
-        }
-        $event = $this->start(__FUNCTION__);
-        try {
+        if ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
-        } finally {
-            $event->end = microtime(true);
         }
+
+        $this->clearCalls();
     }
 
     /**

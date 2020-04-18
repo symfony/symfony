@@ -96,6 +96,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
+use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -2076,6 +2077,7 @@ class FrameworkExtension extends Extension
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
+            GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',

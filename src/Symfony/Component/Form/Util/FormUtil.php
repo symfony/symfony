@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Util;
 
+use Symfony\Component\Form\FormView;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -40,5 +42,14 @@ class FormUtil
         // This method is used in occurrences where arrays are
         // not considered to be empty, ever.
         return null === $data || '' === $data;
+    }
+
+    /**
+     * Appends a block prefix after the static defaults and before dynamic ones.
+     */
+    public static function appendStaticBlockPrefix(FormView $view, string $prefix, bool $decreaseOffset): void
+    {
+        // the offset is decreased if more than one dynamic prefix exists, i.e. using the "block_prefix" option
+        array_splice($view->vars['block_prefixes'], $decreaseOffset ? -2 : -1, 0, $prefix);
     }
 }

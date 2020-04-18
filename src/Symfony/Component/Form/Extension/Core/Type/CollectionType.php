@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -72,19 +73,19 @@ class CollectionType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $prefixOffset = -1;
+        $decreaseOffset = false;
         // check if the entry type also defines a block prefix
         /** @var FormInterface $entry */
         foreach ($form as $entry) {
             if ($entry->getConfig()->getOption('block_prefix')) {
-                --$prefixOffset;
+                $decreaseOffset = true;
             }
 
             break;
         }
 
         foreach ($view as $entryView) {
-            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
+            FormUtil::appendStaticBlockPrefix($entryView, 'collection_entry', $decreaseOffset);
         }
 
         /** @var FormInterface $prototype */
@@ -93,11 +94,11 @@ class CollectionType extends AbstractType
                 $view->vars['multipart'] = true;
             }
 
-            if ($prefixOffset > -2 && $prototype->getConfig()->getOption('block_prefix')) {
-                --$prefixOffset;
+            if (!$decreaseOffset && $prototype->getConfig()->getOption('block_prefix')) {
+                $decreaseOffset = true;
             }
 
-            array_splice($view->vars['prototype']->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
+            FormUtil::appendStaticBlockPrefix($view->vars['prototype'], 'collection_entry', $decreaseOffset);
         }
     }
 

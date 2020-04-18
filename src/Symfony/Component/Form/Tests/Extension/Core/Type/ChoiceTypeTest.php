@@ -418,6 +418,50 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
+    public function testCheckboxBlockPrefixes()
+    {
+        $choiceView = $this->factory->createNamed('choices', static::TESTED_TYPE, [''], [
+            'choices' => ['foo' => 'bar'],
+            'expanded' => true,
+            'multiple' => true,
+        ])
+            ->createView()
+        ;
+
+        $expectedBlockPrefixes = [
+            'form',
+            'checkbox',
+            'choice_entry',
+            'checkbox_entry',
+            '_choices_entry',
+        ];
+
+        $this->assertCount(1, $choiceView);
+        $this->assertSame($expectedBlockPrefixes, $choiceView[0]->vars['block_prefixes']);
+    }
+
+    public function testRadioBlockPrefixes()
+    {
+        $choiceView = $this->factory->createNamed('choices', static::TESTED_TYPE, '', [
+            'choices' => ['foo' => 'bar'],
+            'expanded' => true,
+        ])
+            ->createView()
+        ;
+
+        $expectedBlockPrefixes = [
+            'form',
+            'checkbox',
+            'radio',
+            'choice_entry',
+            'radio_entry',
+            '_choices_entry',
+        ];
+
+        $this->assertCount(1, $choiceView);
+        $this->assertSame($expectedBlockPrefixes, $choiceView[0]->vars['block_prefixes']);
+    }
+
     public function testSubmitSingleNonExpanded()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

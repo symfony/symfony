@@ -39,6 +39,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -260,6 +261,7 @@ class ChoiceType extends AbstractType
 
             foreach ($view as $childView) {
                 $childView->vars['full_name'] = $childName;
+                FormUtil::appendStaticBlockPrefix($childView, 'choice_entry', true);
             }
         }
     }
@@ -399,8 +401,10 @@ class ChoiceType extends AbstractType
             // The user can check 0 or more checkboxes. If required
             // is true, they are required to check all of them.
             $choiceOpts['required'] = false;
+            $choiceOpts['block_prefix'] = 'checkbox_entry';
         } else {
             $choiceType = RadioType::class;
+            $choiceOpts['block_prefix'] = 'radio_entry';
         }
 
         $builder->add($name, $choiceType, $choiceOpts);

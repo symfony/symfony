@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added `choice_entry`, `checkbox_entry` and `radio_entry` block prefixes to `ChoiceType` entries
  * Added `collection_entry` block prefix to `CollectionType` entries
  * Added a `choice_filter` option to `ChoiceType`
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.

@@ -146,8 +146,6 @@ class RememberMeFactory implements SecurityFactoryInterface
         foreach ($this->options as $name => $value) {
             if (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
-            } elseif (\is_int($value)) {
-                $builder->integerNode($name)->defaultValue($value);
             } else {
                 $builder->scalarNode($name)->defaultValue($value);
             }

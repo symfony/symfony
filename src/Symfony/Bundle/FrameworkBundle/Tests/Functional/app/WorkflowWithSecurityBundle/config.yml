@@ -1,0 +1,51 @@
+imports:
+    - { resource: services.yml }
+
+framework:
+    secret: test
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
+    workflows:
+        test_security_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: 'is_granted("ROLE_ADMIN") and subject.isTrue()'
+        test_no_security_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: '1 + 1 === 2 and subject.isTrue()'
+        test_invalid_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: 'fn_does_not_exist()'
+
+security:
+    providers:
+        users_in_memory: { memory: null }
+    firewalls:
+        main:
+            anonymous: lazy
+            provider: users_in_memory

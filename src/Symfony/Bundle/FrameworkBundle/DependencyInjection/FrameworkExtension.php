@@ -113,7 +113,6 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -791,12 +790,11 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
                 }
 
-                if (!class_exists(Security::class)) {
-                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security-core".');
-                }
+                $container->setDefinition('workflow.no_security.expression_language', new Definition(ExpressionLanguage::class));
 
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);
                 $guard->setPrivate(true);
+                $guard->addTag('workflow.guard_listener');
 
                 $guard->setArguments([
                     $guardsConfiguration,

@@ -1,0 +1,41 @@
+imports:
+    - { resource: services.yml }
+
+framework:
+    workflows:
+        test_security_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: 'is_granted("ROLE_ADMIN") and subject.isTrue()'
+        test_no_security_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: '1 + 1 === 2 and subject.isTrue()'
+        test_invalid_guard_expression:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\TestSubject
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from: first
+                    to: last
+                    guard: 'fn_does_not_exist()'

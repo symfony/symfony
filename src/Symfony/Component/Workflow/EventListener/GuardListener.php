@@ -25,8 +25,8 @@ use Symfony\Component\Workflow\TransitionBlocker;
  */
 class GuardListener
 {
-    private $configuration;
-    private $expressionLanguage;
+    protected $configuration;
+    protected $expressionLanguage;
     private $tokenStorage;
     private $authorizationChecker;
     private $trustResolver;
@@ -63,7 +63,7 @@ class GuardListener
         }
     }
 
-    private function validateGuardExpression(GuardEvent $event, string $expression)
+    protected function validateGuardExpression(GuardEvent $event, string $expression)
     {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);
@@ -72,7 +72,7 @@ class GuardListener
     }
 
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
-    private function getVariables(GuardEvent $event): array
+    protected function getVariables(GuardEvent $event): array
     {
         $token = $this->tokenStorage->getToken();
 

@@ -14,6 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Workflow\EventListener\NoSecurityGuardListener;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
@@ -39,10 +42,26 @@ class WorkflowGuardListenerPass implements CompilerPassInterface
             'security.role_hierarchy',
         ];
 
+        $missingService = false;
         foreach ($servicesNeeded as $service) {
             if (!$container->has($service)) {
-                throw new LogicException(sprintf('The "%s" service is needed to be able to use the workflow guard listener.', $service));
+                $missingService = true;
+                break;
             }
+        }
+
+        if ($missingService) {
+            foreach ($container->findTaggedServiceIds('workflow.guard_listener') as $id => $attributes) {
+                $definition = $container->getDefinition($id);
+                $guardsConfiguration = $definition->getArgument(0);
+                $definition->setClass(NoSecurityGuardListener::class);
+                $definition->setArguments([
+                    $guardsConfiguration,
+                    new Reference('workflow.no_security.expression_language'),
+                ]);
+            }
+        } elseif (!class_exists(Security::class)) {
+            throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security-core".');
         }
     }
 }

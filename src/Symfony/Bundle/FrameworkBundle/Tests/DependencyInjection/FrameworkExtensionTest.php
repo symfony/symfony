@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Doctrine\Common\Annotations\Annotation;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -41,6 +42,10 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -396,6 +401,51 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('!!true', $transitionGuardExpressions[0]->getArgument(1));
         $this->assertSame('.workflow.article.transition.4', (string) $transitionGuardExpressions[1]->getArgument(0));
         $this->assertSame('!!false', $transitionGuardExpressions[1]->getArgument(1));
+    }
+
+    public function testWorkflowWithoutGuardExpressions()
+    {
+        $container = $this->createContainerFromFile('workflows');
+
+        $this->assertFalse($container->hasDefinition('.workflow.article.listener.guard'), 'Workflow guard listener is not registered as a service');
+        $this->assertFalse($container->hasParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter does not exist');
+    }
+
+    public function testGuardListenersWithSecurityServices()
+    {
+        $container = $this->createContainerFromFile('workflow_with_guard_expression', [], true, false);
+        $container->register('security.token_storage', TokenStorageInterface::class);
+        $container->register('security.authorization_checker', AuthorizationCheckerInterface::class);
+        $container->register('security.authentication.trust_resolver', AuthenticationTrustResolverInterface::class);
+        $container->register('security.role_hierarchy', RoleHierarchy::class);
+        $container->addCompilerPass(new WorkflowGuardListenerPass());
+        $container->compile();
+
+        $guardDefinition = $container->getDefinition('.workflow.article.listener.guard');
+        $this->assertTrue($guardDefinition->hasTag('workflow.guard_listener'));
+        $this->assertSame(Workflow\EventListener\GuardListener::class, $guardDefinition->getClass());
+        $this->assertCount(7, $guardDefinition->getArguments());
+        $this->assertTrue(\is_array($guardDefinition->getArgument(0)) && !empty($guardDefinition->getArgument(0)));
+        $this->assertSame('workflow.security.expression_language', (string) $guardDefinition->getArgument(1));
+        $this->assertSame('security.token_storage', (string) $guardDefinition->getArgument(2));
+        $this->assertSame('security.authorization_checker', (string) $guardDefinition->getArgument(3));
+        $this->assertSame('security.authentication.trust_resolver', (string) $guardDefinition->getArgument(4));
+        $this->assertSame('security.role_hierarchy', (string) $guardDefinition->getArgument(5));
+        $this->assertSame('validator', (string) $guardDefinition->getArgument(6));
+    }
+
+    public function testGuardListenersWithoutSecurityServices()
+    {
+        $container = $this->createContainerFromFile('workflow_with_guard_expression', [], true, false);
+        $container->addCompilerPass(new WorkflowGuardListenerPass());
+        $container->compile();
+
+        $guardDefinition = $container->getDefinition('.workflow.article.listener.guard');
+        $this->assertTrue($guardDefinition->hasTag('workflow.guard_listener'));
+        $this->assertSame(Workflow\EventListener\NoSecurityGuardListener::class, $guardDefinition->getClass());
+        $this->assertCount(2, $guardDefinition->getArguments());
+        $this->assertTrue(\is_array($guardDefinition->getArgument(0)) && !empty($guardDefinition->getArgument(0)));
+        $this->assertSame('workflow.no_security.expression_language', (string) $guardDefinition->getArgument(1));
     }
 
     public function testWorkflowServicesCanBeEnabled()

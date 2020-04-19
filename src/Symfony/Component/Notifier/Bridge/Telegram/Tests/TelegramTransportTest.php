@@ -13,12 +13,12 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -87,7 +87,7 @@ final class TelegramTransportTest extends TestCase
         $expectedBody = [
             'chat_id' => $channel,
             'text' => 'testMessage',
-            'parse_mode' => 'Markdown',
+            'parse_mode' => 'MarkdownV2',
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
@@ -116,7 +116,7 @@ final class TelegramTransportTest extends TestCase
         $expectedBody = [
             'chat_id' => $channelOverride,
             'text' => 'testMessage',
-            'parse_mode' => 'Markdown',
+            'parse_mode' => 'MarkdownV2',
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
@@ -127,11 +127,8 @@ final class TelegramTransportTest extends TestCase
 
         $transport = new TelegramTransport('testToken', 'defaultChannel', $client);
 
-        $messageOptions = $this->createMock(MessageOptionsInterface::class);
-        $messageOptions
-            ->expects($this->once())
-            ->method('getRecipientId')
-            ->willReturn($channelOverride);
+        $messageOptions = new TelegramOptions();
+        $messageOptions->chatId($channelOverride);
 
         $transport->send(new ChatMessage('testMessage', $messageOptions));
     }

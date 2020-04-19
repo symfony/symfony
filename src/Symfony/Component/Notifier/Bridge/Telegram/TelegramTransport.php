@@ -66,13 +66,21 @@ final class TelegramTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
+        if ($message->getOptions() && !$message->getOptions() instanceof TelegramOptions) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, TelegramOptions::class));
+        }
+
         $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
         if (!isset($options['chat_id'])) {
             $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
         }
+
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+        }
+
         $options['text'] = $message->getSubject();
-        $options['parse_mode'] = 'Markdown';
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

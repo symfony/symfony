@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -51,6 +52,12 @@ class PropertyPathMapper implements DataMapperInterface
                     $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
                 } catch (AccessException $e) {
                     // Skip unitialized properties on $data
+                    if (!$e instanceof UninitializedPropertyException
+                        // For versions without UninitializedPropertyException check the exception message
+                        && (class_exists(UninitializedPropertyException::class) || false === strpos($e->getMessage(), 'You should initialize it'))
+                    ) {
+                        throw $e;
+                    }
                 }
             } else {
                 $form->setData($config->getData());

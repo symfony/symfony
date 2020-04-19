@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\Tests\Fixtures\TypehintedPropertiesCar;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -298,6 +299,22 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData([$form], $car);
 
         $this->assertSame($initialEngine, $car->engine);
+    }
+
+    /**
+     * @requires PHP >= 7.4
+     */
+    public function testMapFormsToUninitializedProperties()
+    {
+        $engine = new \stdClass();
+        $car = new TypehintedPropertiesCar();
+        $config = new FormConfigBuilder('engine', \stdClass::class, $this->dispatcher);
+        $config->setData($engine);
+        $form = new SubmittedForm($config);
+
+        $this->mapper->mapFormsToData([$form], $car);
+
+        $this->assertSame($engine, $car->engine);
     }
 
     /**

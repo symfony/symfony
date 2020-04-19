@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -76,16 +77,37 @@ class PropertyPathMapper implements DataMapperInterface
                 $propertyValue = $form->getData();
                 // If the field is of type DateTimeInterface and the data is the same skip the update to
                 // keep the original object hash
-                if ($propertyValue instanceof \DateTimeInterface && $propertyValue == $this->propertyAccessor->getValue($data, $propertyPath)) {
+                if ($propertyValue instanceof \DateTimeInterface && $propertyValue == $this->getPropertyValue($data, $propertyPath)) {
                     continue;
                 }
 
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
-                if (!\is_object($data) || !$config->getByReference() || $propertyValue !== $this->propertyAccessor->getValue($data, $propertyPath)) {
+                if (!\is_object($data) || !$config->getByReference() || $propertyValue !== $this->getPropertyValue($data, $propertyPath)) {
                     $this->propertyAccessor->setValue($data, $propertyPath, $propertyValue);
                 }
             }
+        }
+    }
+
+    /**
+     * Get the property value per PropertyAccessor.
+     * Treat uninitialized properties as null.
+     *
+     * @param object|array                 $objectOrArray The object or array to traverse
+     * @param string|PropertyPathInterface $propertyPath  The property path to read
+     *
+     * @return mixed The value at the end of the property path
+     *
+     * @throws Exception\InvalidArgumentException If the property path is invalid
+     * @throws Exception\UnexpectedTypeException  If a value within the path is neither object nor array
+     */
+    private function getPropertyValue($data, $propertyPath)
+    {
+        try {
+            return $this->propertyAccessor->getValue($data, $propertyPath);
+        } catch (AccessException $e) {
+            return null;
         }
     }
 }

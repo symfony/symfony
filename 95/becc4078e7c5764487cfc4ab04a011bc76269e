@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-15T15:02:18Z
+
+Did you try with 3.4?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-04-15T15:10:13Z
+
+@nicolas-grekas the bug only appears with the classes which extend from `AbstractTagAwareAdapter` like FilesystemTagAwareAdapter which do not exist in 3.4 only in 4.3 . The `new TagAwareAdapter(new FileSystemAdapter));` which exist before does not contain this behaviour.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-18T14:31:41Z
+
+I pushed the fix on your fork. Redis adapters don't have the bug. The transient failures related to them are due to expirations being time-sensitive.
+FilesystemTagAwareAdapter is the one that needed a fix.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-04-18T16:43:58Z
+
+@nicolas-grekas looks good. Thank you for having a look at this 👍. Travis error seems to have nothing todo with the changes in this PR.

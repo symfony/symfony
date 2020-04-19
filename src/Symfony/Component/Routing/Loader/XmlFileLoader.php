@@ -301,9 +301,9 @@ class XmlFileLoader extends FileLoader
         }
         if ($stateless = $node->getAttribute('stateless')) {
             if (isset($defaults['_stateless'])) {
-                $name = $node->hasAttribute('id') ? sprintf('"%s"', $node->getAttribute('id')) : sprintf('the "%s" tag', $node->tagName);
+                $name = $node->hasAttribute('id') ? sprintf('"%s".', $node->getAttribute('id')) : sprintf('the "%s" tag.', $node->tagName);
 
-                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for %s.', $path, $name));
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for ', $path).$name);
             }
 
             $defaults['_stateless'] = XmlUtils::phpize($stateless);

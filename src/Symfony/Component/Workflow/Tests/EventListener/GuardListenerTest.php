@@ -22,7 +22,11 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 class GuardListenerTest extends TestCase
 {
+    private $expressionLanguage;
+    private $tokenStorage;
     private $authenticationChecker;
+    private $trustResolver;
+    private $roleHierarchy;
     private $validator;
     private $listener;
     private $configuration;
@@ -37,15 +41,15 @@ class GuardListenerTest extends TestCase
                 new GuardExpression(new Transition('name', 'from', 'to'), 'is_valid(subject)'),
             ],
         ];
-        $expressionLanguage = new ExpressionLanguage();
+        $this->expressionLanguage = new ExpressionLanguage();
         $token = new UsernamePasswordToken('username', 'credentials', 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
         $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
-        $trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
+        $this->trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
-        $roleHierarchy = new RoleHierarchy([]);
-        $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, $roleHierarchy, $this->validator);
+        $this->roleHierarchy = new RoleHierarchy([]);
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage, $this->tokenStorage, $this->authenticationChecker, $this->trustResolver, $this->roleHierarchy, $this->validator);
     }
 
     protected function tearDown(): void
@@ -131,6 +135,61 @@ class GuardListenerTest extends TestCase
         $this->listener->onTransition($event, 'test_expression');
 
         $this->assertTrue($event->isBlocked());
+    }
+
+    public function testExceptionIfTheTokenStorageServiceIsNotPresent()
+    {
+        $this->expectException('Symfony\Component\Workflow\Exception\RuntimeException');
+        $this->expectExceptionMessage('"is_granted" cannot be used as the SecurityBundle is not registered in your application.');
+
+        $event = $this->createEvent();
+
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage);
+        $this->listener->onTransition($event, 'test_is_granted');
+    }
+
+    public function testExceptionIfTheAuthorizationCheckerServiceIsNotPresent()
+    {
+        $this->expectException('Symfony\Component\Workflow\Exception\RuntimeException');
+        $this->expectExceptionMessage('"is_granted" cannot be used as the SecurityBundle is not registered in your application.');
+
+        $event = $this->createEvent();
+
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage, $this->tokenStorage);
+        $this->listener->onTransition($event, 'test_is_granted');
+    }
+
+    public function testNoExceptionIfTheAuthenticationTrustResolverServiceIsNotPresent()
+    {
+        $event = $this->createEvent();
+        $this->configureAuthenticationChecker(true, true);
+
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage, $this->tokenStorage, $this->authenticationChecker);
+        $this->listener->onTransition($event, 'test_is_granted');
+
+        $this->assertFalse($event->isBlocked());
+    }
+
+    public function testNoExceptionIfTheRoleHierarchyServiceIsNotPresent()
+    {
+        $event = $this->createEvent();
+        $this->configureAuthenticationChecker(true, true);
+
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage, $this->tokenStorage, $this->authenticationChecker, $this->trustResolver);
+        $this->listener->onTransition($event, 'test_is_granted');
+
+        $this->assertFalse($event->isBlocked());
+    }
+
+    public function testExceptionIfTheValidatorServiceIsNotPresent()
+    {
+        $this->expectException('Symfony\Component\Workflow\Exception\RuntimeException');
+        $this->expectExceptionMessage('"is_valid" cannot be used as the Validator component is not installed.');
+
+        $event = $this->createEvent();
+
+        $this->listener = new GuardListener($this->configuration, $this->expressionLanguage, $this->tokenStorage, $this->authenticationChecker, $this->trustResolver, $this->roleHierarchy);
+        $this->listener->onTransition($event, 'test_is_valid');
     }
 
     private function createEvent(Transition $transition = null)

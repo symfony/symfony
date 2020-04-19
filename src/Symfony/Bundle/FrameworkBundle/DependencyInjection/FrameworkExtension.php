@@ -801,10 +801,10 @@ class FrameworkExtension extends Extension
                 $guard->setArguments([
                     $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
-                    new Reference('security.token_storage'),
-                    new Reference('security.authorization_checker'),
-                    new Reference('security.authentication.trust_resolver'),
-                    new Reference('security.role_hierarchy'),
+                    new Reference('security.token_storage', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    new Reference('security.authorization_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    new Reference('security.authentication.trust_resolver', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    new Reference('security.role_hierarchy', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ]);
                 foreach ($guardsConfiguration as $eventName => $config) {
@@ -812,7 +812,6 @@ class FrameworkExtension extends Extension
                 }
 
                 $container->setDefinition(sprintf('.%s.listener.guard', $workflowId), $guard);
-                $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
     }

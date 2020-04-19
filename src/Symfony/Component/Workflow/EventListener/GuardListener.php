@@ -33,7 +33,7 @@ class GuardListener
     private $roleHierarchy;
     private $validator;
 
-    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null, AuthenticationTrustResolverInterface $trustResolver = null, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
@@ -74,17 +74,27 @@ class GuardListener
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
     private function getVariables(GuardEvent $event): array
     {
+        if (null === $this->tokenStorage || null === $this->authorizationChecker) {
+            return ['subject' => $event->getSubject()];
+        }
+
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
             throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow "%s".', $event->getWorkflowName()));
         }
 
+        $roleNames = $token->getRoleNames();
+
+        if (null !== $this->roleHierarchy) {
+            $roleNames = $this->roleHierarchy->getReachableRoleNames($roleNames);
+        }
+
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
+            'role_names' => $roleNames,
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function

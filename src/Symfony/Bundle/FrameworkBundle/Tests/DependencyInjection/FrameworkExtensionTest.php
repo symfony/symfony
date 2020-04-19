@@ -211,6 +211,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflows');
 
+        $this->assertFalse($container->hasDefinition('.workflow.article.listener.guard'), 'Workflow guard listener is not registered as a service');
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
@@ -380,8 +381,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('workflow_with_guard_expression');
 
         $this->assertTrue($container->hasDefinition('.workflow.article.listener.guard'), 'Workflow guard listener is registered as a service');
-        $this->assertTrue($container->hasParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter exists');
-        $this->assertTrue(true === $container->getParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter is enabled');
         $guardDefinition = $container->getDefinition('.workflow.article.listener.guard');
         $this->assertSame([
             [

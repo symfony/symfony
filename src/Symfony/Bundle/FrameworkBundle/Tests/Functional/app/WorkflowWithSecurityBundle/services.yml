@@ -1,0 +1,4 @@
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\PublicService:
+        public: true
+        autowire: true

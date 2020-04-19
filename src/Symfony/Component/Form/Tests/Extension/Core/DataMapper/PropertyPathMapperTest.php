@@ -314,7 +314,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $config->setDisabled(true);
-        $form = new Form($config);
+        $form = new SubmittedForm($config);
 
         $this->mapper->mapFormsToData([$form], $car);
 
@@ -376,7 +376,7 @@ class SubmittedForm extends Form
     }
 }
 
-class NotSynchronizedForm extends Form
+class NotSynchronizedForm extends SubmittedForm
 {
     public function isSynchronized()
     {

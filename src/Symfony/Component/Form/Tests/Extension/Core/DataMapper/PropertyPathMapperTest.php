@@ -114,6 +114,26 @@ class PropertyPathMapperTest extends TestCase
         $this->assertNull($form->getData());
     }
 
+    /**
+     * @requires PHP >= 7.4
+     */
+    public function testMapDataToFormsIgnoresUninitializedProperties()
+    {
+        $engineForm = new Form(new FormConfigBuilder('engine', \stdClass::class, $this->dispatcher));
+        $colorConfig = new FormConfigBuilder('color', \stdClass::class, $this->dispatcher);
+        $color = new \stdClass();
+        $colorConfig->setData($color);
+        $colorForm = new Form($colorConfig);
+
+        $car = new TypehintedPropertiesCar();
+        $car->engine = new \stdClass();
+
+        $this->mapper->mapDataToForms($car, [$engineForm, $colorForm]);
+
+        $this->assertSame($car->engine, $engineForm->getData());
+        $this->assertSame($color, $colorForm->getData());
+    }
+
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
     {
         $default = new \stdClass();

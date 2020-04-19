@@ -47,7 +47,11 @@ class PropertyPathMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (!$empty && null !== $propertyPath && $config->getMapped()) {
-                $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+                try {
+                    $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+                } catch (AccessException $e) {
+                    // Skip unitialized properties on $data
+                }
             } else {
                 $form->setData($config->getData());
             }

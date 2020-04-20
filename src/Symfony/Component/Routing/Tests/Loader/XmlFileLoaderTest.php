@@ -520,4 +520,44 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
         $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
 }

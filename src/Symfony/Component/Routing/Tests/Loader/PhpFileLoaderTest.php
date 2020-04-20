@@ -243,4 +243,44 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedCollection, $routeCollection);
     }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
 }

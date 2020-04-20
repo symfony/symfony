@@ -234,6 +234,7 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'baz'])->setRequirement('_locale', 'en'));
         $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_foo'])->setRequirement('_locale', 'fr'));
         $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_bar'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('non_localized.fr', (new Route('/ench/non-localized'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'non_localized'])->setRequirement('_locale', 'fr'));
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));

@@ -3,6 +3,7 @@
 $container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
+    'available_locales' => ['fr'],
     'csrf_protection' => true,
     'form' => [
         'csrf_protection' => [

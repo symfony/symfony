@@ -341,6 +341,7 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'available_locales' => [],
             'csrf_protection' => [
                 'enabled' => false,
             ],

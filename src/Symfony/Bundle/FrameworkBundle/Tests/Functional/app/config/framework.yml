@@ -6,6 +6,7 @@ framework:
     form: true
     test: true
     default_locale: en
+    available_locales: ['en', 'fr']
     session:
         storage_id:     session.storage.mock_file
 

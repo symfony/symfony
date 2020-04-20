@@ -92,4 +92,19 @@ class ResponseListenerTest extends TestCase
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
+
+    public function testSetContentLanguageHeaderWhenEmptyAccceptLocaleHeaders()
+    {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+
+        $response = new Response('content');
+        $request = Request::create('/');
+        $request->setLocale('fr');
+
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+
+        $this->assertEquals('fr', $response->headers->get('Content-Language'));
+    }
 }

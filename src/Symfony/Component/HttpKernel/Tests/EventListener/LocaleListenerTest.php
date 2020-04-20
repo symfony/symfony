@@ -114,6 +114,72 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
+    public function testRequestPreferredLocaleFromAcceptLanguageHeader()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+
+        $listener = new LocaleListener($this->requestStack, 'de', null, ['de', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('fr', $request->getLocale());
+    }
+
+    public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+
+        $listener = new LocaleListener($this->requestStack, 'de', null, ['de', 'en']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('en', $request->getLocale());
+    }
+
+    public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+
+        $listener = new LocaleListener($this->requestStack, 'de', null, ['de', 'it']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('de', $request->getLocale());
+    }
+
+    public function testRequestNoLocaleFromAcceptLanguageHeader()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+
+        $listener = new LocaleListener($this->requestStack, 'de');
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('de', $request->getLocale());
+    }
+
+    public function testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('_locale', 'it');
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+
+        $listener = new LocaleListener($this->requestStack, 'de', null, ['fr', 'en']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('it', $request->getLocale());
+    }
+
     private function getEvent(Request $request): RequestEvent
     {
         return new RequestEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);

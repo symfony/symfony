@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T18:50:01Z
+
+What happens when the route defines both localized paths and localized hosts?
+
+> It's still possible to define an unique host (host: wwww.example.com) and if a host is defined for a given route directly, it's not overridden.
+
+I'm not sure this is correct: other attributes (defaults, condition, etc) give precedence to the importing side, isn't it?
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-03-31T19:02:33Z
+
+> What happens when the route defines both localized paths and localized hosts?
+
+Both will be used. I didn't add any test for this case cause TBH I don't know what's the expected behavior.
+
+> I'm not sure this is correct: other attributes (defaults, condition, etc) give precedence to the importing side, isn't it?
+
+You tell me. :) I can remove this behavior ([here](https://github.com/symfony/symfony/pull/36187/files#diff-1116f019010409bff1cd19e3a31e768cR38-R40)) if you think it makes sense.
+I added it cause you may want to define a totally different domain for a given route (and only for this one).
+Anyway, it's doable by adding another rule in configuration so giving precedence to the importing side is not a problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T19:07:40Z
+
+> I didn't add any test for this case cause TBH I don't know what's the expected behavior.
+
+can you please add one? the behavior should be that we synchronize both path and host to create only one route for the locale, that matches host *and* path, both at the same time.
+
+> I can remove this behavior (here) if you think it makes sense.
+
+I confirm, see [this line](https://github.com/symfony/symfony/pull/36187/files#diff-1116f019010409bff1cd19e3a31e768cR28) that already has the correct precedence. It would make no sense to have precedence vary by type of declaration I think.
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-03-31T22:16:35Z
+
+Tests updated.
+@nicolas-grekas tell me if they're OK for you, if it's the case, I'll implement them for xml & php aswell and we'll focus on the implementation once done if you're OK (I need to take a look more closely to the prefixes implementation to know how to deal with hosts properly). :)
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-04-04T16:06:05Z
+
+Looks like all implementations (xml, yaml & php) are working now. :)
+For tests, I use a route file container 3 routes: 1 without host nor path, 1 with a single host, 1 with 2 hosts & 2 paths.
+This file is imported 4 times: without any host, with only 1 host, with several hosts & with both hosts & locales (prefixes)
+I tried to be as exhaustive as possible for those tests, tell me if I forget something.
+
+Now waiting for your reviews! :)
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2020-04-05T11:31:57Z
+
+Thanks @odolbeau for your work!
+I tested it [here](https://github.com/welcoMattic/test-hosts) with a replication of a real-life case based on a client project, and it works like a charm :ok_hand:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-19T17:57:14Z
+
+Just one thing: can you please rebase and update the changelog of the component?
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-04-19T18:03:39Z
+
+> Just one thing: can you please rebase and update the changelog of the component?
+
+Done! :+1:
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-04-20T08:26:58Z
+
+Documentation available here: https://github.com/symfony/symfony-docs/pull/13571

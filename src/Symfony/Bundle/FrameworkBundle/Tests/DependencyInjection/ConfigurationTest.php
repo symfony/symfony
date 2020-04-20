@@ -370,6 +370,9 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'enabled_locales' => [],
+            'set_locale_from_accept_language' => false,
+            'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
             'trusted_hosts' => [],
             'trusted_headers' => [

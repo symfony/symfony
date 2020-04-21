@@ -33,15 +33,16 @@
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="available-locales" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
-        <xsd:attribute name="available-locales" type="xsd:string" />
         <xsd:attribute name="test" type="xsd:boolean" />
         <xsd:attribute name="error-controller" type="xsd:string" />
+
     </xsd:complexType>
 
     <xsd:complexType name="form">

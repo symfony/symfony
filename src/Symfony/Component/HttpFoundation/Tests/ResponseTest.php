@@ -606,28 +606,6 @@ class ResponseTest extends ResponseTestCase
         $this->assertTrue($cookie->isSecure());
     }
 
-    public function testPrepareSetsContentLanguage()
-    {
-        $response = new Response('foo');
-        $request = new Request();
-        $request->setLocale('fr');
-        $response->prepare($request);
-
-        $this->assertSame('fr', $response->headers->get('Content-Language'));
-    }
-
-    public function testPrepareDoNotOverrideContentLanguage()
-    {
-        $response = new Response('foo');
-        $response->headers->set('Content-Language', 'fr');
-
-        $request = new Request();
-        $request->setLocale('de');
-        $response->prepare($request);
-
-        $this->assertSame('fr', $response->headers->get('Content-Language'));
-    }
-
     public function testSetCache()
     {
         $response = new Response();

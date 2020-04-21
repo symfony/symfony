@@ -476,7 +476,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
-        $this->assertEquals(['fr'], $container->getParameter('kernel.available_locales'));
+        $this->assertEquals(['mi', 'fr'], $container->getParameter('kernel.available_locales'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
@@ -725,6 +725,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException('LogicException');
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
+    }
+
+    public function testAvailableLocales()
+    {
+        $container = $this->createContainerFromFile('available_locales');
+        $this->assertEquals(['mi', 'fr'], $container->getParameter('kernel.available_locales'));
+    }
+
+    public function testAvailableLocalesFallbackOnEnabledLocales()
+    {
+        $container = $this->createContainerFromFile('available_locales_fallback_enabled_locales');
+        $this->assertEquals(['mi', 'fr'], $container->getParameter('kernel.available_locales'));
+    }
+
+    public function testAvailableLocalesCannotFallbackOnEnabledLocales()
+    {
+        $container = $this->createContainerFromFile('available_locales_cannot_fallback_enabled_locales');
+        $this->assertEquals([], $container->getParameter('kernel.available_locales'));
     }
 
     public function testTranslator()

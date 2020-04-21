@@ -93,7 +93,38 @@ class ResponseListenerTest extends TestCase
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
 
-    public function testSetContentLanguageHeaderWhenEmptyAccceptLocaleHeaders()
+    public function testSetContentLanguageHeaderWhenEmptyAndWithAvailableLocales()
+    {
+        $listener = new ResponseListener('ISO-8859-15', ['fr']);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+
+        $response = new Response('content');
+        $request = Request::create('/');
+        $request->setLocale('fr');
+
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+
+        $this->assertEquals('fr', $response->headers->get('Content-Language'));
+    }
+
+    public function testNotOverrideContentLanguageHeaderWhenNotEmpty()
+    {
+        $listener = new ResponseListener('ISO-8859-15', ['de']);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+
+        $response = new Response('content');
+        $response->headers->set('Content-Language', 'mi, en');
+        $request = Request::create('/');
+        $request->setLocale('de');
+
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+
+        $this->assertEquals('mi, en', $response->headers->get('Content-Language'));
+    }
+
+    public function testNotSetContentLanguageHeaderWhenEmptyAvailableLocales()
     {
         $listener = new ResponseListener('ISO-8859-15');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
@@ -105,6 +136,6 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('fr', $response->headers->get('Content-Language'));
+        $this->assertNull($response->headers->get('Content-Language'));
     }
 }

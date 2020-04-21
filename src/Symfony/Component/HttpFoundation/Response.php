@@ -316,10 +316,6 @@ class Response
                     $headers->set('Content-Length', $length);
                 }
             }
-
-            if (!$headers->has('Content-Language')) {
-                $headers->set('Content-Language', $request->getLocale());
-            }
         }
 
         // Fix protocol

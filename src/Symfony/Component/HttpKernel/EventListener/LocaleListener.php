@@ -34,7 +34,7 @@ class LocaleListener implements EventSubscriberInterface
     private $availableLocales;
     private $requestStack;
 
-    public function __construct(RequestStack $requestStack, string $defaultLocale = 'en', RequestContextAwareInterface $router = null, ?array $availableLocales = null)
+    public function __construct(RequestStack $requestStack, string $defaultLocale = 'en', RequestContextAwareInterface $router = null, array $availableLocales = [])
     {
         $this->availableLocales = $availableLocales;
         $this->defaultLocale = $defaultLocale;
@@ -68,7 +68,7 @@ class LocaleListener implements EventSubscriberInterface
             $request->setLocale($locale);
         }
 
-        if (null === $locale && null !== $this->availableLocales &&
+        if (null === $locale && !empty($this->availableLocales) &&
             $preferredLanguage = $request->getPreferredLanguage($this->availableLocales)) {
             $request->setLocale($preferredLanguage);
         }

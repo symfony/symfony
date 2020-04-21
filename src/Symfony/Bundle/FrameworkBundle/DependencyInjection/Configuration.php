@@ -72,6 +72,14 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return !isset($v['available_locales']) && (isset($v['translator']['enabled_locales']) || isset($v['translator']['enabled-locale'])); })
+                ->then(function ($v) {
+                    $v['available_locales'] = $v['translator']['enabled_locales'] ?? $v['translator']['enabled-locale'];
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -83,8 +91,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->arrayNode('available_locales')
                     ->info('An array of available locales for your application. It will help determine the locale according to the Accept-Language header.')
-                    ->beforeNormalization()->castToArray()->end()
-                    ->defaultValue([])
+                    ->beforeNormalization()->ifEmpty()->thenUnset()->end()
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('trusted_hosts')

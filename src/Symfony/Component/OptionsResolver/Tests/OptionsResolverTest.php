@@ -2388,22 +2388,9 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfOptionIsAlreadyDefined()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\OptionDefinitionException');
-        $this->expectExceptionMessage('The options "foo" is already defined.');
+        $this->expectExceptionMessage('The option "foo" is already defined.');
         $this->resolver->define('foo');
         $this->resolver->define('foo');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedByOptionConfiguratorWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/options-resolver 5.1: The signature of method "Symfony\Component\OptionsResolver\OptionConfigurator::deprecated()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.');
-
-        $this->resolver
-            ->define('foo')
-            ->deprecated()
-        ;
     }
 
     public function testResolveOptionsDefinedByOptionConfigurator()

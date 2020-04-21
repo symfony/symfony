@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-20T16:16:31Z
+
+I'd suggest changing the factory method: it should be `getBag('attributes')` instead.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-20T16:24:38Z
+
+I thought about this but `$this->attributeName` is dynamic. We don't care?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-20T16:28:33Z
+
+It's not dynamic in the context of wiring.

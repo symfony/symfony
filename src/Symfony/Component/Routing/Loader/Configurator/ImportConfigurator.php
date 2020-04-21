@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Loader\Configurator;
 
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

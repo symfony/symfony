@@ -211,6 +211,7 @@ class XmlFileLoader extends FileLoader
                             $localizedRoute = clone $route;
                             $localizedRoute->setPath($localePrefix.(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
                             $localizedRoute->setDefault('_locale', $locale);
+                            $localizedRoute->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
                             $localizedRoute->setDefault('_canonical_route', $name);
                             $subCollection->add($name.'.'.$locale, $localizedRoute);
                         }

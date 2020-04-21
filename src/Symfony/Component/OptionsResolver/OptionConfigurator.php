@@ -90,21 +90,8 @@ final class OptionConfigurator
      *
      * @return $this
      */
-    public function deprecated(/*string $package, string $version, $message = 'The option "%name%" is deprecated.'*/): self
+    public function deprecated(string $package, string $version, $message = 'The option "%name%" is deprecated.'): self
     {
-        $args = \func_get_args();
-
-        if (\func_num_args() < 2) {
-            trigger_deprecation('symfony/options-resolver', '5.1', 'The signature of method "%s()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.', __METHOD__);
-
-            $message = $args[0] ?? 'The option "%name%" is deprecated.';
-            $package = (string) $version = '';
-        } else {
-            $package = (string) $args[0];
-            $version = (string) $args[1];
-            $message = (string) ($args[2] ?? 'The option "%name%" is deprecated.');
-        }
-
         $this->resolver->setDeprecated($this->name, $package, $version, $message);
 
         return $this;

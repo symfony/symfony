@@ -733,7 +733,7 @@ class OptionsResolver implements Options
     public function define(string $option): OptionConfigurator
     {
         if (isset($this->defined[$option])) {
-            throw new OptionDefinitionException(sprintf('The options "%s" is already defined.', $option));
+            throw new OptionDefinitionException(sprintf('The option "%s" is already defined.', $option));
         }
 
         return new OptionConfigurator($option, $this);

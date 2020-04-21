@@ -35,7 +35,7 @@ class AvailableAtStampMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope(
             new DummyMessage('the message'),
             [
-                $availableAtStamp
+                $availableAtStamp,
             ]
         );
 

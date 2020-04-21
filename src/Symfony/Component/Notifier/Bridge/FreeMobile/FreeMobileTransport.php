@@ -66,9 +66,14 @@ final class FreeMobileTransport extends AbstractTransport
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
+            $errors = [
+                400 => 'Missing required parameter or wrongly formatted message.',
+                402 => 'Too many messages have been sent too fast.',
+                403 => 'Service not enabled or wrong credentials.',
+                500 => 'Server error, please try again later.',
+            ];
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (see "%s").', $error['message'], $error['more_info']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $response->getStatusCode()).($errors[$response->getStatusCode()] ?? ''), $response);
         }
     }
 }

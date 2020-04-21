@@ -84,6 +84,6 @@ class HttpBasicAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
         $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
         $badge = $passport->getBadge(PasswordUpgradeBadge::class);
-        $this->assertEquals('ThePassword', $badge->getPlaintextPassword());
+        $this->assertEquals('ThePassword', $badge->getAndErasePlaintextPassword());
     }
 }

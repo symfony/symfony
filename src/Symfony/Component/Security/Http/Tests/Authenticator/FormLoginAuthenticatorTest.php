@@ -155,7 +155,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $passport = $this->authenticator->authenticate($request);
         $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
         $badge = $passport->getBadge(PasswordUpgradeBadge::class);
-        $this->assertEquals('s$cr$t', $badge->getPlaintextPassword());
+        $this->assertEquals('s$cr$t', $badge->getAndErasePlaintextPassword());
     }
 
     private function setUpAuthenticator(array $options = [])

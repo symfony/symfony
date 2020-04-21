@@ -61,6 +61,12 @@ EOT
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
+        if (method_exists($kernel, 'getBuildDir')) {
+            $buildDir = $kernel->getBuildDir();
+        } else {
+            $buildDir = $kernel->getCacheDir();
+        }
+
         $rows = [
             ['<info>Symfony</>'],
             new TableSeparator(),
@@ -76,6 +82,7 @@ EOT
             ['Debug', $kernel->isDebug() ? 'true' : 'false'],
             ['Charset', $kernel->getCharset()],
             ['Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'],
+            ['Build directory', self::formatPath($buildDir, $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($buildDir).'</>)'],
             ['Log directory', self::formatPath($kernel->getLogDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'],
             new TableSeparator(),
             ['<info>PHP</>'],

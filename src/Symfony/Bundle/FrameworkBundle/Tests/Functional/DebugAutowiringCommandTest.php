@@ -97,4 +97,16 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester->run(['command' => 'debug:autowiring', 'search' => 'redirect', '--all' => true]);
         $this->assertStringContainsString('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.', $tester->getDisplay());
     }
+
+    public function testNotConfusedByClassAliases()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'ClassAlias']);
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass (public)', $tester->getDisplay());
+    }
 }

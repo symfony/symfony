@@ -31,9 +31,6 @@ class Route
     private $methods = [];
     private $schemes = [];
     private $condition;
-    private $locale;
-    private $format;
-    private $utf8;
 
     /**
      * @param array $data An array of key/value parameters

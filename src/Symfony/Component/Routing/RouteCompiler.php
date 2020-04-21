@@ -65,7 +65,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         $locale = $route->getDefault('_locale');
-        if (null !== $locale && null !== $route->getDefault('_canonical_route') && preg_quote($locale, self::REGEX_DELIMITER) === $route->getRequirement('_locale')) {
+        if (null !== $locale && null !== $route->getDefault('_canonical_route') && preg_quote($locale) === $route->getRequirement('_locale')) {
             $requirements = $route->getRequirements();
             unset($requirements['_locale']);
             $route->setRequirements($requirements);

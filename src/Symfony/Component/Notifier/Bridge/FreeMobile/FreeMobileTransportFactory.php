@@ -34,8 +34,8 @@ final class FreeMobileTransportFactory extends AbstractTransportFactory
         $password = $this->getPassword($dsn);
         $phone = $dsn->getOption('phone');
 
-        if (null === $phone || '' === $phone) {
-            throw new IncompleteDsnException('Missing phone.');
+        if (!$phone) {
+            throw new IncompleteDsnException('Missing phone.', $dsn->getOriginalDsn());
         }
 
         if ('freemobile' === $scheme) {

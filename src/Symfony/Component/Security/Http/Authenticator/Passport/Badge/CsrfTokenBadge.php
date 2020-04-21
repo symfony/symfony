@@ -45,7 +45,7 @@ class CsrfTokenBadge implements BadgeInterface
         return $this->csrfTokenId;
     }
 
-    public function getCsrfToken(): string
+    public function getCsrfToken(): ?string
     {
         return $this->csrfToken;
     }

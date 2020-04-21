@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @internal
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TelegramTransport extends AbstractTransport
 {

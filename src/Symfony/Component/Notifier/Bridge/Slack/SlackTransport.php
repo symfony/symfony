@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @see https://api.slack.com/messaging/webhooks
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class SlackTransport extends AbstractTransport
 {

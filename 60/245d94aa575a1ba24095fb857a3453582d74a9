@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-20T10:25:18Z
+
+There are e few more, check https://github.com/nicolas-grekas/symfony/commit/cba72ccf68f717a5fd9d3bba48aee894499a7339
+It'd be great to have some tests if you can also.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-20T12:20:10Z
+
+I took your commit and added tests. You will impact the `PrefixTrait` when merging on master :)

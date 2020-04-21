@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * This is used to not break AuthenticationChecker and ContextListener when
  * using the authenticator system. Once the authenticator system is no longer
- * experimental, this class can be used trigger deprecation notices.
+ * experimental, this class can be used to trigger deprecation notices.
  *
  * @internal
  *

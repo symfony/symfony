@@ -77,7 +77,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     public function supports(Request $request): ?bool
     {
         if (null !== $this->logger) {
-            $context = ['firewall_key' => $this->firewallName];
+            $context = ['firewall_name' => $this->firewallName];
 
             if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
                 $context['authenticators'] = \count($this->authenticators);
@@ -90,14 +90,14 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $lazy = true;
         foreach ($this->authenticators as $authenticator) {
             if (null !== $this->logger) {
-                $this->logger->debug('Checking support on authenticator.', ['firewall_key' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
             }
 
             if (false !== $supports = $authenticator->supports($request)) {
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
             } elseif (null !== $this->logger) {
-                $this->logger->debug('Authenticator does not support the request.', ['firewall_key' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+                $this->logger->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
             }
         }
 

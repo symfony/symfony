@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
@@ -38,22 +39,21 @@ class PasswordUpgradeBadge implements BadgeInterface
         $this->passwordUpgrader = $passwordUpgrader;
     }
 
-    public function getPlaintextPassword(): string
+    public function getAndErasePlaintextPassword(): string
     {
-        return $this->plaintextPassword;
+        $password = $this->plaintextPassword;
+        if (null === $password) {
+            throw new LogicException('The password is erased as another listener already used this badge.');
+        }
+
+        $this->plaintextPassword = null;
+
+        return $password;
     }
 
     public function getPasswordUpgrader(): PasswordUpgraderInterface
     {
         return $this->passwordUpgrader;
-    }
-
-    /**
-     * @internal
-     */
-    public function eraseCredentials()
-    {
-        $this->plaintextPassword = null;
     }
 
     public function isResolved(): bool

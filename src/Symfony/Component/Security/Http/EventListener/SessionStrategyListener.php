@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
- * Migrates/invalidate the session after successful login.
+ * Migrates/invalidates the session after successful login.
  *
  * This should be registered as subscriber to any "stateful" firewalls.
  *

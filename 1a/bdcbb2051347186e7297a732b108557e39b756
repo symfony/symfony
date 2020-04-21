@@ -1,0 +1,278 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-09-15T14:19:05Z
+
+Just note:
+A user should also be able to use the provider/listener/handler/factory implementation. I love Guard but sometimes it is not enough to work with my super special authentication.
+
+I recently had a scenario where I get a user if passed with an authenticated jwt token. I should create a user entity if it missing (by using data in auth0), if email is valid I create an authenticated token, if not, I will ask the user to login (with different authenticator).
+
+I was not able to write a nice solution with guard for this scenario, so I had to use the “low level code”.
+
+I’m all for promoting guard and trying to make it better, but I think it would be use the more flexible solution when needed.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-09-17T07:38:58Z
+
+Good movement, but AFIK it is impossible to define custom config nodes with guards. Should we add method similar to `addConfiguration(NodeDefinition $builder)` inside `GuardFactoryInterface` like already done in [`SecurityFactoryInterface`](https://github.com/symfony/symfony/blob/4.4/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/SecurityFactoryInterface.php#L55)?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-21T11:07:41Z
+
+> I’m all for promoting guard and trying to make it better, but I think it would be use the more flexible solution when needed.
+
+Hmm, interesting. Our assumption has always been that Guard is not less flexible than the current listener-provider solution. Guard only combines them into one class, which makes it more difficult to reuse partial systems (i.e. the DaoAuthenticationProvider).
+
+I do not fully follow your requirements, but it would be interesting to see whether or not Guard (or a modification in Guard) could have fixed your requirements.
+
+---
+
+For now, I would say it doesn't matter as this PR is not about deprecating the old system. It's only introducing a new system next to it, to allow experimenting (and discovering exactly cases like you mentioned). For that reason, it's maybe a good idea to mark the new classes as `@experimental` (or do we only mark complete components as experimental?)
+
+@fabpot @nicolas-grekas @weaverryan what should we do to get this into the next release (probably not 4.4, but 5.0?)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-21T11:09:21Z
+
+> Good movement, but AFIK it is impossible to define custom config nodes with guards. Should we add method similar to `addConfiguration(NodeDefinition $builder)` inside `GuardFactoryInterface` like already done in `SecurityFactoryInterface`?
+
+In order to be usable a class should as of now implement both interfaces, so the `addConfiguration()` method is added by the other interface. For clarity, we can add the methods to the new interface as well.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-21T12:58:32Z
+
+Making it experimental means that it cannot be part of 4.4. But it can be part of 5.0.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-04T16:11:06Z
+
+As #36243 is merged, the "specific event dispatcher per firewall" feature is already implemented in Symfony. I've updated this PR accordingly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-05T07:05:48Z
+
+@wouterj @weaverryan I would really like to merge this one before 5.1 freeze :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-05T12:26:29Z
+
+> I would really like to merge this one before 5.1 freeze :)
+
+@fabpot so do we :) I've just updated this PR:
+
+* Fixed the tests (fabbot's error is a false-negative & appveyor fails on master with the same errors)
+* Implemented the JSON login authenticator
+* Some minor log message updates (removed some left-over duplicated messages)
+
+The open points from my point of view:
+
+* [x] I've finished ~80% to migrate the default success/failure handlers to event listeners. I'll finish later today (I'm first going to enjoy the nice weather).
+* [ ] There is one important open discussion: https://github.com/symfony/symfony/pull/33558#discussion_r403477698
+
+   > Idea: rename `AuthenticatorInterface` to `AuthenticatorStrategyInterface` and rename `AuthenticatorManagerInterface` to `AuthenticatorInterface`?
+* @weaverryan wanted to give this PR another test drive
+
+I suggest skipping LDAP authenticators for now. This new system is experimental & the old system not yet deprecated, so I think it's fine to introduce this in 5.2.
+
+Is there anything else I can help with to get this ready for merge? (I can fully imagine it's a really tough one to review)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-04-05T18:13:36Z
+
+> There is one important open discussion: #33558 (comment)
+
+> Idea: rename AuthenticatorInterface to AuthenticatorStrategyInterface and rename AuthenticatorManagerInterface to AuthenticatorInterface?
+
+I talked about this with Nicolas and he convinced me of the change. Then I looked into it more, and I'm unconvinced :D. When you call a class an "Authenticator" (e.g. `LoginFormAuthenticator`) it's clear that its purpose is to authenticate. Calling it `LoginFormAuthenticatorStrategy` is less clear - its job/purpose sounds more "meta".
+
+Nicolas' point is that users will be autowiring `AuthenticatorManagerInterface` into (for example) registration controllers for manual authentication and so `AuthenticatorInterface` sounds better in that situation. I agree, but because I can't think of a good name to use for the "authenticators" (other than `AuthenticatorInterface`), I don't think we should do that.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-05T21:50:26Z
+
+> Nicolas' point is that users will be autowiring AuthenticatorManagerInterface into (for example) registration controllers for manual authentication and so AuthenticatorInterface sounds better in that situation. I agree, but because I can't think of a good name to use for the "authenticators" (other than AuthenticatorInterface), I don't think we should do that.
+
+Yes, I agree here. Looking at some other popular frameworks, Laravel calls these things (rather unsurprisingly :wink: ) "guards", Auth0 calls it "authentication systems" and rails/cakePHP seem to completely lack authentication mechanisms :dizzy_face:
+It would be great to get rid of "manager" in "authenticator manager". Yet many apps, or at least apps I work on, have custom authenticators. So I guess the `AuthenticatorStrategyInterface` also needs to be a good name, for better DX.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-04-07T00:51:48Z
+
+# 3 New things
+
+**1) On the design question from the PR description of:**
+
+*Heavy-use of Authenticator Interfaces Makes Decoration Difficult*
+
+Wouter, Nicolas & I have talked a BUNCH about this and made some decisions. Authenticators will have a method where they can return "data objects" (similar to Messenger stamps):
+
+```php
+public function getBadges(): array
+{
+    return [
+        // used by an event listener to verify your CSRF token
+        // in this example, _token is the request parameter name for the token
+        // an alternative might be to pass a Request object to getBadges() and fetch it
+        // out directly right here
+        return new CsrfProtectionBadge('_token', 'the_token_id'),
+
+        // used by an event listener to say that you DO want remember me enabled on this authenticator
+        return new RememberMeBadge(),
+    ];
+}
+```
+
+**2) Some badges can say they must be resolved**
+
+Wouter & I also talked about some badges needing "to be resolved". Basically, we don't want someone to return a `CsrfProtectionBadge` but then due to misconfiguration (really only possible when using the component directly), no listener ever actually uses this to check the CSRF token. So we're thinking about some concept where maybe the badges can have an optional `isResolved()`. The listener would mark the badge as resolved after checking CSRF. If any badges are not resolved by the end, we throw an exception.
+
+**3) Moving "credentials checking" from a badge to a dedicated method**
+
+By using the `getBadges()` system, we originally thought about something like this if your authenticator needs their password checked:
+
+```php
+public function getBadges(): array
+{
+    return [
+        return new CheckPasswordBadge('_password'),
+    ];
+}
+```
+
+But because EVERY authenticator should REALLY, affirmatively say "my credentials are valid" in some way, we're thinking about moving this to a dedicated method where you would return different types of objects based on the type of check you need. It's similar to the above, but it makes "credentials checking" a core concern - no part of the "add on" badge system:
+
+```php
+    public function getAuthentication(UserInterface $user, array $credentials): AuthenticationInterface
+    {
+        return new PasswordAuthentication($user, $credentials['password']);
+
+        // or for an API token authenticator that needs none, perhaps
+        return new SelfValidatedAuthentication();
+    }
+```
+
+A listener would use this and we would make sure that SOMETHING indeed used this to verify credentials.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-07T20:06:40Z
+
+### 1 More New Thing
+
+After a talk with Javier, Ryan and I, we've come up with a better `AuthenticatorInterface` that incorporates the previously mentioned "3 new things":
+
+Merge `getCredentials()`, `getUser()` and the to-be-created `getBadges` into one `authenticate()` method. This method returns a `Passport` containing the user, the credentials and any add-on badge we want to be checked by Symfony:
+
+```php
+class FormLoginAuthenticator implements AuthenticatorInterface
+{
+    public function supports(Request $request): ?bool
+    {
+        return $request->isMethod('POST') && $request->getPathInfo() === '/login';
+    }
+
+    public function authenticate(Request $request): Passport
+    {
+        $user = $this->userRepository->findByEmail($request->get('_email'));
+        if (!$user) {
+            // an abstract class/trait could add a helper function to make this
+            throw new CustomAuthenticationException('Email not found.');
+        }
+
+        return new Passport(
+            $user,
+            new PasswordCredentials($request->get('_password')),
+            [
+                new CsrfBadge($request->get('_token'))
+            ]
+        );
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    {
+        return new RedirectResponse('/');
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
+    {
+        return new RedirectResponse('/login');
+    }
+}
+```
+
+Nicolas suggested also adding `new SelfValidatedPassport($user, $badges)` to use in authenticators that don't require credentials to be checked (i.e. API token-based authenticators).
+
+---
+
+Furthermore - for future reference, not to be included in this PR - Javier came up with this list of "core authenticators" that we could/should support in Symfony at some point:
+
+* [x] User + Password: HTTP Basic, Login Form, ...
+* [ ] Third-party/redirections: SAML, OAuth, ...
+* [ ] Tokens: JWT, JOSE, Windows Identity Foundation, ...
+* [x] Digital certificates
+* [ ] "Magic links" sent via email
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-16T09:23:35Z
+
+Build failure appears to be unrelated, master has this same error for a couple commits already.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-20T11:48:19Z
+
+@wouterj Do you have a small app that we can use to test the new features?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-20T12:27:52Z
+
+@fabpot I used to test this on the Symfony demo application using `security.enable_authenticator_manager: true`. I've also pushed this little application for a bit more customized authentication testing: https://github.com/wouterj/sf-security-authenticators/ It's implementing remember me and CSRF protected login forms and uses a custom api authenticator (the default sqlite db comes with a `sf@example.org:sf` user)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-20T12:56:55Z
+
+Thanks for sharing your sample app! About this snippet found in `config/packages/security.yaml`:
+
+```yaml
+api:
+    pattern: /api
+    provider: app_user_provider
+    custom_authenticator:
+        services:
+            - App\Security\ApiTokenAuthenticator
+```
+
+Would it make sense to define it as follows?
+
+```yaml
+api:
+    pattern: /api
+    provider: app_user_provider
+    # if there's just one authenticator
+    authenticator: 'App\Security\ApiTokenAuthenticator'
+
+    # if there are many authenticators:
+    authenticator:
+    	- 'App\Security\ApiTokenAuthenticator'
+    	- 'App\Security\AnotherApiTokenAuthenticator'
+    	- '...'
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-20T14:05:30Z
+
+Oh yes, I would love to do it that way! The current Security config generation (using Factory classes) doesn't allow us to do that (in an easy way). So we decided to for now skip it and make a new PR after this one to make such hacky change.

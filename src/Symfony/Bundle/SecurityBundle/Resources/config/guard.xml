@@ -17,7 +17,7 @@
                 <argument type="service" id="security.authentication.session_strategy" />
             </call>
         </service>
-        
+
         <service id="Symfony\Component\Security\Guard\GuardAuthenticatorHandler" alias="security.authentication.guard_handler" />
 
         <!-- See GuardAuthenticationFactory -->

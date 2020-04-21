@@ -30,6 +30,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'check_path' => '/login_check',
         'use_forward' => false,
         'require_previous_session' => false,
+        'login_path' => '/login',
     ];
 
     protected $defaultSuccessHandlerOptions = [

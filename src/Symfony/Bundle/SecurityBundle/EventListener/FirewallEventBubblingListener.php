@@ -12,7 +12,10 @@
 namespace Symfony\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -34,6 +37,9 @@ class FirewallEventBubblingListener implements EventSubscriberInterface
     {
         return [
             LogoutEvent::class => 'bubbleEvent',
+            LoginFailureEvent::class => 'bubbleEvent',
+            LoginSuccessEvent::class => 'bubbleEvent',
+            VerifyAuthenticatorCredentialsEvent::class => 'bubbleEvent',
         ];
     }
 

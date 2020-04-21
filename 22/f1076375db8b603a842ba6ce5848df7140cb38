@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2020-03-21T20:54:41Z
+
+Or maybe we can call `->setIp()` only when `$request->getClientIp()` is not `null`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-23T08:48:45Z
+
+Setting the IP or URL to null doesn't look useful from the pov of the API, does it? How did you spot this?
+
+---------------------------------------------------------------------------
+
+by mRoca at 2020-03-23T09:10:03Z
+
+I've spotted it by calling the fpm agent with `cgi-fcgi` (for container cache warmup & docker healthcheck):
+
+```
+REDIRECT_STATUS=true SCRIPT_FILENAME=/srv/public/index.php HTTP_HOST=127.0.0.1 REQUEST_URI=/ REQUEST_METHOD=GET HTTP_USER_AGENT=probe cgi-fcgi -bind -connect 127.0.0.1:9001
+```
+
+This line command won't work because of this type bug, as `$request->getClientIp()` parses the `$_SERVER['REMOTE_ADDR']` value. But if I add the corresponding header `REMOTE_ADDR=127.0.0.1` to the command, everything is fine.

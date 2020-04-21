@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 interface UserAuthenticatorInterface
 {
     /**
-     * Convenience method to manually login a user and return a
+     * Convenience method to programmatically login a user and return a
      * Response *if any* for success.
      */
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request): ?Response;

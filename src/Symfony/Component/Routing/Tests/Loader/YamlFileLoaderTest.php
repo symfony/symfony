@@ -338,6 +338,9 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(2, $routes);
         $this->assertEquals('/nl/imported', $routes->get('imported.nl')->getPath());
         $this->assertEquals('/en/imported', $routes->get('imported.en')->getPath());
+
+        $this->assertSame('nl', $routes->get('imported.nl')->getRequirement('_locale'));
+        $this->assertSame('en', $routes->get('imported.en')->getRequirement('_locale'));
     }
 
     public function testImportingRoutesWithOfficialLocales()

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stephanvierkant at 2020-04-08T18:42:45Z
+
+I don't think this should be added. There are thousands of providers like this and adding them would make it unmaintainable.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2020-04-08T19:33:27Z
+
+@stephanvierkant there is no thousands of ISP ([it is the 2nd biggest of France](https://img-0.journaldunet.com/IvvEoVv_ufvOH8ET5UpsmGM2u1I=/1280x/smart/c7aa1c6402b5411d98f8211865ee18ba/ccmcms-jdn/14609986.png)), no. I'm :+1: with this addition, it feels absolutely legit to support biggest notification providers to me.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-04-21T09:43:00Z
+
+test failures are not related
+
+```
+- Symfony\Component\Cache\Tests\Adapter\RedisClusterAdapterTest::testGetMetadata
+- Symfony\Component\HttpClient\Tests\AmpHttpClientTest::testInformationalResponseStream
+12091Trying to access array offset on value of type null
+```

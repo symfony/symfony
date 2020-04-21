@@ -1,5 +1,5 @@
 {
-    "name": "symfony/freemobile-notifier",
+    "name": "symfony/free-mobile-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Free Mobile Notifier Bridge",
     "keywords": ["sms", "FreeMobile", "notifier", "alerting"],

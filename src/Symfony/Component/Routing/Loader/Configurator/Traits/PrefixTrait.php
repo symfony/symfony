@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Loader\Configurator\Traits;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * @internal

@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class NotificationLoggerListener implements EventSubscriberInterface, ResetInterface
 {

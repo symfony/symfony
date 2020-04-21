@@ -16,7 +16,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class TransportException extends RuntimeException implements TransportExceptionInterface
 {

@@ -139,7 +139,6 @@
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
             <tag name="container.service_subscriber" id="translator" />
             <tag name="kernel.cache_warmer" />
-            <tag name="container.no_preload" />
             <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
     </services>

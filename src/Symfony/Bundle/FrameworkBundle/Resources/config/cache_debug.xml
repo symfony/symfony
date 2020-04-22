@@ -20,7 +20,6 @@
                 <argument>cache.serializer</argument>
             </argument>
             <tag name="kernel.cache_warmer" priority="64" />
-            <tag name="container.no_preload" />
         </service>
     </services>
 </container>

@@ -222,7 +222,6 @@
         <!-- Cache Warmers -->
         <service id="security.cache_warmer.expression" class="Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer">
             <tag name="kernel.cache_warmer" />
-            <tag name="container.no_preload" />
             <argument type="collection" /> <!-- expressions -->
             <argument type="service" id="security.expression_language" />
         </service>

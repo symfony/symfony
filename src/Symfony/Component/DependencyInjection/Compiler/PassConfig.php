@@ -92,6 +92,7 @@ class PassConfig
         $this->afterRemovingPasses = [[
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
+            new ResolveNoPreloadPass(),
         ]];
     }
 

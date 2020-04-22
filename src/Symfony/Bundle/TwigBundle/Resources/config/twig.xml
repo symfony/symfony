@@ -45,7 +45,6 @@
 
         <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer">
             <tag name="kernel.cache_warmer" />
-            <tag name="container.no_preload" />
             <tag name="container.service_subscriber" id="twig" />
             <argument type="service" id="Psr\Container\ContainerInterface" />
             <argument type="service" id="twig.template_iterator" />

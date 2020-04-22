@@ -109,7 +109,7 @@ class ConnectionTest extends TestCase
         $queueUrl = $this->handleGetQueueUrl(0, $httpClient);
 
         $httpClient->expects($this->at(1))->method('request')
-            ->with('POST', $queueUrl, ['body' => ['Action' => 'ReceiveMessage', 'VisibilityTimeout' => null, 'MaxNumberOfMessages' => 9, 'WaitTimeSeconds' => 20]])
+            ->with('POST', $queueUrl, ['body' => ['Action' => 'ReceiveMessage', 'VisibilityTimeout' => null, 'MaxNumberOfMessages' => 9, 'WaitTimeSeconds' => 20, 'MessageAttributeName.1' => 'All']])
             ->willReturn($response);
         $response->expects($this->once())->method('getContent')->willReturn('<ReceiveMessageResponse>
           <ReceiveMessageResult>

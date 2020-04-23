@@ -176,6 +176,7 @@ class Connection
                 'Action' => 'ReceiveMessage',
                 'VisibilityTimeout' => $this->configuration['visibility_timeout'],
                 'MaxNumberOfMessages' => $this->configuration['buffer_size'],
+                'MessageAttributeName.1' => 'All',
                 'WaitTimeSeconds' => $this->configuration['wait_time'],
             ]);
         }
@@ -186,9 +187,18 @@ class Connection
 
         $xml = new \SimpleXMLElement($this->currentResponse->getContent());
         foreach ($xml->ReceiveMessageResult->Message as $xmlMessage) {
+            $headers = [];
+            foreach ($xmlMessage->MessageAttribute as $item) {
+                if ('String' !== (string) $item->Value->DataType) {
+                    continue;
+                }
+                $headers[(string) $item->Name] = (string) $item->Value->StringValue;
+            }
             $this->buffer[] = [
                 'id' => (string) $xmlMessage->ReceiptHandle,
-            ] + json_decode($xmlMessage->Body, true);
+                'body' => (string) $xmlMessage->Body,
+                'headers' => $headers,
+            ];
         }
 
         $this->currentResponse = null;
@@ -246,17 +256,23 @@ class Connection
             $this->setup();
         }
 
-        $messageBody = json_encode(['body' => $body, 'headers' => $headers]);
-
         $parameters = [
             'Action' => 'SendMessage',
-            'MessageBody' => $messageBody,
+            'MessageBody' => $body,
             'DelaySeconds' => $delay,
         ];
 
+        $index = 0;
+        foreach ($headers as $name => $value) {
+            ++$index;
+            $parameters["MessageAttribute.$index.Name"] = $name;
+            $parameters["MessageAttribute.$index.Value.DataType"] = 'String';
+            $parameters["MessageAttribute.$index.Value.StringValue"] = $value;
+        }
+
         if ($this->isFifoQueue($this->configuration['queue_name'])) {
             $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
-            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1($messageBody);
+            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1(json_encode(['body' => $body, 'headers' => $headers]));
         }
 
         $this->call($this->getQueueUrl(), $parameters);

@@ -65,11 +65,11 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 }
 
                 for ($i = 0; $i < 38; ++$i) {
-                    if (!file_exists($dir.$chars[$i])) {
+                    if (!is_dir($dir.$chars[$i])) {
                         continue;
                     }
                     for ($j = 0; $j < 38; ++$j) {
-                        if (!file_exists($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
+                        if (!is_dir($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
                             continue;
                         }
                         foreach (scandir($d, SCANDIR_SORT_NONE) ?: [] as $link) {
@@ -136,7 +136,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     {
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!file_exists($file) || !$h = @fopen($file, 'rb')) {
+            if (!is_file($file) || !$h = @fopen($file, 'rb')) {
                 continue;
             }
 
@@ -193,7 +193,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {
-            if (!file_exists($tagFolder = $this->getTagFolder($tagId))) {
+            if (!is_dir($tagFolder = $this->getTagFolder($tagId))) {
                 continue;
             }
 

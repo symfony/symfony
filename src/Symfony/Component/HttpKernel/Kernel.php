@@ -280,12 +280,12 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if (null === $this->projectDir) {
             $r = new \ReflectionObject($this);
 
-            if (!file_exists($dir = $r->getFileName())) {
+            if (!is_file($dir = $r->getFileName())) {
                 throw new \LogicException(sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
             }
 
             $dir = $rootDir = \dirname($dir);
-            while (!file_exists($dir.'/composer.json')) {
+            while (!is_file($dir.'/composer.json')) {
                 if ($dir === \dirname($dir)) {
                     return $this->projectDir = $rootDir;
                 }
@@ -432,7 +432,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $errorLevel = error_reporting(E_ALL ^ E_WARNING);
 
         try {
-            if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
+            if (is_file($cachePath) && \is_object($this->container = include $cachePath)
                 && (!$this->debug || (self::$freshCache[$cachePath] ?? $cache->isFresh()))
             ) {
                 self::$freshCache[$cachePath] = true;

@@ -114,7 +114,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (!is_scalar($file = $getEnv($name))) {
                 throw new RuntimeException(sprintf('Invalid file name: env var "%s" is non-scalar.', $name));
             }
-            if (!file_exists($file)) {
+            if (!is_file($file)) {
                 throw new EnvNotFoundException(sprintf('File "%s" not found (resolved from "%s").', $file, $name));
             }
 

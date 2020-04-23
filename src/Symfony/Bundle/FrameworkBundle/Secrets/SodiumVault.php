@@ -58,7 +58,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             // ignore failures to load keys
         }
 
-        if ('' !== $this->decryptionKey && !file_exists($this->pathPrefix.'encrypt.public.php')) {
+        if ('' !== $this->decryptionKey && !is_file($this->pathPrefix.'encrypt.public.php')) {
             $this->export('encrypt.public', $this->encryptionKey);
         }
 
@@ -99,7 +99,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
+        if (!is_file($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -133,7 +133,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
+        if (!is_file($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return false;
@@ -152,7 +152,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
     {
         $this->lastMessage = null;
 
-        if (!file_exists($file = $this->pathPrefix.'list.php')) {
+        if (!is_file($file = $this->pathPrefix.'list.php')) {
             return [];
         }
 
@@ -184,11 +184,11 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             return;
         }
 
-        if (file_exists($this->pathPrefix.'decrypt.private.php')) {
+        if (is_file($this->pathPrefix.'decrypt.private.php')) {
             $this->decryptionKey = (string) include $this->pathPrefix.'decrypt.private.php';
         }
 
-        if (file_exists($this->pathPrefix.'encrypt.public.php')) {
+        if (is_file($this->pathPrefix.'encrypt.public.php')) {
             $this->encryptionKey = (string) include $this->pathPrefix.'encrypt.public.php';
         } elseif ('' !== $this->decryptionKey) {
             $this->encryptionKey = sodium_crypto_box_publickey($this->decryptionKey);

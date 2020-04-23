@@ -18,6 +18,7 @@ CHANGELOG
  * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
  * Added ability for `config:dump-reference` and `debug:config` to dump and debug kernel container extension configuration.
  * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
+ * Added `debug:router --sort` option to see routes sorted by name or path as well as by priority
 
 5.0.0
 -----

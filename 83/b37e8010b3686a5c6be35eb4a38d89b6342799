@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-04-22T13:08:50Z
+
+tests are broken because the FakeSqs service does not support MessageAttributes.... https://github.com/iain/fake_sqs/pull/59
+
+I'm looking for an alternative testing image

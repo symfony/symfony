@@ -248,6 +248,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     public function terminate(Request $request, Response $response)
     {
+        if ($this->getStore() instanceof TerminableInterface) {
+            $this->getStore()->terminate($request, $response);
+        }
+
         if ($this->getKernel() instanceof TerminableInterface) {
             $this->getKernel()->terminate($request, $response);
         }

@@ -31,7 +31,8 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $parameters;
     private $root;
     private $invalidValue;
-    private $propertyPath;
+    private $basePropertyPath;
+    private $propertyPaths;
     private $translator;
     private $translationDomain;
     private $plural;
@@ -52,7 +53,8 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         $this->message = $message;
         $this->parameters = $parameters;
         $this->root = $root;
-        $this->propertyPath = $propertyPath;
+        $this->basePropertyPath = $propertyPath;
+        $this->propertyPaths = [];
         $this->invalidValue = $invalidValue;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
@@ -64,7 +66,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     public function atPath(string $path)
     {
-        $this->propertyPath = PropertyPath::append($this->propertyPath, $path);
+        $this->propertyPaths[] = PropertyPath::append($this->basePropertyPath, $path);
 
         return $this;
     }
@@ -158,17 +160,19 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             );
         }
 
-        $this->violations->add(new ConstraintViolation(
-            $translatedMessage,
-            $this->message,
-            $this->parameters,
-            $this->root,
-            $this->propertyPath,
-            $this->invalidValue,
-            $this->plural,
-            $this->code,
-            $this->constraint,
-            $this->cause
-        ));
+        foreach ($this->propertyPaths as $propertyPath) {
+            $this->violations->add(new ConstraintViolation(
+                $translatedMessage,
+                $this->message,
+                $this->parameters,
+                $this->root,
+                $propertyPath,
+                $this->invalidValue,
+                $this->plural,
+                $this->code,
+                $this->constraint,
+                $this->cause
+            ));
+        }
     }
 }

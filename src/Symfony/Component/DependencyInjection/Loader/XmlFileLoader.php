@@ -537,8 +537,7 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = $value;
                     break;
                 case 'abstract':
-                    $serviceId = $node->getAttribute('id');
-                    $arguments[$key] = new AbstractArgument($serviceId, (string) $key, $arg->nodeValue);
+                    $arguments[$key] = new AbstractArgument($arg->nodeValue);
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

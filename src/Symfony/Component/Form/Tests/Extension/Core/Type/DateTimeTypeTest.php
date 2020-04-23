@@ -444,6 +444,37 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
+    public function testSingleTextWidgetWithSecondsShouldHaveRightStepAttribute()
+    {
+        $view = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'widget' => 'single_text',
+                'with_seconds' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertArrayHasKey('step', $view->vars['attr']);
+        $this->assertEquals(1, $view->vars['attr']['step']);
+    }
+
+    public function testSingleTextWidgetWithSecondsShouldNotOverrideStepAttribute()
+    {
+        $view = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'widget' => 'single_text',
+                'with_seconds' => true,
+                'attr' => [
+                    'step' => 30,
+                ],
+            ])
+            ->createView()
+        ;
+
+        $this->assertArrayHasKey('step', $view->vars['attr']);
+        $this->assertEquals(30, $view->vars['attr']['step']);
+    }
+
     public function testDateTypeChoiceErrorsBubbleUp()
     {
         $error = new FormError('Invalid!');

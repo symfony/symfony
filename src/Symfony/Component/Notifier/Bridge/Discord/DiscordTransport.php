@@ -20,7 +20,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * DiscordTransport.
  *
  * @author Mathieu Piot <math.piot@gmail.com>
  *

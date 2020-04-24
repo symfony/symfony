@@ -289,6 +289,7 @@ EOF;
             'double-quote' => ['"', "'\"'"],
             'slash' => ['/', '/'],
             'backslash' => ['\\', '\\'],
+            'del' => ["\x7f", '"\x7f"'],
             'next-line' => ["\xC2\x85", '"\\N"'],
             'non-breaking-space' => ["\xc2\xa0", '"\\_"'],
             'line-separator' => ["\xE2\x80\xA8", '"\\L"'],

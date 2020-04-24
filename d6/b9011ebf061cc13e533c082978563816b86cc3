@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by dragoonis at 2020-04-09T10:40:44Z
+
+can you share details on why the community would switch from middleware to decorator stack pattern?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-09T11:08:52Z
+
+@dragoonis everyone in the community will decide what they need, there is no one-size-fits-all solution. But this PR fills the gap between a middleware system and a stack of decorators. This brings "ease of stacking" to both styles. If that was the main benefit of a middleware system, this PR makes it less relevant - for ppl using the Symfony DI component of course.
+
+See this thread for more details: https://twitter.com/nicolasgrekas/status/1248198573998604288
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-04-10T07:31:56Z
+
+Today I do that stack part by myself. Can’t wait to use it that way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-14T16:37:53Z
+
+This PR is ready and I'm quite happy about it!
+
+Here are some implementation details and a future opening:
+
+## How does this work?
+
+When a stack `foo` is declared, loaders create a `ChildDefinition` with the chain of decorators set as its *arguments*. The child definition is also tagged with a new `container.stack` tag. Like aliases, stacks support two attributes: `public` and `deprecated`.
+
+This means it's possible to define a stack without using a loader, by following the above convention (all other attributes of the `ChildDefinition` would be ignored). The benefit of using a new syntax is that it makes defining the chain compatible with "defaults" set in the config file.
+
+About the chain itself, it must be a list of either services, aliases or references. Alias and references are used undifferentiated to insert another stack definition in the middle of a new one. Both styles are needed to fit each kind of loader (yaml&xml can do only aliases and php-dsl does `ref()`).
+
+This is already quite powerful. But there's more!
+
+There's a second way to insert a stack inside a stack: using a "parent" in the chain. Such an insertion point will override the top-most definition in the embedded stack. This means one can also *configure* a stack while including it! All attributes of child definitions work here, it all depends on what the stack is about and only you will know about this.
+
+Then, the new `ResolveDecoratorStackPass` will turn all this into plain old decorating services.
+
+## What could come next?
+
+I've been talking with @dunglas and @pamil on Twitter and Slack and they asked me about inserting or removing frames inside an existing stack.
+
+For now, this would be reasonably easy using a compiler pass.
+
+Using configuration, we could also imagine new tags. E.g. one to allow filtering a frame while embedding a stack, another to allow replacing a frame by a new one, another for inserting a frame before/after another one - doing so either while embedding and/or by altering an existing stack definition. I didn't mention it, but frames can be named, this could help.
+
+All this could replace an event dispatcher in some situations I believe. But that's hypotheses for the future.
+
+Please give this a try for now :)

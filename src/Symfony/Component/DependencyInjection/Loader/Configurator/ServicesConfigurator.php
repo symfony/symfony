@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
@@ -129,6 +130,39 @@ class ServicesConfigurator extends AbstractConfigurator
         $definition = $this->container->getDefinition($id);
 
         return new ServiceConfigurator($this->container, $definition->getInstanceofConditionals(), true, $this, $definition, $id, []);
+    }
+
+    /**
+     * Registers a stack of decorator services.
+     *
+     * @param InlineServiceConfigurator[]|ReferenceConfigurator[] $services
+     */
+    final public function stack(string $id, array $services): AliasConfigurator
+    {
+        foreach ($services as $i => $service) {
+            if ($service instanceof InlineServiceConfigurator) {
+                $definition = $service->definition->setInstanceofConditionals($this->instanceof);
+
+                $changes = $definition->getChanges();
+                $definition->setAutowired((isset($changes['autowired']) ? $definition : $this->defaults)->isAutowired());
+                $definition->setAutoconfigured((isset($changes['autoconfigured']) ? $definition : $this->defaults)->isAutoconfigured());
+                $definition->setBindings(array_merge($this->defaults->getBindings(), $definition->getBindings()));
+                $definition->setChanges($changes);
+
+                $services[$i] = $definition;
+            } elseif (!$service instanceof ReferenceConfigurator) {
+                throw new InvalidArgumentException(sprintf('"%s()" expects a list of definitions as returned by "%s()" or "%s()", "%s" given at index "%s" for service "%s".', __METHOD__, InlineServiceConfigurator::FACTORY, ReferenceConfigurator::FACTORY, $service instanceof AbstractConfigurator ? $service::FACTORY.'()' : get_debug_type($service)), $i, $id);
+            }
+        }
+
+        $alias = $this->alias($id, '');
+        $alias->definition = $this->set($id)
+            ->parent('')
+            ->args($services)
+            ->tag('container.stack')
+            ->definition;
+
+        return $alias;
     }
 
     /**

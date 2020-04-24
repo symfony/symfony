@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Bundle\FrameworkBundle\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 

@@ -104,33 +104,31 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      *
-     * @param \DOMElement $node     Element to parse that represents a Route
-     * @param string      $filepath Full path of the XML file being processed
+     * @param \DOMElement $node Element to parse that represents a Route
+     * @param string      $path Full path of the XML file being processed
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $filepath)
+    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path)
     {
         if ('' === $id = $node->getAttribute('id')) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $filepath));
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options, $condition, $paths, /* $prefixes */, $hosts) = $this->parseConfigs($node, $filepath);
+        list($defaults, $requirements, $options, $condition, $paths, /* $prefixes */, $hosts) = $this->parseConfigs($node, $path);
 
-        $path = $node->getAttribute('path');
-
-        if (!$paths && '' === $path) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $filepath));
+        if (!$paths && '' === $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $path));
         }
 
-        if ($paths && '' !== $path) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "path" attribute and <path> child nodes.', $filepath));
+        if ($paths && '' !== $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "path" attribute and <path> child nodes.', $path));
         }
 
-        $routes = $this->createLocalizedRoute($collection, $id, $paths ?: $path);
+        $routes = $this->createLocalizedRoute($collection, $id, $paths ?: $node->getAttribute('path'));
         $routes->addDefaults($defaults);
         $routes->addRequirements($requirements);
         $routes->addOptions($options);

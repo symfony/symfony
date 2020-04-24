@@ -1372,12 +1372,12 @@ class PhpDumperTest extends TestCase
     public function testDumpServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract (should be defined by Pass), did you forget to define it?');
+        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract: should be defined by Pass.');
 
         $container = new ContainerBuilder();
 
         $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
-            ->setArgument('$baz', new AbstractArgument(FooWithAbstractArgument::class, '$baz', 'should be defined by Pass'))
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
             ->setArgument('$bar', 'test')
             ->setPublic(true);
 

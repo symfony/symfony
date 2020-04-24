@@ -320,10 +320,6 @@ class XmlDumper extends Dumper
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
             } elseif ($value instanceof AbstractArgument) {
-                $argKey = $value->getArgumentKey();
-                if (!is_numeric($argKey)) {
-                    $element->setAttribute('key', $argKey);
-                }
                 $element->setAttribute('type', 'abstract');
                 $text = $this->document->createTextNode(self::phpToXml($value->getText()));
                 $element->appendChild($text);

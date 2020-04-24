@@ -123,7 +123,7 @@ class YamlDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
-            ->setArgument('$baz', new AbstractArgument(FooWithAbstractArgument::class, '$baz', 'should be defined by Pass'))
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
             ->setArgument('$bar', 'test');
 
         $dumper = new YamlDumper($container);

@@ -552,11 +552,14 @@ class ContainerBuilderTest extends TestCase
     public function testCreateServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract (should be defined by Pass), did you forget to define it?');
+        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract: should be defined by Pass.');
 
         $builder = new ContainerBuilder();
         $builder->register('foo', FooWithAbstractArgument::class)
-            ->addArgument(new AbstractArgument('foo', '$baz', 'should be defined by Pass'));
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setPublic(true);
+
+        $builder->compile();
 
         $builder->get('foo');
     }

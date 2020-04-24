@@ -449,7 +449,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['arguments'])) {
-            $definition->setArguments($this->resolveServices($service['arguments'], $file, false, $id));
+            $definition->setArguments($this->resolveServices($service['arguments'], $file));
         }
 
         if (isset($service['properties'])) {
@@ -721,7 +721,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array|string|Reference|ArgumentInterface
      */
-    private function resolveServices($value, string $file, bool $isParameter = false, string $serviceId = '', string $argKey = '')
+    private function resolveServices($value, string $file, bool $isParameter = false)
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -795,7 +795,7 @@ class YamlFileLoader extends FileLoader
                 return new Reference($id);
             }
             if ('abstract' === $value->getTag()) {
-                return new AbstractArgument($serviceId, $argKey, $value->getValue());
+                return new AbstractArgument($value->getValue());
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));
@@ -803,7 +803,7 @@ class YamlFileLoader extends FileLoader
 
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$k] = $this->resolveServices($v, $file, $isParameter, $serviceId, $k);
+                $value[$k] = $this->resolveServices($v, $file, $isParameter);
             }
         } elseif (\is_string($value) && 0 === strpos($value, '@=')) {
             if (!class_exists(Expression::class)) {

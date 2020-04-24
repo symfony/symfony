@@ -73,10 +73,19 @@ class CoverageListenerTrait
         $r = new \ReflectionProperty($testClass, 'annotationCache');
         $r->setAccessible(true);
 
+        $covers = $sutFqcn;
+        if (!\is_array($sutFqcn)) {
+            $covers = [$sutFqcn];
+            while ($parent = get_parent_class($sutFqcn)) {
+                $covers[] = $parent;
+                $sutFqcn = $parent;
+            }
+        }
+
         $cache = $r->getValue();
         $cache = array_replace_recursive($cache, array(
             \get_class($test) => array(
-                'covers' => \is_array($sutFqcn) ? $sutFqcn : array($sutFqcn),
+                'covers' => $covers,
             ),
         ));
         $r->setValue($testClass, $cache);

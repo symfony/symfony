@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lmasforne at 2020-04-16T06:01:34Z
+
+I modify the PR as i understand of your recommandations @nicolas-grekas ;) thank you for your feedbacks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-16T09:52:18Z
+
+~In the linked issue, I mentioned using the translator instead of a simple map.~ (bad idea: what would be the string to translate?)
+
+There is still one question remaining here: how will people take advantage of the new argument in a Symfony app? How will they configure the map? Do we need tighter integration?
+
+---------------------------------------------------------------------------
+
+by lmasforne at 2020-04-17T07:57:07Z
+
+@nicolas-grekas i have fixed your feedbacks, thank you for your reviews

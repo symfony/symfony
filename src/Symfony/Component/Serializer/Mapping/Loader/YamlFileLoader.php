@@ -93,6 +93,14 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
                 }
+
+                if (isset($data['ignore'])) {
+                    if (!\is_bool($data['ignore'])) {
+                        throw new MappingException(sprintf('The "ignore" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setIgnore($data['ignore']);
+                }
             }
         }
 

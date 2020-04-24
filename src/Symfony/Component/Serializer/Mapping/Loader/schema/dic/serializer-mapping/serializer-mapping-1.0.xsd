@@ -48,7 +48,7 @@
         </xsd:choice>
         <xsd:attribute name="type-property" type="xsd:string" use="required" />
     </xsd:complexType>
-    
+
     <xsd:complexType name="discriminator-map-mapping">
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="class" type="xsd:string" use="required" />
@@ -78,6 +78,7 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="ignore" type="xsd:boolean" />
     </xsd:complexType>
 
 </xsd:schema>

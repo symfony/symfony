@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support for scalar values denormalization
  * added support for `\stdClass` to `ObjectNormalizer`
+ * added the ability to ignore properties using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Ignore`)
 
 5.0.0
 -----

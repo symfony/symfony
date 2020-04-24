@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-24T06:30:25Z
+
+The difference is that the availability of the redis backend doesn't vary by runtime.
+That's the best I can think of. There must be some runtime code that deals with the situation. Configuration only cannot do anything for us here (for redis it can.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-24T07:28:19Z
+
+> I said Redis extension/lib not backend.
+
+and I wrote "backend" to mean "extension" :D
+
+The alternative would be to make the ApcuAdapter NOT throw any warning when it's not enabled and on the CLI. But as you explained in one of the issues, there should be some reporting when ApcuAdapter is used directly and it doesn't work at all. In a chain, we can relax this rule - that's what this PR proposes.
+
+Thanks for approving :)

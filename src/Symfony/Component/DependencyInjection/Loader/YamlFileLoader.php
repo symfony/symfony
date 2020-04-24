@@ -670,7 +670,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
         }
 
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not exist.', $file));
         }
 

@@ -38,7 +38,7 @@ trait FilesystemCommonTrait
         } else {
             $directory .= \DIRECTORY_SEPARATOR.'@';
         }
-        if (!file_exists($directory)) {
+        if (!is_dir($directory)) {
             @mkdir($directory, 0777, true);
         }
         $directory .= \DIRECTORY_SEPARATOR;
@@ -77,7 +77,7 @@ trait FilesystemCommonTrait
 
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            $ok = (!file_exists($file) || $this->doUnlink($file) || !file_exists($file)) && $ok;
+            $ok = (!is_file($file) || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;
@@ -113,7 +113,7 @@ trait FilesystemCommonTrait
         $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));
         $dir = ($directory ?? $this->directory).strtoupper($hash[0].\DIRECTORY_SEPARATOR.$hash[1].\DIRECTORY_SEPARATOR);
 
-        if ($mkdir && !file_exists($dir)) {
+        if ($mkdir && !is_dir($dir)) {
             @mkdir($dir, 0777, true);
         }
 
@@ -127,19 +127,19 @@ trait FilesystemCommonTrait
 
     private function scanHashDir(string $directory): \Generator
     {
-        if (!file_exists($directory)) {
+        if (!is_dir($directory)) {
             return;
         }
 
         $chars = '+-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
         for ($i = 0; $i < 38; ++$i) {
-            if (!file_exists($directory.$chars[$i])) {
+            if (!is_dir($directory.$chars[$i])) {
                 continue;
             }
 
             for ($j = 0; $j < 38; ++$j) {
-                if (!file_exists($dir = $directory.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
+                if (!is_dir($dir = $directory.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
                     continue;
                 }
 
@@ -178,7 +178,7 @@ trait FilesystemCommonTrait
         if (method_exists(parent::class, '__destruct')) {
             parent::__destruct();
         }
-        if (null !== $this->tmp && file_exists($this->tmp)) {
+        if (null !== $this->tmp && is_file($this->tmp)) {
             unlink($this->tmp);
         }
     }

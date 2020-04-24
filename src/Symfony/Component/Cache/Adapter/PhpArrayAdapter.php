@@ -390,7 +390,7 @@ EOF;
     {
         if (isset(self::$valuesCache[$this->file])) {
             $values = self::$valuesCache[$this->file];
-        } elseif (!file_exists($this->file)) {
+        } elseif (!is_file($this->file)) {
             $this->keys = $this->values = [];
 
             return;

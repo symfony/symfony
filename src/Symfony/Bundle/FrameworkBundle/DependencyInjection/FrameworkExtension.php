@@ -436,8 +436,7 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(CacheClearerInterface::class)
             ->addTag('kernel.cache_clearer');
         $container->registerForAutoconfiguration(CacheWarmerInterface::class)
-            ->addTag('kernel.cache_warmer')
-            ->addTag('container.no_preload');
+            ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)

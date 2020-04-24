@@ -11,12 +11,10 @@
             <argument type="service" id="logger" on-invalid="null" />
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="console" />
-            <tag name="container.no_preload" />
         </service>
 
         <service id="console.suggest_missing_package_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber">
             <tag name="kernel.event_subscriber" />
-            <tag name="container.no_preload" />
         </service>
 
         <service id="console.command.about" class="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">

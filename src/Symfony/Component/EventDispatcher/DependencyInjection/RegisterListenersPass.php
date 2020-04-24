@@ -32,6 +32,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
     private $hotPathEvents = [];
     private $hotPathTagName;
+    private $noPreloadEvents = [];
+    private $noPreloadTagName;
 
     public function __construct(string $dispatcherService = 'event_dispatcher', string $listenerTag = 'kernel.event_listener', string $subscriberTag = 'kernel.event_subscriber', string $eventAliasesParameter = 'event_dispatcher.event_aliases')
     {
@@ -41,10 +43,24 @@ class RegisterListenersPass implements CompilerPassInterface
         $this->eventAliasesParameter = $eventAliasesParameter;
     }
 
-    public function setHotPathEvents(array $hotPathEvents, $tagName = 'container.hot_path')
+    /**
+     * @return $this
+     */
+    public function setHotPathEvents(array $hotPathEvents, string $tagName = 'container.hot_path')
     {
         $this->hotPathEvents = array_flip($hotPathEvents);
         $this->hotPathTagName = $tagName;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setNoPreloadEvents(array $noPreloadEvents, string $tagName = 'container.no_preload'): self
+    {
+        $this->noPreloadEvents = array_flip($noPreloadEvents);
+        $this->noPreloadTagName = $tagName;
 
         return $this;
     }
@@ -64,6 +80,8 @@ class RegisterListenersPass implements CompilerPassInterface
         $globalDispatcherDefinition = $container->findDefinition($this->dispatcherService);
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
+            $noPreload = 0;
+
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
@@ -99,7 +117,13 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 if (isset($this->hotPathEvents[$event['event']])) {
                     $container->getDefinition($id)->addTag($this->hotPathTagName);
+                } elseif (isset($this->noPreloadEvents[$event['event']])) {
+                    ++$noPreload;
                 }
+            }
+
+            if ($noPreload && \count($events) === $noPreload) {
+                $container->getDefinition($id)->addTag($this->noPreloadTagName);
             }
         }
 
@@ -132,6 +156,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 $dispatcherDefinitions = [$globalDispatcherDefinition];
             }
 
+            $noPreload = 0;
             ExtractingEventDispatcher::$aliases = $aliases;
             ExtractingEventDispatcher::$subscriber = $class;
             $extractingDispatcher->addSubscriber($extractingDispatcher);
@@ -143,7 +168,12 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 if (isset($this->hotPathEvents[$args[0]])) {
                     $container->getDefinition($id)->addTag($this->hotPathTagName);
+                } elseif (isset($this->noPreloadEvents[$args[0]])) {
+                    ++$noPreload;
                 }
+            }
+            if ($noPreload && \count($extractingDispatcher->listeners) === $noPreload) {
+                $container->getDefinition($id)->addTag($this->noPreloadTagName);
             }
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];

@@ -113,7 +113,6 @@
             <argument type="collection" /><!-- Loaders injected by the extension -->
             <argument>%serializer.mapping.cache.file%</argument>
             <tag name="kernel.cache_warmer" />
-            <tag name="container.no_preload" />
         </service>
 
         <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">

@@ -36,7 +36,6 @@
             <argument type="service" id="validator.builder" />
             <argument>%validator.mapping.cache.file%</argument>
             <tag name="kernel.cache_warmer" />
-            <tag name="container.no_preload" />
         </service>
 
         <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">

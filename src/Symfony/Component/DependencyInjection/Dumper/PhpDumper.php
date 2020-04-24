@@ -851,7 +851,8 @@ EOF;
 
             if ($this->getProxyDumper()->isProxyCandidate($definition)) {
                 $factoryCode = $asFile ? "\$this->load('%s', false)" : '$this->%s(false)';
-                $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
+                $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
+                $code .= $asFile ? preg_replace('/function \(([^)]*+)\) {/', 'function (\1) use ($container) {', $factoryCode) : $factoryCode;
             }
 
             $code .= $this->addServiceInclude($id, $definition);

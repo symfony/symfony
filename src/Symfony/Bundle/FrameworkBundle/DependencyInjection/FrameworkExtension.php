@@ -95,6 +95,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
@@ -2129,6 +2130,7 @@ class FrameworkExtension extends Extension
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
+            EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
         ];
 
         foreach ($classToServices as $class => $service) {

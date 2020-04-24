@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier;
 
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
@@ -58,6 +59,7 @@ class Transport
         ZulipTransportFactory::class,
         MobytTransportFactory::class,
         SmsapiTransportFactory::class,
+        EsendexTransportFactory::class,
     ];
 
     private $factories;

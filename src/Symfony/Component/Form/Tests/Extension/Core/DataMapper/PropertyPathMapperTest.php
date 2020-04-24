@@ -120,10 +120,7 @@ class PropertyPathMapperTest extends TestCase
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
         $engineForm = new Form(new FormConfigBuilder('engine', \stdClass::class, $this->dispatcher));
-        $colorConfig = new FormConfigBuilder('color', \stdClass::class, $this->dispatcher);
-        $color = new \stdClass();
-        $colorConfig->setData($color);
-        $colorForm = new Form($colorConfig);
+        $colorForm = new Form(new FormConfigBuilder('color', \stdClass::class, $this->dispatcher));
 
         $car = new TypehintedPropertiesCar();
         $car->engine = new \stdClass();
@@ -131,7 +128,6 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapDataToForms($car, [$engineForm, $colorForm]);
 
         $this->assertSame($car->engine, $engineForm->getData());
-        $this->assertSame($color, $colorForm->getData());
     }
 
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()

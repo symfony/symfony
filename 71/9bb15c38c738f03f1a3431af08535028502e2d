@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T08:49:47Z
+
+Looks like `src/Symfony/Bridge/PhpUnit/bin/simple-phpunit` also uses the blacklist.
+
+---------------------------------------------------------------------------
+
+by garak at 2020-04-23T08:57:30Z
+
+Added check in simple-phpunit too

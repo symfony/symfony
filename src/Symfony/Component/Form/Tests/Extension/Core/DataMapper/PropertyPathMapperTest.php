@@ -115,7 +115,7 @@ class PropertyPathMapperTest extends TestCase
     }
 
     /**
-     * @requires PHP >= 7.4
+     * @requires PHP 7.4
      */
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
@@ -322,7 +322,7 @@ class PropertyPathMapperTest extends TestCase
     }
 
     /**
-     * @requires PHP >= 7.4
+     * @requires PHP 7.4
      */
     public function testMapFormsToUninitializedProperties()
     {

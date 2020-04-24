@@ -25,7 +25,7 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.php" class="Symfony\Bundle\FrameworkBundle\Routing\Loader\PhpFileLoader">
+        <service id="routing.loader.php" class="Symfony\Component\Routing\Loader\PhpFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>

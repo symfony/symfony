@@ -41,9 +41,8 @@ class IsinValidator extends ConstraintValidator
         }
 
         $value = strtoupper($value);
-        $canonicalize = str_replace(' ', '', $value);
 
-        if (Isin::VALIDATION_LENGTH !== \strlen($canonicalize)) {
+        if (Isin::VALIDATION_LENGTH !== \strlen($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Isin::INVALID_LENGTH_ERROR)

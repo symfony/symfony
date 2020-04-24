@@ -383,7 +383,7 @@
                 <target>Chaque élément de cette collection doit satisfaire à son propre jeu de contraintes.</target>
             </trans-unit>
             <trans-unit id="99">
-                <source>This is not a valid International Securities Identification Number (ISIN).</source>
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Ce n'est pas un code international de sécurité valide (ISIN).</target>
             </trans-unit>
         </body>

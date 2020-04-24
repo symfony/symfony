@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-23T15:03:41Z
+
+Thanks for simplifying this feature. This is the **before**:
+
+```xml
+<service id="maker.generator" class="Symfony\Bundle\MakerBundle\Generator">
+    <argument type="service" id="maker.file_manager" />
+    <argument type="abstract" key="$rootNamespace">defined in MakerPass</argument>
+</service>
+```
+
+```yaml
+maker.generator:
+    class: Symfony\Bundle\MakerBundle\Generator
+    arguments:
+        $rootNamespace: !abstract defined in MakerPass
+```
+
+```php
+$builder->register('maker.generator', Generator::class)
+    ->addArgument(new AbstractArgument('maker.generator', '$rootNamespace', 'defined in MakerPass'));
+```
+
+Could you please show the **after** config? Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T15:06:55Z
+
+before:
+`->addArgument(new AbstractArgument('foo', '$baz', 'should be defined by Pass'));`
+
+after:
+`->addArgument(new AbstractArgument('should be defined by Pass'));`
+
+the rest is untouched.
+
+But the example in PHP should be this actually if we want the equivalent of yaml/xml:
+`->setArgument('$rootNamespace', new AbstractArgument('should be defined by Pass'));`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-23T16:44:13Z
+
+So I used this feature in the Security PR (see e.g. https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/Resources/config/security_authenticator.xml#L17) as `<argument type="abstract">provider key</argument>`.
+Should we replace it with `<argument type="abstract" key="$providerKey"/>`? And then, if I'm correct we can no longer use `replaceArgument(1, $providerKey)`, but need to do `replaceArgument('$providerKey', $providerKey)`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T17:05:04Z
+
+>  Should we replace it with `<argument type="abstract" key="$providerKey"/>`?
+
+nope: we don't use named arguments in core
+
+> And then, if I'm correct we can no longer use `replaceArgument(1, $providerKey)`, but need to do `replaceArgument('$providerKey', $providerKey)`?
+
+nothing changes here (but this is argument 3, not 1)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-23T17:18:47Z
+
+Hmm, but then I think this feature might still not be generic enough (or at least, it doesn't fit Symfony's usage). If I read the code correctly, the XML currently used in Security will result in this error message:
+`Argument "3" of service "security.authenticator.manager" is abstract. provider key`.
+
+This is imho weird in 2 ways:
+
+1. `provider key.` is a bit lost. The solution would be to only use `<argument type="abstract"/>`, but that removes the usefull explanation of what the argument will contain.
+2. It's not actually the 3rd argument that is missing, it's the 4th argument (but arguments are zero-indexed in the DI component).
+
+(Btw, I agree with the changes in this PR, but I feel like the feature itself is not 100% correct yet)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T17:35:22Z
+
+The message would be:
+`Argument "3" of service "security.authenticator.manager" is abstract: provider key.`
+
+I get what you mean @wouterj, but I don't have any better proposal.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T17:36:18Z
+
+Note that what matters is that the message is actionable. In this regard, I think it is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T20:40:48Z
+
+>  Argument "3" of service "security.authenticator.manager" is abstract: provider key.
+
+Updated to use positional numbers: ` Argument 4 of service "security.authenticator.manager" is abstract: provider key.`

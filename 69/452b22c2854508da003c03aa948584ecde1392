@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-04-23T13:50:41Z
+
+@nicolas-grekas can we have tests covering the dumping of lazy services to avoid such issues in the future ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T13:56:50Z
+
+@stof not really - that would require adding the proxy-manager bridge as a dev-dependency of the DI component and add tests for it. Too much effort for too little benefit IMHO.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-04-23T14:00:52Z
+
+@nicolas-grekas or having such tests in the proxy-manager bridge
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-23T14:08:38Z
+
+Not sure how to test this specific behavior from the bridge... The bridge is not part if it actually, it works the same with the different modes (5.0, as_file=0/1, etc) A true regression test would require testing the integration from the DI component.

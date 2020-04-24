@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by Koc at 2018-10-06T20:28:47Z
+
+What about providing `@ExclusionPolicy` in JMS-serializer manner? There is opened PR #19374 for that.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-06T21:39:00Z
+
+The plans to improve the Serializer are in https://github.com/symfony/symfony/pull/19374#issuecomment-418889589.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-20T12:42:32Z
+
+@dunglas Do you plan to finish this PR before 4.3 feature freeze?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-20T18:57:03Z
+
+Yes I'll try to finish it tomorrow
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-26T15:06:46Z
+
+Can this annotation be a `PropertyInfo` component feature instead ? Which remove the property from the getProperties method if needed ?
+
+So other components / library can profit from this metadata as well ?
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-03-27T07:10:47Z
+
+IMHO, the @Ignore annotation should be owned by the Serializer component because we may want to exclude the property for the Serializer but to include it for anything else.
+
+And about properties extraction, after trying to finish https://github.com/symfony/symfony/pull/28775, I figured that the interface about extracting properties to (un-)serialize must belong to the Serializer component and we could also ship a default implementation built on top of the PropertyInfo component.
+
+Then, we could use decorators, to implement `@Ignore`, `@ExclusionPolicy`, `@Expose`, `@Since`, `@Until`, etc... We also be able to move the `@Groups` into an implementation of this interface.
+
+This would move the logic of getting which properties must be (un-)serialize out of Normalizer and improve a lot the S.O.L.I.D.ity of the Serializer component and help to deprecate the `GetSetMethodNormalizer`, the `PropertyNormalizer`, the `AbstractObjectNormalizer` and the `AbstractNormalizer`.
+
+@joelwurtz, @dunglas let's talk about this at Symfony Live :)
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-27T10:37:35Z
+
+:+1: for talking about this at SymfonyLive, as for the annotation, i don't see a problem on having it on Serializer only by using a dedicated PropertyInfo extractor chain ?
+
+A lot of the annotations that you propose can be also useful in the context of the `Automapper` if this component is wanted, i would prefer having those in the symfony property info component as decorator, so other components can also profit of this.
+
+Also if this gets merged https://github.com/symfony/symfony/pull/30704 and there is a direct link between PropertyAccess and ProperyInfo component in the future, those annotation + decorators could be used in many place where we want to restrict property. Like in the `Form` / `Validator` / `Workflow` compoenent, this would allow to restrict some properties to be used when using a property path, and avoid exposing some data.
+
+but let's discuss this at symfony live like you said,
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-06T13:16:59Z
+
+Just talk with @dmaicher and i think it would be wise to do/finish #30818 (or at least the basics) first before doing this. WDYT @dunglas ?
+
+---------------------------------------------------------------------------
+
+by raresserban at 2020-01-03T09:05:04Z
+
+Any updates regarding this?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-01-15T17:59:14Z
+
+Tests added and comments resolved. This PR should be good to be merged now.
+As the refactoring work on the Serializer is stuck for months  (#30818), I propose to move forward regarding this PR, we'll be able to refactor this later anyway if needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-02T12:39:36Z
+
+(and fixed deps=low)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-03-31T12:02:39Z
+
+This one is ready to be merged.

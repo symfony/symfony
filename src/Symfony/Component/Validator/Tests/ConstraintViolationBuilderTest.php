@@ -29,7 +29,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->builder = new ConstraintViolationBuilder(
             $this->violations,
             new NotBlank(),
-            "myMessage",
+            'myMessage',
             [],
             null,
             'root',
@@ -38,7 +38,8 @@ class ConstraintViolationBuilderTest extends TestCase
         );
     }
 
-    public function testMultipleAtPathCall() {
+    public function testMultipleAtPathCall()
+    {
         $this->builder
             ->atPath('firstName')
             ->atPath('lastName')

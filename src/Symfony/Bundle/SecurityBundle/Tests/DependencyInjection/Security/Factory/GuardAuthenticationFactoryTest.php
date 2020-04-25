@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 
 class GuardAuthenticationFactoryTest extends TestCase
 {
@@ -161,6 +162,29 @@ class GuardAuthenticationFactoryTest extends TestCase
         ];
         list(, $entryPointId) = $this->executeCreate($config, null);
         $this->assertEquals('authenticatorABC', $entryPointId);
+    }
+
+    public function testAuthenticatorSystemCreate()
+    {
+        $container = new ContainerBuilder();
+        $firewallName = 'my_firewall';
+        $userProviderId = 'my_user_provider';
+        $config = [
+            'authenticators' => ['authenticator123'],
+            'entry_point' => null,
+        ];
+        $factory = new GuardAuthenticationFactory();
+
+        $authenticators = $factory->createAuthenticator($container, $firewallName, $config, $userProviderId);
+        $this->assertEquals('security.authenticator.guard.my_firewall.0', $authenticators[0]);
+
+        $entryPointId = $factory->createEntryPoint($container, $firewallName, $config, null);
+        $this->assertEquals('authenticator123', $entryPointId);
+
+        $authenticatorDefinition = $container->getDefinition('security.authenticator.guard.my_firewall.0');
+        $this->assertEquals(GuardBridgeAuthenticator::class, $authenticatorDefinition->getClass());
+        $this->assertEquals('authenticator123', (string) $authenticatorDefinition->getArgument(0));
+        $this->assertEquals($userProviderId, (string) $authenticatorDefinition->getArgument(1));
     }
 
     private function executeCreate(array $config, $defaultEntryPointId)

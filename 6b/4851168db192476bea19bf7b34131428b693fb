@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-04-25T08:54:24Z
+
+> Worth a CHANGELOG entry?
+
+We only have a CHANGELOG file in `symfony/security` and we didn't document any other new authenticator there as well (only "hey, we wrote a complete new system"). Do you want me to add an entry with all new authenticators?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-25T14:13:38Z
+
+Ok thanks, nothing to do then :)
+Ready to go on my side.

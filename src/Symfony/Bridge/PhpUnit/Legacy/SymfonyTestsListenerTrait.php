@@ -49,7 +49,7 @@ class SymfonyTestsListenerTrait
             \PHPUnit_Util_Blacklist::$blacklistedClassNames[__CLASS__] = 2;
         } elseif (method_exists(Blacklist::class, 'addDirectory')) {
             (new BlackList())->getBlacklistedDirectories();
-            Blacklist::addDirectory(\dirname(\dirname((new \ReflectionClass(__CLASS__))->getFileName())));
+            Blacklist::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
         } else {
             Blacklist::$blacklistedClassNames[__CLASS__] = 2;
         }

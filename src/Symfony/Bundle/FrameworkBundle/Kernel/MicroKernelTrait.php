@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurat
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
@@ -180,5 +182,20 @@ trait MicroKernelTrait
         $this->configureRoutes($routes);
 
         return $routes->build();
+    }
+
+    public static function run(string $environment, bool $debug): void
+    {
+        if ($debug) {
+            umask(0000);
+
+            Debug::enable();
+        }
+
+        $kernel = new static($environment, $debug);
+        $request = Request::createFromGlobals();
+        $response = $kernel->handle($request);
+        $response->send();
+        $kernel->terminate($request, $response);
     }
 }

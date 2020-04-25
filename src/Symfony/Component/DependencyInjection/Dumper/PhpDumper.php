@@ -270,7 +270,7 @@ class %s extends {$options['class']}
 
 EOF;
             $files = [];
-
+            $preloadedFiles = [];
             $ids = $this->container->getRemovedIds();
             foreach ($this->container->getDefinitions() as $id => $definition) {
                 if (!$definition->isPublic()) {
@@ -287,11 +287,16 @@ EOF;
             }
 
             if (!$this->inlineFactories) {
-                foreach ($this->generateServiceFiles($services) as $file => $c) {
+                foreach ($this->generateServiceFiles($services) as $file => [$c, $preload]) {
                     $files[$file] = sprintf($fileTemplate, substr($file, 0, -4), $c);
+
+                    if ($preload) {
+                        $preloadedFiles[$file] = $file;
+                    }
                 }
                 foreach ($proxyClasses as $file => $c) {
                     $files[$file] = "<?php\n".$c;
+                    $preloadedFiles[$file] = $file;
                 }
             }
 
@@ -304,11 +309,16 @@ EOF;
             }
 
             $files[$options['class'].'.php'] = $code;
+            $preloadedFiles[$options['class'].'.php'] = $options['class'].'.php';
             $hash = ucfirst(strtr(ContainerBuilder::hash($files), '._', 'xx'));
             $code = [];
 
             foreach ($files as $file => $c) {
                 $code["Container{$hash}/{$file}"] = substr_replace($c, "<?php\n\nnamespace Container{$hash};\n", 0, 6);
+
+                if (isset($preloadedFiles[$file])) {
+                    $preloadedFiles[$file] = "Container{$hash}/{$file}";
+                }
             }
             $namespaceLine = $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
             $time = $options['build_time'];
@@ -318,8 +328,8 @@ EOF;
             if ($this->preload && null !== $autoloadFile = $this->getAutoloadFile()) {
                 $autoloadFile = substr($this->export($autoloadFile), 2, -1);
 
-                $factoryFiles = array_reverse(array_keys($code));
-                $factoryFiles = implode("';\nrequire __DIR__.'/", $factoryFiles);
+                $preloadedFiles = array_reverse($preloadedFiles);
+                $preloadedFiles = implode("';\nrequire __DIR__.'/", $preloadedFiles);
 
                 $code[$options['class'].'.preload.php'] = <<<EOF
 <?php
@@ -330,7 +340,7 @@ EOF;
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
 require $autoloadFile;
-require __DIR__.'/$factoryFiles';
+require __DIR__.'/$preloadedFiles';
 
 \$classes = [];
 
@@ -1036,7 +1046,7 @@ EOTXT
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if ((list($file, $code) = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
-                yield $file => $code;
+                yield $file => [$code, !$definition->hasTag($this->preloadTags[1]) && !$definition->isDeprecated() && !$definition->hasErrors()];
             }
         }
     }

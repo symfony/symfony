@@ -80,8 +80,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         self::INTEGER,
     ];
 
-    protected $roundingMode;
-
+    private $roundingMode;
     private $type;
     private $scale;
 
@@ -93,7 +92,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = self::ROUND_HALF_UP)
+    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = null)
     {
         if (null === $scale) {
             $scale = 0;
@@ -103,8 +102,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $type = self::FRACTIONAL;
         }
 
-        if (null === $roundingMode) {
-            $roundingMode = self::ROUND_HALF_UP;
+        if (null === $roundingMode && (\func_num_args() < 4 || func_get_arg(3))) {
+            trigger_deprecation('symfony/form', '5.1', sprintf('Not passing a rounding mode to %s() is deprecated. Starting with Symfony 6.0 it will default to "%s::ROUND_HALF_UP".', __METHOD__, __CLASS__));
         }
 
         if (!\in_array($type, self::$types, true)) {
@@ -235,7 +234,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
-        $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
+
+        if (null !== $this->roundingMode) {
+            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
+        }
 
         return $formatter;
     }

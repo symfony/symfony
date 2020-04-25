@@ -39,6 +39,8 @@ EventDispatcher
 Form
 ----
 
+ * Not configuring the `rounding_mode` option of the `PercentType` is deprecated. It will default to `PercentToLocalizedStringTransformer::ROUND_HALF_UP` in Symfony 6.
+ * Not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer` is deprecated. It will default to `ROUND_HALF_UP` in Symfony 6.
  * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method

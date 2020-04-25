@@ -39,6 +39,8 @@ EventDispatcher
 Form
 ----
 
+ * The default value of the `rounding_mode` option of the `PercentType` has been changed to `PercentToLocalizedStringTransformer::ROUND_HALF_UP`.
+ * The default rounding mode of the `PercentToLocalizedStringTransformer` has been changed to `ROUND_HALF_UP`.
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
  * Added the `setIsEmptyCallback()` method to the `FormConfigBuilderInterface`.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.

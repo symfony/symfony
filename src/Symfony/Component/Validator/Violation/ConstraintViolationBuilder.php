@@ -146,6 +146,8 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     public function addViolation()
     {
+        $paths = empty($this->propertyPaths) ? [$this->basePropertyPath] : $this->propertyPaths;
+
         if (null === $this->plural) {
             $translatedMessage = $this->translator->trans(
                 $this->message,
@@ -160,7 +162,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             );
         }
 
-        foreach ($this->propertyPaths as $propertyPath) {
+        foreach ($paths as $propertyPath) {
             $this->violations->add(new ConstraintViolation(
                 $translatedMessage,
                 $this->message,

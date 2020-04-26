@@ -20,6 +20,8 @@ CHANGELOG
  * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
  * Add service `fragment.uri_generator` to generate the URI of a fragment
  * Deprecate registering workflow services as public
+ * Deprecate option `--xliff-version` of the `translation:update` command, use e.g. `--format=xlf20` instead
+ * Deprecate option `--output-format` of the `translation:update` command, use e.g. `--format=xlf20` instead
 
 5.2.0
 -----

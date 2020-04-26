@@ -44,6 +44,8 @@ FrameworkBundle
  * Deprecate the `KernelTestCase::$container` property, use `KernelTestCase::getContainer()` instead
  * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
  * Deprecate registering workflow services as public
+ * Deprecate option `--xliff-version` of the `translation:update` command, use e.g. `--format=xlf20` instead
+ * Deprecate option `--output-format` of the `translation:update` command, use e.g. `--format=xlf20` instead
 
 HttpFoundation
 --------------

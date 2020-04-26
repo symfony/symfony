@@ -244,6 +244,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCatalogues(): array
+    {
+        return array_values($this->catalogues);
+    }
+
+    /**
      * Gets the loaders.
      *
      * @return array LoaderInterface[]

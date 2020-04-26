@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `translation:pull` and `translation:push` commands to manage translations with third-party providers
+
 5.2.0
 -----
 

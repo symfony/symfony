@@ -568,11 +568,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Checks if a value exists in an array
+     * Checks if a value exists in an array.
      */
     private function inArray($value, array $collection): bool
     {
-        if (\is_object($value) && method_exists($value,'getId') && $value->getId()) {
+        if (\is_object($value) && method_exists($value, 'getId') && $value->getId()) {
             foreach ($collection as $element) {
                 if (method_exists($element, 'getId') && $value->getId() === $element->getId()) {
                     return true;

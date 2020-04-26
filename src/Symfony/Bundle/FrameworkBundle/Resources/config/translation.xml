@@ -141,5 +141,15 @@
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
+
+        <service id="translation.remotes" class="Symfony\Component\Translation\Remotes">
+            <factory service="translation.remotes_factory" method="fromConfig" />
+            <argument type="collection" /> <!-- transports -->
+        </service>
+
+        <service id="translation.remotes_factory" class="Symfony\Component\Translation\RemotesFactory">
+            <argument type="tagged_iterator" tag="translation.remote_factory" />
+            <argument type="collection" /> <!-- Enabled locales -->
+        </service>
     </services>
 </container>

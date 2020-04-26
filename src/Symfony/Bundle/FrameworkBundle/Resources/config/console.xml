@@ -172,6 +172,26 @@
             <tag name="console.command" command="translation:update" />
         </service>
 
+        <service id="console.command.translation_pull" class="Symfony\Bundle\FrameworkBundle\Command\TranslationPullCommand">
+            <argument type="service" id="translation.remotes" />
+            <argument type="service" id="translation.writer" />
+            <argument type="service" id="translation.reader" />
+            <argument>%kernel.default_locale%</argument>
+            <argument>%translator.default_path%</argument>
+            <argument type="collection" /> <!-- Translator paths -->
+            <argument type="collection" /> <!-- Enabled locales -->
+            <tag name="console.command" command="translation:pull" />
+        </service>
+
+        <service id="console.command.translation_push" class="Symfony\Bundle\FrameworkBundle\Command\TranslationPushCommand">
+            <argument type="service" id="translation.remotes" />
+            <argument type="service" id="translation.reader" />
+            <argument>%translator.default_path%</argument>
+            <argument type="collection" /> <!-- Translator paths -->
+            <argument type="collection" /> <!-- Enabled locales -->
+            <tag name="console.command" command="translation:push" />
+        </service>
+
         <service id="console.command.workflow_dump" class="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
             <tag name="console.command" command="workflow:dump" />
         </service>

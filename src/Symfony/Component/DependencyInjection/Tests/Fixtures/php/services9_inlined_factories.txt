@@ -548,7 +548,6 @@ use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 require __DIR__.'/Container%s/ProjectServiceContainer.php';
-require __DIR__.'/Container%s/removed-ids.php';
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

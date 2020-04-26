@@ -907,10 +907,8 @@ require __DIR__.'/Container%s/getFooWithInlineService.php';
 require __DIR__.'/Container%s/getFooBarService.php';
 require __DIR__.'/Container%s/getFoo_BazService.php';
 require __DIR__.'/Container%s/getFooService.php';
-require __DIR__.'/Container%s/getFactorySimpleService.php';
 require __DIR__.'/Container%s/getFactoryServiceSimpleService.php';
 require __DIR__.'/Container%s/getFactoryServiceService.php';
-require __DIR__.'/Container%s/getDeprecatedServiceService.php';
 require __DIR__.'/Container%s/getDecoratorServiceWithNameService.php';
 require __DIR__.'/Container%s/getDecoratorServiceService.php';
 require __DIR__.'/Container%s/getConfiguredServiceSimpleService.php';
@@ -919,7 +917,6 @@ require __DIR__.'/Container%s/getBazService.php';
 require __DIR__.'/Container%s/getBar23Service.php';
 require __DIR__.'/Container%s/getBAR22Service.php';
 require __DIR__.'/Container%s/getBAR2Service.php';
-require __DIR__.'/Container%s/removed-ids.php';
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

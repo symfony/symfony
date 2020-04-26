@@ -64,7 +64,7 @@
 
         {% if profile.collectors.memory %}
             <div class="metric">
-                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
+                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MiB</span></span>
                 <span class="label">Peak memory usage</span>
             </div>
         {% endif %}
@@ -386,7 +386,7 @@
                     ctx.fillStyle = "#444";
                     ctx.font = "12px sans-serif";
                     text = event.name;
-                    ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MB";
+                    ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MiB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";

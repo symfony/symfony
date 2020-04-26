@@ -11,8 +11,9 @@ services:
     foo:
         class: Bar\FooClass
         tags:
-            - { name: foo, foo: foo }
-            - { name: foo, bar: bar, baz: baz }
+            - foo: { foo: foo }
+            - foo: { bar: bar, baz: baz }
+            - foo: { name: bar, baz: baz }
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
@@ -158,7 +159,7 @@ services:
     tagged_iterator_foo:
         class: Bar
         tags:
-            - { name: foo }
+            - foo
         public: false
     tagged_iterator:
         class: Bar
@@ -194,6 +195,6 @@ services:
     preload_sidekick:
         class: stdClass
         tags:
-            - {name: container.preload, class: 'Some\Sidekick1'}
-            - {name: container.preload, class: 'Some\Sidekick2'}
+            - container.preload: { class: 'Some\Sidekick1' }
+            - container.preload: { class: 'Some\Sidekick2' }
         public: true

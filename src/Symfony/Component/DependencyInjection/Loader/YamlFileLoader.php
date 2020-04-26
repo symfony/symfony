@@ -266,11 +266,16 @@ class YamlFileLoader extends FileLoader
                     $tag = ['name' => $tag];
                 }
 
-                if (!isset($tag['name'])) {
-                    throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in "%s".', $file));
+                if (1 === \count($tag) && \is_array(current($tag))) {
+                    $name = key($tag);
+                    $tag = current($tag);
+                } else {
+                    if (!isset($tag['name'])) {
+                        throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in "%s".', $file));
+                    }
+                    $name = $tag['name'];
+                    unset($tag['name']);
                 }
-                $name = $tag['name'];
-                unset($tag['name']);
 
                 if (!\is_string($name) || '' === $name) {
                     throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in "%s".', $file));
@@ -568,11 +573,16 @@ class YamlFileLoader extends FileLoader
                 $tag = ['name' => $tag];
             }
 
-            if (!isset($tag['name'])) {
-                throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in "%s".', $id, $file));
+            if (1 === \count($tag) && \is_array(current($tag))) {
+                $name = key($tag);
+                $tag = current($tag);
+            } else {
+                if (!isset($tag['name'])) {
+                    throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in "%s".', $id, $file));
+                }
+                $name = $tag['name'];
+                unset($tag['name']);
             }
-            $name = $tag['name'];
-            unset($tag['name']);
 
             if (!\is_string($name) || '' === $name) {
                 throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $id, $file));

@@ -137,7 +137,11 @@ class XmlDumper extends Dumper
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
                 $tag = $this->document->createElement('tag');
-                $tag->setAttribute('name', $name);
+                if (!\array_key_exists('name', $attributes)) {
+                    $tag->setAttribute('name', $name);
+                } else {
+                    $tag->appendChild($this->document->createTextNode($name));
+                }
                 foreach ($attributes as $key => $value) {
                     $tag->setAttribute($key, $value);
                 }

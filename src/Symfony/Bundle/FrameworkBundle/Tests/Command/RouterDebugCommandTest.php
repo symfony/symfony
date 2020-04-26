@@ -19,7 +19,7 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTester();
         $result = $tester->execute(['--sort' => 'priority'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo)/m', $tester->getDisplay(true));
     }
 
@@ -27,7 +27,7 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTester();
         $result = $tester->execute(['--sort' => 'name'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(alfa).*\n\W*(bravo).*\n\W*(charlie).*\n\W*(delta)/m', $tester->getDisplay(true));
     }
 
@@ -35,7 +35,7 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTester();
         $result = $tester->execute(['--sort' => 'path'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(\/romeo).*\n.*(\/sierra).*\n.*(\/tango).*\n.*(\/uniform)/m', $tester->getDisplay(true));
     }
 
@@ -57,7 +57,7 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTesterWithDuplicatePath();
         $result = $tester->execute(['--sort' => 'priority'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo).*\n\W*(echo)/m', $tester->getDisplay(true));
     }
 
@@ -65,7 +65,7 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTesterWithDuplicatePath();
         $result = $tester->execute(['--sort' => 'name'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(alfa).*\n\W*(bravo).*\n\W*(charlie).*\n\W*(delta).*\n\W*(echo)/m', $tester->getDisplay(true));
     }
 
@@ -73,8 +73,16 @@ class RouterDebugCommandTest extends TestCase
     {
         $tester = $this->createCommandTesterWithDuplicatePath();
         $result = $tester->execute(['--sort' => 'path'], ['decorated' => false]);
-        $this->assertEquals(0, $result, 'Returns 0 in case of success');
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(\/romeo).*\n.*(\/sierra).*\n.*(\/tango).*\n.*(\/uniform).*\n.*(\/uniform)/m', $tester->getDisplay(true));
+    }
+
+    public function testWithoutCallingSortOptionExplicitly()
+    {
+        $tester = $this->createCommandTester();
+        $result = $tester->execute([], ['decorated' => false]);
+        $this->assertSame(0, $result, 'Returns 0 in case of success');
+        $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo)/m', $tester->getDisplay(true));
     }
 
     private function createCommandTester(): CommandTester

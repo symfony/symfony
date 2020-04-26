@@ -82,13 +82,9 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper($this->fileLinkFormatter);
-        $routes = $this->router->getRouteCollection();
         $container = $this->fileLinkFormatter ? \Closure::fromCallable([$this, 'getContainerBuilder']) : null;
         $sortOption = $input->getOption('sort');
-
-        if (null !== $sortOption) {
-            $routes = $this->sortRoutes($routes, $sortOption);
-        }
+        $routes = $this->sortRoutes($this->router->getRouteCollection(), $sortOption);
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
@@ -135,18 +131,12 @@ EOF
 
     private function sortRoutes(RouteCollection $routes, string $propertyName): RouteCollection
     {
-        $validOptions = ['', 'priority', 'name', 'path'];
         $sortedRoutes = $routes->all();
         if ('name' === $propertyName) {
             ksort($sortedRoutes);
         } elseif ('path' === $propertyName) {
-            uasort(
-                $sortedRoutes,
-                static function (Route $a, Route $b): int {
-                    return $a->getPath() <=> $b->getPath();
-                }
-            );
-        } elseif (!\in_array($propertyName, $validOptions)) {
+            uasort($sortedRoutes, function ($a, $b) { return $a->getPath() <=> $b->getPath(); });
+        } elseif ('priority' !== $propertyName) {
             throw new InvalidArgumentException(sprintf('The option "%s" is not valid.', $propertyName));
         }
         $routeCollection = new RouteCollection();

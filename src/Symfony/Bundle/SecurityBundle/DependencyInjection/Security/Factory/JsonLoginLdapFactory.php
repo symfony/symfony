@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\Exception\LogicException;
  */
 class JsonLoginLdapFactory extends JsonLoginFactory
 {
+    use LdapFactoryTrait;
+
     public function getKey()
     {
         return 'json-login-ldap';

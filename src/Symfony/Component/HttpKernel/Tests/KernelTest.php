@@ -19,6 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -480,6 +481,14 @@ EOF;
         $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
     }
 
+    public function testWarmup()
+    {
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertTrue($kernel->warmedUp);
+    }
+
     public function testServicesResetter()
     {
         $httpKernelMock = $this->getMockBuilder(HttpKernelInterface::class)
@@ -603,8 +612,9 @@ class TestKernel implements HttpKernelInterface
     }
 }
 
-class CustomProjectDirKernel extends Kernel
+class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
+    public $warmedUp = false;
     private $baseDir;
     private $buildContainer;
     private $httpKernel;
@@ -629,6 +639,13 @@ class CustomProjectDirKernel extends Kernel
     public function getProjectDir(): string
     {
         return __DIR__.'/Fixtures';
+    }
+
+    public function warmUp(string $cacheDir): array
+    {
+        $this->warmedUp = true;
+
+        return [];
     }
 
     protected function build(ContainerBuilder $container)

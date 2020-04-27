@@ -39,6 +39,7 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Twig\Extension\AbstractExtension;
 
 /**
@@ -519,6 +520,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         $listeners = [];
         $hasListeners = false;
+        $entryPoints = [];
 
         foreach ($this->listenerPositions as $position) {
             foreach ($this->factories[$position] as $factory) {
@@ -541,8 +543,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             $authenticationProviders[] = $authenticators;
                         }
 
-                        if ($factory instanceof EntryPointFactoryInterface) {
-                            $defaultEntryPoint = $factory->createEntryPoint($container, $id, $firewall[$key], $defaultEntryPoint);
+                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->createEntryPoint($container, $id, $firewall[$key], null))) {
+                            $entryPoints[$key] = $entryPoint;
                         }
                     } else {
                         list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
@@ -553,6 +555,19 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $hasListeners = true;
                 }
             }
+        }
+
+        if ($entryPoints) {
+            // we can be sure the authenticator system is enabled
+            if (null !== $defaultEntryPoint) {
+                return $entryPoints[$defaultEntryPoint] ?? $defaultEntryPoint;
+            }
+
+            if (1 === \count($entryPoints)) {
+                return current($entryPoints);
+            }
+
+            throw new InvalidConfigurationException(sprintf('Because you have multiple authenticators in firewall "%s", you need to set the "entry_point" key to one of your authenticators (%s) or a service ID implementing "%s". The "entry_point" determines what should happen (e.g. redirect to "/login") when an anonymous user tries to access a protected page.', $id, implode(', ', $entryPoints), AuthenticationEntryPointInterface::class));
         }
 
         if (false === $hasListeners) {

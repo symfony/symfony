@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @internal
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
@@ -65,7 +67,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
 
         // create entry point if applicable (optional)
-        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPointId);
+        $entryPointId = $this->createDefaultEntryPoint($container, $id, $config, $defaultEntryPointId);
 
         return [$authProviderId, $listenerId, $entryPointId];
     }
@@ -126,7 +128,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return string|null the entry point id
      */
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    protected function createDefaultEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
     {
         return $defaultEntryPointId;
     }

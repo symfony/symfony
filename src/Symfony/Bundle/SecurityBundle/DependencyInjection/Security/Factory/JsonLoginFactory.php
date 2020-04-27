@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * JsonLoginFactory creates services for JSON login authentication.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
 class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {

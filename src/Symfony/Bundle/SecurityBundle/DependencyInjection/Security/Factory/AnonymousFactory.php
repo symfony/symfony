@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @internal
  */
 class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {

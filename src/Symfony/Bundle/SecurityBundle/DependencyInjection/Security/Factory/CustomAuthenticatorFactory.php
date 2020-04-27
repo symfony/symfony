@@ -15,6 +15,12 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @internal
+ * @experimental in Symfony 5.1
+ */
 class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)

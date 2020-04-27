@@ -22,6 +22,8 @@ use Symfony\Component\Security\Core\Exception\LogicException;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @internal
  */
 class FormLoginLdapFactory extends FormLoginFactory
 {

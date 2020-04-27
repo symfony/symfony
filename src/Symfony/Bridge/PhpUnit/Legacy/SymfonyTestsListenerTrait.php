@@ -50,8 +50,14 @@ class SymfonyTestsListenerTrait
      */
     public function __construct(array $mockedNamespaces = [])
     {
-        Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
-
+        if (class_exists('PHPUnit_Util_Blacklist')) {
+            \PHPUnit_Util_Blacklist::$blacklistedClassNames[__CLASS__] = 2;
+        } elseif (method_exists(Blacklist::class, 'addDirectory')) {
+            (new BlackList())->getBlacklistedDirectories();
+            Blacklist::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
+        } else {
+            Blacklist::$blacklistedClassNames[__CLASS__] = 2;
+        }
         $enableDebugClassLoader = class_exists(DebugClassLoader::class) || class_exists(LegacyDebugClassLoader::class);
 
         foreach ($mockedNamespaces as $type => $namespaces) {

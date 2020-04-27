@@ -123,6 +123,15 @@ class ExpressionLanguageTest extends TestCase
             ['false && object.foo()', ['object' => $object], false],
             ['true || object.foo()', ['object' => $object], true],
             ['true or object.foo()', ['object' => $object], true],
+            ['true ? false : object.foo()', ['object' => $object], false],
+            ['false ? object.foo() : true', ['object' => $object], true],
+
+            ['false and foo', ['object' => $object], false],
+            ['false && foo', ['object' => $object], false],
+            ['true || foo', ['object' => $object], true],
+            ['true or foo', ['object' => $object], true],
+            ['true ? false : foo', ['object' => $object], false],
+            ['false ? foo : true', ['object' => $object], true],
         ];
     }
 

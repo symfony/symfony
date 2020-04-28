@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -38,6 +40,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Variable;
@@ -911,6 +914,20 @@ class PhpDumperTest extends TestCase
 
         $container->register(CustomDefinition::class, CustomDefinition::class)
             ->setPublic(false);
+
+        $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
+
+        $container->addCompilerPass(new class() implements CompilerPassInterface {
+            /**
+             * {@inheritdoc}
+             */
+            public function process(ContainerBuilder $container)
+            {
+                $container->setDefinition('late_alias', new Definition(TestDefinition1::class));
+                $container->setAlias(TestDefinition1::class, 'late_alias');
+            }
+        }, PassConfig::TYPE_AFTER_REMOVING);
+
         $container->compile();
 
         $dumper = new PhpDumper($container);

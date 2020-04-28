@@ -16,19 +16,16 @@ use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Test\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 class ConstraintViolationBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $root;
     private $violations;
     private $messageTemplate = '%value% is invalid';
     private $builder;
 
-    private function doSetUp()
+    protected function setUp(): void
     {
         $this->root = [
             'data' => [
@@ -69,10 +66,10 @@ class ConstraintViolationBuilderTest extends TestCase
     public function testCodeCanBeSet()
     {
         $this->builder
-            ->setCode(5)
+            ->setCode('5')
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, 5, new Valid()));
+        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, '5', new Valid()));
     }
 
     public function testCauseCanBeSet()

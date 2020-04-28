@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 
 /**
  * Uses several Transports using a round robin algorithm.
@@ -63,13 +64,11 @@ class RoundRobinTransport implements TransportInterface
         return false;
     }
 
-    public function send(MessageInterface $message): void
+    public function send(MessageInterface $message): SentMessage
     {
         while ($transport = $this->getNextTransport($message)) {
             try {
-                $transport->send($message);
-
-                return;
+                return $transport->send($message);
             } catch (TransportExceptionInterface $e) {
                 $this->deadTransports[$transport] = microtime(true);
             }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -51,7 +52,7 @@ final class FreeMobileTransport extends AbstractTransport
         return $message instanceof SmsMessage && $this->phone === $message->getPhone();
     }
 
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$this->supports($message)) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given) and configured with your phone number.', __CLASS__, SmsMessage::class, \get_class($message)));
@@ -75,5 +76,7 @@ final class FreeMobileTransport extends AbstractTransport
 
             throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $response->getStatusCode()).($errors[$response->getStatusCode()] ?? ''), $response);
         }
+
+        return new SentMessage($message, (string) $this);
     }
 }

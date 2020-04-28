@@ -17,6 +17,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Notifier\Event\MessageEvent;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -69,16 +70,16 @@ abstract class AbstractTransport implements TransportInterface
         return $this;
     }
 
-    public function send(MessageInterface $message): void
+    public function send(MessageInterface $message): SentMessage
     {
         if (null !== $this->dispatcher) {
             $this->dispatcher->dispatch(new MessageEvent($message));
         }
 
-        $this->doSend($message);
+        return $this->doSend($message);
     }
 
-    abstract protected function doSend(MessageInterface $message): void;
+    abstract protected function doSend(MessageInterface $message): SentMessage;
 
     protected function getEndpoint(): ?string
     {

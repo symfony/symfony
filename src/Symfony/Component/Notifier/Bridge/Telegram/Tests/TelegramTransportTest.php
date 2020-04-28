@@ -80,9 +80,34 @@ final class TelegramTransportTest extends TestCase
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "from": {
+                        "id": 12345678,
+                        "first_name": "YourBot",
+                        "username": "YourBot"
+                    },
+                    "chat": {
+                        "id": 1234567890,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "JohnDoe",
+                        "type": "private"
+                    },
+                    "date": 1459958199,
+                    "text": "Hello from Bot!"
+                }
+            }
+JSON;
+
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn('');
+            ->willReturn($content)
+        ;
 
         $expectedBody = [
             'chat_id' => $channel,
@@ -98,7 +123,10 @@ final class TelegramTransportTest extends TestCase
 
         $transport = new TelegramTransport('testToken', $channel, $client);
 
-        $transport->send(new ChatMessage('testMessage'));
+        $sentMessage = $transport->send(new ChatMessage('testMessage'));
+
+        $this->assertEquals(1, $sentMessage->getMessageId());
+        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithChannelOverride(): void
@@ -109,9 +137,33 @@ final class TelegramTransportTest extends TestCase
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "from": {
+                        "id": 12345678,
+                        "first_name": "YourBot",
+                        "username": "YourBot"
+                    },
+                    "chat": {
+                        "id": 1234567890,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "JohnDoe",
+                        "type": "private"
+                    },
+                    "date": 1459958199,
+                    "text": "Hello from Bot!"
+                }
+            }
+JSON;
+
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn('');
+            ->willReturn($content)
+        ;
 
         $expectedBody = [
             'chat_id' => $channelOverride,
@@ -133,6 +185,9 @@ final class TelegramTransportTest extends TestCase
             ->method('getRecipientId')
             ->willReturn($channelOverride);
 
-        $transport->send(new ChatMessage('testMessage', $messageOptions));
+        $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
+
+        $this->assertEquals(1, $sentMessage->getMessageId());
+        $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 }

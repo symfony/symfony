@@ -70,10 +70,10 @@ class ConstraintViolationBuilderTest extends TestCase
     public function testCodeCanBeSet()
     {
         $this->builder
-            ->setCode(5)
+            ->setCode('5')
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, 5, new Valid()));
+        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, '5', new Valid()));
     }
 
     public function testCauseCanBeSet()

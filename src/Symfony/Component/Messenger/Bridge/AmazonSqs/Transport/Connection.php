@@ -334,7 +334,7 @@ class Connection
         $parsedUrl = parse_url($endpoint);
 
         $headers = [
-            'host' => $parsedUrl['host'],
+            'host' => $parsedUrl['host'].($parsedUrl['port'] ? ':'.$parsedUrl['port'] : ''),
             'x-amz-date' => $amzDate,
             'content-type' => 'application/x-www-form-urlencoded',
         ];

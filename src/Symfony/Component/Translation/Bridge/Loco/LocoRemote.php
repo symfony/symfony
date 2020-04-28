@@ -53,7 +53,7 @@ final class LocoRemote extends AbstractRemote
     /**
      * {@inheritdoc}
      */
-    public function read(array $domains = [], array $locales = []): TranslatorBag
+    public function read(array $domains, array $locales): TranslatorBag
     {
         $response = $this->client->request('GET', sprintf('https://%s/api/export/all.xlf', $this->getEndpoint()), [
             'headers' => [

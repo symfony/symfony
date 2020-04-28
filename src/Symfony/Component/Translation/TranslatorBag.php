@@ -19,4 +19,31 @@ final class TranslatorBag
     {
         $this->catalogues[] = $catalogue;
     }
+
+    public function getDomains(): array
+    {
+        $domains = [];
+
+        foreach ($this->catalogues as $catalogue) {
+            $domains += $catalogue->getDomains();
+        }
+
+        return array_unique($domains);
+    }
+
+    public function all(): array
+    {
+        $messages = [];
+
+        foreach ($this->catalogues as $catalogue) {
+            $locale = $catalogue->getLocale();
+            if (!isset($messages[$locale])) {
+                $messages[$locale] = $catalogue->all();
+            } else {
+                $messages[$locale] = array_merge($messages[$locale], $catalogue->all());
+            }
+        }
+
+        return $messages;
+    }
 }

@@ -128,7 +128,7 @@ EOF
             $translatorBag->addCatalogue($this->loadCurrentMessages($locale, $transPaths));
         }
 
-        $remoteTranslations = $this->remotes->get($input->getArgument('remote'))->read($domains, $locales);
+        $remoteTranslations = $this->remotes->get($input->getArgument('remote'))->read($domains ?? $translatorBag->getDomains(), $locales);
 
         dump($remoteTranslations);
         return 0;

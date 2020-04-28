@@ -31,7 +31,7 @@ interface RemoteInterface
     /**
      * This method must return asked translations.
      */
-    public function read(array $domains = [], array $locales = []): TranslatorBag;
+    public function read(array $domains, array $locales): TranslatorBag;
 
     /**
      * This method must delete all translation given in the TranslatorBag.

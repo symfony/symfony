@@ -37,7 +37,7 @@ class RemoteDecorator implements RemoteInterface
     /**
      * {@inheritdoc}
      */
-    public function read(array $domains = [], array $locales = []): TranslatorBag
+    public function read(array $domains, array $locales): TranslatorBag
     {
         $domains = empty($this->domains) ? $domains : array_intersect($this->domains, $domains);
         $locales = array_intersect($this->locales, $locales);

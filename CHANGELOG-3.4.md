@@ -7,6 +7,35 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.40 (2020-04-28)
+
+ * bug #36566 [PhpUnitBridge] Use COMPOSER_BINARY env var if available (fancyweb)
+ * bug #36560 [YAML] escape DEL(\x7f) (sdkawata)
+ * bug #36539 [PhpUnitBridge] fix compatibility with phpunit 9 (garak)
+ * bug #36555 [Cache] skip APCu in chains when the backend is disabled (nicolas-grekas)
+ * bug #36523 [Form] apply automatically step=1 for datetime-local input (ottaviano)
+ * bug #36498 [Security/Core] fix escape for username in LdapBindAuthenticationProvider.php (stoccc)
+ * bug #36506 [FrameworkBundle] Fix session.attribute_bag service definition (fancyweb)
+ * bug #36490 [HttpFoundation] workaround PHP bug in the session module (nicolas-grekas)
+ * bug #36483 [SecurityBundle] fix accepting env vars in remember-me configurations (zek)
+ * bug #36343 [Form] Fixed handling groups sequence validation (HeahDude)
+ * bug #36460 [Cache] Avoid memory leak in TraceableAdapter::reset() (lyrixx)
+ * bug #36411 [Form] RepeatedType should always have inner types mapped (biozshock)
+ * bug #36441 [DI] fix loading defaults when using the PHP-DSL (nicolas-grekas)
+ * bug #36434 [HttpKernel] silence E_NOTICE triggered since PHP 7.4 (xabbuh)
+ * bug #36365 [Validator] Fixed default group for nested composite constraints (HeahDude)
+ * bug #35591 [Validator] do not merge constraints within interfaces (greedyivan)
+ * bug #36375 [Workflow] Use a strict comparison when retrieving raw marking in MarkingStore (lyrixx)
+ * bug #36305 [PropertyInfo][ReflectionExtractor] Check the array mutator prefixes last when the property is singular (fancyweb)
+ * bug #35656 [HttpFoundation] Fixed session migration with custom cookie lifetime (Guite)
+ * bug #36315 [WebProfilerBundle] Support for Content Security Policy style-src-elem and script-src-elem in WebProfiler (ampaze)
+ * bug #36286 [Validator] Allow URL-encoded special characters in basic auth part of URLs (cweiske)
+ * bug #36332 [Serializer] Fix unitialized properties (from PHP 7.4.2) when serializing context for the cache key (alanpoulain)
+ * bug #36239 [HttpKernel][LoggerDataCollector] Prevent keys collisions in the sanitized logs processing (fancyweb)
+ * bug #36245 [Validator] Fixed calling getters before resolving groups (HeahDude)
+ * bug #36252 [Security/Http] Allow setting cookie security settings for delete_cookies (wouterj)
+ * bug #36261 [FrameworkBundle] revert to legacy wiring of the session when circular refs are detected (nicolas-grekas)
+
 * 3.4.39 (2020-03-30)
 
  * bug #36216 [Validator] Assert Valid with many groups (phucwan91)

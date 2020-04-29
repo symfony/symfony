@@ -62,6 +62,21 @@ class File extends \SplFileInfo
     }
 
     /**
+     * Returns the base file name without the extension.
+     *
+     * If the file has more than one extension, only the last one will be stripped.
+     *
+     * If the file is prefixed with dot, and has no extension (e.g. ".hidden"),
+     * result will be empty string.
+     *
+     * @return string
+     */
+    public function getFilenameWithoutExtension(): string
+    {
+        return pathinfo($this->getFilename(), PATHINFO_FILENAME);
+    }
+
+    /**
      * Returns the mime type of the file.
      *
      * The mime type is guessed using a MimeTypeGuesserInterface instance,

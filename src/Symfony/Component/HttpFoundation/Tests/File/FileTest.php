@@ -46,6 +46,15 @@ class FileTest extends TestCase
         new File(__DIR__.'/Fixtures/not_here');
     }
 
+    public function testGetFilenameWithoutExtension()
+    {
+        $file = new File(__DIR__.'/Fixtures/test.gif');
+        $this->assertEquals('test', $file->getFilenameWithoutExtension());
+
+        $file = new File(__DIR__.'/Fixtures/-test');
+        $this->assertEquals('-test', $file->getFilenameWithoutExtension());
+    }
+
     public function testMove()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';

@@ -48,7 +48,7 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
             }
 
             foreach ($container->getAliases() as $alias) {
-                if ($alias->isPublic() && !$alias->isPrivate() && !isset($this->resolvedIds[$id = (string) $alias]) && $container->has($id)) {
+                if ($alias->isPublic() && !$alias->isPrivate() && !isset($this->resolvedIds[$id = (string) $alias]) && $container->hasDefinition($id)) {
                     $this->resolvedIds[$id] = true;
                     $this->processValue($container->getDefinition($id), true);
                 }
@@ -72,8 +72,8 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
      */
     protected function processValue($value, bool $isRoot = false)
     {
-        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = (string) $value)) {
-            $definition = $this->container->findDefinition($id);
+        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->hasDefinition($id = (string) $value)) {
+            $definition = $this->container->getDefinition($id);
 
             if (!isset($this->resolvedIds[$id]) && (!$definition->isPublic() || $definition->isPrivate())) {
                 $this->resolvedIds[$id] = true;

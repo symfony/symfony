@@ -75,7 +75,7 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
         if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = (string) $value)) {
             $definition = $this->container->findDefinition($id);
 
-            if (!isset($this->resolvedIds[$id])) {
+            if (!isset($this->resolvedIds[$id]) && (!$definition->isPublic() || $definition->isPrivate())) {
                 $this->resolvedIds[$id] = true;
                 $this->processValue($definition, true);
             }

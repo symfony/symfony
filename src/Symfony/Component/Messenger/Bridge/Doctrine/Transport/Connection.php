@@ -244,7 +244,11 @@ class Connection implements ResetInterface
             $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression(null);
         }
 
-        $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
+        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $migration = new Migration($this->configuration['table_name']);
+        $migration->up($schema, $this->driverConnection);
+
+        $this->schemaSynchronizer->updateSchema($schema, true);
 
         if ($hasFilterCallback) {
             $this->driverConnection->getConfiguration()->setSchemaAssetsFilter($assetFilter);
@@ -336,33 +340,6 @@ class Connection implements ResetInterface
         }
 
         return $stmt;
-    }
-
-    private function getSchema(): Schema
-    {
-        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
-        $table = $schema->createTable($this->configuration['table_name']);
-        $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
-            ->setAutoincrement(true)
-            ->setNotnull(true);
-        $table->addColumn('body', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
-            ->setNotnull(true);
-        $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
-            ->setNotnull(true);
-        $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
-            ->setNotnull(true);
-        $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
-            ->setNotnull(true);
-        $table->addColumn('available_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
-            ->setNotnull(true);
-        $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
-            ->setNotnull(false);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['queue_name']);
-        $table->addIndex(['available_at']);
-        $table->addIndex(['delivered_at']);
-
-        return $schema;
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

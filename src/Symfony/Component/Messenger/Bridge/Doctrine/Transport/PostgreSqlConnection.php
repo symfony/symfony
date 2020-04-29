@@ -79,32 +79,6 @@ final class PostgreSqlConnection extends Connection
         return parent::get();
     }
 
-    public function setup(): void
-    {
-        parent::setup();
-
-        $sql = sprintf(<<<'SQL'
-LOCK TABLE %1$s;
--- create trigger function
-CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$
-	BEGIN
-		PERFORM pg_notify('%1$s', NEW.queue_name::text);
-		RETURN NEW;
-    END;
-$$ LANGUAGE plpgsql;
-
--- register trigger
-DROP TRIGGER IF EXISTS notify_trigger ON %1$s;
-
-CREATE TRIGGER notify_trigger
-AFTER INSERT
-ON %1$s
-FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();
-SQL
-            , $this->configuration['table_name']);
-        $this->driverConnection->exec($sql);
-    }
-
     private function unlisten()
     {
         if (!$this->listening) {

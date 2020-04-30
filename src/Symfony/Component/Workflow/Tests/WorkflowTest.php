@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 class WorkflowTest extends TestCase
 {
@@ -448,6 +449,53 @@ class WorkflowTest extends TestCase
         } else {
             $this->assertNotContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
         }
+    }
+
+    public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions, null, null, []);
+
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        // Guard and Transition events are still called
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+        ];
+
+        $workflow->apply($subject, 'a-b');
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
+    public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions, null, null, [WorkflowEvents::COMPLETED]);
+
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        // Guard and Transition events are still called
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+            'workflow.completed',
+            'workflow.workflow_name.completed',
+            'workflow.workflow_name.completed.a-b',
+        ];
+
+        $workflow->apply($subject, 'a-b');
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher()

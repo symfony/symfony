@@ -26,13 +26,15 @@ final class Definition
     private $transitions = [];
     private $initialPlaces = [];
     private $metadataStore;
+    private $dispatchEvents;
 
     /**
      * @param string[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
+     * @param array|null $dispatchEvents
      */
-    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null, array $dispatchEvents = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -45,6 +47,8 @@ final class Definition
         $this->setInitialPlaces($initialPlaces);
 
         $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
+
+        $this->dispatchEvents = $dispatchEvents ?? WorkflowEvents::getDefaultDispatchEvents();
     }
 
     /**
@@ -74,6 +78,14 @@ final class Definition
     public function getMetadataStore(): MetadataStoreInterface
     {
         return $this->metadataStore;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDispatchEvents(): array
+    {
+        return $this->dispatchEvents;
     }
 
     private function setInitialPlaces($places = null)

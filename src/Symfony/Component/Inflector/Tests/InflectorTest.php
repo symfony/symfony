@@ -309,15 +309,15 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider pluralizeProvider
      */
-    public function testPluralize($plural, $singular)
+    public function testPluralize($singular, $expectedPlural)
     {
-        $single = Inflector::pluralize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $plural = Inflector::pluralize($singular);
+        if (\is_string($expectedPlural) && \is_array($plural)) {
+            $this->fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
+        } elseif (\is_array($expectedPlural) && \is_string($plural)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedPlural, $plural);
     }
 }

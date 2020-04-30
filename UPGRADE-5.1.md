@@ -109,6 +109,14 @@ Routing
  * Added argument `$priority` to `RouteCollection::add()`
  * Deprecated the `RouteCompiler::REGEX_DELIMITER` constant
 
+SecurityBundle
+--------------
+
+ * Marked the `AbstractFactory`, `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`,
+   `HttpBasicFactory`, `HttpBasicLdapFactory`, `JsonLoginFactory`, `JsonLoginLdapFactory`, `RememberMeFactory`, `RemoteUserFactory`
+   and `X509Factory` as `@internal`. Instead of extending these classes, create your own implementation based on
+   `SecurityFactoryInterface`.
+
 Security
 --------
 

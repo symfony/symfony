@@ -23,5 +23,5 @@ interface EntryPointFactoryInterface
     /**
      * Creates the entry point and returns the service ID.
      */
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): string;
+    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): ?string;
 }

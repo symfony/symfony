@@ -23,6 +23,8 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
  * Configures the "guard" authentication provider key under a firewall.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @internal
  */
 class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
@@ -111,9 +113,15 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         return $authenticatorIds;
     }
 
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): string
+    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): ?string
     {
-        return $this->determineEntryPoint($defaultEntryPointId, $config);
+        try {
+            return $this->determineEntryPoint(null, $config);
+        } catch (\LogicException $e) {
+            // ignore the exception, the new system prefers setting "entry_point" over "guard.entry_point"
+        }
+
+        return null;
     }
 
     private function determineEntryPoint(?string $defaultEntryPointId, array $config): string

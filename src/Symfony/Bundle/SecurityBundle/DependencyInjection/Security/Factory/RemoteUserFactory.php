@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Maxime Douailin <maxime.douailin@gmail.com>
+ *
+ * @internal
  */
 class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {

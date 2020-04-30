@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @internal
  */
 class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
@@ -90,7 +92,12 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $listenerId;
     }
 
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPoint): string
+    protected function createDefaultEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    {
+        return $this->createEntryPoint($container, $id, $config);
+    }
+
+    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container

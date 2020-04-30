@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 
+/**
+ * @internal
+ */
 class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
     protected $options = [

@@ -39,6 +39,9 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ConfigCache::class);
+
 /**
  * The Kernel is the heart of the Symfony system.
  *

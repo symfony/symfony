@@ -569,7 +569,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if ($this->container->has('cache_warmer')) {
             $preload = (array) $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
 
-            if (method_exists(Preloader::class, 'append') && file_exists($preloadFile = $cacheDir.'/'.$class.'.preload.php')) {
+            if ($preload && method_exists(Preloader::class, 'append') && file_exists($preloadFile = $cacheDir.'/'.$class.'.preload.php')) {
                 Preloader::append($preloadFile, $preload);
             }
         }

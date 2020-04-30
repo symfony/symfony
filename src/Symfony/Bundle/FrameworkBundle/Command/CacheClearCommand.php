@@ -120,7 +120,7 @@ EOF
                 $warmer->enableOnlyOptionalWarmers();
                 $preload = (array) $warmer->warmUp($realCacheDir);
 
-                if (file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+                if ($preload && file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
                     Preloader::append($preloadFile, $preload);
                 }
             }
@@ -200,7 +200,7 @@ EOF
             $warmer->enableOnlyOptionalWarmers();
             $preload = (array) $warmer->warmUp($warmupDir);
 
-            if (file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+            if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
                 Preloader::append($preloadFile, $preload);
             }
         }

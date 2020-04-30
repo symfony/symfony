@@ -68,8 +68,6 @@ class File extends \SplFileInfo
      *
      * If the file is prefixed with dot, and has no extension (e.g. ".hidden"),
      * result will be empty string.
-     *
-     * @return string
      */
     public function getFilenameWithoutExtension(): string
     {

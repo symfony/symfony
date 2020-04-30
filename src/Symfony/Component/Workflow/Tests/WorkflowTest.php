@@ -427,30 +427,6 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public function provideApplyWithEventDispatcherForAnnounceTests()
-    {
-        yield [false, [Workflow::DISABLE_ANNOUNCE_EVENT => true]];
-        yield [true, [Workflow::DISABLE_ANNOUNCE_EVENT => false]];
-        yield [true, []];
-    }
-
-    /** @dataProvider provideApplyWithEventDispatcherForAnnounceTests */
-    public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
-    {
-        $definition = $this->createComplexWorkflowDefinition();
-        $subject = new Subject();
-        $eventDispatcher = new EventDispatcherMock();
-        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
-
-        $workflow->apply($subject, 't1', $context);
-
-        if ($fired) {
-            $this->assertContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
-        } else {
-            $this->assertNotContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
-        }
-    }
-
     public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition()
     {
         $transitions[] = new Transition('a-b', 'a', 'b');

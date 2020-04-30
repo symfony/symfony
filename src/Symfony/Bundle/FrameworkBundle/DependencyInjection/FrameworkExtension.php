@@ -99,6 +99,7 @@ use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -2091,6 +2092,7 @@ class FrameworkExtension extends Extension
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
+            MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
         ];
 
         foreach ($classToServices as $class => $service) {

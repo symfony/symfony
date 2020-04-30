@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -54,6 +55,7 @@ class Transport
         SinchTransportFactory::class,
         FreeMobileTransportFactory::class,
         ZulipTransportFactory::class,
+        MobytTransportFactory::class,
     ];
 
     private $factories;

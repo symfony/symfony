@@ -1,0 +1,121 @@
+name: CI
+
+on: [push, pull_request]
+
+
+jobs:
+    tests:
+        name: Tests
+        runs-on: ubuntu-latest
+        services:
+            redis:
+                image: redis:latest
+                ports:
+                    - 6379:6379
+                options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+            redis-cluster:
+                image: grokzen/redis-cluster:4.0.8
+                ports:
+                    - 7000:7000
+                    - 7001:7001
+                    - 7002:7002
+                    - 7003:7003
+                    - 7004:7004
+                    - 7005:7005
+            couchbase:
+                image: couchbase:6.0.1
+                ports:
+                    - 8091:8091
+                    - 8092:8092
+                    - 8093:8093
+                    - 8094:8095
+                    - 11210:11210
+            sqs:
+                image: asyncaws/testing-sqs
+                ports:
+                    - 9494:9494
+            rabbitmq:
+                image: rabbitmq:3.7
+                ports:
+                    - 5672:5672
+            memcache:
+                image: ilari/alpine-memcached
+                ports:
+                    - 11211:11211
+        env:
+            REDIS_HOST: redis
+            REDIS_CLUSTER_HOSTS: 'redis-cluster:7000 redis-cluster:7001 redis-cluster:7002 redis-cluster:7003 redis-cluster:7004 redis-cluster:7005'
+            MESSENGER_AMQP_DSN: 'amqp://localhost:5672/%2f/messages'
+            MESSENGER_REDIS_DSN: 'redis://127.0.0.1:7006/messages'
+            MESSENGER_SQS_DSN: 'sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01'
+            MESSENGER_SQS_FIFO_QUEUE_DSN: 'sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01'
+
+        strategy:
+            matrix:
+                php: [7.2,7.3,7.4]
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Install Runner dependencies
+                run: |
+                    sudo apt-get update -y
+                    sudo apt-get install -y parallel
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@master
+                with:
+                    php-version: ${{ matrix.php }}
+                    extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, zookeeper, mysql, redis, apcu, amqp, mongodb, igbinary, couchbase, rdkafka
+                id: php
+
+            -   name: Show PHP Extensions
+                run: php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+
+            -   name: Get Composer Cache Directory
+                id: composer-cache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   uses: actions/cache@v1
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-
+
+            -   name: Composer Customizations
+                run: |
+                    [ -d ~/.composer ] || mkdir ~/.composer
+                    cp .github/composer-config.json ~/.composer/config.json
+
+            -   name: Configure the SYMFONY_VERSION
+                run: echo "::set-env name=SYMFONY_VERSION::$(cat composer.json | grep '^ *\"dev-master\". *\"[1-9]' | grep -o '[0-9.]*')"
+
+            -   name: Configure the COMPOSER_ROOT_VERSION
+                run: echo "::set-env name=COMPOSER_ROOT_VERSION::$SYMFONY_VERSION.x-dev"
+
+            -   name: Install Flex
+                run: composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
+
+            -   name: Validate composer.json and composer.lock
+                run: composer validate
+
+            -   name: Composer update
+                run: composer update --no-progress --no-suggest --ansi --no-interaction
+
+            -   name: Show Versions
+                run: composer info -i
+
+            -   name: Install PHP Unit
+                run: ./phpunit install
+
+            -   name: Tests
+                run: |
+                    find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf "%h\n" | sort | \
+                    parallel --gnu '\
+                    cd {} && \
+                    echo ::group::$(pwd)
+                    rm composer.lock vendor/ -Rf && \
+                    composer update --no-progress --no-suggest --ansi && \
+                    phpunit --exclude-group tty,benchmark,intl-data \
+                    echo ::endgroup::'
+

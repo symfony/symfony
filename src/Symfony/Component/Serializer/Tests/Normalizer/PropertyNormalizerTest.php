@@ -412,11 +412,6 @@ class PropertyNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
 
-    public function testNoStaticPropertySupport()
-    {
-        $this->assertFalse($this->normalizer->supportsNormalization(new StaticPropertyDummy()));
-    }
-
     public function testInheritedPropertiesSupport()
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
@@ -517,11 +512,6 @@ class PropertyConstructorDummy
     {
         return $this->bar;
     }
-}
-
-class StaticPropertyDummy
-{
-    private static $property = 'value';
 }
 
 class PropertyParentDummy

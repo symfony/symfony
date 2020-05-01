@@ -93,6 +93,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
+    private $discriminatorCache = [];
 
     /**
      * @deprecated since Symfony 4.2
@@ -180,7 +181,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            $attributeValue = $this->getValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }
@@ -278,6 +279,41 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
+     * This method is wrapper. Gets the attribute value.
+     *
+     * @param object      $object
+     * @param string      $attribute
+     * @param string|null $format
+     *
+     * @return mixed
+     */
+    private function getValue($object, $attribute, $format = null, array $context = [])
+    {
+        return $attribute === $this->getDiscriminatorProperty($object)
+            ? $this->classDiscriminatorResolver->getTypeForMappedObject($object)
+            : $this->getAttributeValue($object, $attribute, $format, $context);
+    }
+
+    /**
+     * Gets the discriminator property name by object.
+     *
+     * @param object $object
+     */
+    private function getDiscriminatorProperty($object): ?string
+    {
+        $cacheKey = \get_class($object);
+        if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
+            $this->discriminatorCache[$cacheKey] = null;
+            if ($this->classDiscriminatorResolver) {
+                $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
+                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
+            }
+        }
+
+        return $this->discriminatorCache[$cacheKey];
+    }
+
+    /**
      * Extracts attributes to normalize from the class of the given object, format and context.
      *
      * @param object      $object
@@ -350,7 +386,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if ($context[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
                 try {
-                    $context[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $context);
+                    $context[self::OBJECT_TO_POPULATE] = $this->getValue($object, $attribute, $format, $context);
                 } catch (NoSuchPropertyException $e) {
                 }
             }

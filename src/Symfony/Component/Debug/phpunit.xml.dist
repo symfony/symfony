@@ -14,10 +14,7 @@
 
     <testsuites>
         <testsuite name="Symfony Debug Component Test Suite">
-            <directory>./Tests/</directory>
-        </testsuite>
-        <testsuite name="Symfony Debug Extension Test Suite">
-            <directory suffix=".phpt">./Resources/ext/tests/</directory>
+            <directory suffix=".phpt">./Tests/</directory>
         </testsuite>
     </testsuites>
 

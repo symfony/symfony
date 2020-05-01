@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
+use Doctrine\DBAL\Schema\Table;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
@@ -42,5 +43,25 @@ class PostgreSqlConnectionTest extends TestCase
 
         $connection = new PostgreSqlConnection([], $driverConnection, $schemaSynchronizer);
         $connection->__wakeup();
+    }
+
+    public function testGetExtraSetupSql()
+    {
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $table = new Table('queue_table');
+        $table->addOption('_symfony_messenger_table_name', 'queue_table');
+        $this->assertStringContainsString('CREATE TRIGGER', $connection->getExtraSetupSqlForTable($table));
+    }
+
+    public function testGetExtraSetupSqlWrongTable()
+    {
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $table = new Table('queue_table');
+        // don't set the _symfony_messenger_table_name option
+        $this->assertNull($connection->getExtraSetupSqlForTable($table));
     }
 }

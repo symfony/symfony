@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -48,6 +50,23 @@ class DoctrineTransportTest extends TestCase
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testConfigureSchema()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class)
+        );
+
+        $schema = new Schema();
+        $dbalConnection = $this->createMock(DbalConnection::class);
+
+        $connection->expects($this->once())
+            ->method('configureSchema')
+            ->with($schema, $dbalConnection);
+
+        $transport->configureSchema($schema, $dbalConnection);
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): DoctrineTransport

@@ -19,6 +19,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
@@ -33,6 +34,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Connection implements ResetInterface
 {
+    protected const TABLE_OPTION_NAME = '_symfony_messenger_table_name';
+
     protected const DEFAULT_OPTIONS = [
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
@@ -290,6 +293,31 @@ class Connection implements ResetInterface
         return false === $data ? null : $this->decodeEnvelopeHeaders($data);
     }
 
+    /**
+     * @internal
+     */
+    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    {
+        // only update the schema for this connection
+        if ($forConnection !== $this->driverConnection) {
+            return;
+        }
+
+        if ($schema->hasTable($this->configuration['table_name'])) {
+            return;
+        }
+
+        $this->addTableToSchema($schema);
+    }
+
+    /**
+     * @internal
+     */
+    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    {
+        return null;
+    }
+
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTime();
@@ -341,7 +369,16 @@ class Connection implements ResetInterface
     private function getSchema(): Schema
     {
         $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $this->addTableToSchema($schema);
+
+        return $schema;
+    }
+
+    private function addTableToSchema(Schema $schema): void
+    {
         $table = $schema->createTable($this->configuration['table_name']);
+        // add an internal option to mark that we created this & the non-namespaced table name
+        $table->addOption(self::TABLE_OPTION_NAME, $this->configuration['table_name']);
         $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
@@ -361,8 +398,6 @@ class Connection implements ResetInterface
         $table->addIndex(['queue_name']);
         $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
-
-        return $schema;
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

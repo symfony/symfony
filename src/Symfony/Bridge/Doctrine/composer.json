@@ -26,11 +26,13 @@
     },
     "require-dev": {
         "symfony/stopwatch": "^4.4|^5.0",
+        "symfony/cache": "^5.1",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/form": "^5.1",
         "symfony/http-kernel": "^5.0",
         "symfony/messenger": "^4.4|^5.0",
+        "symfony/doctrine-messenger": "^5.1",
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^5.0",
         "symfony/proxy-manager-bridge": "^4.4|^5.0",

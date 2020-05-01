@@ -6,7 +6,7 @@ CHANGELOG
 
  * Added link to source for controllers registered as named services
  * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)
- * Added the `framework.router.context` configuration node to configure the `RequestContext`
+ * Added the `framework.router.default_uri` configuration option to configure the default `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
  * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`

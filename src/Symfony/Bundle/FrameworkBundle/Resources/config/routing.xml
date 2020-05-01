@@ -80,10 +80,10 @@
         <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
-            <argument></argument> <!-- base_url -->
-            <argument>GET</argument>
-            <argument></argument> <!-- host -->
-            <argument></argument> <!-- scheme -->
+            <factory class="Symfony\Component\Routing\RequestContext" method="fromUri" />
+            <argument>%router.request_context.base_url%</argument>
+            <argument>%router.request_context.host%</argument>
+            <argument>%router.request_context.scheme%</argument>
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
             <call method="setParameter">
@@ -117,8 +117,8 @@
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\RedirectController" public="true">
             <argument type="service" id="router" />
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpPort" /></service></argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpsPort" /></service></argument>
         </service>
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">

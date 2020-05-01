@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
 
 /**
  * @group legacy
+ * @group integration
  */
 class MemcachedCacheTextModeTest extends MemcachedCacheTest
 {

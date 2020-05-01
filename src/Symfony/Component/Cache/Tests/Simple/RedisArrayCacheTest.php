@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 /**
  * @group legacy
+ * @group integration
  */
 class RedisArrayCacheTest extends AbstractRedisCacheTest
 {

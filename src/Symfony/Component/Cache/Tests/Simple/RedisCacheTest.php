@@ -15,6 +15,7 @@ use Symfony\Component\Cache\Simple\RedisCache;
 
 /**
  * @group legacy
+ * @group integration
  */
 class RedisCacheTest extends AbstractRedisCacheTest
 {

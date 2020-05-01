@@ -3,3 +3,4 @@
 /src/Symfony/Component/Mailer/Bridge export-ignore
 /src/Symfony/Component/Messenger/Bridge export-ignore
 /src/Symfony/Component/Notifier/Bridge export-ignore
+/src/Symfony/Component/Runtime export-ignore

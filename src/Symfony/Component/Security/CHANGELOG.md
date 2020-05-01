@@ -10,6 +10,7 @@ CHANGELOG
  * Added `LogoutEvent` to allow custom logout listeners.
  * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface` in favor of listening on the `LogoutEvent`.
  * Added experimental new security using `Http\Authenticator\AuthenticatorInterface`, `Http\Authentication\AuthenticatorManager` and `Http\Firewall\AuthenticatorManagerListener`.
+ * Added `CustomUserMessageAccountStatusException` to be used when extending `UserCheckerInterface`
 
 5.0.0
 -----

@@ -560,14 +560,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if ($entryPoints) {
             // we can be sure the authenticator system is enabled
             if (null !== $defaultEntryPoint) {
-                return $entryPoints[$defaultEntryPoint] ?? $defaultEntryPoint;
+                $defaultEntryPoint = $entryPoints[$defaultEntryPoint] ?? $defaultEntryPoint;
+            } elseif (1 === \count($entryPoints)) {
+                $defaultEntryPoint = current($entryPoints);
+            } else {
+                throw new InvalidConfigurationException(sprintf('Because you have multiple authenticators in firewall "%s", you need to set the "entry_point" key to one of your authenticators (%s) or a service ID implementing "%s". The "entry_point" determines what should happen (e.g. redirect to "/login") when an anonymous user tries to access a protected page.', $id, implode(', ', $entryPoints), AuthenticationEntryPointInterface::class));
             }
-
-            if (1 === \count($entryPoints)) {
-                return current($entryPoints);
-            }
-
-            throw new InvalidConfigurationException(sprintf('Because you have multiple authenticators in firewall "%s", you need to set the "entry_point" key to one of your authenticators (%s) or a service ID implementing "%s". The "entry_point" determines what should happen (e.g. redirect to "/login") when an anonymous user tries to access a protected page.', $id, implode(', ', $entryPoints), AuthenticationEntryPointInterface::class));
         }
 
         if (false === $hasListeners) {

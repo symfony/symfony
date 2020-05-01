@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by DavidFeller at 2020-04-30T17:45:51Z
+
+I had the same problem a few weeks ago, but wasn't sure if it was an error on my side. So I only ran a few local tests. @seb37800's fix is identical to the changes I made to make it work in my case (mattermost  5.20.1).

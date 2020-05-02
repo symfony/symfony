@@ -547,7 +547,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             $authenticationProviders[] = $authenticators;
                         }
 
-                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->createEntryPoint($container, $id, $firewall[$key]))) {
+                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->registerEntryPoint($container, $id, $firewall[$key]))) {
                             $entryPoints[$key] = $entryPoint;
                         }
                     } else {

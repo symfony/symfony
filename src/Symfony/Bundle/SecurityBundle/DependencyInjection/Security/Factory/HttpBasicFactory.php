@@ -38,7 +38,7 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
         // entry point
         $entryPointId = $defaultEntryPoint;
         if (null === $entryPointId) {
-            $entryPointId = $this->createEntryPoint($container, $id, $config);
+            $entryPointId = $this->registerEntryPoint($container, $id, $config);
         }
 
         // listener
@@ -82,7 +82,7 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
         ;
     }
 
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): string
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
         $entryPointId = 'security.authentication.basic_entry_point.'.$id;
         $container

@@ -92,12 +92,12 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $listenerId;
     }
 
-    protected function createDefaultEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
     {
-        return $this->createEntryPoint($container, $id, $config);
+        return $this->registerEntryPoint($container, $id, $config);
     }
 
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): string
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container

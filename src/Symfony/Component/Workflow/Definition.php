@@ -41,7 +41,6 @@ final class Definition
      * @param string[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
-     * @param array|null           $dispatchedEvents
      */
     public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null, array $dispatchedEvents = null)
     {
@@ -89,9 +88,6 @@ final class Definition
         return $this->metadataStore;
     }
 
-    /**
-     * @return array
-     */
     public function getDispatchedEvents(): array
     {
         return $this->dispatchedEvents;

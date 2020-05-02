@@ -137,8 +137,6 @@ class DefinitionBuilder
     }
 
     /**
-     * @param array $dispatchEvents
-     *
      * @return $this
      */
     public function setDispatchEvents(array $dispatchEvents)

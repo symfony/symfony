@@ -34,7 +34,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\Workflow\WorkflowEvents;
 
 /**
  * FrameworkExtension configuration structure.

@@ -428,7 +428,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $workflowDefinition = $container->getDefinition('state_machine.my_workflow.definition');
         $dispatchedEvents = $workflowDefinition->getArgument(4);
 
-        $this->assertSame(null, $dispatchedEvents);
+        $this->assertNull($dispatchedEvents);
     }
 
     public function testWorkflowsWithNoDispatchedEvents()

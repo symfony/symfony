@@ -305,7 +305,7 @@ class Workflow implements WorkflowInterface
     {
         $places = $transition->getFroms();
 
-        if (null !== $this->dispatcher && $this->shouldDispatchEvent(WorkflowEvents::LEAVE)) {
+        if ($this->shouldDispatchEvent(WorkflowEvents::LEAVE)) {
             $event = new LeaveEvent($subject, $marking, $transition, $this);
 
             $this->dispatcher->dispatch($event, WorkflowEvents::LEAVE);
@@ -323,7 +323,7 @@ class Workflow implements WorkflowInterface
 
     private function transition(object $subject, Transition $transition, Marking $marking, array $context): array
     {
-        if (null === $this->dispatcher || !$this->shouldDispatchEvent(WorkflowEvents::TRANSITION)) {
+        if (!$this->shouldDispatchEvent(WorkflowEvents::TRANSITION)) {
             return $context;
         }
 
@@ -341,7 +341,7 @@ class Workflow implements WorkflowInterface
     {
         $places = $transition->getTos();
 
-        if (null !== $this->dispatcher && $this->shouldDispatchEvent(WorkflowEvents::ENTER)) {
+        if ($this->shouldDispatchEvent(WorkflowEvents::ENTER)) {
             $event = new EnterEvent($subject, $marking, $transition, $this);
 
             $this->dispatcher->dispatch($event, WorkflowEvents::ENTER);
@@ -359,54 +359,54 @@ class Workflow implements WorkflowInterface
 
     private function entered(object $subject, ?Transition $transition, Marking $marking): void
     {
-        if (null === $this->dispatcher || !$this->shouldDispatchEvent(WorkflowEvents::ENTERED)) {
-            return;
-        }
+        if ($this->shouldDispatchEvent(WorkflowEvents::ENTERED)) {
+            $event = new EnteredEvent($subject, $marking, $transition, $this);
 
-        $event = new EnteredEvent($subject, $marking, $transition, $this);
+            $this->dispatcher->dispatch($event, WorkflowEvents::ENTERED);
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered', $this->name));
 
-        $this->dispatcher->dispatch($event, WorkflowEvents::ENTERED);
-        $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered', $this->name));
-
-        if ($transition) {
-            foreach ($transition->getTos() as $place) {
-                $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered.%s', $this->name, $place));
+            if ($transition) {
+                foreach ($transition->getTos() as $place) {
+                    $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered.%s', $this->name, $place));
+                }
             }
         }
     }
 
     private function completed(object $subject, Transition $transition, Marking $marking): void
     {
-        if (null === $this->dispatcher || !$this->shouldDispatchEvent(WorkflowEvents::COMPLETED)) {
-            return;
+        if ($this->shouldDispatchEvent(WorkflowEvents::COMPLETED)) {
+            $event = new CompletedEvent($subject, $marking, $transition, $this);
+
+            $this->dispatcher->dispatch($event, WorkflowEvents::COMPLETED);
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.completed', $this->name));
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()));
         }
-
-        $event = new CompletedEvent($subject, $marking, $transition, $this);
-
-        $this->dispatcher->dispatch($event, WorkflowEvents::COMPLETED);
-        $this->dispatcher->dispatch($event, sprintf('workflow.%s.completed', $this->name));
-        $this->dispatcher->dispatch($event, sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()));
     }
 
     private function announce(object $subject, Transition $initialTransition, Marking $marking): void
     {
-        if (null === $this->dispatcher || !$this->shouldDispatchEvent(WorkflowEvents::ANNOUNCE)) {
-            return;
-        }
+        if ($this->shouldDispatchEvent(WorkflowEvents::ANNOUNCE)) {
+            $event = new AnnounceEvent($subject, $marking, $initialTransition, $this);
 
-        $event = new AnnounceEvent($subject, $marking, $initialTransition, $this);
+            $this->dispatcher->dispatch($event, WorkflowEvents::ANNOUNCE);
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce', $this->name));
 
-        $this->dispatcher->dispatch($event, WorkflowEvents::ANNOUNCE);
-        $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce', $this->name));
-
-        foreach ($this->getEnabledTransitions($subject) as $transition) {
-            $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()));
+            foreach ($this->getEnabledTransitions($subject) as $transition) {
+                $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()));
+            }
         }
     }
 
     private function shouldDispatchEvent(string $eventName): bool
     {
-        $dispatchEvents = $this->getDefinition()->getDispatchEvents();
+        // If we don't have a dispatcher we can't dispatch the
+        // event even if we wanted to
+        if (null === $this->dispatcher) {
+            return false;
+        }
+
+        $dispatchEvents = $this->getDefinition()->getDispatchedEvents();
 
         // A null value implies all events should be dispatched
         if (null === $dispatchEvents) {
@@ -421,7 +421,7 @@ class Workflow implements WorkflowInterface
         // Check if the WorkflowEvent name is in the events that
         // should be dispatched for this Workflow
         if (count($dispatchEvents) >= 1) {
-            return in_array($eventName, $dispatchEvents);
+            return in_array($eventName, $dispatchEvents, true);
         }
 
         return true;

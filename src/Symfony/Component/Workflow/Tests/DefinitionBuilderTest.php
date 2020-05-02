@@ -62,7 +62,7 @@ class DefinitionBuilderTest extends TestCase
         $builder = new DefinitionBuilder(['a']);
         $definition = $builder->build();
 
-        $this->assertSame(WorkflowEvents::getDefaultDispatchEvents(), $definition->getDispatchEvents());
+        $this->assertSame(WorkflowEvents::getDefaultDispatchedEvents(), $definition->getDispatchedEvents());
     }
 
     public function testSetEmptyDispatchEvents()
@@ -71,7 +71,7 @@ class DefinitionBuilderTest extends TestCase
         $builder->setDispatchEvents([]);
         $definition = $builder->build();
 
-        $this->assertSame([], $definition->getDispatchEvents());
+        $this->assertSame([], $definition->getDispatchedEvents());
     }
 
     public function testSetSpecificDispatchEvents()
@@ -82,6 +82,6 @@ class DefinitionBuilderTest extends TestCase
         $builder->setDispatchEvents($events);
         $definition = $builder->build();
 
-        $this->assertSame($events, $definition->getDispatchEvents());
+        $this->assertSame($events, $definition->getDispatchedEvents());
     }
 }

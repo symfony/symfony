@@ -22,19 +22,28 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 final class Definition
 {
+    /**
+     * When `null` fire all events (the default behaviour).
+     * Setting this to an empty array `[]` means no events are dispatched except the Guard Event.
+     * Passing an array with WorkflowEvents will allow only those events to be dispatched plus
+     * the Guard Event.
+     *
+     * @var array|string[]
+     */
+    private $dispatchedEvents;
+
     private $places = [];
     private $transitions = [];
     private $initialPlaces = [];
     private $metadataStore;
-    private $dispatchEvents;
 
     /**
      * @param string[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
-     * @param array|null $dispatchEvents
+     * @param array|null           $dispatchedEvents
      */
-    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null, array $dispatchEvents = null)
+    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null, array $dispatchedEvents = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -48,7 +57,7 @@ final class Definition
 
         $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
 
-        $this->dispatchEvents = $dispatchEvents ?? WorkflowEvents::getDefaultDispatchEvents();
+        $this->dispatchedEvents = $dispatchedEvents ?? WorkflowEvents::getDefaultDispatchedEvents();
     }
 
     /**
@@ -83,9 +92,9 @@ final class Definition
     /**
      * @return array
      */
-    public function getDispatchEvents(): array
+    public function getDispatchedEvents(): array
     {
-        return $this->dispatchEvents;
+        return $this->dispatchedEvents;
     }
 
     private function setInitialPlaces($places = null)

@@ -76,7 +76,7 @@ class DefinitionTest extends TestCase
         $places = range('a', 'b');
         $definition = new Definition($places, [], null, null, null);
 
-        $this->assertSame(WorkflowEvents::getDefaultDispatchEvents(), $definition->getDispatchEvents());
+        $this->assertSame(WorkflowEvents::getDefaultDispatchedEvents(), $definition->getDispatchedEvents());
     }
 
     public function testSetEmptyDispatchEvents()
@@ -84,7 +84,7 @@ class DefinitionTest extends TestCase
         $places = range('a', 'b');
         $definition = new Definition($places, [], null, null, []);
 
-        $this->assertEmpty($definition->getDispatchEvents());
+        $this->assertEmpty($definition->getDispatchedEvents());
     }
 
     public function testSetSpecificDispatchEvents()
@@ -94,6 +94,6 @@ class DefinitionTest extends TestCase
         $places = range('a', 'b');
         $definition = new Definition($places, [], null, null, $events);
 
-        $this->assertSame($events, $definition->getDispatchEvents());
+        $this->assertSame($events, $definition->getDispatchedEvents());
     }
 }

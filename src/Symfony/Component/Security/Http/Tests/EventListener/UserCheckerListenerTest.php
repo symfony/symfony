@@ -20,8 +20,8 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
 
 class UserCheckerListenerTest extends TestCase
@@ -41,44 +41,44 @@ class UserCheckerListenerTest extends TestCase
     {
         $this->userChecker->expects($this->once())->method('checkPreAuth')->with($this->user);
 
-        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent());
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
     public function testPreAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
-        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent($this->createMock(PassportInterface::class)));
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent($this->createMock(PassportInterface::class)));
     }
 
     public function testPreAuthenticatedBadge()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
-        $this->listener->preCredentialsVerification($this->createVerifyAuthenticatorCredentialsEvent(new SelfValidatingPassport($this->user, [new PreAuthenticatedUserBadge()])));
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport($this->user, [new PreAuthenticatedUserBadge()])));
     }
 
     public function testPostAuthValidCredentials()
     {
         $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user);
 
-        $this->listener->postCredentialsVerification($this->createLoginSuccessEvent());
+        $this->listener->postCheckCredentials($this->createLoginSuccessEvent());
     }
 
     public function testPostAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPostAuth');
 
-        $this->listener->postCredentialsVerification($this->createLoginSuccessEvent($this->createMock(PassportInterface::class)));
+        $this->listener->postCheckCredentials($this->createLoginSuccessEvent($this->createMock(PassportInterface::class)));
     }
 
-    private function createVerifyAuthenticatorCredentialsEvent($passport = null)
+    private function createCheckPassportEvent($passport = null)
     {
         if (null === $passport) {
             $passport = new SelfValidatingPassport($this->user);
         }
 
-        return new VerifyAuthenticatorCredentialsEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }
 
     private function createLoginSuccessEvent($passport = null)

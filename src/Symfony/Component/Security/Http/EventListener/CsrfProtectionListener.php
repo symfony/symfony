@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -33,7 +33,7 @@ class CsrfProtectionListener implements EventSubscriberInterface
         $this->csrfTokenManager = $csrfTokenManager;
     }
 
-    public function verifyCredentials(VerifyAuthenticatorCredentialsEvent $event): void
+    public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
         if (!$passport->hasBadge(CsrfTokenBadge::class)) {
@@ -57,6 +57,6 @@ class CsrfProtectionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [VerifyAuthenticatorCredentialsEvent::class => ['verifyCredentials', 256]];
+        return [CheckPassportEvent::class => ['checkPassport', 128]];
     }
 }

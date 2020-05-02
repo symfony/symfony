@@ -26,10 +26,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -159,7 +159,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $passport = $authenticator->authenticate($request);
 
             // check the passport (e.g. password checking)
-            $event = new VerifyAuthenticatorCredentialsEvent($authenticator, $passport);
+            $event = new CheckPassportEvent($authenticator, $passport);
             $this->eventDispatcher->dispatch($event);
 
             // check if all badges are resolved

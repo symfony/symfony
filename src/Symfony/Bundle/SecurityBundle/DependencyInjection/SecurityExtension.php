@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -443,6 +444,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$this->authenticatorManagerEnabled) {
             $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
         } else {
+            // $configuredEntryPoint is resolved into a service ID and stored in $defaultEntryPoint
+            $configuredEntryPoint = $defaultEntryPoint;
+
             // authenticator manager
             $authenticators = array_map(function ($id) {
                 return new Reference($id);
@@ -543,7 +547,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             $authenticationProviders[] = $authenticators;
                         }
 
-                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->createEntryPoint($container, $id, $firewall[$key], null))) {
+                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->createEntryPoint($container, $id, $firewall[$key]))) {
                             $entryPoints[$key] = $entryPoint;
                         }
                     } else {

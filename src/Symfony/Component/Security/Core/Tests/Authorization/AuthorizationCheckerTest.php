@@ -73,6 +73,13 @@ class AuthorizationCheckerTest extends TestCase
         $this->authorizationChecker->isGranted('ROLE_FOO');
     }
 
+    public function testVoteWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    {
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
+
+        $this->assertFalse($authorizationChecker->isGranted('ROLE_FOO'));
+    }
+
     /**
      * @dataProvider isGrantedProvider
      */

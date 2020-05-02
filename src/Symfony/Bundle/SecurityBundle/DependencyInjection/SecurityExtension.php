@@ -112,6 +112,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
             $loader->load('security_authenticator.xml');
+
+            // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
+            // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
+            // token is available in the token storage.
+            $container->getDefinition('security.access_listener')->setArgument(4, false);
+            $container->getDefinition('security.authorization_checker')->setArgument(4, false);
+            $container->getDefinition('security.authorization_checker')->setArgument(5, false);
         } else {
             $loader->load('security_legacy.xml');
         }
@@ -269,7 +276,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             list($matcher, $listeners, $exceptionListener, $logoutListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
             $contextId = 'security.firewall.map.context.'.$name;
-            $context = new ChildDefinition($firewall['stateless'] || empty($firewall['anonymous']['lazy']) ? 'security.firewall.context' : 'security.firewall.lazy_context');
+            $isLazy = !$firewall['stateless'] && (!empty($firewall['anonymous']['lazy']) || $firewall['lazy']);
+            $context = new ChildDefinition($isLazy ? 'security.firewall.lazy_context' : 'security.firewall.context');
             $context = $container->setDefinition($contextId, $context);
             $context
                 ->replaceArgument(0, new IteratorArgument($listeners))

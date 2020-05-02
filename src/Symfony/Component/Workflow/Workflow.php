@@ -419,7 +419,7 @@ class Workflow implements WorkflowInterface
         }
 
         // Check if the WorkflowEvent name is in the events that
-        // should be dispatched for this Workflow
+        // should be dispatched for this transition
         if (count($dispatchEvents) >= 1) {
             return in_array($eventName, $dispatchEvents, true);
         }

@@ -722,7 +722,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             @chmod($dir.$file, 0666 & ~umask());
         }
         $legacyFile = \dirname($dir.key($content)).'.legacy';
-        if (file_exists($legacyFile)) {
+        if (is_file($legacyFile)) {
             @unlink($legacyFile);
         }
 

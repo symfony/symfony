@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-25T10:20:34Z
+
+I didn't manage to look at #35729 before and did it now. But I think it contains some BC breaks that we need to cover with proper deprecations first which I did here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-27T06:58:04Z
+
+In 4.4 the transformer will simply not round and act like in this test: https://github.com/symfony/symfony/pull/36578/files#diff-3d096748c112b424e758960eb06177caR40

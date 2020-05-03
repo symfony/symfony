@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by jrushlow at 2020-05-03T15:46:45Z
+
+@xabbuh should we fix the `XmlUtil::class` reference in:
+https://github.com/symfony/symfony/blob/eebb3efa2cbe1d08283180ccd6edbe303bfd4918/src/Symfony/Component/Translation/Loader/YamlFileLoader.php#L35
+in this PR for consistency?

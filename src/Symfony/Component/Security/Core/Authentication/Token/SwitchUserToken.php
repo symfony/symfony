@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  */
-class SwitchUserToken extends UsernamePasswordToken
+class SwitchUserToken extends UsernamePasswordToken implements SwitchUserTokenInterface
 {
     private $originalToken;
 
@@ -35,9 +35,14 @@ class SwitchUserToken extends UsernamePasswordToken
         $this->originalToken = $originalToken;
     }
 
-    public function getOriginalToken(): TokenInterface
+    public function getOriginalToken(): ?TokenInterface
     {
         return $this->originalToken;
+    }
+
+    public function getSwitchingAdditionalRole(): string
+    {
+        return 'ROLE_PREVIOUS_ADMIN';
     }
 
     /**

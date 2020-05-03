@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by tienvx at 2020-05-02T04:59:17Z
+
+Related to #34980
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-02T08:53:08Z
+
+I agree with @xabbuh that the fix is not correct. The `id` argument is declared as being an array, so an array must be passed. We could fix the validation of the arguments passed to the command when using an ArrayInput instead, that would be better.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-02T10:06:06Z
+
+I think I understand the issue now. We changed the type of the argument for 5.1. So the PR that introduced the possibility to specify more than one id broke BC.

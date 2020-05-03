@@ -61,7 +61,7 @@ EOF
         $receiver = $this->getReceiver();
 
         $shouldForce = $input->getOption('force');
-        $ids = $input->getArgument('id');
+        $ids = (array) $input->getArgument('id');
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === \count($ids);
         $this->removeMessages($ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
 

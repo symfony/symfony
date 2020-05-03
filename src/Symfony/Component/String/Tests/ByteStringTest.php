@@ -12,6 +12,7 @@
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\AbstractString;
+use function Symfony\Component\String\b;
 use Symfony\Component\String\ByteString;
 
 class ByteStringTest extends AbstractAsciiTestCase
@@ -19,6 +20,47 @@ class ByteStringTest extends AbstractAsciiTestCase
     protected static function createFromString(string $string): AbstractString
     {
         return new ByteString($string);
+    }
+
+    public function testFromRandom(): void
+    {
+        $random = ByteString::fromRandom(32);
+
+        self::assertSame(32, $random->length());
+        foreach ($random->chunk() as $char) {
+            self::assertNotNull(b('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')->indexOf($char));
+        }
+    }
+
+    public function testFromRandomWithSpecificChars(): void
+    {
+        $random = ByteString::fromRandom(32, 'abc');
+
+        self::assertSame(32, $random->length());
+        foreach ($random->chunk() as $char) {
+            self::assertNotNull(b('abc')->indexOf($char));
+        }
+    }
+
+    public function testFromRandomEarlyReturnForZeroLength(): void
+    {
+        self::assertSame('', ByteString::fromRandom(0));
+    }
+
+    public function testFromRandomThrowsForNegativeLength(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Expected positive length value, got -1');
+
+        ByteString::fromRandom(-1);
+    }
+
+    public function testFromRandomAlphabetMin(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Expected $alphabet\'s length to be in [2^1, 2^56]');
+
+        ByteString::fromRandom(32, 'a');
     }
 
     public static function provideBytesAt(): array

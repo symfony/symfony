@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterf
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 class AuthenticatorManagerTest extends TestCase
 {
@@ -95,7 +95,7 @@ class AuthenticatorManagerTest extends TestCase
         $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
 
         $listenerCalled = false;
-        $this->eventDispatcher->addListener(VerifyAuthenticatorCredentialsEvent::class, function (VerifyAuthenticatorCredentialsEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
+        $this->eventDispatcher->addListener(CheckPassportEvent::class, function (CheckPassportEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
             if ($event->getAuthenticator() === $matchingAuthenticator && $event->getPassport()->getUser() === $this->user) {
                 $listenerCalled = true;
             }
@@ -106,7 +106,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $manager = $this->createManager($authenticators);
         $this->assertNull($manager->authenticateRequest($this->request));
-        $this->assertTrue($listenerCalled, 'The VerifyAuthenticatorCredentialsEvent listener is not called');
+        $this->assertTrue($listenerCalled, 'The CheckPassportEvent listener is not called');
     }
 
     public function provideMatchingAuthenticatorIndex()

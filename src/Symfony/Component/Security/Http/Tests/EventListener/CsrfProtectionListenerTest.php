@@ -19,7 +19,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 
 class CsrfProtectionListenerTest extends TestCase
@@ -38,7 +38,7 @@ class CsrfProtectionListenerTest extends TestCase
         $this->csrfTokenManager->expects($this->never())->method('isTokenValid');
 
         $event = $this->createEvent($this->createPassport(null));
-        $this->listener->verifyCredentials($event);
+        $this->listener->checkPassport($event);
     }
 
     public function testValidCsrfToken()
@@ -49,7 +49,7 @@ class CsrfProtectionListenerTest extends TestCase
             ->willReturn(true);
 
         $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
-        $this->listener->verifyCredentials($event);
+        $this->listener->checkPassport($event);
 
         $this->expectNotToPerformAssertions();
     }
@@ -65,12 +65,12 @@ class CsrfProtectionListenerTest extends TestCase
             ->willReturn(false);
 
         $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
-        $this->listener->verifyCredentials($event);
+        $this->listener->checkPassport($event);
     }
 
     private function createEvent($passport)
     {
-        return new VerifyAuthenticatorCredentialsEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }
 
     private function createPassport(?CsrfTokenBadge $badge)

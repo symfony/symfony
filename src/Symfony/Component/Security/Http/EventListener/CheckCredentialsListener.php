@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -8,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
-use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
  * This listeners uses the interfaces of authenticators to
@@ -19,7 +28,7 @@ use Symfony\Component\Security\Http\Event\VerifyAuthenticatorCredentialsEvent;
  * @final
  * @experimental in 5.1
  */
-class VerifyAuthenticatorCredentialsListener implements EventSubscriberInterface
+class CheckCredentialsListener implements EventSubscriberInterface
 {
     private $encoderFactory;
 
@@ -28,7 +37,7 @@ class VerifyAuthenticatorCredentialsListener implements EventSubscriberInterface
         $this->encoderFactory = $encoderFactory;
     }
 
-    public function onAuthenticating(VerifyAuthenticatorCredentialsEvent $event): void
+    public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
         if ($passport instanceof UserPassportInterface && $passport->hasBadge(PasswordCredentials::class)) {
@@ -74,6 +83,6 @@ class VerifyAuthenticatorCredentialsListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [VerifyAuthenticatorCredentialsEvent::class => ['onAuthenticating', 128]];
+        return [CheckPassportEvent::class => 'checkPassport'];
     }
 }

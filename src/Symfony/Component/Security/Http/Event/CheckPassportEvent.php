@@ -1,9 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Http\Event;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -17,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class VerifyAuthenticatorCredentialsEvent extends Event
+class CheckPassportEvent extends Event
 {
     private $authenticator;
     private $passport;

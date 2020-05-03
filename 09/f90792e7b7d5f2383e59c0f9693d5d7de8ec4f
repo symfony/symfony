@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by simonberger at 2020-04-25T11:09:42Z
+
+I really like this change. The anonymous part of the authentication process was always troublesome to handle. Your changes in #30914 are generally much appreciated.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-25T13:06:22Z
+
+@wouterj thanks for this 🙇  Trying to explain that "anonymous users" are "authenticated" was one of the most WTF moments in Symfony training. It never made sense to anyone. So glad to get rid of this.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-02T19:00:33Z
+
+This PR is now tested in the Symfony Demo application and works like charm :tada: . I've updated the PR description with the current state. Ready for review & merge imho.
+
+---
+
+I managed to break fabbot's exception message format and I'm unable to fix the error using concatenation :cry: The other build failures are also unrelated.

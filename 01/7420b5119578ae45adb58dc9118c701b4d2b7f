@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-16T12:34:47Z
+
+If I run my application on a lambda or EC2, there is no authentication configuration required in Symfony.
+
+It will automatically pick up the predefined environment variables. Of course I need to configure the application's role in AWS.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-13T16:43:09Z
+
+LGTM 👍 (once rebased)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-23T09:10:35Z
+
+@jderusse Seems like the low-deps job is still failing https://travis-ci.org/github/symfony/symfony/jobs/678251415#L5486, any idea?
+Needs another rebase also :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-04-23T09:47:49Z
+
+Rebased. But I think we should wait for AsyncAws version 1.0 before merging.

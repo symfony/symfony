@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-07T12:41:06Z
+
+IMHO AsyncAWS should also be a soft dependency when using the HTTP transport.
+I think we would better preserve the current implementation and wire the AsyncAWS one when it is installed, since it is not a core dependency.
+Installing it by default could then be handled in a flex recipe.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-12T12:00:22Z
+
+Thank you for the PR and thank you @chalasr for the review. I agree with you. AsyncAws should be a soft dependency. Currently it is only installed in `require-dev` section. If you are trying to use features that require the external library you get an exception. See https://github.com/symfony/symfony/pull/35992/files#diff-4e7b1bdc9093065fae5fff42cdde5d8cR42
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-13T00:52:18Z
+
+@Nyholm My point is: we have an HTTP implementation that works out of the box currently. Requiring AsyncAWS to be available for using the HTTP transport implicitly makes it an hard dependency, even if it's not in the `require` section, since you now get an exception instead of something that works immediately.
+
+Considering the pros + the fact that AsyncAWS is maintained by two core members, I'm OK for requiring it with a meaningful exception.
+But still, throwing in 5.1 is a BC break. IMHO we should deprecate the current implementation first, suggesting to install the missing package as it will be required in 6.0, and automatically wire the AsyncAWS-based implementation when it is installed.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-14T10:47:39Z
+
+Thank you. I understand the point you are trying to make.
+
+> we have an HTTP implementation that works out of the box currently.
+
+Yes, But it has some bugs and it does not support all authentication mechanism available for AWS.
+Of course, bugs can be fixed and authentication can be implemented.
+We created AsyncAws to be able to abstract authentication away from this bridge. (And possible other parts of the symfony organization that may use AWS). We are also happy to extend the maintainer team with more Symfony core members if there is a wish for that.
+
+> But still, throwing in 5.1 is a BC break.
+
+True, but this component and this bridge is still marked as experimental.
+
+-----------
+
+Side note: Most code in Async AWS is generated so the maintenance is kept to a minimum.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-03-14T16:31:08Z
+
+> True, but this component and this bridge is still marked as experimental.
+
+Oh no.. @chalasr pinged my privately and very politely pointed out that I was wrong. This component is not experimental.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-03-14T18:28:05Z
+
+Thanks you for your review @chalasr. I agreed with you, The current HttpClient implementation should stay for BC.
+
+But as @Nyholm pointed it, this implementation have several opened bugs. One of them is the way the request is signed. It currently use the version 2 which is not supported by all regions (https://docs.aws.amazon.com/general/latest/gr/signature-version-2.html). And maintaing a new implementation, is not trivial (see [async-aws](https://github.com/async-aws/aws/blob/master/src/Core/src/Signer/SignerV4.php) or [AWS SDK](https://github.com/aws/aws-sdk-php/blob/master/src/Signature/SignatureV4.php))
+
+I suggest to use the AsyncAws Adapter when installed package is installed otherwise to fallback to HttpClient Adapter (as suggested by @chalasr), AND to deprecate the HttpClient Adapter in 5.1 to remove the complexity from Symfony.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-14T18:29:42Z
+
+Since this is experimental, we can break BC and cut maintenance efforts.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-15T00:00:12Z
+
+@nicolas-grekas Actually, this is not experimental :) https://github.com/symfony/symfony/pull/35992#issuecomment-599092314
+@jderusse Sounds like a plan!
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-03-15T22:47:09Z
+
+PR updated according our discussion.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-17T08:58:23Z
+
+Tests seem broken
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-04-12T12:57:48Z
+
+Rebase needed
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-04-20T07:14:14Z
+
+@jderusse Since this is an alternative solution, can I close the #33326 pull request?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-04-24T12:35:25Z
+
+@connorhu Probably, but let's wait to see if this PR is accepted. If this PR is rejected then #33326 might be something that should be considered.

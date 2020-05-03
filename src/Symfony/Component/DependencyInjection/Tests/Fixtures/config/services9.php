@@ -22,6 +22,7 @@ return function (ContainerConfigurator $c) {
         ->class(FooClass::class)
         ->tag('foo', ['foo' => 'foo'])
         ->tag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+        ->tag('foo', ['name' => 'bar', 'baz' => 'baz'])
         ->factory([FooClass::class, 'getInstance'])
         ->property('foo', 'bar')
         ->property('moo', ref('foo.baz'))

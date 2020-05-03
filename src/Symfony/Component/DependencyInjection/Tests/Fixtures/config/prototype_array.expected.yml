@@ -8,8 +8,8 @@ services:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
         public: true
         tags:
-            - { name: foo }
-            - { name: baz }
+            - foo
+            - baz
         deprecated:
             package: vendor/package
             version: '1.1'
@@ -20,8 +20,8 @@ services:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
         public: true
         tags:
-            - { name: foo }
-            - { name: baz }
+            - foo
+            - baz
         deprecated:
             package: vendor/package
             version: '1.1'

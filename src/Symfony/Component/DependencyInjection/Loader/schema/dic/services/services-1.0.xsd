@@ -187,8 +187,11 @@
   </xsd:complexType>
 
   <xsd:complexType name="tag">
-    <xsd:attribute name="name" type="xsd:string" use="required" />
-    <xsd:anyAttribute namespace="##any" processContents="lax" />
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:anyAttribute namespace="##any" processContents="lax" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 
   <xsd:complexType name="deprecated">

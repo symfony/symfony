@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T14:16:39Z
+
+Updated 🙂
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T16:01:40Z
+
+I still have a problem on travis 7.2/php_extra=7.4, my check on PHP_VERSION_ID seems not working on this environment 🤔 Do I miss something specific to this environment ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-30T17:07:35Z
+
+You need to list the new file in `.github/patch-types.php`
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T20:27:19Z
+
+Updated 🙂

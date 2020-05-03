@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -113,15 +114,13 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         return $authenticatorIds;
     }
 
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): ?string
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): ?string
     {
         try {
             return $this->determineEntryPoint(null, $config);
         } catch (\LogicException $e) {
-            // ignore the exception, the new system prefers setting "entry_point" over "guard.entry_point"
+            throw new InvalidConfigurationException(sprintf('Because you have multiple guard authenticators, you need to set the "entry_point" key to one of your authenticators (%s).', implode(', ', $config['authenticators'])));
         }
-
-        return null;
     }
 
     private function determineEntryPoint(?string $defaultEntryPointId, array $config): string

@@ -112,7 +112,7 @@ Routing
 SecurityBundle
 --------------
 
- * Marked the `AbstractFactory`, `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`,
+ * Marked the `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`,
    `HttpBasicFactory`, `HttpBasicLdapFactory`, `JsonLoginFactory`, `JsonLoginLdapFactory`, `RememberMeFactory`, `RemoteUserFactory`
    and `X509Factory` as `@internal`. Instead of extending these classes, create your own implementation based on
    `SecurityFactoryInterface`.

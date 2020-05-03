@@ -21,7 +21,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 interface EntryPointFactoryInterface
 {
     /**
-     * Creates the entry point and returns the service ID.
+     * Register the entry point on the container and returns the service ID.
+     *
+     * This does not mean that the entry point is also used. This is managed
+     * by the "entry_point" firewall setting.
      */
-    public function createEntryPoint(ContainerBuilder $container, string $id, array $config): ?string;
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): ?string;
 }

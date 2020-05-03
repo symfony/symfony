@@ -43,7 +43,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         ;
 
         // entry point
-        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+        $entryPointId = $this->registerEntryPoint($container, $id, $config, $defaultEntryPoint);
 
         if (!empty($config['query_string'])) {
             if ('' === $config['search_dn'] || '' === $config['search_password']) {

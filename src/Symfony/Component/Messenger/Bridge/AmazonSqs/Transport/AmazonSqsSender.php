@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -61,7 +61,7 @@ class AmazonSqsSender implements SenderInterface
                 $messageGroupId,
                 $messageDeduplicationId
             );
-        } catch (HttpExceptionInterface $e) {
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 

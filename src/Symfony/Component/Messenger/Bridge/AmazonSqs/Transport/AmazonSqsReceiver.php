@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -19,7 +20,6 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -42,7 +42,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $sqsEnvelope = $this->connection->get();
-        } catch (HttpExceptionInterface $e) {
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
         if (null === $sqsEnvelope) {
@@ -70,7 +70,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
-        } catch (HttpExceptionInterface $e) {
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -82,7 +82,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
-        } catch (HttpExceptionInterface $e) {
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -94,7 +94,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             return $this->connection->getMessageCount();
-        } catch (HttpExceptionInterface $e) {
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }

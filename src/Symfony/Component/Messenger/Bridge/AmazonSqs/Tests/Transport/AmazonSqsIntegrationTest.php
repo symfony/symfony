@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Sqs\SqsClient;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
@@ -39,7 +40,7 @@ class AmazonSqsIntegrationTest extends TestCase
     {
         $connection = Connection::fromDsn($dsn, []);
         $connection->setup();
-        $this->clearSqs($connection);
+        $this->clearSqs($dsn);
 
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $this->assertSame(1, $connection->getMessageCount());
@@ -53,15 +54,12 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
     }
 
-    private function clearSqs(Connection $connection): void
+    private function clearSqs(string $dsn): void
     {
-        $wait = 0;
-        while ($wait++ < 50) {
-            if (null === $message = $connection->get()) {
-                usleep(5000);
-                continue;
-            }
-            $connection->delete($message['id']);
-        }
+        $url = parse_url($dsn);
+        $client = new SqsClient(['endpoint' => "http://{$url['host']}:{$url['port']}"]);
+        $client->purgeQueue([
+            'QueueUrl' => $client->getQueueUrl(['QueueName' => ltrim($url['path'], '/')])->getQueueUrl(),
+        ]);
     }
 }

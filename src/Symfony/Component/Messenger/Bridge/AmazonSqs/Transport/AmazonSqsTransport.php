@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
@@ -71,12 +73,20 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
      */
     public function setup(): void
     {
-        $this->connection->setup();
+        try {
+            $this->connection->setup();
+        } catch (HttpException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
     }
 
     public function reset()
     {
-        $this->connection->reset();
+        try {
+            $this->connection->reset();
+        } catch (HttpException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
     }
 
     private function getReceiver(): AmazonSqsReceiver

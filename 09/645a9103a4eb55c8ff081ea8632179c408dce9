@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-04-28T19:26:58Z
+
+After chatting about this, here is my proposal:
+
+1. Could we decorate `FormLoginAuthenticator` with an `LdapAuthenticator`? The decorator would call the inner `authenticate()` but then ADD an `LdapCredentialsBadge` (not a "credentials" badge, it would just hold LDAP configuration, including the LDAP service id, but not the actual service object
+
+2. Register a listener, like `VerifyLdapCredentialsListener` (higher priority than `VerifyCredentialsListener` ) that looks for the `LdapCredentialsBadge`. If found, it would use the password from the `PasswordCredentials` and the config from the `LdapCredentialsBadge` to do the credentials checking. To avoid passing the Ldap service around in the `LdapCredentialsBadge`, we could inject a service locator into the listener. It would contain all LDAP services that were registered for any ldap authenticators. So... in reality, it would contain a maximum of 2 - one for the service configured under `http_basic_ldap`  and one for the service configured under `form_login_ldap`.
+
+For the last part, we would leverage a new tag for ldap: if your ldap service has a tag, it's injected into the listener's locator. This will allow people to write custom authenticators that use LDAP. They would just need to:
+
+A) Register the LDAP service
+B) Give it the new  tag we invent
+C) Return `PasswordCredentials` and `LdapCredentialsBadge`

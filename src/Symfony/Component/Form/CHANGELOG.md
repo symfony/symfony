@@ -4,6 +4,8 @@ CHANGELOG
 5.1.0
 -----
 
+ * Deprecated not configuring the `rounding_mode` option of the `PercentType`. It will default to `PercentToLocalizedStringTransformer::ROUND_HALF_UP` in Symfony 6.
+ * Deprecated not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer`. It will default to `ROUND_HALF_UP` in Symfony 6.
  * Added `collection_entry` block prefix to `CollectionType` entries
  * Added a `choice_filter` option to `ChoiceType`
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.

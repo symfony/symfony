@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `async-aws/ses` to communicate with AWS API.
+
 4.4.0
 -----
 

@@ -11,24 +11,24 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 
+use AsyncAws\Core\Configuration;
+use AsyncAws\Core\Credentials\NullProvider;
+use AsyncAws\Ses\SesClient;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiTransport;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpAsyncAwsTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
- * @group legacy
- */
-class SesApiTransportTest extends TestCase
+class SesHttpAsyncAwsTransportTest extends TestCase
 {
     /**
      * @dataProvider getTransportData
      */
-    public function testToString(SesApiTransport $transport, string $expected)
+    public function testToString(SesHttpAsyncAwsTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -37,20 +37,20 @@ class SesApiTransportTest extends TestCase
     {
         return [
             [
-                new SesApiTransport('ACCESS_KEY', 'SECRET_KEY'),
-                'ses+api://ACCESS_KEY@email.eu-west-1.amazonaws.com',
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY']))),
+                'ses+https://ACCESS_KEY@us-east-1',
             ],
             [
-                new SesApiTransport('ACCESS_KEY', 'SECRET_KEY', 'us-east-1'),
-                'ses+api://ACCESS_KEY@email.us-east-1.amazonaws.com',
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1']))),
+                'ses+https://ACCESS_KEY@us-west-1',
             ],
             [
-                (new SesApiTransport('ACCESS_KEY', 'SECRET_KEY'))->setHost('example.com'),
-                'ses+api://ACCESS_KEY@example.com',
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com']))),
+                'ses+https://ACCESS_KEY@example.com',
             ],
             [
-                (new SesApiTransport('ACCESS_KEY', 'SECRET_KEY'))->setHost('example.com')->setPort(99),
-                'ses+api://ACCESS_KEY@example.com:99',
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99']))),
+                'ses+https://ACCESS_KEY@example.com:99',
             ],
         ];
     }
@@ -59,28 +59,24 @@ class SesApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://email.eu-west-1.amazonaws.com:8984/', $url);
-            $this->assertStringContainsStringIgnoringCase('X-Amzn-Authorization: AWS3-HTTPS AWSAccessKeyId=ACCESS_KEY,Algorithm=HmacSHA256,Signature=', $options['headers'][0] ?? $options['request_headers'][0]);
+            $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
 
-            parse_str($options['body'], $content);
+            $body = json_decode($options['body'], true);
+            $content = base64_decode($body['Content']['Raw']['Data']);
 
-            $this->assertSame('Hello!', $content['Message_Subject_Data']);
-            $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $content['Destination_ToAddresses_member'][0]);
-            $this->assertSame('Fabien <fabpot@symfony.com>', $content['Source']);
-            $this->assertSame('Hello There!', $content['Message_Body_Text_Data']);
+            $this->assertStringContainsString('Hello!', $content);
+            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
+            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('Hello There!', $content);
 
-            $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
-  <SendEmailResult>
-    <MessageId>foobar</MessageId>
-  </SendEmailResult>
-</SendEmailResponse>';
+            $json = '{"MessageId": "foobar"}';
 
-            return new MockResponse($xml, [
+            return new MockResponse($json, [
                 'http_code' => 200,
             ]);
         });
-        $transport = new SesApiTransport('ACCESS_KEY', 'SECRET_KEY', null, $client);
-        $transport->setPort(8984);
+
+        $transport = new SesHttpAsyncAwsTransport(new SesClient(Configuration::create([]), new NullProvider(), $client));
 
         $mail = new Email();
         $mail->subject('Hello!')
@@ -107,8 +103,8 @@ class SesApiTransportTest extends TestCase
                 'http_code' => 418,
             ]);
         });
-        $transport = new SesApiTransport('ACCESS_KEY', 'SECRET_KEY', null, $client);
-        $transport->setPort(8984);
+
+        $transport = new SesHttpAsyncAwsTransport(new SesClient(Configuration::create([]), new NullProvider(), $client));
 
         $mail = new Email();
         $mail->subject('Hello!')

@@ -64,6 +64,13 @@ HttpKernel
  * Made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
 
+
+Mailer
+------
+
+ * Removed the `SesApiTransport` class. Use `SesApiAsyncAwsTransport` instead.
+ * Removed the `SesHttpTransport` class. Use `SesHttpAsyncAwsTransport` instead.
+
 Messenger
 ---------
 

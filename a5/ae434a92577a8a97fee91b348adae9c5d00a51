@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by artemoliynyk at 2020-04-22T10:48:20Z
+
+Travis build fails on `Symfony\Bundle\FrameworkBundle\Tests\Functional\MailerTest::testMailerAssertions()` test, but it's OK for me on local setup.
+I believe this is unrelated erro to this PR

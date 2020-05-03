@@ -31,17 +31,21 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
+    const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
+
     private $tokenStorage;
     private $accessDecisionManager;
     private $map;
     private $authManager;
+    private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, bool $exceptionOnNoToken = true)
     {
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
         $this->authManager = $authManager;
+        $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
     /**
@@ -52,18 +56,18 @@ class AccessListener extends AbstractListener
         [$attributes] = $this->map->getPatterns($request);
         $request->attributes->set('_access_control_attributes', $attributes);
 
-        return $attributes && [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes ? true : null;
+        return $attributes && ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes && [self::PUBLIC_ACCESS] !== $attributes) ? true : null;
     }
 
     /**
      * Handles access authorization.
      *
      * @throws AccessDeniedException
-     * @throws AuthenticationCredentialsNotFoundException
+     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
     public function authenticate(RequestEvent $event)
     {
-        if (!$event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
+        if (!$event instanceof LazyResponseEvent && null === ($token = $this->tokenStorage->getToken()) && $this->exceptionOnNoToken) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
         }
 
@@ -76,8 +80,26 @@ class AccessListener extends AbstractListener
             return;
         }
 
-        if ($event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
+        if ($event instanceof LazyResponseEvent) {
+            $token = $this->tokenStorage->getToken();
+        }
+
+        if (null === $token) {
+            if ($this->exceptionOnNoToken) {
+                throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
+            }
+
+            if ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes) {
+                trigger_deprecation('symfony/security-http', '5.1', 'Using "IS_AUTHENTICATED_ANONYMOUSLY" in your access_control rules when using the authenticator Security system is deprecated, use "PUBLIC_ACCESS" instead.');
+
+                return;
+            }
+
+            if ([self::PUBLIC_ACCESS] === $attributes) {
+                return;
+            }
+
+            throw $this->createAccessDeniedException($request, $attributes);
         }
 
         if (!$token->isAuthenticated()) {
@@ -86,11 +108,16 @@ class AccessListener extends AbstractListener
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
-            $exception = new AccessDeniedException();
-            $exception->setAttributes($attributes);
-            $exception->setSubject($request);
-
-            throw $exception;
+            throw $this->createAccessDeniedException($request, $attributes);
         }
+    }
+
+    private function createAccessDeniedException(Request $request, array $attributes)
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes($attributes);
+        $exception->setSubject($request);
+
+        return $exception;
     }
 }

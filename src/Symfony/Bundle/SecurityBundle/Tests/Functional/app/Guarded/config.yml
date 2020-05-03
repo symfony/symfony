@@ -26,7 +26,8 @@ security:
     firewalls:
         secure:
             pattern: ^/
-            anonymous: lazy
+            anonymous: ~
+            lazy: true
             stateless: false
             guard:
                 authenticators:

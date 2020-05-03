@@ -112,6 +112,24 @@ Routing
 SecurityBundle
 --------------
 
+ * Deprecated `anonymous: lazy` in favor of `lazy: true`
+
+   *Before*
+   ```yaml
+   security:
+       firewalls:
+           main:
+               anonymous: lazy
+   ```
+
+   *After*
+   ```yaml
+   security:
+       firewalls:
+           main:
+               anonymous: true
+               lazy: true
+   ```
  * Marked the `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`,
    `HttpBasicFactory`, `HttpBasicLdapFactory`, `JsonLoginFactory`, `JsonLoginLdapFactory`, `RememberMeFactory`, `RemoteUserFactory`
    and `X509Factory` as `@internal`. Instead of extending these classes, create your own implementation based on

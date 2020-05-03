@@ -111,13 +111,6 @@
             <argument type="service" id="property_accessor" on-invalid="null" />
         </service>
 
-        <service id="security.authenticator.anonymous"
-                 class="Symfony\Component\Security\Http\Authenticator\AnonymousAuthenticator"
-                 abstract="true">
-            <argument type="abstract">secret</argument>
-            <argument type="service" id="security.untracked_token_storage" />
-        </service>
-
         <service id="security.authenticator.remember_me"
                  class="Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator"
                  abstract="true">

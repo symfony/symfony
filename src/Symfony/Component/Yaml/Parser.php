@@ -969,7 +969,7 @@ class Parser
     private function isCurrentLineComment(): bool
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
-        $ltrimmedLine = ' ' === $this->currentLine[0] ? ltrim($this->currentLine, ' ') : $this->currentLine;
+        $ltrimmedLine = '' !== $this->currentLine && ' ' === $this->currentLine[0] ? ltrim($this->currentLine, ' ') : $this->currentLine;
 
         return '' !== $ltrimmedLine && '#' === $ltrimmedLine[0];
     }

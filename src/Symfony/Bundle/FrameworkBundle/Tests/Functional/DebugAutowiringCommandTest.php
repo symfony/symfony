@@ -107,6 +107,6 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'ClassAlias']);
-        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass (public)', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass', $tester->getDisplay());
     }
 }

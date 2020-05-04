@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-01T08:31:13Z
+
+Cool thanks.
+I would suggest to target 4.4 for this. Docker on 3.4 is not really slowing us down. Then, on 4.4, I would suggest testing with only two versions: the lowest one (7.1) and the highest one. Adding more jobs wouldn't provide much extra safety, while it would slow the overall CI down. Let's save some CO² footprint.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-05-01T08:54:36Z
+
+@nicolas-grekas sounds good. Regarding 7.1 [the phpunit run fails with](https://github.com/jakzal/symfony/runs/635252303?check_suite_focus=true):
+
+```
+Remaining indirect deprecation notices (1)
+
+  1x: The Doctrine\Common\Persistence\Mapping\ClassMetadata class is deprecated since doctrine/persistence 1.3 and will be removed in 2.0. Use \Doctrine\Persistence\Mapping\ClassMetadata instead.
+
+    1x in DoctrineOrmTypeGuesserTest::requiredProvider from Symfony\Bridge\Doctrine\Tests\Form
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-01T09:41:08Z
+
+We skip a few deprecations by default:
+https://github.com/symfony/symfony/blob/master/phpunit#L28
+
+but the logic is this file doesn't reach this line currently.
+We need to find a way to skip them in the new context.
+
+(I wish Doctrine could fix its own deprecations, but that's another story...)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-05-01T12:46:06Z
+
+Rebased against 4.4 and applied feedback:
+
+* run on PHP 7.1 and 7.4 only
+* redis, memcached, rabbitmq moved to the github action
+* use the `integration` group for all tests that depend on docker services
+* do not exclude the `integration` group on Travis, but make sure tests that depend on docker services are skipped properly
+
+Left to do:
+
+* vulcain?
+* higher branches once this is merged
+
+~~Turns out that nothing really depends on mongodb running. The only test I could find actually mocks it (`MongoDbSessionHandlerTest`). There's quite a lot of code in `.travis.yml` that dealing with the mongodb extension.~~ There's something using it in the master branch.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-05-04T11:15:34Z
+
+@Nyholm thank you so much for the review.
+
+Vulcain tests are now migrated. They're skipped on 4.4 however.
+
+This PR is now ready for a final review & merge.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-05-04T11:41:57Z
+
+@nicolas-grekas it seems that some tests on Travis are failing, as they're not run against code in this branch? https://travis-ci.org/github/symfony/symfony/jobs/682876413#L8162
+
+The same branch passes on my account: https://travis-ci.org/github/jakzal/symfony/builds/682876394
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-04T12:47:24Z
+
+Very impressive work @jakzal!

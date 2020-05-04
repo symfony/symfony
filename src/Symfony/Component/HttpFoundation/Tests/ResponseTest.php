@@ -906,6 +906,18 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals((string) $content, $response->getContent());
     }
 
+    /**
+     * @dataProvider validContentProvider
+     */
+    public function testSetHeaders(array $headers)
+    {
+        $response = new Response();
+        $response->setHeaders($headers);
+        $responseHeaders = $response->headers->all();
+        $this->assertEquals(isset($responseHeaders['Foo']), true, 'Header "Foo" not found.');
+        $this->assertEquals(isset($responseHeaders['Bar']), true, 'Header "Foo" not found.');
+    }
+
     public function testSettersAreChainable()
     {
         $response = new Response();
@@ -944,6 +956,7 @@ class ResponseTest extends ResponseTestCase
             'obj' => [new StringableObject()],
             'string' => ['Foo'],
             'int' => [2],
+            'array' => ['Foo' => 'Bar', 'Bar' => 'Foo'],
         ];
     }
 

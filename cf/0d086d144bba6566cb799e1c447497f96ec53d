@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by ndench at 2020-05-04T03:54:34Z
+
+I can't see how my change would have caused Appveyor to fail. Here's the error:
+
+```
+There was 1 failure:
+1) Symfony\Bundle\FrameworkBundle\Tests\Functional\DebugAutowiringCommandTest::testNotConfusedByClassAliases
+Failed asserting that '\r\n
+Autowirable Types\r\n
+=================\r\n
+\r\n
+ The following classes & interfaces can be used as type-hints when autowiring:\r\n
+ (only showing classes/interfaces matching ClassAlias)\r\n
+ \r\n
+ Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass (public)\r\n
+\r\n
+\r\n
+' contains "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass (public)".
+C:\projects\symfony\src\Symfony\Bundle\FrameworkBundle\Tests\Functional\DebugAutowiringCommandTest.php:110
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-04T13:23:59Z
+
+I rebased this PR for 3.4.
+
+@cs278 / @ampaze can you please have a look?
+
+@ndench would you mind having a look at #36645 too?

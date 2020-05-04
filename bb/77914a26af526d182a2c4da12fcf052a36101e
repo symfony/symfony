@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-04T10:44:15Z
+
+For 3.4?
+
+---------------------------------------------------------------------------
+
+by wdiesveld at 2020-05-04T10:58:26Z
+
+@xabbuh - I could not test it for 3.4 and 4.0, only for 5.0 - I get an out-of-mem error when running `composer update` for 3.4 & 4.0 (Windows 10). So the PR is for 5.0
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-04T11:18:55Z
+
+@wdiesveld No problem, I have changed the base branch and rebased your changes. Thank you for working on this issue.

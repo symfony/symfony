@@ -16,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 
+/**
+ * @group integration
+ */
 class AmazonSqsIntegrationTest extends TestCase
 {
     public function testConnectionSendToFifoQueueAndGet(): void

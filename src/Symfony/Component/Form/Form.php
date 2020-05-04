@@ -959,7 +959,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return FormInterface The child form
      *
-     * @throws \OutOfBoundsException if the named child does not exist
+     * @throws OutOfBoundsException if the named child does not exist
      */
     public function offsetGet($name)
     {

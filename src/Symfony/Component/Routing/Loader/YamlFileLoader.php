@@ -67,7 +67,7 @@ class YamlFileLoader extends FileLoader
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML', $path).': '.$e->getMessage(), 0, $e);
         }
 
         $collection = new RouteCollection();

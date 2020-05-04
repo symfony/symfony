@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
+/**
+ * @group integration
+ */
 class PredisTagAwareClusterAdapterTest extends PredisClusterAdapterTest
 {
     use TagAwareTestTrait;

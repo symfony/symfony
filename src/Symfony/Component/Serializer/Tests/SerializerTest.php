@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -489,6 +490,26 @@ class SerializerTest extends TestCase
         $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
 
         (new Serializer())->normalize(tmpfile());
+    }
+
+    public function testNormalizePreserveEmptyArrayObject()
+    {
+        $serializer = new Serializer(
+          [
+              new PropertyNormalizer(),
+              new ObjectNormalizer(),
+              new ArrayDenormalizer(),
+          ],
+          [
+              'json' => new JsonEncoder(),
+          ]
+        );
+
+        $object = [];
+        $object['foo'] = new \ArrayObject();
+        $object['bar'] = new \ArrayObject(['notempty']);
+        $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
+        $this->assertEquals('{"foo":{},"bar":["notempty"],"baz":{"nested":{}}}', $serializer->serialize($object, 'json', [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]));
     }
 
     public function testNormalizeScalar()

@@ -158,6 +158,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         if (\is_array($data) || $data instanceof \Traversable) {
+            if ($data instanceof \Countable && 0 === $data->count()) {
+                return $data;
+            }
+
             $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);

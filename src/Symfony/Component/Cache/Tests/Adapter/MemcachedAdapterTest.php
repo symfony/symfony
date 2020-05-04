@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
+/**
+ * @group integration
+ */
 class MemcachedAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [

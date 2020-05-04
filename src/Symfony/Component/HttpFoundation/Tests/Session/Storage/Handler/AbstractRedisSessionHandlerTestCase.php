@@ -44,6 +44,11 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
 
         $host = getenv('REDIS_HOST') ?: 'localhost';
 

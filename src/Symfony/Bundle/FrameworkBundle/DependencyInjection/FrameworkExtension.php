@@ -899,10 +899,10 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
-        $requestContext = $container->getDefinition('router.request_context');
-        $requestContext->replaceArgument(0, $config['context']['base_url']);
-        $requestContext->replaceArgument(2, $config['context']['host']);
-        $requestContext->replaceArgument(3, $config['context']['scheme']);
+        if (null !== $config['default_uri']) {
+            $container->getDefinition('router.request_context')
+                ->replaceArgument(0, $config['default_uri']);
+        }
 
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)

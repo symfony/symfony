@@ -20,8 +20,8 @@
         </service>
 
         <service id="security.authentication.retry_entry_point" class="Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint">
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpPort" /></service></argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpsPort" /></service></argument>
         </service>
 
         <service id="security.authentication.basic_entry_point" class="Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint" />

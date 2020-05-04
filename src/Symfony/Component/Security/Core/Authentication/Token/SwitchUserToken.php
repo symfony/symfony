@@ -40,11 +40,6 @@ class SwitchUserToken extends UsernamePasswordToken implements SwitchUserTokenIn
         return $this->originalToken;
     }
 
-    public function getSwitchingAdditionalRole(): string
-    {
-        return 'ROLE_PREVIOUS_ADMIN';
-    }
-
     /**
      * {@inheritdoc}
      */

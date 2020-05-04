@@ -19,6 +19,4 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 interface SwitchUserTokenInterface extends TokenInterface
 {
     public function getOriginalToken(): ?TokenInterface;
-
-    public function getSwitchingAdditionalRole(): string;
 }

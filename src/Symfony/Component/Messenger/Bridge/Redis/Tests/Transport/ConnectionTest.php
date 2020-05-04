@@ -158,7 +158,7 @@ class ConnectionTest extends TestCase
     public function testFailedAuth()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectExceptionMessage('Redis connection ');
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
         $redis->expects($this->exactly(1))->method('auth')

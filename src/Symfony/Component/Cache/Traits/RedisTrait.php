@@ -174,7 +174,7 @@ trait RedisTrait
                 try {
                     @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
                 } catch (\RedisException $e) {
-                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): "%s".', $e->getMessage(), $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
                 }
 
                 set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
@@ -182,7 +182,7 @@ trait RedisTrait
                 restore_error_handler();
                 if (!$isConnected) {
                     $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: "%s".', $error, $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
                 }
 
                 if ((null !== $auth && !$redis->auth($auth))
@@ -190,7 +190,7 @@ trait RedisTrait
                     || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
-                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): "%s".', $e, $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
                 }
 
                 if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
@@ -215,7 +215,7 @@ trait RedisTrait
             try {
                 $redis = new $class($hosts, $params);
             } catch (\RedisClusterException $e) {
-                throw new InvalidArgumentException(sprintf('Redis connection failed (%s): "%s".', $e->getMessage(), $dsn));
+                throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
             }
 
             if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
@@ -230,7 +230,7 @@ trait RedisTrait
                 try {
                     $redis = new $class(null, $hosts, $params['timeout'], $params['read_timeout'], (bool) $params['persistent']);
                 } catch (\RedisClusterException $e) {
-                    throw new InvalidArgumentException(sprintf('Redis connection failed (%s): "%s".', $e->getMessage(), $dsn));
+                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
                 }
 
                 if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {

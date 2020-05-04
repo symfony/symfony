@@ -43,7 +43,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());
         } catch (\Exception $e) {
-            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: "%s".', __CLASS__, $e->getMessage()), 0, $e);
+            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }
 
         if ($email->getAttachments()) {

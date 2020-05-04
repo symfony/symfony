@@ -59,7 +59,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function testFailedCreateConnection($dsn)
     {
         $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }
 

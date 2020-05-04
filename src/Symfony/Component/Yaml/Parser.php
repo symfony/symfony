@@ -619,8 +619,14 @@ class Parser
         }
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+        $isItComment = $this->isCurrentLineComment();
 
         while ($this->moveToNextLine()) {
+            if ($isItComment && !$isItUnindentedCollection) {
+                $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+                $isItComment = $this->isCurrentLineComment();
+            }
+
             $indent = $this->getCurrentLineIndentation();
 
             if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {

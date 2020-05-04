@@ -160,15 +160,15 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider singularizeProvider
      */
-    public function testSingularize($plural, $singular)
+    public function testSingularize($plural, $expectedSingular)
     {
-        $single = Inflector::singularize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $singular = Inflector::singularize($plural);
+        if (\is_string($expectedSingular) && \is_array($singular)) {
+            $this->fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
+        } elseif (\is_array($expectedSingular) && \is_string($singular)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedSingular, $singular);
     }
 }

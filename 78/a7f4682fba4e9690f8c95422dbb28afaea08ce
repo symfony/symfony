@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-21T20:50:20Z
+
+as @stof spotted, all these should be moved outside sprintf()
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-21T20:50:58Z
+
+(but this is for master)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-22T09:47:33Z
+
+This is great! Thanks a lot @fancyweb!
+
+I tested it in the Symfony Demo app and the difference is huge:
+
+**Before**
+
+![before](https://user-images.githubusercontent.com/73419/79967337-fe022f80-848e-11ea-9d3f-218cd33fd458.png)
+
+**After**
+
+![after](https://user-images.githubusercontent.com/73419/79967344-ff335c80-848e-11ea-98b0-4ada1bbddf03.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-22T11:35:32Z
+
+Idea: instead of selectively add the previous exception message to the current exception message, what about doing something similar to some Go error handling libraries where the end message of an error is always the concatenation of all error messages. That's something we could do only in the exception page/profiler.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-22T16:09:03Z
+
+> as @stof spotted, all these should be moved outside sprintf()
+
+You mean concatenating the exception message after the sprintf? `sprintf('The file "%s" does not contain valid YAML', $file).': '.$e->getMessage()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-22T16:15:18Z
+
+@fancyweb yes - we should also fix existing messages.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-23T14:21:14Z
+
+I fixed the existing message in the DI YamlFileLoader. Should I apply fabbot exception message formatting here, ie get rid of the `:` and just concatenate with a space + $e->getMessage()?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-26T12:31:05Z
+
+Showing all stacked messages in a more prominent way is absolutely required I agree. The error page currently is not clear enough in this regard (I recently stayed stuck on an exception because I missed the 2nd one which provided the real issue.)
+
+Doing both this change and improving the error page looks like what we should do IMHO. The reason is that we don't have full control over all situations where error messages are used; e.g. exceptions in logs, etc.
+
+Still for master on my side - at least that's the policy we've had in the past: that's improving something.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-05-03T16:39:05Z
+
+I agree with @nicolas-grekas about the possible improvements in the error page. We'll discuss about this in the coming weeks to have it ready for Symfony 5.2 👍

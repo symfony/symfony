@@ -906,16 +906,16 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals((string) $content, $response->getContent());
     }
 
-    /**
-     * @dataProvider validHeadersProvider
-     */
-    public function testSetHeaders(array $headers)
+    public function testSetHeaders()
     {
         $response = new Response();
-        $response->setHeaders($headers);
-        $responseHeaders = $response->headers->all();
-        $this->assertEquals(isset($responseHeaders['Foo']), true, 'Header "Foo" not found.');
-        $this->assertEquals(isset($responseHeaders['Bar']), true, 'Header "Bar" not found.');
+        $response->setHeaders([
+            'Content-Type' => 'Foo',
+            'Content-Disposition' => 'Bar',
+        ]);
+        $headers = $response->headers->all();
+        $this->assertArrayHasKey('content-type', $headers, 'Header "content-type" not found.');
+        $this->assertArrayHasKey('content-disposition', $headers, 'Header "content-disposition" not found.');
     }
 
     public function testSettersAreChainable()
@@ -956,14 +956,6 @@ class ResponseTest extends ResponseTestCase
             'obj' => [new StringableObject()],
             'string' => ['Foo'],
             'int' => [2],
-        ];
-    }
-
-    public function validHeadersProvider(): array
-    {
-        return [
-            'Foo' => 'Bar',
-            'Bar' => 'Foo',
         ];
     }
 

@@ -1429,6 +1429,54 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
+
+    /**
+     * @group legacy
+     */
+    public function testDirectlyAccessingDeprecatedPublicService()
+    {
+        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service();
+
+        $container->get('bar');
+    }
+
+    public function testReferencingDeprecatedPublicService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+        $container
+            ->register('bar_user', \BarUserClass::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('bar'));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service();
+
+        // No deprecation should be triggered.
+        $container->get('bar_user');
+
+        $this->addToAssertionCount(1);
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

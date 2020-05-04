@@ -21,6 +21,7 @@ CHANGELOG
  * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
  * deprecated PHP-DSL's `inline()` function, use `service()` instead
  * added support of PHP8 static return type for withers
+ * added `AliasDeprecatedPublicServicesPass` to deprecate public services to private
 
 5.0.0
 -----

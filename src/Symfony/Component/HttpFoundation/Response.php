@@ -200,8 +200,8 @@ class Response
     }
 
     /**
-     * Set headers method
-     *
+     * Set all headers or replace if headers exists
+     * 
      * @author Konstantin Shtykov <konstantine.shtikov@yandex.ru>
      * @param array $headers
      * @return Response

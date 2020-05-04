@@ -31,12 +31,26 @@ class RedisTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
+    /**
+     * @group integration
+     */
     public function testCreateTransport()
     {
+        $this->skipIfRedisUnavailable();
+
         $factory = new RedisTransportFactory();
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['foo' => 'bar']), $serializer);
+        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['foo' => 'bar']), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['foo' => 'bar'], $serializer));
+        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['foo' => 'bar'], $serializer));
+    }
+
+    private function skipIfRedisUnavailable()
+    {
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 }

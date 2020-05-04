@@ -16,6 +16,9 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
+/**
+ * @group integration
+ */
 class RedisTagAwareAdapterTest extends RedisAdapterTest
 {
     use TagAwareTestTrait;

@@ -627,6 +627,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // See validateClassNode()
         $cascadedGroups = null !== $cascadedGroups && \count($cascadedGroups) > 0 ? $cascadedGroups : $groups;
 
+        if ($value instanceof LazyProperty) {
+            $value = $value->getPropertyValue();
+        }
+
         if (\is_array($value)) {
             // Arrays are always traversed, independent of the specified
             // traversal strategy

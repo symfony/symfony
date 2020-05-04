@@ -16,6 +16,9 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 
+/**
+ * @group integration
+ */
 class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void

@@ -44,6 +44,8 @@ class DependencyInjectionExtensionTest extends TestCase
     public function testThrowExceptionForInvalidExtendedType()
     {
         $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage(sprintf('The extended type "unmatched" specified for the type extension class "%s" does not match any of the actual extended types (["test"]).', TestTypeExtension::class));
+
         $extensions = [
             'unmatched' => new \ArrayIterator([new TestTypeExtension()]),
         ];

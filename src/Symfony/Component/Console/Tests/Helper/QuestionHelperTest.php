@@ -726,6 +726,23 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
+    public function testAskThrowsExceptionFromValidatorEarlyWhenTtyIsMissing()
+    {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Bar, not Foo');
+
+        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output->expects($this->once())->method('writeln');
+
+        (new QuestionHelper())->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream('Foo'), true),
+            $output,
+            (new Question('Q?'))->setHidden(true)->setValidator(function ($input) {
+                throw new \Exception("Bar, not $input");
+            })
+        );
+    }
+
     public function testEmptyChoices()
     {
         $this->expectException('LogicException');

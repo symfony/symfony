@@ -74,3 +74,17 @@ yaml: |
     'foo #': baz
 php: |
     ['foo #' => 'baz']
+---
+test: Comment before first item in unindented collection
+brief: >
+    Comment directly before unindented collection is allowed
+yaml: |
+    collection1:
+    # comment
+    - a
+    - b
+    collection2:
+    - a
+    - b
+php: |
+    ['collection1' => ['a', 'b'], 'collection2' => ['a', 'b']]

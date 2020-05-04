@@ -17,14 +17,14 @@ use Symfony\Component\Messenger\Transport\RedisExt\Connection;
 
 /**
  * @requires extension redis >= 4.3.0
+ * @group integration
  */
 class ConnectionTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        $redis = Connection::fromDsn('redis://localhost/queue');
-
         try {
+            $redis = Connection::fromDsn('redis://localhost/queue');
             $redis->get();
         } catch (TransportException $e) {
             if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
@@ -32,6 +32,8 @@ class ConnectionTest extends TestCase
             }
 
             throw $e;
+        } catch (\RedisException $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 

@@ -39,7 +39,7 @@ class PercentTypeTest extends TypeTestCase
      */
     public function testSubmitWithoutRoundingMode()
     {
-        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::ROUND_HALF_UP in Symfony 6.0.');
+        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to "Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::ROUND_HALF_UP" in Symfony 6.0.');
 
         $form = $this->factory->create(self::TESTED_TYPE, null, [
             'scale' => 2,
@@ -55,7 +55,7 @@ class PercentTypeTest extends TypeTestCase
      */
     public function testSubmitWithNullRoundingMode()
     {
-        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::ROUND_HALF_UP in Symfony 6.0.');
+        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to "Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::ROUND_HALF_UP" in Symfony 6.0.');
 
         $form = $this->factory->create(self::TESTED_TYPE, null, [
             'rounding_mode' => null,

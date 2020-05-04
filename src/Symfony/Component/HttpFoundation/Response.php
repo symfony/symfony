@@ -200,16 +200,15 @@ class Response
     }
 
     /**
-     * Set all headers or replace if headers exists
-     * 
+     * Set all headers or replace if headers exists.
+     *
      * @author Konstantin Shtykov <konstantine.shtikov@yandex.ru>
-     * @param array $headers
-     * @return Response
      */
-    public function setHeaders(array $headers): Response
+    public function setHeaders(array $headers): self
     {
         if (!($this->headers instanceof ResponseHeaderBag)) {
             $this->headers = new ResponseHeaderBag($headers);
+
             return $this;
         }
 

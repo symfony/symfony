@@ -962,8 +962,8 @@ class ResponseTest extends ResponseTestCase
     public function validHeadersProvider(): array
     {
         return [
-            'Foo' => 'Bar', 
-            'Bar' => 'Foo'
+            'Foo' => 'Bar',
+            'Bar' => 'Foo',
         ];
     }
 

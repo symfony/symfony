@@ -55,6 +55,8 @@ FrameworkBundle
  * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
  * The "framework.router.utf8" configuration option defaults to `true`
  * Removed `session.attribute_bag` service and `session.flash_bag` service.
+ * The `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
+   `cache_clearer`, `filesystem` and `validator` services are now private.
 
 HttpFoundation
 --------------

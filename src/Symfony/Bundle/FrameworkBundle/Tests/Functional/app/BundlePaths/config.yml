@@ -12,4 +12,15 @@ twig:
 services:
     twig.alias:
         alias: twig
+
+    validator.alias:
+        alias: validator
+        public: true
+
+    serializer.alias:
+        alias: serializer
+        public: true
+
+    translator.alias:
+        alias: translator
         public: true

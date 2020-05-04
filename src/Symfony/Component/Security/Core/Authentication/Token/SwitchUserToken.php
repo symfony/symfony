@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  */
-class SwitchUserToken extends UsernamePasswordToken implements SwitchUserTokenInterface
+class SwitchUserToken extends UsernamePasswordToken implements ImpersonatedUserTokenInterface
 {
     private $originalToken;
 
@@ -35,6 +35,9 @@ class SwitchUserToken extends UsernamePasswordToken implements SwitchUserTokenIn
         $this->originalToken = $originalToken;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getOriginalToken(): ?TokenInterface
     {
         return $this->originalToken;

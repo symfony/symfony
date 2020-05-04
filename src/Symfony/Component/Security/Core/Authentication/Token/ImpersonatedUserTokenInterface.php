@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 /**
- * SwitchUserTokenInterface is the interface for a switch user token.
+ * ImpersonatedUserTokenInterface is the interface for an impersonated user token.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  */
-interface SwitchUserTokenInterface extends TokenInterface
+interface ImpersonatedUserTokenInterface extends TokenInterface
 {
+    /**
+     * Provides original token if available.
+     */
     public function getOriginalToken(): ?TokenInterface;
 }

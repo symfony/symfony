@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\ImpersonatedUserTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\SwitchUserTokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
@@ -96,7 +96,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $assignedRoles = $token->getRoleNames();
 
             $impersonatorUser = null;
-            if ($token instanceof SwitchUserTokenInterface && null !== $originalToken = $token->getOriginalToken()) {
+            if ($token instanceof ImpersonatedUserTokenInterface && null !== $originalToken = $token->getOriginalToken()) {
                 $impersonatorUser = $originalToken->getUsername();
             }
 

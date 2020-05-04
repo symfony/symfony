@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
-use Symfony\Component\Security\Core\Authentication\Token\SwitchUserTokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\ImpersonatedUserTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -84,7 +84,7 @@ class AuthenticatedVoter implements VoterInterface
                 return VoterInterface::ACCESS_GRANTED;
             }
 
-            if (self::IS_IMPERSONATOR === $attribute && $token instanceof SwitchUserTokenInterface) {
+            if (self::IS_IMPERSONATOR === $attribute && $token instanceof ImpersonatedUserTokenInterface) {
                 return VoterInterface::ACCESS_GRANTED;
             }
         }

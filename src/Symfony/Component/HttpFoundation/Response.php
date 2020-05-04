@@ -193,10 +193,29 @@ class Response
      */
     public function __construct(?string $content = '', int $status = 200, array $headers = [])
     {
-        $this->headers = new ResponseHeaderBag($headers);
+        $this->setHeaders($headers);
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
+    }
+
+    /**
+     * Set headers method
+     *
+     * @author Konstantin Shtykov <konstantine.shtikov@yandex.ru>
+     * @param array $headers
+     * @return Response
+     */
+    public function setHeaders(array $headers): Response
+    {
+        if (!($this->headers instanceof ResponseHeaderBag)) {
+            $this->headers = new ResponseHeaderBag($headers);
+            return $this;
+        }
+
+        $this->headers->replace($headers);
+
+        return $this;
     }
 
     /**

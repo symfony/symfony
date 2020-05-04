@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -87,10 +88,19 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
     private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
     {
+        if ($e instanceof RecoverableExceptionInterface) {
+            return true;
+        }
+
+        // if one or more nested Exceptions is an instance of RecoverableExceptionInterface we should retry
         // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
         if ($e instanceof HandlerFailedException) {
             $shouldNotRetry = true;
             foreach ($e->getNestedExceptions() as $nestedException) {
+                if ($nestedException instanceof RecoverableExceptionInterface) {
+                    return true;
+                }
+
                 if (!$nestedException instanceof UnrecoverableExceptionInterface) {
                     $shouldNotRetry = false;
                     break;

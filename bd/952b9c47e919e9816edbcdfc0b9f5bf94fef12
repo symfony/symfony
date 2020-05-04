@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-20T12:27:25Z
+
+Can you rebase+retarget the PR for branch 3.4 please? It looks like the bug is there also (and we'll merge 3.4 up to master eventually so 5.0 will get the fix too.)
+
+---------------------------------------------------------------------------
+
+by crishoj at 2020-04-22T17:37:23Z
+
+Rebased and retargeted to 3.4.

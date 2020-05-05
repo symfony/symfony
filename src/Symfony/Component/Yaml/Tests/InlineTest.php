@@ -842,4 +842,14 @@ class InlineTest extends TestCase
             [['' => 'foo', 'bar' => 'ccc'], '{!php/const  : foo, bar: ccc}'],
         ];
     }
+
+    public function testParsePositiveOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(342391, Inline::parse('0123456789'));
+    }
+
+    public function testParseNegativeOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(-342391, Inline::parse('-0123456789'));
+    }
 }

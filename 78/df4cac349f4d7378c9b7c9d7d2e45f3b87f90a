@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-05T17:37:39Z
+
+I fixed Travis on master/5.0 and created a small conflict with your PR. Can you please rebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-05T19:29:56Z
+
+Removing the 2nd commit is enough.
+I would have done it for you if github allowed pushing on your fork.
+I'm sad they changed the default value for this checkbox :'(
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-05-05T19:37:35Z
+
+Removed the second commit and rebased 👍

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Schema\Table;
+
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
@@ -83,7 +85,25 @@ final class PostgreSqlConnection extends Connection
     {
         parent::setup();
 
-        $sql = sprintf(<<<'SQL'
+        $this->driverConnection->exec($this->getTriggerSql());
+    }
+
+    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    {
+        if (!$createdTable->hasOption(self::TABLE_OPTION_NAME)) {
+            return null;
+        }
+
+        if ($createdTable->getOption(self::TABLE_OPTION_NAME) !== $this->configuration['table_name']) {
+            return null;
+        }
+
+        return $this->getTriggerSql();
+    }
+
+    private function getTriggerSql(): string
+    {
+        return sprintf(<<<'SQL'
 LOCK TABLE %1$s;
 -- create trigger function
 CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$
@@ -102,7 +122,6 @@ ON %1$s
 FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();
 SQL
             , $this->configuration['table_name']);
-        $this->driverConnection->exec($sql);
     }
 
     private function unlisten()

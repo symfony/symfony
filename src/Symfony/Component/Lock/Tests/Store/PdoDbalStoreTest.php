@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
 
@@ -58,5 +60,13 @@ class PdoDbalStoreTest extends AbstractStoreTest
     public function testAbortAfterExpiration()
     {
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+    }
+
+    public function testConfigureSchema()
+    {
+        $store = new PdoStore($this->createMock(Connection::class), ['db_table' => 'lock_table']);
+        $schema = new Schema();
+        $store->configureSchema($schema);
+        $this->assertTrue($schema->hasTable('lock_table'));
     }
 }

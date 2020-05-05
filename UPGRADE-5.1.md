@@ -71,6 +71,11 @@ HttpKernel
    not returning an array is deprecated
  * Deprecated support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
 
+Inflector
+---------
+
+ * The component has been deprecated, use `EnglishInflector` from the String component instead.
+
 Mailer
 ------
 

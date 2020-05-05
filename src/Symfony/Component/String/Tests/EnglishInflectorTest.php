@@ -9,15 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Inflector\Tests;
+namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Inflector\Inflector;
+use Symfony\Component\String\Inflector\EnglishInflector;
 
-/**
- * @group legacy
- */
-class InflectorTest extends TestCase
+class EnglishInflectorTest extends TestCase
 {
     public function singularizeProvider()
     {
@@ -297,30 +294,16 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider singularizeProvider
      */
-    public function testSingularize($plural, $expectedSingular)
+    public function testSingularize(string $plural, $singular)
     {
-        $singular = Inflector::singularize($plural);
-        if (\is_string($expectedSingular) && \is_array($singular)) {
-            $this->fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
-        } elseif (\is_array($expectedSingular) && \is_string($singular)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
-        }
-
-        $this->assertEquals($expectedSingular, $singular);
+        $this->assertSame(\is_array($singular) ? $singular : [$singular], (new EnglishInflector())->singularize($plural));
     }
 
     /**
      * @dataProvider pluralizeProvider
      */
-    public function testPluralize($singular, $expectedPlural)
+    public function testPluralize(string $singular, $plural)
     {
-        $plural = Inflector::pluralize($singular);
-        if (\is_string($expectedPlural) && \is_array($plural)) {
-            $this->fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
-        } elseif (\is_array($expectedPlural) && \is_string($plural)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
-        }
-
-        $this->assertEquals($expectedPlural, $plural);
+        $this->assertSame(\is_array($plural) ? $plural : [$plural], (new EnglishInflector())->pluralize($singular));
     }
 }

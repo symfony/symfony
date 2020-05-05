@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
+use MongoDB\Driver\Exception\ConnectionTimeoutException;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
@@ -30,7 +31,11 @@ class MongoDbStoreTest extends AbstractStoreTest
     public static function setupBeforeClass(): void
     {
         $client = self::getMongoClient();
-        $client->listDatabases();
+        try {
+            $client->listDatabases();
+        } catch (ConnectionTimeoutException $e) {
+            self::markTestSkipped('MongoDB server not found.');
+        }
     }
 
     private static function getMongoClient(): Client

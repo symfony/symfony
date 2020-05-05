@@ -12,8 +12,8 @@
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\AbstractString;
-use function Symfony\Component\String\b;
 use Symfony\Component\String\ByteString;
+use Symfony\Component\String\Exception\InvalidArgumentException;
 
 class ByteStringTest extends AbstractAsciiTestCase
 {
@@ -22,43 +22,46 @@ class ByteStringTest extends AbstractAsciiTestCase
         return new ByteString($string);
     }
 
-    public function testFromRandom(): void
+    public function testFromRandom()
     {
         $random = ByteString::fromRandom(32);
 
         self::assertSame(32, $random->length());
         foreach ($random->chunk() as $char) {
-            self::assertNotNull(b('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')->indexOf($char));
+            self::assertNotNull((new ByteString('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))->indexOf($char));
         }
     }
 
-    public function testFromRandomWithSpecificChars(): void
+    public function testFromRandomWithSpecificChars()
     {
         $random = ByteString::fromRandom(32, 'abc');
 
         self::assertSame(32, $random->length());
         foreach ($random->chunk() as $char) {
-            self::assertNotNull(b('abc')->indexOf($char));
+            self::assertNotNull((new ByteString('abc'))->indexOf($char));
         }
     }
 
-    public function testFromRandomEarlyReturnForZeroLength(): void
+    public function testFromRandoWithZeroLength()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A strictly positive length is expected, "0" given.');
+
         self::assertSame('', ByteString::fromRandom(0));
     }
 
-    public function testFromRandomThrowsForNegativeLength(): void
+    public function testFromRandomThrowsForNegativeLength()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected positive length value, got -1');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A strictly positive length is expected, "-1" given.');
 
         ByteString::fromRandom(-1);
     }
 
-    public function testFromRandomAlphabetMin(): void
+    public function testFromRandomAlphabetMin()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected $alphabet\'s length to be in [2^1, 2^56]');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The length of the alphabet must in the [2^1, 2^56] range.');
 
         ByteString::fromRandom(32, 'a');
     }

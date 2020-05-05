@@ -39,9 +39,7 @@ class FileSystemWatchTest extends FilesystemTestCase
         };
 
         $watcher = new FileChangeWatcher();
-        $ref = new \ReflectionProperty($watcher, 'locator');
-        $ref->setAccessible(true);
-        $ref->setValue($watcher, $locator);
+        $watcher->locator = $locator;
 
         $count = 0;
         $watcher->watch($this->workspace, function ($file, $code) use (&$count) {
@@ -72,9 +70,9 @@ class FileSystemWatchTest extends FilesystemTestCase
         $ref->setValue($watcher, $locator);
 
         $start = microtime(true);
-        $watcher->watch($this->workspace, function ($file, $code) {
+        $watcher->watch($this->workspace, static function ($file, $code) {
         }, 500);
 
-        $this->assertTrue(microtime(true) - $start > 0.5);
+        $this->assertGreaterThan(0.5, microtime(true) - $start);
     }
 }

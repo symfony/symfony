@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Watcher\Resource\Locator\FileResourceLocator;
  */
 final class FileChangeWatcher implements WatcherInterface
 {
-    private $locator;
+    public $locator;
 
     public function __construct()
     {

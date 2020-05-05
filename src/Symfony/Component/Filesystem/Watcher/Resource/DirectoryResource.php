@@ -73,7 +73,7 @@ final class DirectoryResource implements ResourceInterface
         $files = [];
 
         /** @var \SplFileInfo $file */
-        foreach (new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS) as $file) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS)) as $file) {
             $path = $file->getRealPath();
             $files[$path] = new FileResource($path);
         }

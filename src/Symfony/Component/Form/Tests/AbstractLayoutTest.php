@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
-use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -1924,7 +1923,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => PercentToLocalizedStringTransformer::ROUND_CEILING]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
@@ -1940,7 +1939,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => PercentToLocalizedStringTransformer::ROUND_CEILING]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
@@ -1955,7 +1954,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => PercentToLocalizedStringTransformer::ROUND_CEILING]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]

@@ -39,12 +39,13 @@ EventDispatcher
 Form
 ----
 
- * The default value of the `rounding_mode` option of the `PercentType` has been changed to `PercentToLocalizedStringTransformer::ROUND_HALF_UP`.
- * The default rounding mode of the `PercentToLocalizedStringTransformer` has been changed to `ROUND_HALF_UP`.
+ * The default value of the `rounding_mode` option of the `PercentType` has been changed to `\NumberFormatter::ROUND_HALFUP`.
+ * The default rounding mode of the `PercentToLocalizedStringTransformer` has been changed to `\NumberFormatter::ROUND_HALFUP`.
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
  * Added the `setIsEmptyCallback()` method to the `FormConfigBuilderInterface`.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.
  * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
+ * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been removed, use `\NumberFormatter::ROUND_*` instead.
 
 FrameworkBundle
 ---------------

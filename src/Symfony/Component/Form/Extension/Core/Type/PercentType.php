@@ -50,7 +50,7 @@ class PercentType extends AbstractType
         $resolver->setDefaults([
             'scale' => 0,
             'rounding_mode' => function (Options $options) {
-                trigger_deprecation('symfony/form', '5.1', 'Not configuring the "rounding_mode" option is deprecated. It will default to "%s::ROUND_HALF_UP" in Symfony 6.0.', PercentToLocalizedStringTransformer::class);
+                trigger_deprecation('symfony/form', '5.1', 'Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.');
 
                 return null;
             },
@@ -65,19 +65,19 @@ class PercentType extends AbstractType
         ]);
         $resolver->setAllowedValues('rounding_mode', [
             null,
-            PercentToLocalizedStringTransformer::ROUND_FLOOR,
-            PercentToLocalizedStringTransformer::ROUND_DOWN,
-            PercentToLocalizedStringTransformer::ROUND_HALF_DOWN,
-            PercentToLocalizedStringTransformer::ROUND_HALF_EVEN,
-            PercentToLocalizedStringTransformer::ROUND_HALF_UP,
-            PercentToLocalizedStringTransformer::ROUND_UP,
-            PercentToLocalizedStringTransformer::ROUND_CEILING,
+            \NumberFormatter::ROUND_FLOOR,
+            \NumberFormatter::ROUND_DOWN,
+            \NumberFormatter::ROUND_HALFDOWN,
+            \NumberFormatter::ROUND_HALFEVEN,
+            \NumberFormatter::ROUND_HALFUP,
+            \NumberFormatter::ROUND_UP,
+            \NumberFormatter::ROUND_CEILING,
         ]);
         $resolver->setAllowedTypes('scale', 'int');
         $resolver->setAllowedTypes('symbol', ['bool', 'string']);
         $resolver->setDeprecated('rounding_mode', 'symfony/form', '5.1', function (Options $options, $roundingMode) {
             if (null === $roundingMode) {
-                return sprintf('Not configuring the "rounding_mode" option is deprecated. It will default to "%s::ROUND_HALF_UP" in Symfony 6.0.', PercentToLocalizedStringTransformer::class);
+                return 'Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.';
             }
 
             return '';

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-03-24T10:21:05Z
+
+@nicolas-grekas I reverted the milestone. We cannot introduce a new deprecation in 5.0.x
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-03-24T10:48:36Z
+
+About the migration cost ... I would never change the `render()` method because *everybody* uses it ... but `renderView()` is much less popular (in my experience and from what I've seen out there: render() is used more than 100 times more often that renderView() ... but this is only my experience).
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-03-24T12:27:04Z
+
+> About the migration cost ... I would never change the `render()` method because _everybody_ uses it ... but `renderView()` is much less popular (in my experience and from what I've seen out there: render() is used more than 100 times more often that renderView() ... but this is only my experience).
+
+Seems about right. Not exactly a factor of 100 but here some numbers from my biggest Symfony 4.4 work project:
+
+```
+$ grep -r --include *Controller.php  'this->render(' src/ vendor/ | wc -l
+180
+
+$ grep -r --include *Controller.php  'this->renderView(' src/ vendor/ | wc -l
+14
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2020-03-24T19:41:07Z
+
+Another point. MVC division: Model, view, controller. Most programmers associate with such an approach that the controller generates a view, not a template.

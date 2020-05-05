@@ -319,4 +319,9 @@ class RequestContext
 
         return $this;
     }
+
+    public function isSecure(): bool
+    {
+        return 'https' === $this->scheme;
+    }
 }

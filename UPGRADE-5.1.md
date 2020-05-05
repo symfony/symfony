@@ -39,14 +39,15 @@ EventDispatcher
 Form
 ----
 
- * Not configuring the `rounding_mode` option of the `PercentType` is deprecated. It will default to `PercentToLocalizedStringTransformer::ROUND_HALF_UP` in Symfony 6.
- * Not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer` is deprecated. It will default to `ROUND_HALF_UP` in Symfony 6.
+ * Not configuring the `rounding_mode` option of the `PercentType` is deprecated. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
+ * Not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer` is deprecated. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
  * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
  * Using `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class is deprecated, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
+ * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been deprecated, use `\NumberFormatter::ROUND_*` instead.
 
 FrameworkBundle
 ---------------

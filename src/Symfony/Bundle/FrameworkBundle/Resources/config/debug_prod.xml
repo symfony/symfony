@@ -15,12 +15,13 @@
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="php" />
             <argument>null</argument><!-- Exception handler -->
-            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="monolog.logger.php" on-invalid="null" />
             <argument>null</argument><!-- Log levels map for enabled error levels -->
             <argument>%debug.error_handler.throw_at%</argument>
             <argument>%kernel.debug%</argument>
             <argument type="service" id="debug.file_link_formatter" />
             <argument>%kernel.debug%</argument>
+            <argument type="service" id="monolog.logger.deprecation" on-invalid="null" />
         </service>
 
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">

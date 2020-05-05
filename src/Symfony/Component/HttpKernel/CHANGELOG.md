@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * allowed to use a specific logger channel for deprecations
+
 5.1.0
 -----
 

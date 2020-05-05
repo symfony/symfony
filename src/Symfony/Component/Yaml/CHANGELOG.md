@@ -4,6 +4,22 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added support for parsing numbers prefixed with `0o` as octal numbers.
+ * Deprecated support for parsing numbers starting with `0` as octal numbers. They will be parsed as strings as of Symfony 6.0. Prefix numbers with `0o`
+   so that they are parsed as octal numbers.
+
+   Before:
+
+   ```yaml
+   Yaml::parse('072');
+   ```
+
+   After:
+
+   ```yaml
+   Yaml::parse('0o72');
+   ```
+
  * Added `yaml-lint` binary.
  * Deprecated using the `!php/object` and `!php/const` tags without a value.
 

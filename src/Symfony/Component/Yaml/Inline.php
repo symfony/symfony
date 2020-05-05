@@ -631,6 +631,14 @@ class Inline
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                 }
+            case preg_match('/^(?:\+|-)?0o(?P<value>[0-7_]++)$/', $scalar, $matches):
+                $value = str_replace('_', '', $matches['value']);
+
+                if ('-' === $scalar[0]) {
+                    return -octdec($value);
+                } else {
+                    return octdec($value);
+                }
 
             // Optimize for returning strings.
             // no break
@@ -644,10 +652,18 @@ class Inline
                         $raw = $scalar;
                         $cast = (int) $scalar;
 
+                        if ('0' === $scalar[0] && '0' !== $scalar) {
+                            trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
+                        }
+
                         return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
                         $raw = $scalar;
                         $cast = (int) $scalar;
+
+                        if ('0' === $scalar[1] && '-0' !== $scalar) {
+                            trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
+                        }
 
                         return '0' == $scalar[1] ? -octdec(substr($scalar, 1)) : (($raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):

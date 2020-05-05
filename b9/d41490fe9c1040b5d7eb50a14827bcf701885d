@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-05-01T15:34:49Z
+
+Basically, if this makes sense, I will:
+
+A) Complete this for Messenger with tests
+B) Propose the DoctrineBundle PR
+C) (At least) make a list of the other areas in the system that need this type of thing
+
+---------------------------------------------------------------------------
+
+by Koc at 2020-05-02T11:04:02Z
+
+Should we deprecate schema filters from https://github.com/doctrine/DoctrineBundle/pull/1037 PR if current will be merged?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-05-02T14:13:42Z
+
+> Should we deprecate schema filters from doctrine/DoctrineBundle#1037 PR if current will be merged?
+
+@Koc At least for Messenger & Cache, definitely. In fact, I'd argue we should we remove them: this feature will replace them
+
+For Lock & PdoSessionStorage, they will probably need to stay, as this PR doesn't fix those situations - at least not all the way.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-05-02T15:01:29Z
+
+This is ready - test failures look unrelated.
+
+I'm super happy with the Messenger & Cache integration and very dissatisfied with the Lock & Session integration. My instinct is that we need to save a proper Lock & Session solution for later.
+
+Cheers!

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-04-01T18:18:15Z
+
+Constraints should not be implemented in the Form component IMO.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-01T18:28:13Z
+
+So a solution could be to use the normalizer to add a `Regex` constraint when the option is true.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-01T18:36:47Z
+
+>So a solution could be to use the normalizer to add a Regex constraint when the option is true.
+
+But then we should not require the Validator component for such option, add do it in the `ColorType` directly using a `preg_match` in a listener instead.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-04-02T07:20:07Z
+
+I agree, this could simply be part of the `ColorType`. For consistency with other form types I suggest to add an `html5` option which renders an HTML5 `input="type"` widget and performs these validation rules.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-08T10:24:23Z
+
+I took your ideas into consideration. That's kind of out of my initial use case but it's still going to  be useful.
+
+> which renders an HTML5 input="type" widget
+
+AFAIK, that's already the case.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-08T10:27:16Z
+
+> do it in the ColorType directly using a preg_match in a listener instead.
+
+Should we however add a RegExp constraint (and skip the listener) if the Validator component is there?

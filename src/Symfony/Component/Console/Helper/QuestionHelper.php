@@ -460,10 +460,6 @@ class QuestionHelper extends Helper
         $error = null;
         $attempts = $question->getMaxAttempts();
 
-        if (null === $attempts && !$this->isTty()) {
-            $attempts = 1;
-        }
-
         while (null === $attempts || $attempts--) {
             if (null !== $error) {
                 $this->writeError($output, $error);
@@ -475,6 +471,8 @@ class QuestionHelper extends Helper
                 throw $e;
             } catch (\Exception $error) {
             }
+
+            $attempts = $attempts ?? -(int) $this->isTty();
         }
 
         throw $error;
@@ -515,7 +513,7 @@ class QuestionHelper extends Helper
             return stream_isatty($inputStream);
         }
 
-        if (!\function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             return posix_isatty($inputStream);
         }
 

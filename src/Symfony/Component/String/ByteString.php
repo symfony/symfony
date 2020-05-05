@@ -45,14 +45,14 @@ class ByteString extends AbstractString
     public static function fromRandom(int $length = 16, string $alphabet = null): self
     {
         if ($length <= 0) {
-            throw new InvalidArgumentException(sprintf('Expected positive length value, got "%d".', $length));
+            throw new InvalidArgumentException(sprintf('A strictly positive length is expected, "%d" given.', $length));
         }
 
         $alphabet = $alphabet ?? self::ALPHABET_ALPHANUMERIC;
         $alphabetSize = \strlen($alphabet);
         $bits = (int) ceil(log($alphabetSize, 2.0));
         if ($bits <= 0 || $bits > 56) {
-            throw new InvalidArgumentException('Expected $alphabet\'s length to be in [2^1, 2^56].');
+            throw new InvalidArgumentException('The length of the alphabet must in the [2^1, 2^56] range.');
         }
 
         $ret = '';

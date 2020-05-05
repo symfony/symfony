@@ -18,7 +18,7 @@ use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
-class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     /**
      * {@inheritdoc}
@@ -50,7 +50,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!class_exists(AbstractUid::class)) {
-            throw new LogicException('Unable to execute this command as the Symfony Uid Component is not installed.');
+            throw new LogicException('You cannot use the "Symfony\Component\Serializer\Normalizer\UidNormalizer" as the Symfony Uid Component is not installed. Try running "composer require symfony/uid".');
         }
 
         try {
@@ -67,7 +67,7 @@ class UidNormalizer implements NormalizerInterface, DenormalizerInterface, Cache
      */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        return is_subclass_of($type, AbstractUid::class) || AbstractUid::class === $type;
+        return is_a($type, AbstractUid::class, true);
     }
 
     /**

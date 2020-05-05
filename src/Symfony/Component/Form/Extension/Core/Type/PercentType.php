@@ -50,7 +50,7 @@ class PercentType extends AbstractType
         $resolver->setDefaults([
             'scale' => 0,
             'rounding_mode' => function (Options $options) {
-                trigger_deprecation('symfony/form', '5.1', sprintf('Not configuring the "rounding_mode" option is deprecated. It will default to "%s::ROUND_HALF_UP" in Symfony 6.0.', PercentToLocalizedStringTransformer::class));
+                trigger_deprecation('symfony/form', '5.1', 'Not configuring the "rounding_mode" option is deprecated. It will default to "%s::ROUND_HALF_UP" in Symfony 6.0.', PercentToLocalizedStringTransformer::class);
 
                 return null;
             },

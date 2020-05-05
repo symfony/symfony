@@ -101,6 +101,23 @@ class ExpressionLanguage
     }
 
     /**
+     * Validates the syntax of an expression.
+     *
+     * @param Expression|string $expression The expression to validate
+     * @param array|null        $names      The list of acceptable variable names in the expression, or null to accept any names
+     *
+     * @throws SyntaxError When the passed expression is invalid
+     */
+    public function lint($expression, ?array $names): void
+    {
+        if ($expression instanceof ParsedExpression) {
+            return;
+        }
+
+        $this->getParser()->lint($this->getLexer()->tokenize((string) $expression), $names);
+    }
+
+    /**
      * Registers a function.
      *
      * @param callable $compiler  A callable able to compile the function

@@ -814,6 +814,22 @@ class InlineTest extends TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testParsePositiveOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(342391, Inline::parse('0123456789'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testParseNegativeOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(-342391, Inline::parse('-0123456789'));
+    }
+
+    /**
      * @dataProvider unquotedExclamationMarkThrowsProvider
      */
     public function testUnquotedExclamationMarkThrows(string $value)

@@ -252,9 +252,7 @@ install:
           fi
 
           ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
-          if [[ $deps || $PHP != 7.2 ]]; then
-              tfold 'composer update' $COMPOSER_UP
-          fi
+          tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1

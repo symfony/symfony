@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T20:43:06Z
+
+Do you mean to use the same handler(s) as `php` channel if no handler if defined for `deprecation` channel ?
+Currently I don't see any way to do that but maybe we could add a `fallback` (not sure for the name) tag property (with a channel name). [FixEmptyLoggerPass](https://github.com/symfony/monolog-bundle/blob/v3.5.0/DependencyInjection/Compiler/FixEmptyLoggerPass.php) could use the handlers defined for this channel instead of `NullHandler` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-04T16:31:49Z
+
+> Do you mean to use the same handler(s) as php channel if no handler if defined for deprecation channel ?
+
+Yes, that's a possibility.
+
+I fear that logging deprecations to a new channel might break apps that configured the php channel and expect deprecations to go there.
+
+Ideally, we'd figure out a way to make the new channel opt-in somehow.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-05-04T20:33:47Z
+
+> Ideally, we'd figure out a way to make the new channel opt-in somehow.
+
+Logging to specific channel is now disabled by default (the service `monolog.logger.deprecation` doesn't exist). Adding a `deprecation` additional channel in monolog configuration create the service and enable the feature (see exemple in [PR description](https://github.com/symfony/symfony/pull/36621#issue-410738921))

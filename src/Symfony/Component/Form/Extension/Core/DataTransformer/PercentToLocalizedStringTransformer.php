@@ -103,7 +103,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (null === $roundingMode && (\func_num_args() < 4 || func_get_arg(3))) {
-            trigger_deprecation('symfony/form', '5.1', sprintf('Not passing a rounding mode to %s() is deprecated. Starting with Symfony 6.0 it will default to "%s::ROUND_HALF_UP".', __METHOD__, __CLASS__));
+            trigger_deprecation('symfony/form', '5.1', 'Not passing a rounding mode to %s() is deprecated. Starting with Symfony 6.0 it will default to "%s::ROUND_HALF_UP".', __METHOD__, __CLASS__);
         }
 
         if (!\in_array($type, self::$types, true)) {

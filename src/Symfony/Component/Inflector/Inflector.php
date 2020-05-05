@@ -13,7 +13,7 @@ namespace Symfony\Component\Inflector;
 
 use Symfony\Component\String\Inflector\EnglishInflector;
 
-trigger_deprecation('symfony/inflector', '5.1', sprintf('The "%s" class is deprecated, use "%s" instead.', Inflector::class, EnglishInflector::class));
+trigger_deprecation('symfony/inflector', '5.1', 'The "%s" class is deprecated, use "%s" instead.', Inflector::class, EnglishInflector::class);
 
 /**
  * Converts words between singular and plural forms.

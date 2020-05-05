@@ -109,6 +109,8 @@ class QuestionHelper extends Helper
         $inputStream = $this->inputStream ?: STDIN;
         $autocomplete = $question->getAutocompleterCallback();
 
+        $cursor = new Cursor($output);
+
         if (null === $autocomplete || !Terminal::hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
@@ -123,10 +125,80 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = fgets($inputStream, 4096);
-                if (false === $ret) {
-                    throw new MissingInputException('Aborted.');
+                if (!Terminal::hasSttyAvailable()) {
+                    $ret = fgets($inputStream, 4096);
+                    if (false === $ret) {
+                        throw new MissingInputException('Aborted.');
+                    }
+                } else {
+                    $sttyMode = shell_exec('stty -g');
+
+                    shell_exec('stty -icanon -echo');
+
+                    $k = null;
+                    $string = '';
+
+                    [$x] = $cursor->getCurrentPosition();
+
+                    while (10 !== $k && 0 !== $k) {
+                        [$pos] = $cursor->getCurrentPosition();
+                        $pos -= $x;
+
+                        $ret = fgetc($inputStream);
+                        if (false === $ret && '' === $string) {
+                            shell_exec(sprintf('stty %s', $sttyMode));
+                            throw new MissingInputException('Aborted.');
+                        }
+
+                        $k = \ord($ret);
+
+                        if (27 === $k) {
+                            fgetc($inputStream);
+                            $k = \ord(fgetc($inputStream));
+
+                            switch (true) {
+                                case 67 === $k && $pos < self::strlen($string):
+                                    $cursor->moveRight();
+                                    break;
+                                case 68 === $k && $pos > 0:
+                                    $cursor->moveLeft();
+                                    break;
+                                case 51 === $k && $pos >= 0:
+                                    $string = self::substr($string, 0, $pos).self::substr($string, $pos + 1);
+                                    $cursor->clearLineAfter();
+                                    $output->write(self::substr($string, $pos));
+                                    $cursor->moveToColumn($pos + $x);
+                                    break;
+                            }
+                        } elseif (127 === $k) {
+                            if ($pos > 0) {
+                                $string = self::substr($string, 0, $pos - 1).self::substr($string, $pos);
+
+                                $cursor->moveToColumn($x);
+                                $output->write($string);
+                                $cursor->clearLineAfter()
+                                    ->moveToColumn(($pos + $x) - 1);
+                            }
+                        } elseif ($k >= 32 && $k <= 126) {
+                            if ($pos > 0 && $pos < \strlen($string)) {
+                                $string = self::substr($string, 0, $pos).$ret.self::substr($string, $pos);
+                                $output->write($ret.self::substr($string, $pos + 1));
+                                $cursor->clearLineAfter()
+                                    ->moveToColumn($pos + $x + 1);
+                            } else {
+                                $string .= $ret;
+                                $output->write($ret);
+                            }
+                        } else {
+                            $output->write($ret);
+                        }
+                    }
+
+                    shell_exec(sprintf('stty %s', $sttyMode));
+
+                    $ret = $string;
                 }
+
                 if ($question->isTrimmable()) {
                     $ret = trim($ret);
                 }

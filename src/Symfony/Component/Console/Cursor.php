@@ -163,6 +163,10 @@ final class Cursor
 
         sscanf($code, "\033[%d;%dR", $row, $col);
 
+        if (null === $row && null === $col) {
+            sscanf($code, "~\033[%d;%dR", $row, $col);
+        }
+
         return [$col, $row];
     }
 }

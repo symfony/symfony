@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-05-05T10:29:29Z
+
+What's the reproduction scenario for this? There is an phpt integration test using stdin and question helper, I'm wondering why it didn't fail. Code I used is inspired by former code in Application class and there was no `sapi_windows_vt100_support` used there. It was also passing stream to those functions disregarding if output is instance of streaminterface
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-05T10:33:19Z
+
+`echo "$several_answers" | the-command`

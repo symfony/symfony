@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by dbrumann at 2020-05-04T07:28:01Z
+
+Code looks good to me, but I am wondering what this is needed for and if this is the correct way of doing it?
+
+There are a few exceptions that already extend the AccountStatusException, e.g. LockedException, AccountExpiredException or DisabledException. These would not benefit from your change. Is that intended?
+
+That brings me to my other question, these Exceptions already communicate what the status problem was and a custom message could be provided, e.g. via translations. Do you have a use case for when you need a fully customizable message? Maybe that would help me understand better what this is needed for.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-05-04T07:53:46Z
+
+> Code looks good to me, but I am wondering what this is needed for and if this is the correct way of doing it?
+>
+> There are a few exceptions that already extend the AccountStatusException, e.g. LockedException, AccountExpiredException or DisabledException. These would not benefit from your change. Is that intended?
+>
+> That brings me to my other question, these Exceptions already communicate what the status problem was and a custom message could be provided, e.g. via translations. Do you have a use case for when you need a fully customizable message? Maybe that would help me understand better what this is needed for.
+
+Yes, it's intended.
+
+In the same way, there are multiple `AuthenticationException`, like `BadCredentialsException`, `AuthenticationCredentialsNotFoundException`, `UsernameNotFoundException`, etc... BUT symfony provide a `CustomUserMessageAuthenticationException` if a custom message is needed. This avoid every developper to create a new custom `Exception`.
+
+For `UserChecker`, there are indeed `LockedException`, `AccountExpiredException`, `DisabledException`, etc... but you can't customize the message. Symfony won't be able to cover every possible case, so providing a `CustomUserMessage` sounds like a nice idea to me.
+
+You can indeed override the error message `Account is locked.` of, let's say, a `LockedException` but the exception are no taking `messageData`. So If my user is temporary locked until some date, I can't pass this date to the `LockedException` and display it in the error message.
+
+Plus, If you override an error message like `Account is disabled.`, I am maybe wrong but you'll can only have one override. If you have multiple reason to disabled the account, you may want different exception and error message.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2020-05-04T11:08:46Z
+
+Thanks for the clarification.

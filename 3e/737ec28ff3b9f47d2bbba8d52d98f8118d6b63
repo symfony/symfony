@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-09T14:16:15Z
+
+Me too :)
+
+> standalone inflector (like the Slugger)
+
+I think this is the way to go personally.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-01-09T16:17:08Z
+
+> * Deprecate the Inflector component
+> * Use the String inflector in Symfony's code
+
+Note that these 2 TODOs look impossible to me as long as String is experimental (we should not make PropertyAccess and PropertyInfo stable components depend on an experimental one.
+
+Also, given the performance sensitivity of these 2 components, I would like to see benchmarks of using your new Inflector vs using the existing one relying on PHP strings.
+As all the English inflection rules are pure ASCII, I don't see any benefit for using the String abstraction (which probably adds overhead compared to native strings).
+
+Also, what is the migration plan ? The current Inflector has a non-configurable static API. Your new inflector would require injecting an inflector in PropertyAccess and PropertyInfo. But changing the inflection rules used to access properties can become quite unexpected (if your project changes them, it might break all forms shipped by bundles where they expect PropertyAccess to work based on the core rules).
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-03T15:46:01Z
+
+> Also, given the performance sensitivity of these 2 components, I would like to see benchmarks of using your new Inflector vs using the existing one relying on PHP strings.
+
+From my benchmark, using the String component makes `singularize` between 5 to 7 times slower.
+
+> As all the English inflection rules are pure ASCII, I don't see any benefit for using the String abstraction (which probably adds overhead compared to native strings).
+
+> the implementation should use native string functionsn, that would fix most of the perf considerations.
+
+Since what we have is an English inflector, do you mean we should directly return the passed string suffixed with `s` (for pluralize as example) when it does not match `[a-zA-Z]+` and keep the current code (using native string functions) for the rest?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-04-30T13:29:22Z
+
+I reworked on this with a simple approach. We just copy paste the existing code in the String component. We add an interface. The only code change we make is that singularize and pluralize always return an array of strings.
+
+I deprecated the Inflector component. The deprecated Inflector component uses the String component.
+
+The PropertyInfo ReflectionExtractor class can now receive an InflectorInterface in its constructor. By default, it instantiates an EnglishInflector so there is no BC break.
+
+I guess we don't need to make this more complicated.
+
+Thanks to @nicolas-grekas for his suggestions btw.

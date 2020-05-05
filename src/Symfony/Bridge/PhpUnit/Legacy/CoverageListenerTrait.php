@@ -75,7 +75,7 @@ class CoverageListenerTrait
 
         $covers = $sutFqcn;
         if (!\is_array($sutFqcn)) {
-            $covers = [$sutFqcn];
+            $covers = array($sutFqcn);
             while ($parent = get_parent_class($sutFqcn)) {
                 $covers[] = $parent;
                 $sutFqcn = $parent;

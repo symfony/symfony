@@ -1,14 +1,10 @@
 CHANGELOG
 =========
 
-5.2.0
------
-
- * allowed to use a specific logger channel for deprecations
-
 5.1.0
 -----
 
+ * allowed to use a specific logger channel for deprecations
  * made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+;
    not returning an array is deprecated
  * made kernels implementing `WarmableInterface` be part of the cache warmup stage

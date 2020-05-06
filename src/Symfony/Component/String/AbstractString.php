@@ -27,7 +27,7 @@ use Symfony\Component\String\Exception\RuntimeException;
  *
  * @throws ExceptionInterface
  */
-abstract class AbstractString implements \JsonSerializable
+abstract class AbstractString implements \Stringable, \JsonSerializable
 {
     public const PREG_PATTERN_ORDER = PREG_PATTERN_ORDER;
     public const PREG_SET_ORDER = PREG_SET_ORDER;
@@ -252,6 +252,14 @@ abstract class AbstractString implements \JsonSerializable
         $str->string = trim(preg_replace('/(?:\s{2,}+|[^\S ])/', ' ', $str->string));
 
         return $str;
+    }
+
+    /**
+     * @param string|string[] $needle
+     */
+    public function containsAny($needle): bool
+    {
+        return null !== $this->indexOf($needle);
     }
 
     /**
@@ -620,7 +628,7 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
-    public function truncate(int $length, string $ellipsis = ''): self
+    public function truncate(int $length, string $ellipsis = '', bool $cut = true): self
     {
         $stringLength = $this->length();
 
@@ -632,6 +640,10 @@ abstract class AbstractString implements \JsonSerializable
 
         if ($length < $ellipsisLength) {
             $ellipsisLength = 0;
+        }
+
+        if (!$cut) {
+            $length = $ellipsisLength + ($this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1) ?? $stringLength);
         }
 
         $str = $this->slice(0, $length - $ellipsisLength);

@@ -144,7 +144,8 @@ class SwitchUserListener extends AbstractListener
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // User already switched, exit before seamlessly switching to another user
+            $token = $this->attemptExitUser($request);
         }
 
         $currentUsername = $token->getUsername();
@@ -157,7 +158,7 @@ class SwitchUserListener extends AbstractListener
 
             try {
                 $this->provider->loadUserByUsername($nonExistentUsername);
-            } catch (AuthenticationException $e) {
+            } catch (\Exception $e) {
             }
         } catch (AuthenticationException $e) {
             $this->provider->loadUserByUsername($currentUsername);

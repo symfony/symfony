@@ -14,6 +14,9 @@ namespace Symfony\Component\ExpressionLanguage;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ParsedExpression::class);
+
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
  *
@@ -95,6 +98,23 @@ class ExpressionLanguage
         }
 
         return $parsedExpression;
+    }
+
+    /**
+     * Validates the syntax of an expression.
+     *
+     * @param Expression|string $expression The expression to validate
+     * @param array|null        $names      The list of acceptable variable names in the expression, or null to accept any names
+     *
+     * @throws SyntaxError When the passed expression is invalid
+     */
+    public function lint($expression, ?array $names): void
+    {
+        if ($expression instanceof ParsedExpression) {
+            return;
+        }
+
+        $this->getParser()->lint($this->getLexer()->tokenize((string) $expression), $names);
     }
 
     /**

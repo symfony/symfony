@@ -164,7 +164,7 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient(__FUNCTION__);
 
         $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () {
-            throw new \Exception('Boo');
+            throw new \Exception('Boo.');
         }]);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -646,7 +646,7 @@ abstract class HttpClientTestCase extends TestCase
         $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
             'on_progress' => function ($dlNow) {
                 if (0 < $dlNow) {
-                    throw new \Exception('Aborting the request');
+                    throw new \Exception('Aborting the request.');
                 }
             },
         ]);
@@ -656,7 +656,7 @@ abstract class HttpClientTestCase extends TestCase
             }
             $this->fail(ClientExceptionInterface::class.' expected');
         } catch (TransportExceptionInterface $e) {
-            $this->assertSame('Aborting the request', $e->getPrevious()->getMessage());
+            $this->assertSame('Aborting the request.', $e->getPrevious()->getMessage());
         }
 
         $this->assertNotNull($response->getInfo('error'));
@@ -670,7 +670,7 @@ abstract class HttpClientTestCase extends TestCase
         $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
             'on_progress' => function ($dlNow) {
                 if (0 < $dlNow) {
-                    throw new \Error('BUG');
+                    throw new \Error('BUG.');
                 }
             },
         ]);
@@ -680,7 +680,7 @@ abstract class HttpClientTestCase extends TestCase
             }
             $this->fail('Error expected');
         } catch (\Error $e) {
-            $this->assertSame('BUG', $e->getMessage());
+            $this->assertSame('BUG.', $e->getMessage());
         }
 
         $this->assertNotNull($response->getInfo('error'));
@@ -701,6 +701,23 @@ abstract class HttpClientTestCase extends TestCase
         $response = null;
         $this->expectException(TransportExceptionInterface::class);
         $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 1]);
+    }
+
+    public function testIdnResolve()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://0-------------------------------------------------------------0.com:8057/', [
+            'resolve' => ['0-------------------------------------------------------------0.com' => '127.0.0.1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response = $client->request('GET', 'http://Bücher.example:8057/', [
+            'resolve' => ['xn--bcher-kva.example' => '127.0.0.1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testNotATimeout()

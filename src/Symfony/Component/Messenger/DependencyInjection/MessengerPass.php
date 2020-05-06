@@ -75,7 +75,7 @@ class MessengerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (isset($tag['bus']) && !\in_array($tag['bus'], $busIds, true)) {
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: %s).', $serviceId, $tag['bus'], $this->handlerTag, implode(', ', $busIds)));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], $this->handlerTag, implode('", "', $busIds)));
                 }
 
                 $className = $this->getServiceClass($container, $serviceId);
@@ -102,7 +102,7 @@ class MessengerPass implements CompilerPassInterface
                             $message = $options;
                             $options = [];
                         } else {
-                            throw new RuntimeException(sprintf('The handler configuration needs to return an array of messages or an associated array of message and configuration. Found value of type "%s" at position "%d" for service "%s".', \gettype($options), $message, $serviceId));
+                            throw new RuntimeException(sprintf('The handler configuration needs to return an array of messages or an associated array of message and configuration. Found value of type "%s" at position "%d" for service "%s".', get_debug_type($options), $message, $serviceId));
                         }
                     }
 

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
@@ -33,10 +34,9 @@ class RegisterCsrfTokenClearingLogoutHandlerPass implements CompilerPassInterfac
             return;
         }
 
-        $container->register('security.logout.handler.csrf_token_clearing', 'Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler')
+        $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
             ->addArgument(new Reference('security.csrf.token_storage'))
+            ->addTag('kernel.event_subscriber')
             ->setPublic(false);
-
-        $container->findDefinition('security.logout_listener')->addMethodCall('addHandler', [new Reference('security.logout.handler.csrf_token_clearing')]);
     }
 }

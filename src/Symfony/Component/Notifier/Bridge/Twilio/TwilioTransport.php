@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TwilioTransport extends AbstractTransport
 {
@@ -54,7 +54,7 @@ final class TwilioTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
         }
 
         $endpoint = sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
@@ -70,7 +70,7 @@ final class TwilioTransport extends AbstractTransport
         if (201 !== $response->getStatusCode()) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s (see %s).', $error['message'], $error['more_info']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: '.$error['message'].' (see %s).', $error['more_info']), $response);
         }
     }
 }

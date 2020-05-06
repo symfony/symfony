@@ -86,7 +86,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         }
 
         if (!\is_string($username) && (!\is_object($username) || !method_exists($username, '__toString'))) {
-            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($username)));
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], get_debug_type($username)));
         }
 
         $username = trim($username);

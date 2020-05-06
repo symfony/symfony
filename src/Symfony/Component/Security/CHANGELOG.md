@@ -5,6 +5,12 @@ CHANGELOG
 -----
 
  * Added access decision strategy to override access decisions by voter service priority
+ * Added `IS_ANONYMOUS`, `IS_REMEMBERED`, `IS_IMPERSONATOR`
+ * Hash the persistent RememberMe token value in database.
+ * Added `LogoutEvent` to allow custom logout listeners.
+ * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface` in favor of listening on the `LogoutEvent`.
+ * Added experimental new security using `Http\Authenticator\AuthenticatorInterface`, `Http\Authentication\AuthenticatorManager` and `Http\Firewall\AuthenticatorManagerListener`.
+ * Added `CustomUserMessageAccountStatusException` to be used when extending `UserCheckerInterface`
 
 5.0.0
 -----

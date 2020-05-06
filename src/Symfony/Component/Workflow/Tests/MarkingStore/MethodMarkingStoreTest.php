@@ -53,6 +53,18 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertEquals($marking, $marking2);
     }
 
+    public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName()
+    {
+        $subject = new Subject(0);
+
+        $markingStore = new MethodMarkingStore(true);
+
+        $marking = $markingStore->getMarking($subject);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertCount(1, $marking->getPlaces());
+    }
+
     public function testGetMarkingWithValueObject()
     {
         $subject = new Subject($this->createValueObject('first_place'));

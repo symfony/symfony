@@ -467,7 +467,7 @@ class Application implements ResetInterface
         $command->getDefinition();
 
         if (!$command->getName()) {
-            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', \get_class($command)));
+            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_debug_type($command)));
         }
 
         $this->commands[$command->getName()] = $command;
@@ -576,7 +576,7 @@ class Application implements ResetInterface
 
         $exact = \in_array($namespace, $namespaces, true);
         if (\count($namespaces) > 1 && !$exact) {
-            throw new NamespaceNotFoundException(sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
+            throw new NamespaceNotFoundException(sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -647,15 +647,7 @@ class Application implements ResetInterface
         // filter out aliases for commands which are already on the list
         if (\count($commands) > 1) {
             $commandList = $this->commandLoader ? array_merge(array_flip($this->commandLoader->getNames()), $this->commands) : $this->commands;
-
-            if (isset($commandList[$name])) {
-                return $this->get($name);
-            }
-
-            foreach ($commands as $k => $nameOrAlias) {
-                if ($nameOrAlias === $name) {
-                    return $this->get($nameOrAlias);
-                }
+            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use (&$commandList, $commands, &$aliases) {
                 if (!$commandList[$nameOrAlias] instanceof Command) {
                     $commandList[$nameOrAlias] = $this->commandLoader->get($nameOrAlias);
                 }
@@ -664,14 +656,8 @@ class Application implements ResetInterface
 
                 $aliases[$nameOrAlias] = $commandName;
 
-                if ($commandName === $nameOrAlias || !\in_array($commandName, $commands)) {
-                    continue;
-                }
-
-                unset($commands[$k]);
-            }
-
-            $commands = array_unique($commands);
+                return $commandName === $nameOrAlias || !\in_array($commandName, $commands);
+            }));
         }
 
         if (\count($commands) > 1) {
@@ -696,7 +682,7 @@ class Application implements ResetInterface
             if (\count($commands) > 1) {
                 $suggestions = $this->getAbbreviationSuggestions(array_filter($abbrevs));
 
-                throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
+                throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $name, $suggestions), array_values($commands));
             }
         }
 
@@ -788,17 +774,16 @@ class Application implements ResetInterface
         do {
             $message = trim($e->getMessage());
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $class = \get_class($e);
-                $class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class))).'@anonymous' : $class;
+                $class = get_debug_type($e);
                 $title = sprintf('  [%s%s]  ', $class, 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
                 $len = Helper::strlen($title);
             } else {
                 $len = 0;
             }
 
-            if (false !== strpos($message, "class@anonymous\0")) {
-                $message = preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
-                    return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0]))).'@anonymous' : $m[0];
+            if (false !== strpos($message, "@anonymous\0")) {
+                $message = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
+                    return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0];
                 }, $message);
             }
 

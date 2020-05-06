@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -31,41 +32,26 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class XmlDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $this->writeDocument($this->getRouteCollectionDocument($routes));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeDocument($this->getRouteDocument($route, isset($options['name']) ? $options['name'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeDocument($this->getContainerParametersDocument($parameters));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -75,25 +61,16 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $builder, isset($options['show_arguments']) && $options['show_arguments']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], isset($options['filter']) ? $options['filter'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         $this->writeDocument($this->getContainerDefinitionDocument($definition, isset($options['id']) ? $options['id'] : null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -110,41 +87,54 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, \array_key_exists('event', $options) ? $options['event'] : null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCallable($callable, array $options = [])
     {
         $this->writeDocument($this->getCallableDocument($callable));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $this->writeDocument($this->getContainerParameterDocument($parameter, $options));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
         throw new LogicException('Using the XML format to debug environment variables is not supported.');
     }
 
-    /**
-     * Writes DOM document.
-     */
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        if (!file_exists($containerDeprecationFilePath)) {
+            throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
+        }
+
+        $logs = unserialize(file_get_contents($containerDeprecationFilePath));
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($deprecationsXML = $dom->createElement('deprecations'));
+
+        $formattedLogs = [];
+        $remainingCount = 0;
+        foreach ($logs as $log) {
+            $deprecationsXML->appendChild($deprecationXML = $dom->createElement('deprecation'));
+            $deprecationXML->setAttribute('count', $log['count']);
+            $deprecationXML->appendChild($dom->createElement('message', $log['message']));
+            $deprecationXML->appendChild($dom->createElement('file', $log['file']));
+            $deprecationXML->appendChild($dom->createElement('line', $log['line']));
+            $remainingCount += $log['count'];
+        }
+
+        $deprecationsXML->setAttribute('remainingCount', $remainingCount);
+
+        $this->writeDocument($dom);
+    }
+
     private function writeDocument(\DOMDocument $dom)
     {
         $dom->formatOutput = true;
@@ -422,8 +412,8 @@ class XmlDescriptor extends Descriptor
             } elseif (\is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 
-                foreach ($this->getArgumentNodes($argument, $dom) as $childArgumenXML) {
-                    $argumentXML->appendChild($childArgumenXML);
+                foreach ($this->getArgumentNodes($argument, $dom) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
                 }
             } else {
                 $argumentXML->appendChild(new \DOMText($argument));

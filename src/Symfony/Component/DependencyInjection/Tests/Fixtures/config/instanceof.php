@@ -6,7 +6,7 @@ use App\FooService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 
 return function (ContainerConfigurator $c) {
-    $s = $c->services();
+    $s = $c->services()->defaults()->public();
     $s->instanceof(Prototype\Foo::class)
         ->property('p', 0)
         ->call('setFoo', [ref('foo')])

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `Security\LdapBadge`, `Security\LdapAuthenticator` and `Security\CheckLdapCredentialsListener` to integrate with the authenticator Security system
+
 5.0.0
 -----
 

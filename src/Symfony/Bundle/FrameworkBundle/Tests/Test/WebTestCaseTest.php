@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
@@ -233,6 +234,17 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Request has attribute "_route" with value "articles".');
         $this->getRequestTester()->assertRouteSame('articles');
+    }
+
+    public function testExceptionOnServerError()
+    {
+        try {
+            $this->getResponseTester(new Response('', 500, ['X-Debug-Exception' => 'An exception has occurred', 'X-Debug-Exception-File' => '%2Fsrv%2Ftest.php:12']))->assertResponseIsSuccessful();
+        } catch (ExpectationFailedException $exception) {
+            $this->assertSame('An exception has occurred', $exception->getPrevious()->getMessage());
+            $this->assertSame('/srv/test.php', $exception->getPrevious()->getFile());
+            $this->assertSame(12, $exception->getPrevious()->getLine());
+        }
     }
 
     private function getResponseTester(Response $response): WebTestCase

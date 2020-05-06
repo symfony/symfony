@@ -57,7 +57,7 @@ class WindowsPipes extends AbstractPipes
 
                     if (!$h = fopen($file.'.lock', 'w')) {
                         restore_error_handler();
-                        throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $lastError));
+                        throw new RuntimeException('A temporary file could not be opened to write the process output: '.$lastError);
                     }
                     if (!flock($h, LOCK_EX | LOCK_NB)) {
                         continue 2;

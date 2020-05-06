@@ -193,7 +193,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $dumper = new HtmlDumper($data, $this->charset);
             $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
         } else {
-            throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
+            throw new \InvalidArgumentException(sprintf('Invalid dump format: "%s".', $format));
         }
         $dumps = [];
 

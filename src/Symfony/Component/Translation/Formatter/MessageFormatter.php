@@ -14,6 +14,9 @@ namespace Symfony\Component\Translation\Formatter;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(IntlFormatter::class);
+
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */

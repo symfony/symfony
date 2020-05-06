@@ -23,6 +23,7 @@
         "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
+        "doctrine/orm": "^2.6.3",
         "symfony/serializer": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0"
     },

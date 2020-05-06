@@ -1,0 +1,67 @@
+services:
+    stack_short:
+        stack:
+            - stdClass: [1, 2]
+
+    stack_a:
+        public: true
+        stack:
+            - class: stdClass
+              properties:
+                  label: A
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: B
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: C
+
+    stack_abstract:
+        stack:
+            - class: stdClass
+              abstract: true
+              properties:
+                  label: A
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: B
+                  inner: '@.inner'
+
+    stack_b:
+        public: true
+        stack:
+            - alias: 'stack_abstract'
+            - class: stdClass
+              properties:
+                  label: C
+
+    stack_c:
+        public: true
+        stack:
+            - class: stdClass
+              properties:
+                  label: Z
+                  inner: '@.inner'
+            - '@stack_a'
+
+    stack_d:
+        public: true
+        stack:
+            - parent: 'stack_abstract'
+              properties:
+                  label: 'Z'
+            - class: stdClass
+              properties:
+                  label: C
+
+    stack_e:
+        public: true
+        stack:
+            - class: stdClass
+              properties:
+                  label: Y
+                  inner: '@.inner'
+            - '@stack_d'

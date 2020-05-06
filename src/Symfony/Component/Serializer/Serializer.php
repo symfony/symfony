@@ -87,7 +87,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
-                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
         $this->normalizers = $normalizers;
@@ -106,7 +106,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($encoder instanceof EncoderInterface || $encoder instanceof DecoderInterface)) {
-                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($encoder), EncoderInterface::class, DecoderInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($encoder), EncoderInterface::class, DecoderInterface::class));
             }
         }
         $this->encoder = new ChainEncoder($realEncoders);
@@ -119,7 +119,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function serialize($data, string $format, array $context = []): string
     {
         if (!$this->supportsEncoding($format, $context)) {
-            throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
+            throw new NotEncodableValueException(sprintf('Serialization for the format "%s" is not supported.', $format));
         }
 
         if ($this->encoder->needsNormalization($format, $context)) {
@@ -135,7 +135,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function deserialize($data, string $type, string $format, array $context = [])
     {
         if (!$this->supportsDecoding($format, $context)) {
-            throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
+            throw new NotEncodableValueException(sprintf('Deserialization for the format "%s" is not supported.', $format));
         }
 
         $data = $this->decode($data, $format, $context);
@@ -158,6 +158,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         if (\is_array($data) || $data instanceof \Traversable) {
+            if ($data instanceof \Countable && 0 === $data->count()) {
+                return $data;
+            }
+
             $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
@@ -171,10 +175,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new NotNormalizableValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', \get_class($data)));
+            throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', get_debug_type($data)));
         }
 
-        throw new NotNormalizableValueException(sprintf('An unexpected value could not be normalized: %s', !\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
+        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
     }
 
     /**
@@ -186,7 +190,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     {
         if (isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
-                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given)', $type, \is_object($data) ? \get_class($data) : \gettype($data)));
+                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)));
             }
 
             return $data;
@@ -200,7 +204,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $normalizer->denormalize($data, $type, $format, $context);
         }
 
-        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
+        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
     }
 
     /**

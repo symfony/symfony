@@ -79,7 +79,7 @@ class Logger extends AbstractLogger
         }
 
         $formatter = $this->formatter;
-        fwrite($this->handle, $formatter($level, $message, $context));
+        @fwrite($this->handle, $formatter($level, $message, $context));
     }
 
     private function format(string $level, string $message, array $context): string

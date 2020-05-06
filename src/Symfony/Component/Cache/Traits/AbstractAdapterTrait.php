@@ -107,7 +107,7 @@ trait AbstractAdapterTrait
         try {
             return $this->doHave($id);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached: '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached: '.$e->getMessage(), ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
 
             return false;
         }
@@ -122,6 +122,12 @@ trait AbstractAdapterTrait
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
+            if ('' === $namespaceVersionToClear = $this->namespaceVersion) {
+                foreach ($this->doFetch([static::NS_SEPARATOR.$this->namespace]) as $v) {
+                    $namespaceVersionToClear = $v;
+                }
+            }
+            $namespaceToClear = $this->namespace.$namespaceVersionToClear;
             $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5);
             try {
                 $cleared = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
@@ -132,12 +138,14 @@ trait AbstractAdapterTrait
                 $this->namespaceVersion = $namespaceVersion;
                 $this->ids = [];
             }
+        } else {
+            $namespaceToClear = $this->namespace.$prefix;
         }
 
         try {
-            return $this->doClear($this->namespace.$prefix) || $cleared;
+            return $this->doClear($namespaceToClear) || $cleared;
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to clear the cache: '.$e->getMessage(), ['exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to clear the cache: '.$e->getMessage(), ['exception' => $e, 'cache-adapter' => get_debug_type($this)]);
 
             return false;
         }
@@ -186,7 +194,7 @@ trait AbstractAdapterTrait
             } catch (\Exception $e) {
             }
             $message = 'Failed to delete key "{key}"'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
-            CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
             $ok = false;
         }
 
@@ -214,7 +222,7 @@ trait AbstractAdapterTrait
 
             return $f($key, $value, $isHit);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
         }
 
         return $f($key, null, false);
@@ -236,7 +244,7 @@ trait AbstractAdapterTrait
         try {
             $items = $this->doFetch($ids);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch items: '.$e->getMessage(), ['keys' => $keys, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch items: '.$e->getMessage(), ['keys' => $keys, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
             $items = [];
         }
         $ids = array_combine($ids, $keys);
@@ -339,7 +347,7 @@ trait AbstractAdapterTrait
                 yield $key => $f($key, $value, true);
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch items: '.$e->getMessage(), ['keys' => array_values($keys), 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch items: '.$e->getMessage(), ['keys' => array_values($keys), 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
         }
 
         foreach ($keys as $key) {

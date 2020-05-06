@@ -42,6 +42,9 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
 
         $properties = $value->getProperties();
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            if (!$reflectionProperty->hasType()) {
+                continue;
+            }
             if (false === $doc = $reflectionProperty->getDocComment()) {
                 continue;
             }

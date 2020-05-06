@@ -16,11 +16,19 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -413,6 +421,90 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
     }
 
+    /**
+     * @dataProvider provideEntryPointFirewalls
+     */
+    public function testAuthenticatorManagerEnabledEntryPoint(array $firewall, $entryPointId)
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'first' => ['id' => 'users'],
+            ],
+
+            'firewalls' => [
+                'main' => $firewall,
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
+        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
+    }
+
+    public function provideEntryPointFirewalls()
+    {
+        // only one entry point available
+        yield [['http_basic' => true], 'security.authentication.basic_entry_point.main'];
+        // explicitly configured by authenticator key
+        yield [['form_login' => true, 'http_basic' => true, 'entry_point' => 'form_login'], 'security.authentication.form_entry_point.main'];
+        // explicitly configured another service
+        yield [['form_login' => true, 'entry_point' => EntryPointStub::class], EntryPointStub::class];
+        // no entry point required
+        yield [['json_login' => true], null];
+
+        // only one guard authenticator entry point available
+        yield [[
+            'guard' => ['authenticators' => [AppCustomAuthenticator::class]],
+        ], AppCustomAuthenticator::class];
+        // explicitly configured guard authenticator entry point
+        yield [[
+            'guard' => [
+                'authenticators' => [AppCustomAuthenticator::class, NullAuthenticator::class],
+                'entry_point' => NullAuthenticator::class,
+            ],
+        ], NullAuthenticator::class];
+    }
+
+    /**
+     * @dataProvider provideEntryPointRequiredData
+     */
+    public function testEntryPointRequired(array $firewall, $messageRegex)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($messageRegex);
+
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'first' => ['id' => 'users'],
+            ],
+
+            'firewalls' => [
+                'main' => $firewall,
+            ],
+        ]);
+
+        $container->compile();
+    }
+
+    public function provideEntryPointRequiredData()
+    {
+        // more than one entry point available and not explicitly set
+        yield [
+            ['http_basic' => true, 'form_login' => true],
+            '/^Because you have multiple authenticators in firewall "main", you need to set the "entry_point" key to one of your authenticators/',
+        ];
+        // more than one guard entry point available and not explicitly set
+        yield [
+            ['guard' => ['authenticators' => [AppCustomAuthenticator::class, NullAuthenticator::class]]],
+            '/^Because you have multiple guard authenticators, you need to set the "entry_point" key to one of your authenticators/',
+        ];
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
@@ -437,5 +529,44 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         return $container;
+    }
+}
+
+class NullAuthenticator implements AuthenticatorInterface
+{
+    public function start(Request $request, AuthenticationException $authException = null)
+    {
+    }
+
+    public function supports(Request $request)
+    {
+    }
+
+    public function getCredentials(Request $request)
+    {
+    }
+
+    public function getUser($credentials, UserProviderInterface $userProvider)
+    {
+    }
+
+    public function checkCredentials($credentials, UserInterface $user)
+    {
+    }
+
+    public function createAuthenticatedToken(UserInterface $user, string $providerKey)
+    {
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    {
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    {
+    }
+
+    public function supportsRememberMe()
+    {
     }
 }

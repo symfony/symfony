@@ -61,16 +61,18 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            // handle seconds ignored by user's browser when with_seconds enabled
-            // https://codereview.chromium.org/450533009/
-            if ($options['with_seconds']) {
-                $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
-                    $data = $e->getData();
-                    if ($data && preg_match('/^\d{2}:\d{2}$/', $data)) {
-                        $e->setData($data.':00');
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) use ($options) {
+                $data = $e->getData();
+                if ($data && preg_match('/^(?P<hours>\d{2}):(?P<minutes>\d{2})(?::(?P<seconds>\d{2})(?:\.\d+)?)?$/', $data, $matches)) {
+                    if ($options['with_seconds']) {
+                        // handle seconds ignored by user's browser when with_seconds enabled
+                        // https://codereview.chromium.org/450533009/
+                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], isset($matches['seconds']) ? $matches['seconds'] : '00'));
+                    } else {
+                        $e->setData(sprintf('%s:%s', $matches['hours'], $matches['minutes']));
                     }
-                });
-            }
+                }
+            });
 
             if (null !== $options['reference_date']) {
                 $format = 'Y-m-d '.$format;

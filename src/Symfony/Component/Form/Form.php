@@ -168,7 +168,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
         if ($config->getCompound() && !$config->getDataMapper()) {
-            throw new LogicException('Compound forms need a data mapper');
+            throw new LogicException('Compound forms need a data mapper.');
         }
 
         // If the form inherits the data from its parent, it is not necessary
@@ -265,7 +265,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function setParent(FormInterface $parent = null)
     {
         if ($this->submitted) {
-            throw new AlreadySubmittedException('You cannot set the parent of a submitted form');
+            throw new AlreadySubmittedException('You cannot set the parent of a submitted form.');
         }
 
         if (null !== $parent && '' === $this->name) {
@@ -357,11 +357,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $dataClass = $this->config->getDataClass();
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                $actualType = \is_object($viewData)
-                    ? 'an instance of class '.\get_class($viewData)
-                    : 'a(n) '.\gettype($viewData);
+                $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be an instance of class '.$dataClass.', but is '.$actualType.'. You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms '.$actualType.' to an instance of '.$dataClass.'.');
+                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
             }
         }
 
@@ -500,7 +498,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function submit($submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
-            throw new AlreadySubmittedException('A form can only be submitted once');
+            throw new AlreadySubmittedException('A form can only be submitted once.');
         }
 
         // Initialize errors in the very beginning so we're sure
@@ -844,7 +842,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function add($child, string $type = null, array $options = [])
     {
         if ($this->submitted) {
-            throw new AlreadySubmittedException('You cannot add children to a submitted form');
+            throw new AlreadySubmittedException('You cannot add children to a submitted form.');
         }
 
         if (!$this->config->getCompound()) {
@@ -915,7 +913,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     public function remove(string $name)
     {
         if ($this->submitted) {
-            throw new AlreadySubmittedException('You cannot remove children from a submitted form');
+            throw new AlreadySubmittedException('You cannot remove children from a submitted form.');
         }
 
         if (isset($this->children[$name])) {
@@ -968,7 +966,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return FormInterface The child form
      *
-     * @throws \OutOfBoundsException if the named child does not exist
+     * @throws OutOfBoundsException if the named child does not exist
      */
     public function offsetGet($name)
     {
@@ -1065,7 +1063,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException('Unable to transform data for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(sprintf('Unable to transform data for property path "%s": '.$exception->getMessage(), $this->getPropertyPath()), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -1087,7 +1085,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException('Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(sprintf('Unable to reverse value for property path "%s": '.$exception->getMessage(), $this->getPropertyPath()), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -1116,7 +1114,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException('Unable to transform value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(sprintf('Unable to transform value for property path "%s": '.$exception->getMessage(), $this->getPropertyPath()), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -1140,7 +1138,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException('Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(sprintf('Unable to reverse value for property path "%s": '.$exception->getMessage(), $this->getPropertyPath()), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;

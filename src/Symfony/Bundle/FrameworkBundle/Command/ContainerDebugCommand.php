@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,10 +19,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
@@ -36,12 +32,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ContainerDebugCommand extends Command
 {
-    protected static $defaultName = 'debug:container';
+    use BuildDebugContainerTrait;
 
-    /**
-     * @var ContainerBuilder|null
-     */
-    protected $containerBuilder;
+    protected static $defaultName = 'debug:container';
 
     /**
      * {@inheritdoc}
@@ -62,12 +55,17 @@ class ContainerDebugCommand extends Command
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Displays environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
+                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Displays deprecations generated when compiling and warming up the container'),
             ])
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>
+
+To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> option:
+
+  <info>php %command.full_name% --deprecations</info>
 
 To get specific information about a service, specify its name:
 
@@ -149,6 +147,8 @@ EOF
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
+        } elseif ($input->getOption('deprecations')) {
+            $options = ['deprecations' => true];
         } else {
             $options = [];
         }
@@ -180,7 +180,7 @@ EOF
                 $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
                 $errorIo->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
-            } else {
+            } elseif (!$input->getOption('deprecations')) {
                 $errorIo->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
             }
         }
@@ -210,34 +210,6 @@ EOF
         } elseif ((null === $name) && $optionsCount > 1) {
             throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
         }
-    }
-
-    /**
-     * Loads the ContainerBuilder from the cache.
-     *
-     * @throws \LogicException
-     */
-    protected function getContainerBuilder(): ContainerBuilder
-    {
-        if ($this->containerBuilder) {
-            return $this->containerBuilder;
-        }
-
-        $kernel = $this->getApplication()->getKernel();
-
-        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
-            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
-            $container = $buildContainer();
-            $container->getCompilerPassConfig()->setRemovingPasses([]);
-            $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
-            $container->compile();
-        } else {
-            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
-            $locatorPass = new ServiceLocatorTagPass();
-            $locatorPass->process($container);
-        }
-
-        return $this->containerBuilder = $container;
     }
 
     private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden): string

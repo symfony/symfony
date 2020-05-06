@@ -4,14 +4,20 @@ CHANGELOG
 5.1.0
 -----
 
- * Added `Routing\Loader` and `Routing\Loader\Configurator` namespaces to ease defining routes with default controllers
- * Added the `framework.router.context` configuration node to configure the `RequestContext`
+ * Added link to source for controllers registered as named services
+ * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)
+ * Added the `framework.router.default_uri` configuration option to configure the default `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
- * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`
- * Deprecated passing a `RouteCollectionBuiler` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * Added flex-compatible default implementation for `MicroKernelTrait::registerBundles()`
+ * Deprecated passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
  * The `TemplateController` now accepts context argument
  * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
+ * Added tag `routing.expression_language_function` to define functions available in route conditions
+ * Added `debug:container --deprecations` option to see compile-time deprecations.
+ * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
+ * Added ability for `config:dump-reference` and `debug:config` to dump and debug kernel container extension configuration.
+ * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
 
 5.0.0
 -----

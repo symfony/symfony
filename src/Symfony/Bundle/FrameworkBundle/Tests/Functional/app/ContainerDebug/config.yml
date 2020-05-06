@@ -13,6 +13,7 @@ services:
         public: false
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass: '@public'
     env:
         class: stdClass
         arguments:

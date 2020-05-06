@@ -67,7 +67,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsWhenPassingNullToRequiredArgument()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -245,7 +245,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -288,7 +288,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -376,7 +376,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -536,6 +536,42 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessFactoryForTypeSameAsClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'callable')
+            ->setFactory([
+                new Reference('foo'),
+                'createCallable',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setCallable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessFactoryForIterableTypeAndArrayClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'array')
+            ->setFactory([
+                new Reference('foo'),
+                'createArray',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setIterable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault()
     {
         $container = new ContainerBuilder();
@@ -564,7 +600,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessThrowsOnIterableTypeWhenScalarPassed()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -736,6 +772,22 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->addMethodCall('setClosure', [new ServiceClosureArgument(new Reference('foo'))]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testExpressionLanguageWithSyntheticService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('synthetic')
+            ->setSynthetic(true);
+        $container->register('baz', \stdClass::class)
+            ->addArgument(new Reference('synthetic'));
+        $container->register('bar', Bar::class)
+            ->addArgument(new Expression('service("baz").getStdClass()'));
+
+        (new CheckTypeDeclarationsPass())->process($container);
 
         $this->addToAssertionCount(1);
     }

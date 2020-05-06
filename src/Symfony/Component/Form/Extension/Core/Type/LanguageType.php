@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Exception\MissingResourceException;
@@ -32,7 +33,7 @@ class LanguageType extends AbstractType
                 $useAlpha3Codes = $options['alpha3'];
                 $choiceSelfTranslation = $options['choice_self_translation'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation) {
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation) {
                     if (true === $choiceSelfTranslation) {
                         foreach (Languages::getLanguageCodes() as $alpha2Code) {
                             try {
@@ -47,7 +48,7 @@ class LanguageType extends AbstractType
                     }
 
                     return array_flip($languagesList);
-                });
+                }), [$choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation]);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,

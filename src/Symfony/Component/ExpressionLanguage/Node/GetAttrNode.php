@@ -80,10 +80,10 @@ class GetAttrNode extends Node
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_object($obj)) {
-                    throw new \RuntimeException('Unable to get a property on a non-object.');
+                    throw new \RuntimeException('Unable to call method of a non-object.');
                 }
                 if (!\is_callable($toCall = [$obj, $this->nodes['attribute']->attributes['value']])) {
-                    throw new \RuntimeException(sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], \get_class($obj)));
+                    throw new \RuntimeException(sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], get_debug_type($obj)));
                 }
 
                 return $toCall(...array_values($this->nodes['arguments']->evaluate($functions, $values)));

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class Dsn
 {
@@ -27,6 +27,7 @@ final class Dsn
     private $port;
     private $options;
     private $path;
+    private $dsn;
 
     public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)
     {
@@ -59,7 +60,10 @@ final class Dsn
         $path = $parsedDsn['path'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query, $path);
+        $dsnObject = new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query, $path);
+        $dsnObject->dsn = $dsn;
+
+        return $dsnObject;
     }
 
     public function getScheme(): string
@@ -95,5 +99,10 @@ final class Dsn
     public function getPath(): ?string
     {
         return $this->path;
+    }
+
+    public function getOriginalDsn(): string
+    {
+        return $this->dsn;
     }
 }

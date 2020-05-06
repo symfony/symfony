@@ -7,8 +7,8 @@ use App\BarService;
 return new class() {
     public function __invoke(ContainerConfigurator $c)
     {
-        $s = $c->services();
+        $s = $c->services()->defaults()->public();
         $s->set(BarService::class)
-            ->args([inline('FooClass')]);
+            ->args([service('FooClass')]);
     }
 };

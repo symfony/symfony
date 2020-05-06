@@ -37,15 +37,19 @@ final class CurlResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(CurlClientState $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null)
+    public function __construct(CurlClientState $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null)
     {
         $this->multi = $multi;
 
         if (\is_resource($ch)) {
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
-            curl_setopt($ch, CURLOPT_VERBOSE, true);
-            curl_setopt($ch, CURLOPT_STDERR, $this->debugBuffer);
+            if (0x074000 === $curlVersion) {
+                fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
+            } else {
+                curl_setopt($ch, CURLOPT_VERBOSE, true);
+                curl_setopt($ch, CURLOPT_STDERR, $this->debugBuffer);
+            }
         } else {
             $this->info['url'] = $ch;
             $ch = $this->handle;

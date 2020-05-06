@@ -4,6 +4,7 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 
 /**
  * @method string interfaceMethod()
+ * @method static staticReturningMethod()
  * @method        sameLineInterfaceMethod($arg)
  * @method sameLineInterfaceMethodNoBraces
  *
@@ -25,7 +26,7 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
  *
  * Static
  * @method static Foo&Bar staticMethod()
- * @method static staticMethodNoBraces
+ * @method static mixed staticMethodNoBraces
  * @method static \stdClass staticMethodTyped(int $arg) Description
  * @method static \stdClass[] staticMethodTypedNoBraces
  */

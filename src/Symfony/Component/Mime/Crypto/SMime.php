@@ -24,7 +24,7 @@ abstract class SMime
     protected function normalizeFilePath(string $path): string
     {
         if (!file_exists($path)) {
-            throw new RuntimeException(sprintf('File does not exist: %s.', $path));
+            throw new RuntimeException(sprintf('File does not exist: "%s".', $path));
         }
 
         return 'file://'.str_replace('\\', '/', realpath($path));
@@ -65,7 +65,7 @@ abstract class SMime
     protected function getStreamIterator($stream): iterable
     {
         while (!feof($stream)) {
-            yield fread($stream, 16372);
+            yield str_replace("\n", "\r\n", str_replace("\r\n", "\n", fread($stream, 16372)));
         }
     }
 

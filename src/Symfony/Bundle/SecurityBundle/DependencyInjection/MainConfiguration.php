@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
@@ -72,6 +73,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
+                ->booleanNode('enable_authenticator_manager')->defaultFalse()->info('Enables the new Symfony Security system based on Authenticators, all used authenticators must support this before enabling this.')->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -195,6 +197,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('entry_point')->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
+            ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
@@ -205,7 +208,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
-                    ->scalarNode('success_handler')->end()
+                    ->scalarNode('success_handler')->setDeprecated('symfony/security-bundle', '5.1', sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
                 ->end()
                 ->fixXmlConfig('delete_cookie')
@@ -221,6 +224,8 @@ class MainConfiguration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('path')->defaultNull()->end()
                                 ->scalarNode('domain')->defaultNull()->end()
+                                ->scalarNode('secure')->defaultFalse()->end()
+                                ->scalarNode('samesite')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()
@@ -228,7 +233,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('handler')
                 ->children()
                     ->arrayNode('handlers')
-                        ->prototype('scalar')->end()
+                        ->prototype('scalar')->setDeprecated('symfony/security-bundle', '5.1', sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->end()
                 ->end()
             ->end()

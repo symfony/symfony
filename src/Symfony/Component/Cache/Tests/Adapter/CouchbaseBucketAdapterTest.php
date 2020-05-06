@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
 
 /**
  * @requires extension couchbase 2.6.0
+ * @group integration
  *
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
  */

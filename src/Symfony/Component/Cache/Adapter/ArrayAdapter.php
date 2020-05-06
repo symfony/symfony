@@ -351,9 +351,9 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             try {
                 $serialized = serialize($value);
             } catch (\Exception $e) {
-                $type = \is_object($value) ? \get_class($value) : \gettype($value);
+                $type = get_debug_type($value);
                 $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
-                CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
+                CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
 
                 return;
             }
@@ -375,7 +375,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             try {
                 $value = unserialize($value);
             } catch (\Exception $e) {
-                CacheItem::log($this->logger, 'Failed to unserialize key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
+                CacheItem::log($this->logger, 'Failed to unserialize key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
                 $value = false;
             }
             if (false === $value) {

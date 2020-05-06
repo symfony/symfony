@@ -16,29 +16,26 @@ namespace Symfony\Component\DependencyInjection\Argument;
  */
 final class AbstractArgument
 {
-    private $serviceId;
-    private $argKey;
     private $text;
+    private $context;
 
-    public function __construct(string $serviceId, string $argKey, string $text = '')
+    public function __construct(string $text = '')
     {
-        $this->serviceId = $serviceId;
-        $this->argKey = $argKey;
-        $this->text = $text;
+        $this->text = trim($text, '. ');
     }
 
-    public function getServiceId(): string
+    public function setContext(string $context): void
     {
-        return $this->serviceId;
-    }
-
-    public function getArgumentKey(): string
-    {
-        return $this->argKey;
+        $this->context = $context.' is abstract'.('' === $this->text ? '' : ': ');
     }
 
     public function getText(): string
     {
         return $this->text;
+    }
+
+    public function getTextWithContext(): string
+    {
+        return $this->context.$this->text.'.';
     }
 }

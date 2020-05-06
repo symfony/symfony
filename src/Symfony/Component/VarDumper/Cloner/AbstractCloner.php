@@ -76,6 +76,7 @@ abstract class AbstractCloner implements ClonerInterface
         'ErrorException' => ['Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castErrorException'],
         'Exception' => ['Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castException'],
         'Error' => ['Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castError'],
+        'Symfony\Bridge\Monolog\Logger' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'],
         'Symfony\Component\DependencyInjection\ContainerInterface' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'],
         'Symfony\Component\EventDispatcher\EventDispatcherInterface' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'],
         'Symfony\Component\HttpClient\CurlHttpClient' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castHttpClient'],
@@ -297,8 +298,8 @@ abstract class AbstractCloner implements ClonerInterface
         $obj = $stub->value;
         $class = $stub->class;
 
-        if (isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00")) {
-            $stub->class = (get_parent_class($class) ?: key(class_implements($class))).'@anonymous';
+        if (\PHP_VERSION_ID < 80000 ? "\0" === ($class[15] ?? null) : false !== strpos($class, "@anonymous\0")) {
+            $stub->class = get_debug_type($obj);
         }
         if (isset($this->classInfo[$class])) {
             list($i, $parents, $hasDebugInfo, $fileInfo) = $this->classInfo[$class];
@@ -327,7 +328,7 @@ abstract class AbstractCloner implements ClonerInterface
         }
 
         $stub->attr += $fileInfo;
-        $a = Caster::castObject($obj, $class, $hasDebugInfo);
+        $a = Caster::castObject($obj, $class, $hasDebugInfo, $stub->class);
 
         try {
             while ($i--) {

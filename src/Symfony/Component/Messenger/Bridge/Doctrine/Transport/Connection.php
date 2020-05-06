@@ -19,7 +19,9 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\Service\ResetInterface;
@@ -32,6 +34,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Connection implements ResetInterface
 {
+    protected const TABLE_OPTION_NAME = '_symfony_messenger_table_name';
+
     protected const DEFAULT_OPTIONS = [
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
@@ -56,12 +60,18 @@ class Connection implements ResetInterface
     private $schemaSynchronizer;
     private $autoSetup;
 
+    private static $useDeprecatedConstants;
+
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+
+        if (null === self::$useDeprecatedConstants) {
+            self::$useDeprecatedConstants = !class_exists(Types::class);
+        }
     }
 
     public function reset()
@@ -93,13 +103,13 @@ class Connection implements ResetInterface
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s]', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
         $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s]', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         return $configuration;
@@ -133,12 +143,18 @@ class Connection implements ResetInterface
             $this->configuration['queue_name'],
             $now,
             $availableAt,
-        ], [
+        ], self::$useDeprecatedConstants ? [
             null,
             null,
             null,
             Type::DATETIME,
             Type::DATETIME,
+        ] : [
+            null,
+            null,
+            null,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIME_MUTABLE,
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -181,7 +197,7 @@ class Connection implements ResetInterface
                 $now,
                 $doctrineEnvelope['id'],
             ], [
-                Type::DATETIME,
+                self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE,
             ]);
 
             $this->driverConnection->commit();
@@ -277,6 +293,31 @@ class Connection implements ResetInterface
         return false === $data ? null : $this->decodeEnvelopeHeaders($data);
     }
 
+    /**
+     * @internal
+     */
+    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    {
+        // only update the schema for this connection
+        if ($forConnection !== $this->driverConnection) {
+            return;
+        }
+
+        if ($schema->hasTable($this->configuration['table_name'])) {
+            return;
+        }
+
+        $this->addTableToSchema($schema);
+    }
+
+    /**
+     * @internal
+     */
+    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    {
+        return null;
+    }
+
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTime();
@@ -290,9 +331,12 @@ class Connection implements ResetInterface
                 $redeliverLimit,
                 $now,
                 $this->configuration['queue_name'],
-            ], [
+            ], self::$useDeprecatedConstants ? [
                 Type::DATETIME,
                 Type::DATETIME,
+            ] : [
+                Types::DATETIME_MUTABLE,
+                Types::DATETIME_MUTABLE,
             ]);
     }
 
@@ -325,28 +369,35 @@ class Connection implements ResetInterface
     private function getSchema(): Schema
     {
         $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $this->addTableToSchema($schema);
+
+        return $schema;
+    }
+
+    private function addTableToSchema(Schema $schema): void
+    {
         $table = $schema->createTable($this->configuration['table_name']);
-        $table->addColumn('id', Type::BIGINT)
+        // add an internal option to mark that we created this & the non-namespaced table name
+        $table->addOption(self::TABLE_OPTION_NAME, $this->configuration['table_name']);
+        $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
-        $table->addColumn('body', Type::TEXT)
+        $table->addColumn('body', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('headers', Type::TEXT)
+        $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
-        $table->addColumn('queue_name', Type::STRING)
+        $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
             ->setNotnull(true);
-        $table->addColumn('created_at', Type::DATETIME)
+        $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('available_at', Type::DATETIME)
+        $table->addColumn('available_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
-        $table->addColumn('delivered_at', Type::DATETIME)
+        $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['queue_name']);
         $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
-
-        return $schema;
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

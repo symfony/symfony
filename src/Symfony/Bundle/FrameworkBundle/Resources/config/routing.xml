@@ -25,7 +25,7 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.php" class="Symfony\Bundle\FrameworkBundle\Routing\Loader\PhpFileLoader">
+        <service id="routing.loader.php" class="Symfony\Component\Routing\Loader\PhpFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
@@ -80,14 +80,23 @@
         <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
-            <argument></argument> <!-- base_url -->
-            <argument>GET</argument>
-            <argument></argument> <!-- host -->
-            <argument></argument> <!-- scheme -->
+            <factory class="Symfony\Component\Routing\RequestContext" method="fromUri" />
+            <argument>%router.request_context.base_url%</argument>
+            <argument>%router.request_context.host%</argument>
+            <argument>%router.request_context.scheme%</argument>
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
+            <call method="setParameter">
+                <argument>_functions</argument>
+                <argument type="service" id="router.expression_language_provider" on-invalid="ignore" />
+            </call>
         </service>
         <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" />
+
+        <service id="router.expression_language_provider" class="Symfony\Component\Routing\Matcher\ExpressionLanguageProvider">
+            <argument type="tagged_locator" tag="routing.expression_language_function" index-by="function" />
+            <tag name="routing.expression_language_provider" />
+        </service>
 
         <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer">
             <tag name="container.service_subscriber" id="router" />
@@ -108,8 +117,8 @@
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\RedirectController" public="true">
             <argument type="service" id="router" />
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpPort" /></service></argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpsPort" /></service></argument>
         </service>
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">

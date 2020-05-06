@@ -215,9 +215,10 @@ require PHPUNIT_COMPOSER_INSTALL;
 if (!class_exists('SymfonyBlacklistPhpunit', false)) {
     class SymfonyBlacklistPhpunit {}
 }
-if (class_exists('PHPUnit_Util_Blacklist')) {
-    PHPUnit_Util_Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;
-    PHPUnit_Util_Blacklist::$blacklistedClassNames['SymfonyBlacklistSimplePhpunit'] = 1;
+if (method_exists('PHPUnit\Util\Blacklist', 'addDirectory')) {
+    (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
+    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyBlacklistPhpunit'))->getFileName()));
+    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyBlacklistSimplePhpunit'))->getFileName()));
 } else {
     PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;
     PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistSimplePhpunit'] = 1;

@@ -22,6 +22,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
@@ -349,7 +350,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function readIndex(array $zval, $index): array
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_debug_type($zval[self::VALUE])));
         }
 
         $result = self::$resultProto;
@@ -389,14 +390,33 @@ class PropertyAccessor implements PropertyAccessorInterface
             $name = $access->getName();
             $type = $access->getType();
 
-            if (PropertyReadInfo::TYPE_METHOD === $type) {
-                $result[self::VALUE] = $object->$name();
-            } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                $result[self::VALUE] = $object->$name;
+            try {
+                if (PropertyReadInfo::TYPE_METHOD === $type) {
+                    try {
+                        $result[self::VALUE] = $object->$name();
+                    } catch (\TypeError $e) {
+                        if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of the type (\w+), null returned$/', preg_quote(\get_class($object)), $name)), $e->getMessage(), $matches)) {
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', \get_class($object), $name, $matches[1]), 0, $e);
+                        }
 
-                if (isset($zval[self::REF]) && $access->canBeReference()) {
-                    $result[self::REF] = &$object->$name;
+                        throw $e;
+                    }
+                } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                    $result[self::VALUE] = $object->$name;
+
+                    if (isset($zval[self::REF]) && $access->canBeReference()) {
+                        $result[self::REF] = &$object->$name;
+                    }
                 }
+            } catch (\Error $e) {
+                // handle uninitialized properties in PHP >= 7.4
+                if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
+                    $r = new \ReflectionProperty($matches[1], $matches[2]);
+
+                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
+                }
+
+                throw $e;
             }
         } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
             $result[self::VALUE] = $object->$property;
@@ -457,7 +477,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex(array $zval, $index, $value)
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_debug_type($zval[self::VALUE])));
         }
 
         $zval[self::REF][$index] = $value;
@@ -497,7 +517,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
             }
 
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, \get_class($object)));
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
         }
     }
 
@@ -631,7 +651,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public static function createCache(string $namespace, int $defaultLifetime, string $version, LoggerInterface $logger = null)
     {
         if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
-            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use %s().', __METHOD__));
+            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use "%s()".', __METHOD__));
         }
 
         if (!ApcuAdapter::isSupported()) {

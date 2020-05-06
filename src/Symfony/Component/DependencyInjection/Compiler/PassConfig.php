@@ -51,6 +51,7 @@ class PassConfig
         $this->optimizationPasses = [[
             new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
+            new ResolveDecoratorStackPass(),
             new ResolveChildDefinitionsPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveParameterPlaceHoldersPass(false, false),
@@ -92,6 +93,8 @@ class PassConfig
         $this->afterRemovingPasses = [[
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
+            new ResolveNoPreloadPass(),
+            new AliasDeprecatedPublicServicesPass(),
         ]];
     }
 

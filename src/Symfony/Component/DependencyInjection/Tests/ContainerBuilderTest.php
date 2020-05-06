@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -45,11 +46,14 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testDefaultRegisteredDefinitions()
     {
         $builder = new ContainerBuilder();
@@ -94,10 +98,11 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testCreateDeprecatedService()
     {
+        $this->expectDeprecation('The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.');
+
         $definition = new Definition('stdClass');
         $definition->setDeprecated(true);
 
@@ -293,10 +298,11 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testDeprecatedAlias()
     {
+        $this->expectDeprecation('The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.');
+
         $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
 
@@ -547,11 +553,14 @@ class ContainerBuilderTest extends TestCase
     public function testCreateServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract (should be defined by Pass), did you forget to define it?');
+        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract: should be defined by Pass.');
 
         $builder = new ContainerBuilder();
         $builder->register('foo', FooWithAbstractArgument::class)
-            ->addArgument(new AbstractArgument('foo', '$baz', 'should be defined by Pass'));
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setPublic(true);
+
+        $builder->compile();
 
         $builder->get('foo');
     }
@@ -752,7 +761,7 @@ class ContainerBuilderTest extends TestCase
     public function testCompileWithArrayInStringResolveEnv()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type array inside string value "ABC %env(json:ARRAY)%".');
+        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type "array" inside string value "ABC %env(json:ARRAY)%".');
         putenv('ARRAY={"foo":"bar"}');
 
         $container = new ContainerBuilder();
@@ -1616,6 +1625,25 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testWitherWithStaticReturnType()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', WitherStaticReturnType::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
     public function testAutoAliasing()
     {
         $container = new ContainerBuilder();
@@ -1632,6 +1660,44 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $this->assertInstanceOf(D::class, $container->get(X::class));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDirectlyAccessingDeprecatedPublicService()
+    {
+        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.');
+
+        $container = new ContainerBuilder();
+        $container
+            ->register(A::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+
+        $container->compile();
+
+        $container->get(A::class);
+    }
+
+    public function testReferencingDeprecatedPublicService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(A::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+        $container
+            ->register(B::class)
+            ->setPublic(true)
+            ->addArgument(new Reference(A::class));
+
+        $container->compile();
+
+        // No deprecation should be triggered.
+        $container->get(B::class);
+
+        $this->addToAssertionCount(1);
     }
 }
 

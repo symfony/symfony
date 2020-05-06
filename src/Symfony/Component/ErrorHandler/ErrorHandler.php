@@ -91,7 +91,7 @@ class ErrorHandler
     private $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
     private $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private $loggedErrors = 0;
-    private $traceReflector;
+    private $configureException;
     private $debug;
 
     private $isRecursive = 0;
@@ -187,8 +187,14 @@ class ErrorHandler
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
         }
-        $this->traceReflector = new \ReflectionProperty('Exception', 'trace');
-        $this->traceReflector->setAccessible(true);
+        $traceReflector = new \ReflectionProperty('Exception', 'trace');
+        $traceReflector->setAccessible(true);
+        $this->configureException = \Closure::bind(static function ($e, $trace, $file = null, $line = null) use ($traceReflector) {
+            $traceReflector->setValue($e, $trace);
+            $e->file = $file ?? $e->file;
+            $e->line = $line ?? $e->line;
+        }, null, new class() extends \Exception {
+        });
         $this->debug = $debug;
     }
 
@@ -246,14 +252,14 @@ class ErrorHandler
             if (!\is_array($log)) {
                 $log = [$log];
             } elseif (!\array_key_exists(0, $log)) {
-                throw new \InvalidArgumentException('No logger provided');
+                throw new \InvalidArgumentException('No logger provided.');
             }
             if (null === $log[0]) {
                 $this->loggedErrors &= ~$type;
             } elseif ($log[0] instanceof LoggerInterface) {
                 $this->loggedErrors |= $type;
             } else {
-                throw new \InvalidArgumentException('Invalid logger provided');
+                throw new \InvalidArgumentException('Invalid logger provided.');
             }
             $this->loggers[$type] = $log + $prev[$type];
 
@@ -435,7 +441,7 @@ class ErrorHandler
             $context = $e;
         }
 
-        if (false !== strpos($message, "class@anonymous\0")) {
+        if (false !== strpos($message, "@anonymous\0")) {
             $logMessage = $this->parseAnonymousClass($message);
         } else {
             $logMessage = $this->levels[$type].': '.$message;
@@ -473,9 +479,9 @@ class ErrorHandler
             if ($throw || $this->tracedErrors & $type) {
                 $backtrace = $errorAsException->getTrace();
                 $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
-                $this->traceReflector->setValue($errorAsException, $lightTrace);
+                ($this->configureException)($errorAsException, $lightTrace, $file, $line);
             } else {
-                $this->traceReflector->setValue($errorAsException, []);
+                ($this->configureException)($errorAsException, []);
                 $backtrace = [];
             }
         }
@@ -519,7 +525,7 @@ class ErrorHandler
         if ($this->isRecursive) {
             $log = 0;
         } else {
-            if (!\defined('HHVM_VERSION')) {
+            if (\PHP_VERSION_ID < (\PHP_VERSION_ID < 70400 ? 70316 : 70404)) {
                 $currentErrorHandler = set_error_handler('var_dump');
                 restore_error_handler();
             }
@@ -531,7 +537,7 @@ class ErrorHandler
             } finally {
                 $this->isRecursive = false;
 
-                if (!\defined('HHVM_VERSION')) {
+                if (\PHP_VERSION_ID < (\PHP_VERSION_ID < 70400 ? 70316 : 70404)) {
                     set_error_handler($currentErrorHandler);
                 }
             }
@@ -558,7 +564,7 @@ class ErrorHandler
         }
 
         if ($this->loggedErrors & $type) {
-            if (false !== strpos($message = $exception->getMessage(), "class@anonymous\0")) {
+            if (false !== strpos($message = $exception->getMessage(), "@anonymous\0")) {
                 $message = $this->parseAnonymousClass($message);
             }
 
@@ -736,7 +742,7 @@ class ErrorHandler
     /**
      * Cleans the trace by removing function arguments and the frames added by the error handler and DebugClassLoader.
      */
-    private function cleanTrace(array $backtrace, int $type, string $file, int $line, bool $throw): array
+    private function cleanTrace(array $backtrace, int $type, string &$file, int &$line, bool $throw): array
     {
         $lightTrace = $backtrace;
 
@@ -744,6 +750,19 @@ class ErrorHandler
             if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
                 $lightTrace = \array_slice($lightTrace, 1 + $i);
                 break;
+            }
+        }
+        if (E_USER_DEPRECATED === $type) {
+            for ($i = 0; isset($lightTrace[$i]); ++$i) {
+                if (!isset($lightTrace[$i]['file'], $lightTrace[$i]['line'], $lightTrace[$i]['function'])) {
+                    continue;
+                }
+                if (!isset($lightTrace[$i]['class']) && 'trigger_deprecation' === $lightTrace[$i]['function']) {
+                    $file = $lightTrace[$i]['file'];
+                    $line = $lightTrace[$i]['line'];
+                    $lightTrace = \array_slice($lightTrace, 1 + $i);
+                    break;
+                }
             }
         }
         if (class_exists(DebugClassLoader::class, false)) {
@@ -768,8 +787,8 @@ class ErrorHandler
      */
     private function parseAnonymousClass(string $message): string
     {
-        return preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', static function ($m) {
-            return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0]))).'@anonymous' : $m[0];
+        return preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', static function ($m) {
+            return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0];
         }, $message);
     }
 }

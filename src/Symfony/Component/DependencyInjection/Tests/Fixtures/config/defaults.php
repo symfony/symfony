@@ -14,7 +14,7 @@ return function (ContainerConfigurator $c) {
         ->autowire()
         ->tag('t', ['a' => 'b'])
         ->bind(Foo::class, ref('bar'))
-        ->private();
+        ->public();
 
     $s->set(Foo::class)->args([ref('bar')])->public();
     $s->set('bar', Foo::class)->call('setFoo')->autoconfigure(false);

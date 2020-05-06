@@ -203,6 +203,25 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->willReturn($contextualValidator);
     }
 
+    protected function expectViolationsAt($i, $value, Constraint $constraint)
+    {
+        $context = $this->createContext();
+
+        $validatorClassname = $constraint->validatedBy();
+
+        $validator = new $validatorClassname();
+        $validator->initialize($context);
+        $validator->validate($value, $constraint);
+
+        $this->context->getValidator()
+            ->expects($this->at($i))
+            ->method('validate')
+            ->willReturn($context->getViolations())
+        ;
+
+        return $context->getViolations();
+    }
+
     protected function assertNoViolation()
     {
         $this->assertSame(0, $violationsCount = \count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));

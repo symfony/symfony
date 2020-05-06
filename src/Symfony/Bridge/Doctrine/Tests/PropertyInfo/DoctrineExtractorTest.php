@@ -11,12 +11,16 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy210;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -39,27 +43,40 @@ class DoctrineExtractorTest extends TestCase
 
     public function testGetProperties()
     {
+        // Fields
+        $expected = [
+            'id',
+            'guid',
+            'time',
+            'timeImmutable',
+            'dateInterval',
+            'jsonArray',
+            'simpleArray',
+            'float',
+            'decimal',
+            'bool',
+            'binary',
+            'customFoo',
+            'bigint',
+        ];
+
+        if (class_exists(Types::class)) {
+            $expected[] = 'json';
+        }
+
+        // Associations
+        $expected = array_merge($expected, [
+            'foo',
+            'bar',
+            'indexedBar',
+            'indexedFoo',
+            'indexedByDt',
+            'indexedByCustomType',
+        ]);
+
         $this->assertEquals(
-             [
-                'id',
-                'guid',
-                'time',
-                'timeImmutable',
-                'dateInterval',
-                'json',
-                'simpleArray',
-                'float',
-                'decimal',
-                'bool',
-                'binary',
-                'customFoo',
-                'bigint',
-                'foo',
-                'bar',
-                'indexedBar',
-                'indexedFoo',
-            ],
-            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy')
+            $expected,
+            $this->createExtractor()->getProperties(!class_exists(Types::class) ? 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy' : DoctrineDummy210::class)
         );
     }
 
@@ -83,7 +100,7 @@ class DoctrineExtractorTest extends TestCase
      */
     public function testExtract($property, array $type = null)
     {
-        $this->assertEquals($type, $this->createExtractor()->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, []));
+        $this->assertEquals($type, $this->createExtractor()->getTypes(!class_exists(Types::class) ? 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy' : DoctrineDummy210::class, $property, []));
     }
 
     public function testExtractWithEmbedded()
@@ -109,7 +126,7 @@ class DoctrineExtractorTest extends TestCase
 
     public function typesProvider()
     {
-        return [
+        $provider = [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['bigint', [new Type(Type::BUILTIN_TYPE_STRING)]],
@@ -120,7 +137,7 @@ class DoctrineExtractorTest extends TestCase
             ['decimal', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['binary', [new Type(Type::BUILTIN_TYPE_RESOURCE)]],
-            ['json', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['jsonArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
             ['foo', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')]],
             ['bar', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -149,7 +166,22 @@ class DoctrineExtractorTest extends TestCase
             ['simpleArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
             ['customFoo', null],
             ['notMapped', null],
+            ['indexedByDt', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_OBJECT),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
+            ['indexedByCustomType', null],
         ];
+
+        if (class_exists(Types::class)) {
+            $provider[] = ['json', null];
+        }
+
+        return $provider;
     }
 
     public function testGetPropertiesCatchException()

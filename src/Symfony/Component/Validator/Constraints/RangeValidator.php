@@ -69,7 +69,7 @@ class RangeValidator extends ConstraintValidator
                 try {
                     $min = new $dateTimeClass($min);
                 } catch (\Exception $e) {
-                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, \get_class($constraint)));
+                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
 
@@ -79,7 +79,7 @@ class RangeValidator extends ConstraintValidator
                 try {
                     $max = new $dateTimeClass($max);
                 } catch (\Exception $e) {
-                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, \get_class($constraint)));
+                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
         }
@@ -157,7 +157,7 @@ class RangeValidator extends ConstraintValidator
         try {
             return $this->getPropertyAccessor()->getValue($object, $propertyPath);
         } catch (NoSuchPropertyException $e) {
-            throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $propertyPath, \get_class($constraint), $e->getMessage()), 0, $e);
+            throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $propertyPath, get_debug_type($constraint)).$e->getMessage(), 0, $e);
         }
     }
 

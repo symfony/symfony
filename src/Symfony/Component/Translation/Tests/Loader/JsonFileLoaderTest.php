@@ -50,7 +50,7 @@ class JsonFileLoaderTest extends TestCase
     public function testParseException()
     {
         $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
-        $this->expectExceptionMessage('Error parsing JSON - Syntax error, malformed JSON');
+        $this->expectExceptionMessage('Error parsing JSON: Syntax error, malformed JSON');
         $loader = new JsonFileLoader();
         $resource = __DIR__.'/../fixtures/malformed.json';
         $loader->load($resource, 'en', 'domain1');

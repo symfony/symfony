@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ResponseHeaderBag::class);
+
 /**
  * Response represents an HTTP response.
  *
@@ -81,6 +84,24 @@ class Response
     const HTTP_LOOP_DETECTED = 508;                                               // RFC5842
     const HTTP_NOT_EXTENDED = 510;                                                // RFC2774
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
+
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+     */
+    private const HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES = [
+        'must_revalidate' => false,
+        'no_cache' => false,
+        'no_store' => false,
+        'no_transform' => false,
+        'public' => false,
+        'private' => false,
+        'proxy_revalidate' => false,
+        'max_age' => true,
+        's_maxage' => true,
+        'immutable' => false,
+        'last_modified' => true,
+        'etag' => true,
+    ];
 
     /**
      * @var ResponseHeaderBag
@@ -267,7 +288,7 @@ class Response
         } else {
             // Content-type based on the Request
             if (!$headers->has('Content-Type')) {
-                $format = $request->getPreferredFormat(null);
+                $format = $request->getRequestFormat(null);
                 if (null !== $format && $mimeType = $request->getMimeType($format)) {
                     $headers->set('Content-Type', $mimeType);
                 }
@@ -918,7 +939,7 @@ class Response
     /**
      * Sets the response's cache headers (validation and/or expiration).
      *
-     * Available options are: etag, last_modified, max_age, s_maxage, private, public and immutable.
+     * Available options are: must_revalidate, no_cache, no_store, no_transform, public, private, proxy_revalidate, max_age, s_maxage, immutable, last_modified and etag.
      *
      * @return $this
      *
@@ -928,7 +949,7 @@ class Response
      */
     public function setCache(array $options): object
     {
-        if ($diff = array_diff(array_keys($options), ['etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'immutable'])) {
+        if ($diff = array_diff(array_keys($options), array_keys(self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
         }
 
@@ -948,6 +969,16 @@ class Response
             $this->setSharedMaxAge($options['s_maxage']);
         }
 
+        foreach (self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES as $directive => $hasValue) {
+            if (!$hasValue && isset($options[$directive])) {
+                if ($options[$directive]) {
+                    $this->headers->addCacheControlDirective(str_replace('_', '-', $directive));
+                } else {
+                    $this->headers->removeCacheControlDirective(str_replace('_', '-', $directive));
+                }
+            }
+        }
+
         if (isset($options['public'])) {
             if ($options['public']) {
                 $this->setPublic();
@@ -962,10 +993,6 @@ class Response
             } else {
                 $this->setPublic();
             }
-        }
-
-        if (isset($options['immutable'])) {
-            $this->setImmutable((bool) $options['immutable']);
         }
 
         return $this;

@@ -47,7 +47,7 @@ class ProcessHelper extends Helper
         }
 
         if (!\is_array($cmd)) {
-            throw new \TypeError(sprintf('The "command" argument of "%s()" must be an array or a "%s" instance, "%s" given.', __METHOD__, Process::class, \is_object($cmd) ? \get_class($cmd) : \gettype($cmd)));
+            throw new \TypeError(sprintf('The "command" argument of "%s()" must be an array or a "%s" instance, "%s" given.', __METHOD__, Process::class, get_debug_type($cmd)));
         }
 
         if (\is_string($cmd[0] ?? null)) {

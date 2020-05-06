@@ -23,7 +23,7 @@ class AppCustomAuthenticator extends AbstractGuardAuthenticator
 {
     public function supports(Request $request)
     {
-        return true;
+        return '/manual_login' !== $request->getPathInfo() && '/profile' !== $request->getPathInfo();
     }
 
     public function getCredentials(Request $request)

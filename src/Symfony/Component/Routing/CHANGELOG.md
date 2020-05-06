@@ -8,6 +8,11 @@ CHANGELOG
  * deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
  * added "priority" option to annotated routes
  * added argument `$priority` to `RouteCollection::add()`
+ * deprecated the `RouteCompiler::REGEX_DELIMITER` constant
+ * added `ExpressionLanguageProvider` to expose extra functions to route conditions
+ * added support for a `stateless` keyword for configuring route stateless in PHP, YAML and XML configurations.
+ * added the "hosts" option to be able to configure the host per locale.
+ * added `RequestContext::fromUri()` to ease building the default context
 
 5.0.0
 -----

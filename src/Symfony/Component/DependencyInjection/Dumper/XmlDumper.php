@@ -137,7 +137,11 @@ class XmlDumper extends Dumper
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
                 $tag = $this->document->createElement('tag');
-                $tag->setAttribute('name', $name);
+                if (!\array_key_exists('name', $attributes)) {
+                    $tag->setAttribute('name', $name);
+                } else {
+                    $tag->appendChild($this->document->createTextNode($name));
+                }
                 foreach ($attributes as $key => $value) {
                     $tag->setAttribute($key, $value);
                 }
@@ -179,8 +183,11 @@ class XmlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecation('%service_id%')['message']));
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }
@@ -225,8 +232,11 @@ class XmlDumper extends Dumper
         }
 
         if ($id->isDeprecated()) {
+            $deprecation = $id->getDeprecation('%alias_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($id->getDeprecationMessage('%alias_id%')));
+            $deprecated->appendChild($this->document->createTextNode($deprecation['message']));
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }
@@ -314,10 +324,6 @@ class XmlDumper extends Dumper
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
             } elseif ($value instanceof AbstractArgument) {
-                $argKey = $value->getArgumentKey();
-                if (!is_numeric($argKey)) {
-                    $element->setAttribute('key', $argKey);
-                }
                 $element->setAttribute('type', 'abstract');
                 $text = $this->document->createTextNode(self::phpToXml($value->getText()));
                 $element->appendChild($text);

@@ -9,7 +9,7 @@ return function (ContainerConfigurator $c) {
         ('foo', 'Foo')
         ('bar', 'Bar')
     ;
-    $c->services()
+    $c->services()->defaults()->public()
         (Foo::class)
             ->arg('$bar', ref('bar'))
             ->public()

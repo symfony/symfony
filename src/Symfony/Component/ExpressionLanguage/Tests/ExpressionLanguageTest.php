@@ -195,6 +195,17 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->compile($expression, ['B' => 'b', 'a']);
     }
 
+    public function testOperatorCollisions()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = 'foo.not in [bar]';
+        $compiled = $expressionLanguage->compile($expression, ['foo', 'bar']);
+        $this->assertSame('in_array($foo->not, [0 => $bar])', $compiled);
+
+        $result = $expressionLanguage->evaluate($expression, ['foo' => (object) ['not' => 'test'], 'bar' => 'test']);
+        $this->assertTrue($result);
+    }
+
     /**
      * @dataProvider getRegisterCallbacks
      */
@@ -220,7 +231,7 @@ class ExpressionLanguageTest extends TestCase
     public function testCallBadCallable()
     {
         $this->expectException('RuntimeException');
-        $this->expectExceptionMessageRegExp('/Unable to call method "\w+" of object "\w+"./');
+        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }

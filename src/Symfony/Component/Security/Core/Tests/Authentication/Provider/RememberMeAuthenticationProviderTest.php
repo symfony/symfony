@@ -13,7 +13,9 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\User\User;
 
 class RememberMeAuthenticationProviderTest extends TestCase
 {
@@ -23,6 +25,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
         $this->assertTrue($provider->supports($this->getSupportedToken()));
         $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
+        $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->disableOriginalConstructor()->getMock()));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
@@ -41,6 +44,17 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(null, 'secret1');
         $token = $this->getSupportedToken(null, 'secret2');
 
+        $provider->authenticate($token);
+    }
+
+    public function testAuthenticateThrowsOnNonUserInterfaceInstance()
+    {
+        $this->expectException('Symfony\Component\Security\Core\Exception\LogicException');
+        $this->expectExceptionMessage('Method "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken::getUser()" must return a "Symfony\Component\Security\Core\User\UserInterface" instance, "string" returned.');
+
+        $provider = $this->getProvider();
+        $token = new RememberMeToken(new User('dummyuser', null), 'foo', 'test');
+        $token->setUser('stringish-user');
         $provider->authenticate($token);
     }
 

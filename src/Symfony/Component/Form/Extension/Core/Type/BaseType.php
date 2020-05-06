@@ -97,6 +97,7 @@ abstract class BaseType extends AbstractType
             'disabled' => $form->isDisabled(),
             'label' => $options['label'],
             'label_format' => $labelFormat,
+            'label_html' => $options['label_html'],
             'multipart' => false,
             'attr' => $options['attr'],
             'block_prefixes' => $blockPrefixes,
@@ -127,6 +128,7 @@ abstract class BaseType extends AbstractType
             'label' => null,
             'label_format' => null,
             'row_attr' => [],
+            'label_html' => false,
             'label_translation_parameters' => [],
             'attr_translation_parameters' => [],
             'attr' => [],
@@ -137,5 +139,6 @@ abstract class BaseType extends AbstractType
         $resolver->setAllowedTypes('block_prefix', ['null', 'string']);
         $resolver->setAllowedTypes('attr', 'array');
         $resolver->setAllowedTypes('row_attr', 'array');
+        $resolver->setAllowedTypes('label_html', 'bool');
     }
 }

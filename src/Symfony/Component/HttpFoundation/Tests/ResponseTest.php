@@ -500,12 +500,25 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('content-type'));
     }
 
+    /**
+     * Same URL cannot produce different Content-Type based on the value of the Accept header,
+     * unless explicitly stated in the response object.
+     */
+    public function testPrepareDoesNotSetContentTypeBasedOnRequestAcceptHeader()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/json');
+        $response->prepare($request);
+
+        $this->assertSame('text/html; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
     public function testPrepareSetContentType()
     {
         $response = new Response('foo');
         $request = Request::create('/');
         $request->setRequestFormat('json');
-        $request->headers->remove('accept');
 
         $response->prepare($request);
 
@@ -646,6 +659,25 @@ class ResponseTest extends ResponseTestCase
 
         $response->setCache(['immutable' => false]);
         $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
+
+        $directives = ['proxy_revalidate', 'must_revalidate', 'no_cache', 'no_store', 'no_transform'];
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => true]);
+
+            $this->assertTrue($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => false]);
+
+            $this->assertFalse($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        $response = new DefaultResponse();
+
+        $options = ['etag' => '"whatever"'];
+        $response->setCache($options);
+        $this->assertSame($response->getEtag(), '"whatever"');
     }
 
     public function testSendContent()

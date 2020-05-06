@@ -10,6 +10,7 @@
     <service id="foo" class="Bar\FooClass" public="true">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
+      <tag name="bar" baz="baz">foo</tag>
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument type="collection">
@@ -97,7 +98,7 @@
     <service id="decorator_service" class="stdClass" public="true" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" public="true" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="deprecated_service" class="stdClass" public="true">
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
@@ -114,7 +115,7 @@
     </service>
     <service id="factory_simple" class="SimpleFactoryClass" public="false">
       <argument>foo</argument>
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
     <service id="factory_service_simple" class="Bar" public="true">
       <factory service="factory_simple" method="getInstance"/>
@@ -148,8 +149,16 @@
       <argument type="service" id="errored_definition"/>
     </service>
     <service id="errored_definition" class="stdClass"/>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
+    <service id="preload_sidekick" class="stdClass" public="true">
+      <tag name="container.preload" class="Some\Sidekick1"/>
+      <tag name="container.preload" class="Some\Sidekick2"/>
+    </service>
+    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false">
+      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
+    </service>
+    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false">
+      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
+    </service>
     <service id="alias_for_foo" alias="foo" public="true"/>
     <service id="alias_for_alias" alias="foo" public="true"/>
   </services>

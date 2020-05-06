@@ -165,7 +165,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
             if (ctype_alpha($region) && !RegionDataGenerator::isValidCountryCode($region)) {
-                throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
+                throw new MissingResourceException(sprintf('Skipping "%s" due an invalid country.', $locale));
             }
 
             $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));

@@ -84,13 +84,15 @@ final class OptionConfigurator
     /**
      * Marks this option as deprecated.
      *
-     * @return $this
+     * @param string          $package The name of the composer package that is triggering the deprecation
+     * @param string          $version The version of the package that introduced the deprecation
+     * @param string|\Closure $message The deprecation message to use
      *
-     * @param string|\Closure $deprecationMessage
+     * @return $this
      */
-    public function deprecated($deprecationMessage = 'The option "%name%" is deprecated.'): self
+    public function deprecated(string $package, string $version, $message = 'The option "%name%" is deprecated.'): self
     {
-        $this->resolver->setDeprecated($this->name, $deprecationMessage);
+        $this->resolver->setDeprecated($this->name, $package, $version, $message);
 
         return $this;
     }

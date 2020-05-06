@@ -4,7 +4,10 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added XSD for configuration
  * Added security configuration for priority-based access decision strategy
+ * Marked the `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`, `HttpBasicFactory`, `HttpBasicLdapFactory`, `JsonLoginFactory`, `JsonLoginLdapFactory`, `RememberMeFactory`, `RemoteUserFactory` and `X509Factory` as `@internal`
+ * Renamed method `AbstractFactory#createEntryPoint()` to `AbstractFactory#createDefaultEntryPoint()`
 
 5.0.0
 -----

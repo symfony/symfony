@@ -99,7 +99,7 @@
             {%- endif -%}
         {%- endif -%}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
-            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain)) -}}
+            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? (label_html is same as(false) ? label : label|raw) : (label_html is same as(false) ? label|trans(label_translation_parameters, translation_domain) : label|trans(label_translation_parameters, translation_domain)|raw)) -}}
         </label>
     {%- endif -%}
 {%- endblock checkbox_radio_label %}

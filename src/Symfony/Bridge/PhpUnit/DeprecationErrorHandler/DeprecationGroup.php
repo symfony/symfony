@@ -30,7 +30,7 @@ final class DeprecationGroup
      */
     public function addNoticeFromObject($message, $class, $method)
     {
-        $this->deprecationNotice($message)->addObjectOccurence($class, $method);
+        $this->deprecationNotice($message)->addObjectOccurrence($class, $method);
         $this->addNotice();
     }
 
@@ -39,7 +39,7 @@ final class DeprecationGroup
      */
     public function addNoticeFromProceduralCode($message)
     {
-        $this->deprecationNotice($message)->addProceduralOccurence();
+        $this->deprecationNotice($message)->addProceduralOccurrence();
         $this->addNotice();
     }
 

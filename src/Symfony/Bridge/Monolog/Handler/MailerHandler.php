@@ -30,8 +30,9 @@ class MailerHandler extends AbstractProcessingHandler
 
     /**
      * @param callable|Email $messageTemplate
+     * @param string|int     $level           The minimum logging level at which this handler will be triggered
      */
-    public function __construct(MailerInterface $mailer, $messageTemplate, int $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(MailerInterface $mailer, $messageTemplate, $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
@@ -101,10 +102,10 @@ class MailerHandler extends AbstractProcessingHandler
         } elseif (\is_callable($this->messageTemplate)) {
             $message = \call_user_func($this->messageTemplate, $content, $records);
             if (!$message instanceof Email) {
-                throw new \InvalidArgumentException(sprintf('Could not resolve message from a callable. Instance of "%s" is expected', Email::class));
+                throw new \InvalidArgumentException(sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
             }
         } else {
-            throw new \InvalidArgumentException('Could not resolve message as instance of Email or a callable returning it');
+            throw new \InvalidArgumentException('Could not resolve message as instance of Email or a callable returning it.');
         }
 
         if ($records) {

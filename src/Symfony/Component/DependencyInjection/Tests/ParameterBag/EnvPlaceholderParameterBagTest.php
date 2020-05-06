@@ -112,7 +112,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testResolveEnvRequiresStrings()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, integer given.');
+        $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
 
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(INT_VAR)');
@@ -123,7 +123,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testGetDefaultScalarEnv()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "integer" given to "env(INT_VAR)".');
+        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
 
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(INT_VAR)', 2);
@@ -154,7 +154,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testResolveThrowsOnBadDefaultValue()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, array given.');
+        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
         $bag->set('env(ARRAY_VAR)', []);

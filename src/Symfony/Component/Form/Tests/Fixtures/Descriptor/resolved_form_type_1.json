@@ -4,6 +4,7 @@
     "options": {
         "own": [
             "choice_attr",
+            "choice_filter",
             "choice_label",
             "choice_loader",
             "choice_name",
@@ -46,6 +47,7 @@
                 "label",
                 "label_attr",
                 "label_format",
+                "label_html",
                 "label_translation_parameters",
                 "mapped",
                 "method",

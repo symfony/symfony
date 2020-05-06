@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -35,6 +37,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
@@ -489,6 +492,26 @@ class SerializerTest extends TestCase
         (new Serializer())->normalize(tmpfile());
     }
 
+    public function testNormalizePreserveEmptyArrayObject()
+    {
+        $serializer = new Serializer(
+          [
+              new PropertyNormalizer(),
+              new ObjectNormalizer(),
+              new ArrayDenormalizer(),
+          ],
+          [
+              'json' => new JsonEncoder(),
+          ]
+        );
+
+        $object = [];
+        $object['foo'] = new \ArrayObject();
+        $object['bar'] = new \ArrayObject(['notempty']);
+        $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
+        $this->assertEquals('{"foo":{},"bar":["notempty"],"baz":{"nested":{}}}', $serializer->serialize($object, 'json', [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]));
+    }
+
     public function testNormalizeScalar()
     {
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
@@ -574,6 +597,20 @@ class SerializerTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
         return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
+    }
+
+    public function testDeserializeAndUnwrap()
+    {
+        $jsonData = '{"baz": {"foo": "bar", "inner": {"title": "value", "numbers": [5,3]}}}';
+
+        $expectedData = Model::fromArray(['title' => 'value', 'numbers' => [5, 3]]);
+
+        $serializer = new Serializer([new UnwrappingDenormalizer(new PropertyAccessor()), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->assertEquals(
+            $expectedData,
+            $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
+        );
     }
 }
 

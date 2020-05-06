@@ -50,7 +50,7 @@ class ProcessTest extends TestCase
     public function testInvalidCwd()
     {
         $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
-        $this->expectExceptionMessageRegExp('/The provided cwd ".*" does not exist\./');
+        $this->expectExceptionMessageMatches('/The provided cwd ".*" does not exist\./');
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process(['echo', 'test'], __DIR__);
@@ -293,7 +293,7 @@ class ProcessTest extends TestCase
     public function testInvalidInput($value)
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.');
+        $this->expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
         $process = $this->getProcess('foo');
         $process->setInput($value);
     }
@@ -940,7 +940,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('foo');
 
         $this->expectException('Symfony\Component\Process\Exception\LogicException');
-        $this->expectExceptionMessage(sprintf('Process must be started before calling %s.', $method));
+        $this->expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
 
         $process->{$method}();
     }
@@ -1488,7 +1488,7 @@ EOTXT;
     public function testPreparedCommandWithMissingValue()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, ['bcd' => 'BCD']);
     }
@@ -1496,7 +1496,7 @@ EOTXT;
     public function testPreparedCommandWithNoValues()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, []);
     }

@@ -136,6 +136,13 @@ class FileLoaderTest extends TestCase
             ],
             array_keys($container->getAliases())
         );
+
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            'Prototype/NotExistingDir'
+        );
     }
 
     public function testRegisterClassesWithExcludeAsArray()
@@ -209,7 +216,7 @@ class FileLoaderTest extends TestCase
     public function testRegisterClassesWithBadPrefix()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
+        $this->expectExceptionMessageMatches('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 

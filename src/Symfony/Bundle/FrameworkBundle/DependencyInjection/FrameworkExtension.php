@@ -81,6 +81,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -91,6 +92,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -107,7 +109,9 @@ use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
@@ -116,6 +120,7 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -323,7 +328,9 @@ class FrameworkExtension extends Extension
 
             if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(AmqpTransportFactory::class)) {
                 if (class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.amqp.factory')->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class);
+                    $container->getDefinition('messenger.transport.amqp.factory')
+                        ->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)
+                        ->addTag('messenger.transport_factory');
                 } else {
                     $container->removeDefinition('messenger.transport.amqp.factory');
                 }
@@ -331,7 +338,9 @@ class FrameworkExtension extends Extension
 
             if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(RedisTransportFactory::class)) {
                 if (class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.redis.factory')->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class);
+                    $container->getDefinition('messenger.transport.redis.factory')
+                        ->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)
+                        ->addTag('messenger.transport_factory');
                 } else {
                     $container->removeDefinition('messenger.transport.redis.factory');
                 }
@@ -874,6 +883,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $enabledLocales]);
         }
 
+        if (!class_exists(ExpressionLanguage::class)) {
+            $container->removeDefinition('router.expression_language_provider');
+        }
+
         $container->setParameter('router.resource', $config['resource']);
         $router = $container->findDefinition('router.default');
         $argument = $router->getArgument(2);
@@ -886,10 +899,10 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
-        $requestContext = $container->getDefinition('router.request_context');
-        $requestContext->replaceArgument(0, $config['context']['base_url']);
-        $requestContext->replaceArgument(2, $config['context']['host']);
-        $requestContext->replaceArgument(3, $config['context']['scheme']);
+        if (null !== $config['default_uri']) {
+            $container->getDefinition('router.request_context')
+                ->replaceArgument(0, $config['default_uri']);
+        }
 
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
@@ -1045,7 +1058,12 @@ class FrameworkExtension extends Extension
         }
 
         if (null !== $jsonManifestPath) {
-            $def = new ChildDefinition('assets.json_manifest_version_strategy');
+            $definitionName = 'assets.json_manifest_version_strategy';
+            if (0 === strpos(parse_url($jsonManifestPath, PHP_URL_SCHEME), 'http')) {
+                $definitionName = 'assets.remote_json_manifest_version_strategy';
+            }
+
+            $def = new ChildDefinition($definitionName);
             $def->replaceArgument(0, $jsonManifestPath);
             $container->setDefinition('assets._version_'.$name, $def);
 
@@ -1113,7 +1131,7 @@ class FrameworkExtension extends Extension
             if ($container->fileExists($dir)) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
-                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
+                throw new \UnexpectedValueException(sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
             }
         }
 
@@ -1372,6 +1390,8 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
+            ->replaceArgument(4, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->replaceArgument(5, new Reference(PropertyWriteInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ;
     }
 
@@ -1450,6 +1470,10 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Yaml::class)) {
             $container->removeDefinition('serializer.encoder.yaml');
+        }
+
+        if (!class_exists(UnwrappingDenormalizer::class)) {
+            $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
         $serializerLoaders = [];
@@ -1609,6 +1633,18 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.xml');
 
+        if (class_exists(AmqpTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
+        }
+
+        if (class_exists(RedisTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
+        }
+
+        if (class_exists(AmazonSqsTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
+        }
+
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
@@ -1666,6 +1702,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.symfony_serializer');
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
+            $container->removeDefinition('messenger.transport.sqs.factory');
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])
@@ -2007,6 +2044,7 @@ class FrameworkExtension extends Extension
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
+            FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
         ];

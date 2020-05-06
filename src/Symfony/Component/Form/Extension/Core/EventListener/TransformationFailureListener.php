@@ -50,7 +50,7 @@ class TransformationFailureListener implements EventSubscriberInterface
             }
         }
 
-        $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : \gettype($form->getViewData());
+        $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : get_debug_type($form->getViewData());
         $messageTemplate = 'The value {{ value }} is not valid.';
 
         if (null !== $this->translator) {

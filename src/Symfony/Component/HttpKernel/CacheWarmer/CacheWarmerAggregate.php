@@ -45,6 +45,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
 
     /**
      * Warms up the cache.
+     *
+     * @return string[] A list of classes or files to preload on PHP 7.4+
      */
     public function warmUp(string $cacheDir)
     {
@@ -83,6 +85,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             });
         }
 
+        $preload = [];
         try {
             foreach ($this->warmers as $warmer) {
                 if (!$this->optionalsEnabled && $warmer->isOptional()) {
@@ -92,7 +95,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                     continue;
                 }
 
-                $warmer->warmUp($cacheDir);
+                $preload[] = array_values((array) $warmer->warmUp($cacheDir));
             }
         } finally {
             if ($collectDeprecations) {
@@ -106,6 +109,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 file_put_contents($this->deprecationLogsFilepath, serialize(array_values($collectedLogs)));
             }
         }
+
+        return array_values(array_unique(array_merge([], ...$preload)));
     }
 
     /**

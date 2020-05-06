@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
@@ -26,6 +27,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class XmlFileLoader extends FileLoader
 {
+    use HostTrait;
     use LocalizedRouteTrait;
     use PrefixTrait;
 
@@ -102,40 +104,41 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      *
-     * @param \DOMElement $node     Element to parse that represents a Route
-     * @param string      $filepath Full path of the XML file being processed
+     * @param \DOMElement $node Element to parse that represents a Route
+     * @param string      $path Full path of the XML file being processed
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $filepath)
+    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path)
     {
         if ('' === $id = $node->getAttribute('id')) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $filepath));
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options, $condition, $paths) = $this->parseConfigs($node, $filepath);
+        list($defaults, $requirements, $options, $condition, $paths, /* $prefixes */, $hosts) = $this->parseConfigs($node, $path);
 
-        $path = $node->getAttribute('path');
-
-        if (!$paths && '' === $path) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $filepath));
+        if (!$paths && '' === $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $path));
         }
 
-        if ($paths && '' !== $path) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "path" attribute and <path> child nodes.', $filepath));
+        if ($paths && '' !== $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "path" attribute and <path> child nodes.', $path));
         }
 
-        $route = $this->createLocalizedRoute($collection, $id, $paths ?: $path);
-        $route->addDefaults($defaults);
-        $route->addRequirements($requirements);
-        $route->addOptions($options);
-        $route->setHost($node->getAttribute('host'));
-        $route->setSchemes($schemes);
-        $route->setMethods($methods);
-        $route->setCondition($condition);
+        $routes = $this->createLocalizedRoute($collection, $id, $paths ?: $node->getAttribute('path'));
+        $routes->addDefaults($defaults);
+        $routes->addRequirements($requirements);
+        $routes->addOptions($options);
+        $routes->setSchemes($schemes);
+        $routes->setMethods($methods);
+        $routes->setCondition($condition);
+
+        if (null !== $hosts) {
+            $this->addHost($routes, $hosts);
+        }
     }
 
     /**
@@ -155,13 +158,12 @@ class XmlFileLoader extends FileLoader
 
         $type = $node->getAttribute('type');
         $prefix = $node->getAttribute('prefix');
-        $host = $node->hasAttribute('host') ? $node->getAttribute('host') : null;
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $trailingSlashOnRoot = $node->hasAttribute('trailing-slash-on-root') ? XmlUtils::phpize($node->getAttribute('trailing-slash-on-root')) : true;
         $namePrefix = $node->getAttribute('name-prefix') ?: null;
 
-        list($defaults, $requirements, $options, $condition, /* $paths */, $prefixes) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition, /* $paths */, $prefixes, $hosts) = $this->parseConfigs($node, $path);
 
         if ('' !== $prefix && $prefixes) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "prefix" attribute and <prefix> child nodes.', $path));
@@ -193,9 +195,10 @@ class XmlFileLoader extends FileLoader
         foreach ($imported as $subCollection) {
             $this->addPrefix($subCollection, $prefixes ?: $prefix, $trailingSlashOnRoot);
 
-            if (null !== $host) {
-                $subCollection->setHost($host);
+            if (null !== $hosts) {
+                $this->addHost($subCollection, $hosts);
             }
+
             if (null !== $condition) {
                 $subCollection->setCondition($condition);
             }
@@ -245,6 +248,7 @@ class XmlFileLoader extends FileLoader
         $condition = null;
         $prefixes = [];
         $paths = [];
+        $hosts = [];
 
         /** @var \DOMElement $n */
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
@@ -255,6 +259,9 @@ class XmlFileLoader extends FileLoader
             switch ($n->localName) {
                 case 'path':
                     $paths[$n->getAttribute('locale')] = trim($n->textContent);
+                    break;
+                case 'host':
+                    $hosts[$n->getAttribute('locale')] = trim($n->textContent);
                     break;
                 case 'prefix':
                     $prefixes[$n->getAttribute('locale')] = trim($n->textContent);
@@ -283,9 +290,9 @@ class XmlFileLoader extends FileLoader
 
         if ($controller = $node->getAttribute('controller')) {
             if (isset($defaults['_controller'])) {
-                $name = $node->hasAttribute('id') ? sprintf('"%s"', $node->getAttribute('id')) : sprintf('the "%s" tag', $node->tagName);
+                $name = $node->hasAttribute('id') ? sprintf('"%s".', $node->getAttribute('id')) : sprintf('the "%s" tag.', $node->tagName);
 
-                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "controller" attribute and the defaults key "_controller" for %s.', $path, $name));
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "controller" attribute and the defaults key "_controller" for ', $path).$name);
             }
 
             $defaults['_controller'] = $controller;
@@ -299,8 +306,21 @@ class XmlFileLoader extends FileLoader
         if ($node->hasAttribute('utf8')) {
             $options['utf8'] = XmlUtils::phpize($node->getAttribute('utf8'));
         }
+        if ($stateless = $node->getAttribute('stateless')) {
+            if (isset($defaults['_stateless'])) {
+                $name = $node->hasAttribute('id') ? sprintf('"%s".', $node->getAttribute('id')) : sprintf('the "%s" tag.', $node->tagName);
 
-        return [$defaults, $requirements, $options, $condition, $paths, $prefixes];
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" attribute and the defaults key "_stateless" for ', $path).$name);
+            }
+
+            $defaults['_stateless'] = XmlUtils::phpize($stateless);
+        }
+
+        if (!$hosts) {
+            $hosts = $node->hasAttribute('host') ? $node->getAttribute('host') : null;
+        }
+
+        return [$defaults, $requirements, $options, $condition, $paths, $prefixes, $hosts];
     }
 
     /**

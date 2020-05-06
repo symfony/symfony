@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
@@ -39,6 +40,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -380,7 +383,7 @@ class XmlFileLoaderTest extends TestCase
     public function testParseTagWithEmptyNameThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/The tag name for service ".+" in .* must be a non-empty string/');
+        $this->expectExceptionMessageMatches('/The tag name for service ".+" in .* must be a non-empty string/');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('tag_with_empty_name.xml');
@@ -394,11 +397,29 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('foo')->isDeprecated());
         $message = 'The "foo" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
+        $this->assertSame($message, $container->getDefinition('foo')->getDeprecation('foo')['message']);
 
         $this->assertTrue($container->getDefinition('bar')->isDeprecated());
         $message = 'The "bar" service is deprecated.';
-        $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
+        $this->assertSame($message, $container->getDefinition('bar')->getDeprecation('bar')['message']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.');
+
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_deprecated_without_package_and_version.xml');
+
+        $this->assertTrue($container->getDefinition('foo')->isDeprecated());
+        $deprecation = $container->getDefinition('foo')->getDeprecation('foo');
+        $this->assertSame('The "foo" service is deprecated.', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     public function testDeprecatedAliases()
@@ -409,11 +430,29 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
         $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
+        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo')['message']);
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
-        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
+        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar')['message']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedAliaseWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.');
+
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('deprecated_alias_definitions_without_package_and_version.xml');
+
+        $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
+        $deprecation = $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo');
+        $this->assertSame('The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     public function testConvertDomElementToArray()
@@ -812,34 +851,34 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
     }
 
-    public function testInstanceOfAndChildDefinitionNotAllowed()
+    public function testInstanceOfAndChildDefinition()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('The service "child_service" cannot use the "parent" option in the same file where "instanceof" configuration is defined as using both is not supported. Move your child definitions to a separate file.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_instanceof_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
-    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    public function testAutoConfigureAndChildDefinition()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('The service "child_service" cannot have a "parent" and also have "autoconfigure". Try setting autoconfigure="false" for the service.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_autoconfigure_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
-    public function testDefaultsAndChildDefinitionNotAllowed()
+    public function testDefaultsAndChildDefinition()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Attribute "autowire" on service "child_service" cannot be inherited from "defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_defaults_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
     public function testAutoConfigureInstanceof()
@@ -1004,5 +1043,37 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($container->hasDefinition(FooWithAbstractArgument::class));
         $arguments = $container->getDefinition(FooWithAbstractArgument::class)->getArguments();
         $this->assertInstanceOf(AbstractArgument::class, $arguments['$baz']);
+    }
+
+    public function testStack()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('stack.xml');
+
+        $container->compile();
+
+        $expected = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'C',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $container->get('stack_a'));
+        $this->assertEquals($expected, $container->get('stack_b'));
+
+        $expected = (object) [
+            'label' => 'Z',
+            'inner' => $expected,
+        ];
+        $this->assertEquals($expected, $container->get('stack_c'));
+
+        $expected = $expected->inner;
+        $expected->label = 'Z';
+        $this->assertEquals($expected, $container->get('stack_d'));
     }
 }

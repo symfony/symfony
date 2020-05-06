@@ -205,6 +205,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->configureRoute($route, $class, $method, $annot);
             if (0 !== $locale) {
                 $route->setDefault('_locale', $locale);
+                $route->setRequirement('_locale', preg_quote($locale));
                 $route->setDefault('_canonical_route', $name);
                 $collection->add($name.'.'.$locale, $route, $priority);
             } else {

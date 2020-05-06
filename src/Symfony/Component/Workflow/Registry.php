@@ -52,7 +52,7 @@ class Registry
         }
 
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_debug_type($subject)));
         }
 
         if (2 <= \count($matched)) {
@@ -60,7 +60,7 @@ class Registry
                 return $workflow->getName();
             }, $matched);
 
-            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), \get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), get_debug_type($subject)));
         }
 
         return $matched[0];

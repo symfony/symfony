@@ -42,7 +42,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
             throw new BadMethodCallException('Please set a serializer before calling denormalize()!');
         }
         if (!\is_array($data)) {
-            throw new InvalidArgumentException('Data expected to be an array, '.\gettype($data).' given.');
+            throw new InvalidArgumentException('Data expected to be an array, '.get_debug_type($data).' given.');
         }
         if ('[]' !== substr($type, -2)) {
             throw new InvalidArgumentException('Unsupported class: '.$type);
@@ -54,7 +54,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
             if (null !== $builtinType && !('is_'.$builtinType)($key)) {
-                throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, \gettype($key)));
+                throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key)));
             }
 
             $data[$key] = $serializer->denormalize($value, $type, $format, $context);
@@ -68,6 +68,10 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
      */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
+        if (null === $this->serializer) {
+            throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used.', __METHOD__));
+        }
+
         return '[]' === substr($type, -2)
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }

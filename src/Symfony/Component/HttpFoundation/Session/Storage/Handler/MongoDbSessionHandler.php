@@ -66,7 +66,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     public function __construct(\MongoDB\Client $mongo, array $options)
     {
         if (!isset($options['database']) || !isset($options['collection'])) {
-            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
+            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler.');
         }
 
         $this->mongo = $mongo;

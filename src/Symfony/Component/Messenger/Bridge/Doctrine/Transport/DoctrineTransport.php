@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -96,6 +99,22 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     public function setup(): void
     {
         $this->connection->setup();
+    }
+
+    /**
+     * Adds the Table to the Schema if this transport uses this connection.
+     */
+    public function configureSchema(Schema $schema, DbalConnection $forConnection): void
+    {
+        $this->connection->configureSchema($schema, $forConnection);
+    }
+
+    /**
+     * Adds extra SQL if the given table was created by the Connection.
+     */
+    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    {
+        return $this->connection->getExtraSetupSqlForTable($createdTable);
     }
 
     private function getReceiver(): DoctrineReceiver

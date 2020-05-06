@@ -16,6 +16,7 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -29,6 +30,10 @@ class DefaultChoiceListFactoryTest extends TestCase
     private $obj3;
 
     private $obj4;
+
+    private $obj5;
+
+    private $obj6;
 
     private $list;
 
@@ -191,6 +196,55 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertObjectListWithCustomValues($list);
     }
 
+    public function testCreateFromFilteredChoices()
+    {
+        $list = $this->factory->createListFromChoices(
+            ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6],
+            null,
+            function ($choice) {
+                return $choice !== $this->obj5 && $choice !== $this->obj6;
+            }
+        );
+
+        $this->assertObjectListWithGeneratedValues($list);
+    }
+
+    public function testCreateFromChoicesGroupedAndFiltered()
+    {
+        $list = $this->factory->createListFromChoices(
+            [
+                'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
+                'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
+                'Group 3' => ['E' => $this->obj5, 'F' => $this->obj6],
+                'Group 4' => [/* empty group should be filtered */],
+            ],
+            null,
+            function ($choice) {
+                return $choice !== $this->obj5 && $choice !== $this->obj6;
+            }
+        );
+
+        $this->assertObjectListWithGeneratedValues($list);
+    }
+
+    public function testCreateFromChoicesGroupedAndFilteredTraversable()
+    {
+        $list = $this->factory->createListFromChoices(
+            new \ArrayIterator([
+                'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
+                'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
+                'Group 3' => ['E' => $this->obj5, 'F' => $this->obj6],
+                'Group 4' => [/* empty group should be filtered */],
+            ]),
+            null,
+            function ($choice) {
+                return $choice !== $this->obj5 && $choice !== $this->obj6;
+            }
+        );
+
+        $this->assertObjectListWithGeneratedValues($list);
+    }
+
     public function testCreateFromLoader()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
@@ -208,6 +262,16 @@ class DefaultChoiceListFactoryTest extends TestCase
         $list = $this->factory->createListFromLoader($loader, $value);
 
         $this->assertEquals(new LazyChoiceList($loader, $value), $list);
+    }
+
+    public function testCreateFromLoaderWithFilter()
+    {
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
+        $filter = function () {};
+
+        $list = $this->factory->createListFromLoader($loader, null, $filter);
+
+        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $filter)), $list);
     }
 
     public function testCreateViewFlat()

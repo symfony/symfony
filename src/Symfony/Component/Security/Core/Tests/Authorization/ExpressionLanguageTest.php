@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\User\User;
 
@@ -35,11 +36,10 @@ class ExpressionLanguageTest extends TestCase
         $trustResolver = new AuthenticationTrustResolver();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
-        $accessDecisionManager = new AccessDecisionManager([new RoleVoter()]);
+        $accessDecisionManager = new AccessDecisionManager([new RoleVoter(), new AuthenticatedVoter($trustResolver)]);
         $authChecker = new AuthorizationChecker($tokenStorage, $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(), $accessDecisionManager);
 
         $context = [];
-        $context['trust_resolver'] = $trustResolver;
         $context['auth_checker'] = $authChecker;
         $context['token'] = $token;
 

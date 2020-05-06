@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractor;
+namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;

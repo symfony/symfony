@@ -69,4 +69,12 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertEquals('Have a great day!', $response->getContent());
     }
+
+    public function testSecretLoadedFromExtension()
+    {
+        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel->boot();
+
+        self::assertSame('$ecret', $kernel->getContainer()->getParameter('kernel.secret'));
+    }
 }

@@ -25,7 +25,7 @@ class ApcuAdapter extends AbstractAdapter
     public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null)
     {
         if (!static::isSupported()) {
-            throw new CacheException('APCu is not enabled');
+            throw new CacheException('APCu is not enabled.');
         }
         if ('cli' === \PHP_SAPI) {
             ini_set('apc.use_request_time', 0);

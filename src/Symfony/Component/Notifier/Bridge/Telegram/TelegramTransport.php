@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @internal
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TelegramTransport extends AbstractTransport
 {
@@ -63,7 +63,7 @@ final class TelegramTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
         $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);
@@ -80,7 +80,7 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Telegram message: %s (%s).', $result['description'], $result['error_code']), $response);
+            throw new TransportException(sprintf('Unable to post the Telegram message: '.$result['description'].' (%s).', $result['error_code']), $response);
         }
     }
 }

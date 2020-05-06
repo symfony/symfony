@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
@@ -28,11 +29,12 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
+    use HostTrait;
     use LocalizedRouteTrait;
     use PrefixTrait;
 
     private static $availableKeys = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
     ];
     private $yamlParser;
 
@@ -65,7 +67,7 @@ class YamlFileLoader extends FileLoader
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: ', $path).$e->getMessage(), 0, $e);
         }
 
         $collection = new RouteCollection();
@@ -133,15 +135,21 @@ class YamlFileLoader extends FileLoader
         if (isset($config['utf8'])) {
             $options['utf8'] = $config['utf8'];
         }
+        if (isset($config['stateless'])) {
+            $defaults['_stateless'] = $config['stateless'];
+        }
 
-        $route = $this->createLocalizedRoute($collection, $name, $config['path']);
-        $route->addDefaults($defaults);
-        $route->addRequirements($requirements);
-        $route->addOptions($options);
-        $route->setHost($config['host'] ?? '');
-        $route->setSchemes($config['schemes'] ?? []);
-        $route->setMethods($config['methods'] ?? []);
-        $route->setCondition($config['condition'] ?? null);
+        $routes = $this->createLocalizedRoute($collection, $name, $config['path']);
+        $routes->addDefaults($defaults);
+        $routes->addRequirements($requirements);
+        $routes->addOptions($options);
+        $routes->setSchemes($config['schemes'] ?? []);
+        $routes->setMethods($config['methods'] ?? []);
+        $routes->setCondition($config['condition'] ?? null);
+
+        if (isset($config['host'])) {
+            $this->addHost($routes, $config['host']);
+        }
     }
 
     /**
@@ -178,6 +186,9 @@ class YamlFileLoader extends FileLoader
         if (isset($config['utf8'])) {
             $options['utf8'] = $config['utf8'];
         }
+        if (isset($config['stateless'])) {
+            $defaults['_stateless'] = $config['stateless'];
+        }
 
         $this->setCurrentDir(\dirname($path));
 
@@ -192,7 +203,7 @@ class YamlFileLoader extends FileLoader
             $this->addPrefix($subCollection, $prefix, $trailingSlashOnRoot);
 
             if (null !== $host) {
-                $subCollection->setHost($host);
+                $this->addHost($subCollection, $host);
             }
             if (null !== $condition) {
                 $subCollection->setCondition($condition);
@@ -243,6 +254,9 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['controller']) && isset($config['defaults']['_controller'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "controller" key and the defaults key "_controller" for "%s".', $path, $name));
+        }
+        if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
+            throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
         }
     }
 }

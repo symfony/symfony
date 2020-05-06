@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Bundle\FrameworkBundle\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
@@ -63,14 +63,6 @@ trait MicroKernelTrait
     /**
      * {@inheritdoc}
      */
-    public function getProjectDir(): string
-    {
-        return \dirname((new \ReflectionObject($this))->getFileName(), 2);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';
@@ -88,6 +80,7 @@ trait MicroKernelTrait
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', [
+                'secret' => '%env(APP_SECRET)%',
                 'router' => [
                     'resource' => 'kernel::loadRoutes',
                     'type' => 'service',
@@ -108,7 +101,6 @@ trait MicroKernelTrait
 
             $container->addObjectResource($this);
             $container->fileExists($this->getProjectDir().'/config/bundles.php');
-            $container->setParameter('kernel.secret', '%env(APP_SECRET)%');
 
             try {
                 $this->configureContainer($container, $loader);

@@ -39,7 +39,7 @@ class ProfilerPass implements CompilerPassInterface
 
             if (isset($attributes[0]['template'])) {
                 if (!isset($attributes[0]['id'])) {
-                    throw new InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
+                    throw new InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template.', $id));
                 }
                 $template = [$attributes[0]['id'], $attributes[0]['template']];
             }

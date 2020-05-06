@@ -23,6 +23,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Compiler/OptionalServiceClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/ParentNotExists.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php'):
+        case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/WitherStaticReturnType.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Dummy.php'):

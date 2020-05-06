@@ -148,13 +148,13 @@ class BinaryNode extends Node
                 return $left * $right;
             case '/':
                 if (0 == $right) {
-                    throw new \DivisionByZeroError('Division by zero');
+                    throw new \DivisionByZeroError('Division by zero.');
                 }
 
                 return $left / $right;
             case '%':
                 if (0 == $right) {
-                    throw new \DivisionByZeroError('Modulo by zero');
+                    throw new \DivisionByZeroError('Modulo by zero.');
                 }
 
                 return $left % $right;

@@ -106,6 +106,39 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testLabelHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"][.="[trans]<b>Bolded label</b>[/trans]"]');
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"]/b[.="Bolded label"]', 0);
+    }
+
+    public function testLabelHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+            'label_html' => true,
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"]/b[.="Bolded label"]');
+    }
+
     public function testHelp()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
@@ -2178,7 +2211,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/div
@@ -2200,7 +2233,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercentNoSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/input
     [@id="my&id"]
@@ -2214,7 +2247,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercentCustomSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/div
     [@class="input-group"]
@@ -2661,6 +2694,31 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/button[@type="button"][@name="name"][.="Name"][@class="my&class btn"]'
         );
+    }
+
+    public function testButtonLabelHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
+            'label' => '<b>Click here!</b>',
+        ]);
+
+        $html = $this->renderWidget($form->createView(), ['attr' => ['class' => 'my&class']]);
+
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][.="[trans]<b>Click here!</b>[/trans]"][@class="my&class btn"]');
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][@class="my&class btn"]/b[.="Click here!"]', 0);
+    }
+
+    public function testButtonLabelHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
+            'label' => '<b>Click here!</b>',
+            'label_html' => true,
+        ]);
+
+        $html = $this->renderWidget($form->createView(), ['attr' => ['class' => 'my&class']]);
+
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][.="[trans]<b>Click here!</b>[/trans]"][@class="my&class btn"]', 0);
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][@class="my&class btn"]/b[.="Click here!"]');
     }
 
     public function testSubmit()

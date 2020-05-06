@@ -45,6 +45,7 @@
     <xsd:sequence>
       <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="path" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="host" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="path" type="xsd:string" />
@@ -55,6 +56,7 @@
     <xsd:attribute name="locale" type="xsd:string" />
     <xsd:attribute name="format" type="xsd:string" />
     <xsd:attribute name="utf8" type="xsd:boolean" />
+    <xsd:attribute name="stateless" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -62,6 +64,7 @@
       <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="prefix" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="host" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
     <xsd:attribute name="resource" type="xsd:string" use="required" />
     <xsd:attribute name="type" type="xsd:string" />
@@ -76,6 +79,7 @@
     <xsd:attribute name="format" type="xsd:string" />
     <xsd:attribute name="trailing-slash-on-root" type="xsd:boolean" />
     <xsd:attribute name="utf8" type="xsd:boolean" />
+    <xsd:attribute name="stateless" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="default" mixed="true">

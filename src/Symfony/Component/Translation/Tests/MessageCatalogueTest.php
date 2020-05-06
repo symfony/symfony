@@ -56,6 +56,30 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals($messages, $catalogue->all());
     }
 
+    public function testAllIntICU()
+    {
+        $messages = [
+            'domain1+intl-icu' => ['foo' => 'bar'],
+            'domain2+intl-icu' => ['bar' => 'foo'],
+            'domain2' => ['biz' => 'biz'],
+        ];
+        $catalogue = new MessageCatalogue('en', $messages);
+
+        // separated domains
+        $this->assertSame(['foo' => 'bar'], $catalogue->all('domain1+intl-icu'));
+        $this->assertSame(['bar' => 'foo'], $catalogue->all('domain2+intl-icu'));
+
+        // merged, intl-icu ignored
+        $this->assertSame(['bar' => 'foo', 'biz' => 'biz'], $catalogue->all('domain2'));
+
+        // intl-icu ignored
+        $messagesExpected = [
+            'domain1' => ['foo' => 'bar'],
+            'domain2' => ['bar' => 'foo', 'biz' => 'biz'],
+        ];
+        $this->assertSame($messagesExpected, $catalogue->all());
+    }
+
     public function testHas()
     {
         $catalogue = new MessageCatalogue('en', ['domain1' => ['foo' => 'foo'], 'domain2+intl-icu' => ['bar' => 'bar']]);

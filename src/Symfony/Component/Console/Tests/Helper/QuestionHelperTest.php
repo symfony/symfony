@@ -630,7 +630,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAmbiguousChoiceFromChoicelist()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of env_2 or env_3.');
+        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of "env_2" or "env_3".');
         $possibleChoices = [
             'env_1' => 'My first environment',
             'env_2' => 'My environment',
@@ -696,7 +696,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -704,7 +704,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
@@ -712,7 +712,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
 
@@ -724,6 +724,23 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         });
 
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
+    }
+
+    public function testAskThrowsExceptionFromValidatorEarlyWhenTtyIsMissing()
+    {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Bar, not Foo');
+
+        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output->expects($this->once())->method('writeln');
+
+        (new QuestionHelper())->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream('Foo'), true),
+            $output,
+            (new Question('Q?'))->setHidden(true)->setValidator(function ($input) {
+                throw new \Exception("Bar, not $input");
+            })
+        );
     }
 
     public function testEmptyChoices()

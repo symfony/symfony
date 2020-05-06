@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="http://symfony.com/schema/dic/security"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/security"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="access-decision-manager" type="access_decision_manager" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="encoders" type="encoders" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="encoder" type="encoder" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="providers" type="providers" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="provider" type="provider" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="firewalls" type="firewalls" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="firewall" type="firewall" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="rule" type="rule" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="role" type="role" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="access-denied-url" type="xsd:string" />
+        <xsd:attribute name="session-fixation-strategy" type="session_fixation_strategy" />
+        <xsd:attribute name="hide-user-not-found" type="xsd:boolean" />
+        <xsd:attribute name="always-authenticate-before-granting" type="xsd:boolean" />
+        <xsd:attribute name="erase-credentials" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="encoders">
+        <xsd:sequence>
+            <xsd:element name="encoder" type="encoder" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="providers">
+        <xsd:sequence>
+            <xsd:element name="provider" type="provider" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="firewalls">
+        <xsd:sequence>
+            <xsd:element name="firewall" type="firewall" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="session_fixation_strategy">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none" />
+            <xsd:enumeration value="migrate" />
+            <xsd:enumeration value="invalidate" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="access_decision_manager">
+        <xsd:attribute name="strategy" type="access_decision_manager_strategy" />
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="allow-if-all-abstain" type="xsd:boolean" />
+        <xsd:attribute name="allow-if-equal-granted-denied" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="access_decision_manager_strategy">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="affirmative" />
+            <xsd:enumeration value="consensus" />
+            <xsd:enumeration value="unanimous" />
+            <xsd:enumeration value="priority" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="encoder">
+        <xsd:sequence>
+            <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+        <xsd:attribute name="algorithm" type="xsd:string" />
+        <xsd:attribute name="hash-algorithm" type="xsd:string" />
+        <xsd:attribute name="key-length" type="xsd:string" />
+        <xsd:attribute name="ignore-case" type="xsd:boolean" />
+        <xsd:attribute name="encode-as-base64" type="xsd:boolean" />
+        <xsd:attribute name="iterations" type="xsd:string" />
+        <xsd:attribute name="cost" type="xsd:integer" />
+        <xsd:attribute name="memory-cost" type="xsd:string" />
+        <xsd:attribute name="time-cost" type="xsd:string" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="provider">
+        <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="chain" type="chain" />
+            <xsd:element name="memory" type="memory" />
+            <xsd:element name="ldap" type="ldap" />
+            <!-- allow factories to use dynamic elements -->
+            <xsd:any processContents="lax" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="chain">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="provider" type="xsd:string" />
+        </xsd:sequence>
+        <xsd:attribute name="providers" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="memory">
+        <xsd:sequence>
+            <xsd:element name="user" type="user" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="user">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="password" type="xsd:string" />
+        <xsd:attribute name="roles" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="ldap">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="extra-field" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="default-role" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="service" type="xsd:string" use="required" />
+        <xsd:attribute name="base-dn" type="xsd:string" use="required" />
+        <xsd:attribute name="search-dn" type="xsd:string" />
+        <xsd:attribute name="search-password" type="xsd:string" />
+        <xsd:attribute name="uid-key" type="xsd:string" />
+        <xsd:attribute name="filter" type="xsd:string" />
+        <xsd:attribute name="password-attribute" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="firewall">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="logout" type="logout" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="switch-user" type="switch_user" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="anonymous" type="anonymous" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="form-login" type="form_login" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="form-login-ldap" type="form_login_ldap" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="guard" type="guard" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="http-basic" type="http_basic" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="http-basic-ldap" type="http_basic_ldap" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="json-login" type="json_login" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="json-login-ldap" type="json_login_ldap" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="remember-me" type="remember_me" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="remote-user" type="remote_user" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="x509" type="x509" minOccurs="0" maxOccurs="1" />
+            <!-- allow factories to use dynamic elements -->
+            <xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="pattern" type="xsd:string" />
+        <xsd:attribute name="host" type="xsd:string" />
+        <xsd:attribute name="methods" type="xsd:string" />
+        <xsd:attribute name="security" type="xsd:boolean" />
+        <xsd:attribute name="user-checker" type="xsd:string" />
+        <xsd:attribute name="request-matcher" type="xsd:string" />
+        <xsd:attribute name="access-denied-url" type="xsd:string" />
+        <xsd:attribute name="access-denied-handler" type="xsd:string" />
+        <xsd:attribute name="entry-point" type="xsd:string" />
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="stateless" type="xsd:boolean" />
+        <xsd:attribute name="context" type="xsd:string" />
+        <!-- allow factories to use dynamic elements -->
+        <xsd:anyAttribute processContents="lax" />
+    </xsd:complexType>
+
+    <xsd:complexType name="logout">
+        <xsd:sequence>
+            <xsd:element name="delete-cookie" type="delete_cookie" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="csrf-parameter" type="xsd:string" />
+        <xsd:attribute name="csrf-token-generator" type="xsd:string" />
+        <xsd:attribute name="csrf-token-id" type="xsd:string" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="target" type="xsd:string" />
+        <xsd:attribute name="success-handler" type="xsd:string" />
+        <xsd:attribute name="invalidate-session" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="delete_cookie">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="domain" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="switch_user">
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="parameter" type="xsd:string" />
+        <xsd:attribute name="role" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="anonymous">
+        <xsd:attribute name="lazy" type="xsd:boolean" />
+        <xsd:attribute name="secret" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="factory" abstract="true">
+        <xsd:attribute name="check-path" type="xsd:string" />
+        <xsd:attribute name="use-forward" type="xsd:boolean" />
+        <xsd:attribute name="require-previous-session" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="success-handler-options">
+        <xsd:attribute name="always-use-default-target-path" type="xsd:boolean" />
+        <xsd:attribute name="default-target-path" type="xsd:string" />
+        <xsd:attribute name="target-path-parameter" type="xsd:string" />
+        <xsd:attribute name="use-referer" type="xsd:boolean" />
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="failure-handler-options">
+        <xsd:attribute name="failure-path" type="xsd:string" />
+        <xsd:attribute name="failure-forward" type="xsd:boolean" />
+        <xsd:attribute name="failure-path-parameter" type="xsd:string" />
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="ldap-factory">
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="dn-string" type="xsd:string" />
+        <xsd:attribute name="query-string" type="xsd:string" />
+        <xsd:attribute name="search-dn" type="xsd:string" />
+        <xsd:attribute name="search-password" type="xsd:string" />
+    </xsd:attributeGroup>
+
+    <xsd:complexType name="form_login">
+        <xsd:complexContent>
+            <xsd:extension base="factory">
+                <xsd:attribute name="login-path" type="xsd:string" />
+                <xsd:attribute name="username-parameter" type="xsd:string" />
+                <xsd:attribute name="password-parameter" type="xsd:string" />
+                <xsd:attribute name="csrf-parameter" type="xsd:string" />
+                <xsd:attribute name="csrf-token-id" type="xsd:string" />
+                <xsd:attribute name="post-only" type="xsd:boolean" />
+                <xsd:attribute name="csrf-token-generator" type="xsd:string" />
+                <xsd:attributeGroup ref="success-handler-options" />
+                <xsd:attributeGroup ref="failure-handler-options" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="form_login_ldap">
+        <xsd:complexContent>
+            <xsd:extension base="form_login">
+                <xsd:attributeGroup ref="ldap-factory" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="guard">
+        <xsd:sequence>
+            <xsd:element name="authenticator" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="entry-point" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="http_basic">
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="realm" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="http_basic_ldap">
+        <xsd:complexContent>
+            <xsd:extension base="http_basic">
+                <xsd:attributeGroup ref="ldap-factory" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="json_login">
+        <xsd:complexContent>
+            <xsd:extension base="factory">
+                <xsd:attribute name="username-path" type="xsd:string" />
+                <xsd:attribute name="password-path" type="xsd:string" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="json_login_ldap">
+        <xsd:complexContent>
+            <xsd:extension base="json_login">
+                <xsd:attributeGroup ref="ldap-factory" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="remember_me">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="user-provider" type="xsd:string" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="lifetime" type="xsd:integer" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="domain" type="xsd:string" />
+        <xsd:attribute name="http-only" type="xsd:boolean" />
+        <xsd:attribute name="always-remember-me" type="xsd:boolean" />
+        <xsd:attribute name="remember-me-parameter" type="xsd:string" />
+        <xsd:attribute name="secret" type="xsd:string" use="required" />
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="token-provider" type="xsd:string" />
+        <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
+        <xsd:attribute name="secure" type="remember_me_secure" />
+        <xsd:attribute name="samesite" type="remember_me_samesite" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="remember_me_secure">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="true" />
+            <xsd:enumeration value="false" />
+            <xsd:enumeration value="auto" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="remember_me_samesite">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="null" />
+            <xsd:enumeration value="lax" />
+            <xsd:enumeration value="strict" />
+            <xsd:enumeration value="none" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="remote_user">
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="user" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="x509">
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="user" type="xsd:string" />
+        <xsd:attribute name="credentials" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="rule">
+        <xsd:choice>
+            <xsd:element name="ip" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="method" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="role" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allow-if" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        </xsd:choice>
+        <xsd:attribute name="requires-channel" type="xsd:string" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="host" type="xsd:string" />
+        <xsd:attribute name="port" type="xsd:integer" />
+        <xsd:attribute name="role" type="xsd:string" />
+        <xsd:attribute name="methods" type="xsd:string" />
+        <xsd:attribute name="allow-if" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="role">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="id" type="xsd:string" use="required" />
+                <xsd:attribute name="value" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+</xsd:schema>

@@ -64,6 +64,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ContainerBuilder && isset($options['parameter']):
                 $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options);
                 break;
+            case $object instanceof ContainerBuilder && isset($options['deprecations']):
+                $this->describeContainerDeprecations($object, $options);
+                break;
             case $object instanceof ContainerBuilder:
                 $this->describeContainerServices($object, $options);
                 break;
@@ -80,7 +83,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeCallable($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
     }
 
@@ -94,24 +97,12 @@ abstract class Descriptor implements DescriptorInterface
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
 
-    /**
-     * Describes an InputArgument instance.
-     */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = []);
 
-    /**
-     * Describes an InputOption instance.
-     */
     abstract protected function describeRoute(Route $route, array $options = []);
 
-    /**
-     * Describes container parameters.
-     */
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = []);
 
-    /**
-     * Describes container tags.
-     */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = []);
 
     /**
@@ -132,24 +123,14 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = []);
 
-    /**
-     * Describes a service definition.
-     */
+    abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void;
+
     abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
 
-    /**
-     * Describes a service alias.
-     */
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
-    /**
-     * Describes a container parameter.
-     */
     abstract protected function describeContainerParameter($parameter, array $options = []);
 
-    /**
-     * Describes container environment variables.
-     */
     abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
     /**
@@ -305,9 +286,6 @@ abstract class Descriptor implements DescriptorInterface
         return $tag;
     }
 
-    /**
-     * Gets class description from a docblock.
-     */
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
         $resolvedClass = $class;

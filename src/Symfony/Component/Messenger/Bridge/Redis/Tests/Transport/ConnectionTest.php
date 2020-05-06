@@ -12,19 +12,22 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis >= 4.3.0
+ * @group integration
  */
 class ConnectionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public static function setUpBeforeClass(): void
     {
-        $redis = Connection::fromDsn('redis://localhost/queue');
-
         try {
+            $redis = Connection::fromDsn('redis://localhost/queue');
             $redis->get();
         } catch (TransportException $e) {
             if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
@@ -32,6 +35,8 @@ class ConnectionTest extends TestCase
             }
 
             throw $e;
+        } catch (\RedisException $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 
@@ -73,6 +78,14 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithOptionsAndTrailingSlash()
+    {
+        $this->assertEquals(
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+        );
+    }
+
     public function testFromDsnWithTls()
     {
         $redis = $this->createMock(\Redis::class);
@@ -109,11 +122,11 @@ class ConnectionTest extends TestCase
     }
 
     /**
-     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.
      * @group legacy
      */
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()
     {
+        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.');
         Connection::fromDsn('redis://localhost/queue?foo=bar');
     }
 
@@ -145,7 +158,7 @@ class ConnectionTest extends TestCase
     public function testFailedAuth()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectExceptionMessage('Redis connection ');
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
         $redis->expects($this->exactly(1))->method('auth')
@@ -294,6 +307,21 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', [], $redis); // 1 = always
         $connection->add('1', []);
+    }
+
+    public function testDeleteAfterAck()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis); // 1 = always
+        $connection->ack('1');
     }
 
     public function testLastErrorGetsCleared()

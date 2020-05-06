@@ -66,7 +66,7 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualifed name and its children.
      *
-     * @return mixed The value of the field
+     * @return FormField|FormField[]|FormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
@@ -77,7 +77,7 @@ class FormFieldRegistry
         while ($segments) {
             $path = array_shift($segments);
             if (!\is_array($target) || !\array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+                throw new \InvalidArgumentException(sprintf('Unreachable field "%s".', $path));
             }
             $target = &$target[$path];
         }

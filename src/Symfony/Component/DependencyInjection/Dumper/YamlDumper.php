@@ -79,9 +79,9 @@ class YamlDumper extends Dumper
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
-                $att = $att ? ', '.implode(', ', $att) : '';
+                $att = $att ? ': { '.implode(', ', $att).' }' : '';
 
-                $tagsCode .= sprintf("            - { name: %s%s }\n", $this->dumper->dump($name), $att);
+                $tagsCode .= sprintf("            - %s%s\n", $this->dumper->dump($name), $att);
             }
         }
         if ($tagsCode) {
@@ -97,7 +97,12 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
-            $code .= sprintf("        deprecated: %s\n", $this->dumper->dump($definition->getDeprecationMessage('%service_id%')));
+            $code .= "        deprecated:\n";
+            foreach ($definition->getDeprecation('%service_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $code .= sprintf("            %s: %s\n", $key, $this->dumper->dump($value));
+                }
+            }
         }
 
         if ($definition->isAutowired()) {
@@ -162,7 +167,17 @@ class YamlDumper extends Dumper
 
     private function addServiceAlias(string $alias, Alias $id): string
     {
-        $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
+        $deprecated = '';
+
+        if ($id->isDeprecated()) {
+            $deprecated = "        deprecated:\n";
+
+            foreach ($id->getDeprecation('%alias_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $deprecated .= sprintf("            %s: %s\n", $key, $value);
+                }
+            }
+        }
 
         if ($id->isPrivate()) {
             return sprintf("    %s: '@%s'\n%s", $alias, $id, $deprecated);
@@ -264,7 +279,7 @@ class YamlDumper extends Dumper
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $tag = 'service_locator';
             } else {
-                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', \get_class($value)));
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_debug_type($value)));
             }
 
             return new TaggedValue($tag, $this->dumpValue($value->getValues()));

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -34,7 +35,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class Transport
 {
@@ -48,6 +49,7 @@ class Transport
         OvhCloudTransportFactory::class,
         FirebaseTransportFactory::class,
         SinchTransportFactory::class,
+        FreeMobileTransportFactory::class,
     ];
 
     private $factories;

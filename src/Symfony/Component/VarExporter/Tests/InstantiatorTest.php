@@ -29,7 +29,7 @@ class InstantiatorTest extends TestCase
     public function testFailingInstantiation(string $class)
     {
         $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
-        $this->expectExceptionMessageRegExp('/Type ".*" is not instantiable\./');
+        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         Instantiator::instantiate($class);
     }
 

@@ -16,6 +16,7 @@ $container
     ->register('foo', '\Bar\FooClass')
     ->addTag('foo', ['foo' => 'foo'])
     ->addTag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+    ->addTag('foo', ['name' => 'bar', 'baz' => 'baz'])
     ->setFactory(['Bar\\FooClass', 'getInstance'])
     ->setArguments(['foo', new Reference('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, new Reference('service_container')])
     ->setProperties(['foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%']])
@@ -115,7 +116,7 @@ $container
 ;
 $container
     ->register('deprecated_service', 'stdClass')
-    ->setDeprecated(true)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
     ->setPublic(true)
 ;
 $container
@@ -142,7 +143,7 @@ $container
 $container
     ->register('factory_simple', 'SimpleFactoryClass')
     ->addArgument('foo')
-    ->setDeprecated(true)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
     ->setPublic(false)
 ;
 $container
@@ -186,5 +187,10 @@ $container->register('runtime_error', 'stdClass')
 
 $container->register('errored_definition', 'stdClass')
     ->addError('Service "errored_definition" is broken.');
+
+$container->register('preload_sidekick', 'stdClass')
+    ->setPublic(true)
+    ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
+    ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
 
 return $container;

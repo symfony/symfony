@@ -12,7 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type as DoctrineType;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
 use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
@@ -40,9 +41,15 @@ class DoctrineTokenProvider implements TokenProviderInterface
 {
     private $conn;
 
+    private static $useDeprecatedConstants;
+
     public function __construct(Connection $conn)
     {
         $this->conn = $conn;
+
+        if (null === self::$useDeprecatedConstants) {
+            self::$useDeprecatedConstants = !class_exists(Types::class);
+        }
     }
 
     /**
@@ -90,7 +97,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
         ];
         $paramTypes = [
             'value' => \PDO::PARAM_STR,
-            'lastUsed' => DoctrineType::DATETIME,
+            'lastUsed' => self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE,
             'series' => \PDO::PARAM_STR,
         ];
         $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
@@ -119,7 +126,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
             'username' => \PDO::PARAM_STR,
             'series' => \PDO::PARAM_STR,
             'value' => \PDO::PARAM_STR,
-            'lastUsed' => DoctrineType::DATETIME,
+            'lastUsed' => self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE,
         ];
         $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
     }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Exception;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

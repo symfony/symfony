@@ -49,7 +49,7 @@ abstract class AbstractUriElement
         $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), PHP_URL_SCHEME);
         $baseUriIsAbsolute = \in_array(strtolower(substr($this->currentUri, 0, 4)), ['http', 'file']);
         if ($elementUriIsRelative && !$baseUriIsAbsolute) {
-            throw new \InvalidArgumentException(sprintf('The URL of the element is relative, so you must define its base URI passing an absolute URL to the constructor of the %s class ("%s" was passed).', __CLASS__, $this->currentUri));
+            throw new \InvalidArgumentException(sprintf('The URL of the element is relative, so you must define its base URI passing an absolute URL to the constructor of the "%s" class ("%s" was passed).', __CLASS__, $this->currentUri));
         }
     }
 

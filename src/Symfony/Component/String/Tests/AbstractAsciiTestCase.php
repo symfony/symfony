@@ -55,6 +55,26 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideIndexOf
+     */
+    public function testContainsAny(?int $result, string $string, $needle)
+    {
+        $instance = static::createFromString($string);
+
+        $this->assertSame(null !== $instance->indexOf($needle), $instance->containsAny($needle));
+    }
+
+    /**
+     * @dataProvider provideIndexOfIgnoreCase
+     */
+    public function testContainsAnyIgnoreCase(?int $result, string $string, $needle)
+    {
+        $instance = static::createFromString($string);
+
+        $this->assertSame(null !== $instance->ignoreCase()->indexOf($needle), $instance->ignoreCase()->containsAny($needle));
+    }
+
     public function testUnwrap()
     {
         $expected = ['hello', 'world'];
@@ -161,7 +181,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideIndexOf
      */
-    public function testIndexOf(?int $result, string $string, string $needle, int $offset)
+    public function testIndexOf(?int $result, string $string, $needle, int $offset)
     {
         $instance = static::createFromString($string);
 
@@ -180,6 +200,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [null, 'abc', 'a', -1],
             [null, '123abc', 'B', -3],
             [null, '123abc', 'b', 6],
+            [0, 'abc', ['a', 'e'], 0],
             [0, 'abc', 'a', 0],
             [1, 'abc', 'b', 1],
             [2, 'abc', 'c', 1],
@@ -191,7 +212,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideIndexOfIgnoreCase
      */
-    public function testIndexOfIgnoreCase(?int $result, string $string, string $needle, int $offset)
+    public function testIndexOfIgnoreCase(?int $result, string $string, $needle, int $offset)
     {
         $instance = static::createFromString($string);
 
@@ -208,6 +229,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [null, 'abc', 'a', -1],
             [null, 'abc', 'A', -1],
             [null, '123abc', 'B', 6],
+            [0, 'ABC', ['a', 'e'], 0],
             [0, 'ABC', 'a', 0],
             [0, 'ABC', 'A', 0],
             [1, 'ABC', 'b', 0],
@@ -1405,9 +1427,9 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideTruncate
      */
-    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis)
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
     {
-        $instance = static::createFromString($origin)->truncate($length, $ellipsis);
+        $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
         $this->assertEquals(static::createFromString($expected), $instance);
     }
@@ -1417,12 +1439,17 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             ['', '', 3, ''],
             ['', 'foo', 0, '...'],
+            ['foo', 'foo', 0, '...', false],
             ['fo', 'foobar', 2, ''],
             ['foobar', 'foobar', 10, ''],
+            ['foobar', 'foobar', 10, '...', false],
             ['foo', 'foo', 3, '...'],
             ['fo', 'foobar', 2, '...'],
             ['...', 'foobar', 3, '...'],
             ['fo...', 'foobar', 5, '...'],
+            ['foobar...', 'foobar foo', 6, '...', false],
+            ['foobar...', 'foobar foo', 7, '...', false],
+            ['foobar foo...', 'foobar foo a', 10, '...', false],
         ];
     }
 

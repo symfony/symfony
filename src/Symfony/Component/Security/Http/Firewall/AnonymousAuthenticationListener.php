@@ -19,6 +19,9 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(AnonymousToken::class);
+
 /**
  * AnonymousAuthenticationListener automatically adds a Token if none is
  * already present.

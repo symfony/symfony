@@ -174,7 +174,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     {
         if ($pdoOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $pdoOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
-                throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION))', __CLASS__));
+                throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __CLASS__));
             }
 
             $this->pdo = $pdoOrDsn;
@@ -468,7 +468,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         }
 
         if (!isset($params['scheme'])) {
-            throw new \InvalidArgumentException('URLs without scheme are not supported to configure the PdoSessionHandler');
+            throw new \InvalidArgumentException('URLs without scheme are not supported to configure the PdoSessionHandler.');
         }
 
         $driverAliasMap = [

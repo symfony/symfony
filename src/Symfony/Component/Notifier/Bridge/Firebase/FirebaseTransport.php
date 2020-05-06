@@ -53,7 +53,7 @@ final class FirebaseTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): void
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
@@ -62,7 +62,7 @@ final class FirebaseTransport extends AbstractTransport
             $options['to'] = $message->getRecipientId();
         }
         if (null === $options['to']) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set', __CLASS__));
+            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
         $options['notification'] = $options['notification'] ?? [];
         $options['notification']['body'] = $message->getSubject();

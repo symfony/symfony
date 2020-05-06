@@ -72,7 +72,7 @@ final class HttplugWaitLoop
                         goto check_duration;
                     }
 
-                    if ([$request, $promise] = $this->promisePool[$response] ?? null) {
+                    if ([, $promise] = $this->promisePool[$response] ?? null) {
                         unset($this->promisePool[$response]);
                         $promise->resolve($this->createPsr7Response($response, true));
                     }

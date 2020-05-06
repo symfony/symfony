@@ -33,5 +33,8 @@
             <tag name="property_info.access_extractor" priority="-1000" />
             <tag name="property_info.initializable_extractor" priority="-1000" />
         </service>
+
+        <service id="Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface" alias="property_info.reflection_extractor" />
+        <service id="Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface" alias="property_info.reflection_extractor" />
     </services>
 </container>

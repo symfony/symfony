@@ -12,6 +12,8 @@
             <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
             <argument type="service" id="cache.property_access" on-invalid="ignore" />
             <argument /> <!-- throwExceptionOnInvalidPropertyPath, set by the extension -->
+            <argument /> <!-- propertyReadInfoExtractor -->
+            <argument /> <!-- propertyWriteInfoExtractor -->
         </service>
         <service id="Symfony\Component\PropertyAccess\PropertyAccessorInterface" alias="property_accessor" />
     </services>

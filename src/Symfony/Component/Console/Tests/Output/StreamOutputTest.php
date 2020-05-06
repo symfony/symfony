@@ -56,4 +56,12 @@ class StreamOutputTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals('foo'.PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
     }
+
+    public function testDoWriteOnFailure()
+    {
+        $resource = fopen(__DIR__.'/../Fixtures/stream_output_file.txt', 'r', false);
+        $output = new StreamOutput($resource);
+        rewind($output->getStream());
+        $this->assertEquals('', stream_get_contents($output->getStream()));
+    }
 }

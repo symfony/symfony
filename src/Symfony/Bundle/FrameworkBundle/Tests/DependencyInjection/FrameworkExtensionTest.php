@@ -425,7 +425,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('php_errors_enabled');
 
         $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertNull($definition->getArgument(2));
         $this->assertSame(-1, $container->getParameter('debug.error_handler.throw_at'));
     }
@@ -445,7 +445,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('php_errors_log_level');
 
         $definition = $container->getDefinition('debug.debug_handlers_listener');
-        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertSame(8, $definition->getArgument(2));
     }
 
@@ -504,7 +504,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
 
-        $expected = ['session', 'initialized_session'];
+        $expected = ['session', 'initialized_session', 'logger'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -535,7 +535,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount(6, $packages);
+        $this->assertCount(7, $packages);
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
@@ -556,6 +556,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
         $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
+
+        $package = $container->getDefinition($packages['remote_manifest']);
+        $versionStrategy = $container->getDefinition($package->getArgument(1));
+        $this->assertSame('assets.remote_json_manifest_version_strategy', $versionStrategy->getParent());
+        $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()
@@ -629,6 +634,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('redis://127.0.0.1:6379/messages', $transportArguments[0]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+
+        $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
+        $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
+        $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
+        $this->assertSame(100, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(3));
+
+        $this->assertEquals(new Reference('messenger.transport.failed'), $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0));
     }
 
     public function testMessengerRouting()
@@ -1301,7 +1313,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session', 'initialized_session', 'session_storage', 'request_stack'];
+        $expected = ['session', 'initialized_session', 'logger', 'session_storage', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -1336,6 +1348,14 @@ abstract class FrameworkExtensionTest extends TestCase
             'resolve' => [],
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
+
+        $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
+        $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
+    }
+
+    public function testScopedHttpClientWithoutQueryOption()
+    {
+        $container = $this->createContainerFromFile('http_client_scoped_without_query_option');
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
         $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());

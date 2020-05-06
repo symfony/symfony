@@ -5,9 +5,11 @@ CHANGELOG
 -----
 
  * added the `Hostname` constraint and validator
- * added option `alpha3` to `Country` constraint
+ * added the `alpha3` option to the `Country` and `Language` constraints
  * allow to define a reusable set of constraints by extending the `Compound` constraint
  * added `Sequentially` constraint, to sequentially validate a set of constraints (any violation raised will prevent further validation of the nested constraints)
+ * added the `divisibleBy` option to the `Count` constraint
+ * added the `ExpressionLanguageSyntax` constraint
 
 5.0.0
 -----

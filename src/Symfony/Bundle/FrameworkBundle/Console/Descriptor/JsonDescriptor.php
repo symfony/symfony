@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -30,9 +31,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class JsonDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $data = [];
@@ -43,25 +41,16 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeData($this->getRouteData($route), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeData($this->sortParameters($parameters), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -77,9 +66,6 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -95,9 +81,6 @@ class JsonDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $serviceIds = isset($options['tag']) && $options['tag']
@@ -131,17 +114,11 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerDefinition(Definition $definition, array $options = [])
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if (!$builder) {
@@ -156,25 +133,16 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, \array_key_exists('event', $options) ? $options['event'] : null), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCallable($callable, array $options = [])
     {
         $this->writeData($this->getCallableData($callable), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerParameter($parameter, array $options = [])
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
@@ -182,17 +150,35 @@ class JsonDescriptor extends Descriptor
         $this->writeData([$key => $parameter], $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
         throw new LogicException('Using the JSON format to debug environment variables is not supported.');
     }
 
-    /**
-     * Writes data as json.
-     */
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        if (!file_exists($containerDeprecationFilePath)) {
+            throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
+        }
+
+        $logs = unserialize(file_get_contents($containerDeprecationFilePath));
+
+        $formattedLogs = [];
+        $remainingCount = 0;
+        foreach ($logs as $log) {
+            $formattedLogs[] = [
+                'message' => $log['message'],
+                'file' => $log['file'],
+                'line' => $log['line'],
+                'count' => $log['count'],
+            ];
+            $remainingCount += $log['count'];
+        }
+
+        $this->writeData(['remainingCount' => $remainingCount, 'deprecations' => $formattedLogs], $options);
+    }
+
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;

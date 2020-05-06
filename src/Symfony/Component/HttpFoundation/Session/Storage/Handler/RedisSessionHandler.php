@@ -54,11 +54,11 @@ class RedisSessionHandler extends AbstractSessionHandler
             !$redis instanceof RedisProxy &&
             !$redis instanceof RedisClusterProxy
         ) {
-            throw new \InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, %s given', __METHOD__, \is_object($redis) ? \get_class($redis) : \gettype($redis)));
+            throw new \InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redis)));
         }
 
         if ($diff = array_diff(array_keys($options), ['prefix', 'ttl'])) {
-            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s"', implode(', ', $diff)));
+            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
         $this->redis = $redis;

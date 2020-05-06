@@ -11,11 +11,17 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
+    use ExpectDeprecationTrait;
+
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = [
@@ -2053,7 +2059,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @dataProvider expandedIsEmptyWhenNoRealChoiceIsSelectedProvider
      */
-    public function testExpandedIsEmptyWhenNoRealChoiceIsSelected(bool $expected, $submittedData, bool $multiple, bool $required, $placeholder)
+    public function testExpandedIsEmptyWhenNoRealChoiceIsSelected($expected, $submittedData, $multiple, $required, $placeholder)
     {
         $options = [
             'expanded' => true,
@@ -2089,5 +2095,67 @@ class ChoiceTypeTest extends BaseTypeTest
             'Nothing submitted / multiple / required / without a placeholder -> should be empty' => [true, null, true, true, null],
             'Placeholder submitted / single / not required / with a placeholder -> should not be empty' => [false, '', false, false, 'ccc'], // The placeholder is a selected value
         ];
+    }
+
+    public function testFilteredChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredGroupedChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->groupedChoices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ])], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredChoiceLoader()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testUsingDeprecatedChoiceListFactory()
+    {
+        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
+        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromLoader()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
+        $this->expectDeprecation('Since symfony/form 5.1: Not defining a third parameter "callable|null $filter" in "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" is deprecated.');
+
+        new ChoiceType(new DeprecatedChoiceListFactory());
     }
 }

@@ -38,7 +38,7 @@ class UpdateOperation
             throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
         }
         if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
-            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', \gettype($values)));
+            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', get_debug_type($values)));
         }
 
         $this->operationType = $operationType;

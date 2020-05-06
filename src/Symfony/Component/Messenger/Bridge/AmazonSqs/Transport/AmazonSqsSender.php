@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -43,9 +43,25 @@ class AmazonSqsSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delay = null !== $delayStamp ? (int) ceil($delayStamp->getDelay() / 1000) : 0;
 
+        $messageGroupId = null;
+        $messageDeduplicationId = null;
+
+        /** @var AmazonSqsFifoStamp|null $amazonSqsFifoStamp */
+        $amazonSqsFifoStamp = $envelope->last(AmazonSqsFifoStamp::class);
+        if (null !== $amazonSqsFifoStamp) {
+            $messageGroupId = $amazonSqsFifoStamp->getMessageGroupId();
+            $messageDeduplicationId = $amazonSqsFifoStamp->getMessageDeduplicationId();
+        }
+
         try {
-            $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
-        } catch (HttpExceptionInterface $e) {
+            $this->connection->send(
+                $encodedMessage['body'],
+                $encodedMessage['headers'] ?? [],
+                $delay,
+                $messageGroupId,
+                $messageDeduplicationId
+            );
+        } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 

@@ -150,7 +150,7 @@ final class Headers
         $name = strtolower($header->getName());
 
         if (isset($map[$name]) && !$header instanceof $map[$name]) {
-            throw new LogicException(sprintf('The "%s" header must be an instance of "%s" (got "%s").', $header->getName(), $map[$name], \get_class($header)));
+            throw new LogicException(sprintf('The "%s" header must be an instance of "%s" (got "%s").', $header->getName(), $map[$name], get_debug_type($header)));
         }
 
         if (\in_array($name, self::$uniqueHeaders, true) && isset($this->headers[$name]) && \count($this->headers[$name]) > 0) {

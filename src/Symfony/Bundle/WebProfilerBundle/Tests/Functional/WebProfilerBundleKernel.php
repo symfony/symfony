@@ -34,7 +34,7 @@ class WebProfilerBundleKernel extends Kernel
     {
         $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
         $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
-        $routes->add('_', '/')->controller('kernel:homepageController');
+        $routes->add('_', '/')->controller('kernel::homepageController');
     }
 
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader)

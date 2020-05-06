@@ -312,4 +312,14 @@ class MockHttpClientTest extends HttpClientTestCase
 
         return new MockHttpClient($responses);
     }
+
+    public function testHttp2PushVulcain()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
+
+    public function testHttp2PushVulcainWithUnusedResponse()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
 }

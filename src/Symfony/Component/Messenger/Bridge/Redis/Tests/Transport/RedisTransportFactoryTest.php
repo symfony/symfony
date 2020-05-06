@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @requires extension redis
+ * @requires extension redis >= 4.3.0
  */
 class RedisTransportFactoryTest extends TestCase
 {
@@ -31,12 +31,26 @@ class RedisTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
+    /**
+     * @group integration
+     */
     public function testCreateTransport()
     {
+        $this->skipIfRedisUnavailable();
+
         $factory = new RedisTransportFactory();
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['stream' => 'bar']), $serializer);
+        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar']), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['stream' => 'bar'], $serializer));
+        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar'], $serializer));
+    }
+
+    private function skipIfRedisUnavailable()
+    {
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 }

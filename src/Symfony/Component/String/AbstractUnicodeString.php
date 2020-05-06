@@ -307,7 +307,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         if (\is_array($to) || $to instanceof \Closure) {
             if (!\is_callable($to)) {
-                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', static::class));
+                throw new \TypeError(sprintf('Argument 2 passed to "%s::replaceMatches()" must be callable, array given.', static::class));
             }
 
             $replace = 'preg_replace_callback';

@@ -18,6 +18,14 @@
                 <argument type="service" id="twig.runtime_loader" />
             </call>
             <configurator service="twig.configurator.environment" method="configure" />
+            <tag name="container.preload" class="Twig\Cache\FilesystemCache" />
+            <tag name="container.preload" class="Twig\Extension\CoreExtension" />
+            <tag name="container.preload" class="Twig\Extension\EscaperExtension" />
+            <tag name="container.preload" class="Twig\Extension\OptimizerExtension" />
+            <tag name="container.preload" class="Twig\Extension\StagingExtension" />
+            <tag name="container.preload" class="Twig\ExtensionSet" />
+            <tag name="container.preload" class="Twig\Template" />
+            <tag name="container.preload" class="Twig\TemplateWrapper" />
         </service>
         <service id="Twig_Environment" alias="twig" />
         <service id="Twig\Environment" alias="twig" />

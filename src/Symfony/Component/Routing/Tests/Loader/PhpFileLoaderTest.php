@@ -43,6 +43,7 @@ class PhpFileLoaderTest extends TestCase
         foreach ($routes as $route) {
             $this->assertSame('/blog/{slug}', $route->getPath());
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertTrue($route->getDefault('_stateless'));
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
@@ -109,9 +110,11 @@ class PhpFileLoaderTest extends TestCase
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
         $localeRoute->setDefault('_locale', 'g_locale');
         $localeRoute->setDefault('_format', 'g_format');
+        $localeRoute->setDefault('_stateless', true);
         $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
         $formatRoute->setDefault('_locale', 'g_locale');
         $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('_stateless', true);
         $formatRoute->setDefault('specific', 'imported');
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.php'));
@@ -172,7 +175,7 @@ class PhpFileLoaderTest extends TestCase
             ->setCondition('abc')
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(['_controller' => 'foo:act'])
+            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
             ->setRequirements(['id' => '\d+'])
@@ -229,15 +232,56 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection = new RouteCollection();
 
-        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'foo']));
-        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'bar']));
-        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'baz']));
-        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_foo']));
-        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_bar']));
+        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'foo'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'bar'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'baz'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_foo'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_bar'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('non_localized.fr', (new Route('/ench/non-localized'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'non_localized'])->setRequirement('_locale', 'fr'));
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));
 
         $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
     }
 }

@@ -88,7 +88,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
             $newBody = preg_replace('/^(\$this->initializer[a-zA-Z0-9]++) && .*;\n\nreturn (\$this->valueHolder)/', '$1 || $2', $body);
 
             if ($body === $newBody) {
-                throw new \UnexpectedValueException(sprintf('Unexpected lazy-proxy format generated for method %s::__destruct()', $originalClass->name));
+                throw new \UnexpectedValueException(sprintf('Unexpected lazy-proxy format generated for method "%s::__destruct()".', $originalClass->name));
             }
 
             $destructor->setBody($newBody);

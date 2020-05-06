@@ -133,7 +133,7 @@ class MongoDbStore implements BlockingStoreInterface
 
             $this->uri = $mongo;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, \is_object($mongo) ? \get_class($mongo) : \gettype($mongo)));
+            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, get_debug_type($mongo)));
         }
 
         if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
@@ -198,9 +198,9 @@ class MongoDbStore implements BlockingStoreInterface
             $this->upsert($key, $this->initialTtl);
         } catch (WriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
-                throw new LockConflictedException('Lock was acquired by someone else', 0, $e);
+                throw new LockConflictedException('Lock was acquired by someone else.', 0, $e);
             }
-            throw new LockAcquiringException('Failed to acquire lock', 0, $e);
+            throw new LockAcquiringException('Failed to acquire lock.', 0, $e);
         }
 
         if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->options['gcProbablity'])) {
@@ -232,7 +232,7 @@ class MongoDbStore implements BlockingStoreInterface
             $this->upsert($key, $ttl);
         } catch (WriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
-                throw new LockConflictedException('Failed to put off the expiration of the lock', 0, $e);
+                throw new LockConflictedException('Failed to put off the expiration of the lock.', 0, $e);
             }
             throw new LockStorageException($e->getMessage(), 0, $e);
         }

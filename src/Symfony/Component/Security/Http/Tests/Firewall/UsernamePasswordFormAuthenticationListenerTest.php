@@ -110,7 +110,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function testHandleNonStringUsernameWithInt($postOnly)
     {
         $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
-        $this->expectExceptionMessage('The key "_username" must be a string, "integer" given.');
+        $this->expectExceptionMessage('The key "_username" must be a string, "int" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -133,7 +133,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function testHandleNonStringUsernameWithObject($postOnly)
     {
         $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
-        $this->expectExceptionMessage('The key "_username" must be a string, "object" given.');
+        $this->expectExceptionMessage('The key "_username" must be a string, "stdClass" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(

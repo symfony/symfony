@@ -232,7 +232,21 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) or label is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
+        {%- if translation_domain is same as(false) -%}
+            {%- if label_html is same as(false) -%}
+                {{- label -}}
+            {%- else -%}
+                {{- label|raw -}}
+            {%- endif -%}
+        {%- else -%}
+            {%- if label_html is same as(false) -%}
+                {{- label|trans(label_translation_parameters, translation_domain) -}}
+            {%- else -%}
+                {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
+            {%- endif -%}
+        {%- endif -%}
+    </button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -288,9 +302,17 @@
         {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
             {%- if translation_domain is same as(false) -%}
-                {{- label -}}
+                {%- if label_html is same as(false) -%}
+                    {{- label -}}
+                {%- else -%}
+                    {{- label|raw -}}
+                {%- endif -%}
             {%- else -%}
-                {{- label|trans(label_translation_parameters, translation_domain) -}}
+                {%- if label_html is same as(false) -%}
+                    {{- label|trans(label_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
+                {%- endif -%}
             {%- endif -%}
         </{{ element|default('label') }}>
     {%- endif -%}

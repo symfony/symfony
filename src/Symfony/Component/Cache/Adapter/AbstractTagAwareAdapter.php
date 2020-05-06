@@ -41,7 +41,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     {
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
-            throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
+            throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
         $this->createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) use ($defaultLifetime) {
@@ -194,9 +194,9 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 foreach (\is_array($e) ? $e : array_keys($values) as $id) {
                     $ok = false;
                     $v = $values[$id];
-                    $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                    $type = get_debug_type($v);
                     $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
+                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -218,9 +218,9 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     continue;
                 }
                 $ok = false;
-                $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                $type = get_debug_type($v);
                 $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
+                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
             }
         }
 
@@ -272,7 +272,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
             } catch (\Exception $e) {
             }
             $message = 'Failed to delete key "{key}"'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
-            CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
             $ok = false;
         }
 

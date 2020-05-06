@@ -70,6 +70,12 @@
             <tag name="serializer.normalizer" priority="-890" />
         </service>
 
+        <service id="serializer.denormalizer.unwrapping" class="Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer">
+            <argument type="service" id="serializer.property_accessor" />
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="1000" />
+        </service>
+
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument type="service" id="serializer.name_converter.metadata_aware" />

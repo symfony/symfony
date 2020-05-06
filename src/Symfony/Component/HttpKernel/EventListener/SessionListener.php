@@ -28,9 +28,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  */
 class SessionListener extends AbstractSessionListener
 {
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, bool $debug = false)
     {
-        $this->container = $container;
+        parent::__construct($container, $debug);
     }
 
     protected function getSession(): ?SessionInterface

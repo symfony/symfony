@@ -11,8 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+
 class SessionTest extends AbstractWebTestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * Tests session attributes persist.
      *
@@ -60,6 +64,32 @@ class SessionTest extends AbstractWebTestCase
 
         // set flash
         $client->request('GET', '/session_setflash/Hello%20world.');
+
+        // check flash displays on redirect
+        $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());
+
+        // check flash is gone
+        $crawler = $client->request('GET', '/session_showflash');
+        $this->assertStringContainsString('No flash was set.', $crawler->text());
+    }
+
+    /**
+     * Tests flash messages work when flashbag service is injected to the constructor.
+     *
+     * @group legacy
+     * @dataProvider getConfigs
+     */
+    public function testFlashOnInjectedFlashbag($config, $insulate)
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.1: The "session.flash_bag" service is deprecated, use "$session->getFlashBag()" instead.');
+
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        // set flash
+        $client->request('GET', '/injected_flashbag/session_setflash/Hello%20world.');
 
         // check flash displays on redirect
         $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());

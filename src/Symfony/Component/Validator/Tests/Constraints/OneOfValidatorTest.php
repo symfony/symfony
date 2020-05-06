@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\AtLeastOneOf;
-use Symfony\Component\Validator\Constraints\AtLeastOneOfValidator;
+use Symfony\Component\Validator\Constraints\OneOf;
+use Symfony\Component\Validator\Constraints\OneOfValidator;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Country;
@@ -32,11 +32,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 /**
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
  */
-class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
+class OneOfValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        return new AtLeastOneOfValidator();
+        return new OneOfValidator();
     }
 
     /**
@@ -50,7 +50,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
             $this->expectViolationsAt($i++, $value, $constraint);
         }
 
-        $this->validator->validate($value, new AtLeastOneOf($constraints));
+        $this->validator->validate($value, new OneOf($constraints));
 
         $this->assertNoViolation();
     }
@@ -94,7 +94,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCombinationsWithDefaultMessage($value, $constraints)
     {
-        $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints]);
+        $atLeastOneOf = new OneOf(['constraints' => $constraints]);
 
         $message = [$atLeastOneOf->message];
 
@@ -106,7 +106,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($value, $atLeastOneOf);
 
-        $this->buildViolation(implode('', $message))->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
+        $this->buildViolation(implode('', $message))->setCode(OneOf::ONE_OF_ERROR)->assertRaised();
     }
 
     /**
@@ -114,7 +114,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCombinationsWithCustomMessage($value, $constraints)
     {
-        $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints, 'message' => 'foo', 'includeInternalMessages' => false]);
+        $atLeastOneOf = new OneOf(['constraints' => $constraints, 'message' => 'foo', 'includeInternalMessages' => false]);
 
         $i = 0;
 
@@ -124,7 +124,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($value, $atLeastOneOf);
 
-        $this->buildViolation('foo')->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
+        $this->buildViolation('foo')->setCode(OneOf::ONE_OF_ERROR)->assertRaised();
     }
 
     public function getInvalidCombinations()

@@ -18,15 +18,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
  */
-class AtLeastOneOfValidator extends ConstraintValidator
+class OneOfValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint instanceof AtLeastOneOf) {
-            throw new UnexpectedTypeException($constraint, AtLeastOneOf::class);
+        if (!$constraint instanceof OneOf) {
+            throw new UnexpectedTypeException($constraint, OneOf::class);
         }
 
         $validator = $this->context->getValidator();
@@ -54,7 +54,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation(implode('', $messages))
-            ->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)
+            ->setCode(OneOf::ONE_OF_ERROR)
             ->addViolation()
         ;
     }

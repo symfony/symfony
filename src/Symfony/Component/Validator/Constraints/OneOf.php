@@ -17,12 +17,12 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
  */
-class AtLeastOneOf extends Composite
+class OneOf extends Composite
 {
-    public const AT_LEAST_ONE_OF_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';
+    public const ONE_OF_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';
 
     protected static $errorNames = [
-        self::AT_LEAST_ONE_OF_ERROR => 'AT_LEAST_ONE_OF_ERROR',
+        self::ONE_OF_ERROR => 'ONE_OF_ERROR',
     ];
 
     public $constraints = [];

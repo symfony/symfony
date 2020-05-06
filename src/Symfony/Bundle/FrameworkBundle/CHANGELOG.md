@@ -9,7 +9,7 @@ CHANGELOG
  * Added the `framework.router.default_uri` configuration option to configure the default `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
- * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`
+ * Added flex-compatible default implementation for `MicroKernelTrait::registerBundles()`
  * Deprecated passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
  * The `TemplateController` now accepts context argument
  * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0

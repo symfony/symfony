@@ -36,6 +36,17 @@ class InputBagTest extends TestCase
         $this->assertNull($bag->get('foo[bar]'));
     }
 
+    public function testGetAny()
+    {
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'arr' => [1], 'num' => 1]);
+
+        $this->assertSame('bar', $bag->getAny('foo'), '->getAny() gets the value of a parameter (string)');
+        $this->assertSame([1], $bag->getAny('arr'), '->getAny() gets the value of a parameter (array)');
+        $this->assertSame(1, $bag->getAny('num'), '->getAny() gets the value of a parameter (int)');
+        $this->assertSame([], $bag->getAny('unknown', []), '->getAny() returns second argument as default if a parameter is not defined');
+        $this->assertNull($bag->getAny('null'), '->getAny() returns null if null is set');
+    }
+
     public function testAllWithInputKey()
     {
         $bag = new InputBag(['foo' => ['bar', 'baz'], 'null' => null]);

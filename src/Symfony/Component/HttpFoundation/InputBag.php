@@ -43,6 +43,18 @@ final class InputBag extends ParameterBag
     }
 
     /**
+     * Returns any input value by name.
+     *
+     * @param mixed $default The default value if the input key does not exist
+     *
+     * @return mixed
+     */
+    public function getAny(string $key, $default = null)
+    {
+        return \array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
+    }
+
+    /**
      * Returns the inputs.
      *
      * @param string|null $key The name of the input to return or null to get them all
@@ -99,7 +111,7 @@ final class InputBag extends ParameterBag
      */
     public function filter(string $key, $default = null, int $filter = FILTER_DEFAULT, $options = [])
     {
-        $value = $this->has($key) ? $this->all()[$key] : $default;
+        $value = $this->getAny($key, $default);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
         if (!\is_array($options) && $options) {

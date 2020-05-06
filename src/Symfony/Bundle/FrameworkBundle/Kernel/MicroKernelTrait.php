@@ -63,14 +63,6 @@ trait MicroKernelTrait
     /**
      * {@inheritdoc}
      */
-    public function getProjectDir(): string
-    {
-        return \dirname((new \ReflectionObject($this))->getFileName(), 2);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';

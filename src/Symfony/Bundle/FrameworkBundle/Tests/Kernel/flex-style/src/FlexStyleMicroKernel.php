@@ -50,6 +50,11 @@ class FlexStyleMicroKernel extends Kernel
         return $this->cacheDir;
     }
 
+    public function getProjectDir(): string
+    {
+        return \dirname((new \ReflectionObject($this))->getFileName(), 2);
+    }
+
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

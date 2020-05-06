@@ -23,7 +23,7 @@
             </framework:package>
             <framework:package name="json_manifest_strategy" json-manifest-path="/path/to/manifest.json" />
             <framework:package name="remote_manifest" json-manifest-path="https://cdn.example.com/manifest.json" />
-            <framework:package name="cached" json-manifest-path="https://cdn.example.com/manifest.json" cache-version="true" />
+            <framework:package name="cached" json-manifest-path="https://cdn.example.com/manifest.json" cache="true" />
         </framework:assets>
     </framework:config>
 </container>

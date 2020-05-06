@@ -996,7 +996,7 @@ class FrameworkExtension extends Extension
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
         }
 
-        if (false !== $config['cache_version']) {
+        if ($config['cache']) {
             $defaultVersion = $this->decorateVersionStrategyWithCache($container, $defaultVersion);
         }
 
@@ -1015,7 +1015,7 @@ class FrameworkExtension extends Extension
                 $format = $package['version_format'] ?: $config['version_format'];
                 $version = isset($package['version']) ? $package['version'] : null;
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
-                if (false !== $package['cache_version']) {
+                if ($package['cache']) {
                     $version = $this->decorateVersionStrategyWithCache($container, $version);
                 }
             }

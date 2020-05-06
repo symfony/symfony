@@ -32,7 +32,7 @@ $container->loadFromExtension('framework', [
             ],
             'cached' => [
                 'json_manifest_path' => 'https://cdn.example.com/manifest.json',
-                'cache_version' => true,
+                'cache' => true,
             ],
         ],
     ],

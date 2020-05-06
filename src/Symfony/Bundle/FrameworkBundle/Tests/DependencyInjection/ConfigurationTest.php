@@ -86,7 +86,7 @@ class ConfigurationTest extends TestCase
             'base_urls' => [],
             'packages' => [],
             'json_manifest_path' => null,
-            'cache_version' => false,
+            'cache' => false,
         ];
 
         $this->assertEquals($defaultConfig, $config['assets']);
@@ -440,7 +440,7 @@ class ConfigurationTest extends TestCase
                 'base_urls' => [],
                 'packages' => [],
                 'json_manifest_path' => null,
-                'cache_version' => false,
+                'cache' => false,
             ],
             'cache' => [
                 'pools' => [],

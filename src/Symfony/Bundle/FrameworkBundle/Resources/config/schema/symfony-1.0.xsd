@@ -144,7 +144,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
-        <xsd:attribute name="cache-version" type="xsd:string" />
+        <xsd:attribute name="cache" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -158,7 +158,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
-        <xsd:attribute name="cache-version" type="xsd:string" />
+        <xsd:attribute name="cache" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form-resources">

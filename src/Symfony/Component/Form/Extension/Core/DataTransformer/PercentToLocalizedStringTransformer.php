@@ -34,16 +34,19 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     private $roundingMode;
     private $type;
     private $scale;
+    private $html5Format;
 
     /**
      * @see self::$types for a list of supported types
      *
-     * @param int    $scale The scale
-     * @param string $type  One of the supported types
+     * @param int      $scale        The scale
+     * @param string   $type         One of the supported types
+     * @param int|null $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
+     * @param bool     $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = null)
+    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = null, bool $html5Format = false)
     {
         if (null === $scale) {
             $scale = 0;
@@ -64,6 +67,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         $this->type = $type;
         $this->scale = $scale;
         $this->roundingMode = $roundingMode;
+        $this->html5Format = $html5Format;
     }
 
     /**
@@ -182,7 +186,13 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      */
     protected function getNumberFormatter()
     {
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
+        // Values used in HTML5 number inputs should be formatted as in "1234.5", ie. 'en' format without grouping,
+        // according to https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
+        $formatter = new \NumberFormatter($this->html5Format ? 'en' : \Locale::getDefault(), \NumberFormatter::DECIMAL);
+
+        if ($this->html5Format) {
+            $formatter->setAttribute(\NumberFormatter::GROUPING_USED, 0);
+        }
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
 

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\OneOf;
-use Symfony\Component\Validator\Constraints\OneOfValidator;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Country;
@@ -24,6 +22,8 @@ use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Negative;
+use Symfony\Component\Validator\Constraints\OneOf;
+use Symfony\Component\Validator\Constraints\OneOfValidator;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Unique;

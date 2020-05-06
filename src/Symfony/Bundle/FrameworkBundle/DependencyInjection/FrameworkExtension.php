@@ -89,6 +89,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -1986,12 +1987,24 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $recipients = $config['envelope']['recipients'] ?? null;
-        $sender = $config['envelope']['sender'] ?? null;
-
         $envelopeListener = $container->getDefinition('mailer.envelope_listener');
-        $envelopeListener->setArgument(0, $sender);
-        $envelopeListener->setArgument(1, $recipients);
+        $envelopeListener->setArgument(0, $config['envelope']['sender'] ?? null);
+        $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
+
+        if ($config['headers']) {
+            $headers = new Definition(Headers::class);
+            foreach ($config['headers'] as $name => $data) {
+                $value = $data['value'];
+                if (\in_array(strtolower($name), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
+                    $value = (array) $value;
+                }
+                $headers->addMethodCall('addHeader', [$name, $value]);
+            }
+            $messageListener = $container->getDefinition('mailer.message_listener');
+            $messageListener->setArgument(0, $headers);
+        } else {
+            $container->removeDefinition('mailer.message_listener');
+        }
     }
 
     private function registerNotifierConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

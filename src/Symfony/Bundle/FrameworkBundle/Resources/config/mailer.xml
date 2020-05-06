@@ -39,6 +39,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="mailer.message_listener" class="Symfony\Component\Mailer\EventListener\MessageListener">
+            <argument /> <!-- headers -->
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="mailer.logger_message_listener" class="Symfony\Component\Mailer\EventListener\MessageLoggerListener">
             <tag name="kernel.event_subscriber"/>
         </service>

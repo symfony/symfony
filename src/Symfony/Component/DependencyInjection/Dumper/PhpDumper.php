@@ -584,7 +584,7 @@ EOF;
             $lineage = [];
             foreach ($this->inlinedDefinitions as $def) {
                 if (!$def->isDeprecated()) {
-                    foreach ($this->getClasses($def, $cId) as $class) {
+                    foreach ($this->getClasses($def) as $class) {
                         $this->collectLineage($class, $lineage);
                     }
                 }
@@ -596,7 +596,7 @@ EOF;
                     && $this->container->has($id)
                     && $this->isTrivialInstance($def = $this->container->findDefinition($id))
                 ) {
-                    foreach ($this->getClasses($def, $cId) as $class) {
+                    foreach ($this->getClasses($def) as $class) {
                         $this->collectLineage($class, $lineage);
                     }
                 }
@@ -851,9 +851,9 @@ EOF;
             if ($definition->isDeprecated()) {
                 $deprecation = $definition->getDeprecation($id);
                 $code .= sprintf("        trigger_deprecation(%s, %s, %s);\n\n", $this->export($deprecation['package']), $this->export($deprecation['version']), $this->export($deprecation['message']));
-            } elseif (!$definition->hasTag($this->preloadTags[1])) {
+            } elseif ($definition->hasTag($this->preloadTags[0]) || !$definition->hasTag($this->preloadTags[1])) {
                 foreach ($this->inlinedDefinitions as $def) {
-                    foreach ($this->getClasses($def, $id) as $class) {
+                    foreach ($this->getClasses($def) as $class) {
                         $this->preload[$class] = $class;
                     }
                 }
@@ -1017,10 +1017,10 @@ EOTXT
         foreach ($definitions as $id => $definition) {
             if (!$definition->isSynthetic()) {
                 $services[$id] = $this->addService($id, $definition);
-            } elseif (!$definition->hasTag($this->preloadTags[1])) {
+            } elseif ($definition->hasTag($this->preloadTags[0]) || !$definition->hasTag($this->preloadTags[1])) {
                 $services[$id] = null;
 
-                foreach ($this->getClasses($definition, $id) as $class) {
+                foreach ($this->getClasses($definition) as $class) {
                     $this->preload[$class] = $class;
                 }
             }
@@ -1046,7 +1046,7 @@ EOTXT
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if ((list($file, $code) = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
-                yield $file => [$code, !$definition->hasTag($this->preloadTags[1]) && !$definition->isDeprecated() && !$definition->hasErrors()];
+                yield $file => [$code, ($definition->hasTag($this->preloadTags[0]) || !$definition->hasTag($this->preloadTags[1])) && !$definition->isDeprecated() && !$definition->hasErrors()];
             }
         }
     }
@@ -1399,7 +1399,7 @@ EOF;
             $inlinedDefinitions = $this->getDefinitionsFromArguments([$definition]);
 
             foreach ($inlinedDefinitions as $def) {
-                foreach ($this->getClasses($def, $id) as $class) {
+                foreach ($this->getClasses($def) as $class) {
                     $this->collectLineage($class, $lineage);
                 }
             }
@@ -2130,17 +2130,15 @@ EOF;
         return null;
     }
 
-    private function getClasses(Definition $definition, string $id): array
+    private function getClasses(Definition $definition): array
     {
         $classes = [];
 
         while ($definition instanceof Definition) {
             foreach ($definition->getTag($this->preloadTags[0]) as $tag) {
-                if (!isset($tag['class'])) {
-                    throw new InvalidArgumentException(sprintf('Missing attribute "class" on tag "%s" for service "%s".', $this->preloadTags[0], $id));
+                if (isset($tag['class'])) {
+                    $classes[] = trim($tag['class'], '\\');
                 }
-
-                $classes[] = trim($tag['class'], '\\');
             }
 
             $classes[] = trim($definition->getClass(), '\\');

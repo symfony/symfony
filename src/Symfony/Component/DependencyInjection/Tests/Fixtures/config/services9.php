@@ -137,6 +137,15 @@ return function (ContainerConfigurator $c) {
         ->tag('container.preload', ['class' => 'Some\Sidekick2'])
         ->public();
 
+    $s->set('no_preload', 'TestNoPreload')
+        ->tag('container.no_preload')
+        ->public();
+
+    $s->set('preload_no_preload', 'TestPreloadNoPreload')
+        ->tag('container.preload')
+        ->tag('container.no_preload')
+        ->public();
+
     $s->alias('alias_for_foo', 'foo')->private()->public();
     $s->alias('alias_for_alias', ref('alias_for_foo'));
 };

@@ -198,3 +198,14 @@ services:
             - container.preload: { class: 'Some\Sidekick1' }
             - container.preload: { class: 'Some\Sidekick2' }
         public: true
+    no_preload:
+        class: TestNoPreload
+        tags:
+            - container.no_preload
+        public: true
+    preload_no_preload:
+        class: TestPreloadNoPreload
+        tags:
+            - container.preload
+            - container.no_preload
+        public: true

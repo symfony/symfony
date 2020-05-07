@@ -45,6 +45,8 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
+            'no_preload' => 'getNoPreloadService',
+            'preload_no_preload' => 'getPreloadNoPreloadService',
             'preload_sidekick' => 'getPreloadSidekickService',
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
@@ -358,6 +360,26 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         $instance->foo = 'bar';
 
         return $instance;
+    }
+
+    /**
+     * Gets the public 'no_preload' shared service.
+     *
+     * @return \TestNoPreload
+     */
+    protected function getNoPreloadService()
+    {
+        return $this->services['no_preload'] = new \TestNoPreload();
+    }
+
+    /**
+     * Gets the public 'preload_no_preload' shared service.
+     *
+     * @return \TestPreloadNoPreload
+     */
+    protected function getPreloadNoPreloadService()
+    {
+        return $this->services['preload_no_preload'] = new \TestPreloadNoPreload();
     }
 
     /**

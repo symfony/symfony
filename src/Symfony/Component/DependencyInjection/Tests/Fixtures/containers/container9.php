@@ -193,4 +193,13 @@ $container->register('preload_sidekick', 'stdClass')
     ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
     ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
 
+$container->register('no_preload', 'TestNoPreload')
+    ->addTag('container.no_preload')
+    ->setPublic(true);
+
+$container->register('preload_no_preload', 'TestPreloadNoPreload')
+    ->addTag('container.preload')
+    ->addTag('container.no_preload')
+    ->setPublic(true);
+
 return $container;

@@ -1,8 +1,8 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
+    [ContainerB4qnkfR/removed-ids.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 return [
     'Psr\\Container\\ContainerInterface' => true,
@@ -19,9 +19,9 @@ return [
     'tagged_iterator_foo' => true,
 ];
 
-    [Container%s/getBAR2Service.php] => <?php
+    [ContainerB4qnkfR/getBAR2Service.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -46,9 +46,9 @@ class getBAR2Service extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getBAR22Service.php] => <?php
+    [ContainerB4qnkfR/getBAR22Service.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -69,9 +69,9 @@ class getBAR22Service extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getBar23Service.php] => <?php
+    [ContainerB4qnkfR/getBar23Service.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -92,9 +92,9 @@ class getBar23Service extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getBazService.php] => <?php
+    [ContainerB4qnkfR/getBazService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -119,9 +119,9 @@ class getBazService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getConfiguredServiceService.php] => <?php
+    [ContainerB4qnkfR/getConfiguredServiceService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -149,9 +149,9 @@ class getConfiguredServiceService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getConfiguredServiceSimpleService.php] => <?php
+    [ContainerB4qnkfR/getConfiguredServiceSimpleService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -176,9 +176,9 @@ class getConfiguredServiceSimpleService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getDecoratorServiceService.php] => <?php
+    [ContainerB4qnkfR/getDecoratorServiceService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -199,9 +199,9 @@ class getDecoratorServiceService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getDecoratorServiceWithNameService.php] => <?php
+    [ContainerB4qnkfR/getDecoratorServiceWithNameService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -222,9 +222,9 @@ class getDecoratorServiceWithNameService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getDeprecatedServiceService.php] => <?php
+    [ContainerB4qnkfR/getDeprecatedServiceService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -249,9 +249,9 @@ class getDeprecatedServiceService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFactoryServiceService.php] => <?php
+    [ContainerB4qnkfR/getFactoryServiceService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -272,9 +272,9 @@ class getFactoryServiceService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFactoryServiceSimpleService.php] => <?php
+    [ContainerB4qnkfR/getFactoryServiceSimpleService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -295,9 +295,9 @@ class getFactoryServiceSimpleService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFactorySimpleService.php] => <?php
+    [ContainerB4qnkfR/getFactorySimpleService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -322,9 +322,9 @@ class getFactorySimpleService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFooService.php] => <?php
+    [ContainerB4qnkfR/getFooService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -356,9 +356,9 @@ class getFooService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFoo_BazService.php] => <?php
+    [ContainerB4qnkfR/getFoo_BazService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -383,9 +383,9 @@ class getFoo_BazService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFooBarService.php] => <?php
+    [ContainerB4qnkfR/getFooBarService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -406,9 +406,9 @@ class getFooBarService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getFooWithInlineService.php] => <?php
+    [ContainerB4qnkfR/getFooWithInlineService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -437,9 +437,9 @@ class getFooWithInlineService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getLazyContextService.php] => <?php
+    [ContainerB4qnkfR/getLazyContextService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -465,9 +465,9 @@ class getLazyContextService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getLazyContextIgnoreInvalidRefService.php] => <?php
+    [ContainerB4qnkfR/getLazyContextIgnoreInvalidRefService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -492,9 +492,9 @@ class getLazyContextIgnoreInvalidRefService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getMethodCall1Service.php] => <?php
+    [ContainerB4qnkfR/getMethodCall1Service.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -523,9 +523,9 @@ class getMethodCall1Service extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getNewFactoryServiceService.php] => <?php
+    [ContainerB4qnkfR/getNewFactoryServiceService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -553,9 +553,32 @@ class getNewFactoryServiceService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getNonSharedFooService.php] => <?php
+    [ContainerB4qnkfR/getNoPreloadService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
+
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+
+/**
+ * @internal This class has been auto-generated by the Symfony Dependency Injection Component.
+ */
+class getNoPreloadService extends ProjectServiceContainer
+{
+    /**
+     * Gets the public 'no_preload' shared service.
+     *
+     * @return \TestNoPreload
+     */
+    public static function do($container, $lazyLoad = true)
+    {
+        return $container->services['no_preload'] = new \TestNoPreload();
+    }
+}
+
+    [ContainerB4qnkfR/getNonSharedFooService.php] => <?php
+
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -578,9 +601,32 @@ class getNonSharedFooService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getPreloadSidekickService.php] => <?php
+    [ContainerB4qnkfR/getPreloadNoPreloadService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
+
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+
+/**
+ * @internal This class has been auto-generated by the Symfony Dependency Injection Component.
+ */
+class getPreloadNoPreloadService extends ProjectServiceContainer
+{
+    /**
+     * Gets the public 'preload_no_preload' shared service.
+     *
+     * @return \TestPreloadNoPreload
+     */
+    public static function do($container, $lazyLoad = true)
+    {
+        return $container->services['preload_no_preload'] = new \TestPreloadNoPreload();
+    }
+}
+
+    [ContainerB4qnkfR/getPreloadSidekickService.php] => <?php
+
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -601,9 +647,9 @@ class getPreloadSidekickService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getRuntimeErrorService.php] => <?php
+    [ContainerB4qnkfR/getRuntimeErrorService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -624,9 +670,9 @@ class getRuntimeErrorService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getServiceFromStaticMethodService.php] => <?php
+    [ContainerB4qnkfR/getServiceFromStaticMethodService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -647,9 +693,9 @@ class getServiceFromStaticMethodService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getTaggedIteratorService.php] => <?php
+    [ContainerB4qnkfR/getTaggedIteratorService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -673,9 +719,9 @@ class getTaggedIteratorService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/getThrowingOneService.php] => <?php
+    [ContainerB4qnkfR/getThrowingOneService.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -696,9 +742,9 @@ class getThrowingOneService extends ProjectServiceContainer
     }
 }
 
-    [Container%s/ProjectServiceContainer.php] => <?php
+    [ContainerB4qnkfR/ProjectServiceContainer.php] => <?php
 
-namespace Container%s;
+namespace ContainerB4qnkfR;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -753,7 +799,9 @@ class ProjectServiceContainer extends Container
             'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
+            'no_preload' => 'getNoPreloadService',
             'non_shared_foo' => 'getNonSharedFooService',
+            'preload_no_preload' => 'getPreloadNoPreloadService',
             'preload_sidekick' => 'getPreloadSidekickService',
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
@@ -891,32 +939,33 @@ class ProjectServiceContainer extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-require dirname(__DIR__, %d).'%svendor/autoload.php';
-require __DIR__.'/Container%s/ProjectServiceContainer.php';
-require __DIR__.'/Container%s/getThrowingOneService.php';
-require __DIR__.'/Container%s/getTaggedIteratorService.php';
-require __DIR__.'/Container%s/getServiceFromStaticMethodService.php';
-require __DIR__.'/Container%s/getRuntimeErrorService.php';
-require __DIR__.'/Container%s/getPreloadSidekickService.php';
-require __DIR__.'/Container%s/getNonSharedFooService.php';
-require __DIR__.'/Container%s/getNewFactoryServiceService.php';
-require __DIR__.'/Container%s/getMethodCall1Service.php';
-require __DIR__.'/Container%s/getLazyContextIgnoreInvalidRefService.php';
-require __DIR__.'/Container%s/getLazyContextService.php';
-require __DIR__.'/Container%s/getFooWithInlineService.php';
-require __DIR__.'/Container%s/getFooBarService.php';
-require __DIR__.'/Container%s/getFoo_BazService.php';
-require __DIR__.'/Container%s/getFooService.php';
-require __DIR__.'/Container%s/getFactoryServiceSimpleService.php';
-require __DIR__.'/Container%s/getFactoryServiceService.php';
-require __DIR__.'/Container%s/getDecoratorServiceWithNameService.php';
-require __DIR__.'/Container%s/getDecoratorServiceService.php';
-require __DIR__.'/Container%s/getConfiguredServiceSimpleService.php';
-require __DIR__.'/Container%s/getConfiguredServiceService.php';
-require __DIR__.'/Container%s/getBazService.php';
-require __DIR__.'/Container%s/getBar23Service.php';
-require __DIR__.'/Container%s/getBAR22Service.php';
-require __DIR__.'/Container%s/getBAR2Service.php';
+require dirname(__DIR__, 5).'/vendor/autoload.php';
+require __DIR__.'/ContainerB4qnkfR/ProjectServiceContainer.php';
+require __DIR__.'/ContainerB4qnkfR/getThrowingOneService.php';
+require __DIR__.'/ContainerB4qnkfR/getTaggedIteratorService.php';
+require __DIR__.'/ContainerB4qnkfR/getServiceFromStaticMethodService.php';
+require __DIR__.'/ContainerB4qnkfR/getRuntimeErrorService.php';
+require __DIR__.'/ContainerB4qnkfR/getPreloadSidekickService.php';
+require __DIR__.'/ContainerB4qnkfR/getPreloadNoPreloadService.php';
+require __DIR__.'/ContainerB4qnkfR/getNonSharedFooService.php';
+require __DIR__.'/ContainerB4qnkfR/getNewFactoryServiceService.php';
+require __DIR__.'/ContainerB4qnkfR/getMethodCall1Service.php';
+require __DIR__.'/ContainerB4qnkfR/getLazyContextIgnoreInvalidRefService.php';
+require __DIR__.'/ContainerB4qnkfR/getLazyContextService.php';
+require __DIR__.'/ContainerB4qnkfR/getFooWithInlineService.php';
+require __DIR__.'/ContainerB4qnkfR/getFooBarService.php';
+require __DIR__.'/ContainerB4qnkfR/getFoo_BazService.php';
+require __DIR__.'/ContainerB4qnkfR/getFooService.php';
+require __DIR__.'/ContainerB4qnkfR/getFactoryServiceSimpleService.php';
+require __DIR__.'/ContainerB4qnkfR/getFactoryServiceService.php';
+require __DIR__.'/ContainerB4qnkfR/getDecoratorServiceWithNameService.php';
+require __DIR__.'/ContainerB4qnkfR/getDecoratorServiceService.php';
+require __DIR__.'/ContainerB4qnkfR/getConfiguredServiceSimpleService.php';
+require __DIR__.'/ContainerB4qnkfR/getConfiguredServiceService.php';
+require __DIR__.'/ContainerB4qnkfR/getBazService.php';
+require __DIR__.'/ContainerB4qnkfR/getBar23Service.php';
+require __DIR__.'/ContainerB4qnkfR/getBAR22Service.php';
+require __DIR__.'/ContainerB4qnkfR/getBAR2Service.php';
 
 $classes = [];
 $classes[] = 'Bar\FooClass';
@@ -928,6 +977,7 @@ $classes[] = 'Foo';
 $classes[] = 'LazyContext';
 $classes[] = 'FooBarBaz';
 $classes[] = 'FactoryClass';
+$classes[] = 'TestPreloadNoPreload';
 $classes[] = 'Some\Sidekick1';
 $classes[] = 'Some\Sidekick2';
 $classes[] = 'Request';
@@ -939,22 +989,22 @@ Preloader::preload($classes);
 
 // This file has been auto-generated by the Symfony Dependency Injection Component for internal use.
 
-if (\class_exists(\Container%s\ProjectServiceContainer::class, false)) {
+if (\class_exists(\ContainerB4qnkfR\ProjectServiceContainer::class, false)) {
     // no-op
-} elseif (!include __DIR__.'/Container%s/ProjectServiceContainer.php') {
-    touch(__DIR__.'/Container%s.legacy');
+} elseif (!include __DIR__.'/ContainerB4qnkfR/ProjectServiceContainer.php') {
+    touch(__DIR__.'/ContainerB4qnkfR.legacy');
 
     return;
 }
 
 if (!\class_exists(ProjectServiceContainer::class, false)) {
-    \class_alias(\Container%s\ProjectServiceContainer::class, ProjectServiceContainer::class, false);
+    \class_alias(\ContainerB4qnkfR\ProjectServiceContainer::class, ProjectServiceContainer::class, false);
 }
 
-return new \Container%s\ProjectServiceContainer([
-    'container.build_hash' => '%s',
-    'container.build_id' => '%s',
-    'container.build_time' => %d,
-], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
+return new \ContainerB4qnkfR\ProjectServiceContainer([
+    'container.build_hash' => 'B4qnkfR',
+    'container.build_id' => '8094687a',
+    'container.build_time' => 1588866825,
+], __DIR__.\DIRECTORY_SEPARATOR.'ContainerB4qnkfR');
 
 )

@@ -236,11 +236,11 @@ class PhpDumperTest extends TestCase
             ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false, 'build_time' => 1588866825]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
         }
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
     }
 
     public function testDumpAsFilesWithFactoriesInlined()

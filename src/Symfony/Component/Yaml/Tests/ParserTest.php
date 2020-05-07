@@ -1650,6 +1650,33 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testEscapedQuoteInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    \\"bar\\"
+    baz"
+YAML;
+        $expected = [
+            'foobar' => 'foo "bar" baz',
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testBackslashInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    bar\\\\"
+YAML;
+        $expected = [
+            'foobar' => 'foo bar\\',
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT

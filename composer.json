@@ -91,7 +91,7 @@
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.4,<=2.10.2",
+        "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",

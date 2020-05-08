@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-05-07T18:09:47Z
+
+This is safe to merge iff not using doctrine/orm >=2.8.x in a pipeline, as this was not merged up yet. Maybe that's what you do on other branches, I'm not sure. Otherwise, let's just wait for these PRs to bubble up in ORM (I can work on speeding that up if necessary)

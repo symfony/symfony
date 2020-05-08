@@ -200,7 +200,7 @@ final class AmpResponse implements ResponseInterface
 
             $options = null;
 
-            $activity[$id] = [new FirstChunk()];
+            $activity[$id][] = new FirstChunk();
 
             if ('HEAD' === $response->getRequest()->getMethod() || \in_array($info['http_code'], [204, 304], true)) {
                 $activity[$id][] = null;

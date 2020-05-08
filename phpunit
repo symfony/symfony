@@ -21,14 +21,4 @@ if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
-
-if (!getenv('SYMFONY_DEPRECATIONS_HELPER')) {
-    foreach ($_SERVER['argv'] as $v) {
-        if (false !== strpos($v, 'Bridge/Doctrine')) {
-            putenv('SYMFONY_DEPRECATIONS_HELPER=max[indirect]=7');
-            break;
-        }
-    }
-}
-
 require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

@@ -84,7 +84,6 @@ jobs:
             -   name: Run tests
                 run: ./phpunit --verbose --group integration
                 env:
-                    SYMFONY_DEPRECATIONS_HELPER: 'max[indirect]=7'
                     REDIS_HOST: localhost
                     REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
                     MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages

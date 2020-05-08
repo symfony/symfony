@@ -121,7 +121,7 @@ EOT
                 if (is_dir(\dirname($targetArg).'/web')) {
                     $targetArg = \dirname($targetArg).'/web';
                 } else {
-                    throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                    throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $targetArg));
                 }
             }
         }

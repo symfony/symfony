@@ -149,7 +149,7 @@ class ExprBuilderTest extends TestCase
     /**
      * @dataProvider castToArrayValues
      */
-    public function testcastToArrayExpression($configValue, $expectedValue)
+    public function testCastToArrayExpression($configValue, $expectedValue)
     {
         $test = $this->getTestBuilder()
             ->castToArray()

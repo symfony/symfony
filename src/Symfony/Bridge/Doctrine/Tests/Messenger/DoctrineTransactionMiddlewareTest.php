@@ -25,7 +25,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
     private $entityManager;
     private $middleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

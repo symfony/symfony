@@ -600,7 +600,7 @@ return function (root, x) {
                     */
                     return;
                 }
-    
+
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();

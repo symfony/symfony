@@ -104,7 +104,7 @@
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.4,<=2.10.2",
+        "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/reflection": "~1.0",
         "doctrine/doctrine-bundle": "^2.0",

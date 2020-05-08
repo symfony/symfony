@@ -51,7 +51,7 @@ class SemaphoreStoreTest extends AbstractStoreTest
     private function getOpenedSemaphores()
     {
         if ('Darwin' === PHP_OS) {
-            $lines = explode(PHP_EOL, trim(`ipcs -s`));
+            $lines = explode(PHP_EOL, trim(shell_exec('ipcs -s')));
             if (-1 === $start = array_search('Semaphores:', $lines)) {
                 throw new \Exception('Failed to extract list of opened semaphores. Expected a Semaphore list, got '.implode(PHP_EOL, $lines));
             }
@@ -59,7 +59,7 @@ class SemaphoreStoreTest extends AbstractStoreTest
             return \count(\array_slice($lines, ++$start));
         }
 
-        $lines = explode(PHP_EOL, trim(`LC_ALL=C ipcs -su`));
+        $lines = explode(PHP_EOL, trim(shell_exec('LC_ALL=C ipcs -su')));
         if ('------ Semaphore Status --------' !== $lines[0]) {
             throw new \Exception('Failed to extract list of opened semaphores. Expected a Semaphore status, got '.implode(PHP_EOL, $lines));
         }

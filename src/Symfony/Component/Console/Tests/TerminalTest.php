@@ -60,7 +60,7 @@ class TerminalTest extends TestCase
         $this->assertSame(60, $terminal->getHeight());
     }
 
-    public function test_zero_values()
+    public function testZeroValues()
     {
         putenv('COLUMNS=0');
         putenv('LINES=0');

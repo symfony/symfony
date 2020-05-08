@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**

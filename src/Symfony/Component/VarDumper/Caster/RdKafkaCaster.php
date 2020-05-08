@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use RdKafka;
 use RdKafka\Conf;
 use RdKafka\Exception as RdKafkaException;
 use RdKafka\KafkaConsumer;

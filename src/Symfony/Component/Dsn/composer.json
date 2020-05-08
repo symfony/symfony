@@ -1,10 +1,10 @@
 {
-    "name": "symfony/redis-messenger",
-    "type": "symfony-bridge",
-    "description": "Symfony Redis extension Messenger Bridge",
-    "keywords": [],
+    "name": "symfony/dsn",
+    "type": "library",
+    "description": "Parse DNS strings into an object.",
+    "keywords": ["dsn"],
     "homepage": "https://symfony.com",
-    "license": "MIT",
+    "license" : "MIT",
     "authors": [
         {
             "name": "Fabien Potencier",
@@ -16,16 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/dsn": "^5.2",
-        "symfony/messenger": "^5.1"
-    },
-    "require-dev": {
-        "symfony/property-access": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0"
+        "php": "^7.2.5"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Redis\\": "" },
+        "psr-4": { "Symfony\\Component\\Dsn\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

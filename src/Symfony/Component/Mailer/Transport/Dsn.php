@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Dsn\Configuration\Url;
+use Symfony\Component\Dsn\DsnParser;
+use Symfony\Component\Dsn\Exception\DsnTypeNotSupported;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-final class Dsn
+final class Dsn extends Url
 {
     private $scheme;
     private $host;
@@ -33,28 +36,22 @@ final class Dsn
         $this->password = $password;
         $this->port = $port;
         $this->options = $options;
+        parent::__construct($scheme, $host, $port, null, $options, ['user' => $user, 'password' => $password]);
     }
 
-    public static function fromString(string $dsn): self
+    public static function fromString(string $dsnString): self
     {
-        if (false === $parsedDsn = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsn));
+        $dsn = DsnParser::parseSimple($dsnString);
+        if (!$dsn instanceof Url) {
+            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsnString), 0, DsnTypeNotSupported::onlyUrl($dsnString));
         }
 
-        if (!isset($parsedDsn['scheme'])) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a scheme.', $dsn));
-        }
+        return self::fromUrlDsn($dsn);
+    }
 
-        if (!isset($parsedDsn['host'])) {
-            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a host (use "default" by default).', $dsn));
-        }
-
-        $user = isset($parsedDsn['user']) ? urldecode($parsedDsn['user']) : null;
-        $password = isset($parsedDsn['pass']) ? urldecode($parsedDsn['pass']) : null;
-        $port = $parsedDsn['port'] ?? null;
-        parse_str($parsedDsn['query'] ?? '', $query);
-
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query);
+    public static function fromUrlDsn(Url $dsn): self
+    {
+        return new self($dsn->getScheme(), $dsn->getHost(), $dsn->getUser(), $dsn->getPassword(), $dsn->getPort(), $dsn->getParameters());
     }
 
     public function getScheme(): string
@@ -65,16 +62,6 @@ final class Dsn
     public function getHost(): string
     {
         return $this->host;
-    }
-
-    public function getUser(): ?string
-    {
-        return $this->user;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
     }
 
     public function getPort(int $default = null): ?int

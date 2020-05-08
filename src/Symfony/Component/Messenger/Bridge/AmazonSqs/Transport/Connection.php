@@ -15,6 +15,7 @@ use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
+use Symfony\Component\Dsn\DsnParser;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -83,16 +84,10 @@ class Connection
      * * visibility_timeout: amount of seconds the message won't be visible
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      */
-    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null): self
+    public static function fromDsn(string $dsnString, array $options = [], HttpClientInterface $client = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Amazon SQS DSN "%s" is invalid.', $dsn));
-        }
-
-        $query = [];
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $query);
-        }
+        $dsn = DsnParser::parseSimple($dsnString);
+        $query = $dsn->getParameters();
 
         $configuration = [
             'buffer_size' => $options['buffer_size'] ?? (int) ($query['buffer_size'] ?? self::DEFAULT_OPTIONS['buffer_size']),
@@ -104,20 +99,20 @@ class Connection
 
         $clientConfiguration = [
             'region' => $options['region'] ?? ($query['region'] ?? self::DEFAULT_OPTIONS['region']),
-            'accessKeyId' => $options['access_key'] ?? (urldecode($parsedUrl['user'] ?? '') ?: self::DEFAULT_OPTIONS['access_key']),
-            'accessKeySecret' => $options['secret_key'] ?? (urldecode($parsedUrl['pass'] ?? '') ?: self::DEFAULT_OPTIONS['secret_key']),
+            'accessKeyId' => $options['access_key'] ?? ($dsn->getUser() ?: self::DEFAULT_OPTIONS['access_key']),
+            'accessKeySecret' => $options['secret_key'] ?? ($dsn->getPassword() ?: self::DEFAULT_OPTIONS['secret_key']),
         ];
         unset($query['region']);
 
-        if ('default' !== ($parsedUrl['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
-            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $parsedUrl['host'], $matches)) {
+        if (null !== $dsn->getHost()) {
+            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $dsn->getHost(), ($dsn->getPort() ? ':'.$dsn->getPort() : ''));
+            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $dsn->getHost(), $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }
             unset($query['sslmode']);
         }
 
-        $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
+        $parsedPath = explode('/', ltrim($dsn->getPath() ?? '/', '/'));
         if (\count($parsedPath) > 0) {
             $configuration['queue_name'] = end($parsedPath);
         }

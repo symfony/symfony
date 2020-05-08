@@ -18,6 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "async-aws/sqs": "^1.0",
+        "symfony/dsn": "^5.2",
         "symfony/messenger": "^4.3|^5.0",
         "symfony/service-contracts": "^1.1|^2"
     },

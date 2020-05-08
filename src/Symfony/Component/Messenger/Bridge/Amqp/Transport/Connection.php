@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
+use Symfony\Component\Dsn\DsnParser;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 
@@ -161,24 +162,21 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(string $dsnString, array $options = [], AmqpFactory $amqpFactory = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
-            // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if ('amqp://' !== $dsn) {
-                throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
-            }
-
-            $parsedUrl = [];
+        $dsn = DsnParser::parseSimple($dsnString);
+        if ('amqp' !== $dsn->getScheme()) {
+            throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
         }
 
-        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+        $path = $dsn->getPath();
+        $pathParts = null === $path ? [] : explode('/', trim($path, '/'));
         $exchangeName = $pathParts[1] ?? 'messages';
-        parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+        $parsedQuery = $dsn->getParameters();
 
         $amqpOptions = array_replace_recursive([
-            'host' => $parsedUrl['host'] ?? 'localhost',
-            'port' => $parsedUrl['port'] ?? 5672,
+            'host' => $dsn->getHost() ?? 'localhost',
+            'port' => $dsn->getPort() ?? 5672,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
             'exchange' => [
                 'name' => $exchangeName,
@@ -187,12 +185,12 @@ class Connection
 
         self::validateOptions($amqpOptions);
 
-        if (isset($parsedUrl['user'])) {
-            $amqpOptions['login'] = $parsedUrl['user'];
+        if (null !== $dsn->getUser()) {
+            $amqpOptions['login'] = $dsn->getUser();
         }
 
-        if (isset($parsedUrl['pass'])) {
-            $amqpOptions['password'] = $parsedUrl['pass'];
+        if (null !== $dsn->getPassword()) {
+            $amqpOptions['password'] = $dsn->getPassword();
         }
 
         if (!isset($amqpOptions['queues'])) {

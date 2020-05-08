@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
+use Symfony\Component\Dsn\Configuration\Path;
+use Symfony\Component\Dsn\DsnParser;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -88,21 +90,12 @@ class Connection
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
 
-    public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
+    public static function fromDsn(string $dsnString, array $redisOptions = [], \Redis $redis = null): self
     {
-        $url = $dsn;
-
-        if (preg_match('#^redis:///([^:@])+$#', $dsn)) {
-            $url = str_replace('redis:', 'file:', $dsn);
+        $dsn = DsnParser::parseSimple($dsnString);
+        if (!empty($dsn->getParameters())) {
+            $redisOptions = $dsn->getParameters();
         }
-
-        if (false === $parsedUrl = parse_url($url)) {
-            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
-        }
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $redisOptions);
-        }
-
         self::validateOptions($redisOptions);
 
         $autoSetup = null;
@@ -159,14 +152,19 @@ class Connection
             'claim_interval' => $claimInterval,
         ];
 
-        if (isset($parsedUrl['host'])) {
+        if ($dsn instanceof Path) {
             $connectionCredentials = [
-                'host' => $parsedUrl['host'] ?? '127.0.0.1',
-                'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                'host' => $dsn->getPath(),
+                'port' => 0,
+            ];
+        } else {
+            $connectionCredentials = [
+                'host' => $dsn->getHost() ?? '127.0.0.1',
+                'port' => $dsn->getPort() ?? 6379,
+                'auth' => $dsn->getPassword() ?? $dsn->getUser(),
             ];
 
-            $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
+            $pathParts = explode('/', rtrim($dsn->getPath() ?? '', '/'));
 
             $configuration['stream'] = $pathParts[1] ?? $configuration['stream'];
             $configuration['group'] = $pathParts[2] ?? $configuration['group'];
@@ -174,11 +172,6 @@ class Connection
             if ($tls) {
                 $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
             }
-        } else {
-            $connectionCredentials = [
-                'host' => $parsedUrl['path'],
-                'port' => 0,
-            ];
         }
 
         return new self($configuration, $connectionCredentials, $redisOptions, $redis);

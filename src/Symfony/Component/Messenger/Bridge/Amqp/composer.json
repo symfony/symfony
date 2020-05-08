@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
+        "symfony/dsn": "^5.2",
         "symfony/messenger": "^5.1"
     },
     "require-dev": {

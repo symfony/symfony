@@ -12,15 +12,18 @@
 namespace Symfony\Component\Mailer;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Dsn\Configuration\Dsn;
+use Symfony\Component\Dsn\Configuration\DsnFunction;
+use Symfony\Component\Dsn\DsnParser;
+use Symfony\Component\Dsn\Exception\FunctionNotSupportedException;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
-use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
-use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\Dsn as MailerDsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
@@ -31,6 +34,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -83,62 +87,38 @@ class Transport
 
     public function fromString(string $dsn): TransportInterface
     {
-        list($transport, $offset) = $this->parseDsn($dsn);
-        if ($offset !== \strlen($dsn)) {
-            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: "%s".', substr($dsn, $offset)));
-        }
-
-        return $transport;
+        return self::fromDsnComponent(DsnParser::parse($dsn));
     }
 
-    private function parseDsn(string $dsn, int $offset = 0): array
+    private function fromDsnComponent($dsn) : TransportInterface
     {
         static $keywords = [
             'failover' => FailoverTransport::class,
             'roundrobin' => RoundRobinTransport::class,
         ];
 
-        while (true) {
-            foreach ($keywords as $name => $class) {
-                $name .= '(';
-                if ($name === substr($dsn, $offset, \strlen($name))) {
-                    $offset += \strlen($name) - 1;
-                    preg_match('{\(([^()]|(?R))*\)}A', $dsn, $matches, 0, $offset);
-                    if (!isset($matches[0])) {
-                        continue;
-                    }
-
-                    ++$offset;
-                    $args = [];
-                    while (true) {
-                        list($arg, $offset) = $this->parseDsn($dsn, $offset);
-                        $args[] = $arg;
-                        if (\strlen($dsn) === $offset) {
-                            break;
-                        }
-                        ++$offset;
-                        if (')' === $dsn[$offset - 1]) {
-                            break;
-                        }
-                    }
-
-                    return [new $class($args), $offset];
-                }
-            }
-
-            if (preg_match('{(\w+)\(}A', $dsn, $matches, 0, $offset)) {
-                throw new InvalidArgumentException(sprintf('The "%s" keyword is not valid (valid ones are "%s"), ', $matches[1], implode('", "', array_keys($keywords))));
-            }
-
-            if ($pos = strcspn($dsn, ' )', $offset)) {
-                return [$this->fromDsnObject(Dsn::fromString(substr($dsn, $offset, $pos))), $offset + $pos];
-            }
-
-            return [$this->fromDsnObject(Dsn::fromString(substr($dsn, $offset))), \strlen($dsn)];
+        if ($dsn instanceof Dsn) {
+            return $this->fromDsnObject(MailerDsn::fromUrlDsn($dsn));
         }
+
+        if (!$dsn instanceof DsnFunction) {
+            throw new \InvalidArgumentException(\sprintf('First argument to Transport::fromDsnComponent() must be a "%s" or %s', DsnFunction::class, Dsn::class));
+        }
+
+        if (!isset($keywords[$dsn->getName()])) {
+            if ('dsn' !== $dsn->getName()) {
+                throw new FunctionNotSupportedException($dsn, $dsn->getName());
+            }
+
+            return $this->fromDsnObject(MailerDsn::fromUrlDsn($dsn->first()));
+        }
+
+        $class = $keywords[$dsn->getName()];
+
+        return new $class(array_map(\Closure::fromCallable([self::class, 'fromDsnComponent']), $dsn->getArguments()));
     }
 
-    public function fromDsnObject(Dsn $dsn): TransportInterface
+    public function fromDsnObject(MailerDsn $dsn): TransportInterface
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn)) {

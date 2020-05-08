@@ -12,7 +12,6 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;

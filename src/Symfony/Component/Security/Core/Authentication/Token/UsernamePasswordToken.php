@@ -26,7 +26,6 @@ class UsernamePasswordToken extends AbstractToken
     /**
      * @param string|\Stringable|UserInterface $user        The username (like a nickname, email address, etc.) or a UserInterface instance
      * @param mixed                            $credentials
-     * @param string                           $providerKey
      * @param string[]                         $roles
      *
      * @throws \InvalidArgumentException

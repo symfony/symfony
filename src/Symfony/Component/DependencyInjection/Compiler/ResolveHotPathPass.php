@@ -52,14 +52,29 @@ class ResolveHotPathPass extends AbstractRecursivePass
         if ($value instanceof ArgumentInterface) {
             return $value;
         }
-        if ($value instanceof Definition && $isRoot && (isset($this->resolvedIds[$this->currentId]) || !$value->hasTag($this->tagName) || $value->isDeprecated())) {
-            return $value->isDeprecated() ? $value->clearTag($this->tagName) : $value;
+
+        if ($value instanceof Definition && $isRoot) {
+            if ($value->isDeprecated()) {
+                return $value->clearTag($this->tagName);
+            }
+
+            $this->resolvedIds[$this->currentId] = true;
+
+            if (!$value->hasTag($this->tagName)) {
+                return $value;
+            }
         }
-        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = (string) $value)) {
-            $definition = $this->container->findDefinition($id);
-            if (!$definition->hasTag($this->tagName) && !$definition->isDeprecated()) {
-                $this->resolvedIds[$id] = true;
-                $definition->addTag($this->tagName);
+
+        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->hasDefinition($id = (string) $value)) {
+            $definition = $this->container->getDefinition($id);
+
+            if ($definition->isDeprecated() || $definition->hasTag($this->tagName)) {
+                return $value;
+            }
+
+            $definition->addTag($this->tagName);
+
+            if (isset($this->resolvedIds[$id])) {
                 parent::processValue($definition, false);
             }
 

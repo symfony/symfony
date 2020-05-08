@@ -19,8 +19,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * A reference test suite for HttpClientInterface implementations.
- *
- * @experimental in 1.1
  */
 abstract class HttpClientTestCase extends TestCase
 {

@@ -15,8 +15,6 @@ namespace Symfony\Contracts\HttpClient\Exception;
  * When a 3xx response is returned and the "max_redirects" option has been reached.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 1.1
  */
 interface RedirectionExceptionInterface extends HttpExceptionInterface
 {

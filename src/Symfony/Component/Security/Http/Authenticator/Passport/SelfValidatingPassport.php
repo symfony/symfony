@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**
  * An implementation used when there are no credentials to be checked (e.g.
@@ -23,6 +24,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SelfValidatingPassport extends Passport
 {
+    /**
+     * @param BadgeInterface[] $badges
+     */
     public function __construct(UserInterface $user, array $badges = [])
     {
         $this->user = $user;

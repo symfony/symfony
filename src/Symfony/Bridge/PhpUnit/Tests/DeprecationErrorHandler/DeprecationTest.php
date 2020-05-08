@@ -22,6 +22,7 @@ class DeprecationTest extends TestCase
     use SetUpTearDownTrait;
 
     private static $vendorDir;
+    private static $prefixDirsPsr4;
 
     private static function getVendorDir()
     {
@@ -151,22 +152,6 @@ class DeprecationTest extends TestCase
 
     public function providerGetTypeDetectsSelf()
     {
-        foreach (get_declared_classes() as $class) {
-            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
-                $r = new \ReflectionClass($class);
-                $v = \dirname(\dirname($r->getFileName()));
-                if (file_exists($v.'/composer/installed.json')) {
-                    $loader = require $v.'/autoload.php';
-                    $reflection = new \ReflectionClass($loader);
-                    $prop = $reflection->getProperty('prefixDirsPsr4');
-                    $prop->setAccessible(true);
-                    $currentValue = $prop->getValue($loader);
-                    $currentValue['Symfony\\Bridge\\PhpUnit\\'] = [realpath(__DIR__.'/../..')];
-                    $prop->setValue($loader, $currentValue);
-                }
-            }
-        }
-
         return [
             'not_from_vendors_file' => [Deprecation::TYPE_SELF, '', 'MyClass1', __FILE__],
             'nonexistent_file' => [Deprecation::TYPE_UNDETERMINED, '', 'MyClass1', 'dummy_vendor_path'],
@@ -276,8 +261,32 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
+    private static function doSetupBeforeClass()
+    {
+        foreach (get_declared_classes() as $class) {
+            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $v = \dirname(\dirname($r->getFileName()));
+                if (file_exists($v.'/composer/installed.json')) {
+                    $loader = require $v.'/autoload.php';
+                    $reflection = new \ReflectionClass($loader);
+                    $prop = $reflection->getProperty('prefixDirsPsr4');
+                    $prop->setAccessible(true);
+                    $currentValue = $prop->getValue($loader);
+                    self::$prefixDirsPsr4[] = [$prop, $loader, $currentValue];
+                    $currentValue['Symfony\\Bridge\\PhpUnit\\'] = [realpath(__DIR__.'/../..')];
+                    $prop->setValue($loader, $currentValue);
+                }
+            }
+        }
+    }
+
     private static function doTearDownAfterClass()
     {
+        foreach (self::$prefixDirsPsr4 as [$prop, $loader, $prefixDirsPsr4]) {
+            $prop->setValue($loader, $prefixDirsPsr4);
+        }
+
         self::removeDir(self::getVendorDir().'/myfakevendor');
     }
 }

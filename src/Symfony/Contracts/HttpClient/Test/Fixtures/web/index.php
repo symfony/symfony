@@ -116,7 +116,7 @@ switch ($vars['REQUEST_URI']) {
         echo '<1>';
         @ob_flush();
         flush();
-        usleep(500000);
+        usleep(600000);
         echo '<2>';
         exit;
 

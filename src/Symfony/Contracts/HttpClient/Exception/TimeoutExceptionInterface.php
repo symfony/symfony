@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpClient\Exception;
-
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+namespace Symfony\Contracts\HttpClient\Exception;
 
 /**
+ * When an idle timeout occurs.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TransportException extends \RuntimeException implements TransportExceptionInterface
+interface TimeoutExceptionInterface extends TransportExceptionInterface
 {
 }

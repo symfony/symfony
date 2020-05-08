@@ -84,7 +84,7 @@ To receive from multiple transports, pass each name:
 Use the --limit option to limit the number of messages received:
 
     <info>php %command.full_name% <receiver-name> --limit=10</info>
-    
+
 Use the --failure-limit option to stop the worker when the given number of failed messages is reached:
 
     <info>php %command.full_name% <receiver-name> --failure-limit=2</info>

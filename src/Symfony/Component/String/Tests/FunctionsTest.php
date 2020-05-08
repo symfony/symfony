@@ -14,8 +14,8 @@ namespace Symfony\Component\String\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\AbstractString;
 use Symfony\Component\String\ByteString;
-use function Symfony\Component\String\s;
 use Symfony\Component\String\UnicodeString;
+use function Symfony\Component\String\s;
 
 final class FunctionsTest extends TestCase
 {

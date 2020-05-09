@@ -97,7 +97,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
-            'timeout' => 0.1,
+            'timeout' => 0.25,
         ]);
 
         try {

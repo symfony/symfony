@@ -47,7 +47,7 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         $this->logger = $logger;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         $response = new Response();
         $response->headers->set('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realmName));
@@ -82,12 +82,12 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     /**
      * @param Passport $passport
      */
-    public function createAuthenticatedToken(PassportInterface $passport, $firewallName): TokenInterface
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
         return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }

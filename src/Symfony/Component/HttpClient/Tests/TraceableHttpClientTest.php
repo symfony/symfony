@@ -88,11 +88,12 @@ class TraceableHttpClientTest extends TestCase
         TestHttpServer::start();
 
         $sut = new TraceableHttpClient(new NativeHttpClient());
-        $chunked = $sut->request('GET', 'http://localhost:8057/chunked');
+        $response = $sut->request('GET', 'http://localhost:8057/chunked');
         $chunks = [];
-        foreach ($sut->stream($chunked) as $response) {
-            $chunks[] = $response->getContent();
+        foreach ($sut->stream($response) as $r => $chunk) {
+            $chunks[] = $chunk->getContent();
         }
+        $this->assertSame($response, $r);
         $this->assertGreaterThan(1, \count($chunks));
         $this->assertSame('Symfony is awesome!', implode('', $chunks));
     }

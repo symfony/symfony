@@ -253,6 +253,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testTimeoutOnStream':
             case 'testUncheckedTimeoutThrows':
+            case 'testTimeoutIsNotAFatalError':
                 $body = ['<1>', '', '<2>'];
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;

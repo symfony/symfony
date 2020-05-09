@@ -97,7 +97,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
-            'timeout' => 0.1,
+            'timeout' => 0.3,
         ]);
 
         try {
@@ -106,7 +106,16 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         } catch (TransportException $e) {
         }
 
-        usleep(400000);
-        $this->assertSame('<1><2>', $response->getContent());
+        for ($i = 0; $i < 10; ++$i) {
+            try {
+                $this->assertSame('<1><2>', $response->getContent());
+                break;
+            } catch (TransportException $e) {
+            }
+        }
+
+        if (10 === $i) {
+            throw $e;
+        }
     }
 }

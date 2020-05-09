@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-06T06:46:01Z
+
+I am not sure that this qualifies as a bug fix. Reading the code it clear that the constructor expects a list of extensions not a single one.  Maybe we should clarify that by adding a docblock?
+
+Like this:
+
+```php
+/**
+ * @param array<string, array<int, string>> $map
+ */
+public function __construct(array $map = [])
+{
+    // ...
+}
+```
+
+---------------------------------------------------------------------------
+
+by mcneely at 2020-05-06T11:45:01Z
+
+@xabbuh
+The bugfix is on line 56, right now it's setting the mimetype for an extension as a string and not an array. getMimeTypes is expected to return an array but when it gets the extension it's a string and throws an error.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-06T11:56:42Z
+
+What I wanted to say is that this was probably not supposed to work:
+
+```php
+$mt = new MimeTypes([
+    'text/bar' => 'foo',
+]);
+```
+
+It should have been written like this instead:
+
+```php
+$mt = new MimeTypes([
+    'text/bar' => ['foo'],
+]);
+```
+
+---------------------------------------------------------------------------
+
+by mcneely at 2020-05-06T12:01:55Z
+
+What's wrong with adding that in?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-07T05:49:46Z
+
+There's nothing wrong with it. I am just questioning whether this has been an intended usage. Depending on the answer this patch would either be a bugfix or a new feature.
+
+---------------------------------------------------------------------------
+
+by mcneely at 2020-05-07T23:31:43Z
+
+@xabbuh I have removed the line of convenience code you're so caught up on. Now it's only a bug fix.
+
+---------------------------------------------------------------------------
+
+by mcneely at 2020-05-07T23:41:38Z
+
+@nicolas-grekas I think the 7.1 integration just needs to be rerun, some sort of hiccup, probably because of 2 commits back to back.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-07T23:54:57Z
+
+At least there is a bug that *if* you pass a string, it explodes.
+I'm fine merging as a bugfix for this reason on my side.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-08T04:47:46Z
+
+> @xabbuh I have removed the line of convenience code you're so caught up on. Now it's only a bug fix.
+
+~I think there is a misunderstanding here. My concern was not if changing that line is important, but whether or not we want to treat the whole patch as a bugfix or as a new feature. I can see good reasons for both that's why I wanted to discuss that.~
+
+I misunderstood the comment I replied to. I understand the issue now and the proposed change fixes it. 👍

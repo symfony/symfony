@@ -62,4 +62,15 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $this->assertContains('image/svg', $mt->getMimeTypes('svg'));
         $this->assertSame([], $mt->getMimeTypes('symfony'));
     }
+
+    public function testCustomMimeTypes()
+    {
+        $mt = new MimeTypes([
+            'text/bar' => ['foo'],
+            'text/baz' => ['foo', 'moof'],
+        ]);
+        $this->assertContains('text/bar', $mt->getMimeTypes('foo'));
+        $this->assertContains('text/baz', $mt->getMimeTypes('foo'));
+        $this->assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
+    }
 }

@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-08T22:49:23Z
+
+> Unfortunately, PHP doesn't allow more specific type signatures for child classes.
+
+I would say "fortunately" here, LSP is a good guide :)
+
+Which means the implementation is not LSP-compliant. Shouldn't it throw an exception at least when a raw `PassportInterface` is passed? Or should `PassportInterface` have some equivalent of `getUser` on it?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-09T09:41:40Z
+
+> I would say "fortunately" here, LSP is a good guide :)
+
+Hehe, alright agreed on this one. :)
+
+---
+
+I'm not sure if this implementation is not LSP-compliant. The "contract" is: whatever instance you return from `authenticate()` is what you get as `$passport` in the next methods. As both methods are called by the same method of the authenticator manager, it is impossible to call `authenticate()` and `createAuthenticatedToken()` on two different authenticators.
+
+I think the passport interface and `getUser()` method are the ones most likely to change in 5.2. We currently need them to provide a somewhat smooth upgrade path if we're removing/replacing `UserInterface` (and we for sure don't want to commit to the current `UserInterface` for the next few years).
+
+Anyway, I don't have a strong opinion on whether we should check the instance and throw an exception if `$passport` is not instance of `Passport`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-09T10:07:05Z
+
+> whatever instance you return from authenticate() is what you get as $passport in the next methods
+
+Oh, good, works! Waiting for @umulmrum then :)
+
+---------------------------------------------------------------------------
+
+by umulmrum at 2020-05-09T11:47:35Z
+
+Changed :-)
+(not completely sure if this satisfies LSP, but fair enough, and I indeed didn't see the dependency on the concrete class)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-09T12:12:07Z
+
+Thank you @umulmrum.

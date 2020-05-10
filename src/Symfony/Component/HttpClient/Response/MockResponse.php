@@ -25,7 +25,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MockResponse implements ResponseInterface
 {
-    use ResponseTrait {
+    use CommonResponseTrait;
+    use TransportResponseTrait {
         doDestruct as public __destruct;
     }
 

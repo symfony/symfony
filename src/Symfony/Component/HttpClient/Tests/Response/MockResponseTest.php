@@ -7,7 +7,7 @@ use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * Test methods from Symfony\Component\HttpClient\Response\ResponseTrait.
+ * Test methods from Symfony\Component\HttpClient\Response\*ResponseTrait.
  */
 class MockResponseTest extends TestCase
 {

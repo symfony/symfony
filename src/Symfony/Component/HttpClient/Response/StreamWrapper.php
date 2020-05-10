@@ -49,7 +49,7 @@ class StreamWrapper
      */
     public static function createResource(ResponseInterface $response, HttpClientInterface $client = null)
     {
-        if (\is_callable([$response, 'toStream']) && isset(class_uses($response)[ResponseTrait::class])) {
+        if (\is_callable([$response, 'toStream']) && isset(class_uses($response)[CommonResponseTrait::class])) {
             $stack = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
             if ($response !== ($stack[1]['object'] ?? null)) {
@@ -83,9 +83,9 @@ class StreamWrapper
     }
 
     /**
-     * @param resource|null $handle  The resource handle that should be monitored when
-     *                               stream_select() is used on the created stream
-     * @param resource|null $content The seekable resource where the response body is buffered
+     * @param resource|callable|null $handle  The resource handle that should be monitored when
+     *                                        stream_select() is used on the created stream
+     * @param resource|null          $content The seekable resource where the response body is buffered
      */
     public function bindHandles(&$handle, &$content): void
     {
@@ -266,7 +266,7 @@ class StreamWrapper
         if (STREAM_CAST_FOR_SELECT === $castAs) {
             $this->response->getHeaders(false);
 
-            return $this->handle ?? false;
+            return (\is_callable($this->handle) ? ($this->handle)() : $this->handle) ?? false;
         }
 
         return false;

@@ -27,9 +27,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CurlResponse implements ResponseInterface
 {
-    use ResponseTrait {
+    use CommonResponseTrait {
         getContent as private doGetContent;
     }
+    use TransportResponseTrait;
 
     private static $performing = false;
     private $multi;

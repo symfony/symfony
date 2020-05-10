@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Translation;
 
-final class TranslatorBag
+final class TranslatorBag implements TranslatorBagInterface
 {
+    /** @var MessageCatalogue[] */
     private $catalogues = [];
 
     public function addCatalogue(MessageCatalogue $catalogue): void
     {
-        $this->catalogues[] = $catalogue;
+        $this->catalogues[$catalogue->getLocale()] = $catalogue;
     }
 
     public function getDomains(): array
@@ -45,5 +46,14 @@ final class TranslatorBag
         }
 
         return $messages;
+    }
+
+    public function getCatalogue(string $locale = null): ?MessageCatalogue
+    {
+        if (!$locale) {
+            return null;
+        }
+
+        return $this->catalogues[$locale];
     }
 }

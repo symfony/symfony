@@ -22,11 +22,11 @@ interface RemoteInterface
      * Write given translation to the remote.
      *
      * * Translations available in the MessageCatalogue only must be created.
-     * * Translations available in bot the MessageCatalogue and on the remote
-     * must be overwriten.
+     * * Translations available in both the MessageCatalogue and on the remote
+     * must be overwritten.
      * * Translations available on the remote only must be kept.
      */
-    public function write(TranslatorBag $translations): void;
+    public function write(TranslatorBag $translations, bool $override = false): void;
 
     /**
      * This method must return asked translations.

@@ -30,7 +30,7 @@ final class LocoRemoteFactory extends AbstractRemoteFactory
         $port = $dsn->getPort();
 
         if ('loco' === $scheme) {
-            return (new LocoRemote($apiKey, $this->client, $this->loader))
+            return (new LocoRemote($apiKey, $this->client, $this->loader, $this->defaultLocale))
                 ->setHost($host)
                 ->setPort($port)
             ;

@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
@@ -41,6 +42,7 @@ class TranslationPushCommand extends Command
     private $defaultTransPath;
     private $transPaths;
     private $enabledLocales;
+    private $arrayLoader;
 
     public function __construct(Remotes $remotes, TranslationReaderInterface $reader, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
     {
@@ -49,6 +51,7 @@ class TranslationPushCommand extends Command
         $this->defaultTransPath = $defaultTransPath;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
+        $this->arrayLoader = new ArrayLoader();
 
         parent::__construct();
     }
@@ -74,7 +77,7 @@ class TranslationPushCommand extends Command
             ->setDescription('Push translations to a given remote.')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> push translations to the given remote. Only new
-translations are pushed, existing ones are not overwriten.
+translations are pushed, existing ones are not overwritten.
 
 You can overwrite existing translations:
 
@@ -82,15 +85,15 @@ You can overwrite existing translations:
 
 You can delete remote translations which are not present locally:
 
-  <info>php %command.full_name% --delete-absolete remote</info>
+  <info>php %command.full_name% --delete-obsolete remote</info>
 
 Full example:
 
-  <info>php %command.full_name% remote --force --delete-obslete --domains=messages,validators --locales=en</info>
+  <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
 This command will push all translations linked to domains messages & validators
 for the locale en. Remote translations for the specified domains & locale will
-be erased if they're not present locally and overwriten if it's the
+be erased if they're not present locally and overwritten if it's the
 case. Remote translations for others domains & locales will be ignored.
 EOF
             )
@@ -106,16 +109,21 @@ EOF
             throw new InvalidArgumentException('You must defined framework.translator.enabled_locales config key in order to work with remotes.');
         }
 
-        $locales = $input->getOption('locales');
-        $domains = $input->getOption('domains');
+        $io = new SymfonyStyle($input, $output);
 
-        /** @var KernelInterface $kernel */
-        $kernel = $this->getApplication()->getKernel();
+        $remoteStorage = $this->remotes->get($input->getArgument('remote'));
+
+        $locales = $input->getOption('locales');
+        $force = $input->getOption('force');
+        $deleteObsolete = $input->getOption('delete-obsolete');
 
         $transPaths = $this->transPaths;
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
+
+        /** @var KernelInterface $kernel */
+        $kernel = $this->getApplication()->getKernel();
 
         // Override with provided Bundle info
         foreach ($kernel->getBundles() as $bundle) {
@@ -123,18 +131,40 @@ EOF
             $transPaths[] = is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundle->getPath().'/translations';
         }
 
-        $translatorBag = new TranslatorBag();
+        $localTranslations = new TranslatorBag();
         foreach ($locales as $locale) {
-            $translatorBag->addCatalogue($this->loadCurrentMessages($locale, $transPaths));
+            $localTranslations->addCatalogue($this->loadCurrentMessages($locale, $transPaths));
         }
 
-        $remoteTranslations = $this->remotes
-            ->get($input->getArgument('remote'))
-            ->read($domains ?? $translatorBag->getDomains(), $locales);
+        $domains = $input->getOption('domains') ?: $localTranslations->getDomains();
 
+        $remoteTranslations = $remoteStorage->read($domains, $locales);
 
-        // diff between $remoteTranslations and $localTranslations,
-        // then write to remote the diff (aka. new translation not yet in the remote storage)
+        foreach ($locales as $locale) {
+            $remoteCatalogue = $remoteTranslations->getCatalogue($locale);
+            $localCatalogue = $localTranslations->getCatalogue($locale);
+
+            $operation = new TargetOperation($remoteCatalogue, $localCatalogue);
+            foreach ($domains as $domain) {
+                if ($force) {
+                    $messages = $operation->getMessages($domain);
+                } else {
+                    $messages = $operation->getNewMessages($domain);
+                }
+
+                $bag = new TranslatorBag();
+                $bag->addCatalogue($this->arrayLoader->load($messages, $locale, $domain));
+                $remoteStorage->write($bag);
+
+                if ($deleteObsolete) {
+                    $obsoleteMessages = $operation->getObsoleteMessages($domain);
+                    $bag = new TranslatorBag();
+                    $bag->addCatalogue($this->arrayLoader->load($obsoleteMessages, $locale, $domain));
+                    $remoteStorage->delete($bag);
+                }
+            }
+        }
+
         return 0;
     }
 
@@ -142,9 +172,7 @@ EOF
     {
         $currentCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            if (is_dir($path)) {
-                $this->reader->read($path, $currentCatalogue);
-            }
+            $this->reader->read($path, $currentCatalogue);
         }
 
         return $currentCatalogue;

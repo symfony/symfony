@@ -29,9 +29,9 @@ class RemoteDecorator implements RemoteInterface
     /**
      * {@inheritdoc}
      */
-    public function write(TranslatorBag $translations): void
+    public function write(TranslatorBag $translations, bool $override = false): void
     {
-        $this->remote->write($translations);
+        $this->remote->write($translations, $override);
     }
 
     /**

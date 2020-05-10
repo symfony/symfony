@@ -22,11 +22,13 @@ abstract class AbstractRemoteFactory implements RemoteFactoryInterface
 {
     protected $client;
     protected $loader;
+    protected $defaultLocale;
 
-    public function __construct(HttpClientInterface $client = null, LoaderInterface $loader)
+    public function __construct(HttpClientInterface $client = null, LoaderInterface $loader = null, string $defaultLocale = null)
     {
         $this->client = $client;
         $this->loader = $loader;
+        $this->defaultLocale = $defaultLocale;
     }
 
     public function supports(Dsn $dsn): bool

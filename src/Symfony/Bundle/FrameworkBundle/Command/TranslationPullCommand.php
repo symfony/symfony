@@ -78,7 +78,7 @@ class TranslationPullCommand extends Command
             ->setDescription('Pull translations from a given remote.')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> pull translations from the given remote. Only
-new translations are pulled, existing ones are not overwriten.
+new translations are pulled, existing ones are not overwritten.
 
 You can overwrite existing translations:
 
@@ -86,15 +86,15 @@ You can overwrite existing translations:
 
 You can remote local translations which are not present on the remote:
 
-  <info>php %command.full_name% --delete-absolete remote</info>
+  <info>php %command.full_name% --delete-obsolete remote</info>
 
 Full example:
 
-  <info>php %command.full_name% remote --force --delete-obslete --domains=messages,validators --locales=en</info>
+  <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
 This command will pull all translations linked to domains messages & validators
 for the locale en. Local translations for the specified domains & locale will
-be erased if they're not present on the remote and overwriten if it's the
+be erased if they're not present on the remote and overwritten if it's the
 case. Local translations for others domains & locales will be ignored.
 EOF
             )
@@ -106,7 +106,44 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $remoteTranslations = $this->remotes->get($input->getArgument('remote'))->read();
+        $remoteStorage = $this->remotes->get($input->getArgument('remote'));
+
+        $locales = $input->getOption('locales');
+        $domains = $input->getOption('domains');
+        $force = $input->getOption('force');
+        $deleteObsolete = $input->getOption('delete-obsolete');
+
+        $remoteTranslations = $remoteStorage->read($domains, $locales);
+
+        if ($deleteObsolete && $force) {
+            foreach ($locales as $locale) {
+                $options = [];
+
+                if ($input->getOption('xliff-version')) {
+                    $options['xliff_version'] = $input->getOption('xliff-version');
+                }
+
+                $this->writer->write($remoteTranslations->getCatalogue($locale), $input->getOption('output-format'), $options);
+            }
+
+            return 0;
+        }
+
+        if ($force) {
+            // merge all messages from remote to local ones
+
+            return 0;
+        } else {
+            // merge only new messages from remote to local ones
+
+            return 0;
+        }
+
+        if ($deleteObsolete) {
+            // remove diff between local messages and remote ones
+
+            return 0;
+        }
 
         //$this->writer->write($operation->getResult(), $input->getOption('output-format'), [
             //'path' => $bundleTransPath,
@@ -114,7 +151,6 @@ EOF
             //'xliff_version' => $input->getOption('xliff-version')
         //]);
 
-        dump($this->remotes);
         return 0;
     }
 }

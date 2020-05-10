@@ -8,6 +8,7 @@
         <service id="translation.remote_factory.abstract" class="Symfony\Component\Translation\Remote\AbstractRemoteFactory" abstract="true">
             <argument type="service" id="http_client" on-invalid="ignore" />
             <argument type="service" id="translation.loader.xliff_raw" />
+            <argument>%kernel.default_locale%</argument>
         </service>
 
         <service id="translation.remote_factory.loco" class="Symfony\Component\Translation\Bridge\Loco\LocoRemoteFactory" parent="translation.remote_factory.abstract">

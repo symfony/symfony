@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Translation\Event\MessageEvent;
 use Symfony\Component\Translation\Message\MessageInterface;
+use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class NullRemote implements RemoteInterface
@@ -36,5 +37,20 @@ class NullRemote implements RemoteInterface
     public function __toString(): string
     {
         return 'null';
+    }
+
+    public function write(TranslatorBag $translations, bool $override = false): void
+    {
+        // TODO: Implement write() method.
+    }
+
+    public function read(array $domains, array $locales): TranslatorBag
+    {
+        // TODO: Implement read() method.
+    }
+
+    public function delete(TranslatorBag $translations): void
+    {
+        // TODO: Implement delete() method.
     }
 }

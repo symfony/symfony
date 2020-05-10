@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -103,32 +102,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('<2>', fread($stream, 8192));
         $this->assertSame('', fread($stream, 8192));
         $this->assertTrue(feof($stream));
-    }
-
-    public function testTimeoutIsNotAFatalError()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
-            'timeout' => 0.25,
-        ]);
-
-        try {
-            $response->getContent();
-            $this->fail(TransportException::class.' expected');
-        } catch (TransportException $e) {
-        }
-
-        for ($i = 0; $i < 10; ++$i) {
-            try {
-                $this->assertSame('<1><2>', $response->getContent());
-                break;
-            } catch (TransportException $e) {
-            }
-        }
-
-        if (10 === $i) {
-            throw $e;
-        }
     }
 
     public function testResponseStreamRewind()

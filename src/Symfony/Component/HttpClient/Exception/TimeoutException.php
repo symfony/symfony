@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\HttpClient\Exception;
 
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TimeoutExceptionInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TransportException extends \RuntimeException implements TransportExceptionInterface
+final class TimeoutException extends TransportException implements TimeoutExceptionInterface
 {
 }

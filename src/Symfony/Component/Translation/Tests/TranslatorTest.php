@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
@@ -551,6 +552,16 @@ class TranslatorTest extends TestCase
         // consistent behavior with Translator::trans(), which returns the string
         // unchanged if it can't be found
         $this->assertEquals('some_message2', $translator->transChoice('some_message2', 10, ['%count%' => 10]));
+    }
+
+    public function testMissingLoaderForResourceError()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No loader is registered for the "twig" format when loading the "messages.en.twig" resource.');
+
+        $translator = new Translator('en');
+        $translator->addResource('twig', 'messages.en.twig', 'en');
+        $translator->getCatalogue('en');
     }
 }
 

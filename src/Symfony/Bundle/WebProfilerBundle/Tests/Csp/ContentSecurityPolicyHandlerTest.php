@@ -144,6 +144,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $nonce,
                 ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
                 $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'none\'', 'Content-Security-Policy-Report-Only' => 'default-src \'none\'']),
+                ['Content-Security-Policy' => 'default-src \'none\'; script-src \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'none\'; script-src \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
                 $this->createResponse(['Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'']),
                 ['Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'', 'X-Content-Security-Policy' => null],
             ],

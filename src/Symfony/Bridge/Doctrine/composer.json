@@ -45,11 +45,12 @@
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.4",
+        "doctrine/dbal": "^2.10",
         "doctrine/orm": "^2.6.3",
         "doctrine/reflection": "~1.0"
     },
     "conflict": {
+        "doctrine/dbal": "<2.10",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/form": "<5.1",

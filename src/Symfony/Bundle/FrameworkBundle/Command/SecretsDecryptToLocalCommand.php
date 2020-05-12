@@ -42,7 +42,7 @@ final class SecretsDecryptToLocalCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Decrypts all secrets and stores them in the local vault.')
+            ->setDescription('Decrypts all secrets and stores them in the local vault')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces overriding of secrets that already exist in the local vault')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.

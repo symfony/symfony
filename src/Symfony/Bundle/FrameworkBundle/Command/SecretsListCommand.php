@@ -45,7 +45,7 @@ final class SecretsListCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists all secrets.')
+            ->setDescription('Lists all secrets')
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command list all stored secrets.

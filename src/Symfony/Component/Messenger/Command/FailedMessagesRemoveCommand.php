@@ -39,7 +39,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
-            ->setDescription('Remove given messages from the failure transport.')
+            ->setDescription('Remove given messages from the failure transport')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 

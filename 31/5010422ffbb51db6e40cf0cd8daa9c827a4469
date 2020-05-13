@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T19:09:01Z
+
+Thank you @ndench
+Is this ready for 4.4? Do your local tests work as expected?
+
+---------------------------------------------------------------------------
+
+by ndench at 2020-05-12T21:23:22Z
+
+Yep, seems to work as expected for me. I'm unsure why aappveyor is failing though.
+
+The only issue I can see is if someone specifies `default-src: 'none' <some other source>` at which point we won't remove the `'none'`. However, that means their CSP was invalid before the WebProfiler touches it, so I don't think that's a problem.

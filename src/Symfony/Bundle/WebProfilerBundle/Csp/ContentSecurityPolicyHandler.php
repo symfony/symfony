@@ -133,6 +133,12 @@ class ContentSecurityPolicyHandler
                         continue;
                     }
 
+                    if (['\'none\''] === $fallback) {
+                        // Fallback came from "default-src: 'none'"
+                        // 'none' is invalid if it's not the only expression in the source list, so we leave it out
+                        $fallback = [];
+                    }
+
                     $headers[$header][$type] = $fallback;
                 }
                 $ruleIsSet = true;

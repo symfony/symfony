@@ -111,6 +111,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security_rememberme.xml');
 
         if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
+            if ($config['always_authenticate_before_granting']) {
+                throw new InvalidConfigurationException('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
+            }
+
             $loader->load('security_authenticator.xml');
 
             // The authenticator system no longer has anonymous tokens. This makes sure AccessListener

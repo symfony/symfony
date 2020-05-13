@@ -505,6 +505,21 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticationManager()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
+
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'always_authenticate_before_granting' => true,
+            'firewalls' => ['main' => []],
+        ]);
+
+        $container->compile();
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

@@ -29,5 +29,6 @@ class NoopAuthenticationManager implements AuthenticationManagerInterface
 {
     public function authenticate(TokenInterface $token)
     {
+        return $token;
     }
 }

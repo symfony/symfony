@@ -8,43 +8,43 @@ return function (ContainerConfigurator $c) {
     $services = $c->services();
 
     $services->stack('stack_a', [
-        service('stdClass')
+        inline_service('stdClass')
             ->property('label', 'A')
-            ->property('inner', ref('.inner')),
-        service('stdClass')
+            ->property('inner', service('.inner')),
+        inline_service('stdClass')
             ->property('label', 'B')
-            ->property('inner', ref('.inner')),
-        service('stdClass')
+            ->property('inner', service('.inner')),
+        inline_service('stdClass')
             ->property('label', 'C'),
     ])->public();
 
     $services->stack('stack_abstract', [
-        service('stdClass')
+        inline_service('stdClass')
             ->property('label', 'A')
-            ->property('inner', ref('.inner')),
-        service('stdClass')
+            ->property('inner', service('.inner')),
+        inline_service('stdClass')
             ->property('label', 'B')
-            ->property('inner', ref('.inner')),
+            ->property('inner', service('.inner')),
     ]);
 
     $services->stack('stack_b', [
-        ref('stack_abstract'),
-        service('stdClass')
+        service('stack_abstract'),
+        inline_service('stdClass')
             ->property('label', 'C'),
     ])->public();
 
     $services->stack('stack_c', [
-        service('stdClass')
+        inline_service('stdClass')
             ->property('label', 'Z')
-            ->property('inner', ref('.inner')),
-        ref('stack_a'),
+            ->property('inner', service('.inner')),
+        service('stack_a'),
     ])->public();
 
     $services->stack('stack_d', [
-        service()
+        inline_service()
             ->parent('stack_abstract')
             ->property('label', 'Z'),
-        service('stdClass')
+        inline_service('stdClass')
             ->property('label', 'C'),
     ])->public();
 };

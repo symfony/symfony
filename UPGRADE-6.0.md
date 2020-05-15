@@ -115,6 +115,34 @@ Security
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
  * Added a `logout(Request $request, Response $response, TokenInterface $token)` method to the `RememberMeServicesInterface`.
 
+Validator
+---------
+
+ * Removed the `allowEmptyString` option from the `Length` constraint.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Length(min=5, allowEmptyString=true)
+    */
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\AtLeastOneOf({
+    *     @Assert\Blank(),
+    *     @Assert\Length(min=5)
+    * })
+    */
+   ```
+
 Yaml
 ----
 

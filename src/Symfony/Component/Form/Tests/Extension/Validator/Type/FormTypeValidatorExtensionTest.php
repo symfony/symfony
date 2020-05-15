@@ -67,7 +67,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'allowEmptyString' => true, 'groups' => ['First']]),
+                    new Length(['min' => 10, 'groups' => ['First']]),
                     new NotBlank(['groups' => ['Second']]),
                 ],
             ])
@@ -83,8 +83,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     public function testManyFieldsGroupSequenceWithConstraintsOption()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
             ->addPropertyConstraint('firstName', new NotBlank(['groups' => 'Second']))
@@ -116,7 +114,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']] + $allowEmptyString),
+                    new Length(['min' => 10, 'groups' => ['First']]),
                 ],
             ])
             ->add('australian', TextTypeTest::TESTED_TYPE, [

@@ -64,5 +64,9 @@ class Length extends Constraint
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
+
+        if (isset($options['allowEmptyString'])) {
+            trigger_deprecation('symfony/validator', '5.2', sprintf('The "allowEmptyString" option of the "%s" constraint is deprecated.', self::class));
+        }
     }
 }

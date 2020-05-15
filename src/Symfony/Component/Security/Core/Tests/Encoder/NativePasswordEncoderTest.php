@@ -73,6 +73,14 @@ class NativePasswordEncoderTest extends TestCase
         $this->assertStringStartsWith('$2', $result);
     }
 
+    public function testConfiguredAlgorithmWithLegacyConstValue()
+    {
+        $encoder = new NativePasswordEncoder(null, null, null, '1');
+        $result = $encoder->encodePassword('password', null);
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
+        $this->assertStringStartsWith('$2', $result);
+    }
+
     public function testCheckPasswordLength()
     {
         $encoder = new NativePasswordEncoder(null, null, 4);

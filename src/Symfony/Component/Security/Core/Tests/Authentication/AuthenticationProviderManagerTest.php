@@ -54,9 +54,15 @@ class AuthenticationProviderManagerTest extends TestCase
 
     public function testAuthenticateWhenProviderReturnsAccountStatusException()
     {
+        $secondAuthenticationProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AccountStatusException'),
+            $secondAuthenticationProvider,
         ]);
+
+        // AccountStatusException stops authentication
+        $secondAuthenticationProvider->expects($this->never())->method('supports');
 
         try {
             $manager->authenticate($token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());

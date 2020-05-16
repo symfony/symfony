@@ -113,6 +113,7 @@ Security
  * Removed `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute
  * Removed `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
+ * Added a `logout(Request $request, Response $response, TokenInterface $token)` method to the `RememberMeServicesInterface`.
 
 Yaml
 ----

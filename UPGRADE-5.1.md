@@ -167,6 +167,7 @@ Security
 
  * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Deprecated `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
+ * Deprecated `RememberMeServicesInterface` implementations without a `logout(Request $request, Response $response, TokenInterface $token)` method.
 
 Yaml
 ----

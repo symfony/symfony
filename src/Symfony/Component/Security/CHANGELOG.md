@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface` in favor of listening on the `LogoutEvent`.
  * Added experimental new security using `Http\Authenticator\AuthenticatorInterface`, `Http\Authentication\AuthenticatorManager` and `Http\Firewall\AuthenticatorManagerListener`.
  * Added `CustomUserMessageAccountStatusException` to be used when extending `UserCheckerInterface`
+ * Deprecated `RememberMeServicesInterface` implementations without `logout(Request $request, Response $response, TokenInterface $token)` method, this method will be required in Symfony 6.0.
 
 5.0.0
 -----

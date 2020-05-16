@@ -89,6 +89,8 @@ class SplCaster
         ];
 
         $prefix = Caster::PREFIX_VIRTUAL;
+        unset($a["\0SplFileInfo\0fileName"]);
+        unset($a["\0SplFileInfo\0pathName"]);
 
         if (false === $c->getPathname()) {
             $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';

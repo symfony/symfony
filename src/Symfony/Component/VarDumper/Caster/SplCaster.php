@@ -175,6 +175,7 @@ class SplCaster
     {
         $storage = [];
         unset($a[Caster::PREFIX_DYNAMIC."\0gcdata"]); // Don't hit https://bugs.php.net/65967
+        unset($a["\0SplObjectStorage\0storage"]);
 
         $clone = clone $c;
         foreach ($clone as $obj) {

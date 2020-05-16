@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
-use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
+use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -25,7 +25,7 @@ class RememberMeLogoutListener implements EventSubscriberInterface
 {
     private $rememberMeServices;
 
-    public function __construct(AbstractRememberMeServices $rememberMeServices)
+    public function __construct(LogoutHandlerInterface $rememberMeServices)
     {
         $this->rememberMeServices = $rememberMeServices;
     }

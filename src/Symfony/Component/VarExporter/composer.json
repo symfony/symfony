@@ -19,7 +19,7 @@
         "php": "^7.2.5"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/var-dumper": "^4.4.9|^5.0.9"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\VarExporter\\": "" },

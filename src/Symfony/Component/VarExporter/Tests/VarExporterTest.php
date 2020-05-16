@@ -87,10 +87,12 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID < 70400 && \in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+        } elseif (\PHP_VERSION_ID < 70400) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
         } else {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+            $this->markAsSkipped('PHP >= 7.4.6 required.');
         }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 

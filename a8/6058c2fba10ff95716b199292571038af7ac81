@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-13T13:04:20Z
+
+Imho, we should do both suggestions of #36804: The `always_authenticate_before_granting` setting is completely ignored in the new system. It's better to make this explicit by not allowing it to be true when the new system is used.
+
+Rationale: This option is heavily misused to reload user roles on the fly, which is not the intention of this option. This use-case has to be addressed by a new feature in Symfony Security, fixing all related issues with changing roles on the fly (such as being logged out since 4.4). As this was considered out of scope for the authenticator system PR, it was decided that if one needs to reload on the fly, one needs to stick with the old system in 5.1.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-05-13T13:36:12Z
+
+@wouterj Makes sense, exception added. Thanks.
+Suggestions welcome to improve the error message

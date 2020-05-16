@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-13T15:00:39Z
+
+Hmm, the `LogoutHandlerInterface` was deprecated and this listener actually replaces it (ref #36243). So I don't think it's a good idea to introduce that interface.
+
+However, I agree with you and I see the problem here as well. What about this:
+
+* Keep the changes in this PR
+* Implement `EventSubscriberInterface` + the code of this listener in `AbstractRememberMeServices`
+* If the remember me service implements `EventSubscriberInterface`, add the `kernel.event_subscriber` tag in `RememberMeFactory`.
+* If the remember me service implements `LogoutHandlerInterface`, but not `EventSubscriberInterface`, trigger a deprecation and "fix" the situation by registering this logout listener with the remember me service instead.
+
+If I'm correct, this would make core work without deprecated usages and provide an upgrade path for your bundle and people creating their own remember me service.
+
+---------------------------------------------------------------------------
+
+by scheb at 2020-05-14T12:11:45Z
+
+Would it be such a bad thing to depend on the deprecated `LogoutHandlerInterface`? For the matter of keeping backwards compatibility, sometimes it's necessary to depend on a deprecated item, until you can introduce a potentially breaking change.
+
+I like that there is a `RememberMeLogoutListener`, because that keeps the architecture nice and clean. Merging the listener into `AbstractRememberMeServices` doesn't feel to me like proper separation of concerns (but I agree, your suggestion would work).
+
+I believe the long-term solution to this problem would be to move the method from `LogoutHandlerInterface` to `RememberMeServicesInterface` in the next major version. Its signature goes very well with the other methods of the interface, so it feels like the right place.
+
+```php
+public function autoLogin(Request $request);
+public function loginFail(Request $request, \Exception $exception = null);
+public function loginSuccess(Request $request, Response $response, TokenInterface $token);
+public function logout(Request $request, Response $response, TokenInterface $token);
+```
+
+For offering a migration path, you could treat the constructor argument in `RememberMeLogoutListener` as a "union type" (even when we don't have union types yet):
+
+```php
+class RememberMeLogoutListener implements EventSubscriberInterface
+{
+    private $rememberMeServices;
+
+    public function __construct(object $rememberMeServices)
+    {
+        if (!($rememberMeServices instanceof RememberMeServicesInterface && $rememberMeServices instanceof LogoutHandlerInterface)) {
+            throw new \InvalidArgumentException('Argument 0 must be instance of RememberMeServicesInterface and LogoutHandlerInterface');
+        }
+        $this->rememberMeServices = $rememberMeServices;
+    }
+```
+
+You could also "softly" introduce the method on `RememberMeServicesInterface` without the risk of breaking code.
+```php
+/**
+ * @method logout(Request $request, Response $response, TokenInterface $token)
+ */
+interface RememberMeServicesInterface
+```
+
+Then, with the next major release, you could move the method, remove `LogoutHandlerInterface` and remove the union type checks to only check for `RememberMeServicesInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-16T08:28:51Z
+
+This change is fine technically to ease BC/FC. Updating the constructor in 6.0 can happen without any hard BC break.

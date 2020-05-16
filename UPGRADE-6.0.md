@@ -24,7 +24,8 @@ DependencyInjection
    configure them explicitly instead.
  * Removed `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead.
  * Removed `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead.
- * The `inline()` function from the PHP-DSL has been removed, use `service()` instead
+ * The `inline()` function from the PHP-DSL has been removed, use `inline_service()` instead.
+ * The `ref()` function from the PHP-DSL has been removed, use `service()` instead.
 
 Dotenv
 ------

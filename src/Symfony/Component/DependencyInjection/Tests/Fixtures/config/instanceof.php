@@ -9,7 +9,7 @@ return function (ContainerConfigurator $c) {
     $s = $c->services()->defaults()->public();
     $s->instanceof(Prototype\Foo::class)
         ->property('p', 0)
-        ->call('setFoo', [ref('foo')])
+        ->call('setFoo', [service('foo')])
         ->tag('tag', ['k' => 'v'])
         ->share(false)
         ->lazy()

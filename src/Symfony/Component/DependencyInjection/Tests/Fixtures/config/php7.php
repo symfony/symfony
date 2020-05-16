@@ -11,7 +11,7 @@ return function (ContainerConfigurator $c) {
     ;
     $c->services()->defaults()->public()
         (Foo::class)
-            ->arg('$bar', ref('bar'))
+            ->arg('$bar', service('bar'))
             ->public()
         ('bar', Foo::class)
             ->call('setFoo')

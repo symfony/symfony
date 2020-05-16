@@ -18,16 +18,16 @@ return function (ContainerConfigurator $c) {
 
     $s = $c->services()->defaults()->public();
     $s->set('foo')
-        ->args(['foo', ref('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, ref('service_container')])
+        ->args(['foo', service('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, service('service_container')])
         ->class(FooClass::class)
         ->tag('foo', ['foo' => 'foo'])
         ->tag('foo', ['bar' => 'bar', 'baz' => 'baz'])
         ->tag('foo', ['name' => 'bar', 'baz' => 'baz'])
         ->factory([FooClass::class, 'getInstance'])
         ->property('foo', 'bar')
-        ->property('moo', ref('foo.baz'))
+        ->property('moo', service('foo.baz'))
         ->property('qux', ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'])
-        ->call('setBar', [ref('bar')])
+        ->call('setBar', [service('bar')])
         ->call('initialize')
         ->configurator('sc_configure');
 
@@ -36,48 +36,48 @@ return function (ContainerConfigurator $c) {
         ->configurator(['%baz_class%', 'configureStatic1']);
 
     $s->set('bar', FooClass::class)
-        ->args(['foo', ref('foo.baz'), new Parameter('foo_bar')])
-        ->configurator([ref('foo.baz'), 'configure']);
+        ->args(['foo', service('foo.baz'), new Parameter('foo_bar')])
+        ->configurator([service('foo.baz'), 'configure']);
 
     $s->set('foo_bar', '%foo_class%')
-        ->args([ref('deprecated_service')])
+        ->args([service('deprecated_service')])
         ->share(false);
 
     $s->set('method_call1', 'Bar\FooClass')
         ->file(realpath(__DIR__.'/../includes/foo.php'))
-        ->call('setBar', [ref('foo')])
-        ->call('setBar', [ref('foo2')->nullOnInvalid()])
-        ->call('setBar', [ref('foo3')->ignoreOnInvalid()])
-        ->call('setBar', [ref('foobaz')->ignoreOnInvalid()])
+        ->call('setBar', [service('foo')])
+        ->call('setBar', [service('foo2')->nullOnInvalid()])
+        ->call('setBar', [service('foo3')->ignoreOnInvalid()])
+        ->call('setBar', [service('foobaz')->ignoreOnInvalid()])
         ->call('setBar', [expr('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]);
 
     $s->set('foo_with_inline', 'Foo')
-        ->call('setBar', [ref('inlined')]);
+        ->call('setBar', [service('inlined')]);
 
     $s->set('inlined', 'Bar')
         ->property('pub', 'pub')
-        ->call('setBaz', [ref('baz')])
+        ->call('setBaz', [service('baz')])
         ->private();
 
     $s->set('baz', 'Baz')
-        ->call('setFoo', [ref('foo_with_inline')]);
+        ->call('setFoo', [service('foo_with_inline')]);
 
     $s->set('request', 'Request')
         ->synthetic();
 
     $s->set('configurator_service', 'ConfClass')
         ->private()
-        ->call('setFoo', [ref('baz')]);
+        ->call('setFoo', [service('baz')]);
 
     $s->set('configured_service', 'stdClass')
-        ->configurator([ref('configurator_service'), 'configureStdClass']);
+        ->configurator([service('configurator_service'), 'configureStdClass']);
 
     $s->set('configurator_service_simple', 'ConfClass')
         ->args(['bar'])
         ->private();
 
     $s->set('configured_service_simple', 'stdClass')
-        ->configurator([ref('configurator_service_simple'), 'configureStdClass']);
+        ->configurator([service('configurator_service_simple'), 'configureStdClass']);
 
     $s->set('decorated', 'stdClass');
 
@@ -95,11 +95,11 @@ return function (ContainerConfigurator $c) {
         ->private();
 
     $s->set('factory_service', 'Bar')
-        ->factory([ref('foo.baz'), 'getInstance']);
+        ->factory([service('foo.baz'), 'getInstance']);
 
     $s->set('new_factory_service', 'FooBarBaz')
         ->property('foo', 'bar')
-        ->factory([ref('new_factory'), 'getInstance']);
+        ->factory([service('new_factory'), 'getInstance']);
 
     $s->set('service_from_static_method', 'Bar\FooClass')
         ->factory(['Bar\FooClass', 'getInstance']);
@@ -110,15 +110,15 @@ return function (ContainerConfigurator $c) {
         ->private();
 
     $s->set('factory_service_simple', 'Bar')
-        ->factory([ref('factory_simple'), 'getInstance']);
+        ->factory([service('factory_simple'), 'getInstance']);
 
     $s->set('lazy_context', 'LazyContext')
-        ->args([iterator(['k1' => ref('foo.baz'), 'k2' => ref('service_container')]), iterator([])]);
+        ->args([iterator(['k1' => service('foo.baz'), 'k2' => service('service_container')]), iterator([])]);
 
     $s->set('lazy_context_ignore_invalid_ref', 'LazyContext')
-        ->args([iterator([ref('foo.baz'), ref('invalid')->ignoreOnInvalid()]), iterator([])]);
+        ->args([iterator([service('foo.baz'), service('invalid')->ignoreOnInvalid()]), iterator([])]);
 
-    $s->set('BAR', 'stdClass')->property('bar', ref('bar'));
+    $s->set('BAR', 'stdClass')->property('bar', service('bar'));
     $s->set('bar2', 'stdClass');
     $s->set('BAR2', 'stdClass');
 
@@ -138,5 +138,5 @@ return function (ContainerConfigurator $c) {
         ->public();
 
     $s->alias('alias_for_foo', 'foo')->private()->public();
-    $s->alias('alias_for_alias', ref('alias_for_foo'));
+    $s->alias('alias_for_alias', service('alias_for_foo'));
 };

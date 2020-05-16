@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * deprecated `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
  * allow decorators to reference their decorated service using the special `.inner` id
  * added support to autowire public typed properties in php 7.4
  * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`

@@ -71,12 +71,12 @@ class RegisterListenersPass implements CompilerPassInterface
             return;
         }
 
+        $aliases = [];
+
         if ($container->hasParameter($this->eventAliasesParameter)) {
             $aliases = $container->getParameter($this->eventAliasesParameter);
-            $container->getParameterBag()->remove($this->eventAliasesParameter);
-        } else {
-            $aliases = [];
         }
+
         $globalDispatcherDefinition = $container->findDefinition($this->dispatcherService);
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {

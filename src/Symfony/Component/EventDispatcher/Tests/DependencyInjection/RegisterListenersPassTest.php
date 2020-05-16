@@ -234,16 +234,21 @@ class RegisterListenersPassTest extends TestCase
     public function testAliasedEventListener(): void
     {
         $container = new ContainerBuilder();
-        $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+        $eventAliases = [AliasedEvent::class => 'aliased_event'];
+        $container->setParameter('event_dispatcher.event_aliases', $eventAliases);
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => AliasedEvent::class, 'method' => 'onEvent']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => CustomEvent::class, 'method' => 'onEvent']);
         $container->register('event_dispatcher');
 
-        $eventAliasPass = new AddEventAliasesPass([CustomEvent::class => 'custom_event']);
+        $customEventAlias = [CustomEvent::class => 'custom_event'];
+        $eventAliasPass = new AddEventAliasesPass($customEventAlias);
         $eventAliasPass->process($container);
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
+
+        $this->assertTrue($container->hasParameter('event_dispatcher.event_aliases'));
+        $this->assertSame(array_merge($eventAliases, $customEventAlias), $container->getParameter('event_dispatcher.event_aliases'));
 
         $definition = $container->getDefinition('event_dispatcher');
         $expectedCalls = [

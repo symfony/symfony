@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-05-13T07:06:07Z
+
+My rationale was that when looking at this:
+
+```php
+->args([ref(Bar::class), service('stdClass')])
+```
+
+Without reading Symfony Docs, you can understand it as follows:
+
+* I'm injecting "ref", which sounds like a "reference" but I don't know exactly what refers to (a parameter, a service, an alias, a factory, etc.)
+* I'm injecting a service called `stdClass`
+
+Both assumptions are wrong ... so you must read the docs and learn about this.
+
+-----
+
+However, to me at least, the proposed methods are self-explanatory and they can be understood without reading or learning anything:
+
+```php
+->args([service(Bar::class), inline_service('stdClass')])
+```
+
+OK, inject a service and then inline a service.
+
+*(you still need to read the docs to learn everything about those methods ... but the learning curve has softened dramatically in the second case).*
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-13T07:32:00Z
+
+I am (currently) not a big fan of PHP configuration. Probably because I never used it. =)
+
+So, with my fresh eyes, using `service()` instead of `ref()` seams like an excellent idea because it is clear and understandable.
+
+---------------------------------------------------------------------------
+
+by sstok at 2020-05-13T08:39:35Z
+
+My biggest concern is BC compatibility 😛 `inline_service()` sounds good to me, but references have been used for a long time.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-05-13T08:58:25Z
+
+Actually I like short names in this config file: `arg` instead of argument, `expr`, instead of expression, `ref` instead of `reference`.
+
+I'm downvoting because:
+- it's not a `service` definition, but a `reference` to an existing service (there's never any ambiguity when I use it). In a XML configuration `<service` is synonym of register a new Service. That would be confusing.
+- `inline` has been renamed into `service` for [consistency with yaml](https://github.com/symfony/symfony/pull/36388), If we renamed it into `inline_service` then we are no more consistent, and at this end we simply renamed `inline` into `inline_service`: a longer method name for no real benefit.
+
+nb: @Nyholm you should have a try.. It's much more convenient than xml/yaml configuration. Autocompletion just work with className, constant, etc, You can leverage language by using loop/if and more... it just work
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-05-13T10:35:52Z
+
+Hi!
+
+3 things from me:
+
+1) Creating an inline service is not common, at least not compared to configuring an argument to a service. So its DX shouldn't take precedence.
+
+2) Calling something a "Reference" internally and using a different name here is not ideal. But it's also not a reference in XML: it's an `<argument type="service" id="foo">`, a bit consistent with `->arg(service('foo'))`.
+
+3) I agree with Javier that this is easier to teach. It would sound like this:
+
+> We want to pass the `Foo::class` service as an argument. Ok, `->arg(Foo::class)`. Hmm, but that would pass the *string* class name. How can we tell Symfony that we actually want to pass the `Foo::class` *service*? Use the `service()` helper: `->arg(service(Foo::class))`.
+
+So, I like it :)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-05-13T12:37:16Z
+
+Do you update blog posts like this when such changes are made ?
+https://symfony.com/blog/new-in-symfony-3-4-php-based-configuration-for-services-and-routes
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-13T12:49:18Z
+
+@GromNaN no. We would do a new blog post. The new feature of 3.4 does not change when we refactor it in 5.1. 3.4 still has the old names.

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^7.2.5",
+        "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",

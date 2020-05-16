@@ -1,0 +1,167 @@
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-12T09:58:32Z
+
+CI Failures seems unrelated
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-12T10:06:13Z
+
+@nicolas-grekas  I'm :+1: with this solution also. But is it not too "hard" for an minor update ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T10:08:07Z
+
+We did it before, this is trivially fixed by ppl that will be affected - and this is not covered by the BC policy :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-12T10:36:18Z
+
+After sleeping on this and some discussions with Nicolas. I think I was wrong with https://github.com/symfony/symfony/issues/36740#issuecomment-625660393
+
+### This is the ~~proper~~ wrong way forward:
+
+Remove these dependencies from symfony/messenger:
+
+```yaml
+ "symfony/amqp-messenger": "^5.1",
+ "symfony/doctrine-messenger": "^5.1",
+ "symfony/redis-messenger": "^5.1"
+```
+
+This will do two things:
+1. It will allow us to specify `ext-amqp`, `ext-redis` and doctrine dependencies in the bridges.
+2. Force the user to run `composer require symfony/*-messenger`.
+
+We want to create a nice message for the user in build time so the user knows they need to run `composer require`.  To do that, we need to throw an exception when:
+- the deprecated classes in `Symfony\Component\Messenger\Transport` is being used AND
+- the new transport is missing.
+
+@tyx, could you please update this PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T11:31:42Z
+
+Hm, after talking with @fabpot, we settled on your approach. Can you please add some LogicException thrown when dbal is not installed? See the other bridges for inspiration, they do something similar already.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T11:46:54Z
+
+Oh, I posted my comment without noticing yours @Nyholm
+The approach I proposed (and you mention in your comment) is cleaner, but the approach you implemented is smoother. I changed my mind and I think you did the right thing then, it's very pragmatic.
+
+I'm OK with removing dbal/etc from the doctrine-messenger bridge. We just need these extra LogicException I mentioned in my previous comment.
+
+Sorry for the confusion.
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-13T05:22:16Z
+
+Hi !
+
+So just to be sure I understand:
+- We keep the current behavior implemented here (aka removing dbal from doctrine/messenger)
+- I need to throw an exception on new DoctrineTransport present in the new bridge when dbal is missing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-13T05:37:07Z
+
+Correct, for persistence also
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-13T19:39:15Z
+
+Ok, I updated with the check asked.
+I failed to find same usecase in other bridge, so feel free to correct me !
+
+---------------------------------------------------------------------------
+
+by shouze at 2020-05-14T13:10:35Z
+
+@tyx and some tests are now failing because of the exception
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-14T13:13:48Z
+
+I think we need to throw exception when the class is used. Currently we throw them when the class is loaded.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-14T14:48:22Z
+
+If we remove the requirements in the bridge and we ask projects to require `doctrine/dbal` and `doctrine/persistence` themselves, we are actually not making them prepare for the state we want in Symfony 6, where `symfony/messenger` does not force installing bridges (otherwise, we should drop the bridges entirely and put these classes directly in `symfony/messenger`). So the migration path being implemented here looks like the wrong one to me.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-14T14:52:02Z
+
+The bridges were a part of symfony/messenger in 5.0. We did not have any checks if doctrine was installed.
+
+When the bridges was moved to a separate package we (mistakenly) added doctrine dependencies. That lead to us forcing the user to install doctrine when they wanted symfony/messegner.
+
+@stof, We want to have the same behaviour as SF 5.0 and a smooth upgrade path.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-14T14:55:19Z
+
+@Nyholm this *won't be* a smooth upgrade path to 5.0, as you will never tell users to add a requirement on the new bridge (which is what they need to do to upgrade to them in a future-proof way)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-14T15:51:00Z
+
+Are you sure? There are already deprecation notices telling you to require the new package.
+
+//Tobias Nyholm
+
+Skickat på språng
+
+> On 14 May 2020, at 16:55, Christophe Coevoet <notifications@github.com> wrote:
+>
+> ﻿
+> @Nyholm this won't be a smooth upgrade path to 5.0, as you will never tell users to add a requirement on the new bridge (which is what they need to do to upgrade to them in a future-proof way)
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub, or unsubscribe.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-14T16:08:23Z
+
+> this won't be a smooth upgrade path to 5.0, as you will never tell users to add a requirement on the new bridge
+
+@stof that's true. There is no better way IMHO. Either we ask ppl to require the bridge now, or we postpone this for 6.0.
+
+In 6.0 is the smoothest to me. Ppl will quickly figure our anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-14T16:54:47Z
+
+@nicolas-grekas The third solution is to keep the deprecated class independent of the new class. So they will need to require the new packages when migrating to the new classes (as that would be the way to *get* the new classes).
+
+> Are you sure? There are already deprecation notices telling you to require the new package.
+
+They can totally use the new classes without doing that, relying on the transitive dependency of `symfony/messenger` adding those bridges.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-14T16:59:45Z
+
+> The third solution is to keep the deprecated class independent of the new class
+
+Hmm. Duplicating the code, right?
+That'd be quite annoying to maintain, ensuring bug fixes are correctly applied to both files.
+
+I think we're good enough with the current approach, let's take the simple path for *us* once :)

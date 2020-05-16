@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-14T10:28:47Z
+
+/cc @dmaicher maybe?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-14T10:29:17Z
+
+Oups, I meant /cc @derrabus actually
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-05-14T14:20:13Z
+
+What are the chances that this RFC got proposed at the same time as this PR?
+
+https://wiki.php.net/rfc/stable_sorting
+
+:joy:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-14T19:45:02Z
+
+The PR removes the piece of code that removes the event aliases parameter from the container.
+
+@nicolas-grekas Do you recall why the event aliases parameter is removed from the container by the pass? It has been there ever since the aliases have been introduced with 75369dabb8af73b0d0ad7f206d85c08cf39117f8.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-15T09:45:33Z
+
+Oh, yes: non-removed parameters end up being inlined in the dumped container and available at runtime. Since this is not desired, the parameter is removed.
+
+I still think this parameter should be removed before the container is dumped.
+
+@X-Coder264 any other idea that would preserve the removal?
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-05-15T10:21:35Z
+
+@nicolas-grekas The only other solution that I see is to make the constructor `$eventAliasesParameter` to be `null` by default and then from the `FrameworkBundle` pass the parameter name explicitly. That way each caller gets to specify their event aliases parameter name and the pass will take care of removing only that parameter (instead of the current case where the default parameter name is the same as the one that `FrameworkBundle` sets so if any bundle calls this compiler pass it will remove the parameter that `FrameworkBundle` set which is not the expected behavior).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-15T10:35:20Z
+
+The default would be to use the current parameter, and you would pass `null` to skip using it?
+Looks interesting to me.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-05-15T10:40:54Z
+
+The default would be `null` so that the pass does not fetch nor remove any parameter from the container and I'd pass [here](https://github.com/symfony/symfony/blob/v4.4.8/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php#L125) `'event_dispatcher.event_aliases'` explicitly as the fourth parameter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-15T10:43:12Z
+
+Not possible, that would be a BC break.
+Another option is to change the priority of some passes as you mentioned.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-05-15T10:47:53Z
+
+What would exactly break in that scenario?
+
+Changing the priority of the passes could also potentially break some applications.
+
+That's why I went with the original approach to just remove the parameter removal logic, because that is a 100% safe code change and like I've said in the original post I don't see any issue with the parameter being left in the compiled container. Yes, maybe it's not ideal but it does not hurt anyone if that parameter remains in the container.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-15T10:51:13Z
+
+Aliases would break for ppl that use the pass directly.
+
+Another option: add a new compiler pass that gets a list of parameters to remove and register it last, after removing passes.
+
+That'd be a new feature of course, so that the fix on your side would be to adjust the priority.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-05-15T11:02:03Z
+
+> Another option: add a new compiler pass that gets a list of parameters to remove and register it last, after removing passes.
+
+Or I can add a new constructor `bool` parameter which would dictate if the parameter should be removed or not. It'd be `false` by default and we'd pass in `true` from `FrameworkBundle` so that the parameter will still get removed when using `FrameworkBundle`.
+
+>
+> That'd be a new feature of course, so that the fix on your side would be to adjust the priority.
+
+By new feature you mean it'd have to go to `master` instead of being treated as a bug fix so that it can go into `4.4`? If so I disagree, since I can't fix the priority on my side since the issue is in a third party bundle (which means that I depend on the maintainers of that bundle to merge the fix and tag a new release). Also, that'd mean that the issue would still be present on 4.4 (with other bundles) and it is really hard to spot it in the first place so a lot of people could be affected even if they don't know it (especially if they don't write tests).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-15T13:11:47Z
+
+> We might want to be able to deprecate fetching some parameters at runtime so that we can remove them later on.
+
+Wouldn't that be a feature worth investigating? Parameters that are available at compile-time, but won't be compiled into the dumped container?

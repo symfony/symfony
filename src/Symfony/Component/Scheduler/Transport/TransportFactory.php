@@ -39,6 +39,10 @@ final class TransportFactory
 
         // Help the user to select Symfony packages based on DSN.
         $packageSuggestion = '';
+        if ('kubernetes://' === substr($dsn, 0, 10) || 'k8s://' === substr($dsn, 0, 3)) {
+            $packageSuggestion = ' Run "composer require symfony/kubernetes-scheduler" to install Kubernetes transport.';
+        }
+
         if ('google://' === substr($dsn, 0, 6)) {
             $packageSuggestion = ' Run "composer require symfony/google-scheduler" to install Google Cloud Platform transport.';
         }

@@ -12,10 +12,129 @@
 namespace Symfony\Component\Scheduler\Bridge\Kubernetes\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Scheduler\Bridge\Kubernetes\Exception\InvalidOperationException;
+use Symfony\Component\Scheduler\Bridge\Kubernetes\Transport\Connection;
+use Symfony\Component\Scheduler\Transport\Dsn;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 final class ConnectionTest extends TestCase
 {
+    public function testJobCannotBeCreated(): void
+    {
+    }
+
+    public function testJobCanBeCreated(): void
+    {
+    }
+
+    public function testJobsCannotBeListed(): void
+    {
+    }
+
+    public function testJobsCanBeListed(): void
+    {
+    }
+
+    public function testJobCannotBePaused(): void
+    {
+    }
+
+    public function testJobCanBePaused(): void
+    {
+    }
+
+    public function testJobCannotBeResumed(): void
+    {
+    }
+
+    public function testJobCanBeResumed(): void
+    {
+    }
+
+    public function testJobCannotBeUpdated(): void
+    {
+    }
+
+    public function testJobCanBeUpdated(): void
+    {
+    }
+
+    public function testJobsCannotBeDeleted(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'code' => 404,
+                'message' => 'Resource not found',
+            ]), ['http_code' => 404]),
+        ]);
+
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+
+        static::expectException(InvalidOperationException::class);
+        $connection->empty();
+    }
+
+    public function testJobsCanBeDeleted(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'code' => 200,
+                'message' => 'OK',
+            ]), ['http_code' => 200]),
+        ]);
+
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+
+        $connection->empty();
+        static::assertSame(1, $httpClient->getRequestsCount());
+    }
+
+    public function testSpecificJobCannotBeDeletedWithUndefinedResource(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'code' => 404,
+                'message' => 'Resource not found',
+            ]), ['http_code' => 404]),
+        ]);
+
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+
+        static::expectException(InvalidOperationException::class);
+        $connection->delete('foo');
+    }
+
+    public function testSpecificJobCanBeDeletedWithValidResource(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'code' => 200,
+                'message' => 'OK',
+            ]), ['http_code' => 200]),
+        ]);
+
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+
+        $connection->delete('foo');
+        static::assertSame(1, $httpClient->getRequestsCount());
+    }
+
+    public function testSpecificJobCanBeAcceptedForDeletion(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'code' => 202,
+                'message' => 'Accepted',
+            ]), ['http_code' => 202]),
+        ]);
+
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+
+        $connection->delete('foo');
+        static::assertSame(1, $httpClient->getRequestsCount());
+    }
 }

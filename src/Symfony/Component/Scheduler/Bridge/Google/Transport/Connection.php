@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class Client
+final class Connection
 {
     private const BASE_URI = 'https://cloudscheduler.googleapis.com/';
 
@@ -221,9 +221,9 @@ final class Client
         }
     }
 
-    public function resume(string $jobName): TaskInterface
+    public function resume(string $taskName): TaskInterface
     {
-        $url = $this->validateUrl(sprintf('%s/jobs/%s', $this->projectConfiguration, $jobName), self::RUN_URL, '#^projects\/[^\/]+\/locations\/[^\/]+\/jobs\/[^\/]+$#');
+        $url = $this->validateUrl(sprintf('%s/jobs/%s', $this->projectConfiguration, $taskName), self::RUN_URL, '#^projects\/[^\/]+\/locations\/[^\/]+\/jobs\/[^\/]+$#');
 
         try {
             $response = $this->httpClient->request('POST', $url);

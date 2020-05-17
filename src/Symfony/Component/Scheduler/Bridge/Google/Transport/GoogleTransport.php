@@ -35,7 +35,7 @@ final class GoogleTransport implements TransportInterface
     {
         $this->dsn = $dsn;
         $this->options = $options;
-        $this->client = new Client($dsn, HttpClient::create(), $factory);
+        $this->client = new Connection($dsn, HttpClient::create(), $factory);
     }
 
     /**

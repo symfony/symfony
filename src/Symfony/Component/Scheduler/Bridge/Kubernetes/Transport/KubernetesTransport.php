@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class KubernetesTransport implements TransportInterface
 {
+    private $connection;
     private $options;
     private $serializer;
     private $httpClient;
@@ -37,7 +38,6 @@ final class KubernetesTransport implements TransportInterface
      */
     public function get(string $taskName): TaskInterface
     {
-        // TODO: Implement get() method.
     }
 
     /**
@@ -45,7 +45,6 @@ final class KubernetesTransport implements TransportInterface
      */
     public function list(): TaskListInterface
     {
-        // TODO: Implement list() method.
     }
 
     /**
@@ -69,7 +68,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function delete(string $taskName): void
     {
-        // TODO: Implement delete() method.
+        $this->connection->delete($taskName);
     }
 
     /**
@@ -93,7 +92,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function empty(): void
     {
-        // TODO: Implement empty() method.
+        $this->connection->empty();
     }
 
     /**

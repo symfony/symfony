@@ -19,7 +19,7 @@ use Symfony\Component\Scheduler\Bridge\Google\Exception\InvalidJobException;
 use Symfony\Component\Scheduler\Bridge\Google\Task\Job;
 use Symfony\Component\Scheduler\Bridge\Google\Task\JobFactory;
 use Symfony\Component\Scheduler\Bridge\Google\Task\State;
-use Symfony\Component\Scheduler\Bridge\Google\Transport\Client;
+use Symfony\Component\Scheduler\Bridge\Google\Transport\Connection;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -27,12 +27,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class ClientTest extends TestCase
+final class ConnectionTest extends TestCase
 {
     public function testClientCannotCreateWithInvalidConfiguration(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
-        $client = new Client(Dsn::fromString('google://@project?auth_key=test&bearer=test'), $httpClient, new JobFactory());
+        $client = new Connection(Dsn::fromString('google://@project?auth_key=test&bearer=test'), $httpClient, new JobFactory());
 
         static::expectException(InvalidConfigurationException::class);
         $client->create(new Job('test'));
@@ -61,7 +61,7 @@ final class ClientTest extends TestCase
         ]);
 
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $client->create($task);
 
         static::assertNotNull($task->get('user_update_time'));
@@ -73,8 +73,9 @@ final class ClientTest extends TestCase
     public function testClientCannotDeleteWithInvalidConfiguration(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
+
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidConfigurationException::class);
         $client->delete('test');
@@ -83,8 +84,9 @@ final class ClientTest extends TestCase
     public function testClientCannotGetWithInvalidConfiguration(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
+
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://@test?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://@test?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidConfigurationException::class);
         $client->get('test');
@@ -102,7 +104,8 @@ final class ClientTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+
         static::expectException(InvalidJobException::class);
         $client->get('test');
     }
@@ -122,7 +125,7 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $job = $client->get('test');
 
         static::assertInstanceOf(TaskInterface::class, $job);
@@ -159,9 +162,9 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
-        $jobs = $client->list();
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
+        $jobs = $client->list();
         static::assertNotEmpty($jobs);
     }
 
@@ -177,7 +180,7 @@ final class ClientTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidJobException::class);
         $client->patch('bar', new Job('test'), 'task.description');
@@ -198,7 +201,7 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $job = $client->patch('bar', new Job('test'), 'task.description');
 
         static::assertInstanceOf(Job::class, $job);
@@ -216,7 +219,7 @@ final class ClientTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidJobException::class);
         $client->pause('bar');
@@ -237,7 +240,7 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $job = $client->pause('bar');
 
         static::assertInstanceOf(Job::class, $job);
@@ -256,7 +259,7 @@ final class ClientTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidJobException::class);
         $client->resume('bar');
@@ -277,7 +280,7 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $job = $client->resume('bar');
 
         static::assertInstanceOf(Job::class, $job);
@@ -296,7 +299,7 @@ final class ClientTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
 
         static::expectException(InvalidJobException::class);
         $client->run('bar');
@@ -317,7 +320,7 @@ final class ClientTest extends TestCase
             ])),
         ]);
         $factory = new JobFactory();
-        $client = new Client(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
+        $client = new Connection(Dsn::fromString('google://tests@europe-west1?auth_key=test&bearer=test'), $httpClient, $factory);
         $job = $client->run('bar');
 
         static::assertInstanceOf(Job::class, $job);

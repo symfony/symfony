@@ -30,6 +30,7 @@ final class TransportFactoryTest extends TestCase
 
         $localTransport = new LocalTransportFactory();
         $nullTransport = new NullTransportFactory();
+
         $factory = new TransportFactory([$localTransport, $nullTransport]);
 
         $transport = $factory->createTransport('local://root?execution_mode=first_in_first_out', [], $serializer);

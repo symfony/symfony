@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-05-16T21:18:08Z
+
+Can it be usefull to create a simple test where the priority of events are set and garanty that the order does not change when runing the test?
+Because changing the priority should be something to do very carefuly imo, moreover core events
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-17T06:19:35Z
+
+This PR reverts the priorities to the state of 4.4.8, which should be a safe change.
+
+Apart from that, yes: Some kind of integration test that prevents future regressions would make sense here.

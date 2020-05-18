@@ -9,6 +9,7 @@
             "choice_loader",
             "choice_name",
             "choice_translation_domain",
+            "choice_translation_parameters",
             "choice_value",
             "choices",
             "expanded",

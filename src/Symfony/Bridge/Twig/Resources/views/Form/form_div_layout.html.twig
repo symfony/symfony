@@ -50,7 +50,7 @@
     <div {{ block('widget_container_attributes') }}>
     {%- for child in form %}
         {{- form_widget(child) -}}
-        {{- form_label(child, null, {label_translation_parameters: choice_translation_parameters, translation_domain: choice_translation_domain}) -}}
+        {{- form_label(child, null, {label_translation_parameters: choice_translation_parameters|default([]), translation_domain: choice_translation_domain}) -}}
     {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded -%}
@@ -80,12 +80,12 @@
 {%- block choice_widget_options -%}
     {% for group_label, choice in options %}
         {%- if choice is iterable -%}
-            <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans(choice_translation_parameters, choice_translation_domain) }}">
+            <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans(choice_translation_parameters|default([]), choice_translation_domain) }}">
                 {% set options = choice %}
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
-            <option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice_translation_parameters, choice_translation_domain) }}</option>
+            <option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice_translation_parameters|default([]), choice_translation_domain) }}</option>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}

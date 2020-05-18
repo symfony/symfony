@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-18T19:14:38Z
+
+Should we need the same for these?
+```
+$ grep 'parent::__unserialize' * -r
+Core/Tests/Authentication/Token/AbstractTokenTest.php:        parent::__unserialize($parentState);
+Core/Tests/Exception/CustomUserMessageAuthenticationExceptionTest.php:        parent::__unserialize($parentData);
+Core/Authentication/Token/AbstractToken.php:     *         parent::__unserialize($parentData);
+Core/Authentication/Token/SwitchUserToken.php:        parent::__unserialize($parentData);
+Core/Authentication/Token/PreAuthenticatedToken.php:        parent::__unserialize($parentData);
+Core/Authentication/Token/RememberMeToken.php:        parent::__unserialize($parentData);
+Core/Authentication/Token/UsernamePasswordToken.php:        parent::__unserialize($parentData);
+Core/Authentication/Token/AnonymousToken.php:        parent::__unserialize($parentData);
+Core/Exception/UsernameNotFoundException.php:        parent::__unserialize($parentData);
+Core/Exception/AccountStatusException.php:        parent::__unserialize($parentData);
+Core/Exception/AuthenticationException.php:     *         parent::__unserialize($parentData);
+Core/Exception/CustomUserMessageAuthenticationException.php:        parent::__unserialize($parentData);
+Core/Exception/CustomUserMessageAccountStatusException.php:        parent::__unserialize($parentData);
+Guard/Token/PostAuthenticationGuardToken.php:        parent::__unserialize($parentData);
+Http/Authenticator/Token/PostAuthenticationToken.php:        parent::__unserialize($parentData);
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-18T19:19:34Z
+
+> Should we need the same for these?
+
+Except for the ones ending with `Test`, I think we should (and the last one, or do we want to have compatibility from 3.4 to 5.1?)
+
+---------------------------------------------------------------------------
+
+by rfaivre at 2020-05-18T21:16:33Z
+
+I did the changes except for `Test` classes

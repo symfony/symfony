@@ -38,14 +38,11 @@ final class Connection implements ConnectionInterface
     private $configuration;
     private $driverConnection;
     private $schemaSynchronizer;
-    private $taskFactories;
+    private $taskFactory;
 
-    /**
-     * @param iterable|TaskFactoryInterface[] $taskFactories
-     */
-    public function __construct(iterable $taskFactories, array $configuration, DBALConnection $driverConnection)
+    public function __construct(TaskFactoryInterface $taskFactory, array $configuration, DBALConnection $driverConnection)
     {
-        $this->taskFactories = $taskFactories;
+        $this->taskFactory = $taskFactory;
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
@@ -57,16 +54,22 @@ final class Connection implements ConnectionInterface
      */
     public function list(): array
     {
+
     }
 
-    public function get(string $taskName): ?array
+    public function get(string $taskName): ?TaskInterface
     {
         $queryBuilder = $this->createQueryBuilder()->where('t.task_name = ?');
         $data = $this->executeQuery($queryBuilder->getSQL(), [
             $taskName,
         ])->fetch();
 
-        return !$data ? null : $this->buildTask($data);
+        if (\array_key_exists('task_name', $data)) {
+            $data['name'] = $data['task_name'];
+            unset($data['task_name']);
+        }
+
+        return !$data ? null : $this->taskFactory->create($data);
     }
 
     /**
@@ -191,6 +194,8 @@ final class Connection implements ConnectionInterface
         $table->addColumn('expression', Types::STRING)
             ->setNotnull(true);
         $table->addColumn('options', Types::ARRAY)
+            ->setNotnull(true);
+        $table->addColumn('type', Types::TEXT)
             ->setNotnull(true);
 
         $table->setPrimaryKey(['id']);

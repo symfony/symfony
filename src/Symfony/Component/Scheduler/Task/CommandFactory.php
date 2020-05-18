@@ -14,7 +14,7 @@ namespace Symfony\Component\Scheduler\Task;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class CommandTaskFactory implements TaskFactoryInterface
+final class CommandFactory implements FactoryInterface
 {
     /**
      * {@inheritdoc}

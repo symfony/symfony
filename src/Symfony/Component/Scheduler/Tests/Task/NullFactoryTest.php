@@ -12,17 +12,10 @@
 namespace Symfony\Component\Scheduler\Tests\Task;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Scheduler\Task\ShellTask;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class ShellTaskUnitTest extends TestCase
+final class NullFactoryTest extends TestCase
 {
-    public function testTaskCanBeCreatedWithValidInformations(): void
-    {
-        $task = new ShellTask('foo', 'echo Symfony!');
-
-        static::assertSame('echo Symfony!', $task->getCommand());
-    }
 }

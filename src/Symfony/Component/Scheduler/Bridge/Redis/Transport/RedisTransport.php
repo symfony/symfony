@@ -12,7 +12,7 @@
 namespace Symfony\Component\Scheduler\Bridge\Redis\Transport;
 
 use Symfony\Component\Scheduler\Exception\LogicException;
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
+use Symfony\Component\Scheduler\Task\FactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
@@ -30,7 +30,7 @@ final class RedisTransport implements TransportInterface
     private $serializer;
     private $taskFactory;
 
-    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer, TaskFactoryInterface $taskFactory)
+    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer, FactoryInterface $taskFactory)
     {
         $this->connection = Connection::createFromDsn($dsn);
         $this->options = $options;

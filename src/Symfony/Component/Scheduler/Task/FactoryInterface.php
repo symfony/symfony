@@ -14,7 +14,9 @@ namespace Symfony\Component\Scheduler\Task;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-interface TaskFactoryInterface
+interface FactoryInterface
 {
-    public function create(array $data): TaskInterface;
+    public function create(array $options): TaskInterface;
+
+    public function support(string $type): bool;
 }

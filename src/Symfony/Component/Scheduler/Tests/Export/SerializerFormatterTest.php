@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class SerializerFormatterUnitTest extends TestCase
+final class SerializerFormatterTest extends TestCase
 {
     public function testFormatterCannotFormatWithoutValidFormat(): void
     {

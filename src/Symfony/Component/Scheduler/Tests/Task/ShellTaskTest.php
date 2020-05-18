@@ -13,22 +13,16 @@ namespace Symfony\Component\Scheduler\Tests\Task;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Task\ShellTask;
-use Symfony\Component\Scheduler\Task\ShellFactory;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class ShellTaskFactoryTest extends TestCase
+final class ShellTaskTest extends TestCase
 {
-    public function testTaskCanBeCreated(): void
+    public function testTaskCanBeCreatedWithValidInformations(): void
     {
-        $factory = new ShellFactory();
+        $task = new ShellTask('foo', 'echo Symfony!');
 
-        $task = $factory->create([
-            'name' => 'foo',
-            'command' => 'echo Symfony!',
-        ]);
-
-        static::assertInstanceOf(ShellTask::class, $task);
+        static::assertSame('echo Symfony!', $task->getCommand());
     }
 }

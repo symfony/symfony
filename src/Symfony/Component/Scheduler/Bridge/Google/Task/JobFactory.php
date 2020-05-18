@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Google\Task;
 
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
+use Symfony\Component\Scheduler\Task\FactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class JobFactory implements TaskFactoryInterface
+final class JobFactory implements FactoryInterface
 {
     /**
      * {@inheritdoc}

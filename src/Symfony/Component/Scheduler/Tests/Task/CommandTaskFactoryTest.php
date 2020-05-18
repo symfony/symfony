@@ -13,7 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Task;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Task\CommandTask;
-use Symfony\Component\Scheduler\Task\CommandTaskFactory;
+use Symfony\Component\Scheduler\Task\CommandFactory;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -22,7 +22,7 @@ final class CommandTaskFactoryTest extends TestCase
 {
     public function testTaskCanBeCreated(): void
     {
-        $factory = new CommandTaskFactory();
+        $factory = new CommandFactory();
 
         $task = $factory->create([
             'name' => 'foo',

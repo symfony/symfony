@@ -50,17 +50,20 @@
         <service id="Symfony\Component\Scheduler\ExecutionModeOrchestratorInterface" alias="scheduler.execution_mode_orchestrator" />
 
         <!-- tasks factories -->
-        <service id="scheduler.shell_task.factory" class="Symfony\Component\Scheduler\Task\ShellTaskFactory">
+        <service id="scheduler.shell_task.factory" class="Symfony\Component\Scheduler\Task\ShellFactory">
             <tag name="scheduler.task_factory" />
         </service>
-        <service id="scheduler.command_task.factory" class="Symfony\Component\Scheduler\Task\CommandTaskFactory">
+        <service id="scheduler.command_task.factory" class="Symfony\Component\Scheduler\Task\CommandFactory">
+            <tag name="scheduler.task_factory" />
+        </service>
+        <service id="scheduler.null_task.factory" class="Symfony\Component\Scheduler\Task\NullFactory">
             <tag name="scheduler.task_factory" />
         </service>
 
         <service id="scheduler.task_factory" class="Symfony\Component\Scheduler\Task\TaskFactory">
             <argument type="tagged_iterator" tag="scheduler.task_factory" />
         </service>
-        <service id="Symfony\Component\Scheduler\Task\TaskFactoryInterface" alias="scheduler.task_factory" />
+        <service id="FactoryInterface" alias="scheduler.task_factory" />
 
         <!-- runners -->
         <service id="scheduler.shell_runner" class="Symfony\Component\Scheduler\Runner\ShellTaskRunner">

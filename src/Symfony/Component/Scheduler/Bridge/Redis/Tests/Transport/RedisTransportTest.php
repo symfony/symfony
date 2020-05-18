@@ -13,7 +13,7 @@ namespace Symfony\Component\Scheduler\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransport;
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
+use Symfony\Component\Scheduler\Task\FactoryInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -25,7 +25,7 @@ final class RedisTransportTest extends TestCase
     public function testDeleteThrowExceptionIfNoKeyIsDeleted(): void
     {
         $serializer = $this->createMock(SerializerInterface::class);
-        $factory = $this->createMock(TaskFactoryInterface::class);
+        $factory = $this->createMock(FactoryInterface::class);
 
         $transport = new RedisTransport(Dsn::fromString('redis://localhost/tasks'), [], $serializer, $factory);
     }

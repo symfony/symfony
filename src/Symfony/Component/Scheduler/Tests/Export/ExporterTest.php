@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class ExporterUnitTest extends TestCase
+final class ExporterTest extends TestCase
 {
     public function testExportCannotBeGeneratedWithoutFormatter(): void
     {

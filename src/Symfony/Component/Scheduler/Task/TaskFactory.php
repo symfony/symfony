@@ -16,23 +16,23 @@ use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class TaskFactory
+final class TaskFactory implements TaskFactoryInterface
 {
     private $factories;
 
     /**
-     * @param iterable|TaskFactoryInterface[] $factories
+     * @param iterable|FactoryInterface[] $factories
      */
     public function __construct(iterable $factories)
     {
         $this->factories = $factories;
     }
 
-    public function create(array $options): TaskInterface
+    public function create(array $data): TaskInterface
     {
         foreach ($this->factories as $factory) {
-            if ($factory->support($options['type'])) {
-                return $factory->create($options);
+            if ($factory->support($data['type'])) {
+                return $factory->create($data);
             }
         }
 

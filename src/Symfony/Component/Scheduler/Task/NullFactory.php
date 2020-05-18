@@ -14,7 +14,7 @@ namespace Symfony\Component\Scheduler\Task;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class ShellTaskFactory implements TaskFactoryInterface
+final class NullFactory implements FactoryInterface
 {
     /**
      * {@inheritdoc}
@@ -22,11 +22,10 @@ final class ShellTaskFactory implements TaskFactoryInterface
     public function create(array $options): TaskInterface
     {
         $name = $options['name'] ?? '';
-        $command = $options['command'] ?? '';
 
-        unset($options['name'], $options['command']);
+        unset($options['name']);
 
-        return new ShellTask($name, $command, $options);
+        return new NullTask($name);
     }
 
     /**
@@ -34,6 +33,6 @@ final class ShellTaskFactory implements TaskFactoryInterface
      */
     public function support(string $type): bool
     {
-        return 'shell' === $type;
+        return 'null' === $type;
     }
 }

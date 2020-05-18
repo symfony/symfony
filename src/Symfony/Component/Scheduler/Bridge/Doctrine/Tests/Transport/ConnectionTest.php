@@ -20,12 +20,45 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\Connection as DoctrineConnection;
+use Symfony\Component\Scheduler\Task\NullFactory;
+use Symfony\Component\Scheduler\Task\TaskFactory;
+use Symfony\Component\Scheduler\Task\TaskInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 final class ConnectionTest extends TestCase
 {
+    public function testConnectionCanReturnASingleTask(): void
+    {
+        $taskFactory = new TaskFactory([new NullFactory()]);
+        $queryBuilder = $this->getQueryBuilderMock();
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $statement = $this->getStatementMock([
+            'id' => 1,
+            'task_name' => 'foo',
+            'expression' => '* * * * *',
+            'options' => [],
+            'type' => 'null',
+        ]);
+
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('');
+        $queryBuilder->method('getParameters')->willReturn(['task_name' => 'foo']);
+        $queryBuilder->method('getParameterTypes')->willReturn([]);
+        $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $task = $connection->get('foo');
+
+        static::assertInstanceOf(TaskInterface::class, $task);
+        static::assertSame('foo', $task->getName());
+        static::assertSame('* * * * *', $task->getExpression());
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(Connection::class);

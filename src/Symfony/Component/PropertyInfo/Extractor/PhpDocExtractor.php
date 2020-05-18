@@ -83,6 +83,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         foreach ($docBlock->getTagsByName('var') as $var) {
+            if (is_a($var, 'phpDocumentor\Reflection\DocBlock\Tags\InvalidTag')) {
+                throw new \InvalidArgumentException(sprintf('Failed to get the description of the @var tag "%s" for class "%s". Please check that the @var tag is correctly defined.', $property, $class));
+            }
+
             $varDescription = $var->getDescription()->render();
 
             if (!empty($varDescription)) {
@@ -137,6 +141,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $types = [];
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
+            if (is_a($tag, 'phpDocumentor\Reflection\DocBlock\Tags\InvalidTag')) {
+                return null;
+            }
+
             if ($tag && null !== $tag->getType()) {
                 $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
             }

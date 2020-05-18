@@ -153,6 +153,7 @@
         {%- for child in form %}
             {{- form_widget(child, {
                 parent_label_class: label_attr.class|default(''),
+                label_translation_parameters: choice_translation_parameters,
                 translation_domain: choice_translation_domain,
             }) -}}
         {% endfor -%}
@@ -161,6 +162,7 @@
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    label_translation_parameters: choice_translation_parameters,
                     translation_domain: choice_translation_domain,
                 }) -}}
             {%- endfor -%}

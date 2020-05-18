@@ -211,6 +211,7 @@ class ChoiceType extends AbstractType
             'choices' => $choiceListView->choices,
             'separator' => '-------------------',
             'placeholder' => null,
+            'choice_translation_parameters' => $options['choice_translation_parameters'],
             'choice_translation_domain' => $choiceTranslationDomain,
         ]);
 
@@ -336,6 +337,7 @@ class ChoiceType extends AbstractType
             // even if the "data" option is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class' => null,
+            'choice_translation_parameters' => [],
             'choice_translation_domain' => true,
             'trim' => false,
             'invalid_message' => function (Options $options, $previousValue) {

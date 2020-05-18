@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Transport;
 
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -21,10 +22,12 @@ final class FileTransport implements TransportInterface
 {
     private $options;
     private $savePath;
+    private $serializer;
 
-    public function __construct(Dsn $dsn, array $options)
+    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer)
     {
         $this->options = array_merge($dsn->getOptions(), $options);
+        $this->serializer = $serializer;
 
         if (!\array_key_exists('save_path', $this->options)) {
             $this->savePath = sys_get_temp_dir();

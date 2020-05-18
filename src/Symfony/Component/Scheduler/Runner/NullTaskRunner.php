@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Task\TaskInterface;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class NullRunner implements RunnerInterface
+final class NullTaskRunner implements RunnerInterface
 {
     /**
      * {@inheritdoc}

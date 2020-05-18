@@ -23,7 +23,7 @@ final class FileTransportFactory implements TransportFactoryInterface
      */
     public function createTransport(Dsn $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        return new FileTransport($dsn, $options);
+        return new FileTransport($dsn, $options, $serializer);
     }
 
     /**

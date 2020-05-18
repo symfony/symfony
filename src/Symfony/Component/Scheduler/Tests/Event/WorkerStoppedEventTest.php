@@ -12,21 +12,19 @@
 namespace Symfony\Component\Scheduler\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Scheduler\Event\WorkerStartedEvent;
+use Symfony\Component\Scheduler\Event\WorkerStoppedEvent;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class WorkerStartedEventTest extends TestCase
+final class WorkerStoppedEventTest extends TestCase
 {
-    public function testEventReturnWorkerState(): void
+    public function testWorkerIsAccessible(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $event = new WorkerStartedEvent($worker);
-
+        $event = new WorkerStoppedEvent($worker);
         static::assertSame($worker, $event->getWorker());
-        static::assertFalse($event->isWorkerIdle());
     }
 }

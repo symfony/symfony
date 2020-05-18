@@ -18,4 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class FileTransportTest extends TestCase
 {
+    public function testTransportCanGetTask(): void
+    {
+    }
 }

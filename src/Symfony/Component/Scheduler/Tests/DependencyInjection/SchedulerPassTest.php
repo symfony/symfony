@@ -65,37 +65,17 @@ final class SchedulerPassTest extends TestCase
         static::assertFalse($container->hasDefinition('kernel'));
     }
 
-    public function testPassCannotRegisterKernelSchedulerOnInvalidKernel(): void
-    {
-        $container = $this->getContainerBuilder();
-        $container->register('kernel', Kernel::class);
-        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
-
-        (new SchedulerPass())->process($container);
-        static::assertTrue($container->hasDefinition('kernel'));
-        static::assertFalse($container->getDefinition('kernel')->hasMethodCall('schedule'));
-    }
-
-    public function testPassCannotRegisterKernelSchedulerOnValidKernel(): void
-    {
-        $container = $this->getContainerBuilder();
-        $container->register('kernel', SchedulerKernel::class);
-        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
-
-        (new SchedulerPass())->process($container);
-        static::assertTrue($container->hasDefinition('kernel'));
-        static::assertTrue($container->getDefinition('kernel')->hasMethodCall('schedule'));
-    }
-
     public function testEntryPointCannotBeGeneratedWithInvalidEntryPoints(): void
     {
         $container = $this->getContainerBuilder();
         $container->register('scheduler.foo_entry_point', FooEntryPoint::class);
+        $container->register('kernel', SchedulerKernel::class);
         $container->register('scheduler.registry', SchedulerRegistryInterface::class);
 
         (new SchedulerPass())->process($container);
         static::assertTrue($container->hasDefinition('scheduler.foo_entry_point'));
         static::assertFalse($container->getDefinition('scheduler.foo_entry_point')->hasMethodCall('schedule'));
+        static::assertFalse($container->getDefinition('kernel')->hasMethodCall('schedule'));
     }
 
     public function testEntryPointCanBeGeneratedWithValidEntryPoints(): void

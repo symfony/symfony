@@ -99,13 +99,13 @@ EOF
 
         $availableWorker = reset($workers);
 
-        if ($limit = $input->getOption('limit')) {
+        if (null !== $limit = $input->getOption('limit')) {
             $stopOptions[] = sprintf('%s tasks has been processed', $limit);
             $availableWorker->addSubscriber(new StopWorkerOnTaskLimitSubscriber($limit, $this->logger));
         }
 
-        if ($timeLimit = $input->getOption('time-limit')) {
-            $stopOptions[] = sprintf('the worker has been running for %d seconds', $timeLimit);
+        if (null !== $timeLimit = $input->getOption('time-limit')) {
+            $stopOptions[] = sprintf('it has been running for %d seconds', $timeLimit);
             $availableWorker->addSubscriber(new StopWorkerOnTimeLimitSubscriber($timeLimit, $this->logger));
         }
 
@@ -115,7 +115,7 @@ EOF
             return \in_array($name, $schedulers);
         });
 
-        if (empty($filteredSchedulers)) {
+        if (0 === \count($filteredSchedulers)) {
             $io->error('No schedulers can be found, please retry');
 
             return 1;
@@ -133,6 +133,12 @@ EOF
         array_map(function (SchedulerInterface $scheduler) use (&$tasks): void {
             $tasks->addMultiples($scheduler->getTasks()->toArray());
         }, $filteredSchedulers);
+
+        if ($stopOptions) {
+            $last = array_pop($stopOptions);
+            $stopsWhen = ($stopOptions ? implode(', ', $stopOptions).' or ' : '').$last;
+            $io->comment(sprintf('The worker will automatically exit once %s.', $stopsWhen));
+        }
 
         $io->comment('Quit the worker with CONTROL-C.');
 

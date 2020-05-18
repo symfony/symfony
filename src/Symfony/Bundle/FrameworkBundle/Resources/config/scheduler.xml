@@ -76,7 +76,7 @@
             <tag name="scheduler.runner" />
         </service>
 
-        <service id="scheduler.null_runner" class="Symfony\Component\Scheduler\Runner\NullRunner">
+        <service id="scheduler.null_runner" class="NullTaskRunner">
             <tag name="scheduler.runner" />
         </service>
 

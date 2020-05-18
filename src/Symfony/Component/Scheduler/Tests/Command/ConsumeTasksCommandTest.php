@@ -164,9 +164,79 @@ final class ConsumeTasksCommandTest extends TestCase
 
     public function testCommandCanConsumeSchedulersWithTaskLimit(): void
     {
+        $task = $this->createMock(TaskInterface::class);
+
+        $taskList = $this->createMock(TaskListInterface::class);
+        $taskList->expects(self::once())->method('toArray')->willReturn([$task]);
+
+        $scheduler = $this->createMock(SchedulerInterface::class);
+        $scheduler->expects(self::once())->method('getTasks')->willReturn($taskList);
+
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('addSubscriber');
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
+        $schedulerRegistry->expects(self::once())->method('filter')->willReturn([$scheduler]);
+
+        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $workerRegistry->expects(self::once())->method('filter')->willReturn([$worker]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $command = new ConsumeTasksCommand($eventDispatcher, $schedulerRegistry, $workerRegistry, $logger);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:consume'));
+        $tester->execute([
+            'schedulers' => ['foo'],
+            '--limit' => 10,
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('The worker will automatically exit once 10 tasks has been processed', $tester->getDisplay());
+        static::assertStringContainsString('Consuming tasks from scheduler: "foo"', $tester->getDisplay());
+        static::assertStringContainsString('Quit the worker with CONTROL-C.', $tester->getDisplay());
     }
 
     public function testCommandCanConsumeSchedulersWithTimeLimit(): void
     {
+        $task = $this->createMock(TaskInterface::class);
+
+        $taskList = $this->createMock(TaskListInterface::class);
+        $taskList->expects(self::once())->method('toArray')->willReturn([$task]);
+
+        $scheduler = $this->createMock(SchedulerInterface::class);
+        $scheduler->expects(self::once())->method('getTasks')->willReturn($taskList);
+
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('addSubscriber');
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
+        $schedulerRegistry->expects(self::once())->method('filter')->willReturn([$scheduler]);
+
+        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $workerRegistry->expects(self::once())->method('filter')->willReturn([$worker]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $command = new ConsumeTasksCommand($eventDispatcher, $schedulerRegistry, $workerRegistry, $logger);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:consume'));
+        $tester->execute([
+            'schedulers' => ['foo'],
+            '--time-limit' => 10,
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('The worker will automatically exit once it has been running for 10 seconds', $tester->getDisplay());
+        static::assertStringContainsString('Consuming tasks from scheduler: "foo"', $tester->getDisplay());
+        static::assertStringContainsString('Quit the worker with CONTROL-C.', $tester->getDisplay());
     }
 }

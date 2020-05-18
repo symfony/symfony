@@ -24,6 +24,16 @@ final class CronJob extends AbstractTask
     private $spec;
     private $status;
 
+    public function toArray(): array
+    {
+        return [
+            'apiVersion' => $this->apiVersion,
+            'bind' => $this->kind,
+            'metadata' => $this->metadata->toArray(),
+            'status' => $this->status->toArray(),
+        ];
+    }
+
     public function getApiVersion(): string
     {
         return $this->apiVersion;

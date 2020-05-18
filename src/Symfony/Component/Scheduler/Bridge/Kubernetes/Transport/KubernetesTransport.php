@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Kubernetes\Transport;
 
+use Symfony\Component\Scheduler\Bridge\Kubernetes\Task\CronJob;
+use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
@@ -52,7 +54,11 @@ final class KubernetesTransport implements TransportInterface
      */
     public function create(TaskInterface $task): void
     {
-        // TODO: Implement create() method.
+        if (!$task instanceof CronJob) {
+            throw new InvalidArgumentException('');
+        }
+
+        $this->connection->create($task->toArray());
     }
 
     /**

@@ -22,6 +22,7 @@ use Symfony\Component\Scheduler\EventListener\StopWorkerOnTaskLimitSubscriber;
 use Symfony\Component\Scheduler\EventListener\StopWorkerOnTimeLimitSubscriber;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
+use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -57,7 +58,7 @@ final class ConsumeTasksCommand extends Command
             ->setDefinition([
                 new InputArgument('schedulers', InputArgument::IS_ARRAY, 'The name of the schedulers to consume'),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of tasks consumed'),
-                new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'Limit the time inn seconds the worker can run'),
+                new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'Limit the time in seconds the worker can run'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes tasks.
@@ -82,13 +83,21 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         $stopOptions = [];
 
-        $worker = $this->workerRegistry->filter(function (WorkerInterface $worker): bool {
+        $workers = $this->workerRegistry->filter(function (WorkerInterface $worker): bool {
             return !$worker->isRunning();
         });
 
-        $availableWorker = reset($worker);
+        if (empty($workers)) {
+            $io->error('No worker is available, please retry');
+
+            return 1;
+        }
+
+        $availableWorker = reset($workers);
 
         if ($limit = $input->getOption('limit')) {
             $stopOptions[] = sprintf('%s tasks has been processed', $limit);
@@ -106,18 +115,23 @@ EOF
             return \in_array($name, $schedulers);
         });
 
-        $io = new SymfonyStyle($input, $output);
         if (empty($filteredSchedulers)) {
-            $io->error('No schedulers can be found');
+            $io->error('No schedulers can be found, please retry');
 
             return 1;
         }
 
-        $io->success(sprintf('Consuming tasks from scheduler%s: "%s"', \count($schedulers) > 0 ? 's' : '', implode(', ', $schedulers)));
+        if (\count($filteredSchedulers) !== \count($schedulers)) {
+            $io->error('The schedulers cannot be found, please retry');
 
-        $tasks = [];
+            return 1;
+        }
+
+        $io->success(sprintf('Consuming tasks from scheduler%s: "%s"', \count($schedulers) > 1 ? 's' : '', implode(', ', $schedulers)));
+
+        $tasks = new TaskList();
         array_map(function (SchedulerInterface $scheduler) use (&$tasks): void {
-            $tasks[] = $scheduler->toArray();
+            $tasks->addMultiples($scheduler->getTasks()->toArray());
         }, $filteredSchedulers);
 
         $io->comment('Quit the worker with CONTROL-C.');

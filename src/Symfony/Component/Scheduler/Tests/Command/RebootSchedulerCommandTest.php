@@ -232,4 +232,66 @@ final class RebootSchedulerCommandTest extends TestCase
         static::assertSame(0, $tester->getStatusCode());
         static::assertStringContainsString('[OK] The desired scheduler "foo" have been rebooted', $tester->getDisplay());
     }
+
+    public function testCommandCannotDryRunTheSchedulerRebootOnEmptyRebootTasks(): void
+    {
+        $taskList = $this->createMock(TaskListInterface::class);
+        $taskList->expects(self::once())->method('count')->willReturn(0);
+        $taskList->expects(self::once())->method('filter')->willReturnSelf();
+
+        $scheduler = $this->createMock(SchedulerInterface::class);
+        $scheduler->expects(self::once())->method('getTasks')->willReturn($taskList);
+
+        $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
+        $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
+
+        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+
+        $command = new RebootSchedulerCommand($schedulerRegistry, $workerRegistry);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:reboot'));
+        $tester->execute([
+            'scheduler' => 'foo',
+            '--dry-run' => true,
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('[WARNING] The scheduler does not contain any tasks planned for the reboot process', $tester->getDisplay());
+    }
+
+    public function testCommandCanDryRunTheSchedulerReboot(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::once())->method('getName')->willReturn('foo');
+
+        $taskList = $this->createMock(TaskListInterface::class);
+        $taskList->expects(self::once())->method('count')->willReturn(1);
+        $taskList->expects(self::once())->method('getIterator')->willReturn(new \ArrayIterator([$task]));
+        $taskList->expects(self::once())->method('filter')->willReturnSelf();
+
+        $scheduler = $this->createMock(SchedulerInterface::class);
+        $scheduler->expects(self::once())->method('getTasks')->willReturn($taskList);
+
+        $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
+        $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
+
+        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+
+        $command = new RebootSchedulerCommand($schedulerRegistry, $workerRegistry);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:reboot'));
+        $tester->execute([
+            'scheduler' => 'foo',
+            '--dry-run' => true,
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('[OK] The following tasks are planned to be executed when the scheduler will reboot:', $tester->getDisplay());
+        static::assertStringContainsString('Name', $tester->getDisplay());
+        static::assertStringContainsString('Type', $tester->getDisplay());
+    }
 }

@@ -45,6 +45,9 @@ final class GenerateCronCommandTest extends TestCase
     public function testCommandCannotGenerateOnEmptySchedulers(): void
     {
         $fs = $this->createMock(Filesystem::class);
+        $fs->expects(self::never())->method('mkdir');
+        $fs->expects(self::never())->method('dumpFile');
+
         $logger = $this->createMock(LoggerInterface::class);
 
         $generator = new CronGenerator($fs, $logger);
@@ -65,6 +68,7 @@ final class GenerateCronCommandTest extends TestCase
     {
         $fs = $this->createMock(Filesystem::class);
         $fs->expects(self::once())->method('mkdir')->will(self::throwException(new IOException('The directory is not valid')));
+        $fs->expects(self::never())->method('dumpFile');
 
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -88,6 +92,9 @@ final class GenerateCronCommandTest extends TestCase
     public function testCommandCanGenerateCronFiles(): void
     {
         $fs = $this->createMock(Filesystem::class);
+        $fs->expects(self::once())->method('mkdir');
+        $fs->expects(self::once())->method('dumpFile');
+
         $logger = $this->createMock(LoggerInterface::class);
 
         $generator = new CronGenerator($fs, $logger);
@@ -110,6 +117,9 @@ final class GenerateCronCommandTest extends TestCase
     public function testCommandCanGenerateCronFilesWithSpecificDirectory(): void
     {
         $fs = $this->createMock(Filesystem::class);
+        $fs->expects(self::once())->method('mkdir');
+        $fs->expects(self::once())->method('dumpFile');
+
         $logger = $this->createMock(LoggerInterface::class);
 
         $generator = new CronGenerator($fs, $logger);
@@ -134,6 +144,9 @@ final class GenerateCronCommandTest extends TestCase
     public function testCommandCanBeGeneratedWithSpecificSchedulers(): void
     {
         $fs = $this->createMock(Filesystem::class);
+        $fs->expects(self::once())->method('mkdir');
+        $fs->expects(self::once())->method('dumpFile');
+
         $logger = $this->createMock(LoggerInterface::class);
 
         $generator = new CronGenerator($fs, $logger);
@@ -153,5 +166,36 @@ final class GenerateCronCommandTest extends TestCase
         static::assertStringContainsString('Cron files have been generated for schedulers', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Directory', $tester->getDisplay());
+    }
+
+    public function testCommandCanDryRunTheFileGeneration(): void
+    {
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects(self::never())->method('mkdir');
+        $fs->expects(self::never())->method('dumpFile');
+
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $generator = new CronGenerator($fs, $logger);
+        $registry = new CronRegistry();
+        $registry->register('foo', new Cron('foo', ['path' => sys_get_temp_dir()]));
+
+        $command = new GenerateCronCommand($generator, $registry);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester->execute([
+            'schedulers' => ['foo'],
+            '--dry-run' => true,
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('Cron files to be generated:', $tester->getDisplay());
+        static::assertStringNotContainsString('Cron files have been generated for schedulers', $tester->getDisplay());
+        static::assertStringContainsString('Name', $tester->getDisplay());
+        static::assertStringContainsString('foo', $tester->getDisplay());
+        static::assertStringContainsString('Directory', $tester->getDisplay());
+        static::assertStringContainsString('/etc/cron.d/foo', $tester->getDisplay());
     }
 }

@@ -127,6 +127,7 @@ use Symfony\Component\Scheduler\Export\FormatterInterface;
 use Symfony\Component\Scheduler\RegistryInterface;
 use Symfony\Component\Scheduler\Runner\RunnerInterface;
 use Symfony\Component\Scheduler\Scheduler;
+use Symfony\Component\Scheduler\SchedulerAwareInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Transport\TransportFactoryInterface as SchedulerTransportFactoryInterface;
@@ -519,6 +520,8 @@ class FrameworkExtension extends Extension
             ->addTag('scheduler.transport');
         $container->registerForAutoconfiguration(RunnerInterface::class)
             ->addTag('scheduler.runner');
+        $container->registerForAutoconfiguration(SchedulerAwareInterface::class)
+            ->addTag('scheduler.entry_point');
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
             $container->getDefinition('config_cache_factory')->setArguments([]);

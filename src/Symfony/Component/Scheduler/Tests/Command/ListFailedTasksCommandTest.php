@@ -81,4 +81,37 @@ final class ListFailedTasksCommandTest extends TestCase
         static::assertStringContainsString('Reason', $tester->getDisplay());
         static::assertStringContainsString('Date', $tester->getDisplay());
     }
+
+    public function testCommandCanListForSpecificWorker(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::exactly(2))->method('getName')->willReturn('foo');
+
+        $failedTask = new FailedTask($task, 'Foo error occurred');
+
+        $failedTasks = $this->createMock(TaskListInterface::class);
+        $failedTasks->expects(self::once())->method('toArray')->willReturn([$failedTask]);
+
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('getFailedTasks')->willReturn($failedTasks);
+
+        $registry = $this->createMock(WorkerRegistryInterface::class);
+        $registry->expects(self::never())->method('toArray')->willReturn(['foo' => $worker]);
+        $registry->expects(self::once())->method('filter')->willReturn([$worker]);
+
+        $command = new ListFailedTasksCommand($registry);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('scheduler:list-failed'));
+        $tester->execute([
+            'worker' => 'foo',
+        ]);
+
+        static::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('Worker', $tester->getDisplay());
+        static::assertStringContainsString('Task', $tester->getDisplay());
+        static::assertStringContainsString('Reason', $tester->getDisplay());
+        static::assertStringContainsString('Date', $tester->getDisplay());
+    }
 }

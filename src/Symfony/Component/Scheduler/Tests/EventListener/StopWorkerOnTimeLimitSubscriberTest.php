@@ -16,6 +16,6 @@ use PHPUnit\Framework\TestCase;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class StopWorkerOnTimeLimitSubscriber extends TestCase
+final class StopWorkerOnTimeLimitSubscriberTest extends TestCase
 {
 }

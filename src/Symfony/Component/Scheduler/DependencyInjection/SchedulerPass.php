@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Scheduler\SchedulerAwareInterface;
 use Symfony\Component\Scheduler\TraceableScheduler;
 use Symfony\Component\Scheduler\Worker\TraceableWorker;
 
@@ -25,11 +26,13 @@ final class SchedulerPass implements CompilerPassInterface
 {
     private $schedulerTag;
     private $workerTag;
+    private $schedulerEntryPointTag;
 
-    public function __construct(string $schedulerTag = 'scheduler.hub', string $workerTag = 'scheduler.worker')
+    public function __construct(string $schedulerTag = 'scheduler.hub', string $workerTag = 'scheduler.worker', string $schedulerEntryPointTag = 'scheduler.entry_point')
     {
         $this->schedulerTag = $schedulerTag;
         $this->workerTag = $workerTag;
+        $this->schedulerEntryPointTag = $schedulerEntryPointTag;
     }
 
     /**
@@ -39,6 +42,8 @@ final class SchedulerPass implements CompilerPassInterface
     {
         $this->registerSchedulerToCollector($container);
         $this->registerWorkerToCollector($container);
+        $this->registerKernelScheduler($container);
+        $this->registerSchedulerEntrypoint($container);
         $this->triggerCronGeneration($container);
     }
 
@@ -61,6 +66,28 @@ final class SchedulerPass implements CompilerPassInterface
                 (new Definition(TraceableWorker::class, [new Reference($tracedId.'.inner')]))->setDecoratedService($workerId)
             );
             $container->getDefinition('scheduler.data_collector')->addMethodCall('registerWorker', [$workerId, new Reference($tracedId)]);
+        }
+    }
+
+    private function registerKernelScheduler(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('kernel')) {
+            return;
+        }
+
+        $kernel = $container->getDefinition('kernel');
+
+        if (!(new \ReflectionClass($kernel->getClass()))->implementsInterface(SchedulerAwareInterface::class)) {
+            return;
+        }
+
+        $kernel->addMethodCall('schedule', [new Reference('scheduler.registry')]);
+    }
+
+    private function registerSchedulerEntryPoint(ContainerBuilder $container): void
+    {
+        foreach ($container->findTaggedServiceIds('scheduler.entry_point') as $entryPointsId => $tags) {
+            $container->getDefinition($entryPointsId)->addMethodCall('schedule', [new Reference('scheduler.registry')]);
         }
     }
 

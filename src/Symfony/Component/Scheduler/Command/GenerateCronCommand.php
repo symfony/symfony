@@ -50,6 +50,7 @@ final class GenerateCronCommand extends Command
             ->setDefinition([
                 new InputArgument('schedulers', InputArgument::IS_ARRAY, 'The name of schedulers to generate files for, if empty, all the schedulers are selected'),
                 new InputOption('directory', 'd', InputOption::VALUE_OPTIONAL, 'The directory where the file will be generated', '/etc/cron.d'),
+                new InputOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Output the files without writing in the directory', false),
             ])
         ;
     }
@@ -73,15 +74,28 @@ final class GenerateCronCommand extends Command
         }
 
         $directory = $input->getOption('directory');
+        $dryRun = $input->getOption('dry-run');
 
         $table = new Table($output);
         $table->setHeaders(['Name', 'Directory']);
+
+        if ($dryRun) {
+            foreach ($crons as $key => $cron) {
+                $table->addRow([$key, sprintf('%s/%s', $directory, $key)]);
+            }
+
+            $io->success('Cron files to be generated:');
+            $table->render();
+
+            return 0;
+        }
 
         try {
             foreach ($crons as $key => $cron) {
                 $this->generator->generate($key, $directory);
                 $this->generator->write($cron->getExpression(), $key, $directory);
-                $table->addRow([$key, $directory]);
+
+                $table->addRow([$key, sprintf('%s/%s', $directory, $key)]);
             }
         } catch (IOException $exception) {
             $io->error(sprintf('An error occurred: %s', $exception->getMessage()));
@@ -90,7 +104,6 @@ final class GenerateCronCommand extends Command
         }
 
         $io->success(sprintf('Cron files have been generated for schedulers at "%s"', $directory));
-
         $table->render();
 
         return 0;

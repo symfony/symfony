@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -41,6 +42,9 @@ final class ListFailedTasksCommand extends Command
     {
         $this
             ->setDescription('List all the failed tasks')
+            ->setDefinition([
+                new InputArgument('worker', InputArgument::OPTIONAL, 'The name of the worker to list the failed tasks')
+            ])
         ;
     }
 
@@ -50,7 +54,11 @@ final class ListFailedTasksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $workers = $this->workerRegistry->toArray();
+        $filterWorker = $input->getArgument('worker');
+
+        $workers = null === $filterWorker ? $this->workerRegistry->toArray() : $this->workerRegistry->filter(function (WorkerInterface $worker, string $name) use ($filterWorker): bool {
+            return $filterWorker === $name;
+        });
 
         if (0 === \count($workers)) {
             $io->warning('No worker found');

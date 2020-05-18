@@ -12,15 +12,19 @@
 namespace Symfony\Component\Scheduler\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Kernel as AbstractKernel;
 use Symfony\Component\Scheduler\Cron\CronFactory;
 use Symfony\Component\Scheduler\Cron\CronRegistry;
 use Symfony\Component\Scheduler\DataCollector\SchedulerDataCollector;
 use Symfony\Component\Scheduler\DependencyInjection\SchedulerPass;
 use Symfony\Component\Scheduler\Scheduler;
+use Symfony\Component\Scheduler\SchedulerAwareInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
+use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
@@ -51,6 +55,58 @@ final class SchedulerPassTest extends TestCase
         (new SchedulerPass())->process($container);
         static::assertTrue($container->hasDefinition('debug.scheduler.worker.foo'));
         static::assertTrue($container->getDefinition('scheduler.data_collector')->hasMethodCall('registerWorker'));
+    }
+
+    public function testPassCannotRegisterKernelSchedulerOnNullKernel(): void
+    {
+        $container = $this->getContainerBuilder();
+
+        (new SchedulerPass())->process($container);
+        static::assertFalse($container->hasDefinition('kernel'));
+    }
+
+    public function testPassCannotRegisterKernelSchedulerOnInvalidKernel(): void
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('kernel', Kernel::class);
+        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
+
+        (new SchedulerPass())->process($container);
+        static::assertTrue($container->hasDefinition('kernel'));
+        static::assertFalse($container->getDefinition('kernel')->hasMethodCall('schedule'));
+    }
+
+    public function testPassCannotRegisterKernelSchedulerOnValidKernel(): void
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('kernel', SchedulerKernel::class);
+        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
+
+        (new SchedulerPass())->process($container);
+        static::assertTrue($container->hasDefinition('kernel'));
+        static::assertTrue($container->getDefinition('kernel')->hasMethodCall('schedule'));
+    }
+
+    public function testEntryPointCannotBeGeneratedWithInvalidEntryPoints(): void
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('scheduler.foo_entry_point', FooEntryPoint::class);
+        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
+
+        (new SchedulerPass())->process($container);
+        static::assertTrue($container->hasDefinition('scheduler.foo_entry_point'));
+        static::assertFalse($container->getDefinition('scheduler.foo_entry_point')->hasMethodCall('schedule'));
+    }
+
+    public function testEntryPointCanBeGeneratedWithValidEntryPoints(): void
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('scheduler.foo_entry_point', FooEntryPoint::class)->addTag('scheduler.entry_point');
+        $container->register('scheduler.registry', SchedulerRegistryInterface::class);
+
+        (new SchedulerPass())->process($container);
+        static::assertTrue($container->hasDefinition('scheduler.foo_entry_point'));
+        static::assertTrue($container->getDefinition('scheduler.foo_entry_point')->hasMethodCall('schedule'));
     }
 
     public function testPassCanTriggerCronGeneration(): void
@@ -154,5 +210,40 @@ final class FooWorker implements WorkerInterface
     public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         return;
+    }
+}
+
+final class Kernel extends AbstractKernel
+{
+    public function registerBundles()
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+}
+
+final class SchedulerKernel extends AbstractKernel implements SchedulerAwareInterface
+{
+    public function registerBundles()
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    public function schedule(SchedulerRegistryInterface $registry): void
+    {
+    }
+}
+
+final class FooEntryPoint implements SchedulerAwareInterface
+{
+    public function schedule(SchedulerRegistryInterface $registry): void
+    {
     }
 }

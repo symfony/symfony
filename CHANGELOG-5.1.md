@@ -7,6 +7,32 @@ in 5.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.1.0...v5.1.1
 
+* 5.1.0-RC1 (2020-05-16)
+
+ * bug #36832 [Security] Improved upgrade path for custom remember me services (wouterj)
+ * bug #36592 [BrowserKit] Allow Referer set by history to be overridden (Slamdunk)
+ * bug #36800 [DI] Renamed some PHP-DSL functions (javiereguiluz)
+ * bug #36806 RememberMeLogoutListener should depend on LogoutHandlerInterface (scheb)
+ * bug #36805 [Security\Core] Fix NoopAuthenticationManager::authenticate() return value (chalasr)
+ * bug #36823 [HttpClient] fix PHP warning + accept status code >= 600 (nicolas-grekas)
+ * bug #36824 [Security/Core] fix compat of `NativePasswordEncoder` with pre-PHP74 values of `PASSWORD_*` consts (nicolas-grekas)
+ * bug #36811 [DependencyInjection] Fix register event listeners compiler pass (X-Coder264)
+ * bug #36789 Change priority of KernelEvents::RESPONSE subscriber (marcw)
+ * bug #36794 [Serializer] fix issue with PHP 8 (nicolas-grekas)
+ * bug #36786 [WebProfiler] Remove 'none' when appending CSP tokens (ndench)
+ * bug #36796 [DI] Use require_once instead of require when appending cache warmer-returned files to preload file (ovrflo)
+ * bug #36743 [Yaml] Fix escaped quotes in quoted multi-line string (ossinkine)
+ * bug #36773 [HttpClient] preserve the identity of responses streamed by TraceableHttpClient (nicolas-grekas)
+ * bug #36777 [TwigBundle] FormExtension does not have a constructor anymore since sf 4.0 (Tobion)
+ * bug #36766 [HttpClient] add TimeoutExceptionInterface (nicolas-grekas)
+ * bug #36716 [Mime] handle passing custom mime types as string (mcneely)
+ * bug #36765 [HttpClient] fix dealing with informational response (nicolas-grekas)
+ * bug #36747 Queue name is a required parameter (theravel)
+ * bug #36751 [Mime] fix bad method call on `EmailAddressContains` (Kocal)
+ * bug #36737 [Cache] fix accepting sub-second max-lifetimes in ArrayAdapter (nicolas-grekas)
+ * bug #36749 [DI] give priority to container.hot_path over container.no_preload (nicolas-grekas)
+ * bug #36721 [FrameworkBundle] remove getProjectDir method from MicroKernelTrait (garak)
+
 * 5.1.0-BETA1 (2020-05-05)
 
  * feature #36711 [Form] deprecate `NumberToLocalizedStringTransformer::ROUND_*` constants (nicolas-grekas)

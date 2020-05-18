@@ -102,7 +102,7 @@ class PhpDocExtractorTest extends TestCase
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
-            ['emptyVar', null, null, null],
+            ['emptyVar', null, 'This should not be removed.', null],
         ];
     }
 
@@ -191,6 +191,14 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }
 
+    public function testReturnNullOnIncompleteDocBlock()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Failed to get the description of the @var tag "foo" for class "Symfony\Component\PropertyInfo\Tests\Extractor\IncompleteDocBlock". Please check that the @var tag is correctly defined.');
+
+        $this->extractor->getShortDescription(IncompleteDocBlock::class, 'foo');
+    }
+
     public function dockBlockFallbackTypesProvider()
     {
         return [
@@ -213,6 +221,16 @@ class PhpDocExtractorTest extends TestCase
     {
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
     }
+}
+
+class IncompleteDocBlock
+{
+    /**
+     * @var
+     * @ORM\Id
+     * @ORM\Column(name="FOO", type="integer")
+     */
+    public $foo;
 }
 
 class EmptyDocBlock

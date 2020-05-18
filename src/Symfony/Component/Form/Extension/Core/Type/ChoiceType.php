@@ -18,6 +18,7 @@ use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceTranslationParameters;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceValue;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\GroupBy;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\PreferredChoice;
@@ -212,6 +213,7 @@ class ChoiceType extends AbstractType
             'separator' => '-------------------',
             'placeholder' => null,
             'choice_translation_domain' => $choiceTranslationDomain,
+            'choice_translation_parameters' => $options['choice_translation_parameters'],
         ]);
 
         // The decision, whether a choice is selected, is potentially done
@@ -326,6 +328,7 @@ class ChoiceType extends AbstractType
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
+            'choice_translation_parameters' => [],
             'preferred_choices' => [],
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -356,6 +359,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceFieldName::class]);
         $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceValue::class]);
         $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', ChoiceAttr::class]);
+        $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('preferred_choices', ['array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', PreferredChoice::class]);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath', GroupBy::class]);
     }
@@ -395,6 +399,7 @@ class ChoiceType extends AbstractType
             'value' => $choiceView->value,
             'label' => $choiceView->label,
             'attr' => $choiceView->attr,
+            'label_translation_parameters' => $choiceView->labelTranslationParameters,
             'translation_domain' => $options['choice_translation_domain'],
             'block_name' => 'entry',
         ];
@@ -439,7 +444,8 @@ class ChoiceType extends AbstractType
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            $options['choice_translation_parameters']
         );
     }
 }

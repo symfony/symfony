@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "ace": "acehnés",
         "ar_001": "árabe estándar moderno",
@@ -32,7 +31,6 @@
         "nr": "ndebele meridional",
         "nso": "sotho septentrional",
         "pa": "punyabí",
-        "pcm": "pcm",
         "shu": "árabe chadiano",
         "ss": "siswati",
         "sw": "suajili",
@@ -41,7 +39,7 @@
         "tet": "tetún",
         "tn": "setswana",
         "tyv": "tuviniano",
-        "wuu": "wuu",
+        "wuu": "chino wu",
         "xal": "kalmyk",
         "zgh": "tamazight marroquí estándar",
         "zh_Hans": "chino simplificado",

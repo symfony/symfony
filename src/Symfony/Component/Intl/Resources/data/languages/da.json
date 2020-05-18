@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -139,6 +138,7 @@
         "eu": "baskisk",
         "ewo": "ewondo",
         "fa": "persisk",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fulah",

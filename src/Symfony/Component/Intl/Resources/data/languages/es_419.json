@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "ace": "achenés",
         "ady": "adigeo",
@@ -18,6 +17,7 @@
         "es_ES": "español de España",
         "es_MX": "español de México",
         "eu": "vasco",
+        "fa_AF": "darí",
         "fr_CA": "francés canadiense",
         "fr_CH": "francés suizo",
         "goh": "alemán de la alta edad antigua",

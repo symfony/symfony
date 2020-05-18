@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "àfar",
         "ab": "abkhaz",
@@ -149,6 +148,7 @@
         "ewo": "ewondo",
         "ext": "extremeny",
         "fa": "persa",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "ful",

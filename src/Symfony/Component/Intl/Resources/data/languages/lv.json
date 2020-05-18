@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afāru",
         "ab": "abhāzu",
@@ -132,6 +131,7 @@
         "eu": "basku",
         "ewo": "evondu",
         "fa": "persiešu",
+        "fa_AF": "darī",
         "fan": "fangu",
         "fat": "fantu",
         "ff": "fulu",
@@ -202,7 +202,7 @@
         "iu": "inuītu",
         "ja": "japāņu",
         "jbo": "ložbans",
-        "jgo": "jgo",
+        "jgo": "ngomba",
         "jmc": "mačamu",
         "jpr": "jūdpersiešu",
         "jrb": "jūdarābu",

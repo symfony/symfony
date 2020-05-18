@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazia",
@@ -121,6 +120,7 @@
         "eu": "Basque",
         "ewo": "Ewondo",
         "fa": "Parsi",
+        "fa_AF": "Dari",
         "ff": "Fulah",
         "fi": "Finland",
         "fil": "Filipina",

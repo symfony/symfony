@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -143,6 +142,7 @@
         "eu": "Basque",
         "ewo": "Ewondo",
         "fa": "Persia",
+        "fa_AF": "Persia Dari",
         "fan": "Fang",
         "fat": "Fanti",
         "ff": "Fula",

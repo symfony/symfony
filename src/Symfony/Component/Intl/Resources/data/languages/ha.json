@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "af": "Afirkanci",
         "agq": "Aghem",
@@ -176,6 +175,7 @@
         "rof": "Rombo",
         "ru": "Rashanci",
         "rw": "Kiniyaruwanda",
+        "rwk": "yaren Rwa",
         "sa": "Sanskrit",
         "sah": "Sakha",
         "saq": "Samburu",
@@ -232,6 +232,7 @@
         "zh": "Harshen Sinanci",
         "zh_Hans": "Sauƙaƙaƙƙen Sinanci",
         "zh_Hant": "Sinanci na gargajiya",
-        "zu": "Harshen Zulu"
+        "zu": "Harshen Zulu",
+        "zxx": "Babu abun-ciki na yare"
     }
 }

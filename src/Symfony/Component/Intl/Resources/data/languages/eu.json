@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarera",
         "ab": "abkhaziera",
@@ -98,6 +97,7 @@
         "eu": "euskara",
         "ewo": "ewondera",
         "fa": "persiera",
+        "fa_AF": "daria",
         "ff": "fula",
         "fi": "finlandiera",
         "fil": "filipinera",

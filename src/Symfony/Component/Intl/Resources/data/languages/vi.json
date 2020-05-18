@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Tiếng Afar",
         "ab": "Tiếng Abkhazia",
@@ -154,6 +153,7 @@
         "ewo": "Tiếng Ewondo",
         "ext": "Tiếng Extremadura",
         "fa": "Tiếng Ba Tư",
+        "fa_AF": "Tiếng Dari",
         "fan": "Tiếng Fang",
         "fat": "Tiếng Fanti",
         "ff": "Tiếng Fulah",

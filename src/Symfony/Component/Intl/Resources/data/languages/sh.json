@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -62,6 +61,7 @@
         "cad": "kado",
         "car": "karipski",
         "cch": "atsam",
+        "ccp": "čakma",
         "ce": "čečenski",
         "ceb": "sebuanski",
         "cgg": "čiga",
@@ -124,6 +124,7 @@
         "eu": "baskijski",
         "ewo": "evondo",
         "fa": "persijski",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fula",

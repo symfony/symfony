@@ -143,7 +143,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
                 }
             }
             $data = [
-                'Version' => $localeBundle['Version'],
                 'Names' => $names,
                 'LocalizedNames' => $localizedNames,
             ];
@@ -167,7 +166,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->languageCodes = array_unique($this->languageCodes);
@@ -175,7 +173,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
         sort($this->languageCodes);
 
         return [
-            'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
             'Alpha3Languages' => $this->generateAlpha3Codes($this->languageCodes, $metadataBundle),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),

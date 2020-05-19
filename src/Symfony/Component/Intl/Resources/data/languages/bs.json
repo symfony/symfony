@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -99,6 +98,7 @@
         "dar": "dargva",
         "dav": "taita",
         "de": "njemački",
+        "de_CH": "visoki njemački (Švicarska)",
         "del": "delaver",
         "den": "slave",
         "dgr": "dogrib",
@@ -128,6 +128,7 @@
         "eu": "baskijski",
         "ewo": "evondo",
         "fa": "perzijski",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fulah",

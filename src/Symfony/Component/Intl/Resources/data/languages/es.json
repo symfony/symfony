@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abjasio",
@@ -129,6 +128,7 @@
         "eu": "euskera",
         "ewo": "ewondo",
         "fa": "persa",
+        "fa_AF": "darí",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fula",

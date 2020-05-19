@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -151,6 +150,7 @@
         "ewo": "ewondo",
         "ext": "estremegno",
         "fa": "persiano",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fulah",

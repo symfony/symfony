@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhazo",
@@ -48,6 +47,7 @@
         "bug": "buginés",
         "byn": "blin",
         "ca": "catalán",
+        "ccp": "chakma",
         "ce": "checheno",
         "ceb": "cebuano",
         "cgg": "kiga",
@@ -90,6 +90,7 @@
         "eu": "éuscaro",
         "ewo": "ewondo",
         "fa": "persa",
+        "fa_AF": "dari",
         "ff": "fula",
         "fi": "finés",
         "fil": "filipino",

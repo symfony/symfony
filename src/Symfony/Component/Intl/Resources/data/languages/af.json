@@ -91,7 +91,6 @@
         "eu": "Baskies",
         "ewo": "Ewondo",
         "fa": "Persies",
-        "fa_AF": "Dari",
         "ff": "Fulah",
         "fi": "Fins",
         "fil": "Filippyns",
@@ -397,6 +396,7 @@
         "ar_001": "Moderne Standaardarabies",
         "en_GB": "Engels (VK)",
         "en_US": "Engels (VSA)",
+        "fa_AF": "Dari",
         "nds_NL": "Nedersaksies",
         "nl_BE": "Vlaams"
     }

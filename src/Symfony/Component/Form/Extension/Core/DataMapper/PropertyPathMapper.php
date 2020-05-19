@@ -52,12 +52,7 @@ class PropertyPathMapper implements DataMapperInterface
                     $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
                 } catch (AccessException $e) {
                     // Skip unitialized properties on $data
-                    if (!$e instanceof UninitializedPropertyException
-                        // For versions without UninitializedPropertyException check the exception message
-                        && (class_exists(UninitializedPropertyException::class) || false === strpos($e->getMessage(), 'You should initialize it'))
-                    ) {
-                        throw $e;
-                    }
+                    $this->catchUninitializedPropertyException($e);
                 }
             } else {
                 $form->setData($config->getData());
@@ -118,7 +113,24 @@ class PropertyPathMapper implements DataMapperInterface
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (AccessException $e) {
+            // The following line might be removed in future versions
+            // See https://github.com/symfony/symfony/issues/36754
+            $this->catchUninitializedPropertyException($e);
+
             return null;
+        }
+    }
+
+    /**
+     * Throw everything but UninitializedPropertyException.
+     */
+    private function catchUninitializedPropertyException(AccessException $e)
+    {
+        if (!$e instanceof UninitializedPropertyException
+            // For versions without UninitializedPropertyException check the exception message
+            && (class_exists(UninitializedPropertyException::class) || false === strpos($e->getMessage(), 'You should initialize it'))
+        ) {
+            throw $e;
         }
     }
 }

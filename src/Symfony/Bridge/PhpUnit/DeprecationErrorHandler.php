@@ -140,7 +140,7 @@ class DeprecationErrorHandler
 
                 $Test = $UtilPrefix.'Test';
 
-                if (0 !== error_reporting()) {
+                if (error_reporting() & $type) {
                     $group = 'unsilenced';
                 } elseif (0 === strpos($method, 'testLegacy')
                     || 0 === strpos($method, 'provideLegacy')
@@ -292,7 +292,7 @@ class DeprecationErrorHandler
 
                 return \call_user_func(DeprecationErrorHandler::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
             }
-            $deprecations[] = array(error_reporting(), $msg, $file);
+            $deprecations[] = array(error_reporting() & $type, $msg, $file);
 
             return null;
         });

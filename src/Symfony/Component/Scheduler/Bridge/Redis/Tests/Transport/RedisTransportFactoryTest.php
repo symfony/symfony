@@ -12,11 +12,8 @@
 namespace Symfony\Component\Scheduler\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransportFactory;
-use Symfony\Component\Scheduler\Transport\Dsn;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -25,21 +22,12 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class RedisTransportFactoryTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testTransportCanSupport(): void
     {
-        $factory = new RedisTransportFactory();
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+        $factory = new RedisTransportFactory($taskFactory);
 
         static::assertFalse($factory->support('test://'));
         static::assertTrue($factory->support('redis://'));
-    }
-
-    public function testFactoryReturnTransport(): void
-    {
-        $serializer = $this->createMock(SerializerInterface::class);
-        $factory = new RedisTransportFactory();
-
-        static::assertInstanceOf(RedisTransport::class, $factory->createTransport(Dsn::fromString('redis://localhost/tasks'), [], $serializer));
     }
 }

@@ -23,7 +23,16 @@ interface TaskInterface
 
     public function getName(): string;
 
+    public function getCommand(): ?string;
+
+    /**
+     * @return \DateTimeInterface|string
+     */
+    public function getExpression();
+
     public function getOptions(): array;
+
+    public function getType(): string;
 
     /**
      * @param null $default

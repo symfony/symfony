@@ -19,10 +19,14 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Exception\TransportException;
+use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
 use Symfony\Component\Scheduler\Task\AbstractTask;
 use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Task\TaskList;
+use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
 
 /**
@@ -40,6 +44,7 @@ final class Connection implements ConnectionInterface
     private $driverConnection;
     private $schemaSynchronizer;
     private $taskFactory;
+    private $orchestrator;
 
     public function __construct(TaskFactoryInterface $taskFactory, array $configuration, DBALConnection $driverConnection)
     {
@@ -48,28 +53,48 @@ final class Connection implements ConnectionInterface
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+        $this->orchestrator = new ExecutionModeOrchestrator($configuration['execution_mode'] ?? ExecutionModeOrchestrator::FIFO);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function list(): array
+    public function list(): TaskListInterface
     {
+        $tasks = [];
+        $data = $this->executeQuery($this->createQueryBuilder()->getSQL())->fetchAll();
+
+        if (0 === \count($data)) {
+            return new TaskList();
+        }
+
+        foreach ($data as $task) {
+            if (\array_key_exists('task_name', $task)) {
+                $task['name'] = $task['task_name'];
+                unset($task['task_name'], $task['id']);
+            }
+
+            $tasks[] = $this->taskFactory->create($task);
+        }
+
+        return new TaskList($this->orchestrator->sort($tasks));
     }
 
-    public function get(string $taskName): ?TaskInterface
+    public function get(string $taskName): TaskInterface
     {
         $queryBuilder = $this->createQueryBuilder()->where('t.task_name = ?');
-        $data = $this->executeQuery($queryBuilder->getSQL(), [
-            $taskName,
-        ])->fetch();
+        $data = $this->executeQuery($queryBuilder->getSQL(), [$taskName], [Types::STRING])->fetch();
+
+        if (null === $data) {
+            throw new LogicException('The desired task cannot be found.');
+        }
 
         if (\array_key_exists('task_name', $data)) {
             $data['name'] = $data['task_name'];
             unset($data['task_name']);
         }
 
-        return !$data ? null : $this->taskFactory->create($data);
+        return $this->taskFactory->create($data);
     }
 
     /**
@@ -77,25 +102,44 @@ final class Connection implements ConnectionInterface
      */
     public function create(TaskInterface $task): void
     {
-        $queryBuilder = $this->driverConnection->createQueryBuilder()
-            ->insert($this->configuration['table_name'])
-            ->values([
-                'task_name' => '?',
-                'expression' => '?',
-                'state' => '?',
-                'options' => '?',
-            ])
-        ;
+        try {
+            $this->driverConnection->beginTransaction();
+            $affectedRows = $this->driverConnection->insert($this->configuration['table_name'], [
+                'task_name' => $task->getName(),
+                'expression' => $task->getExpression(),
+                'state' => $task->get('state'),
+                'options' => $task->getOptions(),
+                'type' => $task->getType(),
+            ], [
+                'task_name' => Types::STRING,
+                'expression' => Types::STRING,
+                'state' => Types::STRING,
+                'options' => Types::ARRAY,
+                'type' => Types::STRING,
+            ]);
 
-        $this->executeQuery($queryBuilder->getSQL(), [
-            $task->getName(),
-            $task->get('expression'),
-            $task->getOptions(),
-        ], [
-            Types::STRING,
-            Types::STRING,
-            Types::STRING,
-            Types::ARRAY,
+            if (1 !== $affectedRows) {
+                throw new DBALException('The given data are invalid.');
+            }
+
+            $this->driverConnection->commit();
+        } catch (\Throwable | \Exception $exception) {
+            $this->driverConnection->rollBack();
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(string $taskName, TaskInterface $updatedTask): void
+    {
+        $this->prepareUpdate($taskName, [
+            'task_name' => $updatedTask->getName(),
+            'expression' => $updatedTask->get('expression'),
+            'options' => $updatedTask->getOptions(),
+            'state' => $updatedTask->get('state'),
+            'type' => $updatedTask->get('type'),
         ]);
     }
 
@@ -104,7 +148,7 @@ final class Connection implements ConnectionInterface
      */
     public function pause(string $taskName): void
     {
-        $this->update(['state' => AbstractTask::PAUSED], ['task_name' => $taskName], ['state' => Types::STRING]);
+        $this->prepareUpdate($taskName, ['state' => AbstractTask::PAUSED], ['state' => Types::STRING]);
     }
 
     /**
@@ -112,22 +156,7 @@ final class Connection implements ConnectionInterface
      */
     public function resume(string $taskName): void
     {
-        $this->update(['state' => AbstractTask::ENABLED], ['task_name' => $taskName], ['state' => Types::STRING]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function empty(): void
-    {
-        try {
-            $this->driverConnection->beginTransaction();
-            $this->driverConnection->exec(sprintf('DELETE * FROM %s', $this->configuration['table_name']));
-            $this->driverConnection->commit();
-        } catch (\Throwable | \Exception $exception) {
-            $this->driverConnection->rollBack();
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $this->prepareUpdate($taskName, ['state' => AbstractTask::ENABLED], ['state' => Types::STRING]);
     }
 
     /**
@@ -147,6 +176,21 @@ final class Connection implements ConnectionInterface
 
             $this->driverConnection->commit();
         } catch (DBALException $exception) {
+            $this->driverConnection->rollBack();
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function empty(): void
+    {
+        try {
+            $this->driverConnection->beginTransaction();
+            $this->driverConnection->exec(sprintf('DELETE * FROM %s', $this->configuration['table_name']));
+            $this->driverConnection->commit();
+        } catch (\Throwable | \Exception $exception) {
             $this->driverConnection->rollBack();
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -176,11 +220,17 @@ final class Connection implements ConnectionInterface
         $this->autoSetup = false;
     }
 
-    private function update(array $data, array $identifiers, array $types): void
+    private function prepareUpdate(string $taskName, array $data, array $identifiers = []): void
     {
         try {
             $this->driverConnection->beginTransaction();
-            $affectedRows = $this->driverConnection->update($this->configuration['table_name'], $data, $identifiers, $types);
+            $affectedRows = $this->driverConnection->update($this->configuration['table_name'], $data, ['task_name' => $taskName], $identifiers ?? [
+                'task_name' => Types::STRING,
+                'expression' => Types::STRING,
+                'options' => Types::ARRAY,
+                'state' => Types::STRING,
+                'type' => Types::STRING,
+            ]);
             if (1 !== $affectedRows) {
                 throw new DBALException('The given identifier is invalid.');
             }
@@ -241,6 +291,7 @@ final class Connection implements ConnectionInterface
         $table->addIndex(['task_name'], 'task_name');
         $table->addIndex(['expression'], 'task_expression');
         $table->addIndex(['state'], 'task_state');
+        $table->addIndex(['type'], 'task_type');
 
         return $schema;
     }

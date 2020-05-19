@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Worker;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 
@@ -39,5 +39,10 @@ interface WorkerInterface
 
     public function getFailedTasks(): TaskListInterface;
 
-    public function addSubscriber(EventSubscriberInterface $subscriber): void;
+    /**
+     * Attach a subscriber to the internal worker EventDispatcher instance.
+     *
+     * The subscriber SHOULD respect the contract of {@see WorkerSubscriberInterface::getSubscribedSchedulers()}
+     */
+    public function addSubscriber(WorkerSubscriberInterface $subscriber): void;
 }

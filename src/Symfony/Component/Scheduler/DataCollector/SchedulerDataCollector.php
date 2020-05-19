@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
@@ -25,7 +26,13 @@ use Symfony\Component\Scheduler\Worker\WorkerInterface;
 final class SchedulerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $schedulers = [];
+    private $transports = [];
     private $workers = [];
+
+    public function registerTransport(string $name, TransportInterface $transport): void
+    {
+        $this->transports[$name] = $transport;
+    }
 
     public function registerScheduler(string $name, SchedulerInterface $scheduler): void
     {
@@ -69,6 +76,12 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
                 'executed_tasks' => $worker->getExecutedTasks(),
             ];
         }
+
+        foreach ($this->transports as $name => $transport) {
+            $this->data['transports'][$name] = [
+                'exceptions' => $transport->getExceptionsCount(),
+            ];
+        }
     }
 
     /**
@@ -85,6 +98,7 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
     public function reset()
     {
         $this->data['schedulers'] = [];
+        $this->data['transports'] = [];
         $this->data['workers'] = [];
     }
 
@@ -118,6 +132,11 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
     public function getSchedulers(): array
     {
         return $this->data['schedulers'];
+    }
+
+    public function getTransports(): array
+    {
+        return $this->data['transports'];
     }
 
     public function getWorkers(): array

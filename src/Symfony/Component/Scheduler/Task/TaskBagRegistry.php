@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Exception;
+namespace Symfony\Component\Scheduler\Task;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class InvalidExpressionException extends \InvalidArgumentException implements ExceptionInterface
+final class TaskBagRegistry
 {
 }

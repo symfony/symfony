@@ -25,7 +25,7 @@ final class NullFactory implements FactoryInterface
 
         unset($options['name']);
 
-        return new NullTask($name);
+        return new NullTask($name, $options['options']);
     }
 
     /**

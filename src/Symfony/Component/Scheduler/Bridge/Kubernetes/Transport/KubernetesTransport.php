@@ -58,7 +58,7 @@ final class KubernetesTransport implements TransportInterface
             throw new InvalidArgumentException('');
         }
 
-        $this->connection->create($task->toArray());
+        $this->connection->create($task);
     }
 
     /**

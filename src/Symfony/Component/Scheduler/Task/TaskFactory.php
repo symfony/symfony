@@ -28,6 +28,9 @@ final class TaskFactory implements TaskFactoryInterface
         $this->factories = $factories;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function create(array $data): TaskInterface
     {
         foreach ($this->factories as $factory) {
@@ -36,6 +39,6 @@ final class TaskFactory implements TaskFactoryInterface
             }
         }
 
-        throw new InvalidArgumentException(sprintf('No factory found for task of type %s', $options['type']));
+        throw new InvalidArgumentException(sprintf('No factory found for task of type %s', $data['type']));
     }
 }

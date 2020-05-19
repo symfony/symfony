@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 
@@ -82,4 +83,11 @@ interface SchedulerInterface
      * The "reboot" tasks are re-scheduled and MUST be executed as soon as possible.
      */
     public function reboot(): void;
+
+    /**
+     * Attach a subscriber to the internal scheduler EventDispatcher instance.
+     *
+     * The subscriber SHOULD respect the contract of {@see SchedulerSubscriberInterface::getSubscribedSchedulers()}
+     */
+    public function addSubscriber(SchedulerSubscriberInterface $subscriber): void;
 }

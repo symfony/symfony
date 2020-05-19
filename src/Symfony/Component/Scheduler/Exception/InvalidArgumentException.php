@@ -14,6 +14,6 @@ namespace Symfony\Component\Scheduler\Exception;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class InvalidArgumentException extends \InvalidArgumentException
+final class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

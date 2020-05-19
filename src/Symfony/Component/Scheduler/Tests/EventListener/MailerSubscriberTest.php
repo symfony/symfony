@@ -9,16 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Tests\Transport;
+namespace Symfony\Component\Scheduler\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class FileTransportTest extends TestCase
+final class MailerSubscriberTest extends TestCase
 {
-    public function testTransportCanGetTask(): void
-    {
-    }
 }

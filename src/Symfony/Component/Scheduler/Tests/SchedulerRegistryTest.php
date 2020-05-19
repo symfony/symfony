@@ -23,7 +23,7 @@ final class SchedulerRegistryTest extends TestCase
 {
     public function testSchedulerCannotBeFoundWithoutBeingRegistered(): void
     {
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->get('foo');
@@ -32,7 +32,7 @@ final class SchedulerRegistryTest extends TestCase
     public function testSchedulerCannotBeReturned(): void
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         $registry->register('foo', $scheduler);
 
@@ -43,7 +43,7 @@ final class SchedulerRegistryTest extends TestCase
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
 
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
         static::assertFalse($registry->has('foo'));
 
         $registry->register('foo', $scheduler);
@@ -54,7 +54,7 @@ final class SchedulerRegistryTest extends TestCase
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
 
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
         $registry->register('foo', $scheduler);
 
         static::expectException(InvalidArgumentException::class);
@@ -65,7 +65,7 @@ final class SchedulerRegistryTest extends TestCase
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
 
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
         $registry->register('foo', $scheduler);
 
         static::assertSame(1, $registry->count());
@@ -73,7 +73,7 @@ final class SchedulerRegistryTest extends TestCase
 
     public function testSchedulerCannotBeRemovedWhenItDoesNotExist(): void
     {
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->remove('foo');
@@ -82,7 +82,7 @@ final class SchedulerRegistryTest extends TestCase
     public function testSchedulerCanBeRemoved(): void
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         $registry->register('foo', $scheduler);
         static::assertSame(1, $registry->count());
@@ -94,7 +94,7 @@ final class SchedulerRegistryTest extends TestCase
     public function testSchedulerCannotBeOverrideWhenItDoesNotExist(): void
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->override('foo', $scheduler);
@@ -103,7 +103,7 @@ final class SchedulerRegistryTest extends TestCase
     public function testSchedulerCanBeOverride(): void
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         $registry->register('foo', $scheduler);
         static::assertSame(1, $registry->count());
@@ -115,7 +115,7 @@ final class SchedulerRegistryTest extends TestCase
     public function testSchedulersCanBeRetrievedAsArray(): void
     {
         $scheduler = $this->createMock(SchedulerInterface::class);
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
 
         $registry->register('foo', $scheduler);
 
@@ -128,7 +128,7 @@ final class SchedulerRegistryTest extends TestCase
         $scheduler = $this->createMock(SchedulerInterface::class);
         $scheduler->expects(self::once())->method('getTimezone')->willReturn(new \DateTimeZone('Europe/Paris'));
 
-        $registry = new SchedulerRegistry();
+        $registry = new SchedulerRegistry([]);
         $registry->register('foo', $scheduler);
 
         static::assertNotEmpty($registry->filter(function (SchedulerInterface $scheduler): bool {

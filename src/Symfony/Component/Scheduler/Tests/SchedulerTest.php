@@ -14,7 +14,6 @@ namespace Symfony\Component\Scheduler\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Scheduler\Event\TaskScheduledEvent;
 use Symfony\Component\Scheduler\Exception\AlreadyScheduledTaskException;
 use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Component\Scheduler\Task\ShellTask;
@@ -23,7 +22,6 @@ use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\LocalTransport;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -48,9 +46,8 @@ final class SchedulerTest extends TestCase
      */
     public function testSchedulerCanBeCreatedWithEventDispatcher(): void
     {
-        $eventDispatcher = new SchedulerEventDispatcherMock();
         $transport = $this->createMock(TransportInterface::class);
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport);
 
         static::assertNotNull($scheduler->getTimezone());
         static::assertInstanceOf(\DateTimeZone::class, $scheduler->getTimezone());
@@ -79,17 +76,13 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeScheduledWithEventDispatcher(TaskInterface $tasks): void
     {
-        $eventDispatcher = new SchedulerEventDispatcherMock();
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport);
 
         $scheduler->schedule($tasks);
 
         static::assertNotEmpty($scheduler->getTasks());
         static::assertInstanceOf(TaskListInterface::class, $scheduler->getTasks());
-
-        $event = $eventDispatcher->getDispatchedEvents()[TaskScheduledEvent::class];
-        static::assertInstanceOf(TaskInterface::class, $event->getTask());
     }
 
     /**
@@ -100,19 +93,14 @@ final class SchedulerTest extends TestCase
     public function testTaskCanBeScheduledWithEventDispatcherAndMessageBus(TaskInterface $task): void
     {
         $messageBus = new SchedulerMessageBus();
-        $eventDispatcher = new SchedulerEventDispatcherMock();
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher, $messageBus);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $messageBus);
 
         $task->set('queued', true);
         $scheduler->schedule($task);
 
         static::assertEmpty($scheduler->getTasks());
         static::assertInstanceOf(TaskListInterface::class, $scheduler->getTasks());
-
-        $event = $eventDispatcher->getDispatchedEvents()[TaskScheduledEvent::class];
-        static::assertInstanceOf(TaskInterface::class, $event->getTask());
-        static::assertCount(1, $eventDispatcher->getDispatchedEvents());
     }
 
     /**
@@ -122,9 +110,8 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCannotBeScheduledTwice(TaskInterface $task): void
     {
-        $eventDispatcher = new SchedulerEventDispatcherMock();
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
 
         $scheduler->schedule($task);
 
@@ -140,11 +127,8 @@ final class SchedulerTest extends TestCase
      */
     public function testDueTasksCanBeReturnedWithoutEventDispatcher(TaskInterface $tasks): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
-
-        $eventDispatcher->expects(self::any())->method('dispatch');
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
 
         $scheduler->schedule($tasks);
         $dueTasks = $scheduler->getDueTasks();
@@ -160,11 +144,8 @@ final class SchedulerTest extends TestCase
      */
     public function testDueTasksCanBeReturnedWithSpecificFilter(TaskInterface $tasks): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects(self::any())->method('dispatch');
-
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
         $scheduler->schedule($tasks);
 
         $dueTasks = $scheduler->getTasks()->filter(function (TaskInterface $task): bool {
@@ -181,11 +162,8 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeUnScheduled(TaskInterface $task): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects(self::any())->method('dispatch');
-
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks());
@@ -202,11 +180,8 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeUpdated(TaskInterface $task): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects(self::any())->method('dispatch');
-
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks()->toArray());
@@ -228,11 +203,8 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBePausedAndResumed(TaskInterface $task): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects(self::any())->method('dispatch');
-
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $eventDispatcher);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks());
@@ -258,23 +230,6 @@ final class SchedulerTest extends TestCase
             new ShellTask('Http AbstractTask - Hello', 'echo Symfony', ['expression' => '* * * * *']),
             new ShellTask('Http AbstractTask - Test', 'echo Symfony', ['expression' => '* * * * *']),
         ];
-    }
-}
-
-final class SchedulerEventDispatcherMock implements EventDispatcherInterface
-{
-    public $dispatchedEvents = [];
-
-    public function dispatch($event, string $eventName = null): object
-    {
-        $this->dispatchedEvents[\get_class($event)] = $event;
-
-        return $event;
-    }
-
-    public function getDispatchedEvents(): array
-    {
-        return $this->dispatchedEvents;
     }
 }
 

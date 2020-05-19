@@ -12,18 +12,21 @@
 namespace Symfony\Component\Scheduler\Tests\Task;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Scheduler\Task\NullTask;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Scheduler\Task\NotificationTask;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class NullTaskTest extends TestCase
+final class NotificationTaskTest extends TestCase
 {
     public function testTaskCanBeCreatedWithValidInformations(): void
     {
-        $task = new NullTask('foo');
+        $notification = $this->createMock(Notification::class);
+
+        $task = new NotificationTask('foo', $notification);
 
         static::assertSame('foo', $task->getName());
-        static::assertSame('null', $task->getType());
+        static::assertSame($notification, $task->get('notification'));
     }
 }

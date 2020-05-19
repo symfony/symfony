@@ -24,6 +24,13 @@ final class CronJob extends AbstractTask
     private $spec;
     private $status;
 
+    public function __construct(string $name, array $options = [], array $additionalOptions = [])
+    {
+        parent::__construct($name, array_merge($options, [
+            'type' => 'cron_job',
+        ]), $additionalOptions);
+    }
+
     public function toArray(): array
     {
         return [

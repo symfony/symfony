@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Redis\Transport;
 
-use Symfony\Component\Scheduler\Exception\LogicException;
-use Symfony\Component\Scheduler\Task\FactoryInterface;
+use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
-use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -27,29 +24,11 @@ final class RedisTransport implements TransportInterface
 {
     private $connection;
     private $options;
-    private $serializer;
-    private $taskFactory;
 
-    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer, FactoryInterface $taskFactory)
+    public function __construct(Dsn $dsn, array $options, TaskFactoryInterface $taskFactory)
     {
-        $this->connection = Connection::createFromDsn($dsn);
+        $this->connection = Connection::createFromDsn($dsn, $taskFactory);
         $this->options = $options;
-        $this->serializer = $serializer;
-        $this->taskFactory = $taskFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get(string $taskName): TaskInterface
-    {
-        $task = $this->connection->get($taskName);
-
-        if (!$this->taskFactory->support($task['type'])) {
-            throw new LogicException('');
-        }
-
-        return $this->taskFactory->create($task);
     }
 
     /**
@@ -57,7 +36,15 @@ final class RedisTransport implements TransportInterface
      */
     public function list(): TaskListInterface
     {
-        return new TaskList($this->connection->list());
+        return $this->connection->list();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $taskName): TaskInterface
+    {
+        return $this->connection->get($taskName);
     }
 
     /**
@@ -65,9 +52,7 @@ final class RedisTransport implements TransportInterface
      */
     public function create(TaskInterface $task): void
     {
-        $body = $this->serializer->serialize($task->getFormattedInformations(), 'json');
-
-        $this->connection->add($task->getName(), $body);
+        $this->connection->create($task);
     }
 
     /**
@@ -75,15 +60,7 @@ final class RedisTransport implements TransportInterface
      */
     public function update(string $taskName, TaskInterface $updatedTask): void
     {
-        $this->connection->update($taskName, $updatedTask->getFormattedInformations());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(string $taskName): void
-    {
-        $this->connection->delete($taskName);
+        $this->connection->update($taskName, $updatedTask);
     }
 
     /**
@@ -100,6 +77,14 @@ final class RedisTransport implements TransportInterface
     public function resume(string $taskName): void
     {
         $this->connection->resume($taskName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $taskName): void
+    {
+        $this->connection->delete($taskName);
     }
 
     /**

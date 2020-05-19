@@ -123,11 +123,7 @@ final class TaskList implements TaskListInterface
             throw new \InvalidArgumentException('A task must be given, received %s', \gettype($value));
         }
 
-        if (null === $offset) {
-            $this->add($value);
-        } else {
-            $this->tasks[$offset] = $value;
-        }
+        null === $offset ? $this->add($value) : $this->tasks[$offset] = $value;
     }
 
     /**
@@ -157,8 +153,8 @@ final class TaskList implements TaskListInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray(): array
+    public function toArray(bool $keepKeys = true): array
     {
-        return $this->tasks;
+        return $keepKeys ? $this->tasks : array_values($this->tasks);
     }
 }

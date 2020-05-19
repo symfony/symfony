@@ -5,14 +5,21 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="scheduler.transport_factory.doctrine" class="Symfony\Component\Scheduler\Bridge\Doctrine\Transport\DoctrineTransportFactory">
-            <argument type="service" id="scheduler.task_factory" />
+        <!-- task factories -->
+        <service id="scheduler.job_task.factory" class="Symfony\Component\Scheduler\Bridge\Google\Task\JobFactory">
+            <tag name="scheduler.task_factory" />
         </service>
 
-        <service id="scheduler.transport_tool.google.job_factory" class="Symfony\Component\Scheduler\Bridge\Google\Task\JobFactory" />
+        <!-- transports factories -->
+        <service id="scheduler.transport_factory.doctrine" class="Symfony\Component\Scheduler\Bridge\Doctrine\Transport\DoctrineTransportFactory">
+            <argument type="service" id="doctrine" on-invalid="exception" />
+            <argument type="service" id="scheduler.task_factory" />
+            <tag name="scheduler.transport_factory" />
+        </service>
 
         <service id="scheduler.transport_factory.google" class="Symfony\Component\Scheduler\Bridge\Google\Transport\GoogleTransportFactory">
-            <argument type="service" id="scheduler.transport_tool.google.job_factory" />
+            <argument type="service" id="scheduler.job_task.factory" />
+            <tag name="scheduler.transport_factory" />
         </service>
 
         <service id="scheduler.transport_factory.redis" class="Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransportFactory" />

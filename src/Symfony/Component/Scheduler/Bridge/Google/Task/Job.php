@@ -29,6 +29,7 @@ final class Job extends AbstractTask
             'user_update_time' => null,
             'schedule_time' => null,
             'last_attempt_time' => null,
+            'type' => 'job',
         ], $defaultOptions), [
             'retry_config' => ['array'],
             'attempt_deadline' => ['string'],

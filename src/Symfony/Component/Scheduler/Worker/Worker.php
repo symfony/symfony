@@ -13,11 +13,11 @@ namespace Symfony\Component\Scheduler\Worker;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Scheduler\Event\TaskExecutedEvent;
 use Symfony\Component\Scheduler\Event\TaskToExecuteEvent;
 use Symfony\Component\Scheduler\Event\WorkerStartedEvent;
 use Symfony\Component\Scheduler\Event\WorkerStoppedEvent;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Exception\UndefinedRunnerException;
 use Symfony\Component\Scheduler\Runner\RunnerInterface;
 use Symfony\Component\Scheduler\Task\ChainedTask;
@@ -26,7 +26,6 @@ use Symfony\Component\Scheduler\Task\TaskExecutionWatcherInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -60,7 +59,7 @@ final class Worker implements WorkerInterface
      */
     public function execute(TaskInterface $task): void
     {
-        $this->dispatchEvent(new WorkerStartedEvent($this));
+        $this->eventDispatcher->dispatch(new WorkerStartedEvent($this));
 
         while (!$this->shouldStop) {
             $this->checkTaskState($task);
@@ -82,7 +81,7 @@ final class Worker implements WorkerInterface
                         $this->tracker->endWatch($task);
                         $lockedTask->release();
                         $this->running = false;
-                        $this->dispatchEvent(new WorkerStoppedEvent($this));
+                        $this->eventDispatcher->dispatch(new WorkerStoppedEvent($this));
 
                         return;
                     }
@@ -122,7 +121,7 @@ final class Worker implements WorkerInterface
     /**
      * {@inheritdoc}
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): void
+    public function addSubscriber(WorkerSubscriberInterface $subscriber): void
     {
         $this->eventDispatcher->addSubscriber($subscriber);
     }
@@ -142,10 +141,10 @@ final class Worker implements WorkerInterface
 
     private function handleTask(RunnerInterface $runner, TaskInterface $task): void
     {
-        $this->dispatchEvent(new TaskToExecuteEvent($task));
+        $this->eventDispatcher->dispatch(new TaskToExecuteEvent($task));
         $output = $runner->run($task);
         $task->set('last_execution', new \DateTimeImmutable());
-        $this->dispatchEvent(new TaskExecutedEvent($task, $output));
+        $this->eventDispatcher->dispatch(new TaskExecutedEvent($task, $output));
     }
 
     private function handleChainedTask(TaskInterface $task): void
@@ -157,15 +156,6 @@ final class Worker implements WorkerInterface
         foreach ($task->getTasks() as $chainedTask) {
             $this->execute($chainedTask);
         }
-    }
-
-    private function dispatchEvent(Event $event): void
-    {
-        if (null === $this->eventDispatcher) {
-            return;
-        }
-
-        $this->eventDispatcher->dispatch($event);
     }
 
     private function log(string $message): void

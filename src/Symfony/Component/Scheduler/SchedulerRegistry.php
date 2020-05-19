@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
 /**
@@ -22,6 +23,15 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
      * @var SchedulerInterface[]
      */
     private $schedulers = [];
+    private $subscribers;
+
+    /**
+     * @param iterable|SchedulerSubscriberInterface[] $subscribers
+     */
+    public function __construct(iterable $subscribers)
+    {
+        $this->subscribers = $subscribers;
+    }
 
     /**
      * {@inheritdoc}
@@ -50,6 +60,12 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
     {
         if ($this->has($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" scheduler is already registered, consider using %s::override() if it need to be override', $name, self::class));
+        }
+
+        foreach ($this->subscribers as $subscriber) {
+            if (\in_array($name, $subscriber::getSubscribedWorkers()) || \in_array('*', $subscriber::getSubscribedWorkers())) {
+                $scheduler->addSubscriber($subscriber);
+            }
         }
 
         $this->schedulers[$name] = $scheduler;

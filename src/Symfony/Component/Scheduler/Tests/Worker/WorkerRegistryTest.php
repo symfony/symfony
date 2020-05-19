@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler\Tests\Worker;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use Symfony\Component\Scheduler\Worker\WorkerRegistry;
@@ -23,17 +24,39 @@ final class WorkerRegistryTest extends TestCase
 {
     public function testWorkerCannotBeFoundWithoutBeingRegistered(): void
     {
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->get('foo');
+    }
+
+    public function testWorkerCannotBeRegisteredWithWildCardSubscribers(): void
+    {
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('addSubscriber');
+
+        $registry = new WorkerRegistry([new FooWorkerSubscriber()]);
+        $registry->register('foo', $worker);
+
+        static::assertInstanceOf(WorkerInterface::class, $registry->get('foo'));
+    }
+
+    public function testWorkerCannotBeRegisteredWithSpecificSubscribers(): void
+    {
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('addSubscriber');
+
+        $registry = new WorkerRegistry([new BarWorkerSubscriber()]);
+        $registry->register('foo', $worker);
+
+        static::assertInstanceOf(WorkerInterface::class, $registry->get('foo'));
     }
 
     public function testWorkerCannotBeReturned(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         $registry->register('foo', $worker);
 
         static::assertInstanceOf(WorkerInterface::class, $registry->get('foo'));
@@ -43,7 +66,7 @@ final class WorkerRegistryTest extends TestCase
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         static::assertFalse($registry->has('foo'));
 
         $registry->register('foo', $worker);
@@ -54,7 +77,7 @@ final class WorkerRegistryTest extends TestCase
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         $registry->register('foo', $worker);
 
         static::expectException(InvalidArgumentException::class);
@@ -65,7 +88,7 @@ final class WorkerRegistryTest extends TestCase
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         $registry->register('foo', $worker);
 
         static::assertSame(1, $registry->count());
@@ -73,7 +96,7 @@ final class WorkerRegistryTest extends TestCase
 
     public function testWorkerCannotBeRemovedWhenItDoesNotExist(): void
     {
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->remove('foo');
@@ -82,7 +105,7 @@ final class WorkerRegistryTest extends TestCase
     public function testWorkerCanBeRemoved(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
 
         $registry->register('foo', $worker);
         static::assertSame(1, $registry->count());
@@ -94,7 +117,7 @@ final class WorkerRegistryTest extends TestCase
     public function testWorkerCannotBeOverrideWhenItDoesNotExist(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
 
         static::expectException(InvalidArgumentException::class);
         $registry->override('foo', $worker);
@@ -103,7 +126,7 @@ final class WorkerRegistryTest extends TestCase
     public function testWorkerCanBeOverride(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
 
         $registry->register('foo', $worker);
         static::assertSame(1, $registry->count());
@@ -116,7 +139,7 @@ final class WorkerRegistryTest extends TestCase
     {
         $worker = $this->createMock(WorkerInterface::class);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         $registry->register('foo', $worker);
 
         static::assertNotEmpty($registry->toArray());
@@ -128,7 +151,7 @@ final class WorkerRegistryTest extends TestCase
         $worker = $this->createMock(WorkerInterface::class);
         $worker->expects(self::once())->method('isRunning')->willReturn(true);
 
-        $registry = new WorkerRegistry();
+        $registry = new WorkerRegistry([]);
         $registry->register('foo', $worker);
 
         static::assertNotEmpty($registry->filter(function (WorkerInterface $worker): bool {
@@ -138,3 +161,43 @@ final class WorkerRegistryTest extends TestCase
         static::assertArrayHasKey('foo', $registry->toArray());
     }
 }
+
+final class FooWorkerSubscriber implements WorkerSubscriberInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedWorkers(): array
+    {
+        return ['*'];
+    }
+}
+
+
+final class BarWorkerSubscriber implements WorkerSubscriberInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedWorkers(): array
+    {
+        return ['foo'];
+    }
+}
+

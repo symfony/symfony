@@ -14,6 +14,8 @@ namespace Symfony\Component\Scheduler\Bridge\Kubernetes\Transport;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Scheduler\Bridge\Kubernetes\Exception\InvalidOperationException;
+use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -71,14 +73,17 @@ final class Connection implements ConnectionInterface
         $this->httpClient = $this->warmClient($httpClient);
     }
 
-    public function create(array $body): void
+    /**
+     * {@inheritdoc}
+     */
+    public function create(TaskInterface $task): void
     {
         try {
             $this->httpClient->request('POST', sprintf(self::CREATE_URL, $this->namespace), [
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                'json' => $body,
+                'json' => $task->toArray(),
             ]);
         } catch (ClientException $exception) {
             $response = $exception->getResponse();
@@ -88,7 +93,18 @@ final class Connection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function list(): array
+    public function list(): TaskListInterface
+    {
+    }
+
+    public function get(string $taskName): TaskInterface
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(string $taskName, TaskInterface $updatedTask): void
     {
     }
 

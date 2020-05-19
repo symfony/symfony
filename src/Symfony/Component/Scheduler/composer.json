@@ -31,11 +31,15 @@
   "require-dev": {
     "symfony/event-dispatcher": "^4.4|^5.0",
     "symfony/http-kernel": "^4.4|^5.0",
-    "symfony/messenger": "^4.4|^5.0"
+    "symfony/mailer": "^4.4|^5.0",
+    "symfony/messenger": "^4.4|^5.0",
+    "symfony/notifier": "^4.4|^5.0"
   },
   "suggest": {
     "symfony/event-dispatcher": "For dispatching and listening to tasks & worker lifecycle events",
+    "symfony/mailer": "For sending emails according to task execution",
     "symfony/messenger": "For dispatching tasks to queue",
+    "symfony/notifier": "For dispatching notification tasks and respond to task execution",
     "symfony/stopwatch": "For tracking and sorting the tasks depending on their execution duration"
   },
   "autoload": {

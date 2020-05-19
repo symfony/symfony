@@ -11,12 +11,21 @@
 
 namespace Symfony\Component\Scheduler\Transport;
 
+use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Task\TaskListInterface;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 interface ConnectionInterface
 {
-    public function list(): array;
+    public function create(TaskInterface $task): void;
+
+    public function list(): TaskListInterface;
+
+    public function get(string $taskName): TaskInterface;
+
+    public function update(string $taskName, TaskInterface $updatedTask): void;
 
     public function pause(string $taskName): void;
 

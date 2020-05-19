@@ -58,7 +58,7 @@ interface TaskListInterface extends \Countable, \ArrayAccess, \IteratorAggregate
     public function findByName(array $names): self;
 
     /**
-     * Allow to filter the list using a custom filter.
+     * Allow to filter the list using a custom filter, the $filter receive the task name and the TaskInterface object (in this order).
      *
      * @param \Closure $filter
      *
@@ -74,9 +74,11 @@ interface TaskListInterface extends \Countable, \ArrayAccess, \IteratorAggregate
     public function remove(string $taskName): void;
 
     /**
-     * Return the list as an array (using tasks name's as keys).
+     * Return the list as an array (using tasks name's as keys), if $keepKeys is false, the array is returned with indexed keys.
+     *
+     * @param bool $keepKeys
      *
      * @return array
      */
-    public function toArray(): array;
+    public function toArray(bool $keepKeys = true): array;
 }

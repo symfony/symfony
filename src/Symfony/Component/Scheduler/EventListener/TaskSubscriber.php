@@ -93,8 +93,10 @@ final class TaskSubscriber implements EventSubscriberInterface
             return !$worker->isRunning();
         });
 
+        $availableWorker = reset($availableWorkers);
+
         foreach ($tasks as $task) {
-            reset($availableWorkers)->execute($task);
+            $availableWorker->execute($task);
         }
     }
 }

@@ -65,6 +65,14 @@ final class ExecutionModeOrchestrator implements ExecutionModeOrchestratorInterf
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getMode(): string
+    {
+        return $this->mode;
+    }
+
     private function sortByPriority(array $tasks): array
     {
         uasort($tasks, function (TaskInterface $task, TaskInterface $nextTask): bool {
@@ -139,10 +147,5 @@ final class ExecutionModeOrchestrator implements ExecutionModeOrchestratorInterf
         });
 
         return $tasks;
-    }
-
-    public function getMode(): string
-    {
-        return $this->mode;
     }
 }

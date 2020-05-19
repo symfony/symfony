@@ -65,13 +65,6 @@ final class DoctrineTransport implements TransportInterface
         $this->connection->update($taskName, $updatedTask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(string $taskName): void
-    {
-        $this->connection->delete($taskName);
-    }
 
     /**
      * {@inheritdoc}
@@ -87,6 +80,14 @@ final class DoctrineTransport implements TransportInterface
     public function resume(string $taskName): void
     {
         $this->connection->resume($taskName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $taskName): void
+    {
+        $this->connection->delete($taskName);
     }
 
     /**

@@ -16,24 +16,15 @@ namespace Symfony\Component\Scheduler\Task;
  */
 final class ShellTask extends AbstractTask
 {
-    /**
-     * @var string
-     */
-    private $command;
-
     public function __construct(string $name, string $command, array $options = [], array $additionalOptions = [])
     {
-        $this->command = $command;
-
-        parent::__construct($name, $options, array_merge([
+        parent::__construct($name, array_merge($options, [
+            'command' => $command,
+            'type' => 'shell',
+        ]), array_merge([
             'cwd' => ['string', 'null'],
             'env' => ['array', 'null'],
             'timeout' => ['int', 'float', 'null'],
         ], $additionalOptions));
-    }
-
-    public function getCommand(): string
-    {
-        return $this->command;
     }
 }

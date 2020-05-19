@@ -204,9 +204,9 @@ final class Connection
         }
     }
 
-    public function pause(string $jobName): TaskInterface
+    public function pause(string $taskName): TaskInterface
     {
-        $url = $this->validateUrl(sprintf('%s/jobs/%s', $this->projectConfiguration, $jobName), self::PAUSE_URL, '#^projects\/[^\/]+\/locations\/[^\/]+\/jobs\/[^\/]+$#');
+        $url = $this->validateUrl(sprintf('%s/jobs/%s', $this->projectConfiguration, $taskName), self::PAUSE_URL, '#^projects\/[^\/]+\/locations\/[^\/]+\/jobs\/[^\/]+$#');
 
         try {
             $response = $this->httpClient->request('POST', $url);

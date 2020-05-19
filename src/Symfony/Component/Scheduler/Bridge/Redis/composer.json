@@ -16,6 +16,7 @@
     }
   ],
   "require": {
+    "ext-redis": "*",
     "php": "^7.2.5",
     "symfony/scheduler": "^4.4|^5.0"
   },

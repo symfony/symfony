@@ -40,6 +40,7 @@ abstract class AbstractTask implements TaskInterface
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'arguments' => [],
+            'command' => null,
             'description' => null,
             'expression' => '* * * * *',
             'execution_mode' => null,
@@ -62,10 +63,12 @@ abstract class AbstractTask implements TaskInterface
             'timezone' => null,
             'tracked' => false,
             'tags' => [],
+            'type' => null,
         ]);
 
         $resolver->setAllowedTypes('arguments', ['string[]', 'int[]']);
         $resolver->setAllowedTypes('arrival_time', [\DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('command', ['string', 'null']);
         $resolver->setAllowedTypes('description', ['string', 'null']);
         $resolver->setAllowedTypes('expression', ['string', \DateTimeInterface::class]);
         $resolver->setAllowedTypes('execution_mode', ['string', 'null']);
@@ -86,6 +89,7 @@ abstract class AbstractTask implements TaskInterface
         $resolver->setAllowedTypes('timezone', [\DateTimeZone::class, 'null']);
         $resolver->setAllowedTypes('tracked', ['bool']);
         $resolver->setAllowedTypes('tags', ['array', 'null']);
+        $resolver->setAllowedTypes('type', ['string', 'null']);
         $resolver->setAllowedValues('expression', function ($expression): bool {
             return $this->handleTimeRelativeTasks($expression);
         });
@@ -121,7 +125,15 @@ abstract class AbstractTask implements TaskInterface
     }
 
     /**
-     * @return \DateTimeInterface|string
+     * {@inheritdoc}
+     */
+    public function getCommand(): ?string
+    {
+        return $this->options['command'];
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getExpression()
     {
@@ -136,6 +148,14 @@ abstract class AbstractTask implements TaskInterface
         }
 
         return $expression;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): string
+    {
+        return $this->options['type'];
     }
 
     /**
@@ -184,6 +204,9 @@ abstract class AbstractTask implements TaskInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFormattedInformations(): array
     {
         return [
@@ -200,6 +223,7 @@ abstract class AbstractTask implements TaskInterface
             'state' => $this->get('state'),
             'scheduled_at' => $this->get('scheduled_at'),
             'tags' => $this->get('tags'),
+            'type' => $this->get('type'),
         ];
     }
 

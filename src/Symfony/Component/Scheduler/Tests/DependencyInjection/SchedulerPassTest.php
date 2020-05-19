@@ -15,21 +15,24 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Kernel as AbstractKernel;
 use Symfony\Component\Scheduler\Cron\CronFactory;
 use Symfony\Component\Scheduler\Cron\CronRegistry;
 use Symfony\Component\Scheduler\DataCollector\SchedulerDataCollector;
 use Symfony\Component\Scheduler\DependencyInjection\SchedulerPass;
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Component\Scheduler\SchedulerAwareInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
+use Symfony\Component\Scheduler\Task\NullTask;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\LocalTransport;
+use Symfony\Component\Scheduler\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
@@ -55,6 +58,15 @@ final class SchedulerPassTest extends TestCase
         (new SchedulerPass())->process($container);
         static::assertTrue($container->hasDefinition('debug.scheduler.worker.foo'));
         static::assertTrue($container->getDefinition('scheduler.data_collector')->hasMethodCall('registerWorker'));
+    }
+
+    public function testPassCanRegisterTraceableTransport(): void
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('foo.transport', FooTransport::class)->addTag('scheduler.transport');
+
+        (new SchedulerPass())->process($container);
+        static::assertTrue($container->getDefinition('scheduler.data_collector')->hasMethodCall('registerTransport'));
     }
 
     public function testPassCannotRegisterKernelSchedulerOnNullKernel(): void
@@ -163,6 +175,10 @@ final class FooScheduler implements SchedulerInterface
     public function reboot(): void
     {
     }
+
+    public function addSubscriber(SchedulerSubscriberInterface $subscriber): void
+    {
+    }
 }
 
 final class FooWorker implements WorkerInterface
@@ -187,7 +203,7 @@ final class FooWorker implements WorkerInterface
         return new TaskList();
     }
 
-    public function addSubscriber(EventSubscriberInterface $subscriber): void
+    public function addSubscriber(WorkerSubscriberInterface $subscriber): void
     {
         return;
     }
@@ -225,5 +241,47 @@ final class FooEntryPoint implements SchedulerAwareInterface
 {
     public function schedule(SchedulerRegistryInterface $registry): void
     {
+    }
+}
+
+final class FooTransport implements TransportInterface
+{
+    public function get(string $taskName): TaskInterface
+    {
+        return new NullTask('foo');
+    }
+
+    public function list(): TaskListInterface
+    {
+        return new TaskList();
+    }
+
+    public function create(TaskInterface $task): void
+    {
+    }
+
+    public function update(string $taskName, TaskInterface $updatedTask): void
+    {
+    }
+
+    public function delete(string $taskName): void
+    {
+    }
+
+    public function pause(string $taskName): void
+    {
+    }
+
+    public function resume(string $taskName): void
+    {
+    }
+
+    public function empty(): void
+    {
+    }
+
+    public function getOptions(): array
+    {
+        return [];
     }
 }

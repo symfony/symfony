@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 
@@ -99,6 +100,14 @@ final class TraceableScheduler implements SchedulerInterface
     public function reboot(): void
     {
         $this->scheduler->reboot();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addSubscriber(SchedulerSubscriberInterface $subscriber): void
+    {
+        $this->scheduler->addSubscriber($subscriber);
     }
 
     public function getScheduledTasks(): array

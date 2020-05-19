@@ -14,6 +14,6 @@ namespace Symfony\Component\Scheduler\Exception;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class LogicException extends \LogicException
+final class LogicException extends \LogicException implements ExceptionInterface
 {
 }

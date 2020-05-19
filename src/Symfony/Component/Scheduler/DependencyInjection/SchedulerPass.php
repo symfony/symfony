@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Scheduler\TraceableScheduler;
+use Symfony\Component\Scheduler\Transport\TraceableTransport;
 use Symfony\Component\Scheduler\Worker\TraceableWorker;
 
 /**
@@ -24,12 +25,14 @@ use Symfony\Component\Scheduler\Worker\TraceableWorker;
 final class SchedulerPass implements CompilerPassInterface
 {
     private $schedulerTag;
+    private $transportTag;
     private $workerTag;
     private $schedulerEntryPointTag;
 
-    public function __construct(string $schedulerTag = 'scheduler.hub', string $workerTag = 'scheduler.worker', string $schedulerEntryPointTag = 'scheduler.entry_point')
+    public function __construct(string $schedulerTag = 'scheduler.hub', string $transportTag = 'scheduler.transport', string $workerTag = 'scheduler.worker', string $schedulerEntryPointTag = 'scheduler.entry_point')
     {
         $this->schedulerTag = $schedulerTag;
+        $this->transportTag = $transportTag;
         $this->workerTag = $workerTag;
         $this->schedulerEntryPointTag = $schedulerEntryPointTag;
     }
@@ -41,6 +44,7 @@ final class SchedulerPass implements CompilerPassInterface
     {
         $this->registerSchedulerToCollector($container);
         $this->registerWorkerToCollector($container);
+        $this->registerTraceableTransport($container);
         $this->registerSchedulerEntrypoint($container);
         $this->triggerCronGeneration($container);
     }
@@ -64,6 +68,20 @@ final class SchedulerPass implements CompilerPassInterface
                 (new Definition(TraceableWorker::class, [new Reference($tracedId.'.inner')]))->setDecoratedService($workerId)
             );
             $container->getDefinition('scheduler.data_collector')->addMethodCall('registerWorker', [$workerId, new Reference($tracedId)]);
+        }
+    }
+
+    public function registerTraceableTransport(ContainerBuilder $container): void
+    {
+        foreach ($container->findTaggedServiceIds($this->transportTag) as $transportId => $tags) {
+            $container->setDefinition(
+                $tracedId = 'debug.scheduler.transport.'.$transportId,
+                (new Definition(TraceableTransport::class, [
+                    new Reference($tracedId.'.inner'),
+                    new Reference('logger')
+                ]))->setDecoratedService($transportId)
+            );
+            $container->getDefinition('scheduler.data_collector')->addMethodCall('registerTransport', [$transportId, new Reference($tracedId)]);
         }
     }
 

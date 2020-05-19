@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Worker;
 
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
 /**
@@ -22,6 +23,15 @@ final class WorkerRegistry implements WorkerRegistryInterface
      * @var WorkerInterface[]
      */
     private $workers = [];
+    private $subscribers;
+
+    /**
+     * @param iterable|WorkerSubscriberInterface[] $subscribers
+     */
+    public function __construct(iterable $subscribers)
+    {
+        $this->subscribers = $subscribers;
+    }
 
     /**
      * {@inheritdoc}
@@ -58,6 +68,12 @@ final class WorkerRegistry implements WorkerRegistryInterface
     {
         if ($this->has($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" worker already exist, please consider using %s::override()', $name, self::class));
+        }
+
+        foreach ($this->subscribers as $workerSubscriber) {
+            if (\in_array($name, $workerSubscriber::getSubscribedWorkers()) || \in_array('*', $workerSubscriber::getSubscribedWorkers())) {
+                $worker->addSubscriber($workerSubscriber);
+            }
         }
 
         $this->workers[$name] = $worker;

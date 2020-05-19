@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Exception;
+namespace Symfony\Component\Scheduler\Tests\EventListener;
+
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class InvalidExpressionException extends \InvalidArgumentException implements ExceptionInterface
+final class NotifierSubscriberTest extends TestCase
 {
 }

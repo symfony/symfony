@@ -44,6 +44,19 @@ final class CommandTaskRunnerTest extends TestCase
         static::assertNull($runner->run($task)->getOutput());
     }
 
+    public function testCommandCanBeCalledWhenRegistered(): void
+    {
+        $application = new Application();
+        $application->add(new FooCommand());
+
+        $task = new CommandTask('foo', 'app:foo');
+
+        $runner = new CommandTaskRunner($application);
+        $output = $runner->run($task);
+
+        static::assertSame(0, $output->getExitCode());
+    }
+
     public function testCommandCanBeCalledWithOptions(): void
     {
         $application = new Application();

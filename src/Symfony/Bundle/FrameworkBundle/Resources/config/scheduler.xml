@@ -21,10 +21,14 @@
         </service>
 
         <!-- registries -->
-        <service id="scheduler.registry" class="Symfony\Component\Scheduler\SchedulerRegistry" />
+        <service id="scheduler.registry" class="Symfony\Component\Scheduler\SchedulerRegistry">
+            <argument type="tagged_iterator" tag="scheduler.hub_subscriber" />
+        </service>
         <service id="Symfony\Component\Scheduler\SchedulerRegistryInterface" alias="scheduler.registry" />
 
-        <service id="scheduler.worker.registry" class="Symfony\Component\Scheduler\Worker\WorkerRegistry" />
+        <service id="scheduler.worker.registry" class="Symfony\Component\Scheduler\Worker\WorkerRegistry">
+            <argument type="tagged_iterator" tag="scheduler.worker_subscriber" />
+        </service>
         <service id="Symfony\Component\Scheduler\Worker\WorkerRegistryInterface" alias="scheduler.worker.registry" />
 
         <!-- transports -->
@@ -79,7 +83,7 @@
             <tag name="scheduler.runner" />
         </service>
 
-        <service id="scheduler.null_runner" class="NullTaskRunner">
+        <service id="scheduler.null_runner" class="Symfony\Component\Scheduler\Runner\NullTaskRunner">
             <tag name="scheduler.runner" />
         </service>
 
@@ -105,6 +109,16 @@
         </service>
 
         <!-- subscriber -->
+        <service id="scheduler.mailer_subscriber" class="Symfony\Component\Scheduler\EventListener\MailerSubscriber">
+            <argument type="service" id="mailer.mailer" on-invalid="null" />
+            <tag name="scheduler.worker_subscriber" />
+        </service>
+
+        <service id="scheduler.notifier_subscriber" class="Symfony\Component\Scheduler\EventListener\NotifierSubscriber">
+            <argument type="service" id="notifier" on-invalid="null" />
+            <tag name="scheduler.worker_subscriber" />
+        </service>
+
         <service id="scheduler.task_subscriber" class="Symfony\Component\Scheduler\EventListener\TaskSubscriber">
             <argument type="service" id="scheduler.registry" />
             <argument type="service" id="scheduler.worker.registry" />

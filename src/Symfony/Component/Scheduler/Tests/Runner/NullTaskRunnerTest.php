@@ -22,7 +22,7 @@ use Symfony\Component\Scheduler\Task\Output;
  */
 final class NullTaskRunnerTest extends TestCase
 {
-    public function testRunnerCantSupportWrongTask(): void
+    public function testRunnerCannotSupportWrongTask(): void
     {
         $task = new BarTask('test');
 

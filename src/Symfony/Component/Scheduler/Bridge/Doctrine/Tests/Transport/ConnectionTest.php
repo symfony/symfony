@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -22,6 +23,7 @@ use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\Connection as DoctrineConnection;
+use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Exception\TransportException;
 use Symfony\Component\Scheduler\Task\AbstractTask;
 use Symfony\Component\Scheduler\Task\NullFactory;
@@ -34,6 +36,129 @@ use Symfony\Component\Scheduler\Task\TaskInterface;
  */
 final class ConnectionTest extends TestCase
 {
+    public function testConnectionCanSortATaskList(): void
+    {
+        $taskFactory = new TaskFactory([new NullFactory()]);
+        $queryBuilder = $this->getQueryBuilderMock();
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $statement = $this->getStatementMock([
+            [
+                'id' => 1,
+                'task_name' => 'foo',
+                'expression' => '* * * * *',
+                'options' => [
+                    'priority' => 1,
+                    'tracked' => true,
+                ],
+                'type' => 'null',
+            ],
+            [
+                'id' => 2,
+                'task_name' => 'bar',
+                'expression' => '* * * * *',
+                'options' => [
+                    'priority' => 2,
+                    'tracked' => false,
+                ],
+                'type' => 'null',
+            ],
+        ], true);
+
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks');
+        $queryBuilder->expects(self::never())->method('getParameterTypes');
+        $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $taskList = $connection->list();
+
+        static::assertNotEmpty($taskList);
+        static::assertInstanceOf(TaskInterface::class, $taskList->get('bar'));
+
+        $list = $taskList->toArray(false);
+        static::assertSame('bar', $list[0]->getName());
+        static::assertSame('foo', $list[1]->getName());
+    }
+
+    public function testConnectionCanReturnAnEmptyTaskList(): void
+    {
+        $taskFactory = new TaskFactory([new NullFactory()]);
+        $queryBuilder = $this->getQueryBuilderMock();
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $statement = $this->getStatementMock([], true);
+
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks');
+        $queryBuilder->expects(self::never())->method('getParameterTypes');
+        $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $taskList = $connection->list();
+
+        static::assertEmpty($taskList);
+    }
+
+    public function testConnectionCanReturnATaskList(): void
+    {
+        $taskFactory = new TaskFactory([new NullFactory()]);
+        $queryBuilder = $this->getQueryBuilderMock();
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $statement = $this->getStatementMock([
+            [
+                'id' => 1,
+                'task_name' => 'foo',
+                'expression' => '* * * * *',
+                'options' => [],
+                'type' => 'null',
+            ],
+            [
+                'id' => 2,
+                'task_name' => 'bar',
+                'expression' => '* * * * *',
+                'options' => [],
+                'type' => 'null',
+            ],
+        ], true);
+
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks');
+        $queryBuilder->expects(self::never())->method('getParameterTypes');
+        $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $taskList = $connection->list();
+
+        static::assertNotEmpty($taskList);
+        static::assertInstanceOf(TaskInterface::class, $taskList->get('foo'));
+        static::assertSame('foo', $taskList->get('foo')->getName());
+        static::assertSame('* * * * *', $taskList->get('foo')->getExpression());
+    }
+
+    public function testConnectionCannotReturnAnInvalidTask(): void
+    {
+        $taskFactory = new TaskFactory([new NullFactory()]);
+        $queryBuilder = $this->getQueryBuilderMock();
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $statement = $this->getStatementMock(null);
+
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks WHERE task_name = "foo"');
+        $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(LogicException::class);
+        $connection->get('foo');
+    }
+
     public function testConnectionCanReturnASingleTask(): void
     {
         $taskFactory = new TaskFactory([new NullFactory()]);
@@ -51,8 +176,6 @@ final class ConnectionTest extends TestCase
         ]);
 
         $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks WHERE task_name = "foo"');
-        $queryBuilder->method('getParameters')->willReturn(['task_name' => 'foo']);
-        $queryBuilder->method('getParameterTypes')->willReturn([]);
         $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
 
         $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
@@ -61,6 +184,73 @@ final class ConnectionTest extends TestCase
         static::assertInstanceOf(TaskInterface::class, $task);
         static::assertSame('foo', $task->getName());
         static::assertSame('* * * * *', $task->getExpression());
+    }
+
+    public function testConnectionCannotInsertASingleTaskWithInvalidIdentifier(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::once())->method('getName')->willReturn('foo');
+        $task->expects(self::once())->method('getExpression')->willReturn('* * * * *');
+        $task->expects(self::once())->method('get')->with(self::equalTo('state'))->willReturn('paused');
+        $task->expects(self::once())->method('getOptions')->willReturn([]);
+        $task->expects(self::once())->method('getType')->willReturn('null');
+
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('insert')->with('scheduler_tasks', [
+            'task_name' => 'foo',
+            'expression' => '* * * * *',
+            'state' => 'paused',
+            'options' => [],
+            'type' => 'null',
+        ], [
+            'task_name' => Types::STRING,
+            'expression' => Types::STRING,
+            'state' => Types::STRING,
+            'options' => Types::ARRAY,
+            'type' => Types::STRING,
+        ])->willReturn(2);
+        $driverConnection->expects(self::once())->method('rollBack');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(TransportException::class);
+        $connection->create($task);
+    }
+
+    public function testConnectionCannotInsertASingleTaskWithValidIdentifier(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::once())->method('getName')->willReturn('foo');
+        $task->expects(self::once())->method('getExpression')->willReturn('* * * * *');
+        $task->expects(self::once())->method('get')->with(self::equalTo('state'))->willReturn('paused');
+        $task->expects(self::once())->method('getOptions')->willReturn([]);
+        $task->expects(self::once())->method('getType')->willReturn('null');
+
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('insert')->with('scheduler_tasks', [
+            'task_name' => 'foo',
+            'expression' => '* * * * *',
+            'state' => 'paused',
+            'options' => [],
+            'type' => 'null',
+        ], [
+            'task_name' => Types::STRING,
+            'expression' => Types::STRING,
+            'state' => Types::STRING,
+            'options' => Types::ARRAY,
+            'type' => Types::STRING,
+        ])->willReturn(1);
+        $driverConnection->expects(self::never())->method('rollBack');
+        $driverConnection->expects(self::once())->method('commit');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection->create($task);
     }
 
     public function testConnectionCannotPauseASingleTaskWithInvalidIdentifier(): void
@@ -150,6 +340,35 @@ final class ConnectionTest extends TestCase
         $connection->delete('foo');
     }
 
+    public function testConnectionCannotEmptyWithInvalidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('exec')->with('DELETE * FROM scheduler_tasks')->willThrowException(new DBALException());
+        $driverConnection->expects(self::once())->method('rollBack');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(TransportException::class);
+        $connection->empty();
+    }
+
+    public function testConnectionCannotEmptyWithValidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('exec')->with('DELETE * FROM scheduler_tasks');
+        $driverConnection->expects(self::never())->method('rollBack');
+        $driverConnection->expects(self::once())->method('commit');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection->empty();
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(Connection::class);
@@ -187,10 +406,10 @@ final class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getStatementMock($expectedResult): Statement
+    private function getStatementMock($expectedResult, bool $list = false): Statement
     {
         $stmt = $this->createMock(Statement::class);
-        $stmt->expects(self::once())->method('fetch')->willReturn($expectedResult);
+        $list ? $stmt->expects(self::once())->method('fetchAll')->willReturn($expectedResult) : $stmt->expects(self::once())->method('fetch')->willReturn($expectedResult);
 
         return $stmt;
     }

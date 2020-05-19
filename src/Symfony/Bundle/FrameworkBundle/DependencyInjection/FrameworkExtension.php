@@ -121,6 +121,8 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
 use Symfony\Component\Scheduler\Export\ExporterInterface;
 use Symfony\Component\Scheduler\Export\FormatterInterface;
@@ -522,6 +524,10 @@ class FrameworkExtension extends Extension
             ->addTag('scheduler.runner');
         $container->registerForAutoconfiguration(SchedulerAwareInterface::class)
             ->addTag('scheduler.entry_point');
+        $container->registerForAutoconfiguration(SchedulerSubscriberInterface::class)
+            ->addTag('scheduler.hub_subscriber');
+        $container->registerForAutoconfiguration(WorkerSubscriberInterface::class)
+            ->addTag('scheduler.worker_subscriber');
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
             $container->getDefinition('config_cache_factory')->setArguments([]);
@@ -2175,6 +2181,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('scheduler.trigger_path', $config['path']);
 
         $loader->load('scheduler.xml');
+        $loader->load('scheduler_bridge.xml');
 
         if (null !== $config['lock_store'] && 0 !== strpos('@', $config['lock_store'])) {
             $store = $container->getDefinition($config['lock_store']);

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Worker;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 
@@ -65,7 +65,7 @@ final class TraceableWorker implements WorkerInterface
     /**
      * {@inheritdoc}
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): void
+    public function addSubscriber(WorkerSubscriberInterface $subscriber): void
     {
         $this->worker->addSubscriber($subscriber);
     }

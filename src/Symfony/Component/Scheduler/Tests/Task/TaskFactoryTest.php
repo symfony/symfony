@@ -37,6 +37,11 @@ final class TaskFactoryTest extends TestCase
                 'name' => 'app.foo',
                 'expression' => '* * * * *',
             ],
+            [
+                'type' => 'null',
+                'name' => 'app.bar',
+                'expression' => '5 * * * *',
+            ],
         ];
     }
 }

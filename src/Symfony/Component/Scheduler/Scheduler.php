@@ -12,15 +12,15 @@
 namespace Symfony\Component\Scheduler;
 
 use Cron\CronExpression;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Scheduler\Event\SchedulerRebootedEvent;
 use Symfony\Component\Scheduler\Event\TaskScheduledEvent;
+use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Messenger\TaskMessage;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
-use Symfony\Contracts\EventDispatcher\Event;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -32,17 +32,17 @@ final class Scheduler implements SchedulerInterface
     private $eventDispatcher;
     private $bus;
 
-    public function __construct(\DateTimeZone $timezone, TransportInterface $transport, EventDispatcherInterface $eventDispatcher = null, MessageBusInterface $bus = null)
+    public function __construct(\DateTimeZone $timezone, TransportInterface $transport, MessageBusInterface $bus = null)
     {
         $this->timezone = $timezone;
         $this->transport = $transport;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = new EventDispatcher();
         $this->bus = $bus;
     }
 
-    public static function forSpecificTimezone(\DateTimeZone $timezone, TransportInterface $transport, EventDispatcherInterface $eventDispatcher = null, MessageBusInterface $bus = null): SchedulerInterface
+    public static function forSpecificTimezone(\DateTimeZone $timezone, TransportInterface $transport, MessageBusInterface $bus = null): SchedulerInterface
     {
-        return new self($timezone, $transport, $eventDispatcher, $bus);
+        return new self($timezone, $transport, $bus);
     }
 
     /**
@@ -57,13 +57,13 @@ final class Scheduler implements SchedulerInterface
 
         if (null !== $this->bus && $task->get('queued')) {
             $this->bus->dispatch(new TaskMessage($task));
-            $this->dispatchEvent(new TaskScheduledEvent($task));
+            $this->eventDispatcher->dispatch(new TaskScheduledEvent($task));
 
             return;
         }
 
         $this->transport->create($task);
-        $this->dispatchEvent(new TaskScheduledEvent($task));
+        $this->eventDispatcher->dispatch(new TaskScheduledEvent($task));
     }
 
     /**
@@ -139,15 +139,14 @@ final class Scheduler implements SchedulerInterface
             $this->transport->create($task);
         }
 
-        $this->dispatchEvent(new SchedulerRebootedEvent($this));
+        $this->eventDispatcher->dispatch(new SchedulerRebootedEvent($this));
     }
 
-    private function dispatchEvent(Event $event): void
+    /**
+     * {@inheritdoc}
+     */
+    public function addSubscriber(SchedulerSubscriberInterface $subscriber): void
     {
-        if (null === $this->eventDispatcher) {
-            return;
-        }
-
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->addSubscriber($subscriber);
     }
 }

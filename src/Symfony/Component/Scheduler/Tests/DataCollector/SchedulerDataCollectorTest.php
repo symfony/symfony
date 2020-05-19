@@ -17,6 +17,8 @@ use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\Task\ShellTask;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\TraceableScheduler;
+use Symfony\Component\Scheduler\Transport\TraceableTransport;
+use Symfony\Component\Scheduler\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Worker\TraceableWorker;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
@@ -41,13 +43,17 @@ final class SchedulerDataCollectorTest extends TestCase
         $scheduler->expects(self::exactly(2))->method('getTasks')->willReturn($taskList);
         $scheduler->expects(self::once())->method('getTimezone')->willReturn(new \DateTimeZone('Europe/Paris'));
 
+        $transport = $this->createMock(TransportInterface::class);
+
         $worker = $this->createMock(WorkerInterface::class);
 
         $dataCollector = new SchedulerDataCollector();
         $traceableScheduler = new TraceableScheduler($scheduler);
+        $traceableTransport = new TraceableTransport($transport);
         $traceableWorker = new TraceableWorker($worker);
 
         $dataCollector->registerScheduler('foo', $traceableScheduler);
+        $dataCollector->registerTransport('foo', $traceableTransport);
         $dataCollector->registerWorker('foo', $traceableWorker);
         $traceableScheduler->schedule(new ShellTask('foo', 'echo Symfony'));
         $traceableWorker->execute(new ShellTask('foo', 'echo Symfony'));
@@ -59,6 +65,8 @@ final class SchedulerDataCollectorTest extends TestCase
         static::assertArrayHasKey('foo', $dataCollector->getSchedulers());
         static::assertNotEmpty($dataCollector->getScheduledTasksByScheduler('foo'));
         static::assertCount(1, $dataCollector->getScheduledTasksByScheduler('foo'));
+
+        static::assertNotEmpty($dataCollector->getTransports());
 
         static::assertNotEmpty($dataCollector->getWorkers());
         static::assertArrayHasKey('foo', $dataCollector->getWorkers());

@@ -11,15 +11,20 @@
 
 namespace Symfony\Component\Scheduler\Task;
 
+use Symfony\Component\Notifier\Notification\Notification;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class NullTask extends AbstractTask
+final class NotificationTask extends AbstractTask
 {
-    public function __construct(string $name, array $options = [], array $additionalOptions = [])
+    public function __construct(string $name, Notification $notification = null, array $options = [], array $additionalOptions = [])
     {
         parent::__construct($name, array_merge($options, [
+            'notification' => $notification,
             'type' => 'null',
-        ]), $additionalOptions);
+        ]), array_merge($additionalOptions, [
+            'notification' => ['null', Notification::class]
+        ]));
     }
 }

@@ -192,4 +192,16 @@ final class TaskListTest extends TestCase
 
         static::assertCount(1, $list->toArray());
     }
+
+    public function testArrayCanBeReturnedWithoutKeys(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::once())->method('getName')->willReturn('foo');
+
+        $list = new TaskList([$task]);
+
+        static::assertCount(1, $list->toArray(false));
+        static::assertArrayHasKey(0, $list->toArray(false));
+        static::assertArrayNotHasKey('foo', $list->toArray(false));
+    }
 }

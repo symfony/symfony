@@ -347,7 +347,7 @@ require __DIR__.'/$preloadedFiles';
 EOF;
 
                 foreach ($this->preload as $class) {
-                    if (!$class || false !== strpos($class, '$')) {
+                    if (!$class || false !== strpos($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
                         continue;
                     }
                     if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined()) {

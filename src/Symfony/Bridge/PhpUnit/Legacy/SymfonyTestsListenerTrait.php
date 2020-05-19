@@ -310,7 +310,7 @@ class SymfonyTestsListenerTrait
         if (\is_array($parsedMsg)) {
             $msg = $parsedMsg['deprecation'];
         }
-        if (error_reporting()) {
+        if (error_reporting() & $type) {
             $msg = 'Unsilenced deprecation: '.$msg;
         }
         $this->gatheredDeprecations[] = $msg;

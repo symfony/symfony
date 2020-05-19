@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-19T07:23:47Z
+
+I think we should also throw a `TypeError` if one calls the method with `null` as the first argument followed by some constraints.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T07:34:37Z
+
+If we don't allow null, it means the signature cannot be expressed using regular PHP types and we must trick it using func_num_args(). I think we'd better avoid such things.

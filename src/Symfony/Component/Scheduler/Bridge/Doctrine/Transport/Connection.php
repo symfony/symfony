@@ -124,7 +124,7 @@ final class Connection implements ConnectionInterface
             $this->driverConnection->beginTransaction();
             $this->driverConnection->exec(sprintf('DELETE * FROM %s', $this->configuration['table_name']));
             $this->driverConnection->commit();
-        } catch (\Throwable|\Exception $exception) {
+        } catch (\Throwable | \Exception $exception) {
             $this->driverConnection->rollBack();
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -186,7 +186,7 @@ final class Connection implements ConnectionInterface
             }
 
             $this->driverConnection->commit();
-        } catch (\Throwable|\Exception $exception) {
+        } catch (\Throwable | \Exception $exception) {
             $this->driverConnection->rollBack();
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

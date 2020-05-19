@@ -177,19 +177,15 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
         $storedEnv = $this->persistRequest($request);
 
-        // write the response body to the entity store if this is the original response
-        if (!$response->headers->has('X-Content-Digest')) {
-            $digest = $this->generateContentDigest($response);
+        $digest = $this->generateContentDigest($response);
+        $response->headers->set('X-Content-Digest', $digest);
 
-            if (!$this->save($digest, $response->getContent())) {
-                throw new \RuntimeException('Unable to store the entity.');
-            }
+        if (!$this->save($digest, $response->getContent(), false)) {
+            throw new \RuntimeException('Unable to store the entity.');
+        }
 
-            $response->headers->set('X-Content-Digest', $digest);
-
-            if (!$response->headers->has('Transfer-Encoding')) {
-                $response->headers->set('Content-Length', \strlen($response->getContent()));
-            }
+        if (!$response->headers->has('Transfer-Encoding')) {
+            $response->headers->set('Content-Length', \strlen($response->getContent()));
         }
 
         // read existing cache entries, remove non-varying, and add this one to the list
@@ -362,14 +358,19 @@ class Store implements StoreInterface
     /**
      * Save data for the given key.
      *
-     * @param string $key  The store key
-     * @param string $data The data to store
+     * @param string $key       The store key
+     * @param string $data      The data to store
+     * @param bool   $overwrite Whether existing data should be overwritten
      *
      * @return bool
      */
-    private function save($key, $data)
+    private function save($key, $data, $overwrite = true)
     {
         $path = $this->getPath($key);
+
+        if (!$overwrite && file_exists($path)) {
+            return true;
+        }
 
         if (isset($this->locks[$key])) {
             $fp = $this->locks[$key];

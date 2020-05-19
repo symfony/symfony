@@ -20,6 +20,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Scheduler\Exception\TransportException;
+use Symfony\Component\Scheduler\Task\AbstractTask;
 use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
@@ -54,7 +55,6 @@ final class Connection implements ConnectionInterface
      */
     public function list(): array
     {
-
     }
 
     public function get(string $taskName): ?TaskInterface
@@ -82,6 +82,7 @@ final class Connection implements ConnectionInterface
             ->values([
                 'task_name' => '?',
                 'expression' => '?',
+                'state' => '?',
                 'options' => '?',
             ])
         ;
@@ -93,6 +94,7 @@ final class Connection implements ConnectionInterface
         ], [
             Types::STRING,
             Types::STRING,
+            Types::STRING,
             Types::ARRAY,
         ]);
     }
@@ -102,6 +104,7 @@ final class Connection implements ConnectionInterface
      */
     public function pause(string $taskName): void
     {
+        $this->update(['state' => AbstractTask::PAUSED], ['task_name' => $taskName], ['state' => Types::STRING]);
     }
 
     /**
@@ -109,6 +112,7 @@ final class Connection implements ConnectionInterface
      */
     public function resume(string $taskName): void
     {
+        $this->update(['state' => AbstractTask::ENABLED], ['task_name' => $taskName], ['state' => Types::STRING]);
     }
 
     /**
@@ -116,6 +120,14 @@ final class Connection implements ConnectionInterface
      */
     public function empty(): void
     {
+        try {
+            $this->driverConnection->beginTransaction();
+            $this->driverConnection->exec(sprintf('DELETE * FROM %s', $this->configuration['table_name']));
+            $this->driverConnection->commit();
+        } catch (\Throwable|\Exception $exception) {
+            $this->driverConnection->rollBack();
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     /**
@@ -124,8 +136,18 @@ final class Connection implements ConnectionInterface
     public function delete(string $taskName): void
     {
         try {
-            $this->driverConnection->delete($this->configuration['table_name'], ['name' => $taskName]);
+            $this->driverConnection->beginTransaction();
+            $affectedRows = $this->driverConnection->delete($this->configuration['table_name'],
+                ['task_name' => $taskName],
+                ['task_name' => Types::STRING]
+            );
+            if (1 !== $affectedRows) {
+                throw new DBALException('The given identifier is invalid.');
+            }
+
+            $this->driverConnection->commit();
         } catch (DBALException $exception) {
+            $this->driverConnection->rollBack();
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -146,13 +168,28 @@ final class Connection implements ConnectionInterface
 
         $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
 
-        if ($hasFilterCallback) {
-            $this->driverConnection->getConfiguration()->setSchemaAssetsFilter($assetFilter);
-        } else {
-            $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression($assetFilter);
-        }
+        $hasFilterCallback
+            ? $this->driverConnection->getConfiguration()->setSchemaAssetsFilter($assetFilter)
+            : $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression($assetFilter)
+        ;
 
         $this->autoSetup = false;
+    }
+
+    private function update(array $data, array $identifiers, array $types): void
+    {
+        try {
+            $this->driverConnection->beginTransaction();
+            $affectedRows = $this->driverConnection->update($this->configuration['table_name'], $data, $identifiers, $types);
+            if (1 !== $affectedRows) {
+                throw new DBALException('The given identifier is invalid.');
+            }
+
+            $this->driverConnection->commit();
+        } catch (\Throwable|\Exception $exception) {
+            $this->driverConnection->rollBack();
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     private function createQueryBuilder(): QueryBuilder
@@ -195,12 +232,15 @@ final class Connection implements ConnectionInterface
             ->setNotnull(true);
         $table->addColumn('options', Types::ARRAY)
             ->setNotnull(true);
+        $table->addColumn('state', Types::STRING)
+            ->setNotnull(true);
         $table->addColumn('type', Types::TEXT)
             ->setNotnull(true);
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['task_name'], 'task_name');
         $table->addIndex(['expression'], 'task_expression');
+        $table->addIndex(['state'], 'task_state');
 
         return $schema;
     }

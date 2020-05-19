@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Doctrine\Transport;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Scheduler\Exception\TransportException;
+use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\TransportFactoryInterface;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
@@ -25,14 +27,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class DoctrineTransportFactory implements TransportFactoryInterface
 {
     private $registry;
+    private $taskFactory;
 
-    public function __construct($registry)
+    public function __construct($registry, TaskFactoryInterface $taskFactory)
     {
         if (!$registry instanceof ManagerRegistry && !$registry instanceof ConnectionRegistry) {
-            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', RegistryInterface::class, ConnectionRegistry::class, get_debug_type($registry)));
+            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', Registry::class, ConnectionRegistry::class, get_debug_type($registry)));
         }
 
         $this->registry = $registry;
+        $this->taskFactory = $taskFactory;
     }
 
     /**
@@ -46,7 +50,7 @@ final class DoctrineTransportFactory implements TransportFactoryInterface
             throw new TransportException(sprintf('Could not find Doctrine connection from Scheduler DSN "%s".', $dsn), 0, $e);
         }
 
-        $connection = new Connection([], $driverConnection);
+        $connection = new Connection($this->taskFactory, [], $driverConnection);
 
         return new DoctrineTransport($dsn, $options, $connection);
     }

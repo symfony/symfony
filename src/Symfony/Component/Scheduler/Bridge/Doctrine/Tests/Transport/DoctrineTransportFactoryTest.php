@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\DoctrineTransportFactory;
+use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -26,8 +27,10 @@ final class DoctrineTransportFactoryTest extends TestCase
 {
     public function testTransportCanSupport(): void
     {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
         $registry = $this->createMock(ManagerRegistry::class);
-        $factory = new DoctrineTransportFactory($registry);
+
+        $factory = new DoctrineTransportFactory($registry, $taskFactory);
 
         static::assertFalse($factory->support('test://'));
         static::assertTrue($factory->support('doctrine://'));
@@ -35,6 +38,7 @@ final class DoctrineTransportFactoryTest extends TestCase
 
     public function testFactoryReturnTransport(): void
     {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
         $connection = $this->createMock(Connection::class);
 
         $registry = $this->createMock(ManagerRegistry::class);
@@ -42,7 +46,7 @@ final class DoctrineTransportFactoryTest extends TestCase
 
         $serializer = $this->createMock(SerializerInterface::class);
 
-        $factory = new DoctrineTransportFactory($registry);
+        $factory = new DoctrineTransportFactory($registry, $taskFactory);
         static::assertInstanceOf(DoctrineTransport::class, $factory->createTransport(Dsn::fromString('doctrine://root@root'), [], $serializer));
     }
 }

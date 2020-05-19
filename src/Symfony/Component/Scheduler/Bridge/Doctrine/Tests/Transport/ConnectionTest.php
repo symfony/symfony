@@ -19,10 +19,14 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\Connection as DoctrineConnection;
+use Symfony\Component\Scheduler\Exception\TransportException;
+use Symfony\Component\Scheduler\Task\AbstractTask;
 use Symfony\Component\Scheduler\Task\NullFactory;
 use Symfony\Component\Scheduler\Task\TaskFactory;
+use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 
 /**
@@ -46,7 +50,7 @@ final class ConnectionTest extends TestCase
             'type' => 'null',
         ]);
 
-        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('');
+        $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks WHERE task_name = "foo"');
         $queryBuilder->method('getParameters')->willReturn(['task_name' => 'foo']);
         $queryBuilder->method('getParameterTypes')->willReturn([]);
         $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
@@ -57,6 +61,93 @@ final class ConnectionTest extends TestCase
         static::assertInstanceOf(TaskInterface::class, $task);
         static::assertSame('foo', $task->getName());
         static::assertSame('* * * * *', $task->getExpression());
+    }
+
+    public function testConnectionCannotPauseASingleTaskWithInvalidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('update')->with('scheduler_tasks', ['state' => AbstractTask::PAUSED], ['task_name' => 'foo'], ['state' => Types::STRING])->willReturn(2);
+        $driverConnection->expects(self::once())->method('rollBack');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(TransportException::class);
+        $connection->pause('foo');
+    }
+
+    public function testConnectionCannotPauseASingleTaskWithValidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('update')->with('scheduler_tasks', ['state' => AbstractTask::PAUSED], ['task_name' => 'foo'], ['state' => Types::STRING])->willReturn(1);
+        $driverConnection->expects(self::never())->method('rollBack');
+        $driverConnection->expects(self::once())->method('commit');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection->pause('foo');
+    }
+
+    public function testConnectionCannotResumeASingleTaskWithInvalidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('update')->with('scheduler_tasks', ['state' => AbstractTask::ENABLED], ['task_name' => 'foo'], ['state' => Types::STRING])->willReturn(2);
+        $driverConnection->expects(self::once())->method('rollBack');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(TransportException::class);
+        $connection->resume('foo');
+    }
+
+    public function testConnectionCannotResumeASingleTaskWithValidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('update')->with('scheduler_tasks', ['state' => AbstractTask::ENABLED], ['task_name' => 'foo'], ['state' => Types::STRING])->willReturn(1);
+        $driverConnection->expects(self::never())->method('rollBack');
+        $driverConnection->expects(self::once())->method('commit');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection->resume('foo');
+    }
+
+    public function testConnectionCannotDeleteASingleTaskWithInvalidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('delete')->with('scheduler_tasks', ['task_name' => 'foo'], ['task_name' => Types::STRING])->willReturn(2);
+        $driverConnection->expects(self::once())->method('rollBack');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+
+        static::expectException(TransportException::class);
+        $connection->delete('foo');
+    }
+
+    public function testConnectionCannotDeleteASingleTaskWithValidIdentifier(): void
+    {
+        $taskFactory = $this->createMock(TaskFactoryInterface::class);
+
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection->expects(self::once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('delete')->with('scheduler_tasks', ['task_name' => 'foo'], ['task_name' => Types::STRING])->willReturn(1);
+        $driverConnection->expects(self::never())->method('rollBack');
+        $driverConnection->expects(self::once())->method('commit');
+
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection->delete('foo');
     }
 
     private function getDBALConnectionMock()

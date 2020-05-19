@@ -99,6 +99,7 @@ class UsernamePasswordToken extends AbstractToken
     public function __unserialize(array $data): void
     {
         [$this->credentials, $this->providerKey, $parentData] = $data;
+        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

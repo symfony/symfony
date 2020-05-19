@@ -126,7 +126,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
             $data = [
-                'Version' => $localeBundle['Version'],
                 'Names' => iterator_to_array($localeBundle['Languages']),
             ];
 
@@ -150,7 +149,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
     {
-        $rootBundle = $reader->read($tempDir, 'root');
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->languageCodes = array_unique($this->languageCodes);
@@ -158,7 +156,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
         sort($this->languageCodes);
 
         return [
-            'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         ];

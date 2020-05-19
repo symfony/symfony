@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abhază",
@@ -132,6 +131,7 @@
         "eu": "bască",
         "ewo": "ewondo",
         "fa": "persană",
+        "fa_AF": "dari",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fulah",
@@ -386,7 +386,6 @@
         "ro": "română",
         "rof": "rombo",
         "rom": "romani",
-        "root": "root",
         "ru": "rusă",
         "rup": "aromână",
         "rw": "kinyarwanda",

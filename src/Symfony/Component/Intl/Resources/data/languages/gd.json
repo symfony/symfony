@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasais",
@@ -158,6 +157,7 @@
         "ewo": "Ewondo",
         "ext": "Cànan na h-Extremadura",
         "fa": "Peirsis",
+        "fa_AF": "Dari",
         "fan": "Fang",
         "fat": "Fanti",
         "ff": "Fulah",

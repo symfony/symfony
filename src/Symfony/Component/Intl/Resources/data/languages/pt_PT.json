@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "af": "africanês",
         "alt": "altai do sul",
@@ -35,6 +34,7 @@
         "es_ES": "espanhol europeu",
         "es_MX": "espanhol mexicano",
         "et": "estónio",
+        "fa_AF": "dari",
         "fon": "fon",
         "fr_CA": "francês canadiano",
         "fr_CH": "francês suíço",
@@ -81,7 +81,6 @@
         "pt_PT": "português europeu",
         "raj": "rajastanês",
         "ro_MD": "moldávio",
-        "root": "root",
         "se": "sami do norte",
         "sga": "irlandês antigo",
         "shu": "árabe do Chade",

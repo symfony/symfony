@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar dili",
         "ab": "abhaz dili",
@@ -92,6 +91,7 @@
         "eu": "bask dili",
         "ewo": "ewondo dili",
         "fa": "pars dili",
+        "fa_AF": "dari dili",
         "ff": "fula dili",
         "fi": "fin dili",
         "fil": "filippin dili",

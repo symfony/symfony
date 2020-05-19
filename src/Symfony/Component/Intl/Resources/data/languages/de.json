@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasisch",
@@ -154,6 +153,7 @@
         "ewo": "Ewondo",
         "ext": "Extremadurisch",
         "fa": "Persisch",
+        "fa_AF": "Dari",
         "fan": "Pangwe",
         "fat": "Fanti",
         "ff": "Ful",

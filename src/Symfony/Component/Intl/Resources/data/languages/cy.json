@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Affareg",
         "ab": "Abchaseg",
@@ -137,6 +136,7 @@
         "ewo": "Ewondo",
         "ext": "Extremadureg",
         "fa": "Perseg",
+        "fa_AF": "Dari",
         "fat": "Ffanti",
         "ff": "Ffwla",
         "fi": "Ffinneg",

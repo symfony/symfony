@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkasies",
@@ -95,6 +94,7 @@
         "eu": "Baskies",
         "ewo": "Ewondo",
         "fa": "Persies",
+        "fa_AF": "Dari",
         "ff": "Fulah",
         "fi": "Fins",
         "fil": "Filippyns",

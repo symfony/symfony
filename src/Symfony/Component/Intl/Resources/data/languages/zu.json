@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "isi-Afar",
         "ab": "isi-Abkhazian",
@@ -99,6 +98,7 @@
         "eu": "isi-Basque",
         "ewo": "isi-Ewondo",
         "fa": "isi-Persian",
+        "fa_AF": "isi-Dari",
         "ff": "isi-Fulah",
         "fi": "isi-Finnish",
         "fil": "isi-Filipino",

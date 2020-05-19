@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-05-19T08:30:29Z
+
+@ro0NL is the `Version` field necessary in all these JSON files ? Diffs for upgrades would be much more readable if we were not updating a version in all files, where it is often the only change.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-05-19T15:51:00Z
+
+@stof agree and done. We dont use this data, nor is it accessible by users.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-19T16:00:46Z
+
+and even for contributors, this number is confusing as this version is not the ICU version either

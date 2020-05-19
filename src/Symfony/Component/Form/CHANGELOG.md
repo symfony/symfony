@@ -12,7 +12,6 @@ CHANGELOG
  * Added a `ChoiceList` facade to leverage explicit choice list caching based on options
  * Added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
  * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.
- * Added default `inputmode` attribute to Search, Email and Tel form types.
  * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method

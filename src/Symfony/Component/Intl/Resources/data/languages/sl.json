@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarščina",
         "ab": "abhaščina",
@@ -119,6 +118,7 @@
         "eu": "baskovščina",
         "ewo": "evondovščina",
         "fa": "perzijščina",
+        "fa_AF": "darijščina",
         "fan": "fangijščina",
         "fat": "fantijščina",
         "ff": "fulščina",

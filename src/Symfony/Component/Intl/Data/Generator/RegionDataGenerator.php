@@ -116,7 +116,6 @@ class RegionDataGenerator extends AbstractDataGenerator
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Countries']) && null !== $localeBundle['Countries']) {
             $data = [
-                'Version' => $localeBundle['Version'],
                 'Names' => $this->generateRegionNames($localeBundle),
             ];
 
@@ -141,7 +140,6 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->regionCodes = array_unique($this->regionCodes);
@@ -153,7 +151,6 @@ class RegionDataGenerator extends AbstractDataGenerator
         asort($alpha3ToAlpha2);
 
         return [
-            'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
             'Alpha2ToAlpha3' => $alpha2ToAlpha3,
             'Alpha3ToAlpha2' => $alpha3ToAlpha2,

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarî",
         "ab": "abxazî",
@@ -30,7 +29,6 @@
         "br": "bretonî",
         "bs": "bosnî",
         "bug": "bugî",
-        "byn": "byn",
         "ca": "katalanî",
         "ce": "çeçenî",
         "ceb": "sebwanoyî",
@@ -68,7 +66,6 @@
         "fy": "frîsî",
         "ga": "îrî",
         "gd": "gaelîka skotî",
-        "gez": "gez",
         "gil": "kîrîbatî",
         "gl": "galîsî",
         "gn": "guwaranî",

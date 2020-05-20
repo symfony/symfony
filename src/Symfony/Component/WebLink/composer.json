@@ -19,7 +19,7 @@
         "psr/link-implementation": "1.0"
     },
     "require": {
-        "php": "^7.1.3",
+        "php": ">=7.1.3",
         "psr/link": "^1.0",
         "symfony/polyfill-php72": "^1.5"
     },

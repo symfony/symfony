@@ -112,7 +112,6 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     }
 
-    $passthruOrFail("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
     @copy("phpunit-$PHPUNIT_VERSION/phpunit.xsd", 'phpunit.xsd');
     chdir("phpunit-$PHPUNIT_VERSION");
     if ($SYMFONY_PHPUNIT_REMOVE) {

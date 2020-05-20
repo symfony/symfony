@@ -150,7 +150,6 @@
         "ewo": "Ewondo",
         "ext": "Extremeens",
         "fa": "Perzisch",
-        "fa_AF": "Dari",
         "fan": "Fang",
         "fat": "Fanti",
         "ff": "Fulah",
@@ -596,6 +595,7 @@
         "zza": "Zaza"
     },
     "LocalizedNames": {
+        "fa_AF": "Dari",
         "nds_NL": "Nederduits"
     }
 }

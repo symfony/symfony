@@ -197,10 +197,11 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
 
-    if ($info['requires']['php'] !== $phpVersion = preg_replace('{\^([\d\.]++)$}', '>=$1', $info['requires']['php'])) {
-        $passthruOrFail("$COMPOSER require --no-update \"php:$phpVersion\"");
+    if (preg_match('{\^(\d++\.\d++)[\d\.]*$}', $info['requires']['php'], $phpVersion) && version_compare($phpVersion[1], PHP_VERSION, '<')) {
+        $passthruOrFail("$COMPOSER config platform.php \"$phpVersion[1].99\"");
+    } else {
+        $passthruOrFail("$COMPOSER config --unset platform.php");
     }
-    $passthruOrFail("$COMPOSER config --unset platform.php");
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));

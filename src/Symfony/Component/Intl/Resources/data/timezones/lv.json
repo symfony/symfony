@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Abidžana (Griničas laiks)",
         "Africa\/Accra": "Akra (Griničas laiks)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Riogaljegosa (Argentīnas laiks)",
         "America\/Argentina\/Salta": "Salta (Argentīnas laiks)",
         "America\/Argentina\/San_Juan": "Sanhuana (Argentīnas laiks)",
-        "America\/Argentina\/San_Luis": "Sanluisa (Rietumargentīnas laiks)",
+        "America\/Argentina\/San_Luis": "Sanluisa (Argentīnas laiks)",
         "America\/Argentina\/Tucuman": "Tukumana (Argentīnas laiks)",
         "America\/Argentina\/Ushuaia": "Ušuaja (Argentīnas laiks)",
         "America\/Aruba": "Aruba (Atlantijas laiks)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunejas Darusalamas laiks",
         "Asia\/Calcutta": "Kalkāta (Indijas ziemas laiks)",
         "Asia\/Chita": "Čita (Jakutskas laiks)",
-        "Asia\/Choibalsan": "Čoibalsanas laiks",
+        "Asia\/Choibalsan": "Čoibalsana (Ulanbatoras laiks)",
         "Asia\/Colombo": "Kolombo (Indijas ziemas laiks)",
         "Asia\/Damascus": "Damaska (Austrumeiropas laiks)",
         "Asia\/Dhaka": "Daka (Bangladešas laiks)",

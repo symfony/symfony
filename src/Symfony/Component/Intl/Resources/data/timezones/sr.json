@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Средње време по Гриничу (Абиџан)",
         "Africa\/Accra": "Средње време по Гриничу (Акра)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Аргентина време (Рио Гаљегос)",
         "America\/Argentina\/Salta": "Аргентина време (Салта)",
         "America\/Argentina\/San_Juan": "Аргентина време (Сан Хуан)",
-        "America\/Argentina\/San_Luis": "Западна Аргентина време (Сан Луи)",
+        "America\/Argentina\/San_Luis": "Аргентина време (Сан Луи)",
         "America\/Argentina\/Tucuman": "Аргентина време (Тукуман)",
         "America\/Argentina\/Ushuaia": "Аргентина време (Ушуаија)",
         "America\/Aruba": "Атлантско време (Аруба)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Брунеј Дарусалум време",
         "Asia\/Calcutta": "Индијско стандардно време (Калкута)",
         "Asia\/Chita": "Јакутск време (Чита)",
-        "Asia\/Choibalsan": "Чојбалсан време",
+        "Asia\/Choibalsan": "Улан Батор време (Чојбалсан)",
         "Asia\/Colombo": "Индијско стандардно време (Коломбо)",
         "Asia\/Damascus": "Источноевропско време (Дамаск)",
         "Asia\/Dhaka": "Бангладеш време (Дака)",

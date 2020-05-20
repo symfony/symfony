@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "שעון גריניץ׳‏ (אביג׳אן)",
         "Africa\/Accra": "שעון גריניץ׳‏ (אקרה)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "שעון ארגנטינה (ריו גאייגוס)",
         "America\/Argentina\/Salta": "שעון ארגנטינה (סלטה)",
         "America\/Argentina\/San_Juan": "שעון ארגנטינה (סן חואן)",
-        "America\/Argentina\/San_Luis": "שעון מערב ארגנטינה (סן לואיס)",
+        "America\/Argentina\/San_Luis": "שעון ארגנטינה (סן לואיס)",
         "America\/Argentina\/Tucuman": "שעון ארגנטינה (טוקומן)",
         "America\/Argentina\/Ushuaia": "שעון ארגנטינה (אושוואיה)",
         "America\/Aruba": "שעון האוקיינוס האטלנטי (ארובה)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "שעון ברוניי דארוסלאם",
         "Asia\/Calcutta": "שעון הודו (קולקטה)",
         "Asia\/Chita": "שעון יקוטסק (צ׳יטה)",
-        "Asia\/Choibalsan": "שעון צ׳ויבלסן",
+        "Asia\/Choibalsan": "שעון אולאן באטור (צ׳ויבלסן)",
         "Asia\/Colombo": "שעון הודו (קולומבו)",
         "Asia\/Damascus": "שעון מזרח אירופה (דמשק)",
         "Asia\/Dhaka": "שעון בנגלדש (דאקה)",

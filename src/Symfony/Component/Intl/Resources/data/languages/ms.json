@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazia",
@@ -434,6 +433,7 @@
         "es_419": "Sepanyol Amerika Latin",
         "es_ES": "Sepanyol Eropah",
         "es_MX": "Sepanyol Mexico",
+        "fa_AF": "Dari",
         "fr_CA": "Perancis Kanada",
         "fr_CH": "Perancis Switzerland",
         "nds_NL": "Saxon Rendah",

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "گىرىنۋىچ ۋاقتى (Abidjan)",
         "Africa\/Accra": "گىرىنۋىچ ۋاقتى (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "ئارگېنتىنا ۋاقتى (Rio Gallegos)",
         "America\/Argentina\/Salta": "ئارگېنتىنا ۋاقتى (Salta)",
         "America\/Argentina\/San_Juan": "ئارگېنتىنا ۋاقتى (San Juan)",
-        "America\/Argentina\/San_Luis": "غەربىي ئارگېنتىنا ۋاقتى (San Luis)",
+        "America\/Argentina\/San_Luis": "ئارگېنتىنا ۋاقتى (San Luis)",
         "America\/Argentina\/Tucuman": "ئارگېنتىنا ۋاقتى (Tucuman)",
         "America\/Argentina\/Ushuaia": "ئارگېنتىنا ۋاقتى (Ushuaia)",
         "America\/Aruba": "ئاتلانتىك ئوكيان ۋاقتى (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "بىرۇنىي دارۇسسالام ۋاقتى (Brunei)",
         "Asia\/Calcutta": "ھىندىستان ئۆلچەملىك ۋاقتى (Kolkata)",
         "Asia\/Chita": "ياكۇتسك ۋاقتى (Chita)",
-        "Asia\/Choibalsan": "چويبالسان ۋاقتى (Choibalsan)",
+        "Asia\/Choibalsan": "ئۇلانباتور ۋاقتى (Choibalsan)",
         "Asia\/Colombo": "ھىندىستان ئۆلچەملىك ۋاقتى (Colombo)",
         "Asia\/Damascus": "شەرقىي ياۋروپا ۋاقتى (Damascus)",
         "Asia\/Dhaka": "باڭلادىش ۋاقتى (Dhaka)",

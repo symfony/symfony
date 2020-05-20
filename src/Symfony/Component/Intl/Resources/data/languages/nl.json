@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abchazisch",
@@ -596,6 +595,7 @@
         "zza": "Zaza"
     },
     "LocalizedNames": {
+        "fa_AF": "Dari",
         "nds_NL": "Nederduits"
     }
 }

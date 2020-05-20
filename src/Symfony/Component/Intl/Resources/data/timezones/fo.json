@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwich Mean tíð (Abidjan)",
         "Africa\/Accra": "Greenwich Mean tíð (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentina tíð (Rio Gallegos)",
         "America\/Argentina\/Salta": "Argentina tíð (Salta)",
         "America\/Argentina\/San_Juan": "Argentina tíð (San Juan)",
-        "America\/Argentina\/San_Luis": "Vestur Argentina tíð (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentina tíð (San Luis)",
         "America\/Argentina\/Tucuman": "Argentina tíð (Tucuman)",
         "America\/Argentina\/Ushuaia": "Argentina tíð (Ushuaia)",
         "America\/Aruba": "Atlantic tíð (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei Darussalam tíð",
         "Asia\/Calcutta": "India tíð (Kolkata)",
         "Asia\/Chita": "Yakutsk tíð (Chita)",
-        "Asia\/Choibalsan": "Choibalsan tíð",
+        "Asia\/Choibalsan": "Ulan Bator tíð (Choibalsan)",
         "Asia\/Colombo": "India tíð (Colombo)",
         "Asia\/Damascus": "Eysturevropa tíð (Damascus)",
         "Asia\/Dhaka": "Bangladesj tíð (Dhaka)",

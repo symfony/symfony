@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "그리니치 표준시(아비장)",
         "Africa\/Accra": "그리니치 표준시(아크라)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "아르헨티나 시간(리오 가예고스)",
         "America\/Argentina\/Salta": "아르헨티나 시간(살타)",
         "America\/Argentina\/San_Juan": "아르헨티나 시간(산후안)",
-        "America\/Argentina\/San_Luis": "아르헨티나 서부 시간(산루이스)",
+        "America\/Argentina\/San_Luis": "아르헨티나 시간(산루이스)",
         "America\/Argentina\/Tucuman": "아르헨티나 시간(투쿠만)",
         "America\/Argentina\/Ushuaia": "아르헨티나 시간(우수아이아)",
         "America\/Aruba": "대서양 시간(아루바)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "브루나이 시간",
         "Asia\/Calcutta": "인도 표준시(콜카타)",
         "Asia\/Chita": "야쿠츠크 시간(치타)",
-        "Asia\/Choibalsan": "초이발산 시간",
+        "Asia\/Choibalsan": "울란바토르 시간(초이발산)",
         "Asia\/Colombo": "인도 표준시(콜롬보)",
         "Asia\/Damascus": "동유럽 시간(다마스쿠스)",
         "Asia\/Dhaka": "방글라데시 시간(다카)",

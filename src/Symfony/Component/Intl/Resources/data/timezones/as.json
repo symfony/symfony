@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "গ্ৰীণউইচ মান সময় (আবিডজান)",
         "Africa\/Accra": "গ্ৰীণউইচ মান সময় (এক্ৰা)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "আৰ্জেণ্টিনাৰ সময় (ৰিঅ’ গালেগোছ)",
         "America\/Argentina\/Salta": "আৰ্জেণ্টিনাৰ সময় (ছাল্টা)",
         "America\/Argentina\/San_Juan": "আৰ্জেণ্টিনাৰ সময় (ছেন জুৱান)",
-        "America\/Argentina\/San_Luis": "পাশ্চাত্য আৰ্জেণ্টিনাৰ সময় (ছেন লুইচ)",
+        "America\/Argentina\/San_Luis": "আৰ্জেণ্টিনাৰ সময় (ছেন লুইচ)",
         "America\/Argentina\/Tucuman": "আৰ্জেণ্টিনাৰ সময় (টুকুমন)",
         "America\/Argentina\/Ushuaia": "আৰ্জেণ্টিনাৰ সময় (উচুআইয়া)",
         "America\/Aruba": "আটলাণ্টিক সময় (আৰুবা)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ব্ৰুনেই ডাৰুছালেমৰ সময়",
         "Asia\/Calcutta": "ভাৰতীয় মান সময় (কলকাতা)",
         "Asia\/Chita": "য়াকুত্স্কৰ সময় (চিটা)",
-        "Asia\/Choibalsan": "কোইবাল্ছনৰ সময়",
+        "Asia\/Choibalsan": "উলানবাটাৰৰ সময় (কোইবাল্ছন)",
         "Asia\/Colombo": "ভাৰতীয় মান সময় (কলম্বো)",
         "Asia\/Damascus": "প্ৰাচ্য ইউৰোপীয় সময় (ডামাস্কাছ)",
         "Asia\/Dhaka": "বাংলাদেশৰ সময় (ঢাকা)",

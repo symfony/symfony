@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abxaz",
@@ -502,6 +501,7 @@
         "es_419": "Latın Amerikası ispancası",
         "es_ES": "Kastiliya ispancası",
         "es_MX": "Meksika ispancası",
+        "fa_AF": "dari",
         "fr_CA": "Kanada fransızcası",
         "fr_CH": "İsveçrə fransızcası",
         "nds_NL": "aşağı sakson",

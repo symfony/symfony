@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Horario do meridiano de Greenwich (Abidjan)",
         "Africa\/Accra": "Horario do meridiano de Greenwich (Acra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Horario da Arxentina (Río Gallegos)",
         "America\/Argentina\/Salta": "Horario da Arxentina (Salta)",
         "America\/Argentina\/San_Juan": "Horario da Arxentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Horario da Arxentina Occidental (San Luis)",
+        "America\/Argentina\/San_Luis": "Horario da Arxentina (San Luis)",
         "America\/Argentina\/Tucuman": "Horario da Arxentina (Tucumán)",
         "America\/Argentina\/Ushuaia": "Horario da Arxentina (Ushuaia)",
         "America\/Aruba": "Horario do Atlántico (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Horario de Brunei Darussalam",
         "Asia\/Calcutta": "Horario da India (Calcuta)",
         "Asia\/Chita": "Horario de Iakutsk (Chitá)",
-        "Asia\/Choibalsan": "Horario de Choibalsan",
+        "Asia\/Choibalsan": "Horario de Ulaanbaatar (Choibalsan)",
         "Asia\/Colombo": "Horario da India (Colombo)",
         "Asia\/Damascus": "Horario de Europa Oriental (Damasco)",
         "Asia\/Dhaka": "Horario de Bangladesh (Dhaka)",

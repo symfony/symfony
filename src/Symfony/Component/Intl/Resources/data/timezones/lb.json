@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Mëttler Greenwich-Zäit (Abidjan)",
         "Africa\/Accra": "Mëttler Greenwich-Zäit (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentinesch Zäit (Rio Gallegos)",
         "America\/Argentina\/Salta": "Argentinesch Zäit (Salta)",
         "America\/Argentina\/San_Juan": "Argentinesch Zäit (San Juan)",
-        "America\/Argentina\/San_Luis": "Westargentinesch Zäit (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentinesch Zäit (San Luis)",
         "America\/Argentina\/Tucuman": "Argentinesch Zäit (Tucuman)",
         "America\/Argentina\/Ushuaia": "Argentinesch Zäit (Ushuaia)",
         "America\/Aruba": "Atlantik-Zäit (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei-Zäit",
         "Asia\/Calcutta": "Indesch Zäit (Kalkutta)",
         "Asia\/Chita": "Jakutsk-Zäit (Chita)",
-        "Asia\/Choibalsan": "Choibalsan-Zäit",
+        "Asia\/Choibalsan": "Ulaanbaatar-Zäit (Choibalsan)",
         "Asia\/Colombo": "Indesch Zäit (Colombo)",
         "Asia\/Damascus": "Osteuropäesch Zäit (Damaskus)",
         "Asia\/Dhaka": "Bangladesch-Zäit (Dhaka)",

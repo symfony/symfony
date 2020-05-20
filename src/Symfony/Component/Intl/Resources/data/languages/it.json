@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -600,6 +599,7 @@
         "es_419": "spagnolo latinoamericano",
         "es_ES": "spagnolo europeo",
         "es_MX": "spagnolo messicano",
+        "fa_AF": "dari",
         "fr_CA": "francese canadese",
         "fr_CH": "francese svizzero",
         "nds_NL": "basso tedesco olandese",

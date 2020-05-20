@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar dili",
         "ab": "abhaz dili",
@@ -376,6 +375,7 @@
         "en_GB": "iňlis dili (Beýik Britaniýa)",
         "en_US": "iňlis dili (Amerika)",
         "es_ES": "ispan dili (Ýewropa)",
+        "fa_AF": "dari dili",
         "nl_BE": "flamand dili",
         "pt_PT": "portugal dili (Ýewropa)",
         "ro_MD": "moldaw dili",

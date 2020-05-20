@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkasies",
@@ -397,6 +396,7 @@
         "ar_001": "Moderne Standaardarabies",
         "en_GB": "Engels (VK)",
         "en_US": "Engels (VSA)",
+        "fa_AF": "Dari",
         "nds_NL": "Nedersaksies",
         "nl_BE": "Vlaams"
     }

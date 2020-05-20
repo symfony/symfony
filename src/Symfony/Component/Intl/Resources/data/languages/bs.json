@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -506,6 +505,8 @@
     },
     "LocalizedNames": {
         "ar_001": "moderni standardni arapski",
+        "de_CH": "visoki njemački (Švicarska)",
+        "fa_AF": "dari",
         "nds_NL": "donjosaksonski",
         "nl_BE": "flamanski",
         "ro_MD": "moldavski",

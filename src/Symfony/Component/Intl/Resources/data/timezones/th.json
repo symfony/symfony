@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "เวลามาตรฐานกรีนิช (อาบีจาน)",
         "Africa\/Accra": "เวลามาตรฐานกรีนิช (อักกรา)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "เวลาอาร์เจนตินา (ริโอกาลเลกอส)",
         "America\/Argentina\/Salta": "เวลาอาร์เจนตินา (ซัลตา)",
         "America\/Argentina\/San_Juan": "เวลาอาร์เจนตินา (ซานฮวน)",
-        "America\/Argentina\/San_Luis": "เวลาตะวันตกของอาร์เจนตินา (ซันลูอิส)",
+        "America\/Argentina\/San_Luis": "เวลาอาร์เจนตินา (ซันลูอิส)",
         "America\/Argentina\/Tucuman": "เวลาอาร์เจนตินา (ทูคูแมน)",
         "America\/Argentina\/Ushuaia": "เวลาอาร์เจนตินา (อูชูเอีย)",
         "America\/Aruba": "เวลาแอตแลนติก (อารูบา)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "เวลาบรูไนดารุสซาลาม",
         "Asia\/Calcutta": "เวลาอินเดีย (โกลกาตา)",
         "Asia\/Chita": "เวลายาคุตสค์ (ชิตา)",
-        "Asia\/Choibalsan": "เวลาชอยปาลชาน (ชอยบาลซาน)",
+        "Asia\/Choibalsan": "เวลาอูลานบาตอร์ (ชอยบาลซาน)",
         "Asia\/Colombo": "เวลาอินเดีย (โคลัมโบ)",
         "Asia\/Damascus": "เวลายุโรปตะวันออก (ดามัสกัส)",
         "Asia\/Dhaka": "เวลาบังกลาเทศ (ดากา)",

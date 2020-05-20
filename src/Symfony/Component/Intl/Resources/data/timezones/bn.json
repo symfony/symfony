@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "গ্রীনিচ মিন টাইম (আবিদজান)",
         "Africa\/Accra": "গ্রীনিচ মিন টাইম (আক্রা)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "আর্জেন্টিনা সময় (রিও গায়েগোস)",
         "America\/Argentina\/Salta": "আর্জেন্টিনা সময় (স্যালটা)",
         "America\/Argentina\/San_Juan": "আর্জেন্টিনা সময় (সান জুয়ান)",
-        "America\/Argentina\/San_Luis": "পশ্চিমি আর্জেন্টিনা সময় (সান লুইস)",
+        "America\/Argentina\/San_Luis": "আর্জেন্টিনা সময় (সান লুইস)",
         "America\/Argentina\/Tucuman": "আর্জেন্টিনা সময় (টুকুমান)",
         "America\/Argentina\/Ushuaia": "আর্জেন্টিনা সময় (উশুয়াইয়া)",
         "America\/Aruba": "অতলান্তিকের সময় (এরুবা)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ব্রুনেই দারুসসালাম সময়",
         "Asia\/Calcutta": "ভারতীয় মানক সময় (কোলকাতা)",
         "Asia\/Chita": "ইয়াকুটাস্ক সময় (চিতা)",
-        "Asia\/Choibalsan": "চয়বালসন সময় (চোইবাল্‌স্যান)",
+        "Asia\/Choibalsan": "উলান বাতোর সময় (চোইবাল্‌স্যান)",
         "Asia\/Colombo": "ভারতীয় মানক সময় (কলম্বো)",
         "Asia\/Damascus": "পূর্ব ইউরোপীয় সময় (দামাস্কাস)",
         "Asia\/Dhaka": "বাংলাদেশ সময় (ঢাকা)",

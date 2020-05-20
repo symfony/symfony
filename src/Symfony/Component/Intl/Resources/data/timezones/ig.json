@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Oge Mpaghara Greemwich Mean (Abidjan)",
         "Africa\/Accra": "Oge Mpaghara Greemwich Mean (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Oge Argentina (Rio Gallegos)",
         "America\/Argentina\/Salta": "Oge Argentina (Salta)",
         "America\/Argentina\/San_Juan": "Oge Argentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Oge Mpaghara Ọdịda Anyanwụ Argentina (San Luis)",
+        "America\/Argentina\/San_Luis": "Oge Argentina (San Luis)",
         "America\/Argentina\/Tucuman": "Oge Argentina (Tucuman)",
         "America\/Argentina\/Ushuaia": "Oge Argentina (Ushuaia)",
         "America\/Aruba": "Oge Mpaghara Atlantic (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Oge Brunei Darussalam",
         "Asia\/Calcutta": "Oge Izugbe India (Kolkata)",
         "Asia\/Chita": "Oge Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Oge Choibals (Choibalsan)",
+        "Asia\/Choibalsan": "Oge Ulaanbaatar (Choibalsan)",
         "Asia\/Colombo": "Oge Izugbe India (Colombo)",
         "Asia\/Damascus": "Oge Mpaghara Ọwụwa Anyanwụ Europe (Damascus)",
         "Asia\/Dhaka": "Oge Bangladesh (Dhaka)",
@@ -341,6 +340,7 @@
         "Europe\/Guernsey": "Oge Mpaghara Greemwich Mean (Guernsey)",
         "Europe\/Helsinki": "Oge Mpaghara Ọwụwa Anyanwụ Europe (Helsinki)",
         "Europe\/Isle_of_Man": "Oge Mpaghara Greemwich Mean (Isle of Man)",
+        "Europe\/Istanbul": "Oge Obodo Turkey (Istanbul)",
         "Europe\/Jersey": "Oge Mpaghara Greemwich Mean (Jersey)",
         "Europe\/Kaliningrad": "Oge Mpaghara Ọwụwa Anyanwụ Europe (Kaliningrad)",
         "Europe\/Kiev": "Oge Mpaghara Ọwụwa Anyanwụ Europe (Kiev)",

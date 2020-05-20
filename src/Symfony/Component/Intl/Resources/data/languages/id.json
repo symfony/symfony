@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -539,6 +538,7 @@
         "de_CH": "Jerman Tinggi (Swiss)",
         "en_GB": "Inggris (Inggris)",
         "es_ES": "Spanyol (Eropa)",
+        "fa_AF": "Persia Dari",
         "fr_CA": "Perancis (Kanada)",
         "fr_CH": "Perancis (Swiss)",
         "pt_PT": "Portugis (Eropa)",

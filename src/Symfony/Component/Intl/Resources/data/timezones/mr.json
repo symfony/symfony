@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ग्रीनिच प्रमाण वेळ (अबिद्जान)",
         "Africa\/Accra": "ग्रीनिच प्रमाण वेळ (अ‍ॅक्रा)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "अर्जेंटिना वेळ (रियो गॅलेगॉस)",
         "America\/Argentina\/Salta": "अर्जेंटिना वेळ (सॉल्ता)",
         "America\/Argentina\/San_Juan": "अर्जेंटिना वेळ (सान जुआन)",
-        "America\/Argentina\/San_Luis": "पश्चिमी अर्जेंटिना वेळ (सान ल्युइस)",
+        "America\/Argentina\/San_Luis": "अर्जेंटिना वेळ (सान ल्युइस)",
         "America\/Argentina\/Tucuman": "अर्जेंटिना वेळ (टुकुमान)",
         "America\/Argentina\/Ushuaia": "अर्जेंटिना वेळ (उस्वाइया)",
         "America\/Aruba": "अटलांटिक वेळ (अरुबा)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ब्रुनेई दारूसलाम वेळ",
         "Asia\/Calcutta": "भारतीय प्रमाण वेळ (कोलकाता)",
         "Asia\/Chita": "याकुत्सक वेळ (चिता)",
-        "Asia\/Choibalsan": "चोईबाल्सन वेळ",
+        "Asia\/Choibalsan": "उलान बाटोर वेळ (चोईबाल्सन)",
         "Asia\/Colombo": "भारतीय प्रमाण वेळ (कोलंबो)",
         "Asia\/Damascus": "पूर्व युरोपियन वेळ (दमास्कस)",
         "Asia\/Dhaka": "बांगलादेश वेळ (ढाका)",

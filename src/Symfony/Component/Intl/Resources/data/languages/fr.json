@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhaze",
@@ -606,6 +605,7 @@
         "es_419": "espagnol d’Amérique latine",
         "es_ES": "espagnol d’Espagne",
         "es_MX": "espagnol du Mexique",
+        "fa_AF": "dari",
         "fr_CA": "français canadien",
         "fr_CH": "français suisse",
         "nds_NL": "bas-saxon néerlandais",

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -597,6 +596,7 @@
     },
     "LocalizedNames": {
         "ar_001": "moderne standardarabisk",
+        "fa_AF": "dari",
         "nds_NL": "nedersaksisk",
         "nl_BE": "flamsk",
         "ro_MD": "moldovsk",

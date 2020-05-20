@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "توقيت غرينتش (أبيدجان)",
         "Africa\/Accra": "توقيت غرينتش (أكرا)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "توقيت الأرجنتين (ريو جالييوس)",
         "America\/Argentina\/Salta": "توقيت الأرجنتين (سالطا)",
         "America\/Argentina\/San_Juan": "توقيت الأرجنتين (سان خوان)",
-        "America\/Argentina\/San_Luis": "توقيت غرب الأرجنتين (سان لويس)",
+        "America\/Argentina\/San_Luis": "توقيت الأرجنتين (سان لويس)",
         "America\/Argentina\/Tucuman": "توقيت الأرجنتين (تاكمان)",
         "America\/Argentina\/Ushuaia": "توقيت الأرجنتين (أشوا)",
         "America\/Aruba": "توقيت الأطلسي (أروبا)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "توقيت بروناي",
         "Asia\/Calcutta": "توقيت الهند (كالكتا)",
         "Asia\/Chita": "توقيت ياكوتسك (تشيتا)",
-        "Asia\/Choibalsan": "توقيت شويبالسان (تشوبالسان)",
+        "Asia\/Choibalsan": "توقيت أولان باتور (تشوبالسان)",
         "Asia\/Colombo": "توقيت الهند (كولومبو)",
         "Asia\/Damascus": "توقيت شرق أوروبا (دمشق)",
         "Asia\/Dhaka": "توقيت بنغلاديش (دكا)",

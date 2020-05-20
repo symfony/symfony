@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ഗ്രീൻവിച്ച് മീൻ സമയം (അബിദ്‌ജാൻ‌)",
         "Africa\/Accra": "ഗ്രീൻവിച്ച് മീൻ സമയം (ആക്ര)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "അർജന്റീന സമയം (റിയോ ഗ്യാലഗോസ്)",
         "America\/Argentina\/Salta": "അർജന്റീന സമയം (സാൽട്ട)",
         "America\/Argentina\/San_Juan": "അർജന്റീന സമയം (സാൻ ജുവാൻ)",
-        "America\/Argentina\/San_Luis": "പടിഞ്ഞാറൻ അർജന്റീന സമയം (സാൻ ലൂയിസ്)",
+        "America\/Argentina\/San_Luis": "അർജന്റീന സമയം (സാൻ ലൂയിസ്)",
         "America\/Argentina\/Tucuman": "അർജന്റീന സമയം (റ്റുകുമാൻ)",
         "America\/Argentina\/Ushuaia": "അർജന്റീന സമയം (ഉഷിയ)",
         "America\/Aruba": "അറ്റ്‌ലാന്റിക് സമയം (അറൂബ)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ബ്രൂണൈ ദാറുസ്സലാം സമയം",
         "Asia\/Calcutta": "ഇന്ത്യൻ സ്റ്റാൻഡേർഡ് സമയം (കൊൽ‌ക്കത്ത)",
         "Asia\/Chita": "യാകസ്‌ക്ക് സമയം (ചീറ്റ)",
-        "Asia\/Choibalsan": "ചോയി‍ബൽസാൻ സമയം (ചൊയ്ബൽസൻ)",
+        "Asia\/Choibalsan": "ഉലൻ ബറ്റർ സമയം (ചൊയ്ബൽസൻ)",
         "Asia\/Colombo": "ഇന്ത്യൻ സ്റ്റാൻഡേർഡ് സമയം (കൊളം‌ബോ)",
         "Asia\/Damascus": "കിഴക്കൻ യൂറോപ്യൻ സമയം (ദമാസ്കസ്)",
         "Asia\/Dhaka": "ബംഗ്ലാദേശ് സമയം (ധാക്ക)",

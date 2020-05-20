@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abhază",
@@ -515,6 +514,7 @@
         "ar_001": "arabă standard modernă",
         "de_CH": "germană standard (Elveția)",
         "es_ES": "spaniolă (Europa)",
+        "fa_AF": "dari",
         "nds_NL": "saxona de jos",
         "nl_BE": "flamandă",
         "pt_PT": "portugheză (Europa)",

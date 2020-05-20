@@ -24,7 +24,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/polyfill-intl-icu": "~1.0"
     },
     "require-dev": {

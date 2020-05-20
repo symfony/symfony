@@ -21,7 +21,7 @@
         "symfony/http-client-implementation": "1.1"
     },
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "psr/log": "^1.0",
         "symfony/http-client-contracts": "^1.1.8|^2",
         "symfony/polyfill-php73": "^1.11",

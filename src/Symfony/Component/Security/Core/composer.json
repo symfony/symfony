@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/event-dispatcher-contracts": "^1.1|^2",
         "symfony/service-contracts": "^1.1.6|^2"
     },

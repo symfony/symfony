@@ -163,7 +163,31 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
     }
-    $passthruOrFail("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+
+    $info = [];
+    foreach (explode("\n", `$COMPOSER info -a -n phpunit/phpunit "$PHPUNIT_VERSION.*"`) as $line) {
+        $line = rtrim($line);
+
+        if (!$info && preg_match('/^versions +: /', $line)) {
+            $info['versions'] = explode(', ', ltrim(substr($line, 9), ': '));
+        } elseif (isset($info['requires'])) {
+            if ('' === $line) {
+                break;
+            }
+
+            $line = explode(' ', $line, 2);
+            $info['requires'][$line[0]] = $line[1];
+        } elseif ($info && 'requires' === $line) {
+            $info['requires'] = [];
+        }
+    }
+
+    if (1 === \count($info['versions'])) {
+        $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi -s dev phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+    } else {
+        $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+    }
+
     @copy("$PHPUNIT_VERSION_DIR/phpunit.xsd", 'phpunit.xsd');
     chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
@@ -173,6 +197,9 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
 
+    if ($info['requires']['php'] !== $phpVersion = preg_replace('{\^([\d\.]++)$}', '>=$1', $info['requires']['php'])) {
+        $passthruOrFail("$COMPOSER require --no-update \"php:$phpVersion\"");
+    }
     $passthruOrFail("$COMPOSER config --unset platform.php");
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/filesystem": "^4.4|^5.0",
         "symfony/polyfill-ctype": "~1.8"
     },

@@ -49,7 +49,8 @@ class MandrillHttpTransport extends AbstractHttpTransport
                 'to' => array_map(function (Address $recipient): string {
                     return $recipient->getAddress();
                 }, $envelope->getRecipients()),
-                'from_email' => $envelope->getSender()->toString(),
+                'from_email' => $envelope->getSender()->getAddress(),
+                'from_name' => $envelope->getSender()->getName(),
                 'raw_message' => $message->toString(),
             ],
         ]);

@@ -326,6 +326,14 @@ abstract class AbstractController implements ServiceSubscriberInterface
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
+    
+    /**
+     * Creates and returns a Form view from the type of the form.
+     */
+    protected function createFormView(string $type, $data = null, array $options = []): FormView
+    {
+        return $this->container->get('form.factory')->create($type, $data, $options)->createView();
+    }
 
     /**
      * Creates and returns a form builder instance.

@@ -12,12 +12,13 @@
 namespace Symfony\Component\Scheduler\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Scheduler\Event\WorkerStartedEvent;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class StopWorkerOnTaskLimitSubscriber implements WorkerSubscriberInterface
+final class StopWorkerOnTaskLimitSubscriber implements EventSubscriberInterface
 {
     private $consumedTasks = 0;
     private $maximumTasks;
@@ -37,14 +38,6 @@ final class StopWorkerOnTaskLimitSubscriber implements WorkerSubscriberInterface
         return [
             WorkerStartedEvent::class => 'onWorkerStarted',
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedWorkers(): array
-    {
-        return ['*'];
     }
 
     public function onWorkerStarted(WorkerStartedEvent $event): void

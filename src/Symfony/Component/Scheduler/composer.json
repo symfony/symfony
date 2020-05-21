@@ -2,7 +2,7 @@
   "name": "symfony/scheduler",
   "type": "library",
   "description": "Symfony Scheduler Component",
-  "keywords": ["schedule", "scheduler", "tasks"],
+  "keywords": ["schedule", "scheduler", "tasks", "cron", "automation"],
   "homepage": "https://symfony.com",
   "license": "MIT",
   "authors": [
@@ -11,15 +11,18 @@
       "email": "fabien@symfony.com"
     },
     {
+      "name": "Guillaume Loulier",
+      "email": "contact@guillaumeloulier.fr"
+    },
+    {
       "name": "Symfony Community",
       "homepage": "https://symfony.com/contributors"
     }
   ],
   "require": {
-    "php": "^7.2.5",
-    "ext-pcntl": "*",
+    "php": ">=7.2.5",
+    "dragonmantank/cron-expression": "^3.0",
     "psr/log": "~1.0",
-    "dragonmantank/cron-expression": "^2.3",
     "symfony/console": "^4.4|^5.0",
     "symfony/expression-language": "^4.4|^5.0",
     "symfony/filesystem": "^4.4|^5.0",
@@ -30,15 +33,19 @@
   },
   "require-dev": {
     "symfony/event-dispatcher": "^4.4|^5.0",
+    "symfony/http-client": "^4.4|^5.0",
     "symfony/http-kernel": "^4.4|^5.0",
     "symfony/mailer": "^4.4|^5.0",
     "symfony/messenger": "^4.4|^5.0",
+    "symfony/mercure": "^0.3.0",
     "symfony/notifier": "^4.4|^5.0"
   },
   "suggest": {
     "symfony/event-dispatcher": "For dispatching and listening to tasks & worker lifecycle events",
+    "symfony/http-client": "For dispatching http tasks",
     "symfony/mailer": "For sending emails according to task execution",
     "symfony/messenger": "For dispatching tasks to queue",
+    "symfony/mercure": "For real-time notifications about tasks lifecycle",
     "symfony/notifier": "For dispatching notification tasks and respond to task execution",
     "symfony/stopwatch": "For tracking and sorting the tasks depending on their execution duration"
   },

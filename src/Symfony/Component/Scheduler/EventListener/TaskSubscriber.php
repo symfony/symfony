@@ -19,7 +19,6 @@ use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -28,7 +27,7 @@ final class TaskSubscriber implements EventSubscriberInterface
 {
     private $schedulerRegistry;
     private $tasksPath;
-    private $workerRegistry;
+    private $worker;
 
     /**
      * {@inheritdoc}
@@ -43,10 +42,10 @@ final class TaskSubscriber implements EventSubscriberInterface
     /**
      * @param string $tasksPath The path that trigger this listener
      */
-    public function __construct(SchedulerRegistryInterface $schedulerRegistry, WorkerRegistryInterface $workerRegistry, string $tasksPath = '/_tasks')
+    public function __construct(SchedulerRegistryInterface $schedulerRegistry, WorkerInterface $worker, string $tasksPath = '/_tasks')
     {
         $this->schedulerRegistry = $schedulerRegistry;
-        $this->workerRegistry = $workerRegistry;
+        $this->worker = $worker;
         $this->tasksPath = $tasksPath;
     }
 
@@ -89,14 +88,8 @@ final class TaskSubscriber implements EventSubscriberInterface
             }
         }
 
-        $availableWorkers = $this->workerRegistry->filter(function (WorkerInterface $worker): bool {
-            return !$worker->isRunning();
-        });
-
-        $availableWorker = reset($availableWorkers);
-
         foreach ($tasks as $task) {
-            $availableWorker->execute($task);
+            $this->worker->execute($task);
         }
     }
 }

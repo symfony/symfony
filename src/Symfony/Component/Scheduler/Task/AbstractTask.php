@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Scheduler\Task;
 
+use Cron\CronExpression;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Scheduler\Expression\ExpressionValidator;
+use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -40,7 +41,9 @@ abstract class AbstractTask implements TaskInterface
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'arguments' => [],
+            'bags' => [],
             'command' => null,
+            'depends_on' => [],
             'description' => null,
             'expression' => '* * * * *',
             'execution_mode' => null,
@@ -57,6 +60,7 @@ abstract class AbstractTask implements TaskInterface
             'nice' => null,
             'output' => false,
             'priority' => 0,
+            'single_run' => false,
             'queued' => false,
             'arrival_time' => null,
             'state' => TaskInterface::ENABLED,
@@ -68,7 +72,9 @@ abstract class AbstractTask implements TaskInterface
 
         $resolver->setAllowedTypes('arguments', ['string[]', 'int[]']);
         $resolver->setAllowedTypes('arrival_time', [\DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('bags', ['string[]', 'array']);
         $resolver->setAllowedTypes('command', ['string', 'null']);
+        $resolver->setAllowedTypes('depends_on', ['string[]', 'array']);
         $resolver->setAllowedTypes('description', ['string', 'null']);
         $resolver->setAllowedTypes('expression', ['string', \DateTimeInterface::class]);
         $resolver->setAllowedTypes('execution_mode', ['string', 'null']);
@@ -85,6 +91,7 @@ abstract class AbstractTask implements TaskInterface
         $resolver->setAllowedTypes('shared', ['bool']);
         $resolver->setAllowedTypes('priority', 'int');
         $resolver->setAllowedTypes('queued', ['bool']);
+        $resolver->setAllowedTypes('single_run', 'bool');
         $resolver->setAllowedTypes('state', 'string');
         $resolver->setAllowedTypes('timezone', [\DateTimeZone::class, 'null']);
         $resolver->setAllowedTypes('tracked', ['bool']);
@@ -153,14 +160,6 @@ abstract class AbstractTask implements TaskInterface
     /**
      * {@inheritdoc}
      */
-    public function getType(): string
-    {
-        return $this->options['type'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getOptions(): array
     {
         return $this->options ?? [];
@@ -172,6 +171,28 @@ abstract class AbstractTask implements TaskInterface
     public function get(string $key, $default = null)
     {
         return \array_key_exists($key, $this->options) ? $this->options[$key] : $default;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addBag(string $name, string $value): void
+    {
+        if (\array_key_exists($name, $this->options['bags'])) {
+            throw new InvalidArgumentException('This bag is already registered.');
+        }
+
+        $this->options['bags'][$name] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBag(string $name): ?string
+    {
+        $bags = $this->get('bags');
+
+        return !\array_key_exists($name, $bags) ? null : $bags[$name];
     }
 
     /**
@@ -237,6 +258,6 @@ abstract class AbstractTask implements TaskInterface
      */
     private function handleTimeRelativeTasks($expression): bool
     {
-        return (strtotime($expression)) || (ExpressionValidator::validateString($expression)) || ($expression instanceof \DateTimeInterface);
+        return (strtotime($expression)) || (CronExpression::isValidExpression($expression)) || ($expression instanceof \DateTimeInterface);
     }
 }

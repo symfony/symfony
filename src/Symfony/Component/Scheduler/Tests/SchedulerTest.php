@@ -14,6 +14,7 @@ namespace Symfony\Component\Scheduler\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\Exception\AlreadyScheduledTaskException;
 use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Component\Scheduler\Task\ShellTask;
@@ -33,8 +34,10 @@ final class SchedulerTest extends TestCase
      */
     public function testSchedulerCanBeCreatedWithSpecificTimezone(): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = $this->createMock(TransportInterface::class);
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/London'), $transport);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/London'), $transport, $registry);
 
         static::assertNotNull($scheduler->getTimezone());
         static::assertInstanceOf(\DateTimeZone::class, $scheduler->getTimezone());
@@ -46,8 +49,10 @@ final class SchedulerTest extends TestCase
      */
     public function testSchedulerCanBeCreatedWithEventDispatcher(): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = $this->createMock(TransportInterface::class);
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport, $registry);
 
         static::assertNotNull($scheduler->getTimezone());
         static::assertInstanceOf(\DateTimeZone::class, $scheduler->getTimezone());
@@ -60,8 +65,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeScheduledWithoutEventDispatcher(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport, $registry);
 
         $scheduler->schedule($task);
 
@@ -76,8 +83,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeScheduledWithEventDispatcher(TaskInterface $tasks): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = Scheduler::forSpecificTimezone(new \DateTimeZone('Europe/Paris'), $transport, $registry);
 
         $scheduler->schedule($tasks);
 
@@ -92,9 +101,11 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeScheduledWithEventDispatcherAndMessageBus(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $messageBus = new SchedulerMessageBus();
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $messageBus);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry, $messageBus);
 
         $task->set('queued', true);
         $scheduler->schedule($task);
@@ -110,8 +121,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCannotBeScheduledTwice(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
 
         $scheduler->schedule($task);
 
@@ -127,8 +140,10 @@ final class SchedulerTest extends TestCase
      */
     public function testDueTasksCanBeReturnedWithoutEventDispatcher(TaskInterface $tasks): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
 
         $scheduler->schedule($tasks);
         $dueTasks = $scheduler->getDueTasks();
@@ -144,8 +159,10 @@ final class SchedulerTest extends TestCase
      */
     public function testDueTasksCanBeReturnedWithSpecificFilter(TaskInterface $tasks): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
         $scheduler->schedule($tasks);
 
         $dueTasks = $scheduler->getTasks()->filter(function (TaskInterface $task): bool {
@@ -162,8 +179,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeUnScheduled(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks());
@@ -180,8 +199,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBeUpdated(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks()->toArray());
@@ -203,8 +224,10 @@ final class SchedulerTest extends TestCase
      */
     public function testTaskCanBePausedAndResumed(TaskInterface $task): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/Paris'), $transport, $registry);
         $scheduler->schedule($task);
 
         static::assertNotEmpty($scheduler->getTasks());

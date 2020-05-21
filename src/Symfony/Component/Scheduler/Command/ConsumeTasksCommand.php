@@ -20,12 +20,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Scheduler\EventListener\StopWorkerOnTaskLimitSubscriber;
 use Symfony\Component\Scheduler\EventListener\StopWorkerOnTimeLimitSubscriber;
+use Symfony\Component\Scheduler\Runner\RunnerInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
+use Symfony\Component\Scheduler\Task\TaskExecutionWatcherInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
-use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
+use Symfony\Component\Scheduler\Worker\Worker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use function array_map;
+use function array_pop;
+use function count;
+use function implode;
+use function in_array;
+use function sprintf;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -34,16 +41,22 @@ final class ConsumeTasksCommand extends Command
 {
     private $eventDispatcher;
     private $logger;
+    private $runners;
     private $schedulerRegistry;
-    private $workerRegistry;
+    private $watcher;
+
     protected static $defaultName = 'scheduler:consume';
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, SchedulerRegistryInterface $schedulerRegistry, WorkerRegistryInterface $workerRegistry, LoggerInterface $logger = null)
+    /**
+     * @param iterable|RunnerInterface[] $runners
+     */
+    public function __construct(iterable $runners, TaskExecutionWatcherInterface $watcher, EventDispatcherInterface $eventDispatcher, SchedulerRegistryInterface $schedulerRegistry, LoggerInterface $logger = null)
     {
+        $this->runners = $runners;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->schedulerRegistry = $schedulerRegistry;
-        $this->workerRegistry = $workerRegistry;
+        $this->watcher = $watcher;
 
         parent::__construct();
     }
@@ -83,51 +96,39 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-
         $stopOptions = [];
-
-        $workers = $this->workerRegistry->filter(function (WorkerInterface $worker): bool {
-            return !$worker->isRunning();
-        });
-
-        if (empty($workers)) {
-            $io->error('No worker is available, please retry');
-
-            return 1;
-        }
-
-        $availableWorker = reset($workers);
-
-        if (null !== $limit = $input->getOption('limit')) {
-            $stopOptions[] = sprintf('%s tasks has been processed', $limit);
-            $availableWorker->addSubscriber(new StopWorkerOnTaskLimitSubscriber($limit, $this->logger));
-        }
-
-        if (null !== $timeLimit = $input->getOption('time-limit')) {
-            $stopOptions[] = sprintf('it has been running for %d seconds', $timeLimit);
-            $availableWorker->addSubscriber(new StopWorkerOnTimeLimitSubscriber($timeLimit, $this->logger));
-        }
 
         $schedulers = $input->getArgument('schedulers');
 
         $filteredSchedulers = $this->schedulerRegistry->filter(function (SchedulerInterface $scheduler, string $name) use ($schedulers): bool {
-            return \in_array($name, $schedulers);
+            return in_array($name, $schedulers);
         });
 
-        if (0 === \count($filteredSchedulers)) {
+        $io = new SymfonyStyle($input, $output);
+
+        if (0 === count($filteredSchedulers)) {
             $io->error('No schedulers can be found, please retry');
 
-            return 1;
+            return self::FAILURE;
         }
 
-        if (\count($filteredSchedulers) !== \count($schedulers)) {
+        if (count($filteredSchedulers) !== count($schedulers)) {
             $io->error('The schedulers cannot be found, please retry');
 
-            return 1;
+            return self::FAILURE;
         }
 
-        $io->success(sprintf('Consuming tasks from scheduler%s: "%s"', \count($schedulers) > 1 ? 's' : '', implode(', ', $schedulers)));
+        $io->success(sprintf('Consuming tasks from scheduler%s: "%s"', count($schedulers) > 1 ? 's' : '', implode(', ', $schedulers)));
+
+        if (null !== $limit = $input->getOption('limit')) {
+            $stopOptions[] = sprintf('%s tasks has been processed', $limit);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnTaskLimitSubscriber($limit, $this->logger));
+        }
+
+        if (null !== $timeLimit = $input->getOption('time-limit')) {
+            $stopOptions[] = sprintf('it has been running for %d seconds', $timeLimit);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitSubscriber($timeLimit, $this->logger));
+        }
 
         $tasks = new TaskList();
         array_map(function (SchedulerInterface $scheduler) use (&$tasks): void {
@@ -142,10 +143,12 @@ EOF
 
         $io->comment('Quit the worker with CONTROL-C.');
 
+        $worker = new Worker($this->runners, $this->watcher, $this->eventDispatcher, $this->logger);
+
         foreach ($tasks as $task) {
-            $availableWorker->execute($task);
+            $worker->execute($task);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 }

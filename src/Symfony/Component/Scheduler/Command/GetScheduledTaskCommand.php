@@ -86,7 +86,7 @@ final class GetScheduledTaskCommand extends Command
         if (0 === \count($scheduledTasks)) {
             $this->io->warning('No tasks found');
 
-            return 0;
+            return self::SUCCESS;
         }
 
         $tableRows = [];
@@ -105,6 +105,6 @@ final class GetScheduledTaskCommand extends Command
         $table->addRows($tableRows);
         $table->render();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

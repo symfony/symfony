@@ -13,24 +13,23 @@ namespace Symfony\Component\Scheduler\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 final class ListFailedTasksCommand extends Command
 {
-    private $workerRegistry;
+    private $worker;
+
     protected static $defaultName = 'scheduler:list-failed';
 
-    public function __construct(WorkerRegistryInterface $workerRegistry)
+    public function __construct(WorkerInterface $worker)
     {
-        $this->workerRegistry = $workerRegistry;
+        $this->worker = $worker;
 
         parent::__construct();
     }
@@ -42,9 +41,6 @@ final class ListFailedTasksCommand extends Command
     {
         $this
             ->setDescription('List all the failed tasks')
-            ->setDefinition([
-                new InputArgument('worker', InputArgument::OPTIONAL, 'The name of the worker to list the failed tasks')
-            ])
         ;
     }
 
@@ -54,34 +50,28 @@ final class ListFailedTasksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $filterWorker = $input->getArgument('worker');
-
-        $workers = null === $filterWorker ? $this->workerRegistry->toArray() : $this->workerRegistry->filter(function (WorkerInterface $worker, string $name) use ($filterWorker): bool {
-            return $filterWorker === $name;
-        });
-
-        if (0 === \count($workers)) {
-            $io->warning('No worker found');
-
-            return 1;
-        }
-
         $failedTasks = [];
 
         $table = new Table($output);
-        $table->setHeaders(['Worker', 'Task', 'Reason', 'Date']);
+        $table->setHeaders(['Task', 'Reason', 'Date']);
 
-        array_walk($workers, function (WorkerInterface $worker, string $name) use (&$failedTasks): void {
-            $failedTasksList = $worker->getFailedTasks()->toArray();
+        $failedTasksList = $this->worker->getFailedTasks()->toArray();
 
-            foreach ($failedTasksList as $task) {
-                $failedTasks[] = [$name, $task->getName(), $task->getReason(), $task->getTriggerDate()->format('m-j-Y H:i:s')];
-            }
-        });
+        if (0 === \count($failedTasksList)) {
+            $io->warning('No failed task has been found');
+
+            return self::SUCCESS;
+        }
+
+        foreach ($failedTasksList as $task) {
+            $failedTasks[] = [$task->getName(), $task->getReason(), $task->getTriggerDate()->format('m-j-Y H:i:s')];
+        }
 
         $table->addRows($failedTasks);
+
+        $io->success('List of the failed tasks:');
         $table->render();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

@@ -12,37 +12,37 @@
 namespace Symfony\Component\Scheduler\Messenger;
 
 use Cron\CronExpression;
+use Exception;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 final class TaskMessageHandler implements MessageHandlerInterface
 {
-    private $workerRegistry;
+    private $worker;
 
-    public function __construct(WorkerRegistryInterface $workerRegistry)
+    public function __construct(WorkerInterface $worker)
     {
-        $this->workerRegistry = $workerRegistry;
+        $this->worker = $worker;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __invoke(TaskMessage $message): void
     {
         $task = $message->getTask();
 
-        if (!CronExpression::factory($task->get('expression'))->isDue($task->get('scheduled_at'), $task->get('timezone'))) {
+        if (!CronExpression::factory($task->get('expression'))->isDue($task->get('arrival_time'), $task->get('timezone'))) {
             return;
         }
 
-        $workers = $this->workerRegistry->filter(function (WorkerInterface $worker): bool {
-            return !$worker->isRunning();
-        });
+        while ($this->worker->isRunning()) {
+            sleep(0.5);
+        }
 
-        reset($workers)->execute($task);
+        $this->worker->execute($task);
     }
 }

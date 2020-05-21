@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\TraceableScheduler;
@@ -25,11 +26,13 @@ final class TraceableSchedulerTest extends TestCase
 {
     public function testTaskDataCanBeCollected(): void
     {
+        $registry = $this->createMock(BagRegistryInterface::class);
+
         $task = $this->createMock(TaskInterface::class);
         $task->method('getName')->willReturn('foo');
         $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
 
-        $scheduler = new Scheduler(new \DateTimeZone('Europe/London'), $transport);
+        $scheduler = new Scheduler(new \DateTimeZone('Europe/London'), $transport, $registry);
         $traceableScheduler = new TraceableScheduler($scheduler);
 
         $traceableScheduler->schedule($task);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
@@ -20,7 +22,7 @@ use Symfony\Component\Scheduler\Transport\TransportInterface;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class DoctrineTransport implements TransportInterface
+class DoctrineTransport implements TransportInterface
 {
     private $connection;
     private $dsn;
@@ -93,7 +95,7 @@ final class DoctrineTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
         $this->connection->empty();
     }
@@ -104,5 +106,10 @@ final class DoctrineTransport implements TransportInterface
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function configureSchema(Schema $schema, DbalConnection $connection): void
+    {
+        $this->connection->configureSchema($schema, $connection);
     }
 }

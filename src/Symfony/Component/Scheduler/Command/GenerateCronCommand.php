@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -22,6 +24,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Scheduler\Cron\CronGenerator;
 use Symfony\Component\Scheduler\Cron\CronInterface;
 use Symfony\Component\Scheduler\Cron\CronRegistry;
+use function in_array;
+use function sprintf;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -30,6 +34,7 @@ final class GenerateCronCommand extends Command
 {
     private $generator;
     private $registry;
+
     protected static $defaultName = 'scheduler:generate';
 
     public function __construct(CronGenerator $generator, CronRegistry $registry)
@@ -64,13 +69,13 @@ final class GenerateCronCommand extends Command
         $schedulers = $input->getArgument('schedulers');
 
         $crons = empty($schedulers) ? $this->registry->toArray() : $this->registry->filter(function (CronInterface $cron, string $name) use ($schedulers): bool {
-            return \in_array($name, $schedulers);
+            return in_array($name, $schedulers);
         });
 
         if (empty($crons)) {
             $io->warning('No cron file found, please be sure that at least a scheduler is defined');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $directory = $input->getOption('directory');
@@ -87,7 +92,7 @@ final class GenerateCronCommand extends Command
             $io->success('Cron files to be generated:');
             $table->render();
 
-            return 0;
+            return self::SUCCESS;
         }
 
         try {
@@ -100,12 +105,12 @@ final class GenerateCronCommand extends Command
         } catch (IOException $exception) {
             $io->error(sprintf('An error occurred: %s', $exception->getMessage()));
 
-            return 1;
+            return self::FAILURE;
         }
 
         $io->success(sprintf('Cron files have been generated for schedulers at "%s"', $directory));
         $table->render();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

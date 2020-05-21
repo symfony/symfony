@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -16,6 +18,7 @@ use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
+use function array_merge;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -29,7 +32,7 @@ final class LocalTransport implements TransportInterface
     public function __construct(Dsn $dsn, array $options = [])
     {
         $this->options = array_merge($dsn->getOptions(), $options);
-        $this->orchestrator = new ExecutionModeOrchestrator($dsn->getOption('execution_mode') ?? ExecutionModeOrchestrator::FIFO);
+        $this->orchestrator = new ExecutionModeOrchestrator($dsn->getUser() ?? ExecutionModeOrchestrator::FIFO);
     }
 
     /**
@@ -53,11 +56,15 @@ final class LocalTransport implements TransportInterface
      */
     public function create(TaskInterface $task): void
     {
-        if (\array_key_exists($task->getName(), $this->tasks)) {
+        if (isset($this->tasks[$task->getName()])) {
             throw new AlreadyScheduledTaskException(sprintf('The following task "%s" has already been scheduled!', $task->getName()));
         }
 
         $task->set('mode', $this->orchestrator->getMode());
+
+        if (isset($this->options['nice'])) {
+            $task->set('nice', $this->options['nice']);
+        }
 
         $this->tasks[$task->getName()] = $task;
         $this->tasks = $this->orchestrator->sort($this->tasks);
@@ -109,16 +116,13 @@ final class LocalTransport implements TransportInterface
         $this->update($taskName, $task);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function empty(): void
+    public function clear(): void
     {
         $this->tasks = [];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string,mixed>
      */
     public function getOptions(): array
     {

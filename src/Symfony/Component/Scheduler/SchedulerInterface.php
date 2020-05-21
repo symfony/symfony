@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,6 +13,8 @@
 
 namespace Symfony\Component\Scheduler;
 
+use DateTimeZone;
+use Symfony\Component\Scheduler\Bag\BagInterface;
 use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
@@ -23,9 +27,10 @@ interface SchedulerInterface
     /**
      * Schedule a specific task, the storage of the task is up to the scheduler.
      *
-     * @param TaskInterface $task
+     * @param TaskInterface        $task
+     * @param array|BagInterface[] $bags
      */
-    public function schedule(TaskInterface $task): void;
+    public function schedule(TaskInterface $task, array $bags = []): void;
 
     /**
      * Un-schedule a specific task, once un-scheduled, the task is removed from the scheduler.
@@ -66,9 +71,9 @@ interface SchedulerInterface
     /**
      * Return the timezone used by the actual scheduler, each scheduler can use a different timezone.
      *
-     * @return \DateTimeZone
+     * @return DateTimeZone
      */
-    public function getTimezone(): \DateTimeZone;
+    public function getTimezone(): DateTimeZone;
 
     /**
      * Return every tasks scheduled.

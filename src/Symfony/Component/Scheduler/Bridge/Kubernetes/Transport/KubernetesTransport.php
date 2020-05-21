@@ -18,6 +18,7 @@ use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -27,12 +28,12 @@ final class KubernetesTransport implements TransportInterface
     private $connection;
     private $options;
     private $serializer;
-    private $httpClient;
 
-    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer)
+    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer, HttpClientInterface $httpClient = null)
     {
         $this->options = array_merge($dsn->getOptions(), $options);
         $this->serializer = $serializer;
+        $this->connection = new Connection($dsn, $serializer, $httpClient);
     }
 
     /**
@@ -40,6 +41,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function get(string $taskName): TaskInterface
     {
+        return $this->connection->get($taskName);
     }
 
     /**
@@ -47,6 +49,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function list(): TaskListInterface
     {
+        return $this->connection->list();
     }
 
     /**
@@ -55,7 +58,7 @@ final class KubernetesTransport implements TransportInterface
     public function create(TaskInterface $task): void
     {
         if (!$task instanceof CronJob) {
-            throw new InvalidArgumentException('');
+            throw new InvalidArgumentException(sprintf('The task must be a CronJob, given "%s"', get_class($task)));
         }
 
         $this->connection->create($task);
@@ -66,7 +69,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function update(string $taskName, TaskInterface $updatedTask): void
     {
-        // TODO: Implement update() method.
+        $this->connection->update($taskName, $updatedTask);
     }
 
     /**
@@ -82,7 +85,7 @@ final class KubernetesTransport implements TransportInterface
      */
     public function pause(string $taskName): void
     {
-        // TODO: Implement pause() method.
+        $this->connection->pause($taskName);
     }
 
     /**
@@ -90,13 +93,13 @@ final class KubernetesTransport implements TransportInterface
      */
     public function resume(string $taskName): void
     {
-        // TODO: Implement resume() method.
+        $this->connection->resume($taskName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
         $this->connection->empty();
     }

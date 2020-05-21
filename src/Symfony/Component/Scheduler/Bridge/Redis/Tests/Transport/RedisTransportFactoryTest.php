@@ -13,7 +13,6 @@ namespace Symfony\Component\Scheduler\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransportFactory;
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -24,10 +23,7 @@ final class RedisTransportFactoryTest extends TestCase
 {
     public function testTransportCanSupport(): void
     {
-        $taskFactory = $this->createMock(TaskFactoryInterface::class);
-        $factory = new RedisTransportFactory($taskFactory);
-
-        static::assertFalse($factory->support('test://'));
-        static::assertTrue($factory->support('redis://'));
+        static::assertFalse((new RedisTransportFactory())->support('test://'));
+        static::assertTrue((new RedisTransportFactory())->support('redis://'));
     }
 }

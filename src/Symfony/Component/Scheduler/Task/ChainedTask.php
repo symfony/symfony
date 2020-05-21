@@ -16,20 +16,13 @@ namespace Symfony\Component\Scheduler\Task;
  */
 final class ChainedTask extends AbstractTask
 {
-    /**
-     * @var TaskInterface[]
-     */
-    private $tasks;
-
     public function __construct(string $name, array $tasks, array $options = [], array $additionalOptions = [])
     {
-        $this->tasks = $tasks;
-
-        parent::__construct($name, $options, $additionalOptions);
-    }
-
-    public function getTasks(): array
-    {
-        return $this->tasks;
+        parent::__construct($name, array_merge($options, [
+            'tasks' => $tasks,
+            'type' => 'chained',
+        ]), array_merge($additionalOptions, [
+            'tasks' => ['Symfony\Component\Scheduler\Task\TaskInterface[]']
+        ]));
     }
 }

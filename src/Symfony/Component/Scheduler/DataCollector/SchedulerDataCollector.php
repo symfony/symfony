@@ -18,16 +18,21 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
-use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 final class SchedulerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    /**
+     * @var array<string,SchedulerInterface>
+     */
     private $schedulers = [];
+
+    /**
+     * @var array<string,TransportInterface>
+     */
     private $transports = [];
-    private $workers = [];
 
     public function registerTransport(string $name, TransportInterface $transport): void
     {
@@ -39,15 +44,10 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
         $this->schedulers[$name] = $scheduler;
     }
 
-    public function registerWorker(string $name, WorkerInterface $worker): void
-    {
-        $this->workers[$name] = $worker;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         // As data can comes from Messenger, local or remote schedulers|workers, we should collect it as late as possible.
     }
@@ -55,7 +55,7 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->reset();
 
@@ -71,12 +71,6 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
             ];
         }
 
-        foreach ($this->workers as $name => $worker) {
-            $this->data['workers'][$name] = [
-                'executed_tasks' => $worker->getExecutedTasks(),
-            ];
-        }
-
         foreach ($this->transports as $name => $transport) {
             $this->data['transports'][$name] = [
                 'exceptions' => $transport->getExceptionsCount(),
@@ -87,19 +81,15 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'scheduler';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->data['schedulers'] = [];
         $this->data['transports'] = [];
-        $this->data['workers'] = [];
     }
 
     public function getScheduledTasks(): array
@@ -118,29 +108,19 @@ final class SchedulerDataCollector extends DataCollector implements LateDataColl
         return $this->data['schedulers'][$scheduler]['scheduled_tasks'];
     }
 
-    public function getExecutedTasks(): array
-    {
-        $tasks = [];
-
-        foreach ($this->data['workers'] as $worker => $data) {
-            $tasks[$worker] = $data['executed_tasks'];
-        }
-
-        return $tasks;
-    }
-
+    /**
+     * @return array<string,SchedulerInterface>
+     */
     public function getSchedulers(): array
     {
         return $this->data['schedulers'];
     }
 
+    /**
+     * @return array<string,TransportInterface>
+     */
     public function getTransports(): array
     {
         return $this->data['transports'];
-    }
-
-    public function getWorkers(): array
-    {
-        return $this->data['workers'];
     }
 }

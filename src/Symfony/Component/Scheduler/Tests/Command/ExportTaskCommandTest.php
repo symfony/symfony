@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Scheduler\Command\ExportTaskCommand;
 use Symfony\Component\Scheduler\Export\ExporterInterface;
@@ -57,7 +58,7 @@ final class ExportTaskCommandTest extends TestCase
             '--filename' => 'export',
         ]);
 
-        static::assertSame(1, $tester->getStatusCode());
+        static::assertSame(Command::FAILURE, $tester->getStatusCode());
         static::assertStringContainsString('[KO] No task found!', $tester->getDisplay());
     }
 
@@ -85,7 +86,7 @@ final class ExportTaskCommandTest extends TestCase
             '--filename' => 'export',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString(sprintf('[OK] Exported "1" tasks to "%s/export.json"', sys_get_temp_dir()), $tester->getDisplay());
     }
 }

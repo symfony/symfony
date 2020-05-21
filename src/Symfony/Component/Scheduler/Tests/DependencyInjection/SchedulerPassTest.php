@@ -21,7 +21,6 @@ use Symfony\Component\Scheduler\Cron\CronRegistry;
 use Symfony\Component\Scheduler\DataCollector\SchedulerDataCollector;
 use Symfony\Component\Scheduler\DependencyInjection\SchedulerPass;
 use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
-use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Scheduler;
 use Symfony\Component\Scheduler\SchedulerAwareInterface;
 use Symfony\Component\Scheduler\SchedulerInterface;
@@ -48,16 +47,6 @@ final class SchedulerPassTest extends TestCase
         (new SchedulerPass())->process($container);
         static::assertTrue($container->hasDefinition('debug.scheduler.hub.foo'));
         static::assertTrue($container->getDefinition('scheduler.data_collector')->hasMethodCall('registerScheduler'));
-    }
-
-    public function testPassCanRegisterWorkerInDataCollector(): void
-    {
-        $container = $this->getContainerBuilder();
-        $container->register('foo', FooWorker::class)->addTag('scheduler.worker');
-
-        (new SchedulerPass())->process($container);
-        static::assertTrue($container->hasDefinition('debug.scheduler.worker.foo'));
-        static::assertTrue($container->getDefinition('scheduler.data_collector')->hasMethodCall('registerWorker'));
     }
 
     public function testPassCanRegisterTraceableTransport(): void
@@ -137,7 +126,7 @@ final class SchedulerPassTest extends TestCase
 
 final class FooScheduler implements SchedulerInterface
 {
-    public function schedule(TaskInterface $task): void
+    public function schedule(TaskInterface $task, array $bags = []): void
     {
     }
 
@@ -178,34 +167,6 @@ final class FooScheduler implements SchedulerInterface
 
     public function addSubscriber(SchedulerSubscriberInterface $subscriber): void
     {
-    }
-}
-
-final class FooWorker implements WorkerInterface
-{
-    public function execute(TaskInterface $task): void
-    {
-        return;
-    }
-
-    public function stop(): void
-    {
-        return;
-    }
-
-    public function isRunning(): bool
-    {
-        return false;
-    }
-
-    public function getFailedTasks(): TaskListInterface
-    {
-        return new TaskList();
-    }
-
-    public function addSubscriber(WorkerSubscriberInterface $subscriber): void
-    {
-        return;
     }
 }
 
@@ -276,7 +237,7 @@ final class FooTransport implements TransportInterface
     {
     }
 
-    public function empty(): void
+    public function clear(): void
     {
     }
 

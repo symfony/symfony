@@ -19,6 +19,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Scheduler\Exception\AlreadyScheduledTaskException;
+use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Exception\TransportException;
 use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
@@ -28,6 +30,7 @@ use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -45,14 +48,16 @@ final class Connection implements ConnectionInterface
     private $schemaSynchronizer;
     private $taskFactory;
     private $orchestrator;
+    private $serializer;
 
-    public function __construct(TaskFactoryInterface $taskFactory, array $configuration, DBALConnection $driverConnection)
+    public function __construct(TaskFactoryInterface $taskFactory, array $configuration, DBALConnection $driverConnection, SerializerInterface $serializer)
     {
         $this->taskFactory = $taskFactory;
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+        $this->serializer = $serializer;
         $this->orchestrator = new ExecutionModeOrchestrator($configuration['execution_mode'] ?? ExecutionModeOrchestrator::FIFO);
     }
 
@@ -80,6 +85,9 @@ final class Connection implements ConnectionInterface
         return new TaskList($this->orchestrator->sort($tasks));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get(string $taskName): TaskInterface
     {
         $queryBuilder = $this->createQueryBuilder()->where('t.task_name = ?');
@@ -89,12 +97,7 @@ final class Connection implements ConnectionInterface
             throw new LogicException('The desired task cannot be found.');
         }
 
-        if (\array_key_exists('task_name', $data)) {
-            $data['name'] = $data['task_name'];
-            unset($data['task_name']);
-        }
-
-        return $this->taskFactory->create($data);
+        return $this->serializer->deserialize($data, TaskInterface::class, 'json');
     }
 
     /**
@@ -102,20 +105,22 @@ final class Connection implements ConnectionInterface
      */
     public function create(TaskInterface $task): void
     {
+        $list = $this->list();
+
+        if (\array_key_exists($task->getName(), $list->toArray())) {
+            throw new AlreadyScheduledTaskException(sprintf('The following task "%s" has already been scheduled!', $task->getName()));
+        }
+
         try {
+            $data = $this->serializer->serialize($task, 'json');
+
             $this->driverConnection->beginTransaction();
             $affectedRows = $this->driverConnection->insert($this->configuration['table_name'], [
                 'task_name' => $task->getName(),
-                'expression' => $task->getExpression(),
-                'state' => $task->get('state'),
-                'options' => $task->getOptions(),
-                'type' => $task->getType(),
+                'body' => $data,
             ], [
                 'task_name' => Types::STRING,
-                'expression' => Types::STRING,
-                'state' => Types::STRING,
-                'options' => Types::ARRAY,
-                'type' => Types::STRING,
+                'body' => Types::TEXT,
             ]);
 
             if (1 !== $affectedRows) {
@@ -136,10 +141,7 @@ final class Connection implements ConnectionInterface
     {
         $this->prepareUpdate($taskName, [
             'task_name' => $updatedTask->getName(),
-            'expression' => $updatedTask->get('expression'),
-            'options' => $updatedTask->getOptions(),
-            'state' => $updatedTask->get('state'),
-            'type' => $updatedTask->get('type'),
+            'body' => $this->serializer->serialize($updatedTask, 'json'),
         ]);
     }
 
@@ -148,7 +150,10 @@ final class Connection implements ConnectionInterface
      */
     public function pause(string $taskName): void
     {
-        $this->prepareUpdate($taskName, ['state' => AbstractTask::PAUSED], ['state' => Types::STRING]);
+        $task = $this->get($taskName);
+
+        $task->set('state', AbstractTask::PAUSED);
+        $this->update($taskName, $task);
     }
 
     /**
@@ -156,7 +161,10 @@ final class Connection implements ConnectionInterface
      */
     public function resume(string $taskName): void
     {
-        $this->prepareUpdate($taskName, ['state' => AbstractTask::ENABLED], ['state' => Types::STRING]);
+        $task = $this->get($taskName);
+
+        $task->set('state', AbstractTask::ENABLED);
+        $this->update($taskName, $task);
     }
 
     /**
@@ -171,7 +179,7 @@ final class Connection implements ConnectionInterface
                 ['task_name' => Types::STRING]
             );
             if (1 !== $affectedRows) {
-                throw new DBALException('The given identifier is invalid.');
+                throw new InvalidArgumentException('The given identifier is invalid.');
             }
 
             $this->driverConnection->commit();
@@ -226,10 +234,7 @@ final class Connection implements ConnectionInterface
             $this->driverConnection->beginTransaction();
             $affectedRows = $this->driverConnection->update($this->configuration['table_name'], $data, ['task_name' => $taskName], $identifiers ?? [
                 'task_name' => Types::STRING,
-                'expression' => Types::STRING,
-                'options' => Types::ARRAY,
-                'state' => Types::STRING,
-                'type' => Types::STRING,
+                'body' => Types::TEXT,
             ]);
             if (1 !== $affectedRows) {
                 throw new DBALException('The given identifier is invalid.');
@@ -269,30 +274,42 @@ final class Connection implements ConnectionInterface
         return $stmt;
     }
 
+    public function configureSchema(Schema $schema, DbalConnection $connection): void
+    {
+        if ($connection !== $this->driverConnection) {
+            return;
+        }
+
+        if ($schema->hasTable($this->configuration['table_name'])) {
+            return;
+        }
+
+        $this->addTableToSchema($schema);
+    }
+
     private function getSchema(): Schema
     {
         $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $this->addTableToSchema($schema);
+
+        return $schema;
+    }
+
+    private function addTableToSchema(Schema $schema): void
+    {
         $table = $schema->createTable($this->configuration['table_name']);
         $table->addColumn('id', Types::BIGINT)
             ->setAutoincrement(true)
-            ->setNotnull(true);
+            ->setNotnull(true)
+        ;
         $table->addColumn('task_name', Types::STRING)
-            ->setNotnull(true);
-        $table->addColumn('expression', Types::STRING)
-            ->setNotnull(true);
-        $table->addColumn('options', Types::ARRAY)
-            ->setNotnull(true);
-        $table->addColumn('state', Types::STRING)
-            ->setNotnull(true);
-        $table->addColumn('type', Types::TEXT)
-            ->setNotnull(true);
+            ->setNotnull(true)
+        ;
+        $table->addColumn('body', Types::TEXT)
+            ->setNotnull(true)
+        ;
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['task_name'], 'task_name');
-        $table->addIndex(['expression'], 'task_expression');
-        $table->addIndex(['state'], 'task_state');
-        $table->addIndex(['type'], 'task_type');
-
-        return $schema;
     }
 }

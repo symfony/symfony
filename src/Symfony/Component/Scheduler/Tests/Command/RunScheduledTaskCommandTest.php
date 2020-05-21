@@ -13,12 +13,13 @@ namespace Symfony\Component\Scheduler\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Scheduler\Command\RunScheduledTaskCommand;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
+use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -28,7 +29,7 @@ final class RunScheduledTaskCommandTest extends TestCase
     public function testCommandIsConfigured(): void
     {
         $scheduler = $this->createMock(SchedulerRegistryInterface::class);
-        $worker = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $command = new RunScheduledTaskCommand($scheduler, $worker);
 
@@ -44,7 +45,7 @@ final class RunScheduledTaskCommandTest extends TestCase
         $scheduler = $this->createMock(SchedulerInterface::class);
         $scheduler->expects(self::once())->method('getDueTasks')->willReturn($tasksList);
 
-        $worker = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
@@ -58,7 +59,7 @@ final class RunScheduledTaskCommandTest extends TestCase
             'scheduler' => 'foo',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -73,7 +74,7 @@ final class RunScheduledTaskCommandTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $worker = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $command = new RunScheduledTaskCommand($schedulerRegistry, $worker);
 
@@ -85,7 +86,7 @@ final class RunScheduledTaskCommandTest extends TestCase
             '--name' => 'app',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -100,7 +101,7 @@ final class RunScheduledTaskCommandTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $worker = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $command = new RunScheduledTaskCommand($schedulerRegistry, $worker);
 
@@ -112,7 +113,7 @@ final class RunScheduledTaskCommandTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -127,7 +128,7 @@ final class RunScheduledTaskCommandTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $worker = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $command = new RunScheduledTaskCommand($schedulerRegistry, $worker);
 
@@ -139,7 +140,7 @@ final class RunScheduledTaskCommandTest extends TestCase
             '--metadata' => 'last_execution',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 }

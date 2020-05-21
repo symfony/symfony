@@ -32,23 +32,17 @@ interface TaskInterface
 
     public function getOptions(): array;
 
-    public function getType(): string;
-
     /**
-     * @param null $default
-     *
      * @return callable|mixed|string
      */
     public function get(string $key, $default = null);
 
-    /**
-     * @param null $value
-     */
+    public function addBag(string $name, string $value): void;
+
+    public function getBag(string $name): ?string;
+
     public function set(string $key, $value = null): void;
 
-    /**
-     * @param array $options
-     */
     public function setMultiples(array $options = []): void;
 
     public function getFormattedInformations(): array;

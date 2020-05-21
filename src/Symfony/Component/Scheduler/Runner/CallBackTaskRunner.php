@@ -25,7 +25,7 @@ final class CallBackTaskRunner implements RunnerInterface
      */
     public function run(TaskInterface $task): Output
     {
-        $output = call_user_func_array($task->getCallback(), $task->getArguments());
+        $output = call_user_func_array($task->get('callback'), $task->get('arguments'));
 
         return false === $output ? Output::forError($task, 1, null) : Output::forSuccess($task, 0, trim($output));
     }

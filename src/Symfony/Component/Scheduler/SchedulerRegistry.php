@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +15,10 @@ namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Scheduler\EventListener\SchedulerSubscriberInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
+use function array_key_exists;
+use function array_filter;
+use function count;
+use function in_array;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -50,7 +56,7 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
      */
     public function has(string $name): bool
     {
-        return \array_key_exists($name, $this->schedulers);
+        return array_key_exists($name, $this->schedulers);
     }
 
     /**
@@ -63,7 +69,7 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
         }
 
         foreach ($this->subscribers as $subscriber) {
-            if (\in_array($name, $subscriber::getSubscribedWorkers()) || \in_array('*', $subscriber::getSubscribedWorkers())) {
+            if (in_array($name, $subscriber::getSubscribedWorkers()) || in_array('*', $subscriber::getSubscribedWorkers())) {
                 $scheduler->addSubscriber($subscriber);
             }
         }
@@ -104,7 +110,7 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string,SchedulerInterface>
      */
     public function toArray(): array
     {
@@ -114,8 +120,8 @@ final class SchedulerRegistry implements SchedulerRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
-        return \count($this->schedulers);
+        return count($this->schedulers);
     }
 }

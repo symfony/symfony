@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +15,9 @@ namespace Symfony\Component\Scheduler\Cron;
 
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\RegistryInterface;
+use function array_key_exists;
+use function array_filter;
+use function count;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -20,7 +25,7 @@ use Symfony\Component\Scheduler\RegistryInterface;
 final class CronRegistry implements RegistryInterface
 {
     /**
-     * @var CronInterface[]
+     * @var array<string,CronInterface>
      */
     private $crons = [];
 
@@ -49,7 +54,7 @@ final class CronRegistry implements RegistryInterface
      */
     public function has(string $name): bool
     {
-        return \array_key_exists($name, $this->crons);
+        return array_key_exists($name, $this->crons);
     }
 
     /**
@@ -70,15 +75,12 @@ final class CronRegistry implements RegistryInterface
     public function remove(string $name): void
     {
         if (!$this->has($name)) {
-            throw new InvalidArgumentException(sprintf('The "%s" worker cannot be found.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" cron cannot be found.', $name));
         }
 
         unset($this->crons[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function override(string $name, CronInterface $worker): void
     {
         if (!$this->has($name)) {
@@ -89,7 +91,7 @@ final class CronRegistry implements RegistryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string,CronInterface>
      */
     public function toArray(): array
     {
@@ -99,8 +101,8 @@ final class CronRegistry implements RegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
-        return \count($this->crons);
+        return count($this->crons);
     }
 }

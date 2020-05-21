@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,12 +13,14 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Closure;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 interface RegistryInterface extends \Countable
 {
-    public function filter(\Closure $filter): array;
+    public function filter(Closure $filter): array;
 
     public function has(string $name): bool;
 

@@ -14,6 +14,6 @@ namespace Symfony\Component\Scheduler\Exception;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class TransportException extends \RuntimeException implements ExceptionInterface
+final class TransportException extends RuntimeException
 {
 }

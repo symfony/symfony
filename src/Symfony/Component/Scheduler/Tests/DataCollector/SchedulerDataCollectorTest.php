@@ -19,7 +19,6 @@ use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\TraceableScheduler;
 use Symfony\Component\Scheduler\Transport\TraceableTransport;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
-use Symfony\Component\Scheduler\Worker\TraceableWorker;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
@@ -50,13 +49,10 @@ final class SchedulerDataCollectorTest extends TestCase
         $dataCollector = new SchedulerDataCollector();
         $traceableScheduler = new TraceableScheduler($scheduler);
         $traceableTransport = new TraceableTransport($transport);
-        $traceableWorker = new TraceableWorker($worker);
 
         $dataCollector->registerScheduler('foo', $traceableScheduler);
         $dataCollector->registerTransport('foo', $traceableTransport);
-        $dataCollector->registerWorker('foo', $traceableWorker);
         $traceableScheduler->schedule(new ShellTask('foo', 'echo Symfony'));
-        $traceableWorker->execute(new ShellTask('foo', 'echo Symfony'));
 
         $dataCollector->lateCollect();
 
@@ -67,10 +63,5 @@ final class SchedulerDataCollectorTest extends TestCase
         static::assertCount(1, $dataCollector->getScheduledTasksByScheduler('foo'));
 
         static::assertNotEmpty($dataCollector->getTransports());
-
-        static::assertNotEmpty($dataCollector->getWorkers());
-        static::assertArrayHasKey('foo', $dataCollector->getWorkers());
-        static::assertNotEmpty($dataCollector->getExecutedTasks());
-        static::assertCount(1, $dataCollector->getExecutedTasks());
     }
 }

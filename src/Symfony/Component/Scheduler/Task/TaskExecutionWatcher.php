@@ -36,6 +36,10 @@ final class TaskExecutionWatcher implements TaskExecutionWatcherInterface
 
     public function endWatch(TaskInterface $task): void
     {
+        if (!$task->get('tracked')) {
+            return;
+        }
+
         if (!$this->watch->isStarted(sprintf('task_execution.%s', $task->getName()))) {
             return;
         }

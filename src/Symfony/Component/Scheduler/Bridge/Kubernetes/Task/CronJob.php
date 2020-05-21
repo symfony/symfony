@@ -18,51 +18,16 @@ use Symfony\Component\Scheduler\Task\AbstractTask;
  */
 final class CronJob extends AbstractTask
 {
-    private $apiVersion;
-    private $kind;
-    private $metadata;
-    private $spec;
-    private $status;
-
-    public function __construct(string $name, array $options = [], array $additionalOptions = [])
+    public function __construct(string $name, string $apiVersion, array $spec = [], array $jobStatus = [], array $options = [], array $additionalOptions = [])
     {
         parent::__construct($name, array_merge($options, [
-            'type' => 'cron_job',
-        ]), $additionalOptions);
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'apiVersion' => $this->apiVersion,
-            'bind' => $this->kind,
-            'metadata' => $this->metadata->toArray(),
-            'status' => $this->status->toArray(),
-        ];
-    }
-
-    public function getApiVersion(): string
-    {
-        return $this->apiVersion;
-    }
-
-    public function getKind(): string
-    {
-        return $this->kind;
-    }
-
-    public function getMetadata(): ObjectMeta
-    {
-        return $this->metadata;
-    }
-
-    public function getSpec(): CronJobSpec
-    {
-        return $this->spec;
-    }
-
-    public function getStatus(): CronJobStatus
-    {
-        return $this->status;
+            'api_version' => $apiVersion,
+            'job_status' => $jobStatus,
+            'spec' => $spec,
+        ]), array_merge($additionalOptions, [
+            'api_version' => ['string'],
+            'spec' => ['array'],
+            'job_status' => ['array'],
+        ]));
     }
 }

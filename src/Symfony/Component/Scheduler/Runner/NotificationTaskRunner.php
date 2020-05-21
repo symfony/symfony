@@ -38,7 +38,7 @@ final class NotificationTaskRunner implements RunnerInterface
                 return Output::forScriptTerminated($task, 130, null);
             }
 
-            $this->notifier->send($task->get('notification'));
+            $this->notifier->send($task->get('notification'), $task->get('recipient'));
 
             return Output::forSuccess($task, 0, null);
         } catch (\Throwable | \Exception $exception) {

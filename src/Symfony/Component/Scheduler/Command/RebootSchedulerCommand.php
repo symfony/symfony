@@ -22,7 +22,6 @@ use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -30,13 +29,14 @@ use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 final class RebootSchedulerCommand extends Command
 {
     private $registry;
-    private $workerRegistry;
+    private $worker;
+
     protected static $defaultName = 'scheduler:reboot';
 
-    public function __construct(SchedulerRegistryInterface $registry, WorkerRegistryInterface $workerRegistry)
+    public function __construct(SchedulerRegistryInterface $registry, WorkerInterface $worker)
     {
         $this->registry = $registry;
-        $this->workerRegistry = $workerRegistry;
+        $this->worker = $worker;
 
         parent::__construct();
     }
@@ -50,7 +50,6 @@ final class RebootSchedulerCommand extends Command
             ->setDescription('Reboot a specific Scheduler')
             ->setDefinition([
                 new InputArgument('scheduler', InputArgument::REQUIRED, 'The name of the scheduler to reboot'),
-                new InputOption('retry', 'r', InputOption::VALUE_OPTIONAL, 'The retry timeout in seconds', 5),
                 new InputOption('dry-run', 'd', InputOption::VALUE_OPTIONAL, 'Test the reboot without executing the tasks, the "ready to reboot" tasks are displayed', false)
             ])
         ;
@@ -69,7 +68,7 @@ final class RebootSchedulerCommand extends Command
         } catch (InvalidArgumentException $exception) {
             $io->error(sprintf('The desired scheduler "%s" cannot be found!', $name));
 
-            return 1;
+            return self::FAILURE;
         }
 
         $dryRun = $input->getOption('dry-run');
@@ -82,7 +81,7 @@ final class RebootSchedulerCommand extends Command
             if (0 === \count($tasks)) {
                 $io->warning('The scheduler does not contain any tasks planned for the reboot process');
 
-                return 0;
+                return self::SUCCESS;
             }
 
             $table = new Table($output);
@@ -95,7 +94,7 @@ final class RebootSchedulerCommand extends Command
             $io->success('The following tasks are planned to be executed when the scheduler will reboot:');
             $table->render();
 
-            return 0;
+            return self::SUCCESS;
         }
 
         $scheduler->reboot();
@@ -104,38 +103,20 @@ final class RebootSchedulerCommand extends Command
         if (0 === \count($tasks)) {
             $io->success(sprintf('The desired scheduler "%s" have been rebooted', $name));
 
-            return 0;
+            return self::SUCCESS;
         }
 
-        $retry = $input->getOption('retry');
-
-        for ($i = 0; $i < $retry; $i++) {
-            $worker = $this->workerRegistry->filter(function (WorkerInterface $worker, string $key) use ($scheduler): bool {
-                return $scheduler === $key && !$worker->isRunning();
-            });
-
-            if (!empty($worker)) {
-                break;
-            }
-
+        while ($this->worker->isRunning()) {
             $io->warning('The scheduler cannot be rebooted as the worker is not available, retrying to access it');
             sleep(1);
         }
 
-        if (empty($worker)) {
-            $io->error('No worker have been found, please consider relaunching the command');
-
-            return 1;
-        }
-
-        $availableWorker = reset($worker);
-
         foreach ($tasks as $rebootTask) {
-            $availableWorker->execute($rebootTask);
+            $this->worker->execute($rebootTask);
         }
 
         $io->success(sprintf('The desired scheduler "%s" have been rebooted', $name));
 
-        return 0;
+        return self::SUCCESS;
     }
 }

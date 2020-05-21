@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Kubernetes\Exception;
 
+use Symfony\Component\Scheduler\Exception\RuntimeException;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class InvalidOperationException extends \RuntimeException
+final class InvalidOperationException extends RuntimeException
 {
 }

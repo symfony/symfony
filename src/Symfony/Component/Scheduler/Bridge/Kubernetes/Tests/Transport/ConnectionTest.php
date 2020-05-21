@@ -17,6 +17,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Scheduler\Bridge\Kubernetes\Exception\InvalidOperationException;
 use Symfony\Component\Scheduler\Bridge\Kubernetes\Transport\Connection;
 use Symfony\Component\Scheduler\Transport\Dsn;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -65,6 +66,8 @@ final class ConnectionTest extends TestCase
 
     public function testJobsCannotBeDeleted(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $httpClient = new MockHttpClient([
             new MockResponse(json_encode([
                 'code' => 404,
@@ -72,7 +75,7 @@ final class ConnectionTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
 
-        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $serializer, $httpClient);
 
         static::expectException(InvalidOperationException::class);
         $connection->empty();
@@ -80,6 +83,8 @@ final class ConnectionTest extends TestCase
 
     public function testJobsCanBeDeleted(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $httpClient = new MockHttpClient([
             new MockResponse(json_encode([
                 'code' => 200,
@@ -87,7 +92,7 @@ final class ConnectionTest extends TestCase
             ]), ['http_code' => 200]),
         ]);
 
-        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $serializer, $httpClient);
 
         $connection->empty();
         static::assertSame(1, $httpClient->getRequestsCount());
@@ -95,6 +100,8 @@ final class ConnectionTest extends TestCase
 
     public function testSpecificJobCannotBeDeletedWithUndefinedResource(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $httpClient = new MockHttpClient([
             new MockResponse(json_encode([
                 'code' => 404,
@@ -102,7 +109,7 @@ final class ConnectionTest extends TestCase
             ]), ['http_code' => 404]),
         ]);
 
-        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $serializer, $httpClient);
 
         static::expectException(InvalidOperationException::class);
         $connection->delete('foo');
@@ -110,6 +117,8 @@ final class ConnectionTest extends TestCase
 
     public function testSpecificJobCanBeDeletedWithValidResource(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $httpClient = new MockHttpClient([
             new MockResponse(json_encode([
                 'code' => 200,
@@ -117,7 +126,7 @@ final class ConnectionTest extends TestCase
             ]), ['http_code' => 200]),
         ]);
 
-        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $serializer, $httpClient);
 
         $connection->delete('foo');
         static::assertSame(1, $httpClient->getRequestsCount());
@@ -125,6 +134,8 @@ final class ConnectionTest extends TestCase
 
     public function testSpecificJobCanBeAcceptedForDeletion(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $httpClient = new MockHttpClient([
             new MockResponse(json_encode([
                 'code' => 202,
@@ -132,7 +143,7 @@ final class ConnectionTest extends TestCase
             ]), ['http_code' => 202]),
         ]);
 
-        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $httpClient);
+        $connection = new Connection(Dsn::fromString('k8s://user:password@localhost?namespace=test&scheme=http'), $serializer, $httpClient);
 
         $connection->delete('foo');
         static::assertSame(1, $httpClient->getRequestsCount());

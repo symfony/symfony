@@ -82,7 +82,7 @@ final class NullTransportTest extends TestCase
         $transport = new NullTransport(Dsn::fromString('null://test'));
 
         static::expectException(\RuntimeException::class);
-        $transport->empty();
+        $transport->clear();
     }
 
     public function provideTasks(): \Generator

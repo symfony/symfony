@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Scheduler\Runner\NotificationTaskRunner;
 use Symfony\Component\Scheduler\Task\NotificationTask;
 
@@ -33,7 +34,10 @@ final class NotificationTaskRunnerTest extends TestCase
 
     public function testRunnerCanSupportValidTask(): void
     {
-        $task = new NotificationTask('test');
+        $notification = $this->createMock(Notification::class);
+        $recipient = $this->createMock(Recipient::class);
+
+        $task = new NotificationTask('test', $notification, $recipient);
 
         $runner = new NotificationTaskRunner();
         static::assertTrue($runner->support($task));
@@ -41,7 +45,10 @@ final class NotificationTaskRunnerTest extends TestCase
 
     public function testRunnerCanReturnOutputWithoutNotifier(): void
     {
-        $task = new NotificationTask('test');
+        $notification = $this->createMock(Notification::class);
+        $recipient = $this->createMock(Recipient::class);
+
+        $task = new NotificationTask('test', $notification, $recipient);
 
         $runner = new NotificationTaskRunner();
 
@@ -57,8 +64,9 @@ final class NotificationTaskRunnerTest extends TestCase
         $notifier->expects(self::once())->method('send')->willThrowException(new LogicException('An error occurred'));
 
         $notification = $this->createMock(Notification::class);
+        $recipient = $this->createMock(Recipient::class);
 
-        $task = new NotificationTask('test', $notification);
+        $task = new NotificationTask('test', $notification, $recipient);
 
         $runner = new NotificationTaskRunner($notifier);
 
@@ -73,8 +81,9 @@ final class NotificationTaskRunnerTest extends TestCase
         $notifier->expects(self::once())->method('send');
 
         $notification = $this->createMock(Notification::class);
+        $recipient = $this->createMock(Recipient::class);
 
-        $task = new NotificationTask('test', $notification);
+        $task = new NotificationTask('test', $notification, $recipient);
 
         $runner = new NotificationTaskRunner($notifier);
 

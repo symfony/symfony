@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,7 +13,6 @@
 
 namespace Symfony\Component\Scheduler\Worker;
 
-use Symfony\Component\Scheduler\EventListener\WorkerSubscriberInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 
@@ -21,7 +22,7 @@ use Symfony\Component\Scheduler\Task\TaskListInterface;
 interface WorkerInterface
 {
     /**
-     * Execute the given task, if the task cannot be executed, the worker should exit.
+     * Execute the given task, if the task cannot be executed, the worker SHOULD exit.
      *
      * An exception can be throw during the execution of the task, if so, it SHOULD be handled.
      *
@@ -38,11 +39,4 @@ interface WorkerInterface
     public function isRunning(): bool;
 
     public function getFailedTasks(): TaskListInterface;
-
-    /**
-     * Attach a subscriber to the internal worker EventDispatcher instance.
-     *
-     * The subscriber SHOULD respect the contract of {@see WorkerSubscriberInterface::getSubscribedSchedulers()}
-     */
-    public function addSubscriber(WorkerSubscriberInterface $subscriber): void;
 }

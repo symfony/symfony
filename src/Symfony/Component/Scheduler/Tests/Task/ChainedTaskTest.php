@@ -26,6 +26,6 @@ final class ChainedTaskTest extends TestCase
         $secondTask = $this->createMock(TaskInterface::class);
 
         $task = new ChainedTask('foo', [$task, $secondTask]);
-        static::assertCount(2, $task->getTasks());
+        static::assertCount(2, $task->get('tasks'));
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Scheduler\EventListener\TaskSubscriber;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
+use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -34,13 +34,13 @@ final class TaskSubscriberTest extends TestCase
     public function testInvalidPathCannotBeHandled(): void
     {
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://www.foo.com/_foo');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $subscriber = new TaskSubscriber($schedulerRegistry, $workerRegistry);
+        $subscriber = new TaskSubscriber($schedulerRegistry, $worker);
 
         $expected = $request->attributes->all();
         $subscriber->onKernelRequest($event);
@@ -51,13 +51,13 @@ final class TaskSubscriberTest extends TestCase
     public function testValidPathCannotBeHandledWithoutParams(): void
     {
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://www.foo.com/_tasks');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $subscriber = new TaskSubscriber($schedulerRegistry, $workerRegistry);
+        $subscriber = new TaskSubscriber($schedulerRegistry, $worker);
 
         static::expectException(\InvalidArgumentException::class);
         $subscriber->onKernelRequest($event);
@@ -70,13 +70,13 @@ final class TaskSubscriberTest extends TestCase
 
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('toArray')->willReturn([$scheduler]);
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://www.foo.com/_tasks?name=app.bar');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $subscriber = new TaskSubscriber($schedulerRegistry, $workerRegistry);
+        $subscriber = new TaskSubscriber($schedulerRegistry, $worker);
 
         $subscriber->onKernelRequest($event);
 
@@ -91,13 +91,13 @@ final class TaskSubscriberTest extends TestCase
 
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('toArray')->willReturn([$scheduler]);
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
+        $worker = $this->createMock(WorkerInterface::class);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://www.foo.com/_tasks?expression=*****');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $subscriber = new TaskSubscriber($schedulerRegistry, $workerRegistry);
+        $subscriber = new TaskSubscriber($schedulerRegistry, $worker);
 
         $subscriber->onKernelRequest($event);
 

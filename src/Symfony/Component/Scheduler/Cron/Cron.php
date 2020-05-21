@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,6 +13,7 @@
 
 namespace Symfony\Component\Scheduler\Cron;
 
+use DateTimeImmutable;
 use Symfony\Component\Scheduler\Exception\LogicException;
 
 /**
@@ -29,7 +32,7 @@ final class Cron implements CronInterface
     {
         $this->name = $name;
         $this->options = $options;
-        $this->generationDate = new \DateTimeImmutable();
+        $this->generationDate = new DateTimeImmutable();
 
         $this->generateExpression();
     }
@@ -39,7 +42,7 @@ final class Cron implements CronInterface
         return $this->name;
     }
 
-    public function getGenerationDate(): \DateTimeImmutable
+    public function getGenerationDate(): DateTimeImmutable
     {
         return $this->generationDate;
     }

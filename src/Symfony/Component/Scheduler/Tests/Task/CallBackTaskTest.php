@@ -31,7 +31,7 @@ final class CallBackTaskTest extends TestCase
             echo 'test';
         });
 
-        static::assertEmpty($task->getArguments());
+        static::assertEmpty($task->get('arguments'));
     }
 
     public function testTaskCanBeCreatedWithValidCallbackAndArguments(): void
@@ -40,6 +40,6 @@ final class CallBackTaskTest extends TestCase
             echo $value;
         }, ['value' => 'test']);
 
-        static::assertNotEmpty($task->getArguments());
+        static::assertNotEmpty($task->get('arguments'));
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Scheduler\Command\GetScheduledTaskCommand;
 use Symfony\Component\Scheduler\SchedulerInterface;
@@ -51,7 +52,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -84,7 +85,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             'scheduler' => 'foo',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringNotContainsString('[WARNING] No tasks found', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Expression', $tester->getDisplay());
@@ -123,7 +124,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringNotContainsString('[WARNING] No tasks found', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Expression', $tester->getDisplay());
@@ -162,7 +163,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--state' => 'paused',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringNotContainsString('[WARNING] No tasks found', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Expression', $tester->getDisplay());
@@ -202,7 +203,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringNotContainsString('[WARNING] No tasks found', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Expression', $tester->getDisplay());
@@ -232,7 +233,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -258,7 +259,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--state' => 'started',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 
@@ -285,7 +286,7 @@ final class GetScheduledTaskCommentTest extends TestCase
             '--expression' => '* * * * *',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('[WARNING] No tasks found', $tester->getDisplay());
     }
 }

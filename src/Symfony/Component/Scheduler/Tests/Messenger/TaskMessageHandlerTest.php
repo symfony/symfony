@@ -16,7 +16,6 @@ use Symfony\Component\Scheduler\Messenger\TaskMessage;
 use Symfony\Component\Scheduler\Messenger\TaskMessageHandler;
 use Symfony\Component\Scheduler\Task\ShellTask;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -25,15 +24,16 @@ final class TaskMessageHandlerTest extends TestCase
 {
     public function testHandlerCannotRunNotDueTask(): void
     {
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
-        $workerRegistry->expects(self::never())->method('filter');
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::never())->method('execute');
 
         $task = new ShellTask('foo', 'echo Symfony', [
+            'arrival_time' => new \DateTimeImmutable(),
             'expression' => '*/45 * * * *',
         ]);
 
         $message = new TaskMessage($task);
-        $handler = new TaskMessageHandler($workerRegistry);
+        $handler = new TaskMessageHandler($worker);
 
         ($handler)($message);
     }
@@ -43,15 +43,13 @@ final class TaskMessageHandlerTest extends TestCase
         $worker = $this->createMock(WorkerInterface::class);
         $worker->expects(self::once())->method('execute');
 
-        $workerRegistry = $this->createMock(WorkerRegistryInterface::class);
-        $workerRegistry->expects(self::once())->method('filter')->willReturn([$worker]);
-
         $task = new ShellTask('foo', 'echo Symfony', [
+            'arrival_time' => new \DateTimeImmutable(),
             'expression' => '* * * * *',
         ]);
 
         $message = new TaskMessage($task);
-        $handler = new TaskMessageHandler($workerRegistry);
+        $handler = new TaskMessageHandler($worker);
 
         ($handler)($message);
     }

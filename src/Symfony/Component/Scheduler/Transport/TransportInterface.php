@@ -33,7 +33,7 @@ interface TransportInterface
 
     public function resume(string $taskName): void;
 
-    public function empty(): void;
+    public function clear(): void;
 
     public function getOptions(): array;
 }

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
-use Symfony\Component\Scheduler\Worker\WorkerRegistryInterface;
+use Symfony\Component\Scheduler\Worker\WorkerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -30,13 +30,14 @@ final class RunScheduledTaskCommand extends Command
 {
     private $schedulerRegistry;
     private $io;
-    private $workerRegistry;
+    private $worker;
+
     protected static $defaultName = 'scheduler:run';
 
-    public function __construct(SchedulerRegistryInterface $schedulerRegistry, WorkerRegistryInterface $workerRegistry)
+    public function __construct(SchedulerRegistryInterface $schedulerRegistry, WorkerInterface $worker)
     {
         $this->schedulerRegistry = $schedulerRegistry;
-        $this->workerRegistry = $workerRegistry;
+        $this->worker = $worker;
 
         parent::__construct();
     }
@@ -104,19 +105,17 @@ final class RunScheduledTaskCommand extends Command
         if (0 === \count($dueTasks)) {
             $this->io->warning('No tasks found');
 
-            return 0;
+            return self::SUCCESS;
         }
 
         $this->io->note(sprintf('Found %d tasks', $dueTasks->count()));
 
-        $worker = $this->workerRegistry->get($scheduler);
-
         foreach ($dueTasks as $task) {
-            $worker->execute($task);
+            $this->worker->execute($task);
         }
 
         $this->io->success(sprintf('%d tasks executed', \count($dueTasks)));
 
-        return 0;
+        return self::SUCCESS;
     }
 }

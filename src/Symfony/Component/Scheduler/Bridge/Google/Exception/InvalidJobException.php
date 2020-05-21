@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Google\Exception;
 
+use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class InvalidJobException extends \InvalidArgumentException
+final class InvalidJobException extends InvalidArgumentException
 {
 }

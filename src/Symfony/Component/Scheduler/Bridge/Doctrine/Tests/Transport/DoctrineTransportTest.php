@@ -100,7 +100,7 @@ final class DoctrineTransportTest extends TestCase
         $connection->expects(self::once())->method('empty');
 
         $transport = new DoctrineTransport(Dsn::fromString('doctrine://root@root?execution_mode=normal'), [], $connection);
-        $transport->empty();
+        $transport->clear();
     }
 
     public function testTransportCanReturnOptions(): void

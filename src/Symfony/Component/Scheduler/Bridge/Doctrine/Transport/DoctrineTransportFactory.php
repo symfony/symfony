@@ -50,7 +50,7 @@ final class DoctrineTransportFactory implements TransportFactoryInterface
             throw new TransportException(sprintf('Could not find Doctrine connection from Scheduler DSN "%s".', $dsn), 0, $e);
         }
 
-        $connection = new Connection($this->taskFactory, [], $driverConnection);
+        $connection = new Connection($this->taskFactory, [], $driverConnection, $serializer);
 
         return new DoctrineTransport($dsn, $options, $connection);
     }

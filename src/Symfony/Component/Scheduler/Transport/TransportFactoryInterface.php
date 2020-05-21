@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -18,7 +20,20 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 interface TransportFactoryInterface
 {
+    /**
+     * @param Dsn                 $dsn
+     * @param array<string,mixed> $options
+     * @param SerializerInterface $serializer
+     *
+     * @return TransportInterface
+     */
     public function createTransport(Dsn $dsn, array $options, SerializerInterface $serializer): TransportInterface;
 
+    /**
+     * @param string              $dsn
+     * @param array<string,mixed> $options
+     *
+     * @return bool
+     */
     public function support(string $dsn, array $options = []): bool;
 }

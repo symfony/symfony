@@ -14,6 +14,6 @@ namespace Symfony\Component\Scheduler\Exception;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class UnrecognizedCommandException extends \InvalidArgumentException implements ExceptionInterface
+final class UnrecognizedCommandException extends InvalidArgumentException
 {
 }

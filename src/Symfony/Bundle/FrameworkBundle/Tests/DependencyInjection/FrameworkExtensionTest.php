@@ -28,6 +28,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -42,7 +43,13 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\ExecutionModeOrchestratorInterface;
+use Symfony\Component\Scheduler\Export\ExporterInterface;
+use Symfony\Component\Scheduler\Export\SerializerFormatter;
+use Symfony\Component\Scheduler\SchedulerRegistryInterface;
+use Symfony\Component\Scheduler\Task\TaskExecutionWatcherInterface;
+use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -1478,68 +1485,121 @@ abstract class FrameworkExtensionTest extends TestCase
         static::assertTrue($container->hasParameter('scheduler.export_directory'));
         static::assertTrue($container->hasParameter('scheduler.output_path'));
         static::assertTrue($container->hasParameter('scheduler.trigger_path'));
-        static::assertTrue($container->has('scheduler.transport_factory'));
-        static::assertTrue($container->has('scheduler.transport_factory.local'));
-        static::assertTrue($container->has('scheduler.transport_factory.null'));
-        static::assertTrue($container->has('scheduler.expression_factory'));
-        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
-        static::assertTrue($container->has('scheduler.task_normalizer'));
-        static::assertTrue($container->has('scheduler.shell_runner'));
-        static::assertTrue($container->has('scheduler.command_runner'));
-        static::assertTrue($container->has('scheduler.stop_watch'));
-        static::assertTrue($container->has('scheduler.task_execution_watcher'));
-        static::assertTrue($container->has('scheduler.worker.registry'));
-        static::assertTrue($container->has('scheduler.task_message.handler'));
+
+        static::assertTrue($container->has('scheduler.cron.registry'));
+        static::assertTrue($container->has('scheduler.cron.factory'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.cron.factory')->getArgument(0));
+
+        static::assertTrue($container->has('scheduler.bag.registry'));
+        static::assertTrue($container->hasAlias(BagRegistryInterface::class));
+
         static::assertTrue($container->has('scheduler.registry'));
+        static::assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('scheduler.registry')->getArgument(0));
+        static::assertTrue($container->hasAlias(SchedulerRegistryInterface::class));
+
+        static::assertTrue($container->has('scheduler.worker'));
+        static::assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('scheduler.worker')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.worker')->getArgument(1));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.worker')->getArgument(2));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.worker')->getArgument(3));
+        static::assertTrue($container->hasAlias(WorkerInterface::class));
+
+        static::assertTrue($container->has('scheduler.application'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.application')->getArgument(0));
+
+        static::assertTrue($container->has('scheduler.exporter'));
+        static::assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('scheduler.exporter')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.exporter')->getArgument(1));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.exporter')->getArgument(2));
+        static::assertTrue($container->hasAlias(ExporterInterface::class));
+
+        static::assertTrue($container->has('scheduler.exporter.serializer_formatter'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.exporter.serializer_formatter')->getArgument(0));
+        static::assertTrue($container->getDefinition('scheduler.exporter.serializer_formatter')->hasTag('scheduler.exporter_formatter'));
+
+        static::assertTrue($container->has('scheduler.transport_factory'));
+        static::assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('scheduler.transport_factory')->getArgument(0));
+
+        static::assertTrue($container->has('scheduler.transport_factory.local'));
+        static::assertTrue($container->getDefinition('scheduler.transport_factory.local')->hasTag('scheduler.transport_factory'));
+
+        static::assertTrue($container->has('scheduler.transport_factory.null'));
+        static::assertTrue($container->getDefinition('scheduler.transport_factory.null')->hasTag('scheduler.transport_factory'));
+
+        static::assertTrue($container->has('scheduler.cron_generator'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.cron_generator')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.cron_generator')->getArgument(1));
+
+        static::assertTrue($container->has('scheduler.expression_factory'));
+
+        static::assertTrue($container->has('scheduler.execution_mode_orchestrator'));
+        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
+
+        static::assertTrue($container->has('scheduler.shell_runner'));
+        static::assertTrue($container->getDefinition('scheduler.shell_runner')->hasTag('scheduler.runner'));
+        static::assertTrue($container->has('scheduler.command_runner'));
+        static::assertTrue($container->getDefinition('scheduler.command_runner')->hasTag('scheduler.runner'));
+        static::assertTrue($container->has('scheduler.callback_runner'));
+        static::assertTrue($container->getDefinition('scheduler.callback_runner')->hasTag('scheduler.runner'));
+        static::assertTrue($container->has('scheduler.http_runner'));
+        static::assertTrue($container->getDefinition('scheduler.http_runner')->hasTag('scheduler.runner'));
+        static::assertTrue($container->has('scheduler.messenger_runner'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.messenger_runner')->getArgument(0));
+        static::assertTrue($container->getDefinition('scheduler.messenger_runner')->hasTag('scheduler.runner'));
+        static::assertTrue($container->has('scheduler.notifier_runner'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.notifier_runner')->getArgument(0));
+        static::assertTrue($container->getDefinition('scheduler.notifier_runner')->hasTag('scheduler.runner'));
+
+        static::assertTrue($container->has('scheduler.normalizer'));
+        static::assertTrue($container->getDefinition('scheduler.normalizer')->hasTag('serializer.normalizer'));
+
+        static::assertTrue($container->has('scheduler.task_message.handler'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.task_message.handler')->getArgument(0));
+        static::assertTrue($container->getDefinition('scheduler.task_message.handler')->hasTag('messenger.message_handler'));
+
+        static::assertTrue($container->has('scheduler.mailer_subscriber'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.mailer_subscriber')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.mailer_subscriber')->getArgument(1));
+        static::assertTrue($container->getDefinition('scheduler.mailer_subscriber')->hasTag('kernel.event_subscriber'));
+
+        static::assertTrue($container->has('scheduler.messenger_subscriber'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.messenger_subscriber')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.messenger_subscriber')->getArgument(1));
+        static::assertTrue($container->getDefinition('scheduler.messenger_subscriber')->hasTag('kernel.event_subscriber'));
+
+        static::assertTrue($container->has('scheduler.mercure_subscriber'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.mercure_subscriber')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.mercure_subscriber')->getArgument(1));
+        static::assertTrue($container->getDefinition('scheduler.mercure_subscriber')->hasTag('kernel.event_subscriber'));
+
+        static::assertTrue($container->has('scheduler.notifier_subscriber'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.notifier_subscriber')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.notifier_subscriber')->getArgument(1));
+        static::assertTrue($container->getDefinition('scheduler.notifier_subscriber')->hasTag('kernel.event_subscriber'));
+
+        static::assertTrue($container->has('scheduler.task_subscriber'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.task_subscriber')->getArgument(0));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.task_subscriber')->getArgument(1));
+        static::assertTrue($container->getDefinition('scheduler.task_subscriber')->hasTag('kernel.event_subscriber'));
+
+        static::assertTrue($container->has('scheduler.stop_watch'));
+        static::assertTrue($container->has('scheduler.task_execution.watcher'));
+        static::assertInstanceOf(Reference::class, $container->getDefinition('scheduler.task_execution.watcher')->getArgument(0));
+        static::assertTrue($container->hasAlias(TaskExecutionWatcherInterface::class));
     }
 
     public function testSchedulerWithShellTasks(): void
     {
         $container = $this->createContainerFromFile('scheduler_shell_tasks');
 
-        static::assertTrue($container->hasParameter('scheduler.timezone'));
-        static::assertTrue($container->hasParameter('scheduler.export_directory'));
-        static::assertTrue($container->hasParameter('scheduler.output_path'));
-        static::assertTrue($container->hasParameter('scheduler.trigger_path'));
         static::assertTrue($container->has('scheduler.hub.foo'));
-        static::assertTrue($container->has('scheduler.expression_factory'));
-        static::assertTrue($container->has('scheduler.transport_factory'));
-        static::assertTrue($container->has('scheduler.transport_factory.local'));
-        static::assertTrue($container->has('scheduler.transport_factory.null'));
-        static::assertTrue($container->has('scheduler.transport.local'));
-        static::assertTrue($container->has('scheduler.execution_mode_orchestrator'));
-        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
-        static::assertTrue($container->has('scheduler.task_normalizer'));
-        static::assertTrue($container->has('scheduler.shell_runner'));
-        static::assertTrue($container->has('scheduler.command_runner'));
-        static::assertTrue($container->has('scheduler.stop_watch'));
-        static::assertTrue($container->has('scheduler.task_execution_watcher'));
-        static::assertTrue($container->has('scheduler.worker.registry'));
-        static::assertTrue($container->has('scheduler.task_message.handler'));
-        static::assertTrue($container->has('scheduler.registry'));
     }
 
     public function testSchedulerWithCommandTasks(): void
     {
         $container = $this->createContainerFromFile('scheduler_command_tasks');
 
-        static::assertTrue($container->hasParameter('scheduler.timezone'));
-        static::assertTrue($container->hasParameter('scheduler.export_directory'));
-        static::assertTrue($container->hasParameter('scheduler.output_path'));
-        static::assertTrue($container->hasParameter('scheduler.trigger_path'));
-        static::assertTrue($container->hasParameter('scheduler.export_directory'));
         static::assertTrue($container->has('scheduler.hub.foo'));
-        static::assertTrue($container->has('scheduler.expression_factory'));
-        static::assertTrue($container->has('scheduler.execution_mode_orchestrator'));
-        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
-        static::assertTrue($container->has('scheduler.task_normalizer'));
-        static::assertTrue($container->has('scheduler.shell_runner'));
-        static::assertTrue($container->has('scheduler.command_runner'));
-        static::assertTrue($container->has('scheduler.stop_watch'));
-        static::assertTrue($container->has('scheduler.task_execution_watcher'));
-        static::assertTrue($container->has('scheduler.worker.registry'));
-        static::assertTrue($container->has('scheduler.task_message.handler'));
-        static::assertTrue($container->has('scheduler.registry'));
     }
 
     protected function createContainer(array $data = [])

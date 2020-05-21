@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Redis\Transport;
 
-use Symfony\Component\Scheduler\Bridge\Google\Task\State;
+use Symfony\Component\Scheduler\Exception\AlreadyScheduledTaskException;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Exception\TransportException;
 use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
+use Symfony\Component\Scheduler\Task\AbstractTask;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -37,12 +38,12 @@ final class Connection implements ConnectionInterface
     ];
 
     private $connection;
-    private $factory;
     private $queue;
     private $orchestrator;
+    private $serializer;
     private $transactionMode;
 
-    public function __construct(Dsn $dsn, TaskFactoryInterface $factory, ?\Redis $redis = null)
+    public function __construct(Dsn $dsn, SerializerInterface $serializer, ?\Redis $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -67,14 +68,14 @@ final class Connection implements ConnectionInterface
             throw new InvalidArgumentException(sprintf('The transaction mode "%s" is not a valid one.', $transactionMode));
         }
 
-        $this->factory = $factory;
+        $this->serializer = $serializer;
         $this->transactionMode = $transactionMode ?? self::DEFAULT_OPTIONS['transaction_mode'];
         $this->orchestrator = new ExecutionModeOrchestrator($dsn->getOption('execution_mode') ?? ExecutionModeOrchestrator::FIFO);
     }
 
-    public static function createFromDsn(Dsn $dsn, TaskFactoryInterface $factory, ?\Redis $redis = null): self
+    public static function createFromDsn(Dsn $dsn, SerializerInterface $serializer, ?\Redis $redis = null): self
     {
-        return new self($dsn, $factory, $redis);
+        return new self($dsn, $serializer, $redis);
     }
 
     /**
@@ -85,14 +86,17 @@ final class Connection implements ConnectionInterface
         $taskList = new TaskList();
 
         $this->transactional(function (\Redis $redis) use ($taskList): void {
-           $data = $redis->keys('*');
+           $keys = $redis->keys('*');
 
-           $tasks = json_decode($data, true);
+           if (0 === \count($keys)) {
+               return;
+           }
 
-           if (0 !== \count($tasks)) {
-               foreach (json_decode($data, true) as $task) {
-                   $taskList->add($this->factory->create($task));
-               }
+           foreach ($keys as $key) {
+               $data = $redis->get($key);
+               $task = $this->serializer->deserialize($data, TaskInterface::class, 'json');
+
+               $taskList->add($task);
            }
         });
 
@@ -104,18 +108,18 @@ final class Connection implements ConnectionInterface
      */
     public function create(TaskInterface $task): void
     {
-        $result = $this->transactional(function (\Redis $redis) use ($task): bool {
-            return $redis->setnx($task->getName(), json_encode([
-                'name' => $task->getName(),
-                'expression' => $task->getExpression(),
-                'state' => $task->get('state'),
-                'options' => $task->getOptions(),
-                'type' => $task->getType(),
-            ]));
-        });
+        $currentList = $this->list();
 
-        if (false === $result) {
-            throw new LogicException(sprintf('The task cannot be created as it already exist, consider using "%s::update().', self::class));
+        if (\array_key_exists($task->getName(), $currentList->toArray())) {
+            throw new AlreadyScheduledTaskException(sprintf('The following task "%s" has already been scheduled!', $task->getName()));
+        }
+
+        $currentList->add($task);
+
+        $sortedList = $this->orchestrator->sort($currentList->toArray());
+
+        foreach ($sortedList as $sortedTask) {
+            $this->update($sortedTask->getName(), $sortedTask);
         }
     }
 
@@ -124,13 +128,15 @@ final class Connection implements ConnectionInterface
      */
     public function get(string $taskName): TaskInterface
     {
-        $data = $this->connection->get($taskName);
+        $task = $this->transactional(function (\Redis $redis) use ($taskName) {
+            return $redis->get($taskName);
+        });
 
-        if (false === $data) {
-            throw new InvalidArgumentException('The task does not exist');
+        if (false === $task) {
+            throw new InvalidArgumentException(sprintf('The task "%s" does not exist', $taskName));
         }
 
-        return $this->factory->create(json_decode($data, true));
+        return $this->serializer->deserialize($task, TaskInterface::class, 'json');
     }
 
     /**
@@ -138,17 +144,13 @@ final class Connection implements ConnectionInterface
      */
     public function update(string $taskName, TaskInterface $updatedTask): void
     {
-        $res = $this->transactional(function (\Redis $redis) use ($taskName, $updatedTask): bool {
-            return $redis->set($taskName, json_encode([
-                'name' => $updatedTask->getName(),
-                'expression' => $updatedTask->getExpression(),
-                'state' => $updatedTask->get('state'),
-                'options' => $updatedTask->getOptions(),
-                'type' => $updatedTask->getType(),
-            ]));
+        $result = $this->transactional(function (\Redis $redis) use ($taskName, $updatedTask): bool {
+            $task = $this->serializer->serialize($updatedTask, 'json');
+
+            return $redis->set($taskName, $task);
         });
 
-        if (false === $res) {
+        if (false === $result) {
             throw new LogicException(sprintf('The task cannot be updated, error: %s', $this->connection->getLastError()));
         }
     }
@@ -159,15 +161,17 @@ final class Connection implements ConnectionInterface
     public function pause(string $taskName): void
     {
         $this->transactional(function (\Redis $redis) use ($taskName): void {
-            $task = $redis->get($taskName);
-            if (false === $task) {
+            $data = $redis->get($taskName);
+            if (false === $data) {
                 throw new InvalidArgumentException('The task does not exist');
             }
 
-            $data = json_decode($task, true);
-            $data['state'] = State::PAUSED;
+            $task = $this->serializer->deserialize($data, TaskInterface::class, 'json');
+            $task->set('state', AbstractTask::PAUSED);
 
-            $updateState = $redis->rPush($taskName, json_encode($data));
+            $data = $this->serializer->serialize($task, 'json');
+
+            $updateState = $redis->rPush($taskName, $data);
             if (false === $updateState) {
                 throw new InvalidArgumentException('The task cannot be updated');
             }
@@ -180,15 +184,17 @@ final class Connection implements ConnectionInterface
     public function resume(string $taskName): void
     {
         $this->transactional(function (\Redis $redis) use ($taskName): void {
-            $task = $redis->get($taskName);
-            if (false === $task) {
+            $data = $redis->get($taskName);
+            if (false === $data) {
                 throw new InvalidArgumentException('The task does not exist');
             }
 
-            $data = json_decode($task, true);
-            $data['state'] = State::ENABLED;
+            $task = $this->serializer->deserialize($data, TaskInterface::class, 'json');
+            $task->set('state', AbstractTask::ENABLED);
 
-            $updateState = $redis->rPush($taskName, json_encode($data));
+            $data = $this->serializer->serialize($task, 'json');
+
+            $updateState = $redis->rPush($taskName, $data);
             if (false === $updateState) {
                 throw new InvalidArgumentException('The task cannot be updated');
             }
@@ -214,8 +220,8 @@ final class Connection implements ConnectionInterface
      */
     public function empty(): void
     {
-        $this->transactional(function (\Redis $redis): bool {
-            return $redis->flushDB();
+        $this->transactional(function (\Redis $redis): void {
+            $redis->flushDB();
         });
     }
 
@@ -224,7 +230,7 @@ final class Connection implements ConnectionInterface
      *
      * The function receive the Redis::MULTI instance returned by {@see Redis::multi()}.
      *
-     * @param \Closure $func The function to execute
+     * @param \Closure $func The function to execute (the current instance of {@see \Redis} is passed as the only argument)
      *
      * @return mixed The value returned by $func
      *

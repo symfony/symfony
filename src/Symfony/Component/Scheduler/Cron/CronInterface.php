@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,12 +13,14 @@
 
 namespace Symfony\Component\Scheduler\Cron;
 
+use DateTimeImmutable;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
 interface CronInterface
 {
-    public function getGenerationDate(): \DateTimeImmutable;
+    public function getGenerationDate(): DateTimeImmutable;
 
     public function getExpression(): string;
 }

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Redis\Transport;
 
-use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
 use Symfony\Component\Scheduler\Transport\TransportInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -25,10 +25,10 @@ final class RedisTransport implements TransportInterface
     private $connection;
     private $options;
 
-    public function __construct(Dsn $dsn, array $options, TaskFactoryInterface $taskFactory)
+    public function __construct(Dsn $dsn, array $options, SerializerInterface $serializer)
     {
-        $this->connection = Connection::createFromDsn($dsn, $taskFactory);
-        $this->options = $options;
+        $this->connection = Connection::createFromDsn($dsn, $serializer);
+        $this->options = array_merge($dsn->getOptions(), $options);
     }
 
     /**
@@ -90,7 +90,7 @@ final class RedisTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
         $this->connection->empty();
     }

@@ -35,7 +35,13 @@ final class TraceableTransport implements TransportInterface
      */
     public function get(string $taskName): TaskInterface
     {
-        return $this->transport->get($taskName);
+        try {
+            return $this->transport->get($taskName);
+        } catch (\Throwable $exception) {
+            $this->exceptions[] = $exception->getMessage();
+
+            throw $exception;
+        }
     }
 
     /**
@@ -43,7 +49,13 @@ final class TraceableTransport implements TransportInterface
      */
     public function list(): TaskListInterface
     {
-        return $this->transport->list();
+        try {
+            return $this->transport->list();
+        } catch (\Throwable $exception) {
+            $this->exceptions[] = $exception->getMessage();
+
+            throw $exception;
+        }
     }
 
     /**
@@ -85,7 +97,7 @@ final class TraceableTransport implements TransportInterface
     {
 
         try {
-            $this->transport->delete();
+            $this->transport->delete($taskName);
         } catch (\Throwable $exception) {
             $this->exceptions[] = $exception->getMessage();
 
@@ -130,10 +142,10 @@ final class TraceableTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
         try {
-            $this->transport->empty();
+            $this->transport->clear();
         } catch (\Throwable $exception) {
             $this->exceptions[] = $exception->getMessage();
 

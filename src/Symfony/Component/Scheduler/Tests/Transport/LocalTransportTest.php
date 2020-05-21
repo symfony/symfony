@@ -27,7 +27,7 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanCreateATask(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
@@ -38,7 +38,7 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanUpdateATask(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
@@ -54,7 +54,7 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanDeleteATask(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
@@ -68,7 +68,7 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanPauseATask(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
@@ -83,7 +83,7 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanResumeAPausedTask(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
@@ -102,12 +102,12 @@ final class LocalTransportTest extends TestCase
      */
     public function testTransportCanEmptyAList(TaskInterface $task): void
     {
-        $transport = new LocalTransport(Dsn::fromString('local://root?execution_mode=first_in_first_out'));
+        $transport = new LocalTransport(Dsn::fromString('local://first_in_first_out'));
 
         $transport->create($task);
         static::assertCount(1, $transport->list());
 
-        $transport->empty();
+        $transport->clear();
         static::assertCount(0, $transport->list());
     }
 

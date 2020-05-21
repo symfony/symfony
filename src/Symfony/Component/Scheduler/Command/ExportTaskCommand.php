@@ -94,7 +94,7 @@ final class ExportTaskCommand extends Command
         if (0 === \count($tasks)) {
             $this->io->error('[KO] No task found!');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $exportDirectory = sprintf('%s/%s', $exportDirectory, $filename);
@@ -102,6 +102,6 @@ final class ExportTaskCommand extends Command
         $this->exporter->export($tasks, $exportDirectory, $format);
         $this->io->success(sprintf('[OK] Exported "%d" tasks to "%s"', \count($tasks), sprintf('%s.%s', $exportDirectory, $format)));
 
-        return 0;
+        return self::SUCCESS;
     }
 }

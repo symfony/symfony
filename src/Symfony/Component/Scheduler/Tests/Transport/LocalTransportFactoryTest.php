@@ -30,14 +30,25 @@ final class LocalTransportFactoryTest extends TestCase
         static::assertTrue($factory->support('local://'));
     }
 
-    public function testFactoryReturnTransport(): void
+    /**
+     * @dataProvider provideDsn
+     */
+    public function testFactoryReturnTransport(string $dsn): void
     {
         $serializer = $this->createMock(SerializerInterface::class);
         $factory = new LocalTransportFactory();
 
-        static::assertInstanceOf(
-            LocalTransport::class,
-            $factory->createTransport(Dsn::fromString('local://root?execution_mode=fifo'), [], $serializer)
-        );
+        static::assertInstanceOf(LocalTransport::class, $factory->createTransport(Dsn::fromString($dsn), [], $serializer));
+    }
+
+    public function provideDsn(): \Generator
+    {
+        yield [
+            'local://batch',
+            'local://deadline',
+            'local://first_in_first_out',
+            'local://normal',
+            'local://normal?nice=10'
+        ];
     }
 }

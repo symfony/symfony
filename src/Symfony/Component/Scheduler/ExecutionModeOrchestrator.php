@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +14,10 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Scheduler\Task\TaskInterface;
+use function array_walk;
+use function in_array;
+use function sprintf;
+use function uasort;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -45,7 +51,7 @@ final class ExecutionModeOrchestrator implements ExecutionModeOrchestratorInterf
      */
     public function sort(array $tasks): array
     {
-        if (self::FIFO !== $this->mode && !\in_array($this->mode, self::EXECUTION_MODES)) {
+        if (self::FIFO !== $this->mode && !in_array($this->mode, self::EXECUTION_MODES)) {
             throw new \InvalidArgumentException(sprintf('The given mode "%s" is not a valid one, allowed ones are: "%s"', $this->mode, implode(', ', self::EXECUTION_MODES)));
         }
 

@@ -21,9 +21,6 @@ final class NullTaskTest extends TestCase
 {
     public function testTaskCanBeCreatedWithValidInformations(): void
     {
-        $task = new NullTask('foo');
-
-        static::assertSame('foo', $task->getName());
-        static::assertSame('null', $task->getType());
+        static::assertSame('foo', (new NullTask('foo'))->getName());
     }
 }

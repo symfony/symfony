@@ -17,16 +17,6 @@ namespace Symfony\Component\Scheduler\Task;
 final class CallBackTask extends AbstractTask
 {
     /**
-     * @var string|callable
-     */
-    private $callback;
-
-    /**
-     * @var array
-     */
-    private $arguments;
-
-    /**
      * {@inheritdoc}
      */
     public function __construct(string $name, $callback, array $arguments = [], array $options = [], array $additionalOptions = [])
@@ -35,22 +25,13 @@ final class CallBackTask extends AbstractTask
             throw new \InvalidArgumentException('The given callback is not a valid callable, must be a string or a callable!');
         }
 
-        $this->callback = $callback;
-        $this->arguments = $arguments;
-
-        parent::__construct($name, $options, $additionalOptions);
-    }
-
-    /**
-     * @return callable|string
-     */
-    public function getCallback()
-    {
-        return $this->callback;
-    }
-
-    public function getArguments(): array
-    {
-        return $this->arguments;
+        parent::__construct($name, array_merge($options, [
+            'arguments' => $arguments,
+            'callback' => $callback,
+            'type' => 'callback',
+        ]), array_merge($additionalOptions, [
+            'arguments' => ['array'],
+            'callback' => ['callable', 'string']
+        ]));
     }
 }

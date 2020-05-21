@@ -40,7 +40,7 @@ final class CommandTaskRunner implements RunnerInterface
      */
     public function run(TaskInterface $task): Output
     {
-        if (!$task instanceof CommandTask) {
+        if (!$this->support($task)) {
             throw new InvalidArgumentException(sprintf('The task must be an instance of %s, given %s', CommandTask::class, get_class($task)));
         }
 

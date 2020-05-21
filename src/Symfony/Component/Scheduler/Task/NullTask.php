@@ -16,10 +16,4 @@ namespace Symfony\Component\Scheduler\Task;
  */
 final class NullTask extends AbstractTask
 {
-    public function __construct(string $name, array $options = [], array $additionalOptions = [])
-    {
-        parent::__construct($name, array_merge($options, [
-            'type' => 'null',
-        ]), $additionalOptions);
-    }
 }

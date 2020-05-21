@@ -14,6 +14,6 @@ namespace Symfony\Component\Scheduler\Exception;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class AlreadyScheduledTaskException extends \RuntimeException implements ExceptionInterface
+final class AlreadyScheduledTaskException extends RuntimeException implements ExceptionInterface
 {
 }

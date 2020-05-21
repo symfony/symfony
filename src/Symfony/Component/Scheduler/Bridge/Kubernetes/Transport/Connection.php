@@ -11,13 +11,17 @@
 
 namespace Symfony\Component\Scheduler\Bridge\Kubernetes\Transport;
 
-use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Scheduler\Bridge\Kubernetes\Exception\InvalidOperationException;
+use Symfony\Component\Scheduler\Bridge\Kubernetes\Task\CronJob;
+use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Component\Scheduler\Transport\ConnectionInterface;
 use Symfony\Component\Scheduler\Transport\Dsn;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -29,11 +33,6 @@ final class Connection implements ConnectionInterface
      * https://kubernetes.io/docs/reference/generated/kubernetes-api/%apiVersion%/#create-cronjob-v1beta1-batch
      */
     private const CREATE_URL = '/apis/batch/v1beta1/namespaces/%s/cronjobs';
-
-    /**
-     * https://kubernetes.io/docs/reference/generated/kubernetes-api/%apiVersion%/#path-cronjob-v1beta1-batch
-     */
-    private const PATCH_URL = '/apis/batch/v1beta1/namespaces/%s/cronjobs/%s';
 
     /**
      * https://kubernetes.io/docs/reference/generated/kubernetes-api/%apiVersion%/#replace-cronjob-v1beta1-batch
@@ -61,16 +60,24 @@ final class Connection implements ConnectionInterface
     private const LIST_URL = '/apis/batch/v1beta1/namespaces/%s/cronjobs';
 
     private $apiUrl;
+    private $authenticationToken;
     private $httpClient;
     private $namespace;
     private $scheme;
+    private $serializer;
 
-    public function __construct(Dsn $dsn, HttpClientInterface $httpClient)
+    public function __construct(Dsn $dsn, SerializerInterface $serializer, HttpClientInterface $httpClient = null)
     {
         $this->apiUrl = $dsn->getHost();
         $this->namespace = $dsn->getOption('namespace');
         $this->scheme = $dsn->getOption('scheme') ?? 'https';
-        $this->httpClient = $this->warmClient($httpClient);
+
+        if (null === $this->authenticationToken = $dsn->getUser()) {
+            throw new InvalidArgumentException('The authentication token MUST be provided.');
+        }
+
+        $this->serializer = $serializer;
+        $this->httpClient = $this->warmClient($httpClient ?? HttpClient::create());
     }
 
     /**
@@ -83,10 +90,11 @@ final class Connection implements ConnectionInterface
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                'json' => $task->toArray(),
+                'auth_bearer' => $this->authenticationToken,
+                'body' => $this->serializer->serialize($task, 'json'),
             ]);
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task cannot be created: "%s"', $exception->getMessage());
         }
     }
 
@@ -95,10 +103,46 @@ final class Connection implements ConnectionInterface
      */
     public function list(): TaskListInterface
     {
+        try {
+            $response = $this->httpClient->request('GET', sprintf(self::LIST_URL, $this->namespace), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+
+            if (!\array_key_exists('items', $response->toArray())) {
+                throw new InvalidOperationException('The task list cannot be retrieved.');
+            }
+
+            $list = new TaskList();
+
+            $task = $this->serializer->deserialize($response, 'Symfony\Component\Scheduler\Bridge\Kubernetes\Task\CronJob[]', 'json');
+            $list->add($task);
+
+            return $list;
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task list cannot be retrieved: "%s"', $exception->getMessage());
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get(string $taskName): TaskInterface
     {
+        try {
+            $response = $this->httpClient->request('GET', sprintf(self::GET_URL, $this->namespace, $taskName), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+
+            return $this->serializer->deserialize($response, CronJob::class, 'json');
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task cannot be updated: "%s"', $exception->getMessage());
+        }
     }
 
     /**
@@ -106,6 +150,17 @@ final class Connection implements ConnectionInterface
      */
     public function update(string $taskName, TaskInterface $updatedTask): void
     {
+        try {
+            $this->httpClient->request('PUT', sprintf(self::REPLACE_URL, $this->namespace, $taskName), [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'auth_bearer' => $this->authenticationToken,
+                'body' => $this->serializer->serialize($updatedTask, 'json'),
+            ]);
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task cannot be updated: "%s"', $exception->getMessage());
+        }
     }
 
     /**
@@ -113,6 +168,21 @@ final class Connection implements ConnectionInterface
      */
     public function pause(string $taskName): void
     {
+        try {
+            $response = $this->httpClient->request('GET', sprintf(self::GET_URL, $this->namespace, $taskName), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+
+            $job = $this->serializer->deserialize($response, CronJob::class, 'json');
+            $job->set('spec', array_merge($job->get('spec'), ['suspend' => true]));
+
+            $this->update($taskName, $job);
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task cannot be updated: "%s"', $exception->getMessage());
+        }
     }
 
     /**
@@ -120,6 +190,25 @@ final class Connection implements ConnectionInterface
      */
     public function resume(string $taskName): void
     {
+        try {
+            $response = $this->httpClient->request('GET', sprintf(self::GET_URL, $this->namespace, $taskName), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+
+            $job = $this->serializer->deserialize($response, CronJob::class, 'json');
+            if (null !== $job->get('spec') && $job->get('spec')['suspend'] === false) {
+                throw new InvalidOperationException('The task cannot be resumed as the task is already allowed to run.');
+            }
+
+            $job->set('spec', array_merge($job->get('spec'), ['suspend' => false]));
+
+            $this->update($taskName, $job);
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException('The task cannot be updated: "%s"', $exception->getMessage());
+        }
     }
 
     /**
@@ -128,13 +217,11 @@ final class Connection implements ConnectionInterface
     public function delete(string $taskName): void
     {
         try {
-            $this->httpClient->request('DELETE', sprintf(self::DELETE_URL, $this->namespace, $taskName));
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
-
-            if (!\in_array($response->getStatusCode(), [200, 202])) {
-                throw new InvalidOperationException('The cron job cannot be deleted');
-            }
+            $this->httpClient->request('DELETE', sprintf(self::DELETE_URL, $this->namespace, $taskName), [
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException(sprintf('The cron job cannot be deleted, error: "%s"', $exception->getMessage()));
         }
     }
 
@@ -144,13 +231,11 @@ final class Connection implements ConnectionInterface
     public function empty(): void
     {
         try {
-            $this->httpClient->request('DELETE', sprintf(self::DELETE_COLLECTION_URL, $this->namespace));
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
-
-            if (200 !== $response->getStatusCode()) {
-                throw new InvalidOperationException('The cron jobs list cannot be emptied');
-            }
+            $this->httpClient->request('DELETE', sprintf(self::DELETE_COLLECTION_URL, $this->namespace), [
+                'auth_bearer' => $this->authenticationToken,
+            ]);
+        } catch (\Throwable $exception) {
+            throw new InvalidOperationException(sprintf('The cron jobs list cannot be emptied, error: "%s"', $exception->getMessage()));
         }
     }
 

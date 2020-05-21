@@ -14,6 +14,7 @@ namespace Symfony\Component\Scheduler\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,7 +61,7 @@ final class GenerateCronCommandTest extends TestCase
         $tester = new CommandTester($application->get('scheduler:generate'));
         $tester->execute([]);
 
-        static::assertSame(1, $tester->getStatusCode());
+        static::assertSame(Command::FAILURE, $tester->getStatusCode());
         static::assertStringContainsString('No cron file found, please be sure that at least a scheduler is defined', $tester->getDisplay());
     }
 
@@ -85,7 +86,7 @@ final class GenerateCronCommandTest extends TestCase
             'schedulers' => ['foo'],
         ]);
 
-        static::assertSame(1, $tester->getStatusCode());
+        static::assertSame(Command::FAILURE, $tester->getStatusCode());
         static::assertStringContainsString('An error occurred: The directory is not valid', $tester->getDisplay());
     }
 
@@ -108,7 +109,7 @@ final class GenerateCronCommandTest extends TestCase
         $tester = new CommandTester($application->get('scheduler:generate'));
         $tester->execute([]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('Cron files have been generated for schedulers', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Directory', $tester->getDisplay());
@@ -135,7 +136,7 @@ final class GenerateCronCommandTest extends TestCase
             '--directory' => '/srv/app',
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('Cron files have been generated for schedulers at "/srv/app"', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Directory', $tester->getDisplay());
@@ -162,7 +163,7 @@ final class GenerateCronCommandTest extends TestCase
             'schedulers' => ['foo'],
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('Cron files have been generated for schedulers', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());
         static::assertStringContainsString('Directory', $tester->getDisplay());
@@ -190,7 +191,7 @@ final class GenerateCronCommandTest extends TestCase
             '--dry-run' => true,
         ]);
 
-        static::assertSame(0, $tester->getStatusCode());
+        static::assertSame(Command::SUCCESS, $tester->getStatusCode());
         static::assertStringContainsString('Cron files to be generated:', $tester->getDisplay());
         static::assertStringNotContainsString('Cron files have been generated for schedulers', $tester->getDisplay());
         static::assertStringContainsString('Name', $tester->getDisplay());

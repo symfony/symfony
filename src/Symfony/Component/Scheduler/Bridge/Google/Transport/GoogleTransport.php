@@ -97,7 +97,7 @@ final class GoogleTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
         foreach ($this->list()->toArray() as $task) {
             $this->delete($task->getName());

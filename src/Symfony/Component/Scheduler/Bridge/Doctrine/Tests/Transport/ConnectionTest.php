@@ -19,7 +19,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
-use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\Connection as DoctrineConnection;
@@ -30,6 +29,7 @@ use Symfony\Component\Scheduler\Task\NullFactory;
 use Symfony\Component\Scheduler\Task\TaskFactory;
 use Symfony\Component\Scheduler\Task\TaskFactoryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -38,6 +38,8 @@ final class ConnectionTest extends TestCase
 {
     public function testConnectionCanSortATaskList(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $taskFactory = new TaskFactory([new NullFactory()]);
         $queryBuilder = $this->getQueryBuilderMock();
 
@@ -71,7 +73,7 @@ final class ConnectionTest extends TestCase
         $queryBuilder->expects(self::never())->method('getParameterTypes');
         $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
 
-        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection, $serializer);
         $taskList = $connection->list();
 
         static::assertNotEmpty($taskList);
@@ -161,6 +163,8 @@ final class ConnectionTest extends TestCase
 
     public function testConnectionCanReturnASingleTask(): void
     {
+        $serializer = $this->createMock(SerializerInterface::class);
+
         $taskFactory = new TaskFactory([new NullFactory()]);
         $queryBuilder = $this->getQueryBuilderMock();
 
@@ -178,7 +182,7 @@ final class ConnectionTest extends TestCase
         $queryBuilder->expects(self::once())->method('getSQL')->willReturn('SELECT * FROM scheduler_tasks WHERE task_name = "foo"');
         $driverConnection->expects(self::once())->method('executeQuery')->willReturn($statement);
 
-        $connection = new DoctrineConnection($taskFactory, [], $driverConnection);
+        $connection = new DoctrineConnection($taskFactory, [], $driverConnection, $serializer);
         $task = $connection->get('foo');
 
         static::assertInstanceOf(TaskInterface::class, $task);
@@ -412,10 +416,5 @@ final class ConnectionTest extends TestCase
         $list ? $stmt->expects(self::once())->method('fetchAll')->willReturn($expectedResult) : $stmt->expects(self::once())->method('fetch')->willReturn($expectedResult);
 
         return $stmt;
-    }
-
-    private function getSchemaSynchronizerMock(): SchemaSynchronizer
-    {
-        return $this->createMock(SchemaSynchronizer::class);
     }
 }

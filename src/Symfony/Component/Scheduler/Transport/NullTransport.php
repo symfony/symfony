@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,8 +13,10 @@
 
 namespace Symfony\Component\Scheduler\Transport;
 
+use RuntimeException;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
+use function array_merge;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -34,25 +38,9 @@ final class NullTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function support(string $configuration): bool
-    {
-        return 0 === strpos('null://', $configuration);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $taskName): TaskInterface
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -60,7 +48,7 @@ final class NullTransport implements TransportInterface
      */
     public function list(): TaskListInterface
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -68,7 +56,7 @@ final class NullTransport implements TransportInterface
      */
     public function create(TaskInterface $task): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -76,7 +64,7 @@ final class NullTransport implements TransportInterface
      */
     public function update(string $taskName, TaskInterface $updatedTask): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -84,7 +72,7 @@ final class NullTransport implements TransportInterface
      */
     public function delete(string $taskName): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -92,7 +80,7 @@ final class NullTransport implements TransportInterface
      */
     public function pause(string $taskName): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
@@ -100,14 +88,22 @@ final class NullTransport implements TransportInterface
      */
     public function resume(string $taskName): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function empty(): void
+    public function clear(): void
     {
-        throw new \RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+        throw new RuntimeException(sprintf('The %s() cannot be called on %s transport!', __METHOD__, __CLASS__));
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -31,11 +33,11 @@ final class TraceableScheduler implements SchedulerInterface
     /**
      * {@inheritdoc}
      */
-    public function schedule(TaskInterface $task): void
+    public function schedule(TaskInterface $task, array $bags = []): void
     {
         $this->scheduledTasks[$task->getName()] = $task->getFormattedInformations();
 
-        $this->scheduler->schedule($task);
+        $this->scheduler->schedule($task, $bags);
     }
 
     /**

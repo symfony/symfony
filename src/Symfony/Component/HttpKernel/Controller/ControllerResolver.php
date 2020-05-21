@@ -136,7 +136,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
                 } else {
                     $arguments[] = $attributes[$param->name];
                 }
-            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
+            } elseif ($this->typeMatchesRequestClass($param, $request)) {
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
@@ -259,5 +259,23 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
         }
 
         return $message;
+    }
+
+    /**
+     * @return bool
+     */
+    private function typeMatchesRequestClass(\ReflectionParameter $param, Request $request)
+    {
+        if (!method_exists($param, 'getType')) {
+            return $param->getClass() && $param->getClass()->isInstance($request);
+        }
+
+        if (!($type = $param->getType()) || $type->isBuiltin()) {
+            return false;
+        }
+
+        $class = new \ReflectionClass(method_exists($type, 'getName') ? $type->getName() : (string) $type);
+
+        return $class && $class->isInstance($request);
     }
 }

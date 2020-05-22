@@ -255,12 +255,15 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     private static function throwInvalidArgumentException($message, $trace, $i, $previous = null)
     {
-        // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
-        if (0 !== strpos($message, 'Argument ')) {
+        if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
         }
 
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
+        if (\PHP_VERSION_ID < 80000) {
+            if (0 !== strpos($message, 'Argument ')) {
+                return;
+            }
+
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += \strlen($delim);
             $j = strpos($message, ',', $pos);
@@ -268,6 +271,12 @@ class PropertyAccessor implements PropertyAccessorInterface
             $message = substr($message, $pos, $j - $pos);
 
             throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given.', $message, 'NULL' === $type ? 'null' : $type), 0, $previous);
+        }
+
+        if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
+            list(, $expectedType, $actualType) = $matches;
+
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given.', $expectedType, 'NULL' === $actualType ? 'null' : $actualType), 0, $previous);
         }
     }
 
@@ -471,7 +480,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
                 } catch (\TypeError $e) {
                     // handle uninitialized properties in PHP >= 7
-                    if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of the type (\w+), null returned$/', preg_quote(\get_class($object)), $access[self::ACCESS_NAME])), $e->getMessage(), $matches)) {
+                    if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of (?:the )?type (\w+), null returned$/', preg_quote(\get_class($object)), $access[self::ACCESS_NAME])), $e->getMessage(), $matches)) {
                         throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', \get_class($object), $access[self::ACCESS_NAME], $matches[1]), 0, $e);
                     }
 

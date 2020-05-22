@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-16T17:32:02Z
+
+Can we deprecate the `allowEmptyString` option instead? If someone wanted to disallow empty strings, they could use the `NotBlank` validator instead, or am I missing something?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-20T18:06:50Z
+
+Good idea, this was actually suggested when the option was introduced in 4.4 (see #31528):
+
+> In my opinion, the flag could even be removed later.

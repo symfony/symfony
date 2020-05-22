@@ -91,7 +91,7 @@ trait DoctrineTrait
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, ?int $lifetime)
     {
         return $this->provider->saveMultiple($values, $lifetime);
     }

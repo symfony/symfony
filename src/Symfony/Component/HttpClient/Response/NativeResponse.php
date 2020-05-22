@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -214,8 +215,10 @@ final class NativeResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param NativeClientState $multi
      */
-    private static function perform(NativeClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, array &$responses = null): void
     {
         // List of native handles for stream_select()
         if (null !== $responses) {
@@ -326,8 +329,10 @@ final class NativeResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param NativeClientState $multi
      */
-    private static function select(NativeClientState $multi, float $timeout): int
+    private static function select(ClientState $multi, float $timeout): int
     {
         $_ = [];
 

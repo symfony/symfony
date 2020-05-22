@@ -21,12 +21,12 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "doctrine/dbal": "~2.5",
+        "doctrine/dbal": "^2.10",
         "mongodb/mongodb": "~1.1",
         "predis/predis": "~1.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.5"
+        "doctrine/dbal": "<2.10"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },

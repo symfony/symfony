@@ -111,7 +111,7 @@
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.4",
+        "doctrine/dbal": "^2.10",
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/reflection": "~1.0",
         "doctrine/doctrine-bundle": "^2.0",
@@ -134,6 +134,7 @@
         "twig/markdown-extra": "^2.12"
     },
     "conflict": {
+        "doctrine/dbal": "<2.10",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",

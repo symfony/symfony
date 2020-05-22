@@ -122,4 +122,9 @@ class DoctrineDummy
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="customType", indexBy="customType")
      */
     private $indexedByCustomType;
+
+    /**
+     * @Column(type="json", nullable=true)
+     */
+    private $json;
 }

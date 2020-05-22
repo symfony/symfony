@@ -101,9 +101,14 @@ class ErrorHandlerTest extends TestCase
             $this->fail('ErrorException expected');
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
-            $this->assertEquals(E_NOTICE, $exception->getSeverity());
+            if (\PHP_VERSION_ID < 80000) {
+                $this->assertEquals(E_NOTICE, $exception->getSeverity());
+                $this->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+            } else {
+                $this->assertEquals(E_WARNING, $exception->getSeverity());
+                $this->assertRegExp('/^Warning: Undefined variable \$(foo|bar)/', $exception->getMessage());
+            }
             $this->assertEquals(__FILE__, $exception->getFile());
-            $this->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
 
             $trace = $exception->getTrace();
 
@@ -247,11 +252,17 @@ class ErrorHandlerTest extends TestCase
 
             $line = null;
             $logArgCheck = function ($level, $message, $context) use (&$line) {
-                $this->assertEquals('Notice: Undefined variable: undefVar', $message);
                 $this->assertArrayHasKey('exception', $context);
                 $exception = $context['exception'];
+
+                if (\PHP_VERSION_ID < 80000) {
+                    $this->assertEquals('Notice: Undefined variable: undefVar', $message);
+                    $this->assertSame(E_NOTICE, $exception->getSeverity());
+                } else {
+                    $this->assertEquals('Warning: Undefined variable $undefVar', $message);
+                    $this->assertSame(E_WARNING, $exception->getSeverity());
+                }
                 $this->assertInstanceOf(SilencedErrorContext::class, $exception);
-                $this->assertSame(E_NOTICE, $exception->getSeverity());
                 $this->assertSame(__FILE__, $exception->getFile());
                 $this->assertSame($line, $exception->getLine());
                 $this->assertNotEmpty($exception->getTrace());
@@ -265,8 +276,13 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler = ErrorHandler::register();
-            $handler->setDefaultLogger($logger, E_NOTICE);
-            $handler->screamAt(E_NOTICE);
+            if (\PHP_VERSION_ID < 80000) {
+                $handler->setDefaultLogger($logger, E_NOTICE);
+                $handler->screamAt(E_NOTICE);
+            } else {
+                $handler->setDefaultLogger($logger, E_WARNING);
+                $handler->screamAt(E_WARNING);
+            }
             unset($undefVar);
             $line = __LINE__ + 1;
             @$undefVar++;

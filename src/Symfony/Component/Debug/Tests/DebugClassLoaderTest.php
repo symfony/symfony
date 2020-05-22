@@ -97,6 +97,9 @@ class DebugClassLoaderTest extends TestCase
         $this->assertStringMatchesFormat('%aParse error%a', $output);
     }
 
+    /**
+     * @requires PHP < 8.0
+     */
     public function testStacking()
     {
         // the ContextErrorException must not be loaded to test the workaround

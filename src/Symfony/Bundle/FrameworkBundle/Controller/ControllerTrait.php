@@ -187,7 +187,7 @@ trait ControllerTrait
      * Adds a flash message to the current session for type.
      *
      * @param string $type    The type
-     * @param string $message The message
+     * @param mixed  $message The message
      *
      * @throws \LogicException
      *

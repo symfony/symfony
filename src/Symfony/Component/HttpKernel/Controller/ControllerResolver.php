@@ -77,7 +77,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
             throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', \get_class($controller), $request->getPathInfo()));
         }
 
-        if (false === strpos($controller, ':')) {
+        if (\is_string($controller) && false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
                 return $this->instantiateController($controller);
             } elseif (\function_exists($controller)) {

@@ -407,7 +407,7 @@ class DebugClassLoader
         }
         $deprecations = [];
 
-        $className = isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00") ? get_parent_class($class).'@anonymous' : $class;
+        $className = false !== strpos($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
 
         // Don't trigger deprecations for classes in the same vendor
         if ($class !== $className) {

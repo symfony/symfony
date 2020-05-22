@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-05-16T16:56:25Z
+
+Hi @azhurb, looks like it fixes #36640 :) cool.
+
+WDYT of my patch suggestion in the issue? I believe there are some other cases where we need to preserve the given content-type as well.
+
+---------------------------------------------------------------------------
+
+by azhurb at 2020-05-16T17:21:39Z
+
+> Hi @azhurb, looks like it fixes #36640 :) cool.
+>
+> WDYT of my patch suggestion in the issue? I believe there are some other cases where we need to preserve the given content-type as well.
+
+Hi @ro0NL. Actually I believe we need to preserve content-type only if the raw body data is not empty. It looks like other cases are already covered. Anyway, your patch should work as well :)
+
+---------------------------------------------------------------------------
+
+by azhurb at 2020-05-16T17:35:31Z
+
+There is also discussion from 2016 about this issue https://github.com/symfony/symfony/issues/20042

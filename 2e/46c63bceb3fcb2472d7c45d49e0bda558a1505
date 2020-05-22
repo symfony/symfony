@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ajgarlag at 2020-03-05T14:25:41Z
+
+I've opened https://github.com/thlbaut/symfony/pull/1 to PR author branch with an small change to reproduce the bug, and to prevent a future regression.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T20:00:34Z
+
+This would deserve more tests I suppose (note the I don't know if this is correct.)

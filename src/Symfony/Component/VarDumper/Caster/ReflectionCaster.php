@@ -333,6 +333,10 @@ class ReflectionCaster
     private static function addMap(&$a, \Reflector $c, $map, $prefix = Caster::PREFIX_VIRTUAL)
     {
         foreach ($map as $k => $m) {
+            if (\PHP_VERSION_ID >= 80000 && 'isDisabled' === $k) {
+                continue;
+            }
+
             if (method_exists($c, $m) && false !== ($m = $c->$m()) && null !== $m) {
                 $a[$prefix.$k] = $m instanceof \Reflector ? $m->name : $m;
             }

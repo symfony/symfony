@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T10:17:18Z
+
+/cc @fre5h WDYT?
+
+---------------------------------------------------------------------------
+
+by fre5h at 2020-05-19T15:01:58Z
+
+I rechecked it on iOS mobile browsers. Works well. I mean only `type` without `inputmode`. I'm not sure that it is really a bug, that `inputmode` was added. Because `inputmode` attribute is still a part of HTML standard, it is not deprecated, it does not perform any negative side effects for form rendering.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2020-05-20T12:21:23Z
+
+Indeed it’s not a bug, nor a feature. It basically added code for nothing so I believe it is okay to remove it.

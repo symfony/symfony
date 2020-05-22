@@ -40,6 +40,13 @@ class SetAclCommandTest extends AbstractWebTestCase
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
 
+    public static function setUpBeforeClass()
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+    }
+
     public function testSetAclUser()
     {
         $objectId = 1;

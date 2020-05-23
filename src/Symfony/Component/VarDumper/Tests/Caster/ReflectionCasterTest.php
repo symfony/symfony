@@ -49,8 +49,8 @@ ReflectionClass {
 %A]
   methods: array:%d [
 %A
-    "export" => ReflectionMethod {
-      +name: "export"
+    "__construct" => ReflectionMethod {
+      +name: "__construct"
       +class: "ReflectionClass"
 %A    parameters: {
         $%s: ReflectionParameter {

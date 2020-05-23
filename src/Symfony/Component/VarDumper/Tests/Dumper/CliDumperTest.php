@@ -203,6 +203,7 @@ EOTXT;
 
     /**
      * @requires extension xml
+     * @requires PHP < 8.0
      */
     public function testXmlResource()
     {

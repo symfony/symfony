@@ -600,7 +600,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
         $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enSymbols');
         $r->setAccessible(true);
-        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+        $expected = $r->getValue();
 
         for ($i = 0; $i <= 17; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getSymbol($i));
@@ -617,7 +617,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
         $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enTextAttributes');
         $r->setAccessible(true);
-        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+        $expected = $r->getValue();
 
         for ($i = 0; $i <= 5; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getTextAttribute($i));

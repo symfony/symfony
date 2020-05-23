@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\InformationalChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -242,8 +243,10 @@ final class CurlResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param CurlClientState $multi
      */
-    private static function perform(CurlClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, array &$responses = null): void
     {
         if (self::$performing) {
             if ($responses) {
@@ -289,8 +292,10 @@ final class CurlResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param CurlClientState $multi
      */
-    private static function select(CurlClientState $multi, float $timeout): int
+    private static function select(ClientState $multi, float $timeout): int
     {
         if (\PHP_VERSION_ID < 70123 || (70200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 70211)) {
             // workaround https://bugs.php.net/76480

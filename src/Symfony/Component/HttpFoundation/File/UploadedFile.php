@@ -31,7 +31,7 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class UploadedFile extends File
 {
-    private $test = false;
+    private $test;
     private $originalName;
     private $mimeType;
     private $error;
@@ -76,7 +76,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return string|null The original name
+     * @return string The original name
      */
     public function getClientOriginalName()
     {
@@ -105,7 +105,7 @@ class UploadedFile extends File
      * For a trusted mime type, use getMimeType() instead (which guesses the mime
      * type based on the file content).
      *
-     * @return string|null The mime type
+     * @return string The mime type
      *
      * @see getMimeType()
      */

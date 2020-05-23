@@ -404,16 +404,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, $parameterData, array $context, string $format = null)
     {
         try {
-            if (\PHP_VERSION_ID < 70100 && null !== $parameterClass = $parameter->getClass()) {
-                $parameterClass = $parameterClass->name;
-            } elseif (\PHP_VERSION_ID >= 70100 && $parameter->hasType() && ($parameterType = $parameter->getType()) && !$parameterType->isBuiltin()) {
+            if (($parameterType = $parameter->getType()) && !$parameterType->isBuiltin()) {
                 $parameterClass = $parameterType->getName();
                 new \ReflectionClass($parameterClass); // throws a \ReflectionException if the class doesn't exist
-            } else {
-                $parameterClass = null;
-            }
 
-            if (null !== $parameterClass) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(sprintf('Cannot create an instance of "%s" from serialized data because the serializer inject in "%s" is not a denormalizer.', $parameterClass, static::class));
                 }

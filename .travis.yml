@@ -28,7 +28,11 @@ matrix:
           env: deps=high
         - php: 7.4
           env: deps=low
+        - php: nightly
+          services: [memcached]
     fast_finish: true
+    allow_failures:
+      - php: nightly
 
 cache:
     directories:
@@ -135,7 +139,9 @@ before_install:
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          echo extension = memcached.so >> $INI
+          if [[ $PHP != nightly ]]; then
+              echo extension = memcached.so >> $INI
+          fi
       done
 
     - |
@@ -146,6 +152,9 @@ before_install:
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           if ! php --ri sodium > /dev/null; then
               tfold ext.libsodium tpecl libsodium sodium.so $INI
+          fi
+          if [[ $PHP = nightly ]]; then
+              tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
           fi
 
           tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
@@ -220,6 +229,12 @@ install:
       # Skip the phpunit-bridge on not-master branches when $deps is empty
       if [[ ! $deps && $TRAVIS_BRANCH != master ]]; then
           export COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
+      fi
+
+    - |
+      # Set composer's platform to php 7.4 if we're on php 8.
+      if [[ $PHP = nightly ]]; then
+          composer config platform.php 7.4.99
       fi
 
     - |

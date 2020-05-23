@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-22T08:49:37Z
+
+> Can we try adding support for DBAL 3 right now?
+
+There shouldn't be much to do on our side. We might be compatible as soon as the ORM is compatible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-23T07:33:40Z
+
+> We might be compatible as soon as the ORM is compatible
+
+does this mean we can make `Cache` compatible right now instead of skipping?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-23T07:41:48Z
+
+I'll look into this.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-23T08:17:45Z
+
+The cache testsuite passes with DBAL 3 on php 8.

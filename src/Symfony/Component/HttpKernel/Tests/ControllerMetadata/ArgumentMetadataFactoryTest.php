@@ -80,7 +80,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
         $this->assertEquals([
             new ArgumentMetadata('foo', 'array', false, true, null, true),
-            new ArgumentMetadata('bar', null, false, false, null),
+            new ArgumentMetadata('bar', null, false, true, null, true),
         ], $arguments);
     }
 
@@ -122,7 +122,7 @@ class ArgumentMetadataFactoryTest extends TestCase
             new ArgumentMetadata('foo', 'string', false, false, null, true),
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
-            new ArgumentMetadata('mandatory', null, false, false, null, true),
+            new ArgumentMetadata('last', 'string', false, true, '', false),
         ], $arguments);
     }
 
@@ -142,7 +142,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
     }
 
-    private function signature5(array $foo = null, $bar)
+    private function signature5(array $foo = null, $bar = null)
     {
     }
 }

@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\MultipleArgumentsOptionalScalarNotReallyOptional;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -473,6 +474,9 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
+    /**
+     * @requires PHP < 8
+     */
     public function testOptionalScalarNotReallyOptionalUsesDefaultValue()
     {
         $container = new ContainerBuilder();

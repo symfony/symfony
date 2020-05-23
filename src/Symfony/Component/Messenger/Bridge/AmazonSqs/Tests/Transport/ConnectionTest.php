@@ -23,6 +23,36 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ConnectionTest extends TestCase
 {
+    public function testExtraOptions()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Connection::fromDsn('sqs://default/queue', [
+            'extra_key',
+        ]);
+    }
+
+    public function testExtraParamsInQuery()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Connection::fromDsn('sqs://default/queue?extra_param=some_value');
+    }
+
+    public function testConfigureWithCredentials()
+    {
+        $awsKey = 'some_aws_access_key_value';
+        $awsSecret = 'some_aws_secret_value';
+        $region = 'eu-west-1';
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => $region, 'accessKeyId' => $awsKey, 'accessKeySecret' => $awsSecret], null, $httpClient)),
+            Connection::fromDsn('sqs://default/queue', [
+                'access_key' => $awsKey,
+                'secret_key' => $awsSecret,
+                'region' => $region,
+            ], $httpClient)
+        );
+    }
+
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);

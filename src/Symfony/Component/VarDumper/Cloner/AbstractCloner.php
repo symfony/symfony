@@ -115,7 +115,6 @@ abstract class AbstractCloner implements ClonerInterface
         'SplDoublyLinkedList' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castDoublyLinkedList'],
         'SplFileInfo' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castFileInfo'],
         'SplFileObject' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castFileObject'],
-        'SplFixedArray' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castFixedArray'],
         'SplHeap' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castHeap'],
         'SplObjectStorage' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castObjectStorage'],
         'SplPriorityQueue' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castHeap'],

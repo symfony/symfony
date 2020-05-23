@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-21T12:01:29Z
+
+What should I do about the fabbot failures? They're unrelated to my changes. Submit a separate PR to fix them or ignore them?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-21T12:07:26Z
+
+They are false positives. We could rewrite the code a bit to prevent fabbot from generating these patches (using concat I guess).
+
+In this PR or another as you wish.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-21T13:20:45Z
+
+Test failures on php 5.5 have been resolved. Travis is green now.

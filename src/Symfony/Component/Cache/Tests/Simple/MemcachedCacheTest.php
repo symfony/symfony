@@ -76,8 +76,14 @@ class MemcachedCacheTest extends CacheTestCase
      */
     public function testBadOptions($name, $value)
     {
-        $this->expectException('ErrorException');
-        $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        if (\PHP_VERSION_ID < 80000) {
+            $this->expectException('ErrorException');
+            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        } else {
+            $this->expectException('Error');
+            $this->expectExceptionMessage('Undefined class constant \'Memcached::');
+        }
+
         MemcachedCache::createConnection([], [$name => $value]);
     }
 

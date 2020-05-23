@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added a `FrenchInflector` class
+
 5.1.0
 -----
 

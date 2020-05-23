@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\LegacyNullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ControllerResolverTest extends TestCase
@@ -243,6 +243,7 @@ class ControllerResolverTest extends TestCase
 
     /**
      * @requires PHP 7.1
+     * @requires PHP < 8
      * @group legacy
      */
     public function testGetNullableArguments()
@@ -253,12 +254,13 @@ class ControllerResolverTest extends TestCase
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', new \stdClass());
         $request->attributes->set('mandatory', 'mandatory');
-        $controller = [new NullableController(), 'action'];
+        $controller = [new LegacyNullableController(), 'action'];
         $this->assertEquals(['foo', new \stdClass(), 'value', 'mandatory'], $resolver->getArguments($request, $controller));
     }
 
     /**
      * @requires PHP 7.1
+     * @requires PHP < 8
      * @group legacy
      */
     public function testGetNullableArgumentsWithDefaults()
@@ -267,7 +269,7 @@ class ControllerResolverTest extends TestCase
 
         $request = Request::create('/');
         $request->attributes->set('mandatory', 'mandatory');
-        $controller = [new NullableController(), 'action'];
+        $controller = [new LegacyNullableController(), 'action'];
         $this->assertEquals([null, null, 'value', 'mandatory'], $resolver->getArguments($request, $controller));
     }
 

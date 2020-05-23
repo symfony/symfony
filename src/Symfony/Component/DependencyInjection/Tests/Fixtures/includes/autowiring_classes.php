@@ -184,12 +184,6 @@ class MultipleArgumentsOptionalScalarLast
     {
     }
 }
-class MultipleArgumentsOptionalScalarNotReallyOptional
-{
-    public function __construct(A $a, $foo = 'default_val', Lille $lille)
-    {
-    }
-}
 
 /*
  * Classes used for testing createResourceForClass

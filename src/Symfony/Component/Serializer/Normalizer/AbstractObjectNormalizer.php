@@ -108,7 +108,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    protected function getAttributes($object, $format = null, array $context)
+    protected function getAttributes($object, $format, array $context)
     {
         $class = \get_class($object);
         $key = $class.'-'.$context['cache_key'];

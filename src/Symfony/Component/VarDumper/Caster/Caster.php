@@ -46,7 +46,7 @@ class Caster
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject($obj, $class, $hasDebugInfo = false)
+    public static function castObject($obj, $class, $hasDebugInfo = false, $debugClass = null)
     {
         if ($class instanceof \ReflectionClass) {
             @trigger_error(sprintf('Passing a ReflectionClass to "%s()" is deprecated since Symfony 3.3 and will be unsupported in 4.0. Pass the class name as string instead.', __METHOD__), E_USER_DEPRECATED);
@@ -71,6 +71,17 @@ class Caster
 
         if ($a) {
             static $publicProperties = [];
+            if (null === $debugClass) {
+                if (\PHP_VERSION_ID >= 80000) {
+                    $debugClass = get_debug_type($obj);
+                } else {
+                    $debugClass = $class;
+
+                    if (isset($debugClass[15]) && "\0" === $debugClass[15]) {
+                        $debugClass = (get_parent_class($debugClass) ?: key(class_implements($debugClass)) ?: 'class').'@anonymous';
+                    }
+                }
+            }
 
             $i = 0;
             $prefixedKeys = [];
@@ -84,8 +95,8 @@ class Caster
                     if (!isset($publicProperties[$class][$k])) {
                         $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
                     }
-                } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
-                    $prefixedKeys[$i] = "\0".get_parent_class($class).'@anonymous'.strrchr($k, "\0");
+                } elseif ($debugClass !== $class && 1 === strpos($k, $class)) {
+                    $prefixedKeys[$i] = "\0".$debugClass.strrchr($k, "\0");
                 }
                 ++$i;
             }
@@ -101,6 +112,9 @@ class Caster
         if ($hasDebugInfo && \is_array($debugInfo)) {
             foreach ($debugInfo as $k => $v) {
                 if (!isset($k[0]) || "\0" !== $k[0]) {
+                    if (\array_key_exists(self::PREFIX_DYNAMIC.$k, $a)) {
+                        continue;
+                    }
                     $k = self::PREFIX_VIRTUAL.$k;
                 }
 

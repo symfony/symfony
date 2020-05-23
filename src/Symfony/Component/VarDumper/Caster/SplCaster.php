@@ -162,15 +162,6 @@ class SplCaster
         return $a;
     }
 
-    public static function castFixedArray(\SplFixedArray $c, array $a, Stub $stub, $isNested)
-    {
-        $a += [
-            Caster::PREFIX_VIRTUAL.'storage' => $c->toArray(),
-        ];
-
-        return $a;
-    }
-
     public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, $isNested)
     {
         $storage = [];
@@ -209,13 +200,15 @@ class SplCaster
     private static function castSplArray($c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
-        $class = $stub->class;
         $flags = $c->getFlags();
 
         if (!($flags & \ArrayObject::STD_PROP_LIST)) {
             $c->setFlags(\ArrayObject::STD_PROP_LIST);
-            $a = Caster::castObject($c, $class);
+            $a = Caster::castObject($c, \get_class($c), method_exists($c, '__debugInfo'), $stub->class);
             $c->setFlags($flags);
+        }
+        if (\PHP_VERSION_ID < 70400) {
+            $a[$prefix.'storage'] = $c->getArrayCopy();
         }
         $a += [
             $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
@@ -224,7 +217,6 @@ class SplCaster
         if ($c instanceof \ArrayObject) {
             $a[$prefix.'iteratorClass'] = new ClassStub($c->getIteratorClass());
         }
-        $a[$prefix.'storage'] = $c->getArrayCopy();
 
         return $a;
     }

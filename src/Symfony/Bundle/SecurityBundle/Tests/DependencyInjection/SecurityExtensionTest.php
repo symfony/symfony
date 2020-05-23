@@ -24,11 +24,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -520,6 +524,41 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    /**
+     * @dataProvider provideConfigureCustomAuthenticatorData
+     */
+    public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators)
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'first' => ['id' => 'users'],
+            ],
+
+            'firewalls' => [
+                'main' => $firewall,
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
+    }
+
+    public function provideConfigureCustomAuthenticatorData()
+    {
+        yield [
+            ['custom_authenticator' => TestAuthenticator::class],
+            [TestAuthenticator::class],
+        ];
+
+        yield [
+            ['custom_authenticators' => [TestAuthenticator::class, HttpBasicAuthenticator::class]],
+            [TestAuthenticator::class, HttpBasicAuthenticator::class],
+        ];
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
@@ -547,7 +586,30 @@ class SecurityExtensionTest extends TestCase
     }
 }
 
-class NullAuthenticator implements AuthenticatorInterface
+class TestAuthenticator implements AuthenticatorInterface
+{
+    public function supports(Request $request): ?bool
+    {
+    }
+
+    public function authenticate(Request $request): PassportInterface
+    {
+    }
+
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    {
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    {
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+    }
+}
+
+class NullAuthenticator implements GuardAuthenticatorInterface
 {
     public function start(Request $request, AuthenticationException $authException = null)
     {

@@ -146,7 +146,7 @@ class OptionsResolver implements Options
             $reflClosure = new \ReflectionFunction($value);
             $params = $reflClosure->getParameters();
 
-            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
+            if (isset($params[0]) && Options::class === $this->getParameterClassName($params[0])) {
                 // Initialize the option if no previous value exists
                 if (!isset($this->defaults[$option])) {
                     $this->defaults[$option] = null;
@@ -1065,5 +1065,21 @@ class OptionsResolver implements Options
     private static function isValueValidType($type, $value)
     {
         return (\function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getParameterClassName(\ReflectionParameter $parameter)
+    {
+        if (!method_exists($parameter, 'getType')) {
+            return ($class = $parameter->getClass()) ? $class->name : null;
+        }
+
+        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+            return null;
+        }
+
+        return method_exists($type, 'getName') ? $type->getName() : (string) $type;
     }
 }

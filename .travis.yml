@@ -122,6 +122,23 @@ before_install:
       }
       export -f tpecl
 
+      install_apcu_dev () {
+          local ref=$1
+          local INI=$2
+
+          wget https://github.com/krakjoe/apcu/archive/${ref}.zip
+          unzip ${ref}.zip
+          cd apcu-${ref}
+          phpize
+          ./configure
+          make
+          mv modules/apcu.so $(php -r "echo ini_get('extension_dir');")
+          echo 'extension = apcu.so' >> $INI
+          cd ..
+          rm -rf apcu-${ref} ${ref}.zip
+      }
+      export -f install_apcu_dev
+
     - |
       # Install sigchild-enabled PHP to test the Process component on the lowest PHP matrix line
       if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
@@ -155,6 +172,7 @@ before_install:
           fi
           if [[ $PHP = nightly ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
+              tfold ext.apcu install_apcu_dev 9c36db45100d4d27ec33072f4be90f1f5a0108b7 $INI
           else
               tfold ext.apcu tpecl apcu-5.1.18 apcu.so $INI
               tfold ext.mongodb tpecl mongodb-1.6.16 mongodb.so $INI

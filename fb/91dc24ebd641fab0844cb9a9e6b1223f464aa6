@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-22T18:29:19Z
+
+I would suggest to patch addMap instead:
+```php
+if (\PHP_VERSION_ID >= 80000 && 'isDisabled' === $m) {
+    continue;
+}
+```

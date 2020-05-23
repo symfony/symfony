@@ -180,7 +180,7 @@ class OptionsResolver implements Options
             $reflClosure = new \ReflectionFunction($value);
             $params = $reflClosure->getParameters();
 
-            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
+            if (isset($params[0]) && Options::class === $this->getParameterClassName($params[0])) {
                 // Initialize the option if no previous value exists
                 if (!isset($this->defaults[$option])) {
                     $this->defaults[$option] = null;
@@ -1216,5 +1216,14 @@ class OptionsResolver implements Options
         }
 
         return implode('", "', $options);
+    }
+
+    private function getParameterClassName(\ReflectionParameter $parameter): ?string
+    {
+        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+            return null;
+        }
+
+        return $type->getName();
     }
 }

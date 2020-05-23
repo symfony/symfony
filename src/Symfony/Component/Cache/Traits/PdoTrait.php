@@ -275,7 +275,7 @@ trait PdoTrait
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, ?int $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;

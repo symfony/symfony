@@ -91,7 +91,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, ?int $lifetime, array $addTagData = [], array $delTagData = []): array
+    protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
         $eviction = $this->getRedisEvictionPolicy();
         if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {

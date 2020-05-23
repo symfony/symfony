@@ -194,7 +194,7 @@ trait PhpFilesTrait
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, ?int $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         $ok = true;
         $expiry = $lifetime ? time() + $lifetime : 'PHP_INT_MAX';

@@ -101,7 +101,7 @@ trait ApcuTrait
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, ?int $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         try {
             if (false === $failures = apcu_store($values, null, $lifetime)) {

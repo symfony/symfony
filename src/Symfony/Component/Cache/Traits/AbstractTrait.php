@@ -78,7 +78,7 @@ trait AbstractTrait
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
-    abstract protected function doSave(array $values, ?int $lifetime);
+    abstract protected function doSave(array $values, int $lifetime);
 
     /**
      * {@inheritdoc}

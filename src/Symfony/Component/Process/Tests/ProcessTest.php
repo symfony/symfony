@@ -992,24 +992,16 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
-        if (\PHP_VERSION_ID < 80000 || \is_int($signal)) {
-            $this->expectException(RuntimeException::class);
-        } else {
-            $this->expectException('TypeError');
-        }
+        $this->expectException(RuntimeException::class);
 
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
             $process->signal(-4);
             $this->fail('A RuntimeException must have been thrown');
-        } catch (\TypeError $e) {
-            $process->stop(0);
-        } catch (RuntimeException $e) {
+        } finally {
             $process->stop(0);
         }
-
-        throw $e;
     }
 
     public function testDisableOutputDisablesTheOutput()

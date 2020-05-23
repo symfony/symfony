@@ -29,7 +29,7 @@
     "require-dev": {
         "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6",
-        "doctrine/dbal": "~2.4",
+        "doctrine/dbal": "~2.4|~3.0",
         "predis/predis": "~1.0"
     },
     "conflict": {

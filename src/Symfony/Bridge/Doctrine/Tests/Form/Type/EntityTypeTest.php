@@ -61,6 +61,13 @@ class EntityTypeTest extends BaseTypeTest
 
     protected static $supportedFeatureSetVersion = 304;
 
+    public static function setUpBeforeClass()
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+    }
+
     protected function setUp()
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();

@@ -262,9 +262,8 @@ install:
 
     - |
       # Set composer's platform to php 7.4 if we're on php 8.
-      echo $PHP
       if [[ $PHP = nightly ]]; then
-          composer config platform.php 7.4.6
+          composer config platform.php 7.4.99
       fi
 
     - |

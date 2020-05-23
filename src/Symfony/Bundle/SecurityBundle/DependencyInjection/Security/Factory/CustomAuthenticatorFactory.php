@@ -35,7 +35,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, Secur
 
     public function getKey(): string
     {
-        return 'custom_authenticator';
+        return 'custom_authenticators';
     }
 
     /**
@@ -44,19 +44,27 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, Secur
     public function addConfiguration(NodeDefinition $builder)
     {
         $builder
-            ->fixXmlConfig('service')
-            ->children()
-                ->arrayNode('services')
-                    ->info('An array of service ids for all of your "authenticators"')
-                    ->requiresAtLeastOneElement()
-                    ->prototype('scalar')->end()
-                ->end()
+            ->info('An array of service ids for all of your "authenticators"')
+            ->requiresAtLeastOneElement()
+            ->prototype('scalar')->end();
+
+        // get the parent array node builder ("firewalls") from inside the children builder
+        $factoryRootNode = $builder->end()->end();
+        $factoryRootNode
+            ->fixXmlConfig('custom_authenticator')
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['custom_authenticators']) && empty($v['custom_authenticators']); })
+                ->then(function ($v) {
+                    unset($v['custom_authenticators']);
+
+                    return $v;
+                })
             ->end()
         ;
     }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array
     {
-        return $config['services'];
+        return $config;
     }
 }

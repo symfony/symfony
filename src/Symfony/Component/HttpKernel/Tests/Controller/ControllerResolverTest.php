@@ -243,11 +243,14 @@ class ControllerResolverTest extends TestCase
 
     /**
      * @requires PHP 7.1
-     * @requires PHP < 8
      * @group legacy
      */
     public function testGetNullableArguments()
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->markTestSkipped('PHP < 8 required.');
+        }
+
         $resolver = new ControllerResolver();
 
         $request = Request::create('/');
@@ -260,11 +263,14 @@ class ControllerResolverTest extends TestCase
 
     /**
      * @requires PHP 7.1
-     * @requires PHP < 8
      * @group legacy
      */
     public function testGetNullableArgumentsWithDefaults()
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->markTestSkipped('PHP < 8 required.');
+        }
+
         $resolver = new ControllerResolver();
 
         $request = Request::create('/');

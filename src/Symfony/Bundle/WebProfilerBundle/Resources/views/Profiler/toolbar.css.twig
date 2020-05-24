@@ -1,5 +1,5 @@
 {# when updating any of these colors, do the same in profiler.css.twig #}
-{% set colors = { 'success': '#4F805D', 'warning': '#A46A1F', 'error': '#B0413E' } %}
+{% set colors = { 'success': '#4F805D', 'deprecation': '#6A1FA4', 'warning': '#A46A1F', 'error': '#B0413E' } %}
 
 .sf-minitoolbar {
     background-color: #222;
@@ -215,6 +215,9 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 .sf-toolbar-block .sf-toolbar-status-yellow {
     background-color: {{ colors.warning|raw }};
 }
+.sf-toolbar-block .sf-toolbar-status-purple {
+    background-color: {{ colors.deprecation|raw }};
+}
 
 .sf-toolbar-block.sf-toolbar-status-green {
     background-color: {{ colors.success|raw }};
@@ -226,6 +229,10 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 }
 .sf-toolbar-block.sf-toolbar-status-yellow {
     background-color: {{ colors.warning|raw }};
+    color: #FFF;
+}
+.sf-toolbar-block.sf-toolbar-status-purple {
+    background-color: {{ colors.deprecation|raw }};
     color: #FFF;
 }
 
@@ -260,6 +267,7 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 }
 
 .sf-toolbar-status-green .sf-toolbar-label,
+.sf-toolbar-status-purple .sf-toolbar-label,
 .sf-toolbar-status-yellow .sf-toolbar-label,
 .sf-toolbar-status-red .sf-toolbar-label {
     color: #FFF;
@@ -268,6 +276,8 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 .sf-toolbar-status-green svg .sf-svg-path,
 .sf-toolbar-status-red svg path,
 .sf-toolbar-status-red svg .sf-svg-path,
+.sf-toolbar-status-purple svg path,
+.sf-toolbar-status-purple svg .sf-svg-path,
 .sf-toolbar-status-yellow svg path,
 .sf-toolbar-status-yellow svg .sf-svg-path {
     fill: #FFF;
@@ -428,6 +438,7 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 }
 .sf-toolbar-status-green .sf-toolbar-info-piece-additional-detail,
 .sf-toolbar-status-yellow .sf-toolbar-info-piece-additional-detail,
+.sf-toolbar-status-purple .sf-toolbar-info-piece-additional-detail,
 .sf-toolbar-status-red .sf-toolbar-info-piece-additional-detail {
     color: #FFF;
 }

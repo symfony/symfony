@@ -72,9 +72,9 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
         $this->handler->expects($this->once())->method('gc')
-            ->with('maxlifetime')->willReturn(true);
+            ->with(4711)->willReturn(true);
 
-        $marshallingSessionHandler->gc('maxlifetime');
+        $marshallingSessionHandler->gc(4711);
     }
 
     public function testRead()

@@ -39,7 +39,7 @@ trait MicroKernelTrait
      *         ->controller('App\Controller\AdminController::dashboard')
      *     ;
      */
-    abstract protected function configureRoutes(RoutingConfigurator $routes);
+    //abstract protected function configureRoutes(RoutingConfigurator $routes);
 
     /**
      * Configures the container.
@@ -58,7 +58,7 @@ trait MicroKernelTrait
      *
      *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    abstract protected function configureContainer(ContainerConfigurator $c);
+    //abstract protected function configureContainer(ContainerConfigurator $c);
 
     /**
      * {@inheritdoc}

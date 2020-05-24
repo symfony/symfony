@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-24T10:51:17Z
+
+For reference, we're suggesting to relax `method_exists()` in PHP 8 in https://bugs.php.net/79623
+We can still do this change of course.

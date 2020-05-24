@@ -31,8 +31,6 @@ matrix:
         - php: nightly
           services: [memcached]
     fast_finish: true
-    allow_failures:
-      - php: nightly
 
 cache:
     directories:
@@ -254,7 +252,7 @@ install:
       # Set composer's platform to php 7.4 if we're on php 8.
       if [[ $PHP = nightly ]]; then
           composer config platform.php 7.4.99
-          export SYMFONY_DEPRECATIONS_HELPER=weak
+          export SYMFONY_DEPRECATIONS_HELPER=max[total]=999
       fi
 
     - |

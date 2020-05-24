@@ -204,19 +204,19 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', new \stdClass());
-        $request->attributes->set('mandatory', 'mandatory');
+        $request->attributes->set('last', 'last');
         $controller = [new NullableController(), 'action'];
 
-        $this->assertEquals(['foo', new \stdClass(), 'value', 'mandatory'], self::$resolver->getArguments($request, $controller));
+        $this->assertEquals(['foo', new \stdClass(), 'value', 'last'], self::$resolver->getArguments($request, $controller));
     }
 
     public function testGetNullableArgumentsWithDefaults()
     {
         $request = Request::create('/');
-        $request->attributes->set('mandatory', 'mandatory');
+        $request->attributes->set('last', 'last');
         $controller = [new NullableController(), 'action'];
 
-        $this->assertEquals([null, null, 'value', 'mandatory'], self::$resolver->getArguments($request, $controller));
+        $this->assertEquals([null, null, 'value', 'last'], self::$resolver->getArguments($request, $controller));
     }
 
     public function testGetSessionArguments()

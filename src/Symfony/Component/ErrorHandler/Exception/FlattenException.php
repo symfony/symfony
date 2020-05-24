@@ -75,7 +75,7 @@ class FlattenException
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromThrowable($exception);
-        $e->setClass(\get_class($exception));
+        $e->setClass(get_debug_type($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
 

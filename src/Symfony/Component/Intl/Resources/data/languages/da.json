@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -522,6 +521,7 @@
         "es_419": "latinamerikansk spansk",
         "es_ES": "europæisk spansk",
         "es_MX": "mexicansk spansk",
+        "fa_AF": "dari",
         "fr_CA": "canadisk fransk",
         "fr_CH": "schweizisk fransk",
         "nl_BE": "flamsk",

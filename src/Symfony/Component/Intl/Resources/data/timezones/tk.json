@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Grinwiç boýunça orta wagt (Abijan)",
         "Africa\/Accra": "Grinwiç boýunça orta wagt (Akkra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentina wagty (Rio-Galegos)",
         "America\/Argentina\/Salta": "Argentina wagty (Salta)",
         "America\/Argentina\/San_Juan": "Argentina wagty (San-Huan)",
-        "America\/Argentina\/San_Luis": "Günbatar Argentina wagty (San-Luis)",
+        "America\/Argentina\/San_Luis": "Argentina wagty (San-Luis)",
         "America\/Argentina\/Tucuman": "Argentina wagty (Tukuman)",
         "America\/Argentina\/Ushuaia": "Argentina wagty (Uşuaýa)",
         "America\/Aruba": "Atlantik wagty (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Bruneý-Darussalam wagty",
         "Asia\/Calcutta": "Hindistan standart wagty (Kalkutta)",
         "Asia\/Chita": "Ýakutsk wagty (Çita)",
-        "Asia\/Choibalsan": "Çoýbalsan wagty",
+        "Asia\/Choibalsan": "Ulan-Bator wagty (Çoýbalsan)",
         "Asia\/Colombo": "Hindistan standart wagty (Kolombo)",
         "Asia\/Damascus": "Gündogar Ýewropa wagty (Damask)",
         "Asia\/Dhaka": "Bangladeş wagty (Dakka)",

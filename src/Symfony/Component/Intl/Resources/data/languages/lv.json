@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afāru",
         "ab": "abhāzu",
@@ -198,7 +197,7 @@
         "iu": "inuītu",
         "ja": "japāņu",
         "jbo": "ložbans",
-        "jgo": "jgo",
+        "jgo": "ngomba",
         "jmc": "mačamu",
         "jpr": "jūdpersiešu",
         "jrb": "jūdarābu",
@@ -510,6 +509,7 @@
         "az_Arab": "dienvidazerbaidžāņu",
         "de_CH": "augšvācu (Šveice)",
         "en_GB": "angļu (Lielbritānija)",
+        "fa_AF": "darī",
         "nds_NL": "lejassakšu",
         "nl_BE": "flāmu",
         "ro_MD": "moldāvu",

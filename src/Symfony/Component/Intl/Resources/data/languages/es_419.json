@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "ace": "achenés",
         "ady": "adigeo",
@@ -43,6 +42,7 @@
         "es_419": "español latinoamericano",
         "es_ES": "español de España",
         "es_MX": "español de México",
+        "fa_AF": "darí",
         "fr_CA": "francés canadiense",
         "fr_CH": "francés suizo",
         "nl_BE": "flamenco",

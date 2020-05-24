@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwich Mean Time (Abidjan)",
         "Africa\/Accra": "Greenwich Mean Time (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Waktu Argentina (Rio Gallegos)",
         "America\/Argentina\/Salta": "Waktu Argentina (Salta)",
         "America\/Argentina\/San_Juan": "Waktu Argentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Waktu Argentina Bagian Barat (San Luis)",
+        "America\/Argentina\/San_Luis": "Waktu Argentina (San Luis)",
         "America\/Argentina\/Tucuman": "Waktu Argentina (Tucuman)",
         "America\/Argentina\/Ushuaia": "Waktu Argentina (Ushuaia)",
         "America\/Aruba": "Waktu Atlantik (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Waktu Brunei Darussalam",
         "Asia\/Calcutta": "Waktu India (Kolkata)",
         "Asia\/Chita": "Waktu Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Waktu Choibalsan",
+        "Asia\/Choibalsan": "Waktu Ulan Bator (Choibalsan)",
         "Asia\/Colombo": "Waktu India (Kolombo)",
         "Asia\/Damascus": "Waktu Eropa Timur (Damaskus)",
         "Asia\/Dhaka": "Waktu Bangladesh (Dhaka)",

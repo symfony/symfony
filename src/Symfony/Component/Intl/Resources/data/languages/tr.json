@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abhazca",
@@ -607,6 +606,7 @@
         "es_419": "Latin Amerika İspanyolcası",
         "es_ES": "Avrupa İspanyolcası",
         "es_MX": "Meksika İspanyolcası",
+        "fa_AF": "Darice",
         "fr_CA": "Kanada Fransızcası",
         "fr_CH": "İsviçre Fransızcası",
         "nds_NL": "Aşağı Saksonca",

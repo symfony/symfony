@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Hora de Greenwich (Abidjan)",
         "Africa\/Accra": "Hora de Greenwich (Acra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Hora da Argentina (Rio Gallegos)",
         "America\/Argentina\/Salta": "Hora da Argentina (Salta)",
         "America\/Argentina\/San_Juan": "Hora da Argentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Hora da Argentina Ocidental (San Luis)",
+        "America\/Argentina\/San_Luis": "Hora da Argentina (San Luis)",
         "America\/Argentina\/Tucuman": "Hora da Argentina (Tucumán)",
         "America\/Argentina\/Ushuaia": "Hora da Argentina (Ushuaia)",
         "America\/Aruba": "Hora do Atlântico (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Hora do Brunei Darussalam",
         "Asia\/Calcutta": "Hora padrão da Índia (Calcutá)",
         "Asia\/Chita": "Hora de Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Hora de Choibalsan",
+        "Asia\/Choibalsan": "Hora de Ulan Bator (Choibalsan)",
         "Asia\/Colombo": "Hora padrão da Índia (Colombo)",
         "Asia\/Damascus": "Hora da Europa Oriental (Damasco)",
         "Asia\/Dhaka": "Hora do Bangladeche (Daca)",
@@ -420,7 +419,6 @@
         "Pacific\/Midway": "Hora de Samoa (Midway)",
         "Pacific\/Nauru": "Hora de Nauru",
         "Pacific\/Niue": "Hora de Niuê (Niue)",
-        "Pacific\/Norfolk": "Hora da Ilha Norfolk",
         "Pacific\/Noumea": "Hora da Nova Caledónia (Nouméa)",
         "Pacific\/Pago_Pago": "Hora de Samoa (Pago Pago)",
         "Pacific\/Palau": "Hora de Palau",

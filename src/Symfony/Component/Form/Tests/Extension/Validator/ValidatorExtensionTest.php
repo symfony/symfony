@@ -94,13 +94,11 @@ class ValidatorExtensionTest extends TestCase
 
     public function testFieldsValidateInSequence()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $form = $this->createForm(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
             ->add('foo', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
                 'constraints' => [new NotBlank(['groups' => ['group2']])],
@@ -117,16 +115,14 @@ class ValidatorExtensionTest extends TestCase
 
     public function testFieldsValidateInSequenceWithNestedGroupsArray()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $form = $this->createForm(FormType::class, null, [
             'validation_groups' => new GroupSequence([['group1', 'group2'], 'group3']),
         ])
             ->add('foo', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group2']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group2']])],
             ])
             ->add('baz', TextType::class, [
                 'constraints' => [new NotBlank(['groups' => ['group3']])],

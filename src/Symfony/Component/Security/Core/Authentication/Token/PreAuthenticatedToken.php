@@ -26,7 +26,6 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * @param string|\Stringable|UserInterface $user
      * @param mixed                            $credentials
-     * @param string                           $providerKey
      * @param string[]                         $roles
      */
     public function __construct($user, $credentials, string $providerKey, array $roles = [])
@@ -88,6 +87,7 @@ class PreAuthenticatedToken extends AbstractToken
     public function __unserialize(array $data): void
     {
         [$this->credentials, $this->providerKey, $parentData] = $data;
+        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

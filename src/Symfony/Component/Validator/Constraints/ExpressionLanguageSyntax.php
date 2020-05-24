@@ -37,6 +37,6 @@ class ExpressionLanguageSyntax extends Constraint
      */
     public function validatedBy()
     {
-        return $this->service;
+        return $this->service ?? static::class.'Validator';
     }
 }

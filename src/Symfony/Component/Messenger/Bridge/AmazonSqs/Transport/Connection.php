@@ -124,13 +124,13 @@ class Connection
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : null;
 
         // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys($configuration));
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys($configuration));
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "af": "africanês",
         "alt": "altai do sul",
@@ -96,6 +95,7 @@
         "es_419": "espanhol latino-americano",
         "es_ES": "espanhol europeu",
         "es_MX": "espanhol mexicano",
+        "fa_AF": "dari",
         "fr_CA": "francês canadiano",
         "fr_CH": "francês suíço",
         "nds_NL": "baixo-saxão",

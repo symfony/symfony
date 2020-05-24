@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -61,6 +60,7 @@
         "cad": "kado",
         "car": "karipski",
         "cch": "atsam",
+        "ccp": "čakma",
         "ce": "čečenski",
         "ceb": "sebuanski",
         "cgg": "čiga",
@@ -497,6 +497,7 @@
         "en_GB": "engleski (Velika Britanija)",
         "en_US": "engleski (Sjedinjene Američke Države)",
         "es_ES": "španski (Evropa)",
+        "fa_AF": "dari",
         "nds_NL": "niskosaksonski",
         "nl_BE": "flamanski",
         "pt_PT": "portugalski (Portugal)",

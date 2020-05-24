@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abház",
@@ -522,6 +521,7 @@
         "es_419": "latin-amerikai spanyol",
         "es_ES": "európai spanyol",
         "es_MX": "spanyol (mexikói)",
+        "fa_AF": "dari",
         "fr_CA": "kanadai francia",
         "fr_CH": "svájci francia",
         "nds_NL": "alsószász",

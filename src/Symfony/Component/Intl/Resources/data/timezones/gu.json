@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ગ્રીનવિચ મધ્યમ સમય (આબિદ્જાન)",
         "Africa\/Accra": "ગ્રીનવિચ મધ્યમ સમય (ઍકરા)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "આર્જેન્ટીના સમય (રિઓ ગેલેગોસ)",
         "America\/Argentina\/Salta": "આર્જેન્ટીના સમય (સાલ્ટા)",
         "America\/Argentina\/San_Juan": "આર્જેન્ટીના સમય (સેન જુએન)",
-        "America\/Argentina\/San_Luis": "પશ્ચિમી આર્જેન્ટીના સમય (સેન લુઇસ)",
+        "America\/Argentina\/San_Luis": "આર્જેન્ટીના સમય (સેન લુઇસ)",
         "America\/Argentina\/Tucuman": "આર્જેન્ટીના સમય (તુકુમાન)",
         "America\/Argentina\/Ushuaia": "આર્જેન્ટીના સમય (ઉશાયા)",
         "America\/Aruba": "એટલાન્ટિક સમય (અરુબા)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "બ્રુનેઇ દરુસલામ સમય",
         "Asia\/Calcutta": "ભારતીય માનક સમય (કોલકાતા)",
         "Asia\/Chita": "યાકુત્સ્ક સમય (ચિતા)",
-        "Asia\/Choibalsan": "ચોઇબાલ્સન સમય",
+        "Asia\/Choibalsan": "ઉલાન બાટોર સમય (ચોઇબાલ્સન)",
         "Asia\/Colombo": "ભારતીય માનક સમય (કોલંબો)",
         "Asia\/Damascus": "પૂર્વી યુરોપિયન સમય (દમાસ્કસ)",
         "Asia\/Dhaka": "બાંગ્લાદેશ સમય (ઢાકા)",

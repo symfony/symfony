@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Ora e Grinuiçit (Abixhan)",
         "Africa\/Accra": "Ora e Grinuiçit (Akra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Ora e Argjentinës (Rio-Galegos)",
         "America\/Argentina\/Salta": "Ora e Argjentinës (Saltë)",
         "America\/Argentina\/San_Juan": "Ora e Argjentinës (San-Huan)",
-        "America\/Argentina\/San_Luis": "Ora e Argjentinës Perëndimore (Shën-Luis)",
+        "America\/Argentina\/San_Luis": "Ora e Argjentinës (Shën-Luis)",
         "America\/Argentina\/Tucuman": "Ora e Argjentinës (Tukuman)",
         "America\/Argentina\/Ushuaia": "Ora e Argjentinës (Ushuaja)",
         "America\/Aruba": "Ora e Atlantikut (Arubë)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Ora e Brunei-Durasalamit",
         "Asia\/Calcutta": "Ora standarde e Indisë (Kalkutë)",
         "Asia\/Chita": "Ora e Jakutskut (Çita)",
-        "Asia\/Choibalsan": "Ora e Çoibalsanit",
+        "Asia\/Choibalsan": "Ora e Ulan-Batorit (Çoibalsan)",
         "Asia\/Colombo": "Ora standarde e Indisë (Kolombo)",
         "Asia\/Damascus": "Ora e Evropës Lindore (Damask)",
         "Asia\/Dhaka": "Ora e Bangladeshit (Daka)",

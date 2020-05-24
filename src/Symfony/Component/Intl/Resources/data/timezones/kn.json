@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ಗ್ರೀನ್‌ವಿಚ್ ಸರಾಸರಿ ಕಾಲಮಾನ (ಅಬಿದ್‌ಜನ್)",
         "Africa\/Accra": "ಗ್ರೀನ್‌ವಿಚ್ ಸರಾಸರಿ ಕಾಲಮಾನ (ಅಕ್ರಾ)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ರಿಯೋ ಗಲ್ಲೆಗೊಸ್)",
         "America\/Argentina\/Salta": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ಸಾಲ್ಟಾ)",
         "America\/Argentina\/San_Juan": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ಸ್ಯಾನ್ ಜುವಾನ್)",
-        "America\/Argentina\/San_Luis": "ಪಶ್ಚಿಮ ಅರ್ಜೆಂಟೀನಾ ಸಮಯ (ಸ್ಯಾನ್ ಲೂಯೀಸ್)",
+        "America\/Argentina\/San_Luis": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ಸ್ಯಾನ್ ಲೂಯೀಸ್)",
         "America\/Argentina\/Tucuman": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ಟುಕುಮಾನ್)",
         "America\/Argentina\/Ushuaia": "ಅರ್ಜೆಂಟಿನಾ ಸಮಯ (ಉಶ್ವಾಯ)",
         "America\/Aruba": "ಅಟ್ಲಾಂಟಿಕ್ ಸಮಯ (ಅರುಬಾ)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ಬ್ರೂನಿ ದಾರುಸಲೆಮ್ ಸಮಯ",
         "Asia\/Calcutta": "ಭಾರತೀಯ ಪ್ರಮಾಣಿತ ಸಮಯ (ಕೊಲ್ಕತ್ತಾ)",
         "Asia\/Chita": "ಯಾಕುಟ್ಸಕ್ ಸಮಯ (ಚಿಟ)",
-        "Asia\/Choibalsan": "ಚೊಯ್‌ಬಲ್ಸಾನ್ ಸಮಯ (ಚೊಯ್‍ಬಾಲ್ಸನ್)",
+        "Asia\/Choibalsan": "ಉಲನ್ ಬ್ಯಾಟರ್ ಸಮಯ (ಚೊಯ್‍ಬಾಲ್ಸನ್)",
         "Asia\/Colombo": "ಭಾರತೀಯ ಪ್ರಮಾಣಿತ ಸಮಯ (ಕೊಲಂಬೊ)",
         "Asia\/Damascus": "ಪೂರ್ವ ಯುರೋಪಿಯನ್ ಸಮಯ (ಡಮಾಸ್ಕಸ್)",
         "Asia\/Dhaka": "ಬಾಂಗ್ಲಾದೇಶ ಸಮಯ (ಢಾಕಾ)",

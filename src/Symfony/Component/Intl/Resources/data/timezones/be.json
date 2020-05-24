@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Час па Грынвічы (Абіджан)",
         "Africa\/Accra": "Час па Грынвічы (Акра)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Аргенцінскі час (Рыа-Гальегас)",
         "America\/Argentina\/Salta": "Аргенцінскі час (Сальта)",
         "America\/Argentina\/San_Juan": "Аргенцінскі час (Сан-Хуан)",
-        "America\/Argentina\/San_Luis": "Час Заходняй Аргенціны (Сан-Луіс)",
+        "America\/Argentina\/San_Luis": "Аргенцінскі час (Сан-Луіс)",
         "America\/Argentina\/Tucuman": "Аргенцінскі час (Тукуман)",
         "America\/Argentina\/Ushuaia": "Аргенцінскі час (Ушуая)",
         "America\/Aruba": "Атлантычны час (Аруба)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Час Брунея (Бруней)",
         "Asia\/Calcutta": "Час Індыі (Калькута)",
         "Asia\/Chita": "Якуцкі час (Чыта)",
-        "Asia\/Choibalsan": "Час Чайбалсана",
+        "Asia\/Choibalsan": "Час Улан-Батара (Чайбалсан)",
         "Asia\/Colombo": "Час Індыі (Каломба)",
         "Asia\/Damascus": "Усходнееўрапейскі час (Дамаск)",
         "Asia\/Dhaka": "Час Бангладэш (Дака)",

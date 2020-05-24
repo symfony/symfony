@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "isi-Afar",
         "ab": "isi-Abkhazian",
@@ -397,6 +396,7 @@
         "es_419": "isi-Latin American Spanish",
         "es_ES": "isi-European Spanish",
         "es_MX": "Isi-Mexican Spanish",
+        "fa_AF": "isi-Dari",
         "fr_CA": "isi-Canadian French",
         "fr_CH": "isi-Swiss French",
         "nds_NL": "isi-Low Saxon",

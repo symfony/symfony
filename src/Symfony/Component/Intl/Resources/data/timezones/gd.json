@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwich Mean Time (Abidjan)",
         "Africa\/Accra": "Greenwich Mean Time (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Àm na h-Argantaine (Río Gallegos)",
         "America\/Argentina\/Salta": "Àm na h-Argantaine (Salta)",
         "America\/Argentina\/San_Juan": "Àm na h-Argantaine (San Juan)",
-        "America\/Argentina\/San_Luis": "Àm na h-Argantaine Siaraich (San Luis)",
+        "America\/Argentina\/San_Luis": "Àm na h-Argantaine (San Luis)",
         "America\/Argentina\/Tucuman": "Àm na h-Argantaine (Tucumán)",
         "America\/Argentina\/Ushuaia": "Àm na h-Argantaine (Ushuaia)",
         "America\/Aruba": "Àm a’ Chuain Siar (Arùba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Àm Bhrùnaigh Dàr as-Salàm (Brùnaigh)",
         "Asia\/Calcutta": "Àm nan Innseachan (Kolkata)",
         "Asia\/Chita": "Àm Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Àm Choibalsan",
+        "Asia\/Choibalsan": "Àm Ulan Bator (Choibalsan)",
         "Asia\/Colombo": "Àm nan Innseachan (Colombo)",
         "Asia\/Damascus": "Àm na Roinn-Eòrpa an Ear (Damascus)",
         "Asia\/Dhaka": "Àm Bangladais (Dhaka)",

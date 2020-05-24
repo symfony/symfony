@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "greenwichský čas (Abidjan)",
         "Africa\/Accra": "greenwichský čas (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "argentínsky čas (Rio Gallegos)",
         "America\/Argentina\/Salta": "argentínsky čas (Salta)",
         "America\/Argentina\/San_Juan": "argentínsky čas (San Juan)",
-        "America\/Argentina\/San_Luis": "západoargentínsky čas (San Luis)",
+        "America\/Argentina\/San_Luis": "argentínsky čas (San Luis)",
         "America\/Argentina\/Tucuman": "argentínsky čas (Tucuman)",
         "America\/Argentina\/Ushuaia": "argentínsky čas (Ushuaia)",
         "America\/Aruba": "atlantický čas (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "brunejský čas",
         "Asia\/Calcutta": "indický čas (Kalkata)",
         "Asia\/Chita": "jakutský čas (Čita)",
-        "Asia\/Choibalsan": "čojbalsanský čas",
+        "Asia\/Choibalsan": "ulanbátarský čas (Čojbalsan)",
         "Asia\/Colombo": "indický čas (Kolombo)",
         "Asia\/Damascus": "východoeurópsky čas (Damask)",
         "Asia\/Dhaka": "bangladéšsky čas (Dháka)",

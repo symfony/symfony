@@ -105,7 +105,7 @@ class DeprecationErrorHandler
                 $filesStack[] = $frame['file'];
             }
 
-            $deprecations[] = [error_reporting(), $msg, $file, $filesStack];
+            $deprecations[] = [error_reporting() & $type, $msg, $file, $filesStack];
 
             return null;
         });
@@ -135,7 +135,7 @@ class DeprecationErrorHandler
             $method = $deprecation->originatingMethod();
             $msg = $deprecation->getMessage();
 
-            if (0 !== error_reporting()) {
+            if (error_reporting() & $type) {
                 $group = 'unsilenced';
             } elseif ($deprecation->isLegacy()) {
                 $group = 'legacy';

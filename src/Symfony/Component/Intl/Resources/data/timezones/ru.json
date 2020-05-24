@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Среднее время по Гринвичу (Абиджан)",
         "Africa\/Accra": "Среднее время по Гринвичу (Аккра)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Аргентина (Рио-Гальегос)",
         "America\/Argentina\/Salta": "Аргентина (Сальта)",
         "America\/Argentina\/San_Juan": "Аргентина (Сан-Хуан)",
-        "America\/Argentina\/San_Luis": "Западная Аргентина (Сан-Луис)",
+        "America\/Argentina\/San_Luis": "Аргентина (Сан-Луис)",
         "America\/Argentina\/Tucuman": "Аргентина (Тукуман)",
         "America\/Argentina\/Ushuaia": "Аргентина (Ушуая)",
         "America\/Aruba": "Атлантическое время (Аруба)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Бруней-Даруссалам",
         "Asia\/Calcutta": "Индия (Калькутта)",
         "Asia\/Chita": "Якутск (Чита)",
-        "Asia\/Choibalsan": "Чойбалсан",
+        "Asia\/Choibalsan": "Улан-Батор (Чойбалсан)",
         "Asia\/Colombo": "Индия (Коломбо)",
         "Asia\/Damascus": "Восточная Европа (Дамаск)",
         "Asia\/Dhaka": "Бангладеш (Дакка)",

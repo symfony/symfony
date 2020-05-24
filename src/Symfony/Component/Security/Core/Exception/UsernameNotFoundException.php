@@ -69,6 +69,7 @@ class UsernameNotFoundException extends AuthenticationException
     public function __unserialize(array $data): void
     {
         [$this->username, $parentData] = $data;
+        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abcázio",
@@ -515,6 +514,7 @@
         "ar_001": "árabe moderno",
         "az_Arab": "azeri sul",
         "de_CH": "alto alemão (Suíça)",
+        "fa_AF": "dari",
         "nds_NL": "baixo saxão",
         "nl_BE": "flamengo",
         "ro_MD": "moldávio",

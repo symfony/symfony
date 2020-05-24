@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ເວ​ລາກຣີນ​ວິ​ຊ (ອາບິດແຈນ)",
         "Africa\/Accra": "ເວ​ລາກຣີນ​ວິ​ຊ (ອັກຄຣາ)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ຣິໂກ ແກວເລກອສ)",
         "America\/Argentina\/Salta": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ຊານຕາ)",
         "America\/Argentina\/San_Juan": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ແຊນຮວນ)",
-        "America\/Argentina\/San_Luis": "ເວ​ລາ​ເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ (ແຊນລຸຍສ໌)",
+        "America\/Argentina\/San_Luis": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ແຊນລຸຍສ໌)",
         "America\/Argentina\/Tucuman": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ຕູຄູແມນ)",
         "America\/Argentina\/Ushuaia": "ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ (ອູຊູເອຍ)",
         "America\/Aruba": "ເວລາຂອງອາແລນຕິກ (ອາຣູບາ)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "​ເວ​ລາບຣູ​ໄນດາ​ຣຸສ​ຊາ​ລາມ (ບຣູໄນ)",
         "Asia\/Calcutta": "ເວລາ ອິນເດຍ (ໂກລກາຕາ)",
         "Asia\/Chita": "ເວລາຢາກູດສ (ຊີຕ່າ)",
-        "Asia\/Choibalsan": "ເວ​ລາ​ໂຊຍ​ບາ​ຊັນ (ຊອຍບອລຊານ)",
+        "Asia\/Choibalsan": "ເວລາ ອູລານບາເຕີ (ຊອຍບອລຊານ)",
         "Asia\/Colombo": "ເວລາ ອິນເດຍ (ໂຄລຳໂບ)",
         "Asia\/Damascus": "ເວ​ລາ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ (ດາມາສຄັສ)",
         "Asia\/Dhaka": "ເວລາ ບັງກະລາເທດ (ດາຫ໌ກາ)",

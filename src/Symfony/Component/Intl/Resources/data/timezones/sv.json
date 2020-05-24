@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwichtid (Abidjan)",
         "Africa\/Accra": "Greenwichtid (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "östargentinsk tid (Río Gallegos)",
         "America\/Argentina\/Salta": "östargentinsk tid (Salta)",
         "America\/Argentina\/San_Juan": "östargentinsk tid (San Juan)",
-        "America\/Argentina\/San_Luis": "västargentinsk tid (San Luis)",
+        "America\/Argentina\/San_Luis": "östargentinsk tid (San Luis)",
         "America\/Argentina\/Tucuman": "östargentinsk tid (Tucumán)",
         "America\/Argentina\/Ushuaia": "östargentinsk tid (Ushuaia)",
         "America\/Aruba": "nordamerikansk atlanttid (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Bruneitid",
         "Asia\/Calcutta": "indisk tid (Kolkata)",
         "Asia\/Chita": "Jakutsktid (Tjita)",
-        "Asia\/Choibalsan": "Tjojbalsantid",
+        "Asia\/Choibalsan": "Ulaanbaatartid (Tjojbalsan)",
         "Asia\/Colombo": "indisk tid (Colombo)",
         "Asia\/Damascus": "östeuropeisk tid (Damaskus)",
         "Asia\/Dhaka": "bangladeshisk tid (Dhaka)",

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwiški srednji čas (Abidžan)",
         "Africa\/Accra": "Greenwiški srednji čas (Akra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentinski čas (Rio Gallegos)",
         "America\/Argentina\/Salta": "Argentinski čas (Salta)",
         "America\/Argentina\/San_Juan": "Argentinski čas (San Juan)",
-        "America\/Argentina\/San_Luis": "Argentinski zahodni čas (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentinski čas (San Luis)",
         "America\/Argentina\/Tucuman": "Argentinski čas (Tucuman)",
         "America\/Argentina\/Ushuaia": "Argentinski čas (Ushuaia)",
         "America\/Aruba": "Atlantski čas (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunejski čas",
         "Asia\/Calcutta": "Indijski standardni čas (Kalkuta)",
         "Asia\/Chita": "Jakutski čas (Čita)",
-        "Asia\/Choibalsan": "Čojbalsanski čas",
+        "Asia\/Choibalsan": "Ulanbatorski čas (Čojbalsan)",
         "Asia\/Colombo": "Indijski standardni čas (Kolombo)",
         "Asia\/Damascus": "Vzhodnoevropski čas (Damask)",
         "Asia\/Dhaka": "Bangladeški čas (Daka)",
@@ -420,7 +419,7 @@
         "Pacific\/Midway": "Samoanski čas (Midway)",
         "Pacific\/Nauru": "Naurujski čas",
         "Pacific\/Niue": "Niuejski čas",
-        "Pacific\/Norfolk": "Čas: Norfolški otoki (Norfolk)",
+        "Pacific\/Norfolk": "Norfolški otoki čas (Norfolk)",
         "Pacific\/Noumea": "Novokaledonijski čas (Noumea)",
         "Pacific\/Pago_Pago": "Samoanski čas (Pago Pago)",
         "Pacific\/Palau": "Palavski čas (Palau)",

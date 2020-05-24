@@ -299,11 +299,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Submits data to the form.
      *
-     * @param string|array|null $submittedData The submitted data
-     * @param bool              $clearMissing  Whether to set fields to NULL
-     *                                         when they are missing in the
-     *                                         submitted data. This argument
-     *                                         is only used in compound form
+     * @param string|array|bool|null $submittedData The submitted data
+     * @param bool                   $clearMissing  Whether to set fields to NULL
+     *                                              when they are missing in the
+     *                                              submitted data. This argument
+     *                                              is only used in compound form
      *
      * @return $this
      *

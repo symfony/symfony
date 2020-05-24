@@ -770,7 +770,7 @@ class ObjectConstructorArgsWithDefaultValueDummy
     protected $foo;
     protected $bar;
 
-    public function __construct($foo = [], $bar)
+    public function __construct($foo = [], $bar = null)
     {
         $this->foo = $foo;
         $this->bar = $bar;
@@ -920,7 +920,7 @@ class DummyWithConstructorObjectAndDefaultValue
     private $foo;
     private $inner;
 
-    public function __construct($foo = 'a', ObjectInner $inner)
+    public function __construct($foo = 'a', ObjectInner $inner = null)
     {
         $this->foo = $foo;
         $this->inner = $inner;

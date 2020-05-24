@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Doctrine\DBAL\Version;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
@@ -29,6 +30,10 @@ class PdoStoreTest extends AbstractStoreTest
     public static function setUpBeforeClass(): void
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
+
+        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
 
         $store = new PdoStore('sqlite:'.self::$dbFile);
         $store->createTable();

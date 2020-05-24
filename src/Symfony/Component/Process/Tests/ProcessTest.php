@@ -988,21 +988,20 @@ class ProcessTest extends TestCase
 
     public function testWrongSignal()
     {
-        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
+
+        $this->expectException(RuntimeException::class);
 
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
             $process->signal(-4);
             $this->fail('A RuntimeException must have been thrown');
-        } catch (RuntimeException $e) {
+        } finally {
             $process->stop(0);
         }
-
-        throw $e;
     }
 
     public function testDisableOutputDisablesTheOutput()

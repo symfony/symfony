@@ -527,6 +527,27 @@ EOF;
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
     }
 
+    public function testAnonymousKernelGeneratesValidContainerClass(): void
+    {
+        $kernel = new class('test', true) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function getContainerClass(): string
+            {
+                return parent::getContainerClass();
+            }
+        };
+
+        $this->assertRegExp('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */

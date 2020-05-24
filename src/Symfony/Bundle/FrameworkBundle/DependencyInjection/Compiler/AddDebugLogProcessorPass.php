@@ -36,7 +36,7 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
 
     public static function configureLogger($logger)
     {
-        if (method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+        if (\is_object($logger) && method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             $logger->removeDebugLogger();
         }
     }

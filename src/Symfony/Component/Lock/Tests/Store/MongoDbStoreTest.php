@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Store\MongoDbStore;
 /**
  * @author Joe Bennett <joe@assimtech.com>
  *
- * @requires function \MongoDB\Client::__construct
+ * @requires extension mongodb
  * @group integration
  */
 class MongoDbStoreTest extends AbstractStoreTest
@@ -31,6 +31,10 @@ class MongoDbStoreTest extends AbstractStoreTest
 
     public static function setupBeforeClass(): void
     {
+        if (!class_exists(\MongoDB\Client::class)) {
+            $this->markTestSkipped('The mongodb/mongodb package is required.');
+        }
+
         $client = self::getMongoClient();
         try {
             $client->listDatabases();

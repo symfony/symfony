@@ -27,6 +27,9 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method void configureRoutes(RoutingConfigurator $routes)
+ * @method void configureContainer(ContainerConfigurator $c)
  */
 trait MicroKernelTrait
 {
@@ -39,7 +42,7 @@ trait MicroKernelTrait
      *         ->controller('App\Controller\AdminController::dashboard')
      *     ;
      */
-    //abstract protected function configureRoutes(RoutingConfigurator $routes);
+    //abstract protected function configureRoutes(RoutingConfigurator $routes): void;
 
     /**
      * Configures the container.
@@ -58,7 +61,7 @@ trait MicroKernelTrait
      *
      *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    //abstract protected function configureContainer(ContainerConfigurator $c);
+    //abstract protected function configureContainer(ContainerConfigurator $c): void;
 
     /**
      * {@inheritdoc}
@@ -87,8 +90,10 @@ trait MicroKernelTrait
                 ],
             ]);
 
+            $kernelClass = false !== strpos(static::class, "@anonymous\0") ? parent::class : static::class;
+
             if (!$container->hasDefinition('kernel')) {
-                $container->register('kernel', static::class)
+                $container->register('kernel', $kernelClass)
                     ->addTag('controller.service_arguments')
                     ->setAutoconfigured(true)
                     ->setSynthetic(true)
@@ -103,20 +108,22 @@ trait MicroKernelTrait
             $container->fileExists($this->getProjectDir().'/config/bundles.php');
 
             try {
+                $configureContainer = new \ReflectionMethod($this, 'configureContainer');
+            } catch (\ReflectionException $e) {
+                throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureContainer(ContainerConfigurator $c): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
+            }
+
+            $configuratorClass = $configureContainer->getNumberOfParameters() > 0 && ($type = $configureContainer->getParameters()[0]->getType()) && !$type->isBuiltin() ? $type->getName() : null;
+
+            if ($configuratorClass && !is_a(ContainerConfigurator::class, $configuratorClass, true)) {
                 $this->configureContainer($container, $loader);
 
                 return;
-            } catch (\TypeError $e) {
-                $file = $e->getFile();
-
-                if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureContainer() must be an instance of %s,', static::class, ContainerConfigurator::class))) {
-                    throw $e;
-                }
             }
 
             // the user has opted into using the ContainerConfigurator
             /* @var ContainerPhpFileLoader $kernelLoader */
-            $kernelLoader = $loader->getResolver()->resolve($file);
+            $kernelLoader = $loader->getResolver()->resolve($file = $configureContainer->getFileName());
             $kernelLoader->setCurrentDir(\dirname($file));
             $instanceof = &\Closure::bind(function &() { return $this->instanceof; }, $kernelLoader, $kernelLoader)();
 
@@ -133,12 +140,14 @@ trait MicroKernelTrait
                 AbstractConfigurator::$valuePreProcessor = $valuePreProcessor;
             }
 
-            $container->setAlias(static::class, 'kernel')->setPublic(true);
+            $container->setAlias($kernelClass, 'kernel')->setPublic(true);
         });
     }
 
     /**
      * @internal
+     *
+     * @return RouteCollection
      */
     public function loadRoutes(LoaderInterface $loader)
     {
@@ -149,28 +158,32 @@ trait MicroKernelTrait
         $collection = new RouteCollection();
 
         try {
-            $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+            $configureRoutes = new \ReflectionMethod($this, 'configureRoutes');
+        } catch (\ReflectionException $e) {
+            throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureRoutes(RoutingConfigurator $routes): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
+        }
 
-            foreach ($collection as $route) {
-                $controller = $route->getDefault('_controller');
+        $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) && !$type->isBuiltin() ? $type->getName() : null;
 
-                if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
-                    $route->setDefault('_controller', ['kernel', $controller[1]]);
-                }
-            }
+        if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {
+            trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
 
-            return $collection;
-        } catch (\TypeError $e) {
-            if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureRoutes() must be an instance of %s,', static::class, RouteCollectionBuilder::class))) {
-                throw $e;
+            $routes = new RouteCollectionBuilder($loader);
+            $this->configureRoutes($routes);
+
+            return $routes->build();
+        }
+
+        $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+
+        foreach ($collection as $route) {
+            $controller = $route->getDefault('_controller');
+
+            if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
+                $route->setDefault('_controller', ['kernel', $controller[1]]);
             }
         }
 
-        trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
-
-        $routes = new RouteCollectionBuilder($loader);
-        $this->configureRoutes($routes);
-
-        return $routes->build();
+        return $collection;
     }
 }

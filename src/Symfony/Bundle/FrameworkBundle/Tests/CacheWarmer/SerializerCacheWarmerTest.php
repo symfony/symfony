@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 
@@ -24,10 +23,6 @@ class SerializerCacheWarmerTest extends TestCase
 {
     public function testWarmUp()
     {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
-        }
-
         $loaders = [
             new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
             new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
@@ -58,10 +53,6 @@ class SerializerCacheWarmerTest extends TestCase
 
     public function testWarmUpWithoutLoader()
     {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
-        }
-
         $file = sys_get_temp_dir().'/cache-serializer-without-loader.php';
         @unlink($file);
 
@@ -84,10 +75,6 @@ class SerializerCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadException()
     {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
-        }
-
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__), new ArrayAdapter());
@@ -111,10 +98,6 @@ class SerializerCacheWarmerTest extends TestCase
     {
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('This exception should not be caught by the warmer.');
-
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
-        }
 
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 

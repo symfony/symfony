@@ -365,6 +365,26 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testHandleErrorWithAnonymousClass()
+    {
+        $handler = ErrorHandler::register();
+        $handler->throwAt(3, true);
+        try {
+            $handler->handleError(3, 'foo '.\get_class(new class() extends \stdClass {
+            }).' bar', 'foo.php', 12);
+            $this->fail('Exception expected.');
+        } catch (\ErrorException $e) {
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+
+        $this->assertSame('foo stdClass@anonymous bar', $e->getMessage());
+        $this->assertSame(3, $e->getSeverity());
+        $this->assertSame('foo.php', $e->getFile());
+        $this->assertSame(12, $e->getLine());
+    }
+
     public function testHandleDeprecation()
     {
         $logArgCheck = function ($level, $message, $context) {
@@ -433,6 +453,10 @@ class ErrorHandlerTest extends TestCase
     {
         return [
             ['Uncaught Exception: foo', new \Exception('foo')],
+            ['Uncaught Exception: foo', new class('foo') extends \RuntimeException {
+            }],
+            ['Uncaught Exception: foo stdClass@anonymous bar', new \RuntimeException('foo '.\get_class(new class() extends \stdClass {
+            }).' bar')],
             ['Uncaught Error: bar', new \Error('bar')],
             ['Uncaught ccc', new \ErrorException('ccc')],
         ];

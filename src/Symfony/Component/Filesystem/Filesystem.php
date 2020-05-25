@@ -685,7 +685,7 @@ class Filesystem
         $tmpFile = $this->tempnam($dir, basename($filename));
 
         if (\is_resource($content)) {
-            $expectedSize = fstat($content)['size'];
+            $expectedSize = fstat($content)['size'] - ftell($content);
         } else {
             $expectedSize = array_sum(array_map('strlen', (array) $content));
         }

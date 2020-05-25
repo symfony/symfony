@@ -83,7 +83,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
         do {
             $file = $class->getFileName();
-            if (false !== $file && file_exists($file)) {
+            if (false !== $file && is_file($file)) {
                 foreach ($this->excludedVendors as $vendor) {
                     if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                         $file = false;
@@ -137,7 +137,11 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $defaults = $class->getDefaultProperties();
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
-                yield $p->getDocComment().$p;
+                yield $p->getDocComment();
+                yield $p->isDefault() ? '<default>' : '';
+                yield $p->isPublic() ? 'public' : 'protected';
+                yield $p->isStatic() ? 'static' : '';
+                yield '$'.$p->name;
                 yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, true);
             }
         }

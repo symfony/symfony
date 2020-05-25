@@ -31,6 +31,7 @@ class Parser
     private $binaryOperators;
     private $functions;
     private $names;
+    private $lint;
 
     public function __construct(array $functions)
     {
@@ -90,6 +91,30 @@ class Parser
      * @throws SyntaxError
      */
     public function parse(TokenStream $stream, array $names = [])
+    {
+        $this->lint = false;
+
+        return $this->doParse($stream, $names);
+    }
+
+    /**
+     * Validates the syntax of an expression.
+     *
+     * The syntax of the passed expression will be checked, but not parsed.
+     * If you want to skip checking dynamic variable names, pass `null` instead of the array.
+     *
+     * @throws SyntaxError When the passed expression is invalid
+     */
+    public function lint(TokenStream $stream, ?array $names = []): void
+    {
+        $this->lint = true;
+        $this->doParse($stream, $names);
+    }
+
+    /**
+     * @throws SyntaxError
+     */
+    private function doParse(TokenStream $stream, ?array $names = []): Node\Node
     {
         $this->stream = $stream;
         $this->names = $names;
@@ -197,13 +222,17 @@ class Parser
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
-                            if (!\in_array($token->value, $this->names, true)) {
-                                throw new SyntaxError(sprintf('Variable "%s" is not valid.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
-                            }
+                            if (!$this->lint || \is_array($this->names)) {
+                                if (!\in_array($token->value, $this->names, true)) {
+                                    throw new SyntaxError(sprintf('Variable "%s" is not valid.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
+                                }
 
-                            // is the name used in the compiled code different
-                            // from the name used in the expression?
-                            if (\is_int($name = array_search($token->value, $this->names))) {
+                                // is the name used in the compiled code different
+                                // from the name used in the expression?
+                                if (\is_int($name = array_search($token->value, $this->names))) {
+                                    $name = $token->value;
+                                }
+                            } else {
                                 $name = $token->value;
                             }
 

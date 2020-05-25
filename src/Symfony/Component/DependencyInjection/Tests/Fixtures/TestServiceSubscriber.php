@@ -22,6 +22,7 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
             '?'.CustomDefinition::class,
             'bar' => CustomDefinition::class,
             'baz' => '?'.CustomDefinition::class,
+            'late_alias' => TestDefinition1::class,
         ];
     }
 }

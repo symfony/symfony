@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Version;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
@@ -31,6 +35,10 @@ class PdoDbalAdapterTest extends AdapterTestCase
             self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
+        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
     }
 
@@ -42,5 +50,51 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
+    }
+
+    public function testConfigureSchema()
+    {
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
+        $schema = new Schema();
+
+        $adapter = new PdoAdapter($connection);
+        $adapter->configureSchema($schema, $connection);
+        $this->assertTrue($schema->hasTable('cache_items'));
+    }
+
+    public function testConfigureSchemaDifferentDbalConnection()
+    {
+        $otherConnection = $this->createConnectionMock();
+        $schema = new Schema();
+
+        $adapter = $this->createCachePool();
+        $adapter->configureSchema($schema, $otherConnection);
+        $this->assertFalse($schema->hasTable('cache_items'));
+    }
+
+    public function testConfigureSchemaTableExists()
+    {
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
+        $schema = new Schema();
+        $schema->createTable('cache_items');
+
+        $adapter = new PdoAdapter($connection);
+        $adapter->configureSchema($schema, $connection);
+        $table = $schema->getTable('cache_items');
+        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+    }
+
+    private function createConnectionMock()
+    {
+        $connection = $this->createMock(Connection::class);
+        $driver = $this->createMock(Driver::class);
+        $driver->expects($this->any())
+            ->method('getName')
+            ->willReturn('pdo_mysql');
+        $connection->expects($this->any())
+            ->method('getDriver')
+            ->willReturn($driver);
+
+        return $connection;
     }
 }

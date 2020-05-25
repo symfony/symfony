@@ -46,27 +46,38 @@ class CacheCollectorPass implements CompilerPassInterface
             return;
         }
 
-        $collectorDefinition = $container->getDefinition($this->dataCollectorCacheId);
         foreach ($container->findTaggedServiceIds($this->cachePoolTag) as $id => $attributes) {
-            $definition = $container->getDefinition($id);
-            if ($definition->isAbstract()) {
-                continue;
+            $this->addToCollector($id, $container);
+
+            if (($attributes[0]['name'] ?? $id) !== $id) {
+                $this->addToCollector($attributes[0]['name'], $container);
             }
-
-            $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
-            $recorder->setTags($definition->getTags());
-            $recorder->setPublic($definition->isPublic());
-            $recorder->setArguments([new Reference($innerId = $id.$this->cachePoolRecorderInnerSuffix)]);
-
-            $definition->setTags([]);
-            $definition->setPublic(false);
-
-            $container->setDefinition($innerId, $definition);
-            $container->setDefinition($id, $recorder);
-
-            // Tell the collector to add the new instance
-            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
-            $collectorDefinition->setPublic(false);
         }
+    }
+
+    private function addToCollector(string $id, ContainerBuilder $container)
+    {
+        $definition = $container->getDefinition($id);
+        if ($definition->isAbstract()) {
+            return;
+        }
+
+        $collectorDefinition = $container->getDefinition($this->dataCollectorCacheId);
+        $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
+        $recorder->setTags($definition->getTags());
+        if (!$definition->isPublic() || !$definition->isPrivate()) {
+            $recorder->setPublic($definition->isPublic());
+        }
+        $recorder->setArguments([new Reference($innerId = $id.$this->cachePoolRecorderInnerSuffix)]);
+
+        $definition->setTags([]);
+        $definition->setPublic(false);
+
+        $container->setDefinition($innerId, $definition);
+        $container->setDefinition($id, $recorder);
+
+        // Tell the collector to add the new instance
+        $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
+        $collectorDefinition->setPublic(false);
     }
 }

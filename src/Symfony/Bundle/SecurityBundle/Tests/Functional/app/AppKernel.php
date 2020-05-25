@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\app;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -98,14 +97,5 @@ class AppKernel extends Kernel
         $parameters['kernel.test_case'] = $this->testCase;
 
         return $parameters;
-    }
-
-    public function getContainer(): ContainerInterface
-    {
-        if (!$this->container) {
-            throw new \LogicException('Cannot access the container on a non-booted kernel. Did you forget to boot it?');
-        }
-
-        return parent::getContainer();
     }
 }

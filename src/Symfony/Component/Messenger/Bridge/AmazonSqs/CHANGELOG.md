@@ -5,4 +5,4 @@ CHANGELOG
 -----
 
  * Introduced the Amazon SQS bridge.
-
+ * Added FIFO support to the SQS transport

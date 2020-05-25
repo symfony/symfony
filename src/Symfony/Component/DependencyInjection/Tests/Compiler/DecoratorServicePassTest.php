@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DecoratorServicePassTest extends TestCase
 {
@@ -240,6 +241,20 @@ class DecoratorServicePassTest extends TestCase
 
         $this->assertEquals(['container.service_locator' => [0 => []]], $container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+    }
+
+    public function testGenericInnerReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+
+        $container->register('bar')
+            ->setDecoratedService('foo')
+            ->setProperty('prop', new Reference('.inner'));
+
+        $this->process($container);
+
+        $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
     }
 
     protected function process(ContainerBuilder $container)

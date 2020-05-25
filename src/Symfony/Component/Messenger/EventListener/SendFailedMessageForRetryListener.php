@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -58,7 +59,9 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             $event->setForRetry();
 
             ++$retryCount;
-            $delay = $retryStrategy->getWaitingTime($envelope);
+
+            $delay = $retryStrategy->getWaitingTime($envelope, $throwable);
+
             if (null !== $this->logger) {
                 $this->logger->error('Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
             }
@@ -85,10 +88,19 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
     private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
     {
+        if ($e instanceof RecoverableExceptionInterface) {
+            return true;
+        }
+
+        // if one or more nested Exceptions is an instance of RecoverableExceptionInterface we should retry
         // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
         if ($e instanceof HandlerFailedException) {
             $shouldNotRetry = true;
             foreach ($e->getNestedExceptions() as $nestedException) {
+                if ($nestedException instanceof RecoverableExceptionInterface) {
+                    return true;
+                }
+
                 if (!$nestedException instanceof UnrecoverableExceptionInterface) {
                     $shouldNotRetry = false;
                     break;
@@ -103,7 +115,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             return false;
         }
 
-        return $retryStrategy->isRetryable($envelope);
+        return $retryStrategy->isRetryable($envelope, $e);
     }
 
     private function getRetryStrategyForTransport(string $alias): ?RetryStrategyInterface

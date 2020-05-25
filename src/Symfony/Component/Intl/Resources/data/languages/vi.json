@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Tiếng Afar",
         "ab": "Tiếng Abkhazia",
@@ -547,6 +546,7 @@
         "en_US": "Tiếng Anh (Mỹ)",
         "es_419": "Tiếng Tây Ban Nha (Mỹ La tinh)",
         "es_ES": "Tiếng Tây Ban Nha (Châu Âu)",
+        "fa_AF": "Tiếng Dari",
         "nds_NL": "Tiếng Hạ Saxon",
         "nl_BE": "Tiếng Flemish",
         "pt_PT": "Tiếng Bồ Đào Nha (Châu Âu)",

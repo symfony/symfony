@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -38,7 +40,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -911,6 +915,20 @@ class PhpDumperTest extends TestCase
 
         $container->register(CustomDefinition::class, CustomDefinition::class)
             ->setPublic(false);
+
+        $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
+
+        $container->addCompilerPass(new class() implements CompilerPassInterface {
+            /**
+             * {@inheritdoc}
+             */
+            public function process(ContainerBuilder $container)
+            {
+                $container->setDefinition('late_alias', new Definition(TestDefinition1::class));
+                $container->setAlias(TestDefinition1::class, 'late_alias');
+            }
+        }, PassConfig::TYPE_AFTER_REMOVING);
+
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -1346,6 +1364,31 @@ class PhpDumperTest extends TestCase
     }
 
     /**
+     * @requires PHP 8
+     */
+    public function testWitherWithStaticReturnType()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', WitherStaticReturnType::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_WitherStaticReturnType']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_staticreturntype.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_WitherStaticReturnType();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    /**
      * @group legacy
      */
     public function testMultipleDeprecatedAliasesWorking()
@@ -1372,12 +1415,12 @@ class PhpDumperTest extends TestCase
     public function testDumpServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract (should be defined by Pass), did you forget to define it?');
+        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract: should be defined by Pass.');
 
         $container = new ContainerBuilder();
 
         $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
-            ->setArgument('$baz', new AbstractArgument(FooWithAbstractArgument::class, '$baz', 'should be defined by Pass'))
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
             ->setArgument('$bar', 'test')
             ->setPublic(true);
 
@@ -1385,6 +1428,54 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDirectlyAccessingDeprecatedPublicService()
+    {
+        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service();
+
+        $container->get('bar');
+    }
+
+    public function testReferencingDeprecatedPublicService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+        $container
+            ->register('bar_user', \BarUserClass::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('bar'));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service();
+
+        // No deprecation should be triggered.
+        $container->get('bar_user');
+
+        $this->addToAssertionCount(1);
     }
 }
 

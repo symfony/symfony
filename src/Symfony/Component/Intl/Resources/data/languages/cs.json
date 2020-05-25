@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarština",
         "ab": "abcházština",
@@ -601,6 +600,7 @@
         "en_GB": "angličtina (Velká Británie)",
         "en_US": "angličtina (USA)",
         "es_ES": "španělština (Evropa)",
+        "fa_AF": "darí",
         "nds_NL": "dolnosaština",
         "nl_BE": "vlámština",
         "pt_PT": "portugalština (Evropa)",

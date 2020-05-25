@@ -12,11 +12,14 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class PercentToLocalizedStringTransformerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $defaultLocale;
 
     protected function setUp(): void
@@ -32,7 +35,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testTransform()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals('10', $transformer->transform(0.1));
         $this->assertEquals('15', $transformer->transform(0.15));
@@ -42,14 +45,14 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testTransformEmpty()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals('', $transformer->transform(null));
     }
 
     public function testTransformWithInteger()
     {
-        $transformer = new PercentToLocalizedStringTransformer(null, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals('0', $transformer->transform(0.1));
         $this->assertEquals('1', $transformer->transform(1));
@@ -64,14 +67,26 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('de_AT');
 
-        $transformer = new PercentToLocalizedStringTransformer(2);
+        $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testReverseTransformWithScaleAndRoundingDisabled()
+    {
+        $this->expectDeprecation('Since symfony/form 5.1: Not passing a rounding mode to "Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::__construct()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".');
+
+        $transformer = new PercentToLocalizedStringTransformer(2, PercentToLocalizedStringTransformer::FRACTIONAL);
+
+        $this->assertEquals(0.0123456, $transformer->reverseTransform('1.23456'));
+    }
+
     public function testReverseTransform()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals(0.1, $transformer->reverseTransform('10'));
         $this->assertEquals(0.15, $transformer->reverseTransform('15'));
@@ -83,92 +98,92 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     {
         return [
             // towards positive infinity (1.6 -> 2, -1.6 -> -1)
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 35, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.5, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [null, 0, '34.5', 0.35, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [null, 0, '34.4', 0.35, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [null, 1, '3.45', 0.035, PercentToLocalizedStringTransformer::ROUND_CEILING],
-            [null, 1, '3.44', 0.035, PercentToLocalizedStringTransformer::ROUND_CEILING],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, \NumberFormatter::ROUND_CEILING],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 35, \NumberFormatter::ROUND_CEILING],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, \NumberFormatter::ROUND_CEILING],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.5, \NumberFormatter::ROUND_CEILING],
+            [null, 0, '34.5', 0.35, \NumberFormatter::ROUND_CEILING],
+            [null, 0, '34.4', 0.35, \NumberFormatter::ROUND_CEILING],
+            [null, 1, '3.45', 0.035, \NumberFormatter::ROUND_CEILING],
+            [null, 1, '3.44', 0.035, \NumberFormatter::ROUND_CEILING],
             // towards negative infinity (1.6 -> 1, -1.6 -> -2)
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [null, 0, '34.5', 0.34, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [null, 0, '34.4', 0.34, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [null, 1, '3.45', 0.034, PercentToLocalizedStringTransformer::ROUND_FLOOR],
-            [null, 1, '3.44', 0.034, PercentToLocalizedStringTransformer::ROUND_FLOOR],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_FLOOR],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, \NumberFormatter::ROUND_FLOOR],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, \NumberFormatter::ROUND_FLOOR],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, \NumberFormatter::ROUND_FLOOR],
+            [null, 0, '34.5', 0.34, \NumberFormatter::ROUND_FLOOR],
+            [null, 0, '34.4', 0.34, \NumberFormatter::ROUND_FLOOR],
+            [null, 1, '3.45', 0.034, \NumberFormatter::ROUND_FLOOR],
+            [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_FLOOR],
             // away from zero (1.6 -> 2, -1.6 -> 2)
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, PercentToLocalizedStringTransformer::ROUND_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 35, PercentToLocalizedStringTransformer::ROUND_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, PercentToLocalizedStringTransformer::ROUND_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.5, PercentToLocalizedStringTransformer::ROUND_UP],
-            [null, 0, '34.5', 0.35, PercentToLocalizedStringTransformer::ROUND_UP],
-            [null, 0, '34.4', 0.35, PercentToLocalizedStringTransformer::ROUND_UP],
-            [null, 1, '3.45', 0.035, PercentToLocalizedStringTransformer::ROUND_UP],
-            [null, 1, '3.44', 0.035, PercentToLocalizedStringTransformer::ROUND_UP],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, \NumberFormatter::ROUND_UP],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 35, \NumberFormatter::ROUND_UP],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, \NumberFormatter::ROUND_UP],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.5, \NumberFormatter::ROUND_UP],
+            [null, 0, '34.5', 0.35, \NumberFormatter::ROUND_UP],
+            [null, 0, '34.4', 0.35, \NumberFormatter::ROUND_UP],
+            [null, 1, '3.45', 0.035, \NumberFormatter::ROUND_UP],
+            [null, 1, '3.44', 0.035, \NumberFormatter::ROUND_UP],
             // towards zero (1.6 -> 1, -1.6 -> -1)
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 2, '37.37', 37.37, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 2, '2.01', 2.01, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 0, '34.5', 0.34, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 0, '34.4', 0.34, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 1, '3.45', 0.034, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 1, '3.44', 0.034, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 2, '37.37', 0.3737, PercentToLocalizedStringTransformer::ROUND_DOWN],
-            [null, 2, '2.01', 0.0201, PercentToLocalizedStringTransformer::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 2, '37.37', 37.37, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 2, '2.01', 2.01, \NumberFormatter::ROUND_DOWN],
+            [null, 0, '34.5', 0.34, \NumberFormatter::ROUND_DOWN],
+            [null, 0, '34.4', 0.34, \NumberFormatter::ROUND_DOWN],
+            [null, 1, '3.45', 0.034, \NumberFormatter::ROUND_DOWN],
+            [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_DOWN],
+            [null, 2, '37.37', 0.3737, \NumberFormatter::ROUND_DOWN],
+            [null, 2, '2.01', 0.0201, \NumberFormatter::ROUND_DOWN],
             // round halves (.5) to the next even number
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '33.5', 34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '32.5', 32, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.35', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.25', 3.2, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 0, '34.6', 0.35, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 0, '34.5', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 0, '34.4', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 0, '33.5', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 0, '32.5', 0.32, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 1, '3.46', 0.035, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 1, '3.45', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 1, '3.44', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 1, '3.35', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [null, 1, '3.25', 0.032, PercentToLocalizedStringTransformer::ROUND_HALF_EVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '33.5', 34, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '32.5', 32, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.35', 3.4, \NumberFormatter::ROUND_HALFEVEN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.25', 3.2, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 0, '34.6', 0.35, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 0, '34.5', 0.34, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 0, '34.4', 0.34, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 0, '33.5', 0.34, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 0, '32.5', 0.32, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 1, '3.46', 0.035, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 1, '3.45', 0.034, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 1, '3.35', 0.034, \NumberFormatter::ROUND_HALFEVEN],
+            [null, 1, '3.25', 0.032, \NumberFormatter::ROUND_HALFEVEN],
             // round halves (.5) away from zero
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 0, '34.6', 0.35, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 0, '34.5', 0.35, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 0, '34.4', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 1, '3.46', 0.035, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 1, '3.45', 0.035, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
-            [null, 1, '3.44', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_UP],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 35, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.5, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, \NumberFormatter::ROUND_HALFUP],
+            [null, 0, '34.6', 0.35, \NumberFormatter::ROUND_HALFUP],
+            [null, 0, '34.5', 0.35, \NumberFormatter::ROUND_HALFUP],
+            [null, 0, '34.4', 0.34, \NumberFormatter::ROUND_HALFUP],
+            [null, 1, '3.46', 0.035, \NumberFormatter::ROUND_HALFUP],
+            [null, 1, '3.45', 0.035, \NumberFormatter::ROUND_HALFUP],
+            [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_HALFUP],
             // round halves (.5) towards zero
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 0, '34.6', 0.35, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 0, '34.5', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 0, '34.4', 0.34, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 1, '3.46', 0.035, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 1, '3.45', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [null, 1, '3.44', 0.034, PercentToLocalizedStringTransformer::ROUND_HALF_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, \NumberFormatter::ROUND_HALFDOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_HALFDOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 0, '34.4', 34, \NumberFormatter::ROUND_HALFDOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.46', 3.5, \NumberFormatter::ROUND_HALFDOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.45', 3.4, \NumberFormatter::ROUND_HALFDOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 1, '3.44', 3.4, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 0, '34.6', 0.35, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 0, '34.5', 0.34, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 0, '34.4', 0.34, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 1, '3.46', 0.035, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 1, '3.45', 0.034, \NumberFormatter::ROUND_HALFDOWN],
+            [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_HALFDOWN],
         ];
     }
 
@@ -184,14 +199,14 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testReverseTransformEmpty()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertNull($transformer->reverseTransform(''));
     }
 
     public function testReverseTransformWithInteger()
     {
-        $transformer = new PercentToLocalizedStringTransformer(null, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals(10, $transformer->reverseTransform('10'));
         $this->assertEquals(15, $transformer->reverseTransform('15'));
@@ -206,14 +221,14 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('de_AT');
 
-        $transformer = new PercentToLocalizedStringTransformer(2);
+        $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12,34'));
     }
 
     public function testTransformExpectsNumeric()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
@@ -222,7 +237,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testReverseTransformExpectsString()
     {
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
@@ -234,7 +249,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         \Locale::setDefault('fr');
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         // completely valid format
         $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
@@ -253,7 +268,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('de_DE');
 
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('1.234.5');
     }
@@ -266,7 +281,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('de_DE');
 
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('1234.5');
     }
@@ -277,7 +292,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('fr');
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
@@ -289,7 +304,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         \Locale::setDefault('bg');
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         // completely valid format
         $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
@@ -305,7 +320,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('1,234,5');
     }
@@ -315,7 +330,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
-        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('1234,5');
     }
@@ -328,7 +343,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         $transformer = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer')
             ->setMethods(['getNumberFormatter'])
-            ->setConstructorArgs([1, 'integer'])
+            ->setConstructorArgs([1, 'integer', \NumberFormatter::ROUND_HALFUP])
             ->getMock();
         $transformer->expects($this->any())
             ->method('getNumberFormatter')
@@ -341,7 +356,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransformDisallowsLeadingExtraCharacters()
     {
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('foo123');
     }
@@ -350,7 +365,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo3"');
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('12foo3');
     }
@@ -367,7 +382,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('ru');
 
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform("12\xc2\xa0345,67foo8");
     }
@@ -376,7 +391,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo"');
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform('123foo');
     }
@@ -393,7 +408,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         \Locale::setDefault('ru');
 
-        $transformer = new PercentToLocalizedStringTransformer();
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwichko meridianoaren ordua (Abidjan)",
         "Africa\/Accra": "Greenwichko meridianoaren ordua (Akkra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentinako ordua (Rio Gallegos)",
         "America\/Argentina\/Salta": "Argentinako ordua (Salta)",
         "America\/Argentina\/San_Juan": "Argentinako ordua (San Juan)",
-        "America\/Argentina\/San_Luis": "Argentina mendebaldeko ordua (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentinako ordua (San Luis)",
         "America\/Argentina\/Tucuman": "Argentinako ordua (Tucumán)",
         "America\/Argentina\/Ushuaia": "Argentinako ordua (Ushuaia)",
         "America\/Aruba": "Ipar Amerikako Atlantikoko ordua (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei Darussalamgo ordua",
         "Asia\/Calcutta": "Indiako ordua (Kalkuta)",
         "Asia\/Chita": "Jakutskeko ordua (Chita)",
-        "Asia\/Choibalsan": "Txoibalsango ordua",
+        "Asia\/Choibalsan": "Ulan Batorreko ordua (Txoibalsan)",
         "Asia\/Colombo": "Indiako ordua (Kolombo)",
         "Asia\/Damascus": "Europako ekialdeko ordua (Damasko)",
         "Asia\/Dhaka": "Bangladesheko ordua (Dhaka)",
@@ -271,7 +270,7 @@
         "Asia\/Pontianak": "Indonesiako mendebaldeko ordua (Pontianak)",
         "Asia\/Pyongyang": "Koreako ordua (Piongiang)",
         "Asia\/Qatar": "Arabiako ordua (Qatar)",
-        "Asia\/Qostanay": "Kazakhstango ekialdeko ordua (Qostanay)",
+        "Asia\/Qostanay": "Kazakhstango ekialdeko ordua (Kostanay)",
         "Asia\/Qyzylorda": "Kazakhstango mendebaldeko ordua (Kyzylorda)",
         "Asia\/Rangoon": "Myanmarreko ordua (Yangon)",
         "Asia\/Riyadh": "Arabiako ordua (Riad)",

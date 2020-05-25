@@ -11,6 +11,7 @@ validateId
 read
 doRead: abc|i:123;
 read
+doRead: abc|i:123;
 
 write
 doWrite: abc|i:123;

@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "symfony/http-client": "^4.3|5.0",
+        "php": ">=7.2.5",
+        "async-aws/sqs": "^1.0",
         "symfony/messenger": "^4.3|^5.0",
         "symfony/service-contracts": "^1.1|^2"
     },
@@ -35,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

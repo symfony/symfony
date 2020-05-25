@@ -601,7 +601,7 @@ EOF;
     public function testMultipleDocumentsNotSupportedException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('/^Multiple documents are not supported.+/');
+        $this->expectExceptionMessageMatches('/^Multiple documents are not supported.+/');
         Yaml::parse(<<<'EOL'
 # Ranking of 1998 home runs
 ---
@@ -1347,7 +1347,7 @@ EOT
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp($expectedMessage);
+        $this->expectExceptionMessageMatches($expectedMessage);
 
         $this->parser->parse($data);
     }
@@ -1524,6 +1524,33 @@ foobar: 'foo
 YAML;
         $expected = [
             'foobar' => "foo\nbar",
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testEscapedQuoteInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    \\"bar\\"
+    baz"
+YAML;
+        $expected = [
+            'foobar' => 'foo "bar" baz',
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testBackslashInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    bar\\\\"
+YAML;
+        $expected = [
+            'foobar' => 'foo bar\\',
         ];
 
         $this->assertSame($expected, $this->parser->parse($yaml));
@@ -2101,14 +2128,14 @@ YAML;
     public function testParsingNonExistentFilesThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
+        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
         $this->parser->parseFile(__DIR__.'/Fixtures/nonexistent.yml');
     }
 
     public function testParsingNotReadableFilesThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
+        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }

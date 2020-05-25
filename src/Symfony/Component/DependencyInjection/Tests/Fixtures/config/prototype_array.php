@@ -8,6 +8,7 @@ return function (ContainerConfigurator $c) {
     $di = $c->services()->defaults()
         ->tag('baz');
     $di->load(Prototype::class.'\\', '../Prototype')
+        ->public()
         ->autoconfigure()
         ->exclude(['../Prototype/OtherDir', '../Prototype/BadClasses', '../Prototype/SinglyImplementedInterface'])
         ->factory('f')
@@ -17,6 +18,6 @@ return function (ContainerConfigurator $c) {
         ->autoconfigure(false)
         ->tag('foo')
         ->parent('foo');
-    $di->set('foo')->lazy()->abstract();
+    $di->set('foo')->lazy()->abstract()->public();
     $di->get(Prototype\Foo::class)->lazy(false);
 };

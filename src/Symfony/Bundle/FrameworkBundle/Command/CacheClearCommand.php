@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Dumper\Preloader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -117,7 +118,11 @@ EOF
                 $warmer = $kernel->getContainer()->get('cache_warmer');
                 // non optional warmers already ran during container compilation
                 $warmer->enableOnlyOptionalWarmers();
-                $warmer->warmUp($realCacheDir);
+                $preload = (array) $warmer->warmUp($realCacheDir);
+
+                if ($preload && file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+                    Preloader::append($preloadFile, $preload);
+                }
             }
         } else {
             $fs->mkdir($warmupDir);
@@ -193,7 +198,11 @@ EOF
             $warmer = $kernel->getContainer()->get('cache_warmer');
             // non optional warmers already ran during container compilation
             $warmer->enableOnlyOptionalWarmers();
-            $warmer->warmUp($warmupDir);
+            $preload = (array) $warmer->warmUp($warmupDir);
+
+            if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+                Preloader::append($preloadFile, $preload);
+            }
         }
 
         // fix references to cached files with the real cache directory name

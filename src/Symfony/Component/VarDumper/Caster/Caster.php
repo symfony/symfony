@@ -94,6 +94,9 @@ class Caster
         if ($hasDebugInfo && \is_array($debugInfo)) {
             foreach ($debugInfo as $k => $v) {
                 if (!isset($k[0]) || "\0" !== $k[0]) {
+                    if (\array_key_exists(self::PREFIX_DYNAMIC.$k, $a)) {
+                        continue;
+                    }
                     $k = self::PREFIX_VIRTUAL.$k;
                 }
 

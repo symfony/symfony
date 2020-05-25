@@ -157,6 +157,27 @@ class RegisterListenersPassTest extends TestCase
         $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
     }
 
+    public function testNoPreloadEvents()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', []);
+        $container->register('bar')->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('baz')
+            ->addTag('kernel.event_listener', ['event' => 'event'])
+            ->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('event_dispatcher', 'stdClass');
+
+        (new RegisterListenersPass())
+            ->setHotPathEvents(['event'])
+            ->setNoPreloadEvents(['cold_event'])
+            ->process($container);
+
+        $this->assertFalse($container->getDefinition('foo')->hasTag('container.no_preload'));
+        $this->assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
+        $this->assertFalse($container->getDefinition('baz')->hasTag('container.no_preload'));
+    }
+
     public function testEventSubscriberUnresolvableClassName()
     {
         $this->expectException('InvalidArgumentException');
@@ -213,16 +234,21 @@ class RegisterListenersPassTest extends TestCase
     public function testAliasedEventListener(): void
     {
         $container = new ContainerBuilder();
-        $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+        $eventAliases = [AliasedEvent::class => 'aliased_event'];
+        $container->setParameter('event_dispatcher.event_aliases', $eventAliases);
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => AliasedEvent::class, 'method' => 'onEvent']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => CustomEvent::class, 'method' => 'onEvent']);
         $container->register('event_dispatcher');
 
-        $eventAliasPass = new AddEventAliasesPass([CustomEvent::class => 'custom_event']);
+        $customEventAlias = [CustomEvent::class => 'custom_event'];
+        $eventAliasPass = new AddEventAliasesPass($customEventAlias);
         $eventAliasPass->process($container);
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
+
+        $this->assertTrue($container->hasParameter('event_dispatcher.event_aliases'));
+        $this->assertSame(array_merge($eventAliases, $customEventAlias), $container->getParameter('event_dispatcher.event_aliases'));
 
         $definition = $container->getDefinition('event_dispatcher');
         $expectedCalls = [

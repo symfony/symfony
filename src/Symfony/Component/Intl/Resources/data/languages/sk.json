@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarčina",
         "ab": "abcházčina",
@@ -517,6 +516,7 @@
         "es_419": "španielčina (latinskoamerická)",
         "es_ES": "španielčina (európska)",
         "es_MX": "španielčina (mexická)",
+        "fa_AF": "daríjčina",
         "fr_CA": "francúzština (kanadská)",
         "fr_CH": "francúzština (švajčiarska)",
         "nds_NL": "dolná saština",

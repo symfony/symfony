@@ -92,6 +92,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -119,6 +120,7 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -897,10 +899,10 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
-        $requestContext = $container->getDefinition('router.request_context');
-        $requestContext->replaceArgument(0, $config['context']['base_url']);
-        $requestContext->replaceArgument(2, $config['context']['host']);
-        $requestContext->replaceArgument(3, $config['context']['scheme']);
+        if (null !== $config['default_uri']) {
+            $container->getDefinition('router.request_context')
+                ->replaceArgument(0, $config['default_uri']);
+        }
 
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
@@ -1056,7 +1058,12 @@ class FrameworkExtension extends Extension
         }
 
         if (null !== $jsonManifestPath) {
-            $def = new ChildDefinition('assets.json_manifest_version_strategy');
+            $definitionName = 'assets.json_manifest_version_strategy';
+            if (0 === strpos(parse_url($jsonManifestPath, PHP_URL_SCHEME), 'http')) {
+                $definitionName = 'assets.remote_json_manifest_version_strategy';
+            }
+
+            $def = new ChildDefinition($definitionName);
             $def->replaceArgument(0, $jsonManifestPath);
             $container->setDefinition('assets._version_'.$name, $def);
 
@@ -1463,6 +1470,10 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Yaml::class)) {
             $container->removeDefinition('serializer.encoder.yaml');
+        }
+
+        if (!class_exists(UnwrappingDenormalizer::class)) {
+            $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
         $serializerLoaders = [];
@@ -2033,6 +2044,7 @@ class FrameworkExtension extends Extension
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
+            FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
         ];

@@ -56,7 +56,7 @@ final class MattermostTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
-        $endpoint = sprintf('https://%s/api/v4/post', $this->getEndpoint());
+        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
 
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
         $options['message'] = $message->getSubject();
@@ -65,11 +65,11 @@ final class MattermostTransport extends AbstractTransport
             $options['channel_id'] = $message->getRecipientId() ?: $this->channel;
         }
         $response = $this->client->request('POST', $endpoint, [
-            'bearer' => $this->token,
+            'auth_bearer' => $this->token,
             'json' => array_filter($options),
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        if (201 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);

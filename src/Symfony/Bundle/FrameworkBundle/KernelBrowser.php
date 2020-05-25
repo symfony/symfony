@@ -198,7 +198,7 @@ class KernelBrowser extends HttpKernelBrowser
             if (0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $file = \dirname($r->getFileName(), 2).'/autoload.php';
-                if (file_exists($file)) {
+                if (is_file($file)) {
                     $requires .= 'require_once '.var_export($file, true).";\n";
                 }
             }

@@ -21,4 +21,14 @@ class GuardedTest extends AbstractWebTestCase
 
         $this->assertSame(418, $client->getResponse()->getStatusCode());
     }
+
+    public function testManualLogin()
+    {
+        $client = $this->createClient(['debug' => true, 'test_case' => 'Guarded', 'root_config' => 'config.yml']);
+
+        $client->request('GET', '/manual_login');
+        $client->request('GET', '/profile');
+
+        $this->assertSame('Username: Jane', $client->getResponse()->getContent());
+    }
 }

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazian",
@@ -395,6 +394,7 @@
         "es_419": "Latin American na Espanyol",
         "es_ES": "European Spanish",
         "es_MX": "Mexican na Espanyol",
+        "fa_AF": "Dari",
         "fr_CA": "French sa Canada",
         "fr_CH": "Swiss na French",
         "nds_NL": "Low Saxon",

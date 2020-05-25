@@ -110,7 +110,7 @@ final class Dotenv
     {
         $k = $envKey ?? $this->envKey;
 
-        if (file_exists($path) || !file_exists($p = "$path.dist")) {
+        if (is_file($path) || !is_file($p = "$path.dist")) {
             $this->load($path);
         } else {
             $this->load($p);
@@ -120,7 +120,7 @@ final class Dotenv
             $this->populate([$k => $env = $defaultEnv]);
         }
 
-        if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
+        if (!\in_array($env, $testEnvs, true) && is_file($p = "$path.local")) {
             $this->load($p);
             $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
         }
@@ -129,11 +129,11 @@ final class Dotenv
             return;
         }
 
-        if (file_exists($p = "$path.$env")) {
+        if (is_file($p = "$path.$env")) {
             $this->load($p);
         }
 
-        if (file_exists($p = "$path.$env.local")) {
+        if (is_file($p = "$path.$env.local")) {
             $this->load($p);
         }
     }
@@ -148,7 +148,7 @@ final class Dotenv
     public function bootEnv(string $path, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
     {
         $p = $path.'.local.php';
-        $env = (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($p)) || file_exists($p) ? include $p : null;
+        $env = is_file($p) ? include $p : null;
         $k = $this->envKey;
 
         if (\is_array($env) && (!isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {

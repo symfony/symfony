@@ -1,4 +1,4 @@
-UPGRADE FROM 4.x to 5.0
+UPGRADE FROM 4.4 to 5.0
 =======================
 
 BrowserKit

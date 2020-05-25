@@ -124,17 +124,22 @@ class ContentSecurityPolicyHandler
         $headers = $this->getCspHeaders($response);
 
         foreach ($headers as $header => $directives) {
-            foreach (['script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce'] as $type => $tokenName) {
+            foreach (['script-src' => 'csp_script_nonce', 'script-src-elem' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce', 'style-src-elem' => 'csp_style_nonce'] as $type => $tokenName) {
                 if ($this->authorizesInline($directives, $type)) {
                     continue;
                 }
                 if (!isset($headers[$header][$type])) {
-                    if (isset($headers[$header]['default-src'])) {
-                        $headers[$header][$type] = $headers[$header]['default-src'];
-                    } else {
-                        // If there is no script-src/style-src and no default-src, no additional rules required.
+                    if (null === $fallback = $this->getDirectiveFallback($directives, $type)) {
                         continue;
                     }
+
+                    if (['\'none\''] === $fallback) {
+                        // Fallback came from "default-src: 'none'"
+                        // 'none' is invalid if it's not the only expression in the source list, so we leave it out
+                        $fallback = [];
+                    }
+
+                    $headers[$header][$type] = $fallback;
                 }
                 $ruleIsSet = true;
                 if (!\in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
@@ -199,9 +204,7 @@ class ContentSecurityPolicyHandler
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];
-        } elseif (isset($directivesSet['default-src'])) {
-            $directives = $directivesSet['default-src'];
-        } else {
+        } elseif (null === $directives = $this->getDirectiveFallback($directivesSet, $type)) {
             return false;
         }
 
@@ -223,6 +226,16 @@ class ContentSecurityPolicyHandler
         }
 
         return false;
+    }
+
+    private function getDirectiveFallback(array $directiveSet, $type)
+    {
+        if (\in_array($type, ['script-src-elem', 'style-src-elem'], true) || !isset($directiveSet['default-src'])) {
+            // Let the browser fallback on it's own
+            return null;
+        }
+
+        return $directiveSet['default-src'];
     }
 
     /**

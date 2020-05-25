@@ -1,0 +1,36 @@
+{
+    "name": "symfony/free-mobile-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony Free Mobile Notifier Bridge",
+    "keywords": ["sms", "FreeMobile", "notifier", "alerting"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Antoine Makdessi",
+            "email": "amakdessi@me.com",
+            "homepage": "http://antoine.makdessi.free.fr"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.3|^5.1",
+        "symfony/notifier": "^5.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\FreeMobile\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

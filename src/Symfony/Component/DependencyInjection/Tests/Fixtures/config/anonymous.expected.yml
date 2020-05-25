@@ -12,7 +12,7 @@ services:
         class: stdClass
         public: false
         tags:
-            - { name: listener }
+            - listener
     decorated:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator
         public: true

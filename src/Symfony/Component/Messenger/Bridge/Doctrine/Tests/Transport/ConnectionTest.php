@@ -16,6 +16,7 @@ use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use PHPUnit\Framework\TestCase;
@@ -342,5 +343,38 @@ class ConnectionTest extends TestCase
         $this->assertEquals(2, $doctrineEnvelopes[1]['id']);
         $this->assertEquals('{"message":"Hi again"}', $doctrineEnvelopes[1]['body']);
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
+    }
+
+    public function testConfigureSchema()
+    {
+        $driverConnection = $this->getDBALConnectionMock();
+        $schema = new Schema();
+
+        $connection = new Connection(['table_name' => 'queue_table'], $driverConnection);
+        $connection->configureSchema($schema, $driverConnection);
+        $this->assertTrue($schema->hasTable('queue_table'));
+    }
+
+    public function testConfigureSchemaDifferentDbalConnection()
+    {
+        $driverConnection = $this->getDBALConnectionMock();
+        $driverConnection2 = $this->getDBALConnectionMock();
+        $schema = new Schema();
+
+        $connection = new Connection([], $driverConnection);
+        $connection->configureSchema($schema, $driverConnection2);
+        $this->assertFalse($schema->hasTable('messenger_messages'));
+    }
+
+    public function testConfigureSchemaTableExists()
+    {
+        $driverConnection = $this->getDBALConnectionMock();
+        $schema = new Schema();
+        $schema->createTable('messenger_messages');
+
+        $connection = new Connection([], $driverConnection);
+        $connection->configureSchema($schema, $driverConnection);
+        $table = $schema->getTable('messenger_messages');
+        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 }

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarščina",
         "ab": "abhaščina",
@@ -497,6 +496,7 @@
         "en_US": "angleščina (ZDA)",
         "es_ES": "evropska španščina",
         "es_MX": "mehiška španščina",
+        "fa_AF": "darijščina",
         "fr_CA": "kanadska francoščina",
         "fr_CH": "švicarska francoščina",
         "nds_NL": "nizka saščina",

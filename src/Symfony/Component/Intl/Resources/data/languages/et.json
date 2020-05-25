@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afari",
         "ab": "abhaasi",
@@ -168,7 +167,6 @@
         "fur": "friuuli",
         "fy": "läänefriisi",
         "ga": "iiri",
-        "gaa": "gaa",
         "gag": "gagauusi",
         "gan": "kani",
         "gay": "gajo",
@@ -598,6 +596,7 @@
         "es_419": "Ladina-Ameerika hispaania",
         "es_ES": "Euroopa hispaania",
         "es_MX": "Mehhiko hispaania",
+        "fa_AF": "dari",
         "fr_CA": "Kanada prantsuse",
         "fr_CH": "Šveitsi prantsuse",
         "nds_NL": "Hollandi alamsaksa",

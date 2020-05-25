@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Гринвич вақти (Abidjan)",
         "Africa\/Accra": "Гринвич вақти (Akkra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Аргентина вақти (Rio-Galyegos)",
         "America\/Argentina\/Salta": "Аргентина вақти (Salta)",
         "America\/Argentina\/San_Juan": "Аргентина вақти (San-Xuan)",
-        "America\/Argentina\/San_Luis": "Ғарбий Аргентина вақти (San-Luis)",
+        "America\/Argentina\/San_Luis": "Аргентина вақти (San-Luis)",
         "America\/Argentina\/Tucuman": "Аргентина вақти (Tukuman)",
         "America\/Argentina\/Ushuaia": "Аргентина вақти (Ushuaya)",
         "America\/Aruba": "Атлантика вақти (Aruba)",
@@ -228,7 +227,7 @@
         "Asia\/Brunei": "Бруней Даруссалом вақти (Bruney)",
         "Asia\/Calcutta": "Ҳиндистон вақти (Kolkata)",
         "Asia\/Chita": "Якутск вақти (Chita)",
-        "Asia\/Choibalsan": "Чойбалсан вақти (Choybalsan)",
+        "Asia\/Choibalsan": "Улан-Батор вақти (Choybalsan)",
         "Asia\/Colombo": "Ҳиндистон вақти (Kolombo)",
         "Asia\/Damascus": "Шарқий Европа вақти (Damashq)",
         "Asia\/Dhaka": "Бангладеш вақти (Dakka)",
@@ -267,7 +266,7 @@
         "Asia\/Pontianak": "Ғарбий Индонезия вақти (Pontianak)",
         "Asia\/Pyongyang": "Корея вақти (Pxenyan)",
         "Asia\/Qatar": "Арабистон вақти (Qatar)",
-        "Asia\/Qostanay": "Шарқий Қозоғистон вақти (Qostanay)",
+        "Asia\/Qostanay": "Шарқий Қозоғистон вақти (Kustanay)",
         "Asia\/Qyzylorda": "Ғарбий Қозоғистон вақти (Qizilo‘rda)",
         "Asia\/Rangoon": "Мьянма вақти (Rangun)",
         "Asia\/Riyadh": "Арабистон вақти (Ar-Riyod)",

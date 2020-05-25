@@ -185,7 +185,7 @@ class OptionsResolver implements Options
             $reflClosure = new \ReflectionFunction($value);
             $params = $reflClosure->getParameters();
 
-            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
+            if (isset($params[0]) && Options::class === $this->getParameterClassName($params[0])) {
                 // Initialize the option if no previous value exists
                 if (!isset($this->defaults[$option])) {
                     $this->defaults[$option] = null;
@@ -206,7 +206,7 @@ class OptionsResolver implements Options
                 return $this;
             }
 
-            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && self::class === $class->name && (!isset($params[1]) || (null !== ($class = $params[1]->getClass()) && Options::class === $class->name))) {
+            if (isset($params[0]) && null !== ($type = $params[0]->getType()) && self::class === $type->getName() && (!isset($params[1]) || (null !== ($type = $params[1]->getType()) && Options::class === $type->getName()))) {
                 // Store closure for later evaluation
                 $this->nested[$option][] = $value;
                 $this->defaults[$option] = [];
@@ -421,9 +421,11 @@ class OptionsResolver implements Options
      * passed to the closure is the value of the option after validating it
      * and before normalizing it.
      *
-     * @param string|\Closure $deprecationMessage
+     * @param string          $package The name of the composer package that is triggering the deprecation
+     * @param string          $version The version of the package that introduced the deprecation
+     * @param string|\Closure $message The deprecation message to use
      */
-    public function setDeprecated(string $option, $deprecationMessage = 'The option "%name%" is deprecated.'): self
+    public function setDeprecated(string $option/*, string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be deprecated from a lazy option or normalizer.');
@@ -433,16 +435,33 @@ class OptionsResolver implements Options
             throw new UndefinedOptionsException(sprintf('The option "%s" does not exist, defined options are: "%s".', $this->formatOptions([$option]), implode('", "', array_keys($this->defined))));
         }
 
-        if (!\is_string($deprecationMessage) && !$deprecationMessage instanceof \Closure) {
-            throw new InvalidArgumentException(sprintf('Invalid type for deprecation message argument, expected string or \Closure, but got "%s".', get_debug_type($deprecationMessage)));
+        $args = \func_get_args();
+
+        if (\func_num_args() < 3) {
+            trigger_deprecation('symfony/options-resolver', '5.1', 'The signature of method "%s()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.', __METHOD__);
+
+            $message = $args[1] ?? 'The option "%name%" is deprecated.';
+            $package = $version = '';
+        } else {
+            $package = $args[1];
+            $version = $args[2];
+            $message = $args[3] ?? 'The option "%name%" is deprecated.';
+        }
+
+        if (!\is_string($message) && !$message instanceof \Closure) {
+            throw new InvalidArgumentException(sprintf('Invalid type for deprecation message argument, expected string or \Closure, but got "%s".', get_debug_type($message)));
         }
 
         // ignore if empty string
-        if ('' === $deprecationMessage) {
+        if ('' === $message) {
             return $this;
         }
 
-        $this->deprecated[$option] = $deprecationMessage;
+        $this->deprecated[$option] = [
+            'package' => $package,
+            'version' => $version,
+            'message' => $message,
+        ];
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -714,7 +733,7 @@ class OptionsResolver implements Options
     public function define(string $option): OptionConfigurator
     {
         if (isset($this->defined[$option])) {
-            throw new OptionDefinitionException(sprintf('The options "%s" is already defined.', $option));
+            throw new OptionDefinitionException(sprintf('The option "%s" is already defined.', $option));
         }
 
         return new OptionConfigurator($option, $this);
@@ -903,8 +922,8 @@ class OptionsResolver implements Options
 
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {
-            if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || $this->calling) && \is_string($this->deprecated[$option])) {
-                trigger_deprecation('', '', strtr($this->deprecated[$option], ['%name%' => $option]));
+            if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || $this->calling) && \is_string($this->deprecated[$option]['message'])) {
+                trigger_deprecation($this->deprecated[$option]['package'], $this->deprecated[$option]['version'], strtr($this->deprecated[$option]['message'], ['%name%' => $option]));
             }
 
             return $this->resolved[$option];
@@ -1048,9 +1067,10 @@ class OptionsResolver implements Options
         // Check whether the option is deprecated
         // and it is provided by the user or is being called from a lazy evaluation
         if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || ($this->calling && \is_string($this->deprecated[$option])))) {
-            $deprecationMessage = $this->deprecated[$option];
+            $deprecation = $this->deprecated[$option];
+            $message = $this->deprecated[$option]['message'];
 
-            if ($deprecationMessage instanceof \Closure) {
+            if ($message instanceof \Closure) {
                 // If the closure is already being called, we have a cyclic dependency
                 if (isset($this->calling[$option])) {
                     throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', $this->formatOptions(array_keys($this->calling))));
@@ -1058,16 +1078,16 @@ class OptionsResolver implements Options
 
                 $this->calling[$option] = true;
                 try {
-                    if (!\is_string($deprecationMessage = $deprecationMessage($this, $value))) {
-                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', get_debug_type($deprecationMessage)));
+                    if (!\is_string($message = $message($this, $value))) {
+                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', get_debug_type($message)));
                     }
                 } finally {
                     unset($this->calling[$option]);
                 }
             }
 
-            if ('' !== $deprecationMessage) {
-                trigger_deprecation('', '', strtr($deprecationMessage, ['%name%' => $option]));
+            if ('' !== $message) {
+                trigger_deprecation($deprecation['package'], $deprecation['version'], strtr($message, ['%name%' => $option]));
             }
         }
 
@@ -1259,5 +1279,14 @@ class OptionsResolver implements Options
         }
 
         return implode('", "', $options);
+    }
+
+    private function getParameterClassName(\ReflectionParameter $parameter): ?string
+    {
+        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+            return null;
+        }
+
+        return $type->getName();
     }
 }

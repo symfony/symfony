@@ -18,6 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class ImportConfigurator
 {
+    use Traits\HostTrait;
     use Traits\PrefixTrait;
     use Traits\RouteTrait;
 
@@ -56,6 +57,20 @@ class ImportConfigurator
     final public function namePrefix(string $namePrefix): self
     {
         $this->route->addNamePrefix($namePrefix);
+
+        return $this;
+    }
+
+    /**
+     * Sets the host to use for all child routes.
+     *
+     * @param string|array $host the host, or the localized hosts
+     *
+     * @return $this
+     */
+    final public function host($host): self
+    {
+        $this->addHost($this->route, $host);
 
         return $this;
     }

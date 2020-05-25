@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler;
 
+/**
+ * @group legacy
+ */
 class DefaultLogoutSuccessHandlerTest extends TestCase
 {
     public function testLogout()

@@ -152,7 +152,7 @@ class AbstractTokenTest extends TestCase
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
     {
-        $token = new ConcreteToken();
+        $token = new ConcreteToken(['ROLE_FOO']);
         $token->setAuthenticated(true);
         $this->assertTrue($token->isAuthenticated());
 

@@ -92,7 +92,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
             $refreshedUser = $repository->find($id);
             if (null === $refreshedUser) {
-                throw new UsernameNotFoundException(sprintf('User with id %s not found.', json_encode($id)));
+                throw new UsernameNotFoundException('User with id '.json_encode($id).' not found.');
             }
         }
 

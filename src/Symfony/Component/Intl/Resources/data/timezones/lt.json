@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Grinvičo laikas (Abidžanas)",
         "Africa\/Accra": "Grinvičo laikas (Akra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentinos laikas (Rio Galjegosas)",
         "America\/Argentina\/Salta": "Argentinos laikas (Saltas)",
         "America\/Argentina\/San_Juan": "Argentinos laikas (San Chuanas)",
-        "America\/Argentina\/San_Luis": "Vakarų Argentinos laikas (Sent Luisas)",
+        "America\/Argentina\/San_Luis": "Argentinos laikas (Sent Luisas)",
         "America\/Argentina\/Tucuman": "Argentinos laikas (Tukumanas)",
         "America\/Argentina\/Ushuaia": "Argentinos laikas (Ušuaja)",
         "America\/Aruba": "Atlanto laikas (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunėjaus Darusalamo laikas (Brunėjus)",
         "Asia\/Calcutta": "Indijos laikas (Kolkata)",
         "Asia\/Chita": "Jakutsko laikas (Čita)",
-        "Asia\/Choibalsan": "Čoibalsano laikas (Čoibalsanas)",
+        "Asia\/Choibalsan": "Ulan Batoro laikas (Čoibalsanas)",
         "Asia\/Colombo": "Indijos laikas (Kolombas)",
         "Asia\/Damascus": "Rytų Europos laikas (Damaskas)",
         "Asia\/Dhaka": "Bangladešo laikas (Daka)",

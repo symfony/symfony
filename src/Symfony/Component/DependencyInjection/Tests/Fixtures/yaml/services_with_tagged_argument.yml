@@ -7,7 +7,7 @@ services:
     foo_service:
         class: Foo
         tags:
-            - { name: foo }
+            - foo
     foo_service_tagged_iterator:
         class: Bar
         arguments: [!tagged_iterator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]

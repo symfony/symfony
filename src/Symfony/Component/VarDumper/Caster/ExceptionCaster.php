@@ -212,7 +212,7 @@ class ExceptionCaster
                 $ellipsisTail = isset($ellipsis->attr['ellipsis-tail']) ? $ellipsis->attr['ellipsis-tail'] : 0;
                 $ellipsis = isset($ellipsis->attr['ellipsis']) ? $ellipsis->attr['ellipsis'] : 0;
 
-                if (file_exists($f['file']) && 0 <= self::$srcContext) {
+                if (is_file($f['file']) && 0 <= self::$srcContext) {
                     if (!empty($f['class']) && (is_subclass_of($f['class'], 'Twig\Template') || is_subclass_of($f['class'], 'Twig_Template')) && method_exists($f['class'], 'getDebugInfo')) {
                         $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
 
@@ -220,7 +220,7 @@ class ExceptionCaster
                         $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
                         $templateInfo = $template->getDebugInfo();
                         if (isset($templateInfo[$f['line']])) {
-                            if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
+                            if (!method_exists($template, 'getSourceContext') || !is_file($templatePath = $template->getSourceContext()->getPath())) {
                                 $templatePath = null;
                             }
                             if ($templateSrc) {

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "[Μέση ώρα Γκρίνουιτς (Αμπιτζάν)]",
         "Africa\/Accra": "[Μέση ώρα Γκρίνουιτς (Άκρα)]",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "[Ώρα Αργεντινής (Ρίο Γκαγιέγκος)]",
         "America\/Argentina\/Salta": "[Ώρα Αργεντινής (Σάλτα)]",
         "America\/Argentina\/San_Juan": "[Ώρα Αργεντινής (Σαν Χουάν)]",
-        "America\/Argentina\/San_Luis": "[Ώρα Δυτικής Αργεντινής (Σαν Λούις)]",
+        "America\/Argentina\/San_Luis": "[Ώρα Αργεντινής (Σαν Λούις)]",
         "America\/Argentina\/Tucuman": "[Ώρα Αργεντινής (Τουκουμάν)]",
         "America\/Argentina\/Ushuaia": "[Ώρα Αργεντινής (Ουσουάια)]",
         "America\/Aruba": "[Ώρα Ατλαντικού (Αρούμπα)]",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Ώρα Μπρουνέι Νταρουσαλάμ",
         "Asia\/Calcutta": "[Ώρα Ινδίας (Καλκούτα)]",
         "Asia\/Chita": "[Ώρα Γιακούτσκ (Τσιτά)]",
-        "Asia\/Choibalsan": "Ώρα Τσοϊμπαλσάν",
+        "Asia\/Choibalsan": "[Ώρα Ουλάν Μπατόρ (Τσοϊμπαλσάν)]",
         "Asia\/Colombo": "[Ώρα Ινδίας (Κολόμπο)]",
         "Asia\/Damascus": "[Ώρα Ανατολικής Ευρώπης (Δαμασκός)]",
         "Asia\/Dhaka": "[Ώρα Μπανγκλαντές (Ντάκα)]",

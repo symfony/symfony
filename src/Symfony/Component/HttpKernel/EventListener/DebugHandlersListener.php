@@ -32,6 +32,7 @@ class DebugHandlersListener implements EventSubscriberInterface
 {
     private $exceptionHandler;
     private $logger;
+    private $deprecationLogger;
     private $levels;
     private $throwAt;
     private $scream;
@@ -48,7 +49,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param string|FileLinkFormatter|null $fileLinkFormat   The format for links to source files
      * @param bool                          $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, LoggerInterface $deprecationLogger = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
@@ -57,6 +58,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->scream = $scream;
         $this->fileLinkFormat = $fileLinkFormat;
         $this->scope = $scope;
+        $this->deprecationLogger = $deprecationLogger;
     }
 
     /**
@@ -76,31 +78,30 @@ class DebugHandlersListener implements EventSubscriberInterface
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
-        if ($this->logger || null !== $this->throwAt) {
-            if ($handler instanceof ErrorHandler) {
-                if ($this->logger) {
-                    $handler->setDefaultLogger($this->logger, $this->levels);
-                    if (\is_array($this->levels)) {
-                        $levels = 0;
-                        foreach ($this->levels as $type => $log) {
-                            $levels |= $type;
-                        }
-                    } else {
-                        $levels = $this->levels;
+        if ($handler instanceof ErrorHandler) {
+            if ($this->logger || $this->deprecationLogger) {
+                $this->setDefaultLoggers($handler);
+                if (\is_array($this->levels)) {
+                    $levels = 0;
+                    foreach ($this->levels as $type => $log) {
+                        $levels |= $type;
                     }
-                    if ($this->scream) {
-                        $handler->screamAt($levels);
-                    }
-                    if ($this->scope) {
-                        $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
-                    } else {
-                        $handler->scopeAt(0, true);
-                    }
-                    $this->logger = $this->levels = null;
+                } else {
+                    $levels = $this->levels;
                 }
-                if (null !== $this->throwAt) {
-                    $handler->throwAt($this->throwAt, true);
+
+                if ($this->scream) {
+                    $handler->screamAt($levels);
                 }
+                if ($this->scope) {
+                    $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
+                } else {
+                    $handler->scopeAt(0, true);
+                }
+                $this->logger = $this->deprecationLogger = $this->levels = null;
+            }
+            if (null !== $this->throwAt) {
+                $handler->throwAt($this->throwAt, true);
             }
         }
         if (!$this->exceptionHandler) {
@@ -123,15 +124,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                     $output = $output->getErrorOutput();
                 }
                 $this->exceptionHandler = static function (\Throwable $e) use ($app, $output) {
-                    if (method_exists($app, 'renderThrowable')) {
-                        $app->renderThrowable($e, $output);
-                    } else {
-                        if (!$e instanceof \Exception) {
-                            $e = new FatalThrowableError($e);
-                        }
-
-                        $app->renderException($e, $output);
-                    }
+                    $app->renderThrowable($e, $output);
                 };
             }
         }
@@ -140,6 +133,34 @@ class DebugHandlersListener implements EventSubscriberInterface
                 $handler->setExceptionHandler($this->exceptionHandler);
             }
             $this->exceptionHandler = null;
+        }
+    }
+
+    private function setDefaultLoggers(ErrorHandler $handler): void
+    {
+        if (\is_array($this->levels)) {
+            $levelsDeprecatedOnly = [];
+            $levelsWithoutDeprecated = [];
+            foreach ($this->levels as $type => $log) {
+                if (E_DEPRECATED == $type || E_USER_DEPRECATED == $type) {
+                    $levelsDeprecatedOnly[$type] = $log;
+                } else {
+                    $levelsWithoutDeprecated[$type] = $log;
+                }
+            }
+        } else {
+            $levelsDeprecatedOnly = $this->levels & (E_DEPRECATED | E_USER_DEPRECATED);
+            $levelsWithoutDeprecated = $this->levels & ~E_DEPRECATED & ~E_USER_DEPRECATED;
+        }
+
+        $defaultLoggerLevels = $this->levels;
+        if ($this->deprecationLogger && $levelsDeprecatedOnly) {
+            $handler->setDefaultLogger($this->deprecationLogger, $levelsDeprecatedOnly);
+            $defaultLoggerLevels = $levelsWithoutDeprecated;
+        }
+
+        if ($this->logger && $defaultLoggerLevels) {
+            $handler->setDefaultLogger($this->logger, $defaultLoggerLevels);
         }
     }
 

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abkhazo",
@@ -48,6 +47,7 @@
         "bug": "buginés",
         "byn": "blin",
         "ca": "catalán",
+        "ccp": "chakma",
         "ce": "checheno",
         "ceb": "cebuano",
         "cgg": "kiga",
@@ -394,6 +394,7 @@
         "es_419": "español de América",
         "es_ES": "español de España",
         "es_MX": "español de México",
+        "fa_AF": "dari",
         "fr_CA": "francés canadense",
         "fr_CH": "francés suízo",
         "nds_NL": "baixo saxón",

@@ -66,6 +66,7 @@
         <service id="Symfony\Component\HttpFoundation\UrlHelper" alias="url_helper" />
 
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
+            <tag name="container.no_preload" />
             <argument type="tagged_iterator" tag="kernel.cache_warmer" />
             <argument>%kernel.debug%</argument>
             <argument>%kernel.cache_dir%/%kernel.container_class%Deprecations.log</argument>

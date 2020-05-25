@@ -759,7 +759,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x0D\x1B[2K\x1B[1A\x1B[2K".
+            "\x1B[1A\x1B[1G\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
@@ -915,7 +915,7 @@ class ProgressBarTest extends TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D\x1B[2K".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
+        return ($count ? sprintf("\x1B[%dA\x1B[1G\x1b[2K", $count) : "\x1B[1G\x1B[2K").$expected;
     }
 
     public function testBarWidthWithMultilineFormat()

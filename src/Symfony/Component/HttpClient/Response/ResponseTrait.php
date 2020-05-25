@@ -153,11 +153,11 @@ trait ResponseTrait
         try {
             $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
-            throw new JsonException(sprintf('%s for "%s".', $e->getMessage(), $this->getInfo('url')), $e->getCode());
+            throw new JsonException($e->getMessage().sprintf(' for "%s".', $this->getInfo('url')), $e->getCode());
         }
 
         if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
-            throw new JsonException(sprintf('%s for "%s".', json_last_error_msg(), $this->getInfo('url')), json_last_error());
+            throw new JsonException(json_last_error_msg().sprintf(' for "%s".', $this->getInfo('url')), json_last_error());
         }
 
         if (!\is_array($content)) {
@@ -253,7 +253,7 @@ trait ResponseTrait
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d)(?: |$)#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([1-9]\d\d)(?: |$)#', $h, $m)) {
                 if ($headers) {
                     $debug .= "< \r\n";
                     $headers = [];

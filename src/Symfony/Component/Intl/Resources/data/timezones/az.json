@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Qrinviç Orta Vaxtı (Abican)",
         "Africa\/Accra": "Qrinviç Orta Vaxtı (Akkra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentina Vaxtı (Rio Qalyeqos)",
         "America\/Argentina\/Salta": "Argentina Vaxtı (Salta)",
         "America\/Argentina\/San_Juan": "Argentina Vaxtı (San Xuan)",
-        "America\/Argentina\/San_Luis": "Qərbi Argentina Vaxtı (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentina Vaxtı (San Luis)",
         "America\/Argentina\/Tucuman": "Argentina Vaxtı (Tukuman)",
         "America\/Argentina\/Ushuaia": "Argentina Vaxtı (Uşuaya)",
         "America\/Aruba": "Atlantik Vaxt (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei Darussalam vaxtı (Bruney)",
         "Asia\/Calcutta": "Hindistan Vaxtı (Kəlkətə)",
         "Asia\/Chita": "Yakutsk Vaxtı (Çita)",
-        "Asia\/Choibalsan": "Çoybalsan Vaxtı",
+        "Asia\/Choibalsan": "Ulanbator Vaxtı (Çoybalsan)",
         "Asia\/Colombo": "Hindistan Vaxtı (Kolombo)",
         "Asia\/Damascus": "Şərqi Avropa Vaxtı (Dəməşq)",
         "Asia\/Dhaka": "Banqladeş Vaxtı (Dəkkə)",

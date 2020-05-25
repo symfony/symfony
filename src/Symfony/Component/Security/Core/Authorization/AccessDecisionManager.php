@@ -61,7 +61,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/)
     {
-        $allowMultipleAttributes =  3 < func_num_args() && func_get_arg(3);
+        $allowMultipleAttributes = 3 < \func_num_args() && func_get_arg(3);
 
         // Special case for AccessListener, do not remove the right side of the condition before 6.0
         if (\count($attributes) > 1 && !$allowMultipleAttributes) {

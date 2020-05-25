@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "格林尼治标准时间（阿比让）",
         "Africa\/Accra": "格林尼治标准时间（阿克拉）",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "阿根廷时间（里奥加耶戈斯）",
         "America\/Argentina\/Salta": "阿根廷时间（萨尔塔）",
         "America\/Argentina\/San_Juan": "阿根廷时间（圣胡安）",
-        "America\/Argentina\/San_Luis": "阿根廷西部时间（圣路易斯）",
+        "America\/Argentina\/San_Luis": "阿根廷时间（圣路易斯）",
         "America\/Argentina\/Tucuman": "阿根廷时间（图库曼）",
         "America\/Argentina\/Ushuaia": "阿根廷时间（乌斯怀亚）",
         "America\/Aruba": "大西洋时间（阿鲁巴）",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "文莱达鲁萨兰时间",
         "Asia\/Calcutta": "印度时间（加尔各答）",
         "Asia\/Chita": "雅库茨克时间（赤塔）",
-        "Asia\/Choibalsan": "乔巴山时间",
+        "Asia\/Choibalsan": "乌兰巴托时间（乔巴山）",
         "Asia\/Colombo": "印度时间（科伦坡）",
         "Asia\/Damascus": "东欧时间（大马士革）",
         "Asia\/Dhaka": "孟加拉时间（达卡）",

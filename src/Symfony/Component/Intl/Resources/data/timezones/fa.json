@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "وقت گرینویچ (آبیجان)",
         "Africa\/Accra": "وقت گرینویچ (اکرا)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "وقت آرژانتین (ریوگالگوس)",
         "America\/Argentina\/Salta": "وقت آرژانتین (سالتا)",
         "America\/Argentina\/San_Juan": "وقت آرژانتین (سن‌خوان)",
-        "America\/Argentina\/San_Luis": "وقت غرب آرژانتین (سن‌لوئیس)",
+        "America\/Argentina\/San_Luis": "وقت آرژانتین (سن‌لوئیس)",
         "America\/Argentina\/Tucuman": "وقت آرژانتین (توکومن)",
         "America\/Argentina\/Ushuaia": "وقت آرژانتین (اوشوایا)",
         "America\/Aruba": "وقت آتلانتیک (اروبا)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "وقت برونئی دارالسلام",
         "Asia\/Calcutta": "وقت هند (کلکته)",
         "Asia\/Chita": "وقت یاکوتسک (چیتا)",
-        "Asia\/Choibalsan": "وقت چویبالسان",
+        "Asia\/Choibalsan": "وقت اولان‌باتور (چویبالسان)",
         "Asia\/Colombo": "وقت هند (کلمبو)",
         "Asia\/Damascus": "وقت شرق اروپا (دمشق)",
         "Asia\/Dhaka": "وقت بنگلادش (داکا)",

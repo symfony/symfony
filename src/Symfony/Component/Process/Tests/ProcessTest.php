@@ -50,7 +50,7 @@ class ProcessTest extends TestCase
     public function testInvalidCwd()
     {
         $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
-        $this->expectExceptionMessageRegExp('/The provided cwd ".*" does not exist\./');
+        $this->expectExceptionMessageMatches('/The provided cwd ".*" does not exist\./');
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process(['echo', 'test'], __DIR__);
@@ -988,21 +988,20 @@ class ProcessTest extends TestCase
 
     public function testWrongSignal()
     {
-        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
+
+        $this->expectException(RuntimeException::class);
 
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
             $process->signal(-4);
             $this->fail('A RuntimeException must have been thrown');
-        } catch (RuntimeException $e) {
+        } finally {
             $process->stop(0);
         }
-
-        throw $e;
     }
 
     public function testDisableOutputDisablesTheOutput()
@@ -1488,7 +1487,7 @@ EOTXT;
     public function testPreparedCommandWithMissingValue()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, ['bcd' => 'BCD']);
     }
@@ -1496,7 +1495,7 @@ EOTXT;
     public function testPreparedCommandWithNoValues()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, []);
     }

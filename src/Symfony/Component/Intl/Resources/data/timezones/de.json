@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Mittlere Greenwich-Zeit (Abidjan)",
         "Africa\/Accra": "Mittlere Greenwich-Zeit (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentinische Zeit (Rio Gallegos)",
         "America\/Argentina\/Salta": "Argentinische Zeit (Salta)",
         "America\/Argentina\/San_Juan": "Argentinische Zeit (San Juan)",
-        "America\/Argentina\/San_Luis": "Westargentinische Zeit (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentinische Zeit (San Luis)",
         "America\/Argentina\/Tucuman": "Argentinische Zeit (Tucuman)",
         "America\/Argentina\/Ushuaia": "Argentinische Zeit (Ushuaia)",
         "America\/Aruba": "Atlantik-Zeit (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei-Darussalam-Zeit",
         "Asia\/Calcutta": "Indische Zeit (Kalkutta)",
         "Asia\/Chita": "Jakutsk-Zeit (Tschita)",
-        "Asia\/Choibalsan": "Tschoibalsan-Zeit",
+        "Asia\/Choibalsan": "Ulaanbaatar-Zeit (Tschoibalsan)",
         "Asia\/Colombo": "Indische Zeit (Colombo)",
         "Asia\/Damascus": "Osteuropäische Zeit (Damaskus)",
         "Asia\/Dhaka": "Bangladesch-Zeit (Dhaka)",

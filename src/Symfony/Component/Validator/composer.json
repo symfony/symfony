@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.15",
@@ -30,7 +31,7 @@
         "symfony/yaml": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/expression-language": "^4.4|^5.0",
+        "symfony/expression-language": "^5.1",
         "symfony/cache": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
@@ -44,6 +45,7 @@
         "doctrine/lexer": "<1.0.2",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
+        "symfony/expression-language": "<5.1",
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
         "symfony/translation": "<4.4",
@@ -61,7 +63,7 @@
         "egulias/email-validator": "Strict (RFC compliant) email validation",
         "symfony/property-access": "For accessing properties within comparison constraints",
         "symfony/property-info": "To automatically add NotNull and Type constraints",
-        "symfony/expression-language": "For using the Expression validator"
+        "symfony/expression-language": "For using the Expression validator and the ExpressionLanguageSyntax constraints"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
@@ -72,7 +74,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

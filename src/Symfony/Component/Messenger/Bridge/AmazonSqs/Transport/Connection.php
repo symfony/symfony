@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
-use Symfony\Component\HttpClient\HttpClient;
+use AsyncAws\Sqs\Enum\QueueAttributeName;
+use AsyncAws\Sqs\Result\ReceiveMessageResult;
+use AsyncAws\Sqs\SqsClient;
+use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * A SQS connection.
@@ -27,6 +29,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class Connection
 {
+    private const AWS_SQS_FIFO_SUFFIX = '.fifo';
+
     private const DEFAULT_OPTIONS = [
         'buffer_size' => 9,
         'wait_time' => 20,
@@ -44,17 +48,17 @@ class Connection
     private $configuration;
     private $client;
 
-    /** @var ResponseInterface */
+    /** @var ReceiveMessageResult */
     private $currentResponse;
     /** @var array[] */
     private $buffer = [];
     /** @var string|null */
     private $queueUrl;
 
-    public function __construct(array $configuration, HttpClientInterface $client = null)
+    public function __construct(array $configuration, SqsClient $client = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
-        $this->client = $client ?? HttpClient::create();
+        $this->client = $client ?? new SqsClient([]);
     }
 
     public function __destruct()
@@ -91,20 +95,25 @@ class Connection
         }
 
         $configuration = [
-            'region' => $options['region'] ?? ($query['region'] ?? self::DEFAULT_OPTIONS['region']),
             'buffer_size' => $options['buffer_size'] ?? (int) ($query['buffer_size'] ?? self::DEFAULT_OPTIONS['buffer_size']),
             'wait_time' => $options['wait_time'] ?? (int) ($query['wait_time'] ?? self::DEFAULT_OPTIONS['wait_time']),
             'poll_timeout' => $options['poll_timeout'] ?? ($query['poll_timeout'] ?? self::DEFAULT_OPTIONS['poll_timeout']),
             'visibility_timeout' => $options['visibility_timeout'] ?? ($query['visibility_timeout'] ?? self::DEFAULT_OPTIONS['visibility_timeout']),
             'auto_setup' => $options['auto_setup'] ?? (bool) ($query['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup']),
-            'access_key' => $options['access_key'] ?? (urldecode($parsedUrl['user'] ?? '') ?: self::DEFAULT_OPTIONS['access_key']),
-            'secret_key' => $options['secret_key'] ?? (urldecode($parsedUrl['pass'] ?? '') ?: self::DEFAULT_OPTIONS['secret_key']),
         ];
 
-        if ('default' === ($parsedUrl['host'] ?? 'default')) {
-            $configuration['endpoint'] = sprintf('https://sqs.%s.amazonaws.com', $configuration['region']);
-        } else {
-            $configuration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
+        $clientConfiguration = [
+            'region' => $options['region'] ?? ($query['region'] ?? self::DEFAULT_OPTIONS['region']),
+            'accessKeyId' => $options['access_key'] ?? (urldecode($parsedUrl['user'] ?? '') ?: self::DEFAULT_OPTIONS['access_key']),
+            'accessKeySecret' => $options['secret_key'] ?? (urldecode($parsedUrl['pass'] ?? '') ?: self::DEFAULT_OPTIONS['secret_key']),
+        ];
+        unset($query['region']);
+
+        if ('default' !== ($parsedUrl['host'] ?? 'default')) {
+            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
+            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $parsedUrl['host'], $matches)) {
+                $clientConfiguration['region'] = $matches[1];
+            }
             unset($query['sslmode']);
         }
 
@@ -115,18 +124,18 @@ class Connection
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : null;
 
         // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys($configuration));
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys($configuration));
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
-        return new self($configuration, $client);
+        return new self($configuration, new SqsClient($clientConfiguration, null, $client));
     }
 
     public function get(): ?array
@@ -167,90 +176,142 @@ class Connection
     private function getNewMessages(): \Generator
     {
         if (null === $this->currentResponse) {
-            $this->currentResponse = $this->request($this->getQueueUrl(), [
-                'Action' => 'ReceiveMessage',
+            $this->currentResponse = $this->client->receiveMessage([
+                'QueueUrl' => $this->getQueueUrl(),
                 'VisibilityTimeout' => $this->configuration['visibility_timeout'],
                 'MaxNumberOfMessages' => $this->configuration['buffer_size'],
+                'MessageAttributeNames' => ['All'],
                 'WaitTimeSeconds' => $this->configuration['wait_time'],
             ]);
         }
 
-        if ($this->client->stream($this->currentResponse, $this->configuration['poll_timeout'])->current()->isTimeout()) {
+        if (!$this->fetchMessage()) {
             return;
         }
-
-        $xml = new \SimpleXMLElement($this->currentResponse->getContent());
-        foreach ($xml->ReceiveMessageResult->Message as $xmlMessage) {
-            $this->buffer[] = [
-                'id' => (string) $xmlMessage->ReceiptHandle,
-            ] + json_decode($xmlMessage->Body, true);
-        }
-
-        $this->currentResponse = null;
 
         yield from $this->getPendingMessages();
     }
 
+    private function fetchMessage(): bool
+    {
+        if (!$this->currentResponse->resolve($this->configuration['poll_timeout'])) {
+            return false;
+        }
+
+        foreach ($this->currentResponse->getMessages() as $message) {
+            $headers = [];
+            foreach ($message->getMessageAttributes() as $name => $attribute) {
+                if ('String' !== $attribute->getDataType()) {
+                    continue;
+                }
+
+                $headers[$name] = $attribute->getStringValue();
+            }
+
+            $this->buffer[] = [
+                'id' => $message->getReceiptHandle(),
+                'body' => $message->getBody(),
+                'headers' => $headers,
+            ];
+        }
+
+        $this->currentResponse = null;
+
+        return true;
+    }
+
     public function setup(): void
     {
-        $this->call($this->configuration['endpoint'], [
-            'Action' => 'CreateQueue',
-            'QueueName' => $this->configuration['queue_name'],
-        ]);
-        $this->queueUrl = null;
-
+        // Set to false to disable setup more than once
         $this->configuration['auto_setup'] = false;
+        if ($this->client->queueExists([
+            'QueueName' => $this->configuration['queue_name'],
+            'QueueOwnerAWSAccountId' => $this->configuration['account'],
+        ])->isSuccess()) {
+            return;
+        }
+
+        if (null !== $this->configuration['account']) {
+            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exists (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+        }
+
+        $parameters = ['QueueName' => $this->configuration['queue_name']];
+
+        if (self::isFifoQueue($this->configuration['queue_name'])) {
+            $parameters['FifoQueue'] = true;
+        }
+
+        $this->client->createQueue($parameters);
+        $exists = $this->client->queueExists(['QueueName' => $this->configuration['queue_name']]);
+        // Blocking call to wait for the queue to be created
+        $exists->wait();
+        if (!$exists->isSuccess()) {
+            throw new TransportException(sprintf('Failed to crate the Amazon SQS queue "%s".', $this->configuration['queue_name']));
+        }
+        $this->queueUrl = null;
     }
 
     public function delete(string $id): void
     {
-        $this->call($this->getQueueUrl(), [
-            'Action' => 'DeleteMessage',
+        $this->client->deleteMessage([
+            'QueueUrl' => $this->getQueueUrl(),
             'ReceiptHandle' => $id,
         ]);
     }
 
     public function getMessageCount(): int
     {
-        $response = $this->request($this->getQueueUrl(), [
-            'Action' => 'GetQueueAttributes',
-            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        $response = $this->client->getQueueAttributes([
+            'QueueUrl' => $this->getQueueUrl(),
+            'AttributeNames' => [QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES],
         ]);
-        $this->checkResponse($response);
-        $xml = new \SimpleXMLElement($response->getContent());
-        foreach ($xml->GetQueueAttributesResult->Attribute as $attribute) {
-            if ('ApproximateNumberOfMessages' !== (string) $attribute->Name) {
-                continue;
-            }
 
-            return (int) $attribute->Value;
-        }
+        $attributes = $response->getAttributes();
 
-        return 0;
+        return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0): void
+    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
         }
 
-        $this->call($this->getQueueUrl(), [
-            'Action' => 'SendMessage',
-            'MessageBody' => json_encode(['body' => $body, 'headers' => $headers]),
+        $parameters = [
+            'QueueUrl' => $this->getQueueUrl(),
+            'MessageBody' => $body,
             'DelaySeconds' => $delay,
-        ]);
+            'MessageAttributes' => [],
+        ];
+
+        foreach ($headers as $name => $value) {
+            $parameters['MessageAttributes'][$name] = new MessageAttributeValue([
+                'DataType' => 'String',
+                'StringValue' => $value,
+            ]);
+        }
+
+        if (self::isFifoQueue($this->configuration['queue_name'])) {
+            $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
+            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1(json_encode(['body' => $body, 'headers' => $headers]));
+        }
+
+        $this->client->sendMessage($parameters);
     }
 
     public function reset(): void
     {
         if (null !== $this->currentResponse) {
-            $this->currentResponse->cancel();
+            // fetch current response in order to requeue in transit messages
+            if (!$this->fetchMessage()) {
+                $this->currentResponse->cancel();
+                $this->currentResponse = null;
+            }
         }
 
         foreach ($this->getPendingMessages() as $message) {
-            $this->call($this->getQueueUrl(), [
-                'Action' => 'ChangeMessageVisibility',
+            $this->client->changeMessageVisibility([
+                'QueueUrl' => $this->getQueueUrl(),
                 'ReceiptHandle' => $message['id'],
                 'VisibilityTimeout' => 0,
             ]);
@@ -259,104 +320,18 @@ class Connection
 
     private function getQueueUrl(): string
     {
-        if (null === $this->queueUrl) {
-            $parameters = [
-                'Action' => 'GetQueueUrl',
-                'QueueName' => $this->configuration['queue_name'],
-            ];
-            if (isset($this->configuration['account'])) {
-                $parameters['QueueOwnerAWSAccountId'] = $this->configuration['account'];
-            }
-
-            $response = $this->request($this->configuration['endpoint'], $parameters);
-            $this->checkResponse($response);
-            $xml = new \SimpleXMLElement($response->getContent());
-
-            $this->queueUrl = (string) $xml->GetQueueUrlResult->QueueUrl;
+        if (null !== $this->queueUrl) {
+            return $this->queueUrl;
         }
 
-        return $this->queueUrl;
+        return $this->queueUrl = $this->client->getQueueUrl([
+            'QueueName' => $this->configuration['queue_name'],
+            'QueueOwnerAWSAccountId' => $this->configuration['account'],
+        ])->getQueueUrl();
     }
 
-    private function call(string $endpoint, array $body): void
+    private static function isFifoQueue(string $queueName): bool
     {
-        $this->checkResponse($this->request($endpoint, $body));
-    }
-
-    private function request(string $endpoint, array $body): ResponseInterface
-    {
-        if (!$this->configuration['access_key']) {
-            return $this->client->request('POST', $endpoint, ['body' => $body]);
-        }
-
-        $region = $this->configuration['region'];
-        $service = 'sqs';
-
-        $method = 'POST';
-        $requestParameters = http_build_query($body, '', '&', PHP_QUERY_RFC1738);
-        $amzDate = gmdate('Ymd\THis\Z');
-        $parsedUrl = parse_url($endpoint);
-
-        $headers = [
-            'host' => $parsedUrl['host'],
-            'x-amz-date' => $amzDate,
-            'content-type' => 'application/x-www-form-urlencoded',
-        ];
-
-        $signedHeaders = ['host', 'x-amz-date'];
-        $canonicalHeaders = implode("\n", array_map(function ($headerName) use ($headers): string {
-            return sprintf('%s:%s', $headerName, $headers[$headerName]);
-        }, $signedHeaders))."\n";
-
-        $canonicalRequest = implode("\n", [
-            $method,
-            $parsedUrl['path'] ?? '/',
-            '',
-            $canonicalHeaders,
-            implode(';', $signedHeaders),
-            hash('sha256', $requestParameters),
-        ]);
-
-        $algorithm = 'AWS4-HMAC-SHA256';
-        $credentialScope = [gmdate('Ymd'), $region, $service, 'aws4_request'];
-
-        $signingKey = 'AWS4'.$this->configuration['secret_key'];
-        foreach ($credentialScope as $credential) {
-            $signingKey = hash_hmac('sha256', $credential, $signingKey, true);
-        }
-
-        $stringToSign = implode("\n", [
-            $algorithm,
-            $amzDate,
-            implode('/', $credentialScope),
-            hash('sha256', $canonicalRequest),
-        ]);
-
-        $authorizationHeader = sprintf(
-            '%s Credential=%s/%s, SignedHeaders=%s, Signature=%s',
-            $algorithm,
-            $this->configuration['access_key'],
-            implode('/', $credentialScope),
-            implode(';', $signedHeaders),
-            hash_hmac('sha256', $stringToSign, $signingKey)
-        );
-
-        $options = [
-            'headers' => $headers + [
-                'authorization' => $authorizationHeader,
-            ],
-            'body' => $requestParameters,
-        ];
-
-        return $this->client->request($method, $endpoint, $options);
-    }
-
-    private function checkResponse(ResponseInterface $response): void
-    {
-        if (200 !== $response->getStatusCode()) {
-            $error = new \SimpleXMLElement($response->getContent(false));
-
-            throw new TransportException($error->Error->Message);
-        }
+        return self::AWS_SQS_FIFO_SUFFIX === substr($queueName, -\strlen(self::AWS_SQS_FIFO_SUFFIX));
     }
 }

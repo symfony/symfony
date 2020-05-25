@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwich Ortalama Saati (Abidjan)",
         "Africa\/Accra": "Greenwich Ortalama Saati (Akra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Arjantin Saati (Rio Gallegos)",
         "America\/Argentina\/Salta": "Arjantin Saati (Salta)",
         "America\/Argentina\/San_Juan": "Arjantin Saati (San Juan)",
-        "America\/Argentina\/San_Luis": "Batı Arjantin Saati (San Luis)",
+        "America\/Argentina\/San_Luis": "Arjantin Saati (San Luis)",
         "America\/Argentina\/Tucuman": "Arjantin Saati (Tucuman)",
         "America\/Argentina\/Ushuaia": "Arjantin Saati (Ushuaia)",
         "America\/Aruba": "Atlantik Saati (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei Darü’s-Selam Saati",
         "Asia\/Calcutta": "Hindistan Standart Saati (Kalküta)",
         "Asia\/Chita": "Yakutsk Saati (Çita)",
-        "Asia\/Choibalsan": "Çoybalsan Saati",
+        "Asia\/Choibalsan": "Ulan Batur Saati (Çoybalsan)",
         "Asia\/Colombo": "Hindistan Standart Saati (Kolombo)",
         "Asia\/Damascus": "Doğu Avrupa Saati (Şam)",
         "Asia\/Dhaka": "Bangladeş Saati (Dakka)",

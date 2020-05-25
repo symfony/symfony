@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "univerzalno vrijeme (Abidjan)",
         "Africa\/Accra": "univerzalno vrijeme (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "argentinsko vrijeme (Rio Gallegos)",
         "America\/Argentina\/Salta": "argentinsko vrijeme (Salta)",
         "America\/Argentina\/San_Juan": "argentinsko vrijeme (San Juan)",
-        "America\/Argentina\/San_Luis": "zapadnoargentinsko vrijeme (San Luis)",
+        "America\/Argentina\/San_Luis": "argentinsko vrijeme (San Luis)",
         "America\/Argentina\/Tucuman": "argentinsko vrijeme (Tucuman)",
         "America\/Argentina\/Ushuaia": "argentinsko vrijeme (Ushuaia)",
         "America\/Aruba": "atlantsko vrijeme (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "vrijeme za Brunej Darussalam",
         "Asia\/Calcutta": "indijsko vrijeme (Kolkata)",
         "Asia\/Chita": "jakutsko vrijeme (Čita)",
-        "Asia\/Choibalsan": "choibalsansko vrijeme",
+        "Asia\/Choibalsan": "ulanbatorsko vrijeme (Choibalsan)",
         "Asia\/Colombo": "indijsko vrijeme (Colombo)",
         "Asia\/Damascus": "istočnoeuropsko vrijeme (Damask)",
         "Asia\/Dhaka": "bangladeško vrijeme (Dhaka)",

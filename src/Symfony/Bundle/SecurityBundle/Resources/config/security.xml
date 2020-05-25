@@ -45,15 +45,6 @@
         </service>
 
         <!-- Authentication related services -->
-        <service id="security.authentication.manager" class="Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager">
-            <argument /> <!-- providers -->
-            <argument>%security.authentication.manager.erase_credentials%</argument>
-            <call method="setEventDispatcher">
-                <argument type="service" id="event_dispatcher" />
-            </call>
-        </service>
-        <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
-
         <service id="security.authentication.trust_resolver" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver" />
 
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
@@ -89,6 +80,10 @@
             <argument type="service" id="request_stack" />
         </service>
         <service id="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" alias="security.authentication_utils" />
+
+        <service id="security.event_dispatcher.event_bubbling_listener" class="Symfony\Bundle\SecurityBundle\EventListener\FirewallEventBubblingListener" abstract="true">
+            <argument type="service" id="event_dispatcher" />
+        </service>
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager">

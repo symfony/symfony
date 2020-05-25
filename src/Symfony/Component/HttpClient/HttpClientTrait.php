@@ -357,11 +357,11 @@ trait HttpClientTrait
         try {
             $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0), $maxDepth);
         } catch (\JsonException $e) {
-            throw new InvalidArgumentException(sprintf('Invalid value for "json" option: %s.', $e->getMessage()));
+            throw new InvalidArgumentException('Invalid value for "json" option: '.$e->getMessage());
         }
 
         if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-            throw new InvalidArgumentException(sprintf('Invalid value for "json" option: %s.', json_last_error_msg()));
+            throw new InvalidArgumentException('Invalid value for "json" option: '.json_last_error_msg());
         }
 
         return $value;

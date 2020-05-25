@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * deprecated the `allowEmptyString` option of the `Length` constraint
+
+   Before:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Length(min=5, allowEmptyString=true)
+    */
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\AtLeastOneOf({
+    *     @Assert\Blank(),
+    *     @Assert\Length(min=5)
+    * })
+    */
+   ```
+
 5.1.0
 -----
 
@@ -10,6 +38,7 @@ CHANGELOG
  * added `Sequentially` constraint, to sequentially validate a set of constraints (any violation raised will prevent further validation of the nested constraints)
  * added the `divisibleBy` option to the `Count` constraint
  * added `Isin` constraint
+ * added the `ExpressionLanguageSyntax` constraint
 
 5.0.0
 -----

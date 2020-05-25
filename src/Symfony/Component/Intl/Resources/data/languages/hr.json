@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -523,6 +522,7 @@
         "es_419": "latinoamerički španjolski",
         "es_ES": "europski španjolski",
         "es_MX": "meksički španjolski",
+        "fa_AF": "dari",
         "fr_CA": "kanadski francuski",
         "fr_CH": "švicarski francuski",
         "nds_NL": "donjosaksonski",

@@ -16,6 +16,9 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
+/**
+ * @group integration
+ */
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
@@ -68,7 +71,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function testFailedCreateConnection(string $dsn)
     {
         $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function setUp(): void
     {
         Inline::initialize(0, 0);
@@ -74,7 +77,7 @@ class InlineTest extends TestCase
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
+        $this->expectExceptionMessageMatches('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
         Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -296,8 +299,8 @@ class InlineTest extends TestCase
             ['123.45_67', 123.4567],
             ['0x4D2', 0x4D2],
             ['0x_4_D_2_', 0x4D2],
-            ['02333', 02333],
-            ['0_2_3_3_3', 02333],
+            ['0o2333', 02333],
+            ['0o_2_3_3_3', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -376,7 +379,7 @@ class InlineTest extends TestCase
             ["'quoted string'", 'quoted string'],
             ['12.30e+02', 12.30e+02],
             ['0x4D2', 0x4D2],
-            ['02333', 02333],
+            ['0o2333', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -599,7 +602,7 @@ class InlineTest extends TestCase
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp($expectedMessage);
+        $this->expectExceptionMessageMatches($expectedMessage);
 
         Inline::parse($data);
     }
@@ -733,7 +736,28 @@ class InlineTest extends TestCase
     public function getTestsForOctalNumbers()
     {
         return [
+            'positive octal number' => [28, '0o34'],
+            'positive octal number with sign' => [28, '+0o34'],
+            'negative octal number' => [-28, '-0o34'],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getTestsForOctalNumbersYaml11Notation
+     */
+    public function testParseOctalNumbersYaml11Notation(int $expected, string $yaml)
+    {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
+
+        self::assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForOctalNumbersYaml11Notation()
+    {
+        return [
             'positive octal number' => [28, '034'],
+            'positive octal number with separator' => [1243, '0_2_3_3_3'],
             'negative octal number' => [-28, '-034'],
         ];
     }
@@ -742,11 +766,11 @@ class InlineTest extends TestCase
      * @dataProvider phpObjectTagWithEmptyValueProvider
      *
      * @group legacy
-     *
-     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.
      */
     public function testPhpObjectWithEmptyValue($expected, $value)
     {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.');
+
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_OBJECT));
     }
 
@@ -766,11 +790,11 @@ class InlineTest extends TestCase
      * @dataProvider phpConstTagWithEmptyValueProvider
      *
      * @group legacy
-     *
-     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.
      */
     public function testPhpConstTagWithEmptyValue($expected, $value)
     {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.');
+
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_CONSTANT));
     }
 
@@ -790,12 +814,28 @@ class InlineTest extends TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testParsePositiveOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(342391, Inline::parse('0123456789'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testParseNegativeOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame(-342391, Inline::parse('-0123456789'));
+    }
+
+    /**
      * @dataProvider unquotedExclamationMarkThrowsProvider
      */
     public function testUnquotedExclamationMarkThrows(string $value)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessageRegExp('/^Using the unquoted scalar value "!" is not supported\. You must quote it at line 1 \(near "/');
+        $this->expectExceptionMessageMatches('/^Using the unquoted scalar value "!" is not supported\. You must quote it at line 1 \(near "/');
 
         Inline::parse($value);
     }

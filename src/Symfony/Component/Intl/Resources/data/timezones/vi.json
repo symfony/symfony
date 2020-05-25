@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Giờ Trung bình Greenwich (Abidjan)",
         "Africa\/Accra": "Giờ Trung bình Greenwich (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Giờ Argentina (Rio Gallegos)",
         "America\/Argentina\/Salta": "Giờ Argentina (Salta)",
         "America\/Argentina\/San_Juan": "Giờ Argentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Giờ miền tây Argentina (San Luis)",
+        "America\/Argentina\/San_Luis": "Giờ Argentina (San Luis)",
         "America\/Argentina\/Tucuman": "Giờ Argentina (Tucuman)",
         "America\/Argentina\/Ushuaia": "Giờ Argentina (Ushuaia)",
         "America\/Aruba": "Giờ Đại Tây Dương (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Giờ Brunei Darussalam",
         "Asia\/Calcutta": "Giờ Chuẩn Ấn Độ (Kolkata)",
         "Asia\/Chita": "Giờ Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Giờ Choibalsan",
+        "Asia\/Choibalsan": "Giờ Ulan Bator (Choibalsan)",
         "Asia\/Colombo": "Giờ Chuẩn Ấn Độ (Colombo)",
         "Asia\/Damascus": "Giờ Đông Âu (Damascus)",
         "Asia\/Dhaka": "Giờ Bangladesh (Dhaka)",
@@ -420,7 +419,7 @@
         "Pacific\/Midway": "Giờ Samoa (Midway)",
         "Pacific\/Nauru": "Giờ Nauru",
         "Pacific\/Niue": "Giờ Niue",
-        "Pacific\/Norfolk": "Giờ đảo Norfolk",
+        "Pacific\/Norfolk": "Giờ Đảo Norfolk",
         "Pacific\/Noumea": "Giờ New Caledonia (Noumea)",
         "Pacific\/Pago_Pago": "Giờ Samoa (Pago Pago)",
         "Pacific\/Palau": "Giờ Palau",

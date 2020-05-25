@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Abidjan (Greenwicha áigi)",
         "Africa\/Accra": "Accra (Greenwicha áigi)",
@@ -58,7 +57,6 @@
         "America\/Anguilla": "Anguilla (atlántalaš áigi)",
         "America\/Antigua": "Antigua (atlántalaš áigi)",
         "America\/Araguaina": "Araguaina (Brasilia áigi)",
-        "America\/Argentina\/San_Luis": "San Luis (Oarje-Argentina áigi)",
         "America\/Aruba": "Aruba (atlántalaš áigi)",
         "America\/Asuncion": "Asuncion (Paraguaya áigi)",
         "America\/Bahia": "Bahia (Brasilia áigi)",
@@ -213,7 +211,7 @@
         "Asia\/Brunei": "Brunei Darussalama áigi",
         "Asia\/Calcutta": "Kolkata (India dálveáigi)",
         "Asia\/Chita": "Chita (Jakucka áigi)",
-        "Asia\/Choibalsan": "Choibalsan (Choibolsana áigi)",
+        "Asia\/Choibalsan": "Choibalsan (Ulan-Batora áigi)",
         "Asia\/Colombo": "Colombo (India dálveáigi)",
         "Asia\/Damascus": "Damaskos (Nuorta-Eurohpa áigi)",
         "Asia\/Dhaka": "Dhaka (Bangladesha áigi)",

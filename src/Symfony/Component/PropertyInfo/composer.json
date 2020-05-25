@@ -23,9 +23,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "symfony/inflector": "^4.4|^5.0",
-        "symfony/polyfill-php80": "^1.15"
+        "php": ">=7.2.5",
+        "symfony/polyfill-php80": "^1.15",
+        "symfony/string": "^5.1"
     },
     "require-dev": {
         "symfony/serializer": "^4.4|^5.0",
@@ -54,7 +54,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

@@ -206,12 +206,11 @@ class SmtpTransport extends AbstractTransport
             $this->stream->flush();
             $this->executeCommand("\r\n.\r\n", [250]);
             $message->appendDebug($this->stream->getDebug());
+            $this->lastMessageTime = microtime(true);
         } catch (TransportExceptionInterface $e) {
             $e->appendDebug($this->stream->getDebug());
-
+            $this->lastMessageTime = 0;
             throw $e;
-        } finally {
-            $this->lastMessageTime = microtime(true);
         }
     }
 

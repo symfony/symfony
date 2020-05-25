@@ -46,6 +46,13 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testObjectEmptyStringIsValid()
+    {
+        $this->validator->validate(new EmptyEmailObject(), new Email());
+
+        $this->assertNoViolation();
+    }
+
     public function testExpectsStringCompatibleType()
     {
         $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
@@ -298,5 +305,13 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ['test@email{'],
             [str_repeat('x', 254).'@example.com'], //email with warnings
         ];
+    }
+}
+
+class EmptyEmailObject
+{
+    public function __toString()
+    {
+        return '';
     }
 }

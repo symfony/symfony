@@ -19,6 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -480,6 +481,14 @@ EOF;
         $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
     }
 
+    public function testWarmup()
+    {
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertTrue($kernel->warmedUp);
+    }
+
     public function testServicesResetter()
     {
         $httpKernelMock = $this->getMockBuilder(HttpKernelInterface::class)
@@ -525,6 +534,27 @@ EOF;
         $kernel->reboot(null);
 
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
+    }
+
+    public function testAnonymousKernelGeneratesValidContainerClass(): void
+    {
+        $kernel = new class('test', true) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function getContainerClass(): string
+            {
+                return parent::getContainerClass();
+            }
+        };
+
+        $this->assertRegExp('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
     /**
@@ -603,8 +633,9 @@ class TestKernel implements HttpKernelInterface
     }
 }
 
-class CustomProjectDirKernel extends Kernel
+class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
+    public $warmedUp = false;
     private $baseDir;
     private $buildContainer;
     private $httpKernel;
@@ -629,6 +660,13 @@ class CustomProjectDirKernel extends Kernel
     public function getProjectDir(): string
     {
         return __DIR__.'/Fixtures';
+    }
+
+    public function warmUp(string $cacheDir): array
+    {
+        $this->warmedUp = true;
+
+        return [];
     }
 
     protected function build(ContainerBuilder $container)

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abhaasi",
@@ -606,6 +605,7 @@
         "es_419": "amerikanespanja",
         "es_ES": "euroopanespanja",
         "es_MX": "meksikonespanja",
+        "fa_AF": "dari",
         "fr_CA": "kanadanranska",
         "fr_CH": "sveitsinranska",
         "nds_NL": "alankomaidenalasaksa",

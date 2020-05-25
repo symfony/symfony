@@ -23,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
@@ -64,6 +65,7 @@ class ConsumeMessagesCommand extends Command
             ->setDefinition([
                 new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names of the receivers/transports to consume in order of priority', $defaultReceiverName ? [$defaultReceiverName] : []),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
+                new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
@@ -82,6 +84,10 @@ To receive from multiple transports, pass each name:
 Use the --limit option to limit the number of messages received:
 
     <info>php %command.full_name% <receiver-name> --limit=10</info>
+
+Use the --failure-limit option to stop the worker when the given number of failed messages is reached:
+
+    <info>php %command.full_name% <receiver-name> --failure-limit=2</info>
 
 Use the --memory-limit option to stop the worker if it exceeds a given memory usage limit. You can use shorthand byte values [K, M or G]:
 
@@ -150,6 +156,11 @@ EOF
         if ($limit = $input->getOption('limit')) {
             $stopsWhen[] = "processed {$limit} messages";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
+        }
+
+        if ($failureLimit = $input->getOption('failure-limit')) {
+            $stopsWhen[] = "reached {$failureLimit} failed messages";
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnFailureLimitListener($failureLimit, $this->logger));
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {

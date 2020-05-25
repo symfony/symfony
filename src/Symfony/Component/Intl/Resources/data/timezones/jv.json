@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Wektu Rerata Greenwich (Abidjan)",
         "Africa\/Accra": "Wektu Rerata Greenwich (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Wektu Argentina (Rio Gallegos)",
         "America\/Argentina\/Salta": "Wektu Argentina (Salta)",
         "America\/Argentina\/San_Juan": "Wektu Argentina (San Juan)",
-        "America\/Argentina\/San_Luis": "Wektu Argentina sisih Kulon (San Luis)",
+        "America\/Argentina\/San_Luis": "Wektu Argentina (San Luis)",
         "America\/Argentina\/Tucuman": "Wektu Argentina (Tucuman)",
         "America\/Argentina\/Ushuaia": "Wektu Argentina (Ushuaia)",
         "America\/Aruba": "Wektu Atlantik (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Wektu Brunai Darussalam (Brunei)",
         "Asia\/Calcutta": "Wektu Standar India (Kalkuta)",
         "Asia\/Chita": "Wektu Yakutsk (Chita)",
-        "Asia\/Choibalsan": "Wektu Choibalsan",
+        "Asia\/Choibalsan": "Wektu Ulaanbaatar (Choibalsan)",
         "Asia\/Colombo": "Wektu Standar India (Kolombo)",
         "Asia\/Damascus": "Wektu Eropa sisih Wetan (Damaskus)",
         "Asia\/Dhaka": "Wektu Bangladesh (Dhaka)",

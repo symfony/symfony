@@ -26,12 +26,12 @@ trait LocalizedRouteTrait
      * Creates one or many routes.
      *
      * @param string|array $path the path, or the localized paths of the route
-     *
-     * @return Route|RouteCollection
      */
-    final protected function createLocalizedRoute(RouteCollection $collection, string $name, $path, string $namePrefix = '', array $prefixes = null)
+    final protected function createLocalizedRoute(RouteCollection $collection, string $name, $path, string $namePrefix = '', array $prefixes = null): RouteCollection
     {
         $paths = [];
+
+        $routes = new RouteCollection();
 
         if (\is_array($path)) {
             if (null === $prefixes) {
@@ -52,12 +52,11 @@ trait LocalizedRouteTrait
                 $paths[$locale] = $prefix.$path;
             }
         } else {
-            $collection->add($namePrefix.$name, $route = $this->createRoute($path));
+            $routes->add($namePrefix.$name, $route = $this->createRoute($path));
+            $collection->add($namePrefix.$name, $route);
 
-            return $route;
+            return $routes;
         }
-
-        $routes = new RouteCollection();
 
         foreach ($paths as $locale => $path) {
             $routes->add($name.'.'.$locale, $route = $this->createRoute($path));

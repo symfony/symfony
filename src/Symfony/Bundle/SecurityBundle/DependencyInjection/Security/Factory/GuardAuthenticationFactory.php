@@ -12,17 +12,22 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 
 /**
  * Configures the "guard" authentication provider key under a firewall.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @internal
  */
-class GuardAuthenticationFactory implements SecurityFactoryInterface
+class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
     public function getPosition()
     {
@@ -90,6 +95,32 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
             ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => $userProvider]);
 
         return [$providerId, $listenerId, $entryPointId];
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
+    {
+        $userProvider = new Reference($userProviderId);
+        $authenticatorIds = [];
+
+        $guardAuthenticatorIds = $config['authenticators'];
+        foreach ($guardAuthenticatorIds as $i => $guardAuthenticatorId) {
+            $container->setDefinition($authenticatorIds[] = 'security.authenticator.guard.'.$firewallName.'.'.$i, new Definition(GuardBridgeAuthenticator::class))
+                ->setArguments([
+                    new Reference($guardAuthenticatorId),
+                    $userProvider,
+                ]);
+        }
+
+        return $authenticatorIds;
+    }
+
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): ?string
+    {
+        try {
+            return $this->determineEntryPoint(null, $config);
+        } catch (\LogicException $e) {
+            throw new InvalidConfigurationException(sprintf('Because you have multiple guard authenticators, you need to set the "entry_point" key to one of your authenticators (%s).', implode(', ', $config['authenticators'])));
+        }
     }
 
     private function determineEntryPoint(?string $defaultEntryPointId, array $config): string

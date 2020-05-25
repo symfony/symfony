@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\HttpClient\Response\TraceableResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -70,15 +71,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
             throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
-        return $this->client->stream(\Closure::bind(static function () use ($responses) {
-            foreach ($responses as $k => $r) {
-                if (!$r instanceof TraceableResponse) {
-                    throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($r)));
-                }
-
-                yield $k => $r->response;
-            }
-        }, null, TraceableResponse::class)(), $timeout);
+        return new ResponseStream(TraceableResponse::stream($this->client, $responses, $timeout));
     }
 
     public function getTracedRequests(): array

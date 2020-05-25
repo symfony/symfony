@@ -68,6 +68,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     public function all(string $domain = null)
     {
         if (null !== $domain) {
+            // skip messages merge if intl-icu requested explicitly
+            if (false !== strpos($domain, self::INTL_DOMAIN_SUFFIX)) {
+                return $this->messages[$domain] ?? [];
+            }
+
             return ($this->messages[$domain.self::INTL_DOMAIN_SUFFIX] ?? []) + ($this->messages[$domain] ?? []);
         }
 

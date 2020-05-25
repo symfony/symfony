@@ -44,7 +44,7 @@ final class SecretsRemoveCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Removes a secret from the vault.')
+            ->setDescription('Removes a secret from the vault')
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Updates the local vault.')
             ->setHelp(<<<'EOF'

@@ -626,8 +626,14 @@ class Parser
         }
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+        $isItComment = $this->isCurrentLineComment();
 
         while ($this->moveToNextLine()) {
+            if ($isItComment && !$isItUnindentedCollection) {
+                $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+                $isItComment = $this->isCurrentLineComment();
+            }
+
             $indent = $this->getCurrentLineIndentation();
 
             if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
@@ -758,7 +764,8 @@ class Parser
                 $lines[] = trim($this->currentLine);
 
                 // quoted string values end with a line that is terminated with the quotation character
-                if ('' !== $this->currentLine && $this->currentLine[-1] === $quotation) {
+                $escapedLine = str_replace(['\\\\', '\\"'], '', $this->currentLine);
+                if ('' !== $escapedLine && $escapedLine[-1] === $quotation) {
                     break;
                 }
             }
@@ -963,7 +970,7 @@ class Parser
     private function isCurrentLineComment(): bool
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
-        $ltrimmedLine = ' ' === $this->currentLine[0] ? ltrim($this->currentLine, ' ') : $this->currentLine;
+        $ltrimmedLine = '' !== $this->currentLine && ' ' === $this->currentLine[0] ? ltrim($this->currentLine, ' ') : $this->currentLine;
 
         return '' !== $ltrimmedLine && '#' === $ltrimmedLine[0];
     }

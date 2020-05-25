@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -21,6 +20,8 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\String\Inflector\EnglishInflector;
+use Symfony\Component\String\Inflector\InflectorInterface;
 
 /**
  * Extracts data using the reflection API.
@@ -62,13 +63,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $enableConstructorExtraction;
     private $methodReflectionFlags;
     private $propertyReflectionFlags;
+    private $inflector;
+
+    private $arrayMutatorPrefixesFirst;
+    private $arrayMutatorPrefixesLast;
 
     /**
      * @param string[]|null $mutatorPrefixes
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC)
+    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null)
     {
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
@@ -76,6 +81,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
+        $this->inflector = $inflector ?? new EnglishInflector();
+
+        $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
+        $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);
     }
 
     /**
@@ -278,7 +287,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         $camelized = $this->camelize($property);
         $constructor = $reflClass->getConstructor();
-        $singulars = (array) Inflector::singularize($camelized);
+        $singulars = $this->inflector->singularize($camelized);
         $errors = [];
 
         if (null !== $constructor && $allowConstruct) {
@@ -546,9 +555,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function getMutatorMethod(string $class, string $property): ?array
     {
         $ucProperty = ucfirst($property);
-        $ucSingulars = (array) Inflector::singularize($ucProperty);
+        $ucSingulars = $this->inflector->singularize($ucProperty);
 
-        foreach ($this->mutatorPrefixes as $prefix) {
+        $mutatorPrefixes = \in_array($ucProperty, $ucSingulars, true) ? $this->arrayMutatorPrefixesLast : $this->arrayMutatorPrefixesFirst;
+
+        foreach ($mutatorPrefixes as $prefix) {
             $names = [$ucProperty];
             if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
                 $names = array_merge($names, $ucSingulars);
@@ -584,7 +595,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
 
             foreach ($reflectionProperties as $reflectionProperty) {
-                foreach ((array) Inflector::singularize($reflectionProperty->name) as $name) {
+                foreach ($this->inflector->singularize($reflectionProperty->name) as $name) {
                     if (strtolower($name) === strtolower($matches[2])) {
                         return $reflectionProperty->name;
                     }

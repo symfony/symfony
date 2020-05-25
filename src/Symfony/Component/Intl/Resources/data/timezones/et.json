@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Greenwichi aeg (Abidjan)",
         "Africa\/Accra": "Greenwichi aeg (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Argentina aeg (Río Gallegos)",
         "America\/Argentina\/Salta": "Argentina aeg (Salta)",
         "America\/Argentina\/San_Juan": "Argentina aeg (San Juan)",
-        "America\/Argentina\/San_Luis": "Lääne-Argentina aeg (San Luis)",
+        "America\/Argentina\/San_Luis": "Argentina aeg (San Luis)",
         "America\/Argentina\/Tucuman": "Argentina aeg (Tucumán)",
         "America\/Argentina\/Ushuaia": "Argentina aeg (Ushuaia)",
         "America\/Aruba": "Atlandi aeg (Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei aeg",
         "Asia\/Calcutta": "India aeg (Kolkata)",
         "Asia\/Chita": "Jakutski aeg (Tšita)",
-        "Asia\/Choibalsan": "Tšojbalsani aeg",
+        "Asia\/Choibalsan": "Ulaanbaatari aeg (Tšojbalsan)",
         "Asia\/Colombo": "India aeg (Colombo)",
         "Asia\/Damascus": "Ida-Euroopa aeg (Damaskus)",
         "Asia\/Dhaka": "Bangladeshi aeg (Dhaka)",

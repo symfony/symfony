@@ -75,6 +75,7 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'non_shared_foo' => 'getNonSharedFooService',
+            'preload_sidekick' => 'getPreloadSidekickService',
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
@@ -401,6 +402,16 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the public 'preload_sidekick' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getPreloadSidekickService()
+    {
+        return $this->services['preload_sidekick'] = new \stdClass();
+    }
+
+    /**
      * Gets the public 'runtime_error' shared service.
      *
      * @return \stdClass
@@ -537,7 +548,6 @@ use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 require __DIR__.'/Container%s/ProjectServiceContainer.php';
-require __DIR__.'/Container%s/removed-ids.php';
 
 $classes = [];
 $classes[] = 'Bar\FooClass';
@@ -549,6 +559,8 @@ $classes[] = 'Foo';
 $classes[] = 'LazyContext';
 $classes[] = 'FooBarBaz';
 $classes[] = 'FactoryClass';
+$classes[] = 'Some\Sidekick1';
+$classes[] = 'Some\Sidekick2';
 $classes[] = 'Request';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 

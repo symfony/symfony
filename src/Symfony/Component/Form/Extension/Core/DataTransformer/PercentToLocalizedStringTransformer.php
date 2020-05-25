@@ -23,55 +23,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
 {
-    /**
-     * Rounds a number towards positive infinity.
-     *
-     * Rounds 1.4 to 2 and -1.4 to -1.
-     */
-    const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
-
-    /**
-     * Rounds a number towards negative infinity.
-     *
-     * Rounds 1.4 to 1 and -1.4 to -2.
-     */
-    const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
-
-    /**
-     * Rounds a number away from zero.
-     *
-     * Rounds 1.4 to 2 and -1.4 to -2.
-     */
-    const ROUND_UP = \NumberFormatter::ROUND_UP;
-
-    /**
-     * Rounds a number towards zero.
-     *
-     * Rounds 1.4 to 1 and -1.4 to -1.
-     */
-    const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
-
-    /**
-     * Rounds to the nearest number and halves to the next even number.
-     *
-     * Rounds 2.5, 1.6 and 1.5 to 2 and 1.4 to 1.
-     */
-    const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
-
-    /**
-     * Rounds to the nearest number and halves away from zero.
-     *
-     * Rounds 2.5 to 3, 1.6 and 1.5 to 2 and 1.4 to 1.
-     */
-    const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
-
-    /**
-     * Rounds to the nearest number and halves towards zero.
-     *
-     * Rounds 2.5 and 1.6 to 2, 1.5 and 1.4 to 1.
-     */
-    const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
-
     const FRACTIONAL = 'fractional';
     const INTEGER = 'integer';
 
@@ -80,8 +31,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         self::INTEGER,
     ];
 
-    protected $roundingMode;
-
+    private $roundingMode;
     private $type;
     private $scale;
 
@@ -93,7 +43,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = self::ROUND_HALF_UP)
+    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = null)
     {
         if (null === $scale) {
             $scale = 0;
@@ -103,8 +53,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $type = self::FRACTIONAL;
         }
 
-        if (null === $roundingMode) {
-            $roundingMode = self::ROUND_HALF_UP;
+        if (null === $roundingMode && (\func_num_args() < 4 || func_get_arg(3))) {
+            trigger_deprecation('symfony/form', '5.1', 'Not passing a rounding mode to "%s()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".', __METHOD__);
         }
 
         if (!\in_array($type, self::$types, true)) {
@@ -235,7 +185,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
-        $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
+
+        if (null !== $this->roundingMode) {
+            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
+        }
 
         return $formatter;
     }
@@ -261,25 +214,25 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $number = (string) ($number * $roundingCoef);
 
             switch ($this->roundingMode) {
-                case self::ROUND_CEILING:
+                case \NumberFormatter::ROUND_CEILING:
                     $number = ceil($number);
                     break;
-                case self::ROUND_FLOOR:
+                case \NumberFormatter::ROUND_FLOOR:
                     $number = floor($number);
                     break;
-                case self::ROUND_UP:
+                case \NumberFormatter::ROUND_UP:
                     $number = $number > 0 ? ceil($number) : floor($number);
                     break;
-                case self::ROUND_DOWN:
+                case \NumberFormatter::ROUND_DOWN:
                     $number = $number > 0 ? floor($number) : ceil($number);
                     break;
-                case self::ROUND_HALF_EVEN:
+                case \NumberFormatter::ROUND_HALFEVEN:
                     $number = round($number, 0, PHP_ROUND_HALF_EVEN);
                     break;
-                case self::ROUND_HALF_UP:
+                case \NumberFormatter::ROUND_HALFUP:
                     $number = round($number, 0, PHP_ROUND_HALF_UP);
                     break;
-                case self::ROUND_HALF_DOWN:
+                case \NumberFormatter::ROUND_HALFDOWN:
                     $number = round($number, 0, PHP_ROUND_HALF_DOWN);
                     break;
             }

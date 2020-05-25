@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -103,6 +104,28 @@ class TraceableResponse implements ResponseInterface
         }
 
         return StreamWrapper::createResource($this->response, $this->client);
+    }
+
+    /**
+     * @internal
+     */
+    public static function stream(HttpClientInterface $client, iterable $responses, ?float $timeout): \Generator
+    {
+        $wrappedResponses = [];
+        $traceableMap = new \SplObjectStorage();
+
+        foreach ($responses as $r) {
+            if (!$r instanceof self) {
+                throw new \TypeError(sprintf('"%s::stream()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', TraceableHttpClient::class, get_debug_type($r)));
+            }
+
+            $traceableMap[$r->response] = $r;
+            $wrappedResponses[] = $r->response;
+        }
+
+        foreach ($client->stream($wrappedResponses, $timeout) as $r => $chunk) {
+            yield $traceableMap[$r] => $chunk;
+        }
     }
 
     private function checkStatusCode($code)

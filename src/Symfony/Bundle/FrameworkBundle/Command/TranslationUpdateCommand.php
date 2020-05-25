@@ -318,7 +318,14 @@ EOF
     {
         $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
 
-        if ($messages = $catalogue->all($domain)) {
+        // extract intl-icu messages only
+        $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+        if ($intlMessages = $catalogue->all($intlDomain)) {
+            $filteredCatalogue->add($intlMessages, $intlDomain);
+        }
+
+        // extract all messages and subtract intl-icu messages
+        if ($messages = array_diff($catalogue->all($domain), $intlMessages)) {
             $filteredCatalogue->add($messages, $domain);
         }
         foreach ($catalogue->getResources() as $resource) {

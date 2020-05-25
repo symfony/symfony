@@ -42,6 +42,8 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[] A list of classes to preload on PHP 7.4+
      */
     public function warmUp(string $cacheDir)
     {
@@ -61,12 +63,15 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         // so here we un-serialize the values first
         $values = array_map(function ($val) { return null !== $val ? unserialize($val) : null; }, $arrayAdapter->getValues());
 
-        $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
+        return $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
     }
 
+    /**
+     * @return string[] A list of classes to preload on PHP 7.4+
+     */
     protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
     {
-        $phpArrayAdapter->warmUp($values);
+        return (array) $phpArrayAdapter->warmUp($values);
     }
 
     /**

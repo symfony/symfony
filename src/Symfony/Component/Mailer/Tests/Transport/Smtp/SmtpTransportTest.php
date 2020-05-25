@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
@@ -41,6 +42,29 @@ class SmtpTransportTest extends TestCase
         $transport->send(new RawMessage('Message 3'), $envelope);
 
         $this->assertNotContains("NOOP\r\n", $stream->getCommands());
+    }
+
+    public function testSendPingAfterTransportException(): void
+    {
+        $stream = new DummyStream();
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
+
+        $transport = new SmtpTransport($stream);
+        $transport->send(new RawMessage('Message 1'), $envelope);
+        $stream->close();
+        $catch = false;
+
+        try {
+            $transport->send(new RawMessage('Message 2'), $envelope);
+        } catch (TransportException $exception) {
+            $catch = true;
+        }
+        $this->assertTrue($catch);
+        $this->assertTrue($stream->isClosed());
+
+        $transport->send(new RawMessage('Message 3'), $envelope);
+
+        $this->assertFalse($stream->isClosed());
     }
 
     public function testSendDoesPingAboveThreshold(): void
@@ -76,13 +100,23 @@ class DummyStream extends AbstractStream
      */
     private $commands;
 
+    /**
+     * @var bool
+     */
+    private $closed = true;
+
     public function initialize(): void
     {
+        $this->closed = false;
         $this->nextResponse = '220 localhost';
     }
 
     public function write(string $bytes, $debug = true): void
     {
+        if ($this->closed) {
+            throw new TransportException('Unable to write bytes on the wire.');
+        }
+
         $this->commands[] = $bytes;
 
         if (0 === strpos($bytes, 'DATA')) {
@@ -119,5 +153,15 @@ class DummyStream extends AbstractStream
     protected function getReadConnectionDescription(): string
     {
         return 'null';
+    }
+
+    public function close(): void
+    {
+        $this->closed = true;
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->closed;
     }
 }

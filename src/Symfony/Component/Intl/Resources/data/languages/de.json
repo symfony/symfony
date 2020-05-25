@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasisch",
@@ -599,6 +598,7 @@
         "ar_001": "Modernes Hocharabisch",
         "de_AT": "Österreichisches Deutsch",
         "de_CH": "Schweizer Hochdeutsch",
+        "fa_AF": "Dari",
         "nds_NL": "Niedersächsisch",
         "nl_BE": "Flämisch",
         "ro_MD": "Moldauisch",

@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
@@ -133,5 +134,21 @@ class AbstractNormalizerTest extends TestCase
         foreach ($dummy->getFoo() as $foo) {
             $this->assertInstanceOf(Dummy::class, $foo);
         }
+    }
+
+    public function testIgnore()
+    {
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
+        $attributeMetadata = new AttributeMetadata('ignored1');
+        $attributeMetadata->setIgnore(true);
+        $classMetadata->addAttributeMetadata($attributeMetadata);
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $dummy = new IgnoreDummy();
+        $dummy->ignored1 = 'hello';
+
+        $normalizer = new PropertyNormalizer($this->classMetadata);
+
+        $this->assertSame([], $normalizer->normalize($dummy));
     }
 }

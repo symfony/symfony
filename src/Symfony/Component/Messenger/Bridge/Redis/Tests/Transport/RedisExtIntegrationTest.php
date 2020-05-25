@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 /**
  * @requires extension redis
  * @group time-sensitive
+ * @group integration
  */
 class RedisExtIntegrationTest extends TestCase
 {
@@ -30,10 +31,14 @@ class RedisExtIntegrationTest extends TestCase
             $this->markTestSkipped('The "MESSENGER_REDIS_DSN" environment variable is required.');
         }
 
-        $this->redis = new \Redis();
-        $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
-        $this->connection->cleanup();
-        $this->connection->setup();
+        try {
+            $this->redis = new \Redis();
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+            $this->connection->cleanup();
+            $this->connection->setup();
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 
     public function testConnectionSendAndGet()

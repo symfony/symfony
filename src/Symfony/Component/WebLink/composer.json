@@ -19,7 +19,7 @@
         "psr/link-implementation": "1.0"
     },
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "psr/link": "^1.0"
     },
     "suggest": {
@@ -41,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

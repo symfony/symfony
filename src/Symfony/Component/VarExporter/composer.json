@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/var-dumper": "^4.4.9|^5.0.9"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\VarExporter\\": "" },
@@ -31,7 +31,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

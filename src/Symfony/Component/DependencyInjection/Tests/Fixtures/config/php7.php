@@ -9,9 +9,9 @@ return function (ContainerConfigurator $c) {
         ('foo', 'Foo')
         ('bar', 'Bar')
     ;
-    $c->services()
+    $c->services()->defaults()->public()
         (Foo::class)
-            ->arg('$bar', ref('bar'))
+            ->arg('$bar', service('bar'))
             ->public()
         ('bar', Foo::class)
             ->call('setFoo')

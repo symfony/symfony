@@ -48,7 +48,7 @@ final class EmailAddressContains extends Constraint
 
         $header = $message->getHeaders()->get($this->headerName);
         if ($header instanceof MailboxHeader) {
-            return $this->expectedValue === $header->Address()->getAddress();
+            return $this->expectedValue === $header->getAddress()->getAddress();
         } elseif ($header instanceof MailboxListHeader) {
             foreach ($header->getAddresses() as $address) {
                 if ($this->expectedValue === $address->getAddress()) {

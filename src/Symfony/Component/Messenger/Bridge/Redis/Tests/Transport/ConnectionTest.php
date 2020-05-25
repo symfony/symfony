@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis >= 4.3.0
+ * @group integration
  */
 class ConnectionTest extends TestCase
 {
@@ -25,9 +26,8 @@ class ConnectionTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $redis = Connection::fromDsn('redis://localhost/queue');
-
         try {
+            $redis = Connection::fromDsn('redis://localhost/queue');
             $redis->get();
         } catch (TransportException $e) {
             if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
@@ -35,6 +35,8 @@ class ConnectionTest extends TestCase
             }
 
             throw $e;
+        } catch (\RedisException $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 
@@ -72,6 +74,14 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+        );
+    }
+
+    public function testFromDsnWithOptionsAndTrailingSlash()
+    {
+        $this->assertEquals(
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
         );
     }
@@ -148,7 +158,7 @@ class ConnectionTest extends TestCase
     public function testFailedAuth()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectExceptionMessage('Redis connection ');
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
         $redis->expects($this->exactly(1))->method('auth')
@@ -297,6 +307,21 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', [], $redis); // 1 = always
         $connection->add('1', []);
+    }
+
+    public function testDeleteAfterAck()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis); // 1 = always
+        $connection->ack('1');
     }
 
     public function testLastErrorGetsCleared()

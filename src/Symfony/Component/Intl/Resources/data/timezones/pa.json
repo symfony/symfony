@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ਗ੍ਰੀਨਵਿਚ ਮੀਨ ਵੇਲਾ (ਅਬੀਦਜਾਨ)",
         "Africa\/Accra": "ਗ੍ਰੀਨਵਿਚ ਮੀਨ ਵੇਲਾ (ਅੱਕਰਾ)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਰਿਓ ਗੈਲੇਗੋਸ)",
         "America\/Argentina\/Salta": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਸਾਲਟਾ)",
         "America\/Argentina\/San_Juan": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਸੇਨ ਜੁਆਨ)",
-        "America\/Argentina\/San_Luis": "ਪੱਛਮੀ ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਸੇਨ ਲੂਈਸ)",
+        "America\/Argentina\/San_Luis": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਸੇਨ ਲੂਈਸ)",
         "America\/Argentina\/Tucuman": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਟੁਕੁਮਨ)",
         "America\/Argentina\/Ushuaia": "ਅਰਜਨਟੀਨਾ ਵੇਲਾ (ਉਸ਼ਵਾਇਆ)",
         "America\/Aruba": "ਅਟਲਾਂਟਿਕ ਵੇਲਾ (ਅਰੂਬਾ)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ਬਰੂਨੇਈ ਦਾਰੂਸਲਾਮ ਵੇਲਾ",
         "Asia\/Calcutta": "ਭਾਰਤੀ ਮਿਆਰੀ ਵੇਲਾ (ਕੋਲਕਾਤਾ)",
         "Asia\/Chita": "ਯਕੁਤਸਕ ਵੇਲਾ (ਚਿਤਾ)",
-        "Asia\/Choibalsan": "ਚੌਇਬਾਲਸਨ ਵੇਲਾ (ਚੋਇਲਬਾਲਸਨ)",
+        "Asia\/Choibalsan": "ਉਲਨ ਬਟੋਰ ਵੇਲਾ (ਚੋਇਲਬਾਲਸਨ)",
         "Asia\/Colombo": "ਭਾਰਤੀ ਮਿਆਰੀ ਵੇਲਾ (ਕੋਲੰਬੋ)",
         "Asia\/Damascus": "ਪੂਰਬੀ ਯੂਰਪੀ ਵੇਲਾ (ਡੈਮਸਕਸ)",
         "Asia\/Dhaka": "ਬੰਗਲਾਦੇਸ਼ ਵੇਲਾ (ਢਾਕਾ)",

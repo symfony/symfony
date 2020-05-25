@@ -21,9 +21,9 @@
         "symfony/http-client-implementation": "1.1"
     },
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "psr/log": "^1.0",
-        "symfony/http-client-contracts": "^1.1.8|^2",
+        "symfony/http-client-contracts": "^2.1.1",
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.0|^2"
@@ -49,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

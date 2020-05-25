@@ -16,10 +16,12 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/mailer": "^4.4|^5.0"
     },
     "require-dev": {
+        "async-aws/ses": "^1.0",
         "symfony/http-client": "^4.4|^5.0"
     },
     "autoload": {
@@ -31,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

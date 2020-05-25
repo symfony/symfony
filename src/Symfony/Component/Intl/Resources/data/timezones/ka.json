@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "გრინვიჩის საშუალო დრო (აბიჯანი)",
         "Africa\/Accra": "გრინვიჩის საშუალო დრო (აკრა)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "არგენტინის დრო (რიო გალეგოსი)",
         "America\/Argentina\/Salta": "არგენტინის დრო (სალტა)",
         "America\/Argentina\/San_Juan": "არგენტინის დრო (სან ხუანი)",
-        "America\/Argentina\/San_Luis": "დასავლეთ არგენტინის დრო (სან-ლუისი)",
+        "America\/Argentina\/San_Luis": "არგენტინის დრო (სან-ლუისი)",
         "America\/Argentina\/Tucuman": "არგენტინის დრო (ტუკუმანი)",
         "America\/Argentina\/Ushuaia": "არგენტინის დრო (უშუაია)",
         "America\/Aruba": "ატლანტიკის ოკეანის დრო (არუბა)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ბრუნეი-დარუსალამის დრო",
         "Asia\/Calcutta": "ინდოეთის დრო (კალკუტა)",
         "Asia\/Chita": "იაკუტსკის დრო (ჩიტა)",
-        "Asia\/Choibalsan": "ჩოიბალსანის დრო",
+        "Asia\/Choibalsan": "ულან-ბატორის დრო (ჩოიბალსანი)",
         "Asia\/Colombo": "ინდოეთის დრო (კოლომბო)",
         "Asia\/Damascus": "აღმოსავლეთ ევროპის დრო (დამასკი)",
         "Asia\/Dhaka": "ბანგლადეშის დრო (დაკა)",

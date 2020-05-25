@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Isikhathi sase-Greenwich Mean (i-Abidjan)",
         "Africa\/Accra": "Isikhathi sase-Greenwich Mean (i-Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Isikhathi sase-Argentina (i-Rio Gallegos)",
         "America\/Argentina\/Salta": "Isikhathi sase-Argentina (i-Salta)",
         "America\/Argentina\/San_Juan": "Isikhathi sase-Argentina (i-San Juan)",
-        "America\/Argentina\/San_Luis": "Isikhathi saseNyakatho ne-Argentina (i-San Luis)",
+        "America\/Argentina\/San_Luis": "Isikhathi sase-Argentina (i-San Luis)",
         "America\/Argentina\/Tucuman": "Isikhathi sase-Argentina (i-Tucuman)",
         "America\/Argentina\/Ushuaia": "Isikhathi sase-Argentina (i-Ushuaia)",
         "America\/Aruba": "Isikhathi sase-Atlantic (i-Aruba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Isikhathi sase-Brunei Darussalam (i-Brunei)",
         "Asia\/Calcutta": "Isikhathi sase-India esivamile (i-Kolkata)",
         "Asia\/Chita": "Isikhathi sase-Yakutsk (i-Chita)",
-        "Asia\/Choibalsan": "Isikhathi sase-Choibalsan (i-Choibalsan)",
+        "Asia\/Choibalsan": "Isikhathi sase-Ulan Bator (i-Choibalsan)",
         "Asia\/Colombo": "Isikhathi sase-India esivamile (i-Colombo)",
         "Asia\/Damascus": "Isikhathi sase-Eastern Europe (i-Damascus)",
         "Asia\/Dhaka": "Isikhathi sase-Bangladesh (i-Dhaka)",

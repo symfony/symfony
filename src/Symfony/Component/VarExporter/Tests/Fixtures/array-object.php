@@ -18,11 +18,13 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
             [
                 'foo' => $o[1],
             ],
+            null,
         ],
         -1 => [
             0,
             [],
             [],
+            null,
         ],
     ]
 );

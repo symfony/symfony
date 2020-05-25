@@ -44,8 +44,14 @@ class LengthValidator extends ConstraintValidator
             $stringValue = ($constraint->normalizer)($stringValue);
         }
 
-        if (!$invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset)) {
-            $length = mb_strlen($stringValue, $constraint->charset);
+        try {
+            $invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset);
+        } catch (\ValueError $e) {
+            if (!str_starts_with($e->getMessage(), 'mb_check_encoding(): Argument #2 ($encoding) must be a valid encoding')) {
+                throw $e;
+            }
+
+            $invalidCharset = true;
         }
 
         if ($invalidCharset) {
@@ -58,6 +64,8 @@ class LengthValidator extends ConstraintValidator
 
             return;
         }
+
+        $length = mb_strlen($stringValue, $constraint->charset);
 
         if (null !== $constraint->max && $length > $constraint->max) {
             $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)

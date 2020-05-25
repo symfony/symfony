@@ -20,8 +20,8 @@
         </service>
 
         <service id="security.authentication.retry_entry_point" class="Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint">
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpPort" /></service></argument>
+            <argument type="service"><service class="int"><factory service="router.request_context" method="getHttpsPort" /></service></argument>
         </service>
 
         <service id="security.authentication.basic_entry_point" class="Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint" />
@@ -48,17 +48,17 @@
         <service id="security.logout_listener" class="Symfony\Component\Security\Http\Firewall\LogoutListener" abstract="true">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.http_utils" />
-            <argument type="service" id="security.logout.success_handler" />
+            <argument /> <!-- event dispatcher -->
             <argument /> <!-- Options -->
         </service>
 
-        <service id="security.logout.handler.session" class="Symfony\Component\Security\Http\Logout\SessionLogoutHandler" />
+        <service id="security.logout.listener.session" class="Symfony\Component\Security\Http\EventListener\SessionLogoutListener" abstract="true" />
 
-        <service id="security.logout.handler.cookie_clearing" class="Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler" abstract="true" />
+        <service id="security.logout.listener.cookie_clearing" class="Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler" abstract="true" />
 
-        <service id="security.logout.success_handler" class="Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler" abstract="true">
+        <service id="security.logout.listener.default" class="Symfony\Component\Security\Http\EventListener\DefaultLogoutListener" abstract="true">
             <argument type="service" id="security.http_utils" />
-            <argument>/</argument>
+            <argument>/</argument> <!-- target url -->
         </service>
 
         <service id="security.authentication.form_entry_point" class="Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint" abstract="true">

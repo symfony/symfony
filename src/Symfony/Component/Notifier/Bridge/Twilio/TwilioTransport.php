@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TwilioTransport extends AbstractTransport
 {
@@ -70,7 +70,7 @@ final class TwilioTransport extends AbstractTransport
         if (201 !== $response->getStatusCode()) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s (see %s).', $error['message'], $error['more_info']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: '.$error['message'].' (see %s).', $error['more_info']), $response);
         }
     }
 }

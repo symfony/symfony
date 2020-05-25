@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afarera",
         "ab": "abkhaziera",
@@ -390,6 +389,7 @@
         "es_419": "Latinoamerikako espainiera",
         "es_ES": "espainiera (Europa)",
         "es_MX": "Mexikoko espainiera",
+        "fa_AF": "daria",
         "fr_CA": "Kanadako frantses",
         "fr_CH": "Suitzako frantses",
         "nds_NL": "behe-saxoiera",

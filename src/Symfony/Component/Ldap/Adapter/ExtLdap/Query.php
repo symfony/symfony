@@ -49,7 +49,7 @@ class Query extends AbstractQuery
                 continue;
             }
             if (!ldap_free_result($result)) {
-                throw new LdapException(sprintf('Could not free results: %s.', ldap_error($con)));
+                throw new LdapException('Could not free results: '.ldap_error($con));
             }
         }
         $this->results = null;

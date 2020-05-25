@@ -50,7 +50,12 @@ class SymfonyTestsListenerTrait
      */
     public function __construct(array $mockedNamespaces = [])
     {
-        Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
+        if (method_exists(Blacklist::class, 'addDirectory')) {
+            (new BlackList())->getBlacklistedDirectories();
+            Blacklist::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
+        } else {
+            Blacklist::$blacklistedClassNames[__CLASS__] = 2;
+        }
 
         $enableDebugClassLoader = class_exists(DebugClassLoader::class) || class_exists(LegacyDebugClassLoader::class);
 
@@ -248,7 +253,7 @@ class SymfonyTestsListenerTrait
         $groups = Test::getGroups($className, $test->getName(false));
 
         if ($this->checkNumAssertions) {
-            if (!self::$expectedDeprecations && !$test->getNumAssertions()) {
+            if (!self::$expectedDeprecations && !$test->getNumAssertions() && $test->getTestResultObject()->noneSkipped()) {
                 $test->getTestResultObject()->addFailure($test, new RiskyTestError('This test did not perform any assertions'), $time);
             }
 
@@ -315,7 +320,7 @@ class SymfonyTestsListenerTrait
         if (\is_array($parsedMsg)) {
             $msg = $parsedMsg['deprecation'];
         }
-        if (error_reporting()) {
+        if (error_reporting() & $type) {
             $msg = 'Unsilenced deprecation: '.$msg;
         }
         self::$gatheredDeprecations[] = $msg;

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "afar",
         "ab": "abchaski",
@@ -606,6 +605,7 @@
         "es_419": "amerykański hiszpański",
         "es_ES": "europejski hiszpański",
         "es_MX": "meksykański hiszpański",
+        "fa_AF": "dari",
         "fr_CA": "kanadyjski francuski",
         "fr_CH": "szwajcarski francuski",
         "nds_NL": "dolnosaksoński",

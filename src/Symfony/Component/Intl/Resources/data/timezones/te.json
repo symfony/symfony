@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "గ్రీన్‌విచ్ సగటు సమయం (అబిడ్జాన్)",
         "Africa\/Accra": "గ్రీన్‌విచ్ సగటు సమయం (అక్రా)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "అర్జెంటీనా సమయం (రియో గల్లేగోస్)",
         "America\/Argentina\/Salta": "అర్జెంటీనా సమయం (సాల్టా)",
         "America\/Argentina\/San_Juan": "అర్జెంటీనా సమయం (శాన్ జ్యూన్)",
-        "America\/Argentina\/San_Luis": "పశ్చిమ అర్జెంటీనా సమయం (శాన్ లూయిస్)",
+        "America\/Argentina\/San_Luis": "అర్జెంటీనా సమయం (శాన్ లూయిస్)",
         "America\/Argentina\/Tucuman": "అర్జెంటీనా సమయం (టుకుమన్)",
         "America\/Argentina\/Ushuaia": "అర్జెంటీనా సమయం (ఉష్యూయ)",
         "America\/Aruba": "అట్లాంటిక్ సమయం (అరుబా)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "బ్రూనే దరుసలామ్ సమయం (బ్రూనై)",
         "Asia\/Calcutta": "భారతదేశ సమయం (కోల్‌కతా)",
         "Asia\/Chita": "యాకుట్స్క్ సమయం (చితా)",
-        "Asia\/Choibalsan": "చోయిబల్సాన్ సమయం (చోయిబాల్సన్)",
+        "Asia\/Choibalsan": "ఉలన్ బతోర్ సమయం (చోయిబాల్సన్)",
         "Asia\/Colombo": "భారతదేశ సమయం (కొలంబో)",
         "Asia\/Damascus": "తూర్పు యూరోపియన్ సమయం (డమాస్కస్)",
         "Asia\/Dhaka": "బంగ్లాదేశ్ సమయం (ఢాకా)",

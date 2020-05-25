@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Lokacin Greenwhich a London (Abidjan)",
         "Africa\/Accra": "Lokacin Greenwhich a London (Accra)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Brunei Darussalam Time",
         "Asia\/Calcutta": "India Standard Time (Kolkata)",
         "Asia\/Chita": "Yakutsk Time (Chita)",
-        "Asia\/Choibalsan": "Choibalsan Time",
+        "Asia\/Choibalsan": "Ulaanbaatar Time (Choibalsan)",
         "Asia\/Colombo": "India Standard Time (Colombo)",
         "Asia\/Damascus": "Lokaci a turai gabas (Damascus)",
         "Asia\/Dhaka": "Bangladesh Time (Dhaka)",
@@ -304,6 +303,7 @@
         "Atlantic\/Faeroe": "Lokaci ta yammacin turai (Faroe)",
         "Atlantic\/Madeira": "Lokaci ta yammacin turai (Madeira)",
         "Atlantic\/Reykjavik": "Lokacin Greenwhich a London (Reykjavik)",
+        "Atlantic\/South_Georgia": "Kudancin Geogia da Kudancin Tsibirin Sandiwic Lokaci (South Georgia)",
         "Atlantic\/St_Helena": "Lokacin Greenwhich a London (St. Helena)",
         "Atlantic\/Stanley": "Tsibiran Falkilan Lokaci (Stanley)",
         "Australia\/Adelaide": "Central Australia Time (Adelaide)",
@@ -390,7 +390,7 @@
         "Indian\/Kerguelen": "French Southern & Antarctic Time (Kerguelen)",
         "Indian\/Mahe": "Seychelles Time (Mahe)",
         "Indian\/Maldives": "Maldives Time",
-        "Indian\/Mauritius": "Moritus Lokaci (Mauritius)",
+        "Indian\/Mauritius": "Lokacin Mauritius",
         "Indian\/Mayotte": "East Africa Time (Mayotte)",
         "Indian\/Reunion": "Réunion Time (Reunion)",
         "MST7MDT": "Lokaci tsauni a arewacin da Amirka",

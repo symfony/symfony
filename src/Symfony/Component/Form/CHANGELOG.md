@@ -4,18 +4,22 @@ CHANGELOG
 5.1.0
 -----
 
+ * Deprecated not configuring the `rounding_mode` option of the `PercentType`. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
+ * Deprecated not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer`. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
  * Added `collection_entry` block prefix to `CollectionType` entries
  * Added a `choice_filter` option to `ChoiceType`
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
  * Added a `ChoiceList` facade to leverage explicit choice list caching based on options
  * Added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
  * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.
- * Added default `inputmode` attribute to Search, Email and Tel form types.
  * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
    is deprecated. The method will be added to the interface in 6.0.
  * Added a `rounding_mode` option for the PercentType and correctly round the value when submitted
+ * Deprecated `Symfony\Component\Form\Extension\Validator\Util\ServerParams` in favor of its parent class `Symfony\Component\Form\Util\ServerParams`
+ * Added the `html5` option to the `ColorType` to validate the input
+ * Deprecated `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
 
 5.0.0
 -----

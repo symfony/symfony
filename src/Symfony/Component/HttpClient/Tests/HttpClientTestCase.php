@@ -240,7 +240,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
-            throw new ProcessFailedException($process);
+            self::markTestSkipped((new ProcessFailedException($process))->getMessage());
         }
 
         self::$vulcainStarted = true;

@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "àfar",
         "ab": "abkhaz",
@@ -562,6 +561,7 @@
         "es_419": "espanyol hispanoamericà",
         "es_ES": "espanyol europeu",
         "es_MX": "espanyol de Mèxic",
+        "fa_AF": "dari",
         "fr_CA": "francès canadenc",
         "fr_CH": "francès suís",
         "nds_NL": "baix saxó",

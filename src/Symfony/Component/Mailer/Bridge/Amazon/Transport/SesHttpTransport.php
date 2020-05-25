@@ -19,6 +19,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+trigger_deprecation('symfony/amazon-mailer', '5.1', 'The "%s" class is deprecated, use "%s" instead. The Amazon transport now requires "AsyncAws". Run "composer require async-aws/ses".', SesHttpTransport::class, SesHttpAsyncAwsTransport::class);
+
 /**
  * @author Kevin Verschaeve
  */
@@ -65,7 +67,7 @@ class SesHttpTransport extends AbstractHttpTransport
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %d).', $result->Error->Message, $result->Error->Code), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: '.$result->Error->Message.' (code %d).', $result->Error->Code), $response);
         }
 
         $message->setMessageId($result->SendRawEmailResult->MessageId);

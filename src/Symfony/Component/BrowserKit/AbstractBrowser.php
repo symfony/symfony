@@ -22,9 +22,6 @@ use Symfony\Component\Process\PhpProcess;
  *
  * To make the actual request, you need to implement the doRequest() method.
  *
- * HttpBrowser is an implementation that uses the HttpClient component
- * to make real HTTP requests.
- *
  * If you want to be able to run requests in their own process (insulated flag),
  * you need to also implement the getScript() method.
  *
@@ -51,9 +48,7 @@ abstract class AbstractBrowser
     private $isMainRequest = true;
 
     /**
-     * @param array     $server    The server parameters (equivalent of $_SERVER)
-     * @param History   $history   A History instance to store the browser history
-     * @param CookieJar $cookieJar A CookieJar instance to store the cookies
+     * @param array $server The server parameters (equivalent of $_SERVER)
      */
     public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
@@ -297,7 +292,6 @@ abstract class AbstractBrowser
     /**
      * Submits a form.
      *
-     * @param Form  $form             A Form instance
      * @param array $values           An array of form field values
      * @param array $serverParameters An array of server parameters
      *
@@ -366,7 +360,7 @@ abstract class AbstractBrowser
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
-        if (!$this->history->isEmpty()) {
+        if (!isset($server['HTTP_REFERER']) && !$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
 
@@ -480,8 +474,6 @@ abstract class AbstractBrowser
 
     /**
      * Filters the BrowserKit request to the origin one.
-     *
-     * @param Request $request The BrowserKit Request to filter
      *
      * @return object An origin request instance
      */
@@ -685,8 +677,7 @@ abstract class AbstractBrowser
     /**
      * Makes a request from a Request object directly.
      *
-     * @param Request $request       A Request instance
-     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */
@@ -695,7 +686,7 @@ abstract class AbstractBrowser
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 
-    private function updateServerFromUri($server, $uri)
+    private function updateServerFromUri(array $server, string $uri): array
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
         $scheme = parse_url($uri, PHP_URL_SCHEME);
@@ -705,7 +696,7 @@ abstract class AbstractBrowser
         return $server;
     }
 
-    private function extractHost($uri)
+    private function extractHost(string $uri): ?string
     {
         $host = parse_url($uri, PHP_URL_HOST);
 

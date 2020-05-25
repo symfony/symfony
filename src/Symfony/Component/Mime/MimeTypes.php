@@ -51,7 +51,7 @@ final class MimeTypes implements MimeTypesInterface
             $this->extensions[$mimeType] = $extensions;
 
             foreach ($extensions as $extension) {
-                $this->mimeTypes[$extension] = $mimeType;
+                $this->mimeTypes[$extension][] = $mimeType;
             }
         }
         $this->registerGuesser(new FileBinaryMimeTypeGuesser());

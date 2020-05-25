@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "aa": "Affareg",
         "ab": "Abchaseg",
@@ -523,6 +522,7 @@
         "es_419": "Sbaeneg America Ladin",
         "es_ES": "Sbaeneg Ewrop",
         "es_MX": "Sbaeneg Mecsico",
+        "fa_AF": "Dari",
         "fr_CA": "Ffrangeg Canada",
         "fr_CH": "Ffrangeg y Swistir",
         "nds_NL": "Sacsoneg Isel",

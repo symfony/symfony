@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Гринвич уақыты (Абиджан)",
         "Africa\/Accra": "Гринвич уақыты (Аккра)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Аргентина уақыты (Рио-Гальегос)",
         "America\/Argentina\/Salta": "Аргентина уақыты (Сальта)",
         "America\/Argentina\/San_Juan": "Аргентина уақыты (Сан-Хуан)",
-        "America\/Argentina\/San_Luis": "Батыс Аргентина уақыты (Сан-Луис)",
+        "America\/Argentina\/San_Luis": "Аргентина уақыты (Сан-Луис)",
         "America\/Argentina\/Tucuman": "Аргентина уақыты (Тукуман)",
         "America\/Argentina\/Ushuaia": "Аргентина уақыты (Ушуайя)",
         "America\/Aruba": "Атлантика уақыты (Аруба)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Бруней-Даруссалам уақыты",
         "Asia\/Calcutta": "Үндістан стандартты уақыты (Калькутта)",
         "Asia\/Chita": "Якутск уақыты (Чита)",
-        "Asia\/Choibalsan": "Чойбалсан уақыты",
+        "Asia\/Choibalsan": "Ұланбатыр уақыты (Чойбалсан)",
         "Asia\/Colombo": "Үндістан стандартты уақыты (Коломбо)",
         "Asia\/Damascus": "Шығыс Еуропа уақыты (Дамаск)",
         "Asia\/Dhaka": "Бангладеш уақыты (Дакка)",

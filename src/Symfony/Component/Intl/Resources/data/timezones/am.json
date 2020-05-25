@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "ግሪንዊች ማዕከላዊ ሰዓት (አቢጃን)",
         "Africa\/Accra": "ግሪንዊች ማዕከላዊ ሰዓት (አክራ)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "የአርጀንቲና የሰዓት አቆጣጠር (ሪዮ ጋሌጎስ)",
         "America\/Argentina\/Salta": "የአርጀንቲና የሰዓት አቆጣጠር (ሳልታ)",
         "America\/Argentina\/San_Juan": "የአርጀንቲና የሰዓት አቆጣጠር (ሳን ጁአን)",
-        "America\/Argentina\/San_Luis": "የአርጀንቲና ምስራቃዊ ሰዓት አቆጣጠር (ሳን ሊውስ)",
+        "America\/Argentina\/San_Luis": "የአርጀንቲና የሰዓት አቆጣጠር (ሳን ሊውስ)",
         "America\/Argentina\/Tucuman": "የአርጀንቲና የሰዓት አቆጣጠር (ቱኩማን)",
         "America\/Argentina\/Ushuaia": "የአርጀንቲና የሰዓት አቆጣጠር (ኡሹአኢ)",
         "America\/Aruba": "የአትላንቲክ የሰዓት አቆጣጠር (አሩባ)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "የብሩኔይ ዳሩሳላም ሰዓት (ብሩናይ)",
         "Asia\/Calcutta": "የህንድ መደበኛ ሰዓት (ኮልካታ)",
         "Asia\/Chita": "ያኩትስክ የሰዓት አቆጣጠር (ቺታ)",
-        "Asia\/Choibalsan": "የቾይባልሳ ሰዓት አቆጣጠር (ቾይባልሳን)",
+        "Asia\/Choibalsan": "የኡላን ባቶር ጊዜ (ቾይባልሳን)",
         "Asia\/Colombo": "የህንድ መደበኛ ሰዓት (ኮሎምቦ)",
         "Asia\/Damascus": "የምስራቃዊ አውሮፓ ሰዓት (ደማስቆ)",
         "Asia\/Dhaka": "የባንግላዴሽ ሰዓት (ዳካ)",

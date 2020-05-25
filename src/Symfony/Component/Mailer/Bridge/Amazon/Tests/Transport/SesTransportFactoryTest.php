@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiTransport;
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpTransport;
+use AsyncAws\Core\Configuration;
+use AsyncAws\Ses\SesClient;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpAsyncAwsTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
@@ -67,37 +69,37 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('ses+api', 'default', self::USER, self::PASSWORD),
-            new SesApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
-            new SesApiTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-2']),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-2']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('ses+api', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new SesApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'endpoint' => 'https://example.com:8080']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('ses+https', 'default', self::USER, self::PASSWORD),
-            new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('ses', 'default', self::USER, self::PASSWORD),
-            new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('ses+https', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'endpoint' => 'https://example.com:8080']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
-            new SesHttpTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-2']),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-2']), null, $client, $logger), $dispatcher, $logger),
         ];
 
         yield [
@@ -127,7 +129,5 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
     public function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('ses+smtp', 'default', self::USER)];
-
-        yield [new Dsn('ses+smtp', 'default', null, self::PASSWORD)];
     }
 }

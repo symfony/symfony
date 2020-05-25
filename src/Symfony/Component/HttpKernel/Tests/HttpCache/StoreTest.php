@@ -97,6 +97,27 @@ class StoreTest extends TestCase
         $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
     }
 
+    public function testDoesNotTrustXContentDigestFromUpstream()
+    {
+        $response = new Response('test', 200, ['X-Content-Digest' => 'untrusted-from-elsewhere']);
+
+        $cacheKey = $this->store->write($this->request, $response);
+        $entries = $this->getStoreMetadata($cacheKey);
+        list(, $res) = $entries[0];
+
+        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
+        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $response->headers->get('X-Content-Digest'));
+    }
+
+    public function testWritesResponseEvenIfXContentDigestIsPresent()
+    {
+        // Prime the store
+        $this->store->write($this->request, new Response('test', 200, ['X-Content-Digest' => 'untrusted-from-elsewhere']));
+
+        $response = $this->store->lookup($this->request);
+        $this->assertNotNull($response);
+    }
+
     public function testFindsAStoredEntryWithLookup()
     {
         $this->storeSimpleEntry();

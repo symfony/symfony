@@ -52,7 +52,7 @@
 
         {% if profile.collectors.memory %}
             <div class="metric">
-                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
+                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MiB</span></span>
                 <span class="label">Peak memory usage</span>
             </div>
         {% endif %}

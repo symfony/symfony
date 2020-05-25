@@ -1,5 +1,4 @@
 {
-    "Version": "36.1",
     "Names": {
         "Africa\/Abidjan": "Meán-Am Greenwich (Abidjan)",
         "Africa\/Accra": "Meán-Am Greenwich (Accra)",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "Am na hAirgintíne (Rio Gallegos)",
         "America\/Argentina\/Salta": "Am na hAirgintíne (Salta)",
         "America\/Argentina\/San_Juan": "Am na hAirgintíne (San Juan)",
-        "America\/Argentina\/San_Luis": "Am Iarthar na hAirgintíne (San Luis)",
+        "America\/Argentina\/San_Luis": "Am na hAirgintíne (San Luis)",
         "America\/Argentina\/Tucuman": "Am na hAirgintíne (Tucuman)",
         "America\/Argentina\/Ushuaia": "Am na hAirgintíne (Ushuaia)",
         "America\/Aruba": "Am an Atlantaigh (Arúba)",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "Am Brúiné Darasalám",
         "Asia\/Calcutta": "Am Caighdeánach na hIndia (Calcúta)",
         "Asia\/Chita": "Am Iacútsc (Chita)",
-        "Asia\/Choibalsan": "Am Choibalsan",
+        "Asia\/Choibalsan": "Am Ulánbátar (Choibalsan)",
         "Asia\/Colombo": "Am Caighdeánach na hIndia (Colombo)",
         "Asia\/Damascus": "Am Oirthear na hEorpa (an Damaisc)",
         "Asia\/Dhaka": "Am na Banglaidéise (Dhaka)",

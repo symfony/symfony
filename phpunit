@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-// Cache-Id: 2020-01-31 10:00 UTC
+// Cache-Id: 2020-04-10 20:30 UTC
 
 if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";
@@ -21,14 +21,4 @@ if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
-
-if (!getenv('SYMFONY_DEPRECATIONS_HELPER')) {
-    foreach ($_SERVER['argv'] as $v) {
-        if (false !== strpos($v, 'Bridge/Doctrine')) {
-            putenv('SYMFONY_DEPRECATIONS_HELPER=max[indirect]=7');
-            break;
-        }
-    }
-}
-
 require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

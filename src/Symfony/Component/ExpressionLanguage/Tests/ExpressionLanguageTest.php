@@ -231,7 +231,7 @@ class ExpressionLanguageTest extends TestCase
     public function testCallBadCallable()
     {
         $this->expectException('RuntimeException');
-        $this->expectExceptionMessageRegExp('/Unable to call method "\w+" of object "\w+"./');
+        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }

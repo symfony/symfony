@@ -412,7 +412,7 @@ class Connection
                 // If we get a 404 for the queue, it means we need to set up the exchange & queue.
                 $this->setupExchangeAndQueues();
 
-                return $this->get();
+                return $this->get($queueName);
             }
 
             throw $e;

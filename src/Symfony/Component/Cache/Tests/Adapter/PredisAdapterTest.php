@@ -14,6 +14,9 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
+/**
+ * @group integration
+ */
 class PredisAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void

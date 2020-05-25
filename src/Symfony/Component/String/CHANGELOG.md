@@ -12,6 +12,7 @@ CHANGELOG
    depending of the input string UTF-8 compliancy
  * added `$cut` parameter to `Symfony\Component\String\AbstractString::truncate()`
  * added `AbstractString::containsAny()`
+ * allow passing a string of custom characters to `ByteString::fromRandom()`
 
 5.0.0
 -----

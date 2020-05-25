@@ -47,7 +47,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
             throw new TransportException(sprintf('Could not find Doctrine connection from Messenger DSN "%s".', $dsn), 0, $e);
         }
 
-        if ($useNotify && method_exists($driverConnection->getWrappedConnection(), 'pgsqlGetNotify')) {
+        if ($useNotify && ($wrappedConnection = $driverConnection->getWrappedConnection()) && method_exists($wrappedConnection, 'pgsqlGetNotify')) {
             $connection = new PostgreSqlConnection($configuration, $driverConnection);
         } else {
             $connection = new Connection($configuration, $driverConnection);

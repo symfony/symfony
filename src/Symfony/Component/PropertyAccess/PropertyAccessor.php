@@ -190,12 +190,15 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath, \Throwable $previous = null): void
     {
-        // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
-        if (0 !== strpos($message, 'Argument ')) {
+        if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
         }
 
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
+        if (\PHP_VERSION_ID < 80000) {
+            if (0 !== strpos($message, 'Argument ')) {
+                return;
+            }
+
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += \strlen($delim);
             $j = strpos($message, ',', $pos);
@@ -203,6 +206,12 @@ class PropertyAccessor implements PropertyAccessorInterface
             $message = substr($message, $pos, $j - $pos);
 
             throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $message, 'NULL' === $type ? 'null' : $type, $propertyPath), 0, $previous);
+        }
+
+        if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
+            list(, $expectedType, $actualType) = $matches;
+
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath), 0, $previous);
         }
     }
 
@@ -395,8 +404,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                     try {
                         $result[self::VALUE] = $object->$name();
                     } catch (\TypeError $e) {
-                        if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of the type (\w+), null returned$/', preg_quote(\get_class($object)), $name)), $e->getMessage(), $matches)) {
-                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Have you forgotten to initialize a property or to make the return type nullable using "?%3$s" instead?', \get_class($object), $name, $matches[1]), 0, $e);
+                        if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of (?:the )?type (\w+), null returned$/', preg_quote(\get_class($object)), $name)), $e->getMessage(), $matches)) {
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', \get_class($object), $name, $matches[1]), 0, $e);
                         }
 
                         throw $e;
@@ -413,7 +422,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
                     $r = new \ReflectionProperty($matches[1], $matches[2]);
 
-                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%3$s". You should either initialize it or make it nullable using "?%3$s" instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
+                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $r->getType()->getName()), 0, $e);
                 }
 
                 throw $e;

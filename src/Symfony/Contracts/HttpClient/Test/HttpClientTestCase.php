@@ -745,7 +745,7 @@ abstract class HttpClientTestCase extends TestCase
         usleep(300000); // wait for the previous test to release the server
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
-            'timeout' => 0.3,
+            'timeout' => 0.25,
         ]);
 
         try {

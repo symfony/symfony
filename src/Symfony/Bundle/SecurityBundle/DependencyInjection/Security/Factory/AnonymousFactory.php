@@ -68,7 +68,7 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
                 ->then(function ($v) { return ['lazy' => true]; })
             ->end()
             ->children()
-                ->booleanNode('lazy')->defaultFalse()->setDeprecated('symfony/security-bundle', '5.1', 'Using "anonymous: lazy" to make the firewall lazy is deprecated, use "lazy: true" instead.')->end()
+                ->booleanNode('lazy')->defaultFalse()->setDeprecated('symfony/security-bundle', '5.1', 'Using "anonymous: lazy" to make the firewall lazy is deprecated, use "anonymous: true" and "lazy: true" instead.')->end()
                 ->scalarNode('secret')->defaultNull()->end()
             ->end()
         ;

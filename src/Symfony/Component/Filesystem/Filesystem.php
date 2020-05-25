@@ -663,8 +663,8 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string $filename The file to be written to
-     * @param string $content  The data to write into the file
+     * @param string                $filename The file to be written to
+     * @param string|resource|array $content  The data to write into the file
      *
      * @throws IOException if the file cannot be written to
      */
@@ -684,8 +684,14 @@ class Filesystem
         // when the filesystem supports chmod.
         $tmpFile = $this->tempnam($dir, basename($filename));
 
-        if (false === @file_put_contents($tmpFile, $content)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        if (\is_resource($content)) {
+            $expectedSize = fstat($content)['size'];
+        } else {
+            $expectedSize = array_sum(array_map('strlen', (array) $content));
+        }
+
+        if ($expectedSize !== ($actualSize = @file_put_contents($tmpFile, $content))) {
+            throw new IOException(sprintf('Failed to write file "%s". Wrote %d of %d bytes.', $filename, $actualSize, $expectedSize), 0, null, $filename);
         }
 
         @chmod($tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());

@@ -32,7 +32,7 @@ class MongoDbStoreTest extends AbstractStoreTest
     public static function setupBeforeClass(): void
     {
         if (!class_exists(\MongoDB\Client::class)) {
-            $this->markTestSkipped('The mongodb/mongodb package is required.');
+            self::markTestSkipped('The mongodb/mongodb package is required.');
         }
 
         $client = self::getMongoClient();

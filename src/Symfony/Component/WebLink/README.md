@@ -8,10 +8,30 @@ This component implements the [HTML5's Links](https://www.w3.org/TR/html5/links.
 and [Resource Hints](https://www.w3.org/TR/resource-hints/) W3C's specifications.
 It can also be used with extensions defined in the [HTML5 link type extensions wiki](http://microformats.org/wiki/existing-rel-values#HTML5_link_type_extensions).
 
+Getting Started
+---------------
+
+```
+$ composer require symfony/web-link
+```
+
+```php
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
+
+$linkProvider = (new GenericLinkProvider())
+    ->withLink(new Link('preload', '/bootstrap.min.css'));
+
+header('Link: '.(new HttpHeaderSerializer())->serialize($linkProvider->getLinks()));
+
+echo 'Hello';
+```
+
 Resources
 ---------
 
-  * [Documentation](https://symfony.com/doc/current/components/web_link.html)
+  * [Documentation](https://symfony.com/doc/current/web_link.html)
   * [Contributing](https://symfony.com/doc/current/contributing/index.html)
   * [Report issues](https://github.com/symfony/symfony/issues) and
     [send Pull Requests](https://github.com/symfony/symfony/pulls)

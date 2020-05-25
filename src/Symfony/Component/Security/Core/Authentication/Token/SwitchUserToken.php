@@ -28,7 +28,7 @@ class SwitchUserToken extends UsernamePasswordToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, string $providerKey, array $roles = [], TokenInterface $originalToken)
+    public function __construct($user, $credentials, string $providerKey, array $roles, TokenInterface $originalToken)
     {
         parent::__construct($user, $credentials, $providerKey, $roles);
 

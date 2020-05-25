@@ -9,7 +9,7 @@ CHANGELOG
  * allow to define a reusable set of constraints by extending the `Compound` constraint
  * added `Sequentially` constraint, to sequentially validate a set of constraints (any violation raised will prevent further validation of the nested constraints)
  * added the `divisibleBy` option to the `Count` constraint
- * added `isin` constraints 
+ * added `Isin` constraint
 
 5.0.0
 -----

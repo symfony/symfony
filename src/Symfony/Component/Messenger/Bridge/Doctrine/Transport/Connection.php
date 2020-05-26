@@ -313,9 +313,9 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    public function getExtraSetupSqlForTable(Table $createdTable): array
     {
-        return null;
+        return [];
     }
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder

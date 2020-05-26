@@ -61,7 +61,7 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         $doctrineTransport->expects($this->once())
             ->method('getExtraSetupSqlForTable')
             ->with($table)
-            ->willReturn('ALTER TABLE pizza ADD COLUMN extra_cheese boolean');
+            ->willReturn(['ALTER TABLE pizza ADD COLUMN extra_cheese boolean']);
 
         // we use the platform to generate the full create table sql
         $platform->expects($this->once())
@@ -87,7 +87,7 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
         $doctrineTransport->expects($this->once())
             ->method('getExtraSetupSqlForTable')
-            ->willReturn(null);
+            ->willReturn([]);
 
         $platform->expects($this->never())
             ->method('getCreateTableSQL');

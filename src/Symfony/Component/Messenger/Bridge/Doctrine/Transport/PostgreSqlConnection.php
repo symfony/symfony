@@ -85,43 +85,43 @@ final class PostgreSqlConnection extends Connection
     {
         parent::setup();
 
-        $this->driverConnection->exec($this->getTriggerSql());
+        $this->driverConnection->exec(implode("\n", $this->getTriggerSql()));
     }
 
-    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    /**
+     * @return string[]
+     */
+    public function getExtraSetupSqlForTable(Table $createdTable): array
     {
         if (!$createdTable->hasOption(self::TABLE_OPTION_NAME)) {
-            return null;
+            return [];
         }
 
         if ($createdTable->getOption(self::TABLE_OPTION_NAME) !== $this->configuration['table_name']) {
-            return null;
+            return [];
         }
 
         return $this->getTriggerSql();
     }
 
-    private function getTriggerSql(): string
+    private function getTriggerSql(): array
     {
-        return sprintf(<<<'SQL'
-LOCK TABLE %1$s;
--- create trigger function
+        return [
+            sprintf('LOCK TABLE %s;', $this->configuration['table_name']),
+            // create trigger function
+            sprintf(<<<'SQL'
 CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$
-	BEGIN
-		PERFORM pg_notify('%1$s', NEW.queue_name::text);
-		RETURN NEW;
+    BEGIN
+        PERFORM pg_notify('%1$s', NEW.queue_name::text);
+        RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
-
--- register trigger
-DROP TRIGGER IF EXISTS notify_trigger ON %1$s;
-
-CREATE TRIGGER notify_trigger
-AFTER INSERT
-ON %1$s
-FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();
 SQL
-            , $this->configuration['table_name']);
+            , $this->configuration['table_name']),
+            // register trigger
+            sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
+            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
+        ];
     }
 
     private function unlisten()

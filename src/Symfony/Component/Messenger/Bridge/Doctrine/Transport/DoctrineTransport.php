@@ -111,8 +111,10 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
 
     /**
      * Adds extra SQL if the given table was created by the Connection.
+     *
+     * @return string[]
      */
-    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    public function getExtraSetupSqlForTable(Table $createdTable): array
     {
         return $this->connection->getExtraSetupSqlForTable($createdTable);
     }

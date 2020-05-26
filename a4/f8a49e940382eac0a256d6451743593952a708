@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-26T05:59:46Z
+
+Why is the `[Documentation]` link not removed for all these components?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-26T09:05:44Z
+
+> Why is the [Documentation] link not removed for all these components?
+
+There is no documentation link in the ErrorHandler README already. For the others, I think it makes sense to link to the main guide if there is one available. I discovered I forgot the Templating doc link btw, so that's fixed now.

@@ -69,6 +69,10 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't unzip");
                 break;
 
+            case 'testTimeoutWithActiveConcurrentStream':
+                $this->markTestSkipped('Real transport required');
+                break;
+
             case 'testDestruct':
                 $this->markTestSkipped("MockHttpClient doesn't timeout on destruct");
                 break;

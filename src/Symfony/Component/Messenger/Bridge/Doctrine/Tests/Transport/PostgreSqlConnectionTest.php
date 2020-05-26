@@ -52,7 +52,7 @@ class PostgreSqlConnectionTest extends TestCase
 
         $table = new Table('queue_table');
         $table->addOption('_symfony_messenger_table_name', 'queue_table');
-        $this->assertStringContainsString('CREATE TRIGGER', $connection->getExtraSetupSqlForTable($table));
+        $this->assertStringContainsString('CREATE TRIGGER', implode("\n", $connection->getExtraSetupSqlForTable($table)));
     }
 
     public function testGetExtraSetupSqlWrongTable()
@@ -62,6 +62,6 @@ class PostgreSqlConnectionTest extends TestCase
 
         $table = new Table('queue_table');
         // don't set the _symfony_messenger_table_name option
-        $this->assertNull($connection->getExtraSetupSqlForTable($table));
+        $this->assertSame([], $connection->getExtraSetupSqlForTable($table));
     }
 }

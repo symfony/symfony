@@ -63,7 +63,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => \PDO::PARAM_STR];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = method_exists($stmt, 'fetchAssociative') ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
             return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));

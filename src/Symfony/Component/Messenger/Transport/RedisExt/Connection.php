@@ -99,6 +99,12 @@ class Connection
             parse_str($parsedUrl['query'], $redisOptions);
         }
 
+        if (\array_key_exists('tls', $redisOptions)) {
+            if (1 === ($tls = filter_var($redisOptions['tls'], FILTER_VALIDATE_INT))) {
+                $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
+            };
+        }
+        
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
             $autoSetup = filter_var($redisOptions['auto_setup'], FILTER_VALIDATE_BOOLEAN);

@@ -102,7 +102,7 @@ class Connection
         if (\array_key_exists('tls', $redisOptions)) {
             if (1 === ($tls = filter_var($redisOptions['tls'], FILTER_VALIDATE_INT))) {
                 $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
-            };
+            }
         }
         
         $autoSetup = null;

@@ -104,7 +104,7 @@ class Connection
                 $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
             }
         }
-        
+
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
             $autoSetup = filter_var($redisOptions['auto_setup'], FILTER_VALIDATE_BOOLEAN);

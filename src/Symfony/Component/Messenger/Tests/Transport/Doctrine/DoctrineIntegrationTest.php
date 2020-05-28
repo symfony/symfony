@@ -64,15 +64,14 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi i am delayed"}', ['type' => DummyMessage::class], 600000);
 
-        $available_at = $this->driverConnection->createQueryBuilder()
+        $stmt = $this->driverConnection->createQueryBuilder()
             ->select('m.available_at')
             ->from('messenger_messages', 'm')
             ->where('m.body = :body')
             ->setParameter(':body', '{"message": "Hi i am delayed"}')
-            ->execute()
-            ->fetchColumn();
+            ->execute();
 
-        $available_at = new \DateTime($available_at);
+        $available_at = new \DateTime(method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
 
         $now = new \DateTime();
         $now->modify('+60 seconds');

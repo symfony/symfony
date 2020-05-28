@@ -12,7 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\ForwardCompatibility\Driver\ResultStatement as ForwardCompatibleResultStatement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -142,11 +143,16 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getStatementMock($expectedResult): Statement
+    private function getStatementMock($expectedResult): ResultStatement
     {
-        $stmt = $this->createMock(Statement::class);
+        $mockedInterface = interface_exists(ForwardCompatibleResultStatement::class)
+            ? ForwardCompatibleResultStatement::class
+            : ResultStatement::class;
+
+        $stmt = $this->createMock($mockedInterface);
+
         $stmt->expects($this->once())
-            ->method('fetch')
+            ->method(method_exists($mockedInterface, 'fetchAssociative') ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
@@ -306,9 +312,12 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(Statement::class);
+        $mockedInterface = interface_exists(ForwardCompatibleResultStatement::class)
+            ? ForwardCompatibleResultStatement::class
+            : ResultStatement::class;
+        $stmt = $this->createMock($mockedInterface);
         $stmt->expects($this->once())
-            ->method('fetchAll')
+            ->method(method_exists($mockedInterface, 'fetchAllAssociative') ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection

@@ -232,7 +232,7 @@ trait PdoTrait
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->execute();
 
-        return (bool) $stmt->fetchColumn();
+        return (bool) (method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

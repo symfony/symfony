@@ -203,7 +203,7 @@ class PdoStore implements StoreInterface
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $stmt->execute();
 
-        return (bool) $stmt->fetchColumn();
+        return (bool) (method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

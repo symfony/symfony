@@ -23,9 +23,9 @@
         "symfony/event-dispatcher": "^5.1",
         "symfony/http-kernel": "^5.0",
         "symfony/polyfill-php80": "^1.15",
-        "symfony/security-core": "^4.4|^5.0",
+        "symfony/security-core": "^5.1",
         "symfony/security-csrf": "^4.4|^5.0",
-        "symfony/security-guard": "^4.4|^5.0",
+        "symfony/security-guard": "^5.1",
         "symfony/security-http": "^5.1"
     },
     "require-dev": {

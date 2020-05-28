@@ -111,7 +111,7 @@ class ExceptionListener
             }
 
             if ($exception instanceof LogoutException) {
-                $this->handleLogoutException($exception);
+                $this->handleLogoutException($event, $exception);
 
                 return;
             }
@@ -181,10 +181,12 @@ class ExceptionListener
         }
     }
 
-    private function handleLogoutException(LogoutException $exception): void
+    private function handleLogoutException(GetResponseForExceptionEvent $event, LogoutException $exception): void
     {
+        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
         if (null !== $this->logger) {
-            $this->logger->info('A LogoutException was thrown.', ['exception' => $exception]);
+            $this->logger->info('A LogoutException was thrown; wrapping with AccessDeniedHttpException', ['exception' => $exception]);
         }
     }
 

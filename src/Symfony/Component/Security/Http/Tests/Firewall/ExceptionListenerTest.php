@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
@@ -155,6 +156,17 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+    }
+
+    public function testLogoutException()
+    {
+        $event = $this->createEvent(new LogoutException('Invalid CSRF.'));
+
+        $listener = $this->createExceptionListener();
+        $listener->onKernelException($event);
+
+        $this->assertEquals('Invalid CSRF.', $event->getException()->getMessage());
+        $this->assertEquals(403, $event->getException()->getStatusCode());
     }
 
     public function getAccessDeniedExceptionProvider()

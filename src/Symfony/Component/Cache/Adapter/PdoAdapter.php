@@ -218,7 +218,13 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
         $stmt->execute();
 
-        while ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
+        if (method_exists($stmt, 'iterateNumeric')) {
+            $stmt = $stmt->iterateNumeric();
+        } else {
+            $stmt->setFetchMode(\PDO::FETCH_NUM);
+        }
+
+        foreach ($stmt as $row) {
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {

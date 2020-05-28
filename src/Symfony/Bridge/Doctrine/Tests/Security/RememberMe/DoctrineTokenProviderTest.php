@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class DoctrineTokenProviderTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (\PHP_VERSION_ID >= 80000) {
             self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');

@@ -29,11 +29,12 @@ class BodyRendererTest extends TestCase
 
     public function testRenderHtmlOnly(): void
     {
-        $email = $this->prepareEmail(null, '<b>HTML</b>');
+        $html = '<head>head</head><b>HTML</b><style type="text/css">css</style>';
+        $email = $this->prepareEmail(null, $html);
         $body = $email->getBody();
         $this->assertInstanceOf(AlternativePart::class, $body);
         $this->assertEquals('HTML', $body->getParts()[0]->bodyToString());
-        $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
+        $this->assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderHtmlOnlyWithTextSet(): void

@@ -106,6 +106,7 @@ use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
@@ -2104,6 +2105,7 @@ class FrameworkExtension extends Extension
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
+            SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
         ];
 
         foreach ($classToServices as $class => $service) {

@@ -158,7 +158,7 @@ class Notification
         return $this;
     }
 
-    public function getChannels(Recipient $recipient): array
+    public function getChannels(): array
     {
         return $this->channels;
     }

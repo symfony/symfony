@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-28T07:42:16Z
+
+There's a related failure on appveyor.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-28T07:50:20Z
+
+> There's a related failure on appveyor.
+
+We don't have `ext-pdo_sqlite` on AppVeyor? :scream:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-28T07:50:49Z
+
+appveyor runs without any, then with many extensions.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-28T07:54:03Z
+
+add `@requires extension pdo_sqlite` on the test so that it is skipped in that case.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-28T08:07:50Z
+
+AppVeyor is happy now. The segfaulting php 8 Cache tests on Travis is hopefully unrealated. :sweat_smile:

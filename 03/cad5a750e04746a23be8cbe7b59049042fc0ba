@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mhujer at 2020-05-28T08:33:35Z
+
+@xabbuh This validator was added recently https://github.com/symfony/symfony/pull/36302 so I guess it won't be backported to 3.4, right? I rebased the branch 5.1 and changed to PR to target it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-28T08:37:37Z
+
+@mhujer It's right that we don't backport new features, but for translations we try to minimise the effort needed for contributions and merge all translations into the oldest still maintained branch (`3.4` right now).

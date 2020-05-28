@@ -35,7 +35,6 @@ use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstantin Myakshin <molodchick@gmail.com>
@@ -90,7 +89,7 @@ class Transport
         return self::fromDsnComponent(DsnParser::parse($dsn));
     }
 
-    private function fromDsnComponent($dsn) : TransportInterface
+    private function fromDsnComponent($dsn): TransportInterface
     {
         static $keywords = [
             'failover' => FailoverTransport::class,
@@ -102,7 +101,7 @@ class Transport
         }
 
         if (!$dsn instanceof DsnFunction) {
-            throw new \InvalidArgumentException(\sprintf('First argument to Transport::fromDsnComponent() must be a "%s" or %s', DsnFunction::class, Dsn::class));
+            throw new \InvalidArgumentException(sprintf('First argument to Transport::fromDsnComponent() must be a "%s" or "%s".', DsnFunction::class, Dsn::class));
         }
 
         if (!isset($keywords[$dsn->getName()])) {

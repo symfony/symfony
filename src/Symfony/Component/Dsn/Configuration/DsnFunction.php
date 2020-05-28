@@ -75,4 +75,12 @@ class DsnFunction
     {
         return reset($this->arguments);
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s(%s)%s', $this->getName(), implode(' ', $this->getArguments()), empty($this->parameters) ? '' : '?'.http_build_query($this->parameters));
+    }
 }

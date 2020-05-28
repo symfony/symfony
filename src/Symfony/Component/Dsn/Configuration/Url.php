@@ -18,6 +18,8 @@ namespace Symfony\Component\Dsn\Configuration;
  *
  * Example:
  * - memcached://user:password@127.0.0.1?weight=50
+ * - 127.0.0.1:80
+ * - amqp://127.0.0.1/%2f/messages
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
@@ -62,5 +64,22 @@ class Url extends Dsn
     public function getPath(): ?string
     {
         return $this->path;
+    }
+
+    /**
+     * @var string
+     */
+    public function __toString()
+    {
+        $parameters = $this->getParameters();
+        $scheme = $this->getScheme();
+
+        return
+            (empty($scheme) ? '' : $scheme.'://').
+            $this->getUserInfoString().
+            $this->getHost().
+            (empty($this->port) ? '' : ':'.$this->port).
+            ($this->getPath() ?? '').
+            (empty($parameters) ? '' : '?'.http_build_query($parameters));
     }
 }

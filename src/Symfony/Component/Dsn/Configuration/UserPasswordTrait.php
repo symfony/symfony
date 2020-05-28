@@ -47,4 +47,16 @@ trait UserPasswordTrait
     {
         return $this->authentication['password'] ?? null;
     }
+
+    private function getUserInfoString(): string
+    {
+        $user = $this->getUser() ?? '';
+        $password = $this->getPassword() ?? '';
+        $userInfo = $user.(empty($password) ? '' : ':'.$password).'@';
+        if (\strlen($userInfo) <= 2) {
+            $userInfo = '';
+        }
+
+        return $userInfo;
+    }
 }

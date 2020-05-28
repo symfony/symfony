@@ -30,15 +30,34 @@ class Path extends Dsn
      */
     private $path;
 
-    public function __construct(?string $scheme, string $path, array $parameters = [], array $authentication = [])
+    public function __construct(string $scheme, string $path, array $parameters = [], array $authentication = [])
     {
         $this->path = $path;
         $this->setAuthentication($authentication);
         parent::__construct($scheme, $parameters);
     }
 
+    public function getScheme(): string
+    {
+        return parent::getScheme();
+    }
+
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    /**
+     * @var string
+     */
+    public function __toString()
+    {
+        $parameters = $this->getParameters();
+
+        return
+            $this->getScheme().'://'.
+            $this->getUserInfoString().
+            $this->getPath().
+            (empty($parameters) ? '' : '?'.http_build_query($parameters));
     }
 }

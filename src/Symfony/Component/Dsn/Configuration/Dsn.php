@@ -76,4 +76,12 @@ class Dsn
     {
         return null;
     }
+
+    /**
+     * @var string
+     */
+    public function __toString()
+    {
+        return sprintf('%s://%s', $this->getScheme(), empty($this->parameters) ? '' : '?'.http_build_query($this->parameters));
+    }
 }

@@ -105,23 +105,23 @@ class DsnParserTest extends TestCase
             $expected = new DsnFunction('dsn', [$expected]);
         }
 
-        $result = DsnParser::parse($dsn);
+        $result = DsnParser::parseFunc($dsn);
         $this->assertEquals($expected, $result);
     }
 
     public function testParseSimple()
     {
-        $result = DsnParser::parseSimple('amqp://user:pass@localhost:5672/%2f/messages');
+        $result = DsnParser::parse('amqp://user:pass@localhost:5672/%2f/messages');
         $this->assertEquals(new Url('amqp', 'localhost', 5672, '/%2f/messages', [], ['user' => 'user', 'password' => 'pass']), $result);
 
-        $result = DsnParser::parseSimple('dsn(amqp://localhost)');
+        $result = DsnParser::parse('dsn(amqp://localhost)');
         $this->assertEquals(new Url('amqp', 'localhost'), $result);
     }
 
     public function testParseSimpleWithFunction()
     {
         $this->expectException(FunctionsNotAllowedException::class);
-        DsnParser::parseSimple('foo(amqp://localhost)');
+        DsnParser::parse('foo(amqp://localhost)');
     }
 
     /**
@@ -130,6 +130,6 @@ class DsnParserTest extends TestCase
     public function testParseInvalid(string $dsn)
     {
         $this->expectException(SyntaxException::class);
-        DsnParser::parse($dsn);
+        DsnParser::parseFunc($dsn);
     }
 }

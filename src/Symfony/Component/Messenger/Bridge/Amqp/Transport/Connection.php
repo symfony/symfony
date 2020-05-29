@@ -164,7 +164,7 @@ class Connection
      */
     public static function fromDsn(string $dsnString, array $options = [], AmqpFactory $amqpFactory = null): self
     {
-        $dsn = DsnParser::parseSimple($dsnString);
+        $dsn = DsnParser::parse($dsnString);
         if ('amqp' !== $dsn->getScheme()) {
             throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
         }

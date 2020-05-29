@@ -41,7 +41,7 @@ final class Dsn extends Url
 
     public static function fromString(string $dsnString): self
     {
-        $dsn = DsnParser::parseSimple($dsnString);
+        $dsn = DsnParser::parse($dsnString);
         if (!$dsn instanceof Url) {
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsnString), 0, DsnTypeNotSupported::onlyUrl($dsnString));
         }

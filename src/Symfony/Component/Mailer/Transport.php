@@ -86,7 +86,7 @@ class Transport
 
     public function fromString(string $dsn): TransportInterface
     {
-        return self::fromDsnComponent(DsnParser::parse($dsn));
+        return self::fromDsnComponent(DsnParser::parseFunc($dsn));
     }
 
     private function fromDsnComponent($dsn): TransportInterface

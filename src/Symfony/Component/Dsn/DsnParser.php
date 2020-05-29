@@ -33,9 +33,12 @@ class DsnParser
     private const SUB_DELIMS = '!\$&\'\(\}\*\+,;=';
 
     /**
+     * Parse A DSN thay may contain functions. If no function is present in the
+     * string, then a "dsn()" function will be added.
+     *
      * @throws SyntaxException
      */
-    public static function parse(string $dsn): DsnFunction
+    public static function parseFunc(string $dsn): DsnFunction
     {
         // Detect a function or add default function
         $parameters = [];
@@ -66,11 +69,11 @@ class DsnParser
      * @throws FunctionsNotAllowedException if the DSN contains a function
      * @throws SyntaxException
      */
-    public static function parseSimple(string $dsn): Dsn
+    public static function parse(string $dsn): Dsn
     {
         if (1 === preg_match(self::FUNCTION_REGEX, $dsn, $matches)) {
             if ('dsn' === $matches[1]) {
-                return self::parseSimple($matches[2]);
+                return self::parse($matches[2]);
             }
             throw new FunctionsNotAllowedException($dsn);
         }
@@ -85,7 +88,7 @@ class DsnParser
     {
         // Detect a function exists
         if (1 === preg_match(self::FUNCTION_REGEX, $dsn)) {
-            return self::parse($dsn);
+            return self::parseFunc($dsn);
         }
 
         // Assert: $dsn does not contain any functions.

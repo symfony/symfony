@@ -86,7 +86,7 @@ class Connection
      */
     public static function fromDsn(string $dsnString, array $options = [], HttpClientInterface $client = null): self
     {
-        $dsn = DsnParser::parseSimple($dsnString);
+        $dsn = DsnParser::parse($dsnString);
         $query = $dsn->getParameters();
 
         $configuration = [

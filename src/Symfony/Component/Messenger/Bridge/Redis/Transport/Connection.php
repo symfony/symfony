@@ -92,7 +92,7 @@ class Connection
 
     public static function fromDsn(string $dsnString, array $redisOptions = [], \Redis $redis = null): self
     {
-        $dsn = DsnParser::parseSimple($dsnString);
+        $dsn = DsnParser::parse($dsnString);
         if (!empty($dsn->getParameters())) {
             $redisOptions = $dsn->getParameters();
         }

@@ -28,21 +28,21 @@ roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)
 
 ## Parsing
 
-There are two methods for parsing; `DsnParser::parse()` and `DsnParser::parseSimple()`.
-The latter is useful in situations where DSN functions are not needed.
+There are two methods for parsing; `DsnParser::parse()` and `DsnParser::parseFunc()`.
+The latter is for in situations where DSN functions are supported.
 
 ```php
-$dsn = DsnParser::parseSimple('scheme://127.0.0.1/foo/bar?key=value');
+$dsn = DsnParser::parse('scheme://127.0.0.1/foo/bar?key=value');
 echo get_class($dsn); // "Symfony\Component\Dsn\Configuration\Url"
 echo $dsn->getHost(); // "127.0.0.1"
 echo $dsn->getPath(); // "/foo/bar"
 echo $dsn->getPort(); // null
 ```
 
-If functions are supported (like in the Mailer component) we can use `DsnParser::parse()`:
+If functions are supported (like in the Mailer component) we can use `DsnParser::parseFunc()`:
 
 ```php
-$func = DsnParser::parse('failover(sendgrid://KEY@default smtp://127.0.0.1)');
+$func = DsnParser::parseFunc('failover(sendgrid://KEY@default smtp://127.0.0.1)');
 echo $func->getName(); // "failover"
 echo get_class($func->first()); // "Symfony\Component\Dsn\Configuration\Url"
 echo $func->first()->getHost(); // "default"
@@ -51,7 +51,7 @@ echo $func->first()->getUser(); // "KEY"
 
 ```php
 
-$func = DsnParser::parse('foo(udp://localhost failover:(tcp://localhost:61616,tcp://remotehost:61616)?initialReconnectDelay=100)?start=now');
+$func = DsnParser::parseFunc('foo(udp://localhost failover:(tcp://localhost:61616,tcp://remotehost:61616)?initialReconnectDelay=100)?start=now');
 echo $func->getName(); // "foo"
 echo $func->getParameters()['start']; // "now"
 $args = $func->getArguments();
@@ -62,21 +62,21 @@ echo $args[0]->getHost(); // "localhost"
 echo get_class($args[1]); // "Symfony\Component\Dsn\Configuration\DsnFunction"
 ```
 
-When using `DsnParser::parse()` on a string that does not contain any DSN functions,
+When using `DsnParser::parseFunc()` on a string that does not contain any DSN functions,
 the parser will automatically add a default "dsn" function. This is added to provide
 a consistent return type of the method.
 
 The string `redis://127.0.0.1` will automatically be converted to `dsn(redis://127.0.0.1)`
-when using `DsnParser::parse()`.
+when using `DsnParser::parseFunc()`.
 
 ```php
-$func = DsnParser::parse('smtp://127.0.0.1');
+$func = DsnParser::parseFunc('smtp://127.0.0.1');
 echo $func->getName(); // "dsn"
 echo get_class($func->first()); // "Symfony\Component\Dsn\Configuration\Url"
 echo $func->first()->getHost(); // "127.0.0.1"
 
 
-$func = DsnParser::parse('dsn(smtp://127.0.0.1)');
+$func = DsnParser::parseFunc('dsn(smtp://127.0.0.1)');
 echo $func->getName(); // "dsn"
 echo get_class($func->first()); // "Symfony\Component\Dsn\Configuration\Url"
 echo $func->first()->getHost(); // "127.0.0.1"

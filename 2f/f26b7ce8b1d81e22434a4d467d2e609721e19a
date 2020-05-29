@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-28T07:54:10Z
+
+@dunglas Does that make sense for you?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-05-28T14:25:44Z
+
+It shouldn't be the case because of https://github.com/symfony/symfony/blob/b841eabe8ede1c6f2a90ab0c112c117bc7f7cabe/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php#L76-L79
+
+The loop should consume some CPU to allow checking for delayed updates, but shouldn't sent useless SQL queries except when `check_delayed_interval` is reached.
+
+Maybe that the default value of `check_delayed_interval` should be increased. But we have to find a tradeoff to support both features (delayed messages and notify). Maybe should we also make it bold in the docs that `check_delayed_interval` should be disabled if this feature isn't used.
+
+By the way, we should maybe call `usleep()` here https://github.com/symfony/symfony/blob/b841eabe8ede1c6f2a90ab0c112c117bc7f7cabe/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php#L78 to save some CPU.

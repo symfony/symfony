@@ -37,6 +37,10 @@ class ProcessHelper extends Helper
      */
     public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
+        if (!class_exists(Process::class)) {
+            throw new \LogicException('The Process helper requires the "Process" component. Install "symfony/process" to use it.');
+        }
+
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
         }

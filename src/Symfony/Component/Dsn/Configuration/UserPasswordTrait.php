@@ -52,11 +52,11 @@ trait UserPasswordTrait
     {
         $user = $this->getUser() ?? '';
         $password = $this->getPassword() ?? '';
-        $userInfo = $user.(empty($password) ? '' : ':'.$password).'@';
-        if (\strlen($userInfo) <= 2) {
-            $userInfo = '';
+
+        if ('' === $password && '' === $user) {
+            return '';
         }
 
-        return $userInfo;
+        return $user.('' === $password ? '' : ':'.$password).'@';
     }
 }

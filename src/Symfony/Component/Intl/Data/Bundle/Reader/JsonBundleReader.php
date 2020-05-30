@@ -46,7 +46,7 @@ class JsonBundleReader implements BundleReaderInterface
         $data = json_decode(file_get_contents($fileName), true);
 
         if (null === $data) {
-            throw new RuntimeException(sprintf('The resource bundle "%s" contains invalid JSON: '.json_last_error_msg(), $fileName));
+            throw new RuntimeException(sprintf('The resource bundle "%s" contains invalid JSON: ', $fileName).json_last_error_msg());
         }
 
         return $data;

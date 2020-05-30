@@ -194,7 +194,7 @@ class XliffFileLoader implements LoaderInterface
         if (!@$dom->schemaValidateSource($schema)) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: '.implode("\n", $this->getXmlErrors($internalErrors)), $file));
+            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: ', $file).implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
         libxml_disable_entity_loader($disableEntities);

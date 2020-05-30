@@ -16,6 +16,7 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
@@ -39,7 +40,7 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
         }
 
         if (!\is_string($expression)) {
-            throw new UnexpectedTypeException($expression, 'string');
+            throw new UnexpectedValueException($expression, 'string');
         }
 
         if (null === $this->expressionLanguage) {
@@ -47,7 +48,7 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
         }
 
         try {
-            $this->expressionLanguage->lint($expression, ($constraint->validateNames ? ($constraint->names ?? []) : null));
+            $this->expressionLanguage->lint($expression, $constraint->allowedVariables);
         } catch (SyntaxError $exception) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ syntax_error }}', $this->formatValue($exception->getMessage()))

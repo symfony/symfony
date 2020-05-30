@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * AnnotationClassLoader loads routing information from a PHP class and its methods.
  *
- * You need to define an implementation for the getRouteDefaults() method. Most of the
+ * You need to define an implementation for the configureRoute() method. Most of the
  * time, this method should define some PHP callable to be called for the route
  * (a controller in MVC speak).
  *

@@ -29,8 +29,7 @@ class ExpressionLanguageSyntax extends Constraint
 
     public $message = 'This value should be a valid expression.';
     public $service;
-    public $validateNames = true;
-    public $names = [];
+    public $allowedVariables = null;
 
     /**
      * {@inheritdoc}

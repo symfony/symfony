@@ -12,7 +12,6 @@
     --color-muted: #999;
     /* when updating any of these colors, do the same in toolbar.css.twig */
     --color-success: #4f805d;
-    --color-deprecation: #6A1FA4;
     --color-warning: #a46a1f;
     --color-error: #b0413e;
     --tab-background: #fff;
@@ -348,7 +347,6 @@ table tbody td.num-col {
     text-align: center;
 }
 .label.status-success { background: var(--color-success); color: #FFF; }
-.label.status-deprecation { background: var(--color-deprecation); color: #FFF; }
 .label.status-warning { background: var(--color-warning); color: #FFF; }
 .label.status-error   { background: var(--background-error); color: #FFF; }
 
@@ -451,9 +449,6 @@ table tbody td.num-col {
 .status-success {
     background: rgba(94, 151, 110, 0.3);
 }
-.status-deprecation {
-    background: rgba(106, 103, 164, 0.3);
-}
 .status-warning {
     background: rgba(240, 181, 24, 0.3);
 }
@@ -461,7 +456,6 @@ table tbody td.num-col {
     background: rgba(176, 65, 62, 0.2);
 }
 .status-success td,
-.status-deprecation td,
 .status-warning td,
 .status-error td {
     background: transparent;
@@ -629,14 +623,11 @@ tr.status-warning td {
 }
 
 #summary .status-success { background: var(--color-success); }
-#summary .status-deprecation { background: var(--color-deprecation); }
 #summary .status-warning { background: var(--color-warning); }
 #summary .status-error   { background: var(--background-error);   }
 
 #summary .status-success h2,
 #summary .status-success a,
-#summary .status-deprecation h2,
-#summary .status-deprecation a,
 #summary .status-warning h2,
 #summary .status-warning a,
 #summary .status-error h2,
@@ -843,9 +834,6 @@ tr.status-warning td {
     color: #AAA;
 }
 
-#menu-profiler .label-status-deprecation .count {
-    background: var(--color-deprecation);
-}
 #menu-profiler .label-status-warning .count {
     background: var(--color-warning);
 }
@@ -930,7 +918,6 @@ tr.status-warning td {
 .tab-content > *:first-child {
     margin-top: 0;
 }
-.tab-navigation li .badge.status-deprecation { background: var(--color-deprecation); color: #FFF; }
 .tab-navigation li .badge.status-warning { background: var(--color-warning); color: #FFF; }
 .tab-navigation li .badge.status-error { background: var(--background-error); color: #FFF; }
 
@@ -1002,7 +989,6 @@ tr.status-warning td {
 }
 #twig-dump .status-error   { background: transparent; color: var(--color-error); }
 #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3);     }
-#twig-dump .status-deprecation { background: rgba(106, 31, 164, 0.3);     }
 #twig-dump .status-success { background: rgba(100, 189, 99, 0.2);     }
 #twig-dump .status-info    { background: var(--info-background);      }
 

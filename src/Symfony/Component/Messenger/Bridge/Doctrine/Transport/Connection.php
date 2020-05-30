@@ -157,11 +157,12 @@ class Connection implements ResetInterface
                 ->setMaxResults(1);
 
             // use SELECT ... FOR UPDATE to lock table
-            $doctrineEnvelope = $this->executeQuery(
+            $stmt = $this->executeQuery(
                 $query->getSQL().' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
                 $query->getParameters(),
                 $query->getParameterTypes()
-            )->fetch();
+            );
+            $doctrineEnvelope = method_exists($stmt, 'fetchAssociative') ? $stmt->fetchAssociative() : $stmt->fetch();
 
             if (false === $doctrineEnvelope) {
                 $this->driverConnection->commit();
@@ -236,7 +237,9 @@ class Connection implements ResetInterface
             ->select('COUNT(m.id) as message_count')
             ->setMaxResults(1);
 
-        return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchColumn();
+        $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
+
+        return method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn();
     }
 
     public function findAll(int $limit = null): array
@@ -246,7 +249,8 @@ class Connection implements ResetInterface
             $queryBuilder->setMaxResults($limit);
         }
 
-        $data = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchAll();
+        $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
+        $data = method_exists($stmt, 'fetchAllAssociative') ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
 
         return array_map(function ($doctrineEnvelope) {
             return $this->decodeEnvelopeHeaders($doctrineEnvelope);
@@ -258,9 +262,8 @@ class Connection implements ResetInterface
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ?');
 
-        $data = $this->executeQuery($queryBuilder->getSQL(), [
-            $id,
-        ])->fetch();
+        $stmt = $this->executeQuery($queryBuilder->getSQL(), [$id]);
+        $data = method_exists($stmt, 'fetchAssociative') ? $stmt->fetchAssociative() : $stmt->fetch();
 
         return false === $data ? null : $this->decodeEnvelopeHeaders($data);
     }
@@ -285,9 +288,9 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function getExtraSetupSqlForTable(Table $createdTable): ?string
+    public function getExtraSetupSqlForTable(Table $createdTable): array
     {
-        return null;
+        return [];
     }
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder

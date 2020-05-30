@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
+use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
+
 class WitherStaticReturnType
 {
     public $foo;

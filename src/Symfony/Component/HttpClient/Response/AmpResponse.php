@@ -25,6 +25,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\Internal\AmpBody;
 use Symfony\Component\HttpClient\Internal\AmpClientState;
+use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -40,6 +41,8 @@ final class AmpResponse implements ResponseInterface
     private $options;
     private $canceller;
     private $onProgress;
+
+    private static $delay;
 
     /**
      * @internal
@@ -143,8 +146,10 @@ final class AmpResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param AmpClientState $multi
      */
-    private static function perform(AmpClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, array &$responses = null): void
     {
         if ($responses) {
             foreach ($responses as $response) {
@@ -163,21 +168,26 @@ final class AmpResponse implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param AmpClientState $multi
      */
-    private static function select(AmpClientState $multi, float $timeout): int
+    private static function select(ClientState $multi, float $timeout): int
     {
-        $selected = 1;
-        $delay = Loop::delay(1000 * $timeout, static function () use (&$selected) {
-            $selected = 0;
-            Loop::stop();
-        });
-        Loop::run();
+        $start = microtime(true);
+        $remaining = $timeout;
 
-        if ($selected) {
-            Loop::cancel($delay);
+        while (true) {
+            self::$delay = Loop::delay(1000 * $remaining, [Loop::class, 'stop']);
+            Loop::run();
+
+            if (null === self::$delay) {
+                return 1;
+            }
+
+            if (0 >= $remaining = $timeout - microtime(true) + $start) {
+                return 0;
+            }
         }
-
-        return $selected;
     }
 
     private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger)
@@ -187,7 +197,7 @@ final class AmpResponse implements ResponseInterface
         $request->setInformationalResponseHandler(static function (Response $response) use (&$activity, $id, &$info, &$headers) {
             self::addResponseHeaders($response, $info, $headers);
             $activity[$id][] = new InformationalChunk($response->getStatus(), $response->getHeaders());
-            Loop::defer([Loop::class, 'stop']);
+            self::stopLoop();
         });
 
         try {
@@ -205,7 +215,7 @@ final class AmpResponse implements ResponseInterface
             if ('HEAD' === $response->getRequest()->getMethod() || \in_array($info['http_code'], [204, 304], true)) {
                 $activity[$id][] = null;
                 $activity[$id][] = null;
-                Loop::defer([Loop::class, 'stop']);
+                self::stopLoop();
 
                 return;
             }
@@ -217,7 +227,7 @@ final class AmpResponse implements ResponseInterface
             $body = $response->getBody();
 
             while (true) {
-                Loop::defer([Loop::class, 'stop']);
+                self::stopLoop();
 
                 if (null === $data = yield $body->read()) {
                     break;
@@ -236,7 +246,7 @@ final class AmpResponse implements ResponseInterface
             $info['download_content_length'] = $info['size_download'];
         }
 
-        Loop::defer([Loop::class, 'stop']);
+        self::stopLoop();
     }
 
     private static function followRedirects(Request $originRequest, AmpClientState $multi, array &$info, array &$headers, CancellationTokenSource $canceller, array $options, \Closure $onProgress, &$handle, ?LoggerInterface $logger)
@@ -396,5 +406,15 @@ final class AmpResponse implements ResponseInterface
 
             return $response;
         }
+    }
+
+    private static function stopLoop(): void
+    {
+        if (null !== self::$delay) {
+            Loop::cancel(self::$delay);
+            self::$delay = null;
+        }
+
+        Loop::defer([Loop::class, 'stop']);
     }
 }

@@ -64,8 +64,7 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
                 continue;
             }
 
-            $extraSql = $transport->getExtraSetupSqlForTable($table);
-            if (null === $extraSql) {
+            if (!$extraSql = $transport->getExtraSetupSqlForTable($table)) {
                 continue;
             }
 
@@ -79,7 +78,9 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
              * the only way to inject some extra SQL.
              */
             $event->addSql($createTableSql);
-            $event->addSql($extraSql);
+            foreach ($extraSql as $sql) {
+                $event->addSql($sql);
+            }
             $event->preventDefault();
 
             return;

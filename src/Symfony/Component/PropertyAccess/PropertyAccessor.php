@@ -408,11 +408,11 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                         // handle uninitialized properties in PHP >= 7
                         if (__FILE__ === $trace['file']
-                            && $access[self::ACCESS_NAME] === $trace['function']
+                            && $name === $trace['function']
                             && $object instanceof $trace['class']
                             && preg_match((sprintf('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/')), $e->getMessage(), $matches)
                         ) {
-                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: 'class').'@anonymous', $access[self::ACCESS_NAME], $matches[1]), 0, $e);
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: key(class_implements($object)) ?: 'class').'@anonymous', $name, $matches[1]), 0, $e);
                         }
 
                         throw $e;

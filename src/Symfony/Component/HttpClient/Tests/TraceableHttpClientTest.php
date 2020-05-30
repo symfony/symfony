@@ -21,6 +21,11 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class TraceableHttpClientTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        TestHttpServer::start();
+    }
+
     public function testItTracesRequest()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
@@ -85,8 +90,6 @@ class TraceableHttpClientTest extends TestCase
 
     public function testStream()
     {
-        TestHttpServer::start();
-
         $sut = new TraceableHttpClient(new NativeHttpClient());
         $response = $sut->request('GET', 'http://localhost:8057/chunked');
         $chunks = [];

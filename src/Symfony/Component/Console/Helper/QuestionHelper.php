@@ -35,7 +35,7 @@ class QuestionHelper extends Helper
 {
     private $inputStream;
     private static $shell;
-    private static $stty;
+    private static $stty = true;
 
     /**
      * Asks a question to the user.
@@ -109,7 +109,7 @@ class QuestionHelper extends Helper
         $inputStream = $this->inputStream ?: STDIN;
         $autocomplete = $question->getAutocompleterCallback();
 
-        if (null === $autocomplete || !Terminal::hasSttyAvailable()) {
+        if (null === $autocomplete || !self::$stty || !Terminal::hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
                 try {
@@ -416,7 +416,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        if (Terminal::hasSttyAvailable()) {
+        if (self::$stty && Terminal::hasSttyAvailable()) {
             $sttyMode = shell_exec('stty -g');
 
             shell_exec('stty -echo');

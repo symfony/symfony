@@ -165,8 +165,8 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener();
         $listener->onKernelException($event);
 
-        $this->assertEquals('Invalid CSRF.', $event->getException()->getMessage());
-        $this->assertEquals(403, $event->getException()->getStatusCode());
+        $this->assertEquals('Invalid CSRF.', $event->getThrowable()->getMessage());
+        $this->assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
     public function getAccessDeniedExceptionProvider()

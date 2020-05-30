@@ -13,8 +13,10 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -170,12 +172,17 @@ class FileValidator extends ConstraintValidator
         }
 
         if ($constraint->mimeTypes) {
-            if (!$value instanceof FileObject) {
-                $value = new FileObject($value);
+            if ($value instanceof FileObject) {
+                $mime = $value->getMimeType();
+            } elseif (class_exists(MimeTypes::class)) {
+                $mime = MimeTypes::getDefault()->guessMimeType($path);
+            } elseif (!class_exists(FileObject::class)) {
+                throw new LogicException('You cannot validate the mime-type of files as the Mime component is not installed. Try running "composer require symfony/mime".');
+            } else {
+                $mime = (new FileObject($value))->getMimeType();
             }
 
             $mimeTypes = (array) $constraint->mimeTypes;
-            $mime = $value->getMimeType();
 
             foreach ($mimeTypes as $mimeType) {
                 if ($mimeType === $mime) {

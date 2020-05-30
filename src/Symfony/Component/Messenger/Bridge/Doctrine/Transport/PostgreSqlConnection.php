@@ -24,11 +24,11 @@ final class PostgreSqlConnection extends Connection
 {
     /**
      * * use_notify: Set to false to disable the use of LISTEN/NOTIFY. Default: true
-     * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 1000
+     * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
      * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
-        'check_delayed_interval' => 1000,
+        'check_delayed_interval' => 60000,
         'get_notify_timeout' => 0,
     ];
 
@@ -75,6 +75,8 @@ final class PostgreSqlConnection extends Connection
             // delayed messages
             (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
         ) {
+            usleep(1000);
+
             return null;
         }
 

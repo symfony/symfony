@@ -53,7 +53,7 @@ class SendgridApiTransport extends AbstractApiTransport
         if (202 !== $response->getStatusCode()) {
             $errors = $response->toArray(false);
 
-            throw new HttpTransportException(sprintf('Unable to send an email: '.implode('; ', array_column($errors['errors'], 'message')).' (code %d).', $response->getStatusCode()), $response);
+            throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($errors['errors'], 'message')).sprintf(' (code %d).', $response->getStatusCode()), $response);
         }
 
         $sentMessage->setMessageId($response->getHeaders(false)['x-message-id'][0]);

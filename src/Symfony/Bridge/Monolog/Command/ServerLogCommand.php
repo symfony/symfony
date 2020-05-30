@@ -102,7 +102,7 @@ EOF
         }
 
         if (!$socket = stream_socket_server($host, $errno, $errstr)) {
-            throw new RuntimeException(sprintf('Server start failed on "%s": '.$errstr.' '.$errno, $host));
+            throw new RuntimeException(sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
         }
 
         foreach ($this->getLogs($socket) as $clientId => $message) {

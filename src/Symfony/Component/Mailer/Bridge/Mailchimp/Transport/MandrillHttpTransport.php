@@ -57,7 +57,7 @@ class MandrillHttpTransport extends AbstractHttpTransport
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('error' === ($result['status'] ?? false)) {
-                throw new HttpTransportException(sprintf('Unable to send an email: '.$result['message'].' (code %d).', $result['code']), $response);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $result['code']), $response);
             }
 
             throw new HttpTransportException(sprintf('Unable to send an email (code %d).', $result['code']), $response);

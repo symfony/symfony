@@ -135,7 +135,7 @@ final class SocketStream extends AbstractStream
         $streamContext = stream_context_create($options);
 
         set_error_handler(function ($type, $msg) {
-            throw new TransportException(sprintf('Connection could not be established with host "%s": '.$msg, $this->url));
+            throw new TransportException(sprintf('Connection could not be established with host "%s": ', $this->url).$msg);
         });
         try {
             $this->stream = stream_socket_client($this->url, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $streamContext);

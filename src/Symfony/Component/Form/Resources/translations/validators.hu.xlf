@@ -17,7 +17,7 @@
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Ez az érték nem egy érvényes HTML5 szín.</target>
-            </trans-unit>            
+            </trans-unit>
         </body>
     </file>
 </xliff>

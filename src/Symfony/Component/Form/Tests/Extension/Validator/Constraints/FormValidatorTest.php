@@ -658,7 +658,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertTrue($form->isSubmitted());
         $this->assertTrue($form->isSynchronized());
-        $this->expectNoValidate();
+
+        $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
         $this->validator->validate($form, new Form());
 
@@ -681,7 +682,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertTrue($form->isSubmitted());
         $this->assertTrue($form->isSynchronized());
-        $this->expectNoValidate();
+
+        $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
         $this->validator->validate($form, new Form());
 

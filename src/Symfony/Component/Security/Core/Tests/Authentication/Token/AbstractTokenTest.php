@@ -238,13 +238,28 @@ class AbstractTokenTest extends TestCase
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
     {
-        $token = new ConcreteToken(['ROLE_FOO']);
+        $token = new ConcreteToken();
         $token->setAuthenticated(true);
         $this->assertTrue($token->isAuthenticated());
 
         $token->setUser($user);
         $this->assertTrue($token->isAuthenticated());
 
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+    }
+
+    public function testIsUserChangedWhenSerializing()
+    {
+        $token = new ConcreteToken(['ROLE_ADMIN']);
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $user = new SerializableUser('wouter', ['ROLE_ADMIN']);
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token = unserialize(serialize($token));
         $token->setUser($user);
         $this->assertTrue($token->isAuthenticated());
     }
@@ -262,6 +277,56 @@ class TestUser
     public function __toString(): string
     {
         return $this->name;
+    }
+}
+
+class SerializableUser implements UserInterface, \Serializable
+{
+    private $roles;
+    private $name;
+
+    public function __construct($name, array $roles = [])
+    {
+        $this->name = $name;
+        $this->roles = $roles;
+    }
+
+    public function getUsername()
+    {
+        return $this->name;
+    }
+
+    public function getPassword()
+    {
+        return '***';
+    }
+
+    public function getRoles()
+    {
+        if (empty($this->roles)) {
+            return ['ROLE_USER'];
+        }
+
+        return $this->roles;
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->name);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->name = unserialize($serialized);
     }
 }
 

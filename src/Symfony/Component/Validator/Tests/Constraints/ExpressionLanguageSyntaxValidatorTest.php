@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ExpressionLanguageSyntaxTest extends ConstraintValidatorTestCase
+class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ExpressionLanguage
@@ -45,6 +45,7 @@ class ExpressionLanguageSyntaxTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($this->value, new ExpressionLanguageSyntax([
             'message' => 'myMessage',
+            'allowedVariables' => [],
         ]));
 
         $this->assertNoViolation();
@@ -58,7 +59,6 @@ class ExpressionLanguageSyntaxTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($this->value, new ExpressionLanguageSyntax([
             'message' => 'myMessage',
-            'validateNames' => false,
         ]));
 
         $this->assertNoViolation();
@@ -73,6 +73,7 @@ class ExpressionLanguageSyntaxTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($this->value, new ExpressionLanguageSyntax([
             'message' => 'myMessage',
+            'allowedVariables' => [],
         ]));
 
         $this->buildViolation('myMessage')

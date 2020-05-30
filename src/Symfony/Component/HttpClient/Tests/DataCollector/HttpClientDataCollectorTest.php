@@ -172,7 +172,7 @@ class HttpClientDataCollectorTest extends TestCase
 
         foreach ($tracedRequests as $request) {
             $response = $httpClient->request($request['method'], $request['url'], $request['options'] ?? []);
-            $response->getContent(false); // To avoid exception in ResponseTrait::doDestruct
+            $response->getContent(false); // disables exceptions from destructors
         }
 
         return $httpClient;

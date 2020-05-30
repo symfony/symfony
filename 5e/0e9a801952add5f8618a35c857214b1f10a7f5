@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T09:09:47Z
+
+Now that the Mime component is standalone, can't we skip the dependency on HttpFoundation instead?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-05-19T09:59:33Z
+
+@nicolas-grekas Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T10:13:18Z
+
+What about considering it as a bugfix?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-05-19T10:37:35Z
+
+> What about considering it as a bugfix?
+
+I wasn't sure if it counted as a bugfix or new feature. When in doubt, I just consider something a new feature :)
+
+But I'm not sure if a bugfix against 3.4 can use the Mime component, so should I create a new PR for 3.4 and have the original exception message for `HttpFoundation`, then just rebase and retarget 4.4 here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T10:39:09Z
+
+I would suggest targeting 4.4 and forget about 3.4.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-05-29T10:58:43Z
+
+Status: Ready for review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-29T11:36:31Z
+
+I pushed a CS change. The code looks good, but the tests need some love, see [failures on appveyor](https://ci.appveyor.com/project/fabpot/symfony/builds/33194124) when the finfo extension is not enabled.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-05-29T12:13:31Z
+
+I reverted the changes to the tests to use mocks again, and just changed the ordering of the checks

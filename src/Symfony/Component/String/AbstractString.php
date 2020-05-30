@@ -39,7 +39,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
     public const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
 
-    protected $string = '';
+    public const EMPTY = '';
+
+    protected $string = self::EMPTY;
     protected $ignoreCase = false;
 
     abstract public function __construct(string $string = '');

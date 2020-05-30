@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-30T10:00:31Z
+
+Travis failures are unrelated (failing on PHP nightly, Cache and PropertyAccess components)
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2020-05-30T13:23:32Z
+
+The problem reported in #36989 should have been appeared when #31177 was merged, but it came with a bug fixed in #35944. Without that bug, all that apps broken now, should have been broken with the feature introduced in #31177.
+
+There are at least 3 options.
+
+1. Revert #35944 fixing some broken implementations that rely on the bug introduced by #31177, but a the cost of breaking some other systems (like mine) that rely in the fact that user roles and token roles have been always (at least since Symfony 2.3) two different things and that has been never deprecated. We may discuss if it has to change in the future in other issue.
+2. Revert #31177 (as proposed originally in this PR). Then whe should introduce a documentation advice about implementing `EquatableInterface` for those systems willing to compare roles to detect if user has changed.
+3. Do not revert anything, forcing those broken implementation to add `EquatableInterface` and/or serialize user roles to fix them.
+
+In my opinion, current behavior is the right one, and any implementation not serializing user roles should be fixed by implementing `EquatableInterface`. I'm against fixing a bug introducing another one already fixed.
+
+Maybe this deserve a longer discussion. Please does not merge this PR on  weekend, and let other developers to review it during next week.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-30T13:32:53Z
+
+We all agree that https://github.com/symfony/symfony/pull/31177 introduced a BC break when custom roles are added to the token (that do not exist in the user), no need to discuss that.
+
+The issue is that the proposed fix (that is reverted in this PR) breaks *every application* (as the user's roles aren't serialized, and thus `$this->user->getRoles() === []`).
+
+The BC break in #31177 can be fixed by using `EquatableInterface`. It is choosen to rather focus on documenting the BC break from 4.3 to 4.4, than introducing another major BC break in patch releases 4.4.9 and 5.0.9 (meaning everyone updating from 4.4.8 to 4.4.9 will have a broken application).
+
+I agree with you that the situation 4.4, 5.0 and 5.1 are in is not ideal. Let's focus on fixing the complete state in 5.2 instead (given that 5.1's stable release is only days away, I don't think there is enough time to think about and test a better fix).
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2020-05-30T14:12:59Z
+
+I do not agree with you that #35944 breaks _every application_. In symfony/symfony there is only one `User` class implementing `UserInterface`, but it implements `EquatableInterface` too, so it is not affected by those BC breaks.
+
+I agree with you that #35944 breaks some applications (including symfony/demo), that decided to use a custom User class and not to serialize user roles, but reverting #35944 will break other applications too.
+
+There is other related problem. If you revert #35944, any discussion about having different roles in user and token will be completely biased.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-30T14:24:32Z
+
+> In symfony/symfony there is only one User class implementing UserInterface, but it implements EquatableInterface too, so it is not affected by those BC breaks.
+
+The same is true for the original BC break, applications using Symfony's `User` class aren't affected by any of the mentioned PRs in this PR, but very very very few applications use this class (it's mostly only used in the `in_memory` user provider, which isn't a production ready user provider).
+
+I don't think it makes sense fixing a BC break introduced in a minor release affecting a few applications (applications that customize Security tokens) by introducing a BC break in a patch release affecting much more applications (applications that customize the User class).
+
+Reverting both PRs (as originally suggested in the PR) is also scary: Applications that are build from 4.4 or 5.0 at the start are build with the premise "user's are logged out when you remove roles". If we revert both changes these applications silently loosen their security permissions without knowing it when upgrading to 4.4.9 or 5.0.9 (there is no Symfony error).
+
+Anyway, I'll let the core team have the final call here. Your and mine arguments are clear now, I think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-30T14:29:46Z
+
+> any discussion about having different roles in user and token will be completely biased.
+
+This raises the question of the next steps. What would be the plan for 5.2? Any idea? Might they influence the decision here? My current understanding is that we should merge this PR as proposed, also because we know how to deprecate things so we won't put us in a dead end, IMHO.

@@ -404,8 +404,15 @@ class PropertyAccessor implements PropertyAccessorInterface
                     try {
                         $result[self::VALUE] = $object->$name();
                     } catch (\TypeError $e) {
-                        if (preg_match((sprintf('/^Return value of %s::%s\(\) must be of (?:the )?type (\w+), null returned$/', preg_quote(\get_class($object)), $name)), $e->getMessage(), $matches)) {
-                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', \get_class($object), $name, $matches[1]), 0, $e);
+                        list($trace) = $e->getTrace();
+
+                        // handle uninitialized properties in PHP >= 7
+                        if (__FILE__ === $trace['file']
+                            && $access[self::ACCESS_NAME] === $trace['function']
+                            && $object instanceof $trace['class']
+                            && preg_match((sprintf('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/')), $e->getMessage(), $matches)
+                        ) {
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: 'class').'@anonymous', $access[self::ACCESS_NAME], $matches[1]), 0, $e);
                         }
 
                         throw $e;

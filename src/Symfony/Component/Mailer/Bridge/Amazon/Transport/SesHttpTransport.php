@@ -67,7 +67,7 @@ class SesHttpTransport extends AbstractHttpTransport
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: '.$result->Error->Message.' (code %d).', $result->Error->Code), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 
         $message->setMessageId($result->SendRawEmailResult->MessageId);

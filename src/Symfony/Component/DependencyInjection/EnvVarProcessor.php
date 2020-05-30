@@ -227,7 +227,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             $env = json_decode($env, true);
 
             if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new RuntimeException(sprintf('Invalid JSON in env var "%s": '.json_last_error_msg(), $name));
+                throw new RuntimeException(sprintf('Invalid JSON in env var "%s": ', $name).json_last_error_msg());
             }
 
             if (null !== $env && !\is_array($env)) {

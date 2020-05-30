@@ -21,8 +21,6 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class Psr18ClientTest extends TestCase
 {
-    private static $server;
-
     public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();

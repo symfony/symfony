@@ -54,9 +54,8 @@ class ValidatorExtensionTest extends TestCase
         $this->assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
 
         $this->assertSame(CascadingStrategy::NONE, $metadata->cascadingStrategy);
-        $this->assertSame(TraversalStrategy::IMPLICIT, $metadata->traversalStrategy);
-        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getPropertyMetadata('children')[0]->cascadingStrategy);
-        $this->assertSame(TraversalStrategy::IMPLICIT, $metadata->getPropertyMetadata('children')[0]->traversalStrategy);
+        $this->assertSame(TraversalStrategy::NONE, $metadata->traversalStrategy);
+        $this->assertCount(0, $metadata->getPropertyMetadata('children'));
     }
 
     public function testDataConstraintsInvalidateFormEvenIfFieldIsNotSubmitted()
@@ -136,6 +135,33 @@ class ValidatorExtensionTest extends TestCase
         $this->assertCount(2, $errors);
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
         $this->assertInstanceOf(Length::class, $errors[1]->getCause()->getConstraint());
+    }
+
+    public function testConstraintsInDifferentGroupsOnSingleField()
+    {
+        $form = $this->createForm(FormType::class, null, [
+            'validation_groups' => new GroupSequence(['group1', 'group2']),
+        ])
+            ->add('foo', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'groups' => ['group1'],
+                    ]),
+                    new Length([
+                        'groups' => ['group2'],
+                        'max' => 3,
+                    ]),
+                ],
+            ]);
+        $form->submit([
+            'foo' => 'test@example.com',
+        ]);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $errors);
+        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
     private function createForm($type, $data = null, array $options = [])

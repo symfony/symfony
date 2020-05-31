@@ -1094,7 +1094,7 @@ class FrameworkExtension extends Extension
         $defaultOptions['cache_dir'] = $config['cache_dir'];
         $translator->setArgument(4, $defaultOptions);
 
-        $translator->setArgument(6, $config['enabled_locales']);
+        $translator->setArgument(5, $config['enabled_locales']);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);

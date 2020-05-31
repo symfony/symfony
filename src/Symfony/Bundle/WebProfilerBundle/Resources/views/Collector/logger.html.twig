@@ -32,7 +32,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label label-status-{{ collector.counterrors ? 'error' :  collector.countwarnings ? 'warning' : 'none' }} {{ collector.logs is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' : 'none' }} {{ collector.logs is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
         {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}

@@ -18,8 +18,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
@@ -257,6 +259,33 @@ class AccessListenerTest extends TestCase
     public function testHandleWhenPublicAccessIsAllowedAndExceptionOnTokenIsFalse()
     {
         $tokenStorage = new TokenStorage();
+        $request = new Request();
+
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[AccessListener::PUBLIC_ACCESS], null])
+        ;
+
+        $listener = new AccessListener(
+            $tokenStorage,
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $accessMap,
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            false
+        );
+
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testHandleWhenPublicAccessWhileAuthenticated()
+    {
+        $token = new UsernamePasswordToken(new User('Wouter', null, ['ROLE_USER']), null, 'main', ['ROLE_USER']);
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
         $request = new Request();
 
         $accessMap = $this->createMock(AccessMapInterface::class);

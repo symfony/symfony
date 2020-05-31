@@ -238,8 +238,8 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testDeprecatedAliasesWithoutPackageAndVersion()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option is deprecated.');
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option in "%s" is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option in "%s" is deprecated.');
 
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));

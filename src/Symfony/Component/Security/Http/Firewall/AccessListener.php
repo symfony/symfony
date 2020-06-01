@@ -95,11 +95,13 @@ class AccessListener extends AbstractListener
                 return;
             }
 
-            if ([self::PUBLIC_ACCESS] === $attributes) {
-                return;
+            if ([self::PUBLIC_ACCESS] !== $attributes) {
+                throw $this->createAccessDeniedException($request, $attributes);
             }
+        }
 
-            throw $this->createAccessDeniedException($request, $attributes);
+        if ([self::PUBLIC_ACCESS] === $attributes) {
+            return;
         }
 
         if (!$token->isAuthenticated()) {

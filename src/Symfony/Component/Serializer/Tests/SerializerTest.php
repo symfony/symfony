@@ -491,6 +491,27 @@ class SerializerTest extends TestCase
         (new Serializer())->normalize(tmpfile());
     }
 
+    public function testNormalizeTransformEmptyArrayObjectToArray()
+    {
+        $serializer = new Serializer(
+          [
+              new PropertyNormalizer(),
+              new ObjectNormalizer(),
+              new ArrayDenormalizer(),
+          ],
+          [
+              'json' => new JsonEncoder(),
+          ]
+        );
+
+        $object = [];
+        $object['foo'] = new \ArrayObject();
+        $object['bar'] = new \ArrayObject(['notempty']);
+        $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
+
+        $this->assertSame('{"foo":[],"bar":["notempty"],"baz":{"nested":[]}}', $serializer->serialize($object, 'json'));
+    }
+
     public function testNormalizePreserveEmptyArrayObject()
     {
         $serializer = new Serializer(

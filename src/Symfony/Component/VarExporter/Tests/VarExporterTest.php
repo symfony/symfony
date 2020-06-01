@@ -92,7 +92,7 @@ class VarExporterTest extends TestCase
         } elseif (\PHP_VERSION_ID < 70400) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
         } else {
-            $this->markAsSkipped('PHP >= 7.4.6 required.');
+            $this->markTestSkipped('PHP >= 7.4.6 required.');
         }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 

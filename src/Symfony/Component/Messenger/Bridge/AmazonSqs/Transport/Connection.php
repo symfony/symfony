@@ -30,6 +30,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class Connection
 {
     private const AWS_SQS_FIFO_SUFFIX = '.fifo';
+    private const MESSAGE_ATTRIBUTE_NAME = 'X-Symfony-Messenger';
 
     private const DEFAULT_OPTIONS = [
         'buffer_size' => 9,
@@ -200,7 +201,12 @@ class Connection
 
         foreach ($this->currentResponse->getMessages() as $message) {
             $headers = [];
-            foreach ($message->getMessageAttributes() as $name => $attribute) {
+            $attributes = $message->getMessageAttributes();
+            if (isset($attributes[self::MESSAGE_ATTRIBUTE_NAME]) && 'String' === $attributes[self::MESSAGE_ATTRIBUTE_NAME]->getDataType()) {
+                $headers = json_decode($attributes[self::MESSAGE_ATTRIBUTE_NAME]->getStringValue(), true);
+                unset($attributes[self::MESSAGE_ATTRIBUTE_NAME]);
+            }
+            foreach ($attributes as $name => $attribute) {
                 if ('String' !== $attribute->getDataType()) {
                     continue;
                 }
@@ -284,12 +290,28 @@ class Connection
             'MessageAttributes' => [],
         ];
 
+        $specialHeaders = [];
         foreach ($headers as $name => $value) {
+            if ('.' === $name[0] || self::MESSAGE_ATTRIBUTE_NAME === $name || \strlen($name) > 256 || '.' === substr($name, -1) || 'AWS.' === substr($name, 0, \strlen('AWS.')) || 'Amazon.' === substr($name, 0, \strlen('Amazon.')) || preg_match('/([^a-zA-Z0-9_\.-]+|\.\.)/', $name)) {
+                $specialHeaders[$name] = $value;
+
+                continue;
+            }
+
             $parameters['MessageAttributes'][$name] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => $value,
             ]);
         }
+
+        if (!empty($specialHeaders)) {
+            $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
+                'DataType' => 'String',
+                'StringValue' => json_encode($specialHeaders),
+            ]);
+        }
+
+        dd($parameters);
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
             $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;

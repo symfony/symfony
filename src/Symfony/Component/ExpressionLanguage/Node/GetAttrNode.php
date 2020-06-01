@@ -70,7 +70,7 @@ class GetAttrNode extends Node
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_object($obj)) {
-                    throw new \RuntimeException('Unable to get a property on a non-object.');
+                    throw new \RuntimeException(sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
@@ -80,7 +80,7 @@ class GetAttrNode extends Node
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_object($obj)) {
-                    throw new \RuntimeException('Unable to call method of a non-object.');
+                    throw new \RuntimeException(sprintf('Unable to call method "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
                 if (!\is_callable($toCall = [$obj, $this->nodes['attribute']->attributes['value']])) {
                     throw new \RuntimeException(sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], get_debug_type($obj)));
@@ -91,7 +91,7 @@ class GetAttrNode extends Node
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_array($array) && !$array instanceof \ArrayAccess) {
-                    throw new \RuntimeException('Unable to get an item on a non-array.');
+                    throw new \RuntimeException(sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];

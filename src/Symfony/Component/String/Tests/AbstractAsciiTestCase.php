@@ -1450,6 +1450,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['foobar...', 'foobar foo', 6, '...', false],
             ['foobar...', 'foobar foo', 7, '...', false],
             ['foobar foo...', 'foobar foo a', 10, '...', false],
+            ['foobar foo aar', 'foobar foo aar', 12, '...', false],
         ];
     }
 

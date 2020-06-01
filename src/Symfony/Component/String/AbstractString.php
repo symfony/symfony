@@ -643,7 +643,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         }
 
         if (!$cut) {
-            $length = $ellipsisLength + ($this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1) ?? $stringLength);
+            if (null === $length = $this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1)) {
+                return clone $this;
+            }
+
+            $length += $ellipsisLength;
         }
 
         $str = $this->slice(0, $length - $ellipsisLength);

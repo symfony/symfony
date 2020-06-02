@@ -137,7 +137,7 @@ trait ResponseTrait
     public function toArray(bool $throw = true): array
     {
         if ('' === $content = $this->getContent($throw)) {
-            throw new TransportException('Response body is empty.');
+            throw new JsonException('Response body is empty.');
         }
 
         if (null !== $this->jsonData) {

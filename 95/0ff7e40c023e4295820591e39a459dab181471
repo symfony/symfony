@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-06-02T15:50:04Z
+
+This comment should be removed in the 5.0 branch of Symfony, as the `base_js` file from TwigBundle got removed there.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-06-02T15:50:40Z
+
+I'm quite sure this bugfix should apply to older versions than master though.
+
+---------------------------------------------------------------------------
+
+by Seikyo at 2020-06-02T16:02:27Z
+
+Sorry I'm a little lost in the process of proposing a pull request.
+I checked the maintained versions from the roadmap and :
+
+* **3.4** is not applicable as it does not have event listener on '.sf-toolbar-ajax-clear'
+* **4.4** is applicable to this patch
+* **5.0 and 5.1**  are applicable to this patch but top comment should be removed as you suggested
+
+Should I update the pull request branch to ">=4.4" ?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-06-02T16:04:30Z
+
+yeah, please submit this to 4.4 (and then check if the TwigBundle file needs the same patch).
+
+Removing the top comment in 5.0 is not actually something related to your bugfix (it is related to what you wrote, though). This should probably be done as a separate PR against the branch.
+
+---------------------------------------------------------------------------
+
+by Seikyo at 2020-06-02T16:30:26Z
+
+Pull request target was updated to origin/4.4 and rebased onto it.
+No references to `-clear` were found in the `TwigBundle/Resources/views/base_js.html.twig`.

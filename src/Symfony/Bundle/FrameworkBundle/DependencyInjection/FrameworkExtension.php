@@ -1379,7 +1379,7 @@ class FrameworkExtension extends Extension
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
+        if (!class_exists(PropertyAccessor::class)) {
             return;
         }
 
@@ -1463,7 +1463,7 @@ class FrameworkExtension extends Extension
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
-        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
+        if (!class_exists(PropertyAccessor::class)) {
             $container->removeAlias('serializer.property_accessor');
             $container->removeDefinition('serializer.normalizer.object');
         }
@@ -1472,7 +1472,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        if (!class_exists(UnwrappingDenormalizer::class)) {
+        if (!class_exists(UnwrappingDenormalizer::class) || !class_exists(PropertyAccessor::class)) {
             $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 

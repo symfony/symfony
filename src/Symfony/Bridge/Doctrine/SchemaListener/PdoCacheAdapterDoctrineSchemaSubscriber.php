@@ -43,6 +43,10 @@ final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
+        if (!class_exists(ToolEvents::class)) {
+            return [];
+        }
+
         return [
             ToolEvents::postGenerateSchema,
         ];

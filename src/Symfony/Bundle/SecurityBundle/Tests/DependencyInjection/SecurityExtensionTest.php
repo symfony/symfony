@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
@@ -527,9 +528,13 @@ class SecurityExtensionTest extends TestCase
     /**
      * @dataProvider provideConfigureCustomAuthenticatorData
      */
-    public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators)
+    public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators, string $expectedEntryPoint)
     {
         $container = $this->getRawContainer();
+        $container->register(TestAuthenticator::class);
+        $container->register(HttpBasicAuthenticator::class);
+        $container->register(FormLoginAuthenticator::class);
+
         $container->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
             'providers' => [
@@ -544,6 +549,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
+        $this->assertEquals($expectedEntryPoint, (string) $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
     }
 
     public function provideConfigureCustomAuthenticatorData()
@@ -551,11 +557,19 @@ class SecurityExtensionTest extends TestCase
         yield [
             ['custom_authenticator' => TestAuthenticator::class],
             [TestAuthenticator::class],
+            '',
         ];
 
         yield [
             ['custom_authenticators' => [TestAuthenticator::class, HttpBasicAuthenticator::class]],
             [TestAuthenticator::class, HttpBasicAuthenticator::class],
+            HttpBasicAuthenticator::class,
+        ];
+
+        yield [
+            ['custom_authenticators' => ['services' => [FormLoginAuthenticator::class, HttpBasicAuthenticator::class], 'entry_point' => HttpBasicAuthenticator::class]],
+            [FormLoginAuthenticator::class, HttpBasicAuthenticator::class],
+            HttpBasicAuthenticator::class,
         ];
     }
 

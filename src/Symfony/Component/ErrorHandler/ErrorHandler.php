@@ -17,6 +17,7 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\ClassNotFoundErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\ErrorEnhancerInterface;
+use Symfony\Component\ErrorHandler\ErrorEnhancer\NonObjectMethodErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
@@ -736,6 +737,7 @@ class ErrorHandler
             new UndefinedFunctionErrorEnhancer(),
             new UndefinedMethodErrorEnhancer(),
             new ClassNotFoundErrorEnhancer(),
+            new NonObjectMethodErrorEnhancer(),
         ];
     }
 

@@ -66,11 +66,6 @@
             <argument type="abstract">stateless firewall keys</argument>
         </service>
 
-        <service id="security.listener.csrf_protection" class="Symfony\Component\Security\Http\EventListener\CsrfProtectionListener">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="security.csrf.token_manager" />
-        </service>
-
         <service id="security.listener.remember_me"
                  class="Symfony\Component\Security\Http\EventListener\RememberMeListener"
                  abstract="true">

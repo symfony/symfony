@@ -34,7 +34,7 @@ class Store implements StoreInterface
     public function __construct(string $root)
     {
         $this->root = $root;
-        if (!file_exists($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
+        if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
             throw new \RuntimeException(sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
@@ -66,7 +66,7 @@ class Store implements StoreInterface
 
         if (!isset($this->locks[$key])) {
             $path = $this->getPath($key);
-            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
             $h = fopen($path, 'cb');
@@ -110,7 +110,7 @@ class Store implements StoreInterface
             return true; // shortcut if lock held by this process
         }
 
-        if (!file_exists($path = $this->getPath($key))) {
+        if (!is_file($path = $this->getPath($key))) {
             return false;
         }
 
@@ -318,7 +318,7 @@ class Store implements StoreInterface
             unset($this->locks[$key]);
         }
 
-        if (file_exists($path = $this->getPath($key))) {
+        if (is_file($path = $this->getPath($key))) {
             unlink($path);
 
             return true;
@@ -334,7 +334,7 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($key);
 
-        return file_exists($path) && false !== ($contents = file_get_contents($path)) ? $contents : null;
+        return is_file($path) && false !== ($contents = file_get_contents($path)) ? $contents : null;
     }
 
     /**
@@ -359,7 +359,7 @@ class Store implements StoreInterface
                 return false;
             }
         } else {
-            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return false;
             }
 

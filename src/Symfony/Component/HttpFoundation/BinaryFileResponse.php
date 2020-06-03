@@ -302,7 +302,7 @@ class BinaryFileResponse extends Response
         fclose($out);
         fclose($file);
 
-        if ($this->deleteFileAfterSend && file_exists($this->file->getPathname())) {
+        if ($this->deleteFileAfterSend && is_file($this->file->getPathname())) {
             unlink($this->file->getPathname());
         }
 

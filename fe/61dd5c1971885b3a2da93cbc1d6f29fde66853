@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-06-02T13:23:33Z
+
+@jeroennoten thanks for this contribution! However, `4.3` branch is no longer maintained, so this should be submitted against `4.4` (see https://symfony.com/releases for the full details). Thanks.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-06-02T13:44:13Z
+
+Hi @javiereguiluz, thanks for your feedback. I rebased to 4.4 and changed the target branch this pull request to 4.4.

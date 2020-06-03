@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kalessil at 2020-05-05T08:29:20Z
+
+@nicolas-grekas: yep, I've noticed that it's only minor places left unchanged. Your original PR clearly shows that it was great piece of work done there. Thank you for sharing feedback!
+
+---------------------------------------------------------------------------
+
+by staabm at 2020-05-09T06:16:51Z
+
+Which SCA tool did you use to do this?
+
+---------------------------------------------------------------------------
+
+by kalessil at 2020-05-09T07:49:49Z
+
+@staabm: this one -  https://plugins.jetbrains.com/plugin/10215-php-inspections-ea-ultimate- (this specific rule is not yet released, I'm using a dev-build).

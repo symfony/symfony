@@ -20,6 +20,8 @@
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
+            <argument>null</argument>
+            <argument type="tagged_iterator" tag="routing.expression_language_provider" />
         </service>
 
         <service id="web_profiler.controller.exception" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController" public="true">

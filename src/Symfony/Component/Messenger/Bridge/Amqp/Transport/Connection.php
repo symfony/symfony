@@ -319,7 +319,7 @@ class Connection
         }
 
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
-        $originQueue = $headers['X-Origin-Queue'] ?? null;
+        $originQueue = $amqpStamp ? $amqpStamp->getOriginQueueName() : null;
 
         $queue = $this->createDelayQueue($delay, $originQueue, $routingKey);
         $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
@@ -385,11 +385,11 @@ class Connection
         if (null === $originQueue) {
             $dlExchange = $this->exchangeOptions['name'];
             $dlRoutingKey = $routingKey ?? '';
-            $dlQueueName = $this->getRoutingKeyForDelay($delay, $routingKey);
+            $dlQueueName = $this->getRoutingKeyForDelay($this->exchangeOptions['name'], $delay, $routingKey);
         } else {
             $dlExchange = self::DEFAULT_EXCHANGE;
             $dlRoutingKey = $originQueue;
-            $dlQueueName = $this->getRoutingKeyForDelay($delay, $originQueue);
+            $dlQueueName = $this->getRoutingKeyForDelay(self::DEFAULT_EXCHANGE, $delay, $originQueue);
         }
 
         $queue->setName($dlQueueName);
@@ -408,11 +408,11 @@ class Connection
         return $queue;
     }
 
-    private function getRoutingKeyForDelay(int $delay, ?string $routingKey): string
+    private function getRoutingKeyForDelay(string $exchangeName, int $delay, ?string $routingKey): string
     {
         return str_replace(
             ['%delay%', '%exchange_name%', '%routing_key%'],
-            [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
+            [$delay, $exchangeName, $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         );
     }

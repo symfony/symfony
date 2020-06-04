@@ -22,12 +22,14 @@ final class AmqpStamp implements NonSendableStampInterface
     private $routingKey;
     private $flags;
     private $attributes;
+    private $originQueueName;
 
-    public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
+    public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [], string $originQueueName = null)
     {
         $this->routingKey = $routingKey;
         $this->flags = $flags;
         $this->attributes = $attributes;
+        $this->originQueueName = $originQueueName;
     }
 
     public function getRoutingKey(): ?string
@@ -45,7 +47,12 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->attributes;
     }
 
-    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null): self
+    public function getOriginQueueName(): ?string
+    {
+        return $this->originQueueName;
+    }
+
+    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $originQueue = null): self
     {
         $attr = $previousStamp->attributes ?? [];
 
@@ -62,15 +69,16 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
 
-        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
+        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr, $originQueue);
     }
 
-    public static function createWithAttributes(array $attributes, self $previousStamp = null): self
+    public static function createWithAttributes(array $attributes, self $previousStamp = null, string $originQueue = null): self
     {
         return new self(
             $previousStamp->routingKey ?? null,
             $previousStamp->flags ?? \AMQP_NOPARAM,
-            array_merge($previousStamp->attributes ?? [], $attributes)
+            array_merge($previousStamp->attributes ?? [], $attributes),
+            $originQueue
         );
     }
 }

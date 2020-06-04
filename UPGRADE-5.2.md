@@ -1,6 +1,12 @@
 UPGRADE FROM 5.1 to 5.2
 =======================
 
+
+HttpFoundation
+---------
+
+* Deprecated `SessionInterface` implementations without a `getFlashBag(): FlashBagInterface` method.
+
 Validator
 ---------
 

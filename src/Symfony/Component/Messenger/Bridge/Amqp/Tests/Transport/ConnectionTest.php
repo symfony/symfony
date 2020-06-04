@@ -608,8 +608,8 @@ class ConnectionTest extends TestCase
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay__origin_queue_name_5000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
 
         $amqpStamp = new AmqpStamp(null, AMQP_NOPARAM, [], 'origin_queue_name');
-        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
-        $connection->publish('{}', ['delay' => ['exchange_name' => '']], 5000, $amqpStamp);
+        $connection = Connection::fromDsn('amqp://localhost', ['delay' => ['exchange_name' => '']], $factory);
+        $connection->publish('{}', [], 5000, $amqpStamp);
     }
 
     public function testItDelaysTheMessageWithADifferentRoutingKeyAndTTLs()

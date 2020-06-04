@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
  * Interface for the session.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @method FlashBagInterface getFlashBag() Gets the flashbag interface. - not implementing it is deprecated since Symfony 5.2
  */
 interface SessionInterface
 {

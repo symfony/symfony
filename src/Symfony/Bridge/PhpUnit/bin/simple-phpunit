@@ -106,10 +106,10 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         }
     }
 
-    $info += [
-        'versions' => [],
-        'requires' => ['php' => '*'],
-    ];
+    $info += array(
+        'versions' => array(),
+        'requires' => array('php' => '*'),
+    );
 
     if (1 === \count($info['versions'])) {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi -s dev phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");

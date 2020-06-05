@@ -13,11 +13,14 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -601,6 +604,29 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->has('security.listener.session.'.$firewallId));
     }
 
+    public function testConfigureCustomFirewallListener(): void
+    {
+        $container = $this->getRawContainer();
+        /** @var SecurityExtension $extension */
+        $extension = $container->getExtension('security');
+        $extension->addSecurityListenerFactory(new TestFirewallListenerFactory());
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => [
+                    'custom_listener' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        /** @var IteratorArgument $listenersIteratorArgument */
+        $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
+        $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
+        $this->assertContains('custom_firewall_listener_id', $firewallListeners);
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
@@ -686,6 +712,33 @@ class NullAuthenticator implements GuardAuthenticatorInterface
     }
 
     public function supportsRememberMe()
+    {
+    }
+}
+
+class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallListenerFactoryInterface
+{
+    public function createListeners(ContainerBuilder $container, string $firewallName, array $config): array
+    {
+        return ['custom_firewall_listener_id'];
+    }
+
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    {
+        return ['provider_id', 'listener_id', $defaultEntryPoint];
+    }
+
+    public function getPosition()
+    {
+        return 'form';
+    }
+
+    public function getKey()
+    {
+        return 'custom_listener';
+    }
+
+    public function addConfiguration(NodeDefinition $builder)
     {
     }
 }

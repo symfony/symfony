@@ -171,6 +171,22 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 $authenticatedToken->eraseCredentials();
             }
 
+            // Since the security token is carrying the state of authentication around between request, for 2fa I'm
+            // making the system to carry a TwoFactorToken around, which has some specific characteristics.
+            // The main one are, it's signalizes to the system:
+            // 1) The authentication is not complete yes IS_AUTHENTICATED_FULLY == false
+            // 2) It actives the 2fa-specific logic, like redirecting to the 2fa form
+
+            // $authenticatedToken is coming from the authenticator, which initially identifies the user (e.g. username+
+            // password). Here at this point I have to hook-in to make multi-step authentication work.
+            // I need to exchange $authenticatedToken (which already exposes all roles/privileges) with a TwoFactorToken
+            // to put authentication into that intermediate state, which is neither anonymous, nor fully authenticated.
+            // I'm doing this by decorating all authenticators, so that I can "magically" exchange $authenticatedToken
+            // before it reaches these lines of code here and becomes visible to the system in the dispatched event
+            // below. But this is really hacky. I'd like to have a better way to hook-in after the authenticator,
+            // "raise a veto" and change the token before it becomes effective in the system.
+
+            // Btw. this if statement is unnecessary, $this->eventDispatcher is always !== null ;)
             if (null !== $this->eventDispatcher) {
                 $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
             }

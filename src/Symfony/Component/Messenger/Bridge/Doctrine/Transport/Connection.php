@@ -390,6 +390,7 @@ class Connection implements ResetInterface
         $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
+            ->setLength(190) // mysql 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
         $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);

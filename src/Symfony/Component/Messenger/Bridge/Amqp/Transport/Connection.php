@@ -381,7 +381,7 @@ class Connection
      */
     private function createDelayQueue(int $delay, string $finalExchange, string $finalRoutingKey = null): \AMQPQueue
     {
-        $queueName = $this->buildDelayQueueName($finalExchange, $delay, $finalRoutingKey);
+        $queueName = $this->buildDelayQueueName($delay, $finalExchange, $finalRoutingKey);
 
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName($queueName);
@@ -399,11 +399,11 @@ class Connection
         return $queue;
     }
 
-    private function buildDelayQueueName(string $exchangeName, int $delay, ?string $routingKey): string
+    private function buildDelayQueueName(int $delay, string $finalExchangeName, ?string $finalRoutingKey): string
     {
         return str_replace(
             ['%delay%', '%exchange_name%', '%routing_key%'],
-            [$delay, $exchangeName, $routingKey ?? ''],
+            [$delay, $finalExchangeName, $finalRoutingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         );
     }

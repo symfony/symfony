@@ -120,4 +120,9 @@ class AccessListener extends AbstractListener
 
         return $exception;
     }
+
+    public function getPriority(): int
+    {
+        return -255;
+    }
 }

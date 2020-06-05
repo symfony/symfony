@@ -52,7 +52,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->originQueueName;
     }
 
-    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $originQueue = null): self
+    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $originQueueName = null): self
     {
         $attr = $previousStamp->attributes ?? [];
 
@@ -69,16 +69,21 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
 
-        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr, $originQueue);
+        return new self(
+            $previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(),
+            $previousStamp->flags ?? \AMQP_NOPARAM,
+            $attr,
+            $originQueueName
+        );
     }
 
-    public static function createWithAttributes(array $attributes, self $previousStamp = null, string $originQueue = null): self
+    public static function createWithAttributes(array $attributes, self $previousStamp = null, string $originQueueName = null): self
     {
         return new self(
             $previousStamp->routingKey ?? null,
             $previousStamp->flags ?? \AMQP_NOPARAM,
             array_merge($previousStamp->attributes ?? [], $attributes),
-            $originQueue
+            $originQueueName
         );
     }
 }

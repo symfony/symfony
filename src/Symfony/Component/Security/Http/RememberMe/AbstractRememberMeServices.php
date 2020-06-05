@@ -182,6 +182,12 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         // Make sure any old remember-me cookies are cancelled
         $this->cancelCookie($request);
 
+        // I'd suggest to extend the conditions under which the security system allows a remember-me cookie to be set.
+        // This class should check \Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface::isFullFledged
+        // Why? 1st) because it makes sense to have that requirement
+        // 2nd) in a multi-step authentication process it would help to prevent the remember-me cookie from being set
+        // Right now I have to do "hacks" to prevent the cookie being set, because AbstractRememberMeServices implicitly
+        // assumes that when it's called it's secure to set a remember-me cookie.
         if (!$token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember-me ignores token since it does not contain a UserInterface implementation.');
@@ -190,6 +196,12 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             return;
         }
 
+        // Having this here makes it unnecessary hard to set a remember-me cookie after 2fa, because this requires
+        // the parameter to be present in the request. There's no way to reach the logic for setting the cookie without
+        // fulfilling this requirement.
+        // Imo the logic for settings the cookie (everything that's implemented in the sub-classes) should be decoupled
+        // from the conditions under which the cookie can be set (everything here). Effectively making the sub-classes
+        // separate classes and a dependency, instead of inheritance.
         if (!$this->isRememberMeRequested($request)) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember-me was not requested.');

@@ -456,6 +456,7 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->createMock(\AMQPExchange::class),
             $delayExchange = $this->createMock(\AMQPExchange::class)
         ));
+        $delayQueue->method('getName')->willReturn('delay_messages__5000');
 
         $amqpExchange->expects($this->once())->method('setName')->with(self::DEFAULT_EXCHANGE_NAME);
         $amqpExchange->expects($this->once())->method('declareExchange');

@@ -314,26 +314,16 @@ class Connection
      */
     private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
     {
-        if ($this->shouldSetup()) {
-            $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
-        }
-
         $originQueueName = $this->getOriginQueueNameForMessage($amqpStamp);
 
-        $queue = null === $originQueueName
-            ? $this->createDelayQueue($delay, $this->exchangeOptions['name'], $this->getRoutingKeyForMessage($amqpStamp))
-            : $this->createDelayQueue($delay, self::DEFAULT_EXCHANGE, $originQueueName);
-
-        $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
-
-        if ($this->useCustomExchangeForDelay()) {
-            $queue->bind($this->connectionOptions['delay']['exchange_name'], $queue->getName());
-        }
+        $delayRoutingKey = null === $originQueueName
+            ? $this->setupDelay($delay, $this->exchangeOptions['name'], $this->getRoutingKeyForMessage($amqpStamp))
+            : $this->setupDelay($delay, self::DEFAULT_EXCHANGE, $originQueueName);
 
         $this->publishOnExchange(
             $this->getDelayExchange(),
             $body,
-            $queue->getName(),
+            $delayRoutingKey,
             $headers,
             $amqpStamp
         );
@@ -358,11 +348,20 @@ class Connection
         }
     }
 
-    private function setupDelayExchange(): void
+    private function setupDelay(int $delay, string $finalExchange, string $finalRoutingKey = null): string
     {
-        if ($this->useCustomExchangeForDelay()) {
-            $this->getDelayExchange()->declareExchange();
+        if ($this->shouldSetup()) {
+            $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
         }
+
+        $queue = $this->createDelayQueue($delay, $finalExchange, $finalRoutingKey);
+        $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
+
+        if ($this->useCustomExchangeForDelay()) {
+            $queue->bind($this->connectionOptions['delay']['exchange_name'], $queue->getName());
+        }
+
+        return $queue->getName();
     }
 
     private function getDelayExchange(): \AMQPExchange
@@ -453,7 +452,10 @@ class Connection
     public function setup(): void
     {
         $this->setupExchangeAndQueues();
-        $this->setupDelayExchange();
+
+        if ($this->useCustomExchangeForDelay()) {
+            $this->getDelayExchange()->declareExchange();
+        }
     }
 
     private function setupExchangeAndQueues(): void

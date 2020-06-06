@@ -512,11 +512,11 @@ class QuestionHelper extends Helper
         $inputStream = !$this->inputStream && \defined('STDIN') ? STDIN : $this->inputStream;
 
         if (\function_exists('stream_isatty')) {
-            return stream_isatty($inputStream);
+            return @stream_isatty($inputStream);
         }
 
         if (\function_exists('posix_isatty')) {
-            return posix_isatty($inputStream);
+            return @posix_isatty($inputStream);
         }
 
         return true;

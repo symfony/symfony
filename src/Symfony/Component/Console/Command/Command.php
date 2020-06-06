@@ -27,7 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Command
+abstract class Command
 {
     public const SUCCESS = 0;
     public const FAILURE = 1;
@@ -141,9 +141,7 @@ class Command
     /**
      * Configures the current command.
      */
-    protected function configure()
-    {
-    }
+    protected abstract function configure();
 
     /**
      * Executes the current command.

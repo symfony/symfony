@@ -141,7 +141,7 @@ abstract class Command
     /**
      * Configures the current command.
      */
-    protected abstract function configure();
+    abstract protected function configure();
 
     /**
      * Executes the current command.

@@ -124,6 +124,9 @@ class Parser
             throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s".', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
 
+        $this->stream = null;
+        $this->names = null;
+
         return $node;
     }
 

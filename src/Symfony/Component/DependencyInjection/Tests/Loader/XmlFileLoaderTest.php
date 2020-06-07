@@ -409,7 +409,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testDeprecatedWithoutPackageAndVersion()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" in "%s" is deprecated.');
 
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
@@ -442,7 +442,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testDeprecatedAliaseWithoutPackageAndVersion()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.');
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" in "%s" is deprecated.');
 
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));

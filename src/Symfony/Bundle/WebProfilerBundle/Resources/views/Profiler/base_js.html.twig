@@ -131,13 +131,6 @@
                 removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
             }
-
-            addEventListener(document.querySelector('.sf-toolbar-ajax-clear'), 'click', function() {
-                requestStack = [];
-                renderAjaxRequests();
-                successStreak = 4;
-                document.querySelector('.sf-toolbar-ajax-request-list').innerHTML = '';
-            });
         };
 
         var startAjaxRequest = function(index) {
@@ -506,6 +499,12 @@
                             setPreference('toolbar/displayState', 'block');
                         });
                         renderAjaxRequests();
+                        addEventListener(document.querySelector('.sf-toolbar-ajax-clear'), 'click', function() {
+                            requestStack = [];
+                            renderAjaxRequests();
+                            successStreak = 4;
+                            document.querySelector('.sf-toolbar-ajax-request-list').innerHTML = '';
+                        });
                         addEventListener(document.querySelector('.sf-toolbar-block-ajax'), 'mouseenter', function (event) {
                             var elem = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
                             elem.scrollTop = elem.scrollHeight;

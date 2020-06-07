@@ -40,7 +40,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      */
-    public static $defaultAccessorPrefixes = ['is', 'can', 'get', 'has'];
+    public static $defaultAccessorPrefixes = ['get', 'is', 'has', 'can'];
 
     /**
      * @internal

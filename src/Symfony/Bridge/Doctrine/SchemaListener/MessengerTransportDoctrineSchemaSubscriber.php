@@ -89,9 +89,16 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
 
     public function getSubscribedEvents(): array
     {
-        return [
-            ToolEvents::postGenerateSchema,
-            Events::onSchemaCreateTable,
-        ];
+        $subscribedEvents = [];
+
+        if (class_exists(ToolEvents::class)) {
+            $subscribedEvents[] = ToolEvents::postGenerateSchema;
+        }
+
+        if (class_exists(Events::class)) {
+            $subscribedEvents[] = Events::onSchemaCreateTable;
+        }
+
+        return $subscribedEvents;
     }
 }

@@ -45,7 +45,7 @@ class AmazonSqsIntegrationTest extends TestCase
         $connection->setup();
         $this->clearSqs($dsn);
 
-        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class, DummyMessage::class => 'special']);
         $this->assertSame(1, $connection->getMessageCount());
 
         $wait = 0;
@@ -54,7 +54,7 @@ class AmazonSqsIntegrationTest extends TestCase
         }
 
         $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
     }
 
     private function clearSqs(string $dsn): void

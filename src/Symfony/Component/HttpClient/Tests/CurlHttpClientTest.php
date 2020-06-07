@@ -33,4 +33,13 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false]);
     }
+
+    public function testTimeoutIsNotAFatalError()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testTimeoutIsNotAFatalError();
+    }
 }

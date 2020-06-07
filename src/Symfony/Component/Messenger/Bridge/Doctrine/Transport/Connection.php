@@ -359,6 +359,7 @@ class Connection implements ResetInterface
         $table->addColumn('headers', Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', Types::STRING)
+            ->setLength(190) // mysql 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
         $table->addColumn('created_at', Types::DATETIME_MUTABLE)
             ->setNotnull(true);

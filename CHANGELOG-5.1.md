@@ -7,6 +7,23 @@ in 5.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.1.0...v5.1.1
 
+* 5.1.0 (2020-05-31)
+
+ * bug #37009 [Validator] use "allowedVariables" to configure the ExpressionLanguageSyntax constraint (xabbuh)
+ * bug #37008 [Security] Fixed AbstractToken::hasUserChanged() (wouterj)
+ * bug #36894 [Validator] never directly validate Existence (Required/Optional) constraints (xabbuh)
+ * bug #37007 [Console] Fix QuestionHelper::disableStty() (chalasr)
+ * bug #36865 [Form] validate subforms in all validation groups (xabbuh)
+ * bug #36907 Fixes sprintf(): Too few arguments in form transformer (pedrocasado)
+ * bug #36868 [Validator] Use Mime component to determine mime type for file validator (pierredup)
+ * bug #37000 Add meaningful message when using ProcessHelper and Process is not installed (l-vo)
+ * bug #36990 [Messenger] Change the default notify timeout value for PostgreSQL (fabpot)
+ * bug #36995 [TwigBridge] fix fallback html-to-txt body converter (nicolas-grekas)
+ * bug #36993 [ErrorHandler] fix setting $trace to null in FatalError (nicolas-grekas)
+ * bug #36987 Handle fetch mode deprecation of DBAL 2.11. (derrabus)
+ * bug #36984 [SecurityBundle] Fixed version constraint on security-core and security-guard (wouterj)
+ * bug #36974 [Security] Fixed handling of CSRF logout error (wouterj)
+
 * 5.1.0-RC2 (2020-05-26)
 
  * bug #36966 Fix extra SQL support in Doctrine migrations (fabpot)

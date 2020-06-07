@@ -559,6 +559,48 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticationManager()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'stateless_firewall';
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                $firewallId => [
+                    'pattern' => '/.*',
+                    'stateless' => true,
+                    'http_basic' => null,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.listener.session.'.$firewallId));
+    }
+
+    public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticationManager()
+    {
+        $container = $this->getRawContainer();
+
+        $firewallId = 'statefull_firewall';
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                $firewallId => [
+                    'pattern' => '/.*',
+                    'stateless' => false,
+                    'http_basic' => null,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->has('security.listener.session.'.$firewallId));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

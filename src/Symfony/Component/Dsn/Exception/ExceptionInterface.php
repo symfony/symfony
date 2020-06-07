@@ -14,22 +14,10 @@ declare(strict_types=1);
 namespace Symfony\Component\Dsn\Exception;
 
 /**
- * Base exception when DSN is not valid.
+ * Base ExceptionInterface for the Dsn Component.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class InvalidDsnException extends InvalidArgumentException
+interface ExceptionInterface
 {
-    private $dsn;
-
-    public function __construct(string $dsn, string $message)
-    {
-        $this->dsn = $dsn;
-        parent::__construct(sprintf('%s (%s)', $message, $dsn));
-    }
-
-    public function getDsn(): string
-    {
-        return $this->dsn;
-    }
 }

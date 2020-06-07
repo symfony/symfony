@@ -53,6 +53,9 @@ class DsnFunction
         return $this->name;
     }
 
+    /**
+     * @return array<DsnFunction|Dsn>
+     */
     public function getArguments(): array
     {
         return $this->arguments;

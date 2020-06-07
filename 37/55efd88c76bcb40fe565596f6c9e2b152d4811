@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-02T08:45:20Z
+
+Tests are broken apparently.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-05T20:23:16Z
+
+Now green.
+`CurlHttpClientTest::testTimeoutIsNotAFatalError()` is skipped on Windows where it is too transient (for reasons unrelated to this PR.)

@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
 {
-    public function getBlacklistData(): array
+    public function getExcludeData(): array
     {
         return [
             // private
@@ -63,16 +63,16 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     }
 
     /**
-     * @dataProvider getBlacklistData
+     * @dataProvider getExcludeData
      */
-    public function testBlacklist(string $ipAddr, $subnets, bool $mustThrow)
+    public function testExclude(string $ipAddr, $subnets, bool $mustThrow)
     {
         $content = 'foo';
         $url = sprintf('http://%s/', 0 < substr_count($ipAddr, ':') ? sprintf('[%s]', $ipAddr) : $ipAddr);
 
         if ($mustThrow) {
             $this->expectException(TransportException::class);
-            $this->expectExceptionMessage(sprintf('IP "%s" is blacklisted for "%s".', $ipAddr, $url));
+            $this->expectExceptionMessage(sprintf('IP "%s" is blocked for "%s".', $ipAddr, $url));
         }
 
         $previousHttpClient = $this->getHttpClientMock($url, $ipAddr, $content);

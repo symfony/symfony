@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by 1ed at 2020-06-02T06:51:49Z
+
+@dunglas thanks for the review. Actually I’m not 100% sure if this fix is good enough and will not break other things in Property Info. What do you think? How should I handle the breaking tests, leave as is now because it will be green after merge or I should split the PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-04T09:35:19Z
+
+Please bump `"symfony/property-info": "^5.1"` to `"symfony/property-info": "^5.1.1"` in `src/Symfony/Component/PropertyAccess/composer.json`.
+
+That should fix deps=low tests. deps=high ones will be fixed once the patch is merged up.

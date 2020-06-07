@@ -316,7 +316,7 @@ trait ResponseTrait
         }
 
         $lastActivity = microtime(true);
-        $isTimeout = false;
+        $enlapsedTimeout = 0;
 
         while (true) {
             $hasActivity = false;
@@ -338,7 +338,7 @@ trait ResponseTrait
                     } elseif (!isset($multi->openHandles[$j])) {
                         unset($responses[$j]);
                         continue;
-                    } elseif ($isTimeout) {
+                    } elseif ($enlapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
                     } else {
                         continue;
@@ -346,7 +346,7 @@ trait ResponseTrait
 
                     while ($multi->handlesActivity[$j] ?? false) {
                         $hasActivity = true;
-                        $isTimeout = false;
+                        $enlapsedTimeout = 0;
 
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
                             if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
@@ -379,7 +379,7 @@ trait ResponseTrait
                             }
                         } elseif ($chunk instanceof ErrorChunk) {
                             unset($responses[$j]);
-                            $isTimeout = true;
+                            $enlapsedTimeout = $timeoutMax;
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
@@ -447,10 +447,11 @@ trait ResponseTrait
                 continue;
             }
 
-            switch (self::select($multi, $timeoutMin)) {
-                case -1: usleep(min(500, 1E6 * $timeoutMin)); break;
-                case 0: $isTimeout = microtime(true) - $lastActivity > $timeoutMax; break;
+            if (-1 === self::select($multi, min($timeoutMin, $timeoutMax - $enlapsedTimeout))) {
+                usleep(min(500, 1E6 * $timeoutMin));
             }
+
+            $enlapsedTimeout = microtime(true) - $lastActivity;
         }
     }
 }

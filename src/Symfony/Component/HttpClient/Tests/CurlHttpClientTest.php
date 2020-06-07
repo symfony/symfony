@@ -112,6 +112,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         $this->assertSame($expected, $logger->logs);
     }
 
+    public function testTimeoutIsNotAFatalError()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testTimeoutIsNotAFatalError();
+    }
+
     private function getVulcainClient(): CurlHttpClient
     {
         if (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) {

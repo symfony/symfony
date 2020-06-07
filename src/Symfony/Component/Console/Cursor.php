@@ -21,10 +21,10 @@ final class Cursor
     private $output;
     private $input;
 
-    public function __construct(OutputInterface $output, $input = STDIN)
+    public function __construct(OutputInterface $output, $input = null)
     {
         $this->output = $output;
-        $this->input = $input;
+        $this->input = $input ?? (\defined('STDIN') ? STDIN : fopen('php://input', 'r+'));
     }
 
     public function moveUp(int $lines = 1): self

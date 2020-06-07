@@ -92,6 +92,28 @@ final class AmpResponse implements ResponseInterface
             return self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger);
         });
 
+        $info['pause_handler'] = static function (float $duration) use ($id, &$delay) {
+            if (null !== $delay) {
+                Loop::cancel($delay);
+                $delay = null;
+            }
+
+            if (0 < $duration) {
+                $duration += microtime(true);
+                Loop::disable($id);
+                $delay = Loop::defer(static function () use ($duration, $id, &$delay) {
+                    if (0 < $duration -= microtime(true)) {
+                        $delay = Loop::delay(ceil(1000 * $duration), static function () use ($id) { Loop::enable($id); });
+                    } else {
+                        $delay = null;
+                        Loop::enable($id);
+                    }
+                });
+            } else {
+                Loop::enable($id);
+            }
+        };
+
         $multi->openHandles[$id] = $id;
         ++$multi->responseCount;
     }

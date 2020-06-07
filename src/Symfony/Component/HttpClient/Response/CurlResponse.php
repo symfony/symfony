@@ -89,6 +89,26 @@ final class CurlResponse implements ResponseInterface
             return;
         }
 
+        $execCounter = $multi->execCounter;
+        $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter) {
+            if (0 < $duration) {
+                if ($execCounter === $multi->execCounter) {
+                    $multi->execCounter = !\is_float($execCounter) ? 1 + $execCounter : PHP_INT_MIN;
+                    curl_multi_exec($multi->handle, $execCounter);
+                }
+
+                $lastExpiry = end($multi->pauseExpiries);
+                $multi->pauseExpiries[(int) $ch] = $duration += microtime(true);
+                if (false !== $lastExpiry && $lastExpiry > $duration) {
+                    asort($multi->pauseExpiries);
+                }
+                curl_pause($ch, CURLPAUSE_ALL);
+            } else {
+                unset($multi->pauseExpiries[(int) $ch]);
+                curl_pause($ch, CURLPAUSE_CONT);
+            }
+        };
+
         $this->inflate = !isset($options['normalized_headers']['accept-encoding']);
         curl_pause($ch, CURLPAUSE_CONT);
 
@@ -206,7 +226,7 @@ final class CurlResponse implements ResponseInterface
     private function close(): void
     {
         $this->inflate = null;
-        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
+        unset($this->multi->pauseExpiries[$this->id], $this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_setopt($this->handle, CURLOPT_PRIVATE, '_0');
 
         if (self::$performing) {
@@ -261,6 +281,7 @@ final class CurlResponse implements ResponseInterface
 
         try {
             self::$performing = true;
+            ++$multi->execCounter;
             $active = 0;
             while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
 
@@ -303,7 +324,29 @@ final class CurlResponse implements ResponseInterface
             $timeout = min($timeout, 0.01);
         }
 
-        return curl_multi_select($multi->handle, $timeout);
+        if ($multi->pauseExpiries) {
+            $now = microtime(true);
+
+            foreach ($multi->pauseExpiries as $id => $pauseExpiry) {
+                if ($now < $pauseExpiry) {
+                    $timeout = min($timeout, $pauseExpiry - $now);
+                    break;
+                }
+
+                unset($multi->pauseExpiries[$id]);
+                curl_pause($multi->openHandles[$id][0], CURLPAUSE_CONT);
+            }
+        }
+
+        if (0 !== $selected = curl_multi_select($multi->handle, $timeout)) {
+            return $selected;
+        }
+
+        if ($multi->pauseExpiries && 0 < $timeout -= microtime(true) - $now) {
+            usleep(1E6 * $timeout);
+        }
+
+        return 0;
     }
 
     /**

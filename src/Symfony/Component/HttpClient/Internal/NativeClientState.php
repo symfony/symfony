@@ -30,6 +30,8 @@ final class NativeClientState extends ClientState
     public $dnsCache = [];
     /** @var bool */
     public $sleep = false;
+    /** @var int[] */
+    public $hosts = [];
 
     public function __construct()
     {

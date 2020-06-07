@@ -176,6 +176,30 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame($expected, $logger->logs);
     }
 
+    public function testPause()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $time = microtime(true);
+        $response->getInfo('pause_handler')(0.5);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue(0.5 <= microtime(true) - $time);
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $time = microtime(true);
+        $response->getInfo('pause_handler')(1);
+
+        foreach ($client->stream($response, 0.5) as $chunk) {
+            $this->assertTrue($chunk->isTimeout());
+            $response->cancel();
+        }
+        $response = null;
+        $this->assertTrue(1.0 > microtime(true) - $time);
+        $this->assertTrue(0.5 <= microtime(true) - $time);
+    }
+
     public function testHttp2PushVulcainWithUnusedResponse()
     {
         $client = $this->getHttpClient(__FUNCTION__);

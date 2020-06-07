@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-06T15:12:28Z
+
+Does that mean only symfony/contracts get's the stars instead of the concrete packages? Why is this better?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-06T15:14:30Z
+
+Both packages get a star with this directive: the individual contracts + symfony/contracts

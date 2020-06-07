@@ -18,6 +18,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -52,7 +53,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
-        $this->factory = (new FormFactoryBuilder())->getFormFactory();
+        $this->factory = (new FormFactoryBuilder())
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory();
 
         parent::setUp();
 
@@ -832,6 +835,61 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(1, $context->getViolations());
         $this->assertSame('This value should not be blank.', $context->getViolations()[0]->getMessage());
         $this->assertSame('data[field1]', $context->getViolations()[0]->getPropertyPath());
+    }
+
+    public function testCascadeValidationToChildFormsUsingPropertyPaths()
+    {
+        $form = $this->getCompoundForm([], [
+            'validation_groups' => ['group1', 'group2'],
+        ])
+            ->add('field1', null, [
+                'constraints' => [new NotBlank(['groups' => 'group1'])],
+                'property_path' => '[foo]',
+            ])
+            ->add('field2', null, [
+                'constraints' => [new NotBlank(['groups' => 'group2'])],
+                'property_path' => '[bar]',
+            ])
+        ;
+
+        $form->submit([
+            'field1' => '',
+            'field2' => '',
+        ]);
+
+        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+
+        $this->assertCount(2, $context->getViolations());
+        $this->assertSame('This value should not be blank.', $context->getViolations()[0]->getMessage());
+        $this->assertSame('children[field1].data', $context->getViolations()[0]->getPropertyPath());
+        $this->assertSame('This value should not be blank.', $context->getViolations()[1]->getMessage());
+        $this->assertSame('children[field2].data', $context->getViolations()[1]->getPropertyPath());
+    }
+
+    public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence()
+    {
+        $form = $this->getCompoundForm([], [
+            'validation_groups' => new GroupSequence(['group1', 'group2']),
+        ])
+            ->add('field1', null, [
+                'constraints' => [new NotBlank(['groups' => 'group1'])],
+                'property_path' => '[foo]',
+            ])
+        ;
+
+        $form->submit([
+            'field1' => '',
+        ]);
+
+        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+
+        $this->assertCount(1, $context->getViolations());
+        $this->assertSame('This value should not be blank.', $context->getViolations()[0]->getMessage());
+        $this->assertSame('children[field1].data', $context->getViolations()[0]->getPropertyPath());
     }
 
     protected function createValidator()

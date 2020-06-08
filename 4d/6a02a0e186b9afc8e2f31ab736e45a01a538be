@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-07T21:09:18Z
+
+Can you check the padding/marging of the link and code tag?
+
+This is how it looks on Chrome:
+![image](https://user-images.githubusercontent.com/2028198/83980142-54adb680-a8e1-11ea-8869-f1fc4fa87f13.png)
+
+Maybe we should add a new style for them.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2020-06-08T11:01:23Z
+
+Sorry for not checking the layout - I didn't expect any weird CSS rules ;-)
+
+That's how it looks now (Firefox):
+![Screenshot_20200608_125545](https://user-images.githubusercontent.com/1054469/84023378-45ce0f00-a988-11ea-8319-b5d23c8268a8.png)
+
+I'd like to keep `kernel.debug`, since that's the name of the parameter used on the linked page.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-06-08T11:06:23Z
+
+im for "debug mode", the parameter name is an implementation detail. The link explains "debug mode"  perfectly fine.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2020-06-08T11:16:04Z
+
+I'm using the `kernel.` part for disambiguation. After all, I confused this "debug mode" with some other debug mode myself yesterday - as *you* told me: https://github.com/symfony/symfony-docs/pull/13772#issuecomment-640264394
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-06-08T11:26:14Z
+
+@ThomasLandauer I agree with Roland. We usually refer to this as either "debug mode" or "kernel.debug container parameter" ... but "kernel.debug mode" looks like a mix of both and I'm not sure is consistent with the rest of Symfony Docs.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2020-06-08T11:41:20Z
+
+Well, 2:1 against me ;-)
+There you go.

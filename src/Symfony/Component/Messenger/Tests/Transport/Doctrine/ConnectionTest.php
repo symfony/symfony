@@ -13,12 +13,12 @@ namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\ForwardCompatibility\Driver\ResultStatement as ForwardCompatibleResultStatement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
+use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -145,14 +145,10 @@ class ConnectionTest extends TestCase
 
     private function getStatementMock($expectedResult): ResultStatement
     {
-        $mockedInterface = interface_exists(ForwardCompatibleResultStatement::class)
-            ? ForwardCompatibleResultStatement::class
-            : ResultStatement::class;
-
-        $stmt = $this->createMock($mockedInterface);
+        $stmt = $this->createMock(Statement::class);
 
         $stmt->expects($this->once())
-            ->method(method_exists($mockedInterface, 'fetchAssociative') ? 'fetchAssociative' : 'fetch')
+            ->method(method_exists(Statement::class, 'fetchAssociative') ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
@@ -312,12 +308,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $mockedInterface = interface_exists(ForwardCompatibleResultStatement::class)
-            ? ForwardCompatibleResultStatement::class
-            : ResultStatement::class;
-        $stmt = $this->createMock($mockedInterface);
+        $stmt = $this->createMock(Statement::class);
         $stmt->expects($this->once())
-            ->method(method_exists($mockedInterface, 'fetchAllAssociative') ? 'fetchAllAssociative' : 'fetchAll')
+            ->method(method_exists(Statement::class, 'fetchAllAssociative') ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection

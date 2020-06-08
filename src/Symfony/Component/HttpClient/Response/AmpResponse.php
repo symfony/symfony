@@ -173,21 +173,18 @@ final class AmpResponse implements ResponseInterface
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        $start = microtime(true);
-        $remaining = $timeout;
-
-        while (true) {
-            self::$delay = Loop::delay(1000 * $remaining, [Loop::class, 'stop']);
-            Loop::run();
-
-            if (null === self::$delay) {
-                return 1;
+        $timeout += microtime(true);
+        self::$delay = Loop::defer(static function () use ($timeout) {
+            if (0 < $timeout -= microtime(true)) {
+                self::$delay = Loop::delay(ceil(1000 * $timeout), [Loop::class, 'stop']);
+            } else {
+                Loop::stop();
             }
+        });
 
-            if (0 >= $remaining = $timeout - microtime(true) + $start) {
-                return 0;
-            }
-        }
+        Loop::run();
+
+        return null === self::$delay ? 1 : 0;
     }
 
     private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger)

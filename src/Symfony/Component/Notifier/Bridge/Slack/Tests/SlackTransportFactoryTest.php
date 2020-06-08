@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -23,18 +24,26 @@ final class SlackTransportFactoryTest extends TestCase
         $factory = new SlackTransportFactory();
 
         $host = 'testHost';
-        $path = 'testPath';
-        $transport = $factory->create(Dsn::fromString(sprintf('slack://%s/%s', $host, $path)));
+        $channel = 'testChannel';
+        $transport = $factory->create(Dsn::fromString(sprintf('slack://testUser@%s/?channel=%s', $host, $channel)));
 
-        $this->assertSame(sprintf('slack://%s/%s', $host, $path), (string) $transport);
+        $this->assertSame(sprintf('slack://%s?channel=%s', $host, $channel), (string) $transport);
+    }
+
+    public function testCreateWithNoTokenThrowsMalformed(): void
+    {
+        $factory = new SlackTransportFactory();
+
+        $this->expectException(IncompleteDsnException::class);
+        $factory->create(Dsn::fromString(sprintf('slack://%s/?channel=%s', 'testHost', 'testChannel')));
     }
 
     public function testSupportsSlackScheme(): void
     {
         $factory = new SlackTransportFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('slack://host/path')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
+        $this->assertTrue($factory->supports(Dsn::fromString('slack://host/?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
     }
 
     public function testNonSlackSchemeThrows(): void
@@ -43,6 +52,6 @@ final class SlackTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $factory->create(Dsn::fromString('somethingElse://host/path'));
+        $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
     }
 }

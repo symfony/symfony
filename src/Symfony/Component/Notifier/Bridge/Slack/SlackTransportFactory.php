@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -30,16 +29,13 @@ final class SlackTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $id = ltrim($dsn->getPath(), '/');
+        $accessToken = $this->getUser($dsn);
+        $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if (!$id) {
-            throw new IncompleteDsnException('Missing path (maybe you haven\'t update the DSN when upgrading from 5.0).', $dsn->getOriginalDsn());
-        }
-
         if ('slack' === $scheme) {
-            return (new SlackTransport($id, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new SlackTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());

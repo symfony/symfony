@@ -14,8 +14,8 @@ namespace Symfony\Component\Lock\Store;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
-use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\WriteException;
+use MongoDB\Driver\ReadPreference;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
@@ -54,8 +54,6 @@ class MongoDbStore implements BlockingStoreInterface
     private $options;
     private $initialTtl;
 
-    private $databaseVersion;
-
     use ExpiringStoreTrait;
 
     /**
@@ -87,8 +85,8 @@ class MongoDbStore implements BlockingStoreInterface
      * to 0.0 and optionally leverage
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
-     * writeConcern, readConcern and readPreference are not specified by
-     * MongoDbStore meaning the collection's settings will take effect.
+     * writeConcern and readConcern are not specified by MongoDbStore meaning the connection's settings will take effect.
+     * readPreference is primary for all queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
     public function __construct($mongo, array $options = [], float $initialTtl = 300.0)
@@ -262,6 +260,8 @@ class MongoDbStore implements BlockingStoreInterface
             'expires_at' => [
                 '$gt' => $this->createMongoDateTime(microtime(true)),
             ],
+        ], [
+            'readPreference' => new ReadPreference(\defined(ReadPreference::PRIMARY) ? ReadPreference::PRIMARY : ReadPreference::RP_PRIMARY),
         ]);
     }
 
@@ -313,25 +313,6 @@ class MongoDbStore implements BlockingStoreInterface
 
         // Mongo error E11000 - DuplicateKey
         return 11000 === $code;
-    }
-
-    private function getDatabaseVersion(): string
-    {
-        if (null !== $this->databaseVersion) {
-            return $this->databaseVersion;
-        }
-
-        $command = new Command([
-            'buildinfo' => 1,
-        ]);
-        $cursor = $this->getCollection()->getManager()->executeReadCommand(
-            $this->getCollection()->getDatabaseName(),
-            $command
-        );
-        $buildInfo = $cursor->toArray()[0];
-        $this->databaseVersion = $buildInfo->version;
-
-        return $this->databaseVersion;
     }
 
     private function getCollection(): Collection

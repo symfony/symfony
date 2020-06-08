@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -21,6 +22,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @group tty
@@ -727,21 +729,36 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
-    public function testAskThrowsExceptionFromValidatorEarlyWhenTtyIsMissing()
+    public function testQuestionValidatorRepeatsThePrompt()
     {
-        $this->expectException('Exception');
-        $this->expectExceptionMessage('Bar, not Foo');
+        $tries = 0;
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->register('question')
+            ->setCode(function ($input, $output) use (&$tries) {
+                $question = new Question('This is a promptable question');
+                $question->setValidator(function ($value) use (&$tries) {
+                    ++$tries;
+                    if (!$value) {
+                        throw new \Exception();
+                    }
 
-        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
-        $output->expects($this->once())->method('writeln');
+                    return $value;
+                });
 
-        (new QuestionHelper())->ask(
-            $this->createStreamableInputInterfaceMock($this->getInputStream('Foo'), true),
-            $output,
-            (new Question('Q?'))->setHidden(true)->setValidator(function ($input) {
-                throw new \Exception("Bar, not $input");
+                (new QuestionHelper())->ask($input, $output, $question);
+
+                return 0;
             })
-        );
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(['', 'not-empty']);
+
+        $statusCode = $tester->run(['command' => 'question'], ['interactive' => true]);
+
+        $this->assertSame(2, $tries);
+        $this->assertSame($statusCode, 0);
     }
 
     public function testEmptyChoices()

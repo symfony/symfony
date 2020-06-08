@@ -63,7 +63,6 @@
                  class="Symfony\Component\Security\Http\EventListener\SessionStrategyListener"
                  abstract="true">
             <argument type="service" id="security.authentication.session_strategy" />
-            <argument type="abstract">stateless firewall keys</argument>
         </service>
 
         <service id="security.listener.remember_me"

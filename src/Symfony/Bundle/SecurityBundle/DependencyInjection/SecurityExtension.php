@@ -168,14 +168,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.authentication.guard_handler')
             ->replaceArgument(2, $this->statelessFirewallKeys);
 
-        if ($this->authenticatorManagerEnabled) {
-            foreach ($this->statelessFirewallKeys as $statelessFirewallId) {
-                $container
-                    ->setDefinition('security.listener.session.'.$statelessFirewallId, new ChildDefinition('security.listener.session'))
-                    ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$statelessFirewallId]);
-            }
-        }
-
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
         }
@@ -373,6 +365,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $contextKey = $firewall['context'] ?? $id;
             $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey));
             $sessionStrategyId = 'security.authentication.session_strategy';
+
+            if ($this->authenticatorManagerEnabled) {
+                $container
+                    ->setDefinition('security.listener.session.'.$id, new ChildDefinition('security.listener.session'))
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+            }
         } else {
             $this->statelessFirewallKeys[] = $id;
             $sessionStrategyId = 'security.authentication.session_strategy_noop';

@@ -160,7 +160,9 @@ class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualPr
 %A
 }
 
-\class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
+if (!\class_exists('FooClass_%s', false)) {
+    \class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
+}
 
     [ProjectServiceContainer.preload.php] => <?php
 

@@ -89,6 +89,11 @@ Messenger
  * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
 
+Mime
+----
+
+ * Removed `Address::fromString()`, use `Address::create()` instead
+
 OptionsResolver
 ---------------
 

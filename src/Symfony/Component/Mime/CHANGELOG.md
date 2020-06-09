@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Deprecated `Address::fromString()`, use `Address::create()` instead
+
 4.4.0
 -----
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -158,10 +159,10 @@ class PdoStore implements PersistingStoreInterface
         $stmt->bindValue(':id', $this->getHashedKey($key));
         $stmt->bindValue(':token1', $uniqueToken);
         $stmt->bindValue(':token2', $uniqueToken);
-        $stmt->execute();
+        $result = $stmt->execute();
 
         // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
-        if (!$stmt->rowCount() && !$this->exists($key)) {
+        if (!($result instanceof Result ? $result : $stmt)->rowCount() && !$this->exists($key)) {
             throw new LockConflictedException();
         }
 
@@ -191,9 +192,9 @@ class PdoStore implements PersistingStoreInterface
 
         $stmt->bindValue(':id', $this->getHashedKey($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
-        $stmt->execute();
+        $result = $stmt->execute();
 
-        return (bool) (method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
+        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

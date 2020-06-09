@@ -171,7 +171,7 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
         $trailingSlashOnRoot = $config['trailing_slash_on_root'] ?? true;
-        $namePrefix = $config['name_prefix'] ?? '';
+        $namePrefix = $config['name_prefix'] ?? null;
         $exclude = $config['exclude'] ?? null;
 
         if (isset($config['controller'])) {

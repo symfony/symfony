@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Traits;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
@@ -175,15 +176,16 @@ trait PdoTrait
         foreach ($ids as $id) {
             $stmt->bindValue(++$i, $id);
         }
-        $stmt->execute();
+        $result = $stmt->execute();
 
-        if (method_exists($stmt, 'iterateNumeric')) {
-            $stmt = $stmt->iterateNumeric();
+        if ($result instanceof Result) {
+            $result = $result->iterateNumeric();
         } else {
             $stmt->setFetchMode(\PDO::FETCH_NUM);
+            $result = $stmt;
         }
 
-        foreach ($stmt as $row) {
+        foreach ($result as $row) {
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
@@ -213,9 +215,9 @@ trait PdoTrait
 
         $stmt->bindValue(':id', $id);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
-        $stmt->execute();
+        $result = $stmt->execute();
 
-        return (bool) $stmt->fetchColumn();
+        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

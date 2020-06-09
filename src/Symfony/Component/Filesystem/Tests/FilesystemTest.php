@@ -1520,6 +1520,23 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($filename, 'ar');
     }
 
+    /**
+     * @group network
+     */
+    public function testDumpFileWithHttpStream()
+    {
+        if (!\in_array('https', stream_get_wrappers())) {
+            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+        }
+        $sourceFilePath = 'https://symfony.com/images/common/logo/logo_symfony_header.png';
+        $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'dump_target_file';
+
+        $this->filesystem->dumpFile($targetFilePath, fopen($sourceFilePath, 'rb'));
+
+        $this->assertFileExists($targetFilePath);
+        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+    }
+
     public function testDumpFileOverwritesAnExistingFile()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo.txt';

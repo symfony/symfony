@@ -684,13 +684,19 @@ class Filesystem
         // when the filesystem supports chmod.
         $tmpFile = $this->tempnam($dir, basename($filename));
 
+        $expectedSize = false;
+
         if (\is_resource($content)) {
-            $expectedSize = fstat($content)['size'] - ftell($content);
+            $stat = fstat($content);
+            if (false !== $stat) {
+                $expectedSize = $stat['size'] - ftell($content);
+            }
         } else {
             $expectedSize = array_sum(array_map('strlen', (array) $content));
         }
 
-        if ($expectedSize !== ($actualSize = @file_put_contents($tmpFile, $content))) {
+        $actualSize = @file_put_contents($tmpFile, $content);
+        if ((false === $expectedSize && false === $actualSize) && ($actualSize !== $expectedSize)) {
             throw new IOException(sprintf('Failed to write file "%s". Wrote %d of %d bytes.', $filename, $actualSize, $expectedSize), 0, null, $filename);
         }
 

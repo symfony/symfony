@@ -51,7 +51,7 @@ class Transport
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {
-        $factory = new self(self::getDefaultFactories($dispatcher, $client, $logger));
+        $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
 
         return $factory->fromString($dsn);
     }

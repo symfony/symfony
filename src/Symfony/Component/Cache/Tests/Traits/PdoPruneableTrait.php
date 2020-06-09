@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
-use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Driver\Result;
 
 trait PdoPruneableTrait
 {

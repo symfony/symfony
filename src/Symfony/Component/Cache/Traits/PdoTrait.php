@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Cache\Traits;
 
+use Doctrine\DBAL\Abstraction\Result;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
@@ -217,7 +218,7 @@ trait PdoTrait
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $result = $stmt->execute();
 
-        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
+        return (bool) ($result instanceof DriverResult ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**
@@ -339,7 +340,7 @@ trait PdoTrait
         foreach ($serialized as $id => $data) {
             $result = $stmt->execute();
 
-            if (null === $driver && !($result instanceof Result ? $result->rowCount() : $stmt->rowCount())) {
+            if (null === $driver && !($result instanceof DriverResult ? $result->rowCount() : $stmt->rowCount())) {
                 try {
                     $insertStmt->execute();
                 } catch (DBALException $e) {

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -63,7 +64,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => \PDO::PARAM_STR];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = method_exists($stmt, 'fetchAssociative') ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt instanceof Result ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
             return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));

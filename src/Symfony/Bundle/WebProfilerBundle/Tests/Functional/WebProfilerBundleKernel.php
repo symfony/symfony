@@ -2,6 +2,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Functional;
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -71,6 +72,11 @@ class WebProfilerBundleKernel extends Kernel
     public function getLogDir()
     {
         return sys_get_temp_dir().'/log-'.spl_object_hash($this);
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        $container->register('logger', NullLogger::class);
     }
 
     public function homepageController()

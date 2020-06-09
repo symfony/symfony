@@ -339,7 +339,7 @@ trait PdoTrait
         foreach ($serialized as $id => $data) {
             $result = $stmt->execute();
 
-            if (null === $driver && !($result instanceof Result ? $result : $stmt)->rowCount()) {
+            if (null === $driver && !($result instanceof Result ? $result->rowCount() : $stmt->rowCount())) {
                 try {
                     $insertStmt->execute();
                 } catch (DBALException $e) {

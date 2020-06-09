@@ -330,4 +330,14 @@ class LdapUserProviderTest extends TestCase
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByUsername('foo'));
     }
+
+    public function testRefreshUserShouldReturnUserWithSameProperties()
+    {
+        $ldap = $this->createMock(LdapInterface::class);
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
+
+        $user = new LdapUser(new Entry('foo'), 'foo', 'bar', ['ROLE_DUMMY'], ['email' => 'foo@symfony.com']);
+
+        $this->assertEquals($user, $provider->refreshUser($user));
+    }
 }

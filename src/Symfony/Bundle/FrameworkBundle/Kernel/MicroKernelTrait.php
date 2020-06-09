@@ -99,7 +99,6 @@ trait MicroKernelTrait
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', [
-                'secret' => '%env(APP_SECRET)%',
                 'router' => [
                     'resource' => 'kernel::loadRoutes',
                     'type' => 'service',

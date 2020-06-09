@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-18T13:08:34Z
+
+The entry-point is now `AsyncDecoratorTrait`, which is a simple trait to wire `AsyncResponse`, where all the logic is.
+
+I implemented test cases that illustrate some use cases:
+- retry after 404
+- retry after a transport error
+- preflight request
+- live transclusion of content, doing concurrent requests inside the main request.
+
+This is what made me change the API proposed here.
+
+PR ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-20T07:57:27Z
+
+> Sorry, unfortunately I gave up reviewing in middle. This is too much of a black box to give proper review.
+
+You did great, thanks for the review. The logic is not trivial, and the code isn't either.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-05-28T21:22:20Z
+
+Could this trait be used to solve #36967? :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-28T22:00:16Z
+
+@derrabus absolutely: it would make it way easier to persist to the cache without breaking async. (bold claim, to be verified of course :) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-30T14:10:09Z
+
+I'm quite happy with this!
+
+BTW, doc PR at https://github.com/symfony/symfony-docs/pull/13736
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-07T16:07:50Z
+
+@symfony/mergers I'd appreciate if we could merge this PR soon as that would unlock some next steps (I'm preparing a PR to allow pausing a response, needed for #36692 and for implementing support for HTTP 429 or throttling)

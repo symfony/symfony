@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Version;
 use PHPUnit\Framework\TestCase;
@@ -71,7 +72,7 @@ class DoctrineIntegrationTest extends TestCase
             ->setParameter(':body', '{"message": "Hi i am delayed"}')
             ->execute();
 
-        $available_at = new \DateTime(method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
+        $available_at = new \DateTime($stmt instanceof Result ? $stmt->fetchOne() : $stmt->fetchColumn());
 
         $now = new \DateTime();
         $now->modify('+60 seconds');

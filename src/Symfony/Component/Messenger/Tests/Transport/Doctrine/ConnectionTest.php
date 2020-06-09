@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -29,7 +30,7 @@ class ConnectionTest extends TestCase
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
         $schemaSynchronizer = $this->getSchemaSynchronizerMock();
-        $stmt = $this->getStatementMock([
+        $stmt = $this->getResultMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -63,7 +64,7 @@ class ConnectionTest extends TestCase
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
         $schemaSynchronizer = $this->getSchemaSynchronizerMock();
-        $stmt = $this->getStatementMock(false);
+        $stmt = $this->getResultMock(false);
 
         $queryBuilder
             ->method('getParameters')
@@ -142,12 +143,12 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getStatementMock($expectedResult)
+    private function getResultMock($expectedResult)
     {
-        $stmt = $this->createMock(Statement::class);
+        $stmt = $this->createMock(interface_exists(Result::class) ? Result::class : Statement::class);
 
         $stmt->expects($this->once())
-            ->method(method_exists(Statement::class, 'fetchAssociative') ? 'fetchAssociative' : 'fetch')
+            ->method(interface_exists(Result::class) ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
@@ -262,7 +263,7 @@ class ConnectionTest extends TestCase
         $driverConnection = $this->getDBALConnectionMock();
         $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $id = 1;
-        $stmt = $this->getStatementMock([
+        $stmt = $this->getResultMock([
             'id' => $id,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -307,9 +308,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(Statement::class);
+        $stmt = $this->createMock(interface_exists(Result::class) ? Result::class : Statement::class);
         $stmt->expects($this->once())
-            ->method(method_exists(Statement::class, 'fetchAllAssociative') ? 'fetchAllAssociative' : 'fetchAll')
+            ->method(interface_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection

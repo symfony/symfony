@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
@@ -310,7 +309,7 @@ class Connection
             ->from($this->configuration['table_name'], 'm');
     }
 
-    private function executeQuery(string $sql, array $parameters = [], array $types = []): ResultStatement
+    private function executeQuery(string $sql, array $parameters = [], array $types = [])
     {
         try {
             $stmt = $this->driverConnection->executeQuery($sql, $parameters, $types);

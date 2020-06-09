@@ -26,7 +26,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class NativeResponse implements ResponseInterface
 {
-    use ResponseTrait;
+    use CommonResponseTrait;
+    use TransportResponseTrait;
 
     private $context;
     private $url;

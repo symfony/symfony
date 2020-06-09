@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `AsyncDecoratorTrait` to ease processing responses without breaking async
+
 5.1.0
 -----
 

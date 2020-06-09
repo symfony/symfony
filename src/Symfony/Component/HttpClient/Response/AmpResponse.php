@@ -35,7 +35,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class AmpResponse implements ResponseInterface
 {
-    use ResponseTrait;
+    use CommonResponseTrait;
+    use TransportResponseTrait;
 
     private $multi;
     private $options;

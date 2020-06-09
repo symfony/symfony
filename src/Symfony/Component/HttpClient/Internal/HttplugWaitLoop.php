@@ -15,7 +15,7 @@ use Http\Client\Exception\NetworkException;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Symfony\Component\HttpClient\Response\ResponseTrait;
+use Symfony\Component\HttpClient\Response\CommonResponseTrait;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -119,7 +119,7 @@ final class HttplugWaitLoop
             }
         }
 
-        if (isset(class_uses($response)[ResponseTrait::class])) {
+        if (isset(class_uses($response)[CommonResponseTrait::class])) {
             $body = $this->streamFactory->createStreamFromResource($response->toStream(false));
         } elseif (!$buffer) {
             $body = $this->streamFactory->createStreamFromResource(StreamWrapper::createResource($response, $this->client));

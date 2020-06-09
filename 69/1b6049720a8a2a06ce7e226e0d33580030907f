@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-06-06T21:32:46Z
+
+Why limiting this feature to the MicroKernelTrait and not having it in the base Kernel class?  It might be confusing.
+
+---------------------------------------------------------------------------
+
+by Plopix at 2020-06-08T19:30:54Z
+
+very good question @GromNaN I think the Kernel is to be really generic where the Trait is more related to Flex and Symfony a Framework (vs as a Component)
+I think that is a tricky question on which there is no valid/straightforward answer.
+
+So I will let you guys decide, but I vote for the Trait ;-)

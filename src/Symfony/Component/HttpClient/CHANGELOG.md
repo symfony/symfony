@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `AsyncDecoratorTrait` to ease processing responses without breaking async
+ * added support for pausing responses with a new `pause_handler` callable exposed as an info item
 
 5.1.0
 -----

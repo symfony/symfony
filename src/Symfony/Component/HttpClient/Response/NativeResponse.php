@@ -38,6 +38,7 @@ final class NativeResponse implements ResponseInterface
     private $multi;
     private $debugBuffer;
     private $shouldBuffer;
+    private $pauseExpiry = 0;
 
     /**
      * @internal
@@ -64,6 +65,11 @@ final class NativeResponse implements ResponseInterface
 
         $this->initializer = static function (self $response) {
             return null === $response->remaining;
+        };
+
+        $pauseExpiry = &$this->pauseExpiry;
+        $info['pause_handler'] = static function (float $duration) use (&$pauseExpiry) {
+            $pauseExpiry = 0 < $duration ? microtime(true) + $duration : 0;
         };
     }
 
@@ -184,7 +190,9 @@ final class NativeResponse implements ResponseInterface
             return;
         }
 
-        $this->multi->openHandles[$this->id] = [$h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info];
+        $host = parse_url($this->info['redirect_url'] ?? $this->url, PHP_URL_HOST);
+        $this->multi->openHandles[$this->id] = [&$this->pauseExpiry, $h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info, $host];
+        $this->multi->hosts[$host] = 1 + ($this->multi->hosts[$host] ?? 0);
     }
 
     /**
@@ -192,6 +200,9 @@ final class NativeResponse implements ResponseInterface
      */
     private function close(): void
     {
+        if (null !== ($host = $this->multi->openHandles[$this->id][6] ?? null) && 0 >= --$this->multi->hosts[$host]) {
+            unset($this->multi->hosts[$host]);
+        }
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         $this->handle = $this->buffer = $this->inflate = $this->onProgress = null;
     }
@@ -221,10 +232,18 @@ final class NativeResponse implements ResponseInterface
      */
     private static function perform(ClientState $multi, array &$responses = null): void
     {
-        foreach ($multi->openHandles as $i => [$h, $buffer, $onProgress]) {
+        foreach ($multi->openHandles as $i => [$pauseExpiry, $h, $buffer, $onProgress]) {
+            if ($pauseExpiry) {
+                if (microtime(true) < $pauseExpiry) {
+                    continue;
+                }
+
+                $multi->openHandles[$i][0] = 0;
+            }
+
             $hasActivity = false;
-            $remaining = &$multi->openHandles[$i][3];
-            $info = &$multi->openHandles[$i][4];
+            $remaining = &$multi->openHandles[$i][4];
+            $info = &$multi->openHandles[$i][5];
             $e = null;
 
             // Read incoming buffer and write it to the dechunk one
@@ -285,6 +304,9 @@ final class NativeResponse implements ResponseInterface
 
                 $multi->handlesActivity[$i][] = null;
                 $multi->handlesActivity[$i][] = $e;
+                if (null !== ($host = $multi->openHandles[$i][6] ?? null) && 0 >= --$multi->hosts[$host]) {
+                    unset($multi->hosts[$host]);
+                }
                 unset($multi->openHandles[$i]);
                 $multi->sleep = false;
             }
@@ -294,25 +316,22 @@ final class NativeResponse implements ResponseInterface
             return;
         }
 
-        // Create empty activity lists to tell ResponseTrait::stream() we still have pending requests
+        $maxHosts = $multi->maxHostConnections;
+
         foreach ($responses as $i => $response) {
-            if (null === $response->remaining && null !== $response->buffer) {
-                $multi->handlesActivity[$i] = [];
+            if (null !== $response->remaining || null === $response->buffer) {
+                continue;
             }
-        }
 
-        if (\count($multi->openHandles) >= $multi->maxHostConnections) {
-            return;
-        }
-
-        // Open the next pending request - this is a blocking operation so we do only one of them
-        foreach ($responses as $i => $response) {
-            if (null === $response->remaining && null !== $response->buffer) {
+            if ($response->pauseExpiry && microtime(true) < $response->pauseExpiry) {
+                // Create empty open handles to tell we still have pending requests
+                $multi->openHandles[$i] = [INF, null, null, null];
+            } elseif ($maxHosts && $maxHosts > ($multi->hosts[parse_url($response->url, PHP_URL_HOST)] ?? 0)) {
+                // Open the next pending request - this is a blocking operation so we do only one of them
                 $response->open();
                 $multi->sleep = false;
                 self::perform($multi);
-
-                break;
+                $maxHosts = 0;
             }
         }
     }
@@ -324,9 +343,32 @@ final class NativeResponse implements ResponseInterface
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        $_ = [];
-        $handles = array_column($multi->openHandles, 0);
+        if (!$multi->sleep = !$multi->sleep) {
+            return -1;
+        }
 
-        return (!$multi->sleep = !$multi->sleep) ? -1 : stream_select($handles, $_, $_, (int) $timeout, (int) (1E6 * ($timeout - (int) $timeout)));
+        $_ = $handles = [];
+        $now = null;
+
+        foreach ($multi->openHandles as [$pauseExpiry, $h]) {
+            if (null === $h) {
+                continue;
+            }
+
+            if ($pauseExpiry && ($now ?? $now = microtime(true)) < $pauseExpiry) {
+                $timeout = min($timeout, $pauseExpiry - $now);
+                continue;
+            }
+
+            $handles[] = $h;
+        }
+
+        if (!$handles) {
+            usleep(1E6 * $timeout);
+
+            return 0;
+        }
+
+        return stream_select($handles, $_, $_, (int) $timeout, (int) (1E6 * ($timeout - (int) $timeout)));
     }
 }

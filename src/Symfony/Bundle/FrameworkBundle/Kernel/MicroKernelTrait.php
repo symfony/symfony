@@ -66,6 +66,22 @@ trait MicroKernelTrait
     /**
      * {@inheritdoc}
      */
+    public function getCacheDir(): string
+    {
+        return $_SERVER['APP_CACHE_DIR'] ?? parent::getCacheDir();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLogDir(): string
+    {
+        return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function registerBundles(): iterable
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';

@@ -16,6 +16,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -216,15 +217,16 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($ids as $id) {
             $stmt->bindValue(++$i, $id);
         }
-        $stmt->execute();
+        $result = $stmt->execute();
 
-        if (method_exists($stmt, 'iterateNumeric')) {
-            $stmt = $stmt->iterateNumeric();
+        if ($result instanceof Result) {
+            $result = $result->iterateNumeric();
         } else {
             $stmt->setFetchMode(\PDO::FETCH_NUM);
+            $result = $stmt;
         }
 
-        foreach ($stmt as $row) {
+        foreach ($result as $row) {
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
@@ -254,9 +256,9 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         $stmt->bindValue(':id', $id);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
-        $stmt->execute();
+        $result = $stmt->execute();
 
-        return (bool) (method_exists($stmt, 'fetchOne') ? $stmt->fetchOne() : $stmt->fetchColumn());
+        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

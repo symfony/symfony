@@ -31,6 +31,9 @@ matrix:
         - php: nightly
           services: [memcached]
     fast_finish: true
+    allow_failures:
+        - php: nightly
+          services: [memcached]
 
 cache:
     directories:

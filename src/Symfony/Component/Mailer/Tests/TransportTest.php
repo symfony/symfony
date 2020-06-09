@@ -61,6 +61,22 @@ class TransportTest extends TestCase
     }
 
     /**
+     * @dataProvider fromDsnProvider
+     */
+    public function testFromDsn(string $dsn, TransportInterface $transport): void
+    {
+        $this->assertEquals($transport, Transport::fromDsn($dsn));
+    }
+
+    public function fromDsnProvider(): iterable
+    {
+        yield 'multiple transports' => [
+            'failover(smtp://a smtp://b)',
+            new FailoverTransport([new Transport\Smtp\EsmtpTransport('a'), new Transport\Smtp\EsmtpTransport('b')]),
+        ];
+    }
+
+    /**
      * @dataProvider fromWrongStringProvider
      */
     public function testFromWrongString(string $dsn, string $error): void

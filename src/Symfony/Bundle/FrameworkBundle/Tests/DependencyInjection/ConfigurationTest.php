@@ -493,6 +493,7 @@ class ConfigurationTest extends TestCase
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
                 'message_bus' => null,
+                'headers' => [],
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),

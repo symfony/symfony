@@ -1,6 +1,11 @@
 UPGRADE FROM 5.1 to 5.2
 =======================
 
+Mime
+----
+
+ * Deprecated `Address::fromString()`, use `Address::create()` instead
+
 Validator
 ---------
 

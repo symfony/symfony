@@ -44,6 +44,19 @@ class AddressTest extends TestCase
         $this->assertEquals($a, Address::create('fabien@symfony.com'));
     }
 
+    /**
+     * @dataProvider fromStringProvider
+     */
+    public function testCreateWithString($string, $displayName, $addrSpec)
+    {
+        $address = Address::create($string);
+        $this->assertEquals($displayName, $address->getName());
+        $this->assertEquals($addrSpec, $address->getAddress());
+        $fromToStringAddress = Address::create($address->toString());
+        $this->assertEquals($displayName, $fromToStringAddress->getName());
+        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
+    }
+
     public function testCreateWrongArg()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -81,6 +94,7 @@ class AddressTest extends TestCase
 
     /**
      * @dataProvider fromStringProvider
+     * @group legacy
      */
     public function testFromString($string, $displayName, $addrSpec)
     {
@@ -92,6 +106,9 @@ class AddressTest extends TestCase
         $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
     }
 
+    /**
+     * @group legacy
+     */
     public function testFromStringFailure()
     {
         $this->expectException(InvalidArgumentException::class);

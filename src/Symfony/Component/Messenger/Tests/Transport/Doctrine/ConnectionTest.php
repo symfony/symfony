@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Abstraction\Result;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;

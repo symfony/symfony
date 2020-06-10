@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by architech99 at 2020-05-10T15:30:52Z
+
+Will we sign configuration values from environment variables using `getenv()` or a super-global like `$_SERVER` or `$_ENV`? I think getenv() would be preferred. Also, is the expectation that each configuration file would contain an associative array?
+
+**Edit:** I jumped on this too quick. The updates posted as I was commenting answer my questions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-10T02:31:56Z
+
+PR rebased and ready for merge.

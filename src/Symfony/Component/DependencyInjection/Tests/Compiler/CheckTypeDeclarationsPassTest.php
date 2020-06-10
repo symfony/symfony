@@ -612,20 +612,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
     }
 
-    public function testProcessResolveArrayParameters()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('ccc', ['foobar']);
-
-        $container
-            ->register('foobar', BarMethodCall::class)
-            ->addMethodCall('setArray', ['%ccc%']);
-
-        (new CheckTypeDeclarationsPass(true))->process($container);
-
-        $this->addToAssertionCount(1);
-    }
-
     public function testProcessResolveExpressions()
     {
         $container = new ContainerBuilder();
@@ -788,6 +774,22 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->addArgument(new Expression('service("baz").getStdClass()'));
 
         (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessResolveParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('array_param', ['foobar']);
+        $container->setParameter('string_param', 'ccc');
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%array_param%'])
+            ->addMethodCall('setString', ['%string_param%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
     }

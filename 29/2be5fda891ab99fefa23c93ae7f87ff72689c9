@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by kralos at 2020-06-08T05:42:06Z
+
+In order to add a CI test for this we would need a replicaSet in CI. Not sure this is worth doing?
+
+---------------------------------------------------------------------------
+
+by kralos at 2020-06-09T11:59:49Z
+
+I can't find anything that appears maintained. There's https://github.com/marketplace/actions/mongodb-in-github-actions#with-a-replica-set however their replica set is single instance (there is no secondary so we therefore can't test against it). I don't really want to create and maintain our own github action for this but might make sense in the future if we want to also test `\Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler::doRead` which i suspect has the same issue. I will be testing this in more depth over the coming months
+
+---------------------------------------------------------------------------
+
+by jmikola at 2020-06-10T01:27:03Z
+
+Side note: while looking at https://github.com/symfony/symfony/blob/6d6d989dbe96ef95fb7e5da34d7c1001e161d4c9/src/Symfony/Component/Lock/Tests/Store/MongoDbStoreTest.php#L119, I noticed that the tests pass a custom `collection` option in the MongoDB connection string. Likewise, this adapter parses a default `database` name from the authentication database. I realize this likely needs to remain in 5.x for BC at this point, but I'd argue against having this behavior for two reasons:
+
+ * The extension uses the connection string to cache internal libmongoc client objects (for socket persistence), so overloading the string to hold extra options not used by the driver will defeat any chance of being able to efficiently re-use existing sockets.
+ * The database name in the connection string is documented as the [`defaultAuthDb`](https://www.php.net/manual/en/mongodb-driver-manager.construct.php) and fallback for the `authSource` URI option. Suggestion folks use it to denote a default database could lead to it inadvertently being used for authentication (over the default "admin" database) if credentials were also provided.
+
+IMO, both `collection` and `database` should be solicited as explicit options to the storage class and not pulled from the connection string, `uriOptions`, or `driverOptions`.
+
+---------------------------------------------------------------------------
+
+by kralos at 2020-06-10T01:53:55Z
+
+> Side note: while looking at
+>
+> https://github.com/symfony/symfony/blob/6d6d989dbe96ef95fb7e5da34d7c1001e161d4c9/src/Symfony/Component/Lock/Tests/Store/MongoDbStoreTest.php#L119
+> , I noticed that the tests pass a custom `collection` option in the MongoDB connection string. Likewise, this adapter parses a default `database` name from the authentication database. I realize this likely needs to remain in 5.x for BC at this point, but I'd argue against having this behavior for two reasons:
+>
+>     * The extension uses the connection string to cache internal libmongoc client objects (for socket persistence), so overloading the string to hold extra options not used by the driver will defeat any chance of being able to efficiently re-use existing sockets.
+>
+>     * The database name in the connection string is documented as the [`defaultAuthDb`](https://www.php.net/manual/en/mongodb-driver-manager.construct.php) and fallback for the `authSource` URI option. Suggestion folks use it to denote a default database could lead to it inadvertently being used for authentication (over the default "admin" database) if credentials were also provided.
+>
+>
+> IMO, both `collection` and `database` should be solicited as explicit options to the storage class and not pulled from the connection string, `uriOptions`, or `driverOptions`.
+
+#### regarding the use of `collection` in the connection URI's querystring
+
+I absolutely agree we should not introduce non-standard querystring params. The reason this was added at the time was to allow `Symfony\Component\Lock\Store\StoreFactory` to construct a `MongoDbStore` from a uri alone. I think we should deprecate `collection` from the uri in `MongoDbStore` as well as uri construction via `StoreFactory`. Since `StoreFactory` doesn't support `$options` the only way to construct a `MongoDbStore` would be to pass it a `\MongoDB\Collection`.
+
+#### regarding the use of `database` in the connection URI's path
+
+I did a fair bit of testing with [mongo cli client](https://docs.mongodb.com/manual/reference/program/mongo/#cmdoption-mongo-arg-db) before implementing the current behavior. As far as i can tell I have mirrored what mongo cli does:
+
+* `mongodb://server/db1` means defaultDb = db1
+* `mongodb://user:pass@server/` means defaultDb = none / [`mongo --nodb`](https://docs.mongodb.com/manual/reference/program/mongo/#cmdoption-mongo-nodb) and authDb = admin
+* `mongodb://user:pass@server/db1` means defaultDb = db1 and authDb = db1
+* `mongodb://user:pass@server/db1?authSource=db2` means defaultDb = db1 and authDb = db2
+
+---------------------------------------------------------------------------
+
+by jmikola at 2020-06-10T03:04:49Z
+
+> regarding the use of database in the connection URI's path
+> I did a fair bit of testing with mongo cli client before implementing the current behavior. As far as i can tell I have mirrored what mongo cli does:
+
+Indeed, the MongoDB shell does use this as its default database since its REPL always has a `db` context. You can chalk this up to legacy behavior. FWIW, the connection strings provided by MongoDB Atlas also include the database component (I believe they use "admin"?).
+
+From the driver's perspective, the root context is always the client object and applications explicitly select a database or collection. The [connection string spec](https://github.com/mongodb/specifications/blob/master/source/connection-string/connection-string-spec.rst#auth-database-optional) for drivers only defines this as a default auth database and makes no mention of it having any other purpose. The [server manual for connection strings](https://docs.mongodb.com/manual/reference/connection-string/#components) says the same. Given that `authSource` exists, I'd encourage everyone to consider the database component obsolete (unless you're working with the shell).
+
+Some libraries built atop drivers also use the database component as _their_ default database (e.g. default DB for storing models in the Mongoose ODM for Node.js); however, I have the same objections about that since it could also clash with authentication.
+
+Having said all that, I imagine none of this can be changed in 5.x. If you'd like to preemptively open a ticket to address this in 6.0, I would still suggest addressing both `database` and `collection` and perhaps expanding the scope of that TODO ticket to cover any other MongoDB adapters that might exist in Symfony. It's been some time since I contributed, but I believe similar code may exist in the session adapter.
+
+---------------------------------------------------------------------------
+
+by kralos at 2020-06-10T04:06:18Z
+
+@jmikola Thanks heaps for your insight to the usage of `collection` / `database` in mongodb connection URIs. In the interest of allowing this bugfix to proceed, I've opened a separate ticket to deprecate the behavior you've raised concerns with https://github.com/symfony/symfony/issues/37180.
+
+I'll make sure all of this also filters down to `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler`

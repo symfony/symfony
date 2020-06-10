@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T14:37:32Z
+
+What do you think about adding this also?
+```php
+function env(string $name): string
+{
+    return '%env('.$name.')%';
+}
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-12T15:17:37Z
+
+> What do you think about adding this also?
+
+I like the idea, but I think env vars might need a special configurator to get rid of the "complex" strings like `int:key:timeout:query_string:MONGODB_URL` and `json:file:resolve:AUTH_FILE`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-12T15:21:43Z
+
+> I think env vars might need a special configurator to get rid of the "complex" strings
+
+Honestly, teaching ppl with the real syntax is going to empower them much more than using some extremely specific DSL here.

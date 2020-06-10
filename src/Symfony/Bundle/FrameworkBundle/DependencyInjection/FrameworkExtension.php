@@ -360,7 +360,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['notifier'])) {
-            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
+            $this->registerNotifierConfiguration($config['notifier'], $container, $phpLoader);
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
@@ -2010,14 +2010,14 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!class_exists(Notifier::class)) {
             throw new LogicException('Notifier support cannot be enabled as the component is not installed. Try running "composer require symfony/notifier".');
         }
 
-        $loader->load('notifier.xml');
-        $loader->load('notifier_transports.xml');
+        $loader->load('notifier.php');
+        $loader->load('notifier_transports.php');
 
         if ($config['chatter_transports']) {
             $container->getDefinition('chatter.transports')->setArgument(0, $config['chatter_transports']);

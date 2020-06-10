@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -80,6 +81,14 @@ class ContainerConfigurator extends AbstractConfigurator
 
         return $clone;
     }
+}
+
+/**
+ * Creates a parameter.
+ */
+function param(string $name): string
+{
+    return '%'.$name.'%';
 }
 
 /**
@@ -164,4 +173,12 @@ function tagged_locator(string $tag, string $indexAttribute = null, string $defa
 function expr(string $expression): Expression
 {
     return new Expression($expression);
+}
+
+/**
+ * Creates an abstract argument.
+ */
+function abstract_arg(string $description): AbstractArgument
+{
+    return new AbstractArgument($description);
 }

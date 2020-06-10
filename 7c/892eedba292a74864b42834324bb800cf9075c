@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-09T17:02:15Z
+
+This is called here for instance:
+https://github.com/symfony/symfony/blob/6d6d989dbe96ef95fb7e5da34d7c1001e161d4c9/src/Symfony/Component/Routing/Loader/YamlFileLoader.php#L217-L219
+
+even if the name prefix is not defined, due to:
+https://github.com/symfony/symfony/blob/6d6d989dbe96ef95fb7e5da34d7c1001e161d4c9/src/Symfony/Component/Routing/Loader/YamlFileLoader.php#L174
+
+I wonder if we should compare with empty string instead or change to `$config['name_prefix'] ?? null` and save some ticks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-09T17:05:51Z
+
+@yceruto that'd make sense yes

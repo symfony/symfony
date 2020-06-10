@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-23T07:15:04Z
+
+This should be considered on 3.4 first to me, agreeing on changing the annotation.
+
+Note that technically this is a BC break, but the method is `@final` in 4.4.
+That's something to consider when deciding what to do here.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2020-05-23T10:26:18Z
+
+In 3.4 the type-hint isn't there - so everything's fine: https://github.com/symfony/symfony/blob/3.4/src/Symfony/Bundle/FrameworkBundle/Controller/ControllerTrait.php#L196
+
+In 4.4 it is there, but the entire method still lives in `Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait` (which doesn't exist any more): https://github.com/symfony/symfony/blob/4.4/src/Symfony/Bundle/FrameworkBundle/Controller/ControllerTrait.php#L159
+So should I do the change there too?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-05-31T06:13:34Z
+
+`@param string $message` should be removed in 3.4 isnt it, which lead to this issue in the first place i believe.

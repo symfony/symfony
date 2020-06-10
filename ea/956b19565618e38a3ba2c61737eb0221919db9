@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-05-14T15:32:14Z
+
+> If you have something else (RGB, HSV, ...), you need to first convert it to a CSS color.
+
+I guess you need to reword your description, to talk about hex colors. CSS colors *do* support RGB and HSL (and more to come)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-16T08:48:26Z
+
+Anyone willing to test on Windows?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-16T18:22:54Z
+
+Some tests with the `Color` class + the rainbow script on some windows command lines (I couldn't test the whole repository, as I haven't set-up my windows PC for development at all). As expected, no true color support, but seems like default colors work as expected.
+
+Windows Powershell
+![powershell](https://user-images.githubusercontent.com/749025/82127199-06116e80-97b2-11ea-9b89-bec2cbcd4eb3.png)
+
+Git Bash GUI
+![git bash](https://user-images.githubusercontent.com/749025/82127243-4d97fa80-97b2-11ea-99d3-df9c3a1b60c2.png)
+
+Command prompt
+![cmd](https://user-images.githubusercontent.com/749025/82127270-80da8980-97b2-11ea-9ab3-fb63a6d83aad.png)
+
+WSL
+![wsl](https://user-images.githubusercontent.com/749025/82127285-a9628380-97b2-11ea-91c4-cacd825dfd07.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-10T02:06:57Z
+
+Thanks @wouterj for testing on Windows.

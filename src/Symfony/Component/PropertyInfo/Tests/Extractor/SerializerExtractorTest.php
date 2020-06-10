@@ -40,4 +40,9 @@ class SerializerExtractorTest extends TestCase
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', ['serializer_groups' => ['a']])
         );
     }
+
+    public function testGetPropertiesWithAnyGroup()
+    {
+        $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy', ['serializer_groups' => null]));
+    }
 }

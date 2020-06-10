@@ -68,18 +68,12 @@ class MongoDbStore implements BlockingStoreInterface
      *
      * Options:
      *      gcProbablity:  Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
-     *      database:      The name of the database [required when $mongo is a Client]
-     *      collection:    The name of the collection [required when $mongo is a Client]
+     *      database:      The name of the database [required when $mongo is not a Collection]
+     *      collection:    The name of the collection [required when $mongo is not a Collection]
      *      uriOptions:    Array of uri options. [used when $mongo is a URI]
      *      driverOptions: Array of driver options. [used when $mongo is a URI]
      *
-     * When using a URI string:
-     *      the database is determined from the "database" option, otherwise the uri's path is used.
-     *      the collection is determined from the "collection" option, otherwise the uri's "collection" querystring parameter is used.
-     *
-     * For example: mongodb://myuser:mypass@myhost/mydatabase?collection=mycollection
-     *
-     * @see https://docs.mongodb.com/php-library/current/reference/method/MongoDBClient__construct/
+     * For uriOptions and driverOptions @see https://docs.mongodb.com/php-library/current/reference/method/MongoDBClient__construct/
      *
      * If gcProbablity is set to a value greater than 0.0 there is a chance
      * this store will attempt to create a TTL index on self::save().
@@ -89,6 +83,7 @@ class MongoDbStore implements BlockingStoreInterface
      *
      * writeConcern, readConcern and readPreference are not specified by
      * MongoDbStore meaning the collection's settings will take effect.
+     *
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
     public function __construct($mongo, array $options = [], float $initialTtl = 300.0)
@@ -123,12 +118,21 @@ class MongoDbStore implements BlockingStoreInterface
                 parse_str($parsedUrl['query'], $query);
             }
             $this->options['collection'] = $this->options['collection'] ?? $query['collection'] ?? null;
-            $this->options['database'] = $this->options['database'] ?? ltrim($parsedUrl['path'] ?? '', '/') ?: null;
+            $authSource = $this->options['uriOptions']['authSource'] ?? $query['authSource'] ?? null;
+            $pathDb = ltrim($parsedUrl['path'] ?? '', '/') ?: null;
+            $databaseDerivedFromPath = null === $this->options['database'] && null !== $pathDb && $authSource !== $pathDb;
+            $this->options['database'] = $this->options['database'] ?? $pathDb;
             if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option when constructing with a URI.', __METHOD__));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" to be passed via $options or the URI path.', __METHOD__));
             }
             if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option when constructing with a URI.', __METHOD__));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" to be passed via $options or the URI querystring.', __METHOD__));
+            }
+            if ($databaseDerivedFromPath) {
+                trigger_deprecation('symfony/lock', '5.2', 'Constructing a "%s" by passing the "database" via a connection URI is deprecated. Either contruct with a "%s" or pass it via $options instead.', __CLASS__, Collection::class);
+            }
+            if (isset($query['collection'])) {
+                trigger_deprecation('symfony/lock', '5.2', 'Constructing a "%s" by passing the "collection" via a connection URI is deprecated. Either contruct with a "%s" or pass it via $options instead.', __CLASS__, Collection::class);
             }
 
             $this->uri = $mongo;

@@ -81,6 +81,8 @@ class StoreFactory
                 return new $storeClass($connection);
 
             case 0 === strpos($connection, 'mongodb'):
+                trigger_deprecation('symfony/lock', '5.2', 'Using "%s" to construct a "%s" with a connection URI string is deprecated. Use a "%s" instead.', __CLASS__, MongoDbStore::class, Collection::class);
+
                 return new MongoDbStore($connection);
 
             case 0 === strpos($connection, 'mssql://'):

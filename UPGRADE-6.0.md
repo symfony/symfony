@@ -73,6 +73,11 @@ Inflector
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
 
+Lock
+----
+
+* `MongoDbStore` can no longer be constructed by passing `database` or `collection` via connection URI, use `$options` instead.
+
 Mailer
 ------
 

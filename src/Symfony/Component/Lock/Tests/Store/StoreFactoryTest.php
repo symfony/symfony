@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -28,6 +29,8 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  */
 class StoreFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider validConnections
      */
@@ -52,7 +55,6 @@ class StoreFactoryTest extends TestCase
         }
         if (class_exists(\MongoDB\Collection::class)) {
             yield [$this->createMock(\MongoDB\Collection::class), MongoDbStore::class];
-            yield ['mongodb://localhost/test?collection=lock', MongoDbStore::class];
         }
         if (class_exists(\Zookeeper::class)) {
             yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
@@ -87,5 +89,23 @@ class StoreFactoryTest extends TestCase
 
         yield ['flock', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+    }
+
+    /**
+     * @dataProvider deprecatedConnections
+     * @group legacy
+     */
+    public function testDeprecatedCreateStore($connection, string $expectedStoreClass)
+    {
+        $this->expectDeprecation('Since symfony/lock 5.2: Using "Symfony\Component\Lock\Store\StoreFactory" to construct a "Symfony\Component\Lock\Store\MongoDbStore" with a connection URI string is deprecated. Use a "Symfony\Component\Lock\Store\Collection" instead.');
+
+        $store = StoreFactory::createStore($connection);
+
+        $this->assertInstanceOf($expectedStoreClass, $store);
+    }
+
+    public function deprecatedConnections()
+    {
+        yield ['mongodb://localhost/test?collection=lock', MongoDbStore::class];
     }
 }

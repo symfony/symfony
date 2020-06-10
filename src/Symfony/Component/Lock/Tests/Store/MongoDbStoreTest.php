@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
@@ -27,6 +28,7 @@ use Symfony\Component\Lock\Store\MongoDbStore;
  */
 class MongoDbStoreTest extends AbstractStoreTest
 {
+    use ExpectDeprecationTrait;
     use ExpiringStoreTestTrait;
 
     public static function setupBeforeClass(): void
@@ -97,9 +99,9 @@ class MongoDbStoreTest extends AbstractStoreTest
      */
     public function testConstructionMethods($mongo, array $options)
     {
-        $key = new Key(uniqid(__METHOD__, true));
-
         $store = new MongoDbStore($mongo, $options);
+
+        $key = new Key(uniqid(__METHOD__, true));
 
         $store->save($key);
         $this->assertTrue($store->exists($key));
@@ -116,9 +118,57 @@ class MongoDbStoreTest extends AbstractStoreTest
         $collection = $client->selectCollection('test', 'lock');
         yield [$collection, []];
 
-        yield ['mongodb://localhost/test?collection=lock', []];
-        yield ['mongodb://localhost/test', ['collection' => 'lock']];
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
+        yield ['mongodb://localhost/test', ['database' => 'test', 'collection' => 'lock']];
+    }
+
+    /**
+     * @dataProvider provideDeprecatedDatabaseConstructorArgs
+     * @group legacy
+     */
+    public function testDeprecatedDatabaseConstructionMethods($mongo, array $options)
+    {
+        $this->expectDeprecation('Since symfony/lock 5.2: Constructing a "Symfony\Component\Lock\Store\MongoDbStore" by passing the "database" via a connection URI is deprecated. Either contruct with a "MongoDB\Collection" or pass it via $options instead.');
+
+        $store = new MongoDbStore($mongo, $options);
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
+    public function provideDeprecatedDatabaseConstructorArgs()
+    {
+        yield ['mongodb://localhost/test', ['collection' => 'lock']];
+    }
+
+    /**
+     * @dataProvider provideDeprecatedCollectionConstructorArgs
+     * @group legacy
+     */
+    public function testDeprecatedCollectionConstructionMethods($mongo, array $options)
+    {
+        $this->expectDeprecation('Since symfony/lock 5.2: Constructing a "Symfony\Component\Lock\Store\MongoDbStore" by passing the "collection" via a connection URI is deprecated. Either contruct with a "MongoDB\Collection" or pass it via $options instead.');
+
+        $store = new MongoDbStore($mongo, $options);
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
+    public function provideDeprecatedCollectionConstructorArgs()
+    {
+        yield ['mongodb://localhost/?collection=lock', ['database' => 'test', 'collection' => 'lock']];
+        yield ['mongodb://localhost/?collection=lock', ['database' => 'test']];
     }
 
     /**
@@ -134,11 +184,16 @@ class MongoDbStoreTest extends AbstractStoreTest
     public function provideInvalidConstructorArgs()
     {
         $client = self::getMongoClient();
-        yield [$client, ['collection' => 'lock']];
+        yield [$client, []];
         yield [$client, ['database' => 'test']];
+        yield [$client, ['collection' => 'lock']];
 
+        yield ['mongodb://localhost/?collection=lock', ['collection' => 'lock']];
         yield ['mongodb://localhost/?collection=lock', []];
-        yield ['mongodb://localhost/test', []];
+        yield ['mongodb://localhost/', ['collection' => 'lock']];
+        yield ['mongodb://localhost/', ['database' => 'test']];
         yield ['mongodb://localhost/', []];
+        yield ['mongodb://localhost/test', ['database' => 'test']];
+        yield ['mongodb://localhost/test', []];
     }
 }

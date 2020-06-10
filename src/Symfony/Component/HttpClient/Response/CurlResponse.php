@@ -94,7 +94,7 @@ final class CurlResponse implements ResponseInterface
             if (0 < $duration) {
                 if ($execCounter === $multi->execCounter) {
                     $multi->execCounter = !\is_float($execCounter) ? 1 + $execCounter : PHP_INT_MIN;
-                    curl_multi_exec($multi->handle, $execCounter);
+                    curl_multi_remove_handle($multi->handle, $ch);
                 }
 
                 $lastExpiry = end($multi->pauseExpiries);
@@ -106,6 +106,7 @@ final class CurlResponse implements ResponseInterface
             } else {
                 unset($multi->pauseExpiries[(int) $ch]);
                 curl_pause($ch, CURLPAUSE_CONT);
+                curl_multi_add_handle($multi->handle, $ch);
             }
         };
 
@@ -335,6 +336,7 @@ final class CurlResponse implements ResponseInterface
 
                 unset($multi->pauseExpiries[$id]);
                 curl_pause($multi->openHandles[$id][0], CURLPAUSE_CONT);
+                curl_multi_add_handle($multi->handle, $multi->openHandles[$id][0]);
             }
         }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -236,6 +237,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'Unused pushed response: "https://127.0.0.1:3000/json/3"',
         ];
         $this->assertSame($expected, $logger->logs);
+    }
+
+    public function testDnsFailure()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://bad.host.test/');
+
+        $this->expectException(TransportException::class);
+        $response->getStatusCode();
     }
 
     private static function startVulcain(HttpClientInterface $client)

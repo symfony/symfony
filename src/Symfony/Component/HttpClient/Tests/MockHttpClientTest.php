@@ -202,6 +202,10 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't support pauses by default");
                 break;
 
+            case 'testDnsFailure':
+                $this->markTestSkipped("MockHttpClient doesn't use a DNS");
+                break;
+
             case 'testGetRequest':
                 array_unshift($headers, 'HTTP/1.1 200 OK');
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);

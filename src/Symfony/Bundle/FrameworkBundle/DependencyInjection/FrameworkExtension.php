@@ -390,7 +390,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['lock'])) {
-            $this->registerLockConfiguration($config['lock'], $container, $loader);
+            $this->registerLockConfiguration($config['lock'], $container, $phpLoader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -1568,9 +1568,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerLockConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('lock.xml');
+        $loader->load('lock.php');
 
         foreach ($config['resources'] as $resourceName => $resourceStores) {
             if (0 === \count($resourceStores)) {

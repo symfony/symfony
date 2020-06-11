@@ -28,6 +28,6 @@ return static function (ContainerConfigurator $container) {
             ->args([abstract_arg('Decryption env var, set in FrameworkExtension')])
 
         ->set('secrets.local_vault', DotenvVault::class)
-            ->args([[abstract_arg('.env file path, set in FrameworkExtension')]])
+            ->args([abstract_arg('.env file path, set in FrameworkExtension')])
     ;
 };

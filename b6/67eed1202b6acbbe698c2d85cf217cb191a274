@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-11T22:28:43Z
+
+> The only remaining question is if we should put all arguments of args([ ... ]) in a single line when there are only a few of them.
+
+Using multiple lines makes merging easier and it reduces conflicts when you add a new argument.

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-11T13:13:45Z
+
+tags are added after the args (and calls) in the other PRs. So I think this should be changed for consistency here.
+
+---------------------------------------------------------------------------
+
+by idetox at 2020-06-11T13:23:47Z
+
+@Tobion , so order is
+```php
+->args()
+->call()
+->tag()
+```
+Right ?
+
+---------------------------------------------------------------------------
+
+by idetox at 2020-06-11T14:03:27Z
+
+If someone can help, i don't know how to fix the test 😢
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-11T14:15:44Z
+
+@idetox don't worry about it, it's a random failure. I've re-run the jobs to see if it happens now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-11T14:45:49Z
+
+Can you squash your commits please?

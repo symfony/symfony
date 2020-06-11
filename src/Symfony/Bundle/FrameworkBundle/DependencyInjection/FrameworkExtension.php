@@ -196,7 +196,7 @@ class FrameworkExtension extends Extension
         }
 
         // Load Cache configuration first as it is used by other components
-        $loader->load('cache.xml');
+        $phpLoader->load('cache.php');
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -579,7 +579,7 @@ class FrameworkExtension extends Extension
 
         $phpLoader->load('profiling.php');
         $phpLoader->load('collectors.php');
-        $loader->load('cache_debug.xml');
+        $phpLoader->load('cache_debug.php');
 
         if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');

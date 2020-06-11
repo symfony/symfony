@@ -185,7 +185,7 @@ class FrameworkExtension extends Extension
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
         if (class_exists(Application::class)) {
-            $loader->load('console.xml');
+            $phpLoader->load('console.php');
 
             if (!class_exists(BaseXliffLintCommand::class)) {
                 $container->removeDefinition('console.command.xliff_lint');

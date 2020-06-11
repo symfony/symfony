@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `param()` and `abstract_arg()` in the PHP-DSL
+
 5.1.0
 -----
 

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-11T14:20:46Z
+
+@Noweh please check the fabbot report, there are other minor CS issue to solve:
+https://fabbot.io/report/symfony/symfony/37206/a2d65813452a12681fdcd264d1ef5c2319663654
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-11T14:23:54Z
+
+> Looks OK to me ... but I have the same doubt as in #37199. ... should we
+
+I don't think that's necessary, since it's the default and others config files don't currently use it.

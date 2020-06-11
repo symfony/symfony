@@ -42,6 +42,16 @@ final class InputBag extends ParameterBag
         return $this === $value ? $default : $value;
     }
 
+    public function getString(string $key, string $default = ''): string
+    {
+        return (string) parent::get($key, $default);
+    }
+
+    public function getArray(string $key, array $default = []): array
+    {
+        return (array) parent::get($key, $default);
+    }
+
     /**
      * Returns the inputs.
      *

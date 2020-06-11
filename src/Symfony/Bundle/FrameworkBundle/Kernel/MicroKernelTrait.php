@@ -68,7 +68,11 @@ trait MicroKernelTrait
      */
     public function getCacheDir(): string
     {
-        return $_SERVER['APP_CACHE_DIR'] ?? parent::getCacheDir();
+        if (isset($_SERVER['APP_CACHE_DIR'])) {
+            return $_SERVER['APP_CACHE_DIR'].'/'.$this->environment;
+        }
+
+        return parent::getCacheDir();
     }
 
     /**

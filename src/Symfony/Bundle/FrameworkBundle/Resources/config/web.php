@@ -55,6 +55,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('controller.argument_value_resolver', ['priority' => 50])
 
         ->set('argument_resolver.service', ServiceValueResolver::class)
+            ->args([
+                abstract_arg('service locator, set in RegisterControllerArgumentLocatorsPass'),
+            ])
             ->tag('controller.argument_value_resolver', ['priority' => -50])
 
         ->set('argument_resolver.default', DefaultValueResolver::class)

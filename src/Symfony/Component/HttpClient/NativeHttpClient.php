@@ -171,12 +171,6 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, implode('', $url)));
 
-        [$host, $port, $url['authority']] = self::dnsResolve($url, $this->multi, $info, $onProgress);
-
-        if (!isset($options['normalized_headers']['host'])) {
-            $options['headers'][] = 'Host: '.$host.$port;
-        }
-
         if (!isset($options['normalized_headers']['user-agent'])) {
             $options['headers'][] = 'User-Agent: Symfony HttpClient/Native';
         }
@@ -198,7 +192,6 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'follow_location' => false, // We follow redirects ourselves - the native logic is too limited
             ],
             'ssl' => array_filter([
-                'peer_name' => $host,
                 'verify_peer' => $options['verify_peer'],
                 'verify_peer_name' => $options['verify_host'],
                 'cafile' => $options['cafile'],
@@ -219,12 +212,23 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             ],
         ];
 
-        $proxy = self::getProxy($options['proxy'], $url, $options['no_proxy']);
-        $resolveRedirect = self::createRedirectResolver($options, $host, $proxy, $info, $onProgress);
         $context = stream_context_create($context, ['notification' => $notification]);
-        self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy);
 
-        return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolveRedirect, $onProgress, $this->logger);
+        $resolver = static function($multi) use ($context, $options, $url, &$info, $onProgress) {
+            [$host, $port, $url['authority']] = self::dnsResolve($url, $multi, $info, $onProgress);
+
+            if (!isset($options['normalized_headers']['host'])) {
+                $options['headers'][] = 'Host: '.$host.$port;
+            }
+
+            stream_context_set_option($context, 'ssl', 'peer_name', $host);
+            $proxy = self::getProxy($options['proxy'], $url, $options['no_proxy']);
+            self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy);
+
+            return [self::createRedirectResolver($options, $host, $proxy, $info, $onProgress), implode('', $url)];
+        };
+
+        return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolver, $onProgress, $this->logger);
     }
 
     /**

@@ -31,7 +31,7 @@ final class NativeResponse implements ResponseInterface
 
     private $context;
     private $url;
-    private $resolveRedirect;
+    private $resolver;
     private $onProgress;
     private $remaining;
     private $buffer;
@@ -43,7 +43,7 @@ final class NativeResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(NativeClientState $multi, $context, string $url, array $options, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
+    public function __construct(NativeClientState $multi, $context, string $url, array $options, array &$info, callable $resolver, ?callable $onProgress, ?LoggerInterface $logger)
     {
         $this->multi = $multi;
         $this->id = (int) $context;
@@ -52,7 +52,7 @@ final class NativeResponse implements ResponseInterface
         $this->logger = $logger;
         $this->timeout = $options['timeout'];
         $this->info = &$info;
-        $this->resolveRedirect = $resolveRedirect;
+        $this->resolver = $resolver;
         $this->onProgress = $onProgress;
         $this->inflate = !isset($options['normalized_headers']['accept-encoding']);
         $this->shouldBuffer = $options['buffer'] ?? true;
@@ -128,6 +128,8 @@ final class NativeResponse implements ResponseInterface
         try {
             $this->info['start_time'] = microtime(true);
 
+            [$resolver, $url] = ($this->resolver)($this->multi);
+
             while (true) {
                 $context = stream_context_get_options($this->context);
 
@@ -145,7 +147,7 @@ final class NativeResponse implements ResponseInterface
                 // Send request and follow redirects when needed
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
                 self::addResponseHeaders($http_response_header, $this->info, $this->headers, $this->info['debug']);
-                $url = ($this->resolveRedirect)($this->multi, $this->headers['location'][0] ?? null, $this->context);
+                $url = $resolver($this->multi, $this->headers['location'][0] ?? null, $this->context);
 
                 if (null === $url) {
                     break;
@@ -169,7 +171,7 @@ final class NativeResponse implements ResponseInterface
         }
 
         stream_set_blocking($h, false);
-        $this->context = $this->resolveRedirect = null;
+        $this->context = $this->resolver = null;
 
         // Create dechunk buffers
         if (isset($this->headers['content-length'])) {

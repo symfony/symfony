@@ -369,7 +369,7 @@ class FrameworkExtension extends Extension
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader, $phpLoader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $phpLoader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
@@ -568,7 +568,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('fragment.path', $config['path']);
     }
 
-    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, PhpFileLoader $phpLoader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             // this is needed for the WebProfiler to work even if the profiler is disabled
@@ -577,7 +577,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $loader->load('profiling.xml');
+        $phpLoader->load('profiling.php');
         $loader->load('collectors.xml');
         $loader->load('cache_debug.xml');
 

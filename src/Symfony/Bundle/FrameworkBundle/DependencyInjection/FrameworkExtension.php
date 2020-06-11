@@ -288,7 +288,7 @@ class FrameworkExtension extends Extension
         if (null === $config['csrf_protection']['enabled']) {
             $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
         }
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $phpLoader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists('Symfony\Component\Form\Form')) {
@@ -1439,7 +1439,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $phpLoader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             return;
@@ -1454,7 +1454,7 @@ class FrameworkExtension extends Extension
         }
 
         // Enable services for CSRF protection (even without forms)
-        $loader->load('security_csrf.xml');
+        $phpLoader->load('security_csrf.php');
 
         if (!class_exists(CsrfExtension::class)) {
             $container->removeDefinition('twig.extension.security_csrf');

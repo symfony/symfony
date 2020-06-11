@@ -780,17 +780,27 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
     public function testProcessResolveParameters()
     {
-        $container = new ContainerBuilder();
+        putenv('ARRAY={"foo":"bar"}');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'env_array_param' => '%env(json:ARRAY)%',
+        ]));
         $container->setParameter('array_param', ['foobar']);
         $container->setParameter('string_param', 'ccc');
 
-        $container
-            ->register('foobar', BarMethodCall::class)
+        $definition = $container->register('foobar', BarMethodCall::class);
+        $definition
             ->addMethodCall('setArray', ['%array_param%'])
             ->addMethodCall('setString', ['%string_param%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
+
+        $definition->addMethodCall('setArray', ['%env_array_param%']);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
+
+        putenv('ARRAY=');
     }
 }

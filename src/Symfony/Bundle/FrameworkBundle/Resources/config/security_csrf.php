@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
-use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use Symfony\Bridge\Twig\Extension\CsrfExtension;
+use Symfony\Bridge\Twig\Extension\CsrfRuntime;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Bridge\Twig\Extension\CsrfRuntime;
-use Symfony\Bridge\Twig\Extension\CsrfExtension;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -37,7 +36,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.csrf.token_generator'),
                 service('security.csrf.token_storage'),
-                service('request_stack')->ignoreOnInvalid()
+                service('request_stack')->ignoreOnInvalid(),
             ])
 
         ->alias(CsrfTokenManagerInterface::class, 'security.csrf.token_manager')

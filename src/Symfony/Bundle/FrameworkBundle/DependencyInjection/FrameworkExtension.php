@@ -375,7 +375,7 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
-        $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
+        $this->registerSecretsConfiguration($config['secrets'], $container, $phpLoader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists('Symfony\Component\Serializer\Serializer')) {
@@ -1399,7 +1399,7 @@ class FrameworkExtension extends Extension
         ;
     }
 
-    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.secrets_set');
@@ -1412,7 +1412,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $loader->load('secrets.xml');
+        $loader->load('secrets.php');
 
         $container->getDefinition('secrets.vault')->replaceArgument(0, $config['vault_directory']);
 

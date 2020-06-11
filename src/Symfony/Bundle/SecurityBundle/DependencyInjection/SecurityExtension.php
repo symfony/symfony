@@ -135,7 +135,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $phpLoader->load('templating_twig.php');
         }
 
-        $loader->load('collectors.xml');
+        $phpLoader->load('collectors.php');
         $loader->load('guard.xml');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {

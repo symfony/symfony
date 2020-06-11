@@ -125,7 +125,7 @@ class StoreTest extends TestCase
          *
          * A restored response does *not* load the body, but only keep the file path in a special X-Body-File
          * header. For reasons (?), the file path was also used as the restored response body.
-         * It would be up to others (HttpCache...?) to hohor this header and actually load the response content
+         * It would be up to others (HttpCache...?) to honor this header and actually load the response content
          * from there.
          *
          * When a restored response was stored again, the Store itself would ignore the header. In the first

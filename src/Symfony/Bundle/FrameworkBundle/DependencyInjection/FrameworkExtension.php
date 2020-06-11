@@ -175,7 +175,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
-        $loader->load('fragment_renderer.xml');
+        $phpLoader->load('fragment_renderer.php');
         $phpLoader->load('error_renderer.php');
 
         if (interface_exists(PsrEventDispatcherInterface::class)) {
@@ -367,7 +367,7 @@ class FrameworkExtension extends Extension
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
-        $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
+        $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader, $phpLoader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
@@ -554,7 +554,7 @@ class FrameworkExtension extends Extension
         $loader->load('ssi.php');
     }
 
-    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('fragment.renderer.hinclude');
@@ -564,7 +564,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
-        $loader->load('fragment_listener.xml');
+        $loader->load('fragment_listener.php');
         $container->setParameter('fragment.path', $config['path']);
     }
 

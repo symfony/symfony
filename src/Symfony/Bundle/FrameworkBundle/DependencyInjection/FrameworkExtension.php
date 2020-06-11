@@ -374,7 +374,7 @@ class FrameworkExtension extends Extension
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $phpLoader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $phpLoader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
@@ -1381,13 +1381,13 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!class_exists(PropertyAccessor::class)) {
             return;
         }
 
-        $loader->load('property_access.xml');
+        $loader->load('property_access.php');
 
         $container
             ->getDefinition('property_accessor')

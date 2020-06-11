@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-06-10T16:00:19Z
+
+Should we add a new test in our HttpClient testsuite based on the scenario of #36911 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-10T22:17:36Z
+
+I'm not sure we can since this is time-dependent.

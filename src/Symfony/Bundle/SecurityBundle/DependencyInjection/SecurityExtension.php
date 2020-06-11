@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -106,6 +107,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+
+        $phpLoader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
+
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
@@ -128,7 +132,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if (class_exists(AbstractExtension::class)) {
-            $loader->load('templating_twig.xml');
+            $phpLoader->load('templating_twig.php');
         }
 
         $loader->load('collectors.xml');

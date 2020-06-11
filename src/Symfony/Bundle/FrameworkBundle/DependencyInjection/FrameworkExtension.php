@@ -213,7 +213,7 @@ class FrameworkExtension extends Extension
             }
 
             if (class_exists(Translator::class)) {
-                $loader->load('identity_translator.xml');
+                $phpLoader->load('identity_translator.php');
             }
         }
 

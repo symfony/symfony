@@ -23,6 +23,7 @@ use Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Messenger\MessageHandler;
+use Symfony\Component\Notifier\Notification\ServiceNotification;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Texter;
@@ -101,5 +102,10 @@ return static function (ContainerConfigurator $container) {
         ->set('texter.messenger.sms_handler', MessageHandler::class)
             ->args([service('texter.transports')])
             ->tag('messenger.message_handler', ['handles' => SmsMessage::class])
+
+        ->instanceof(ServiceNotification::class)
+            ->call('setNotifier', [service('notifier')])
+            ->tag('notifier.notification')
+            ->private()
     ;
 };

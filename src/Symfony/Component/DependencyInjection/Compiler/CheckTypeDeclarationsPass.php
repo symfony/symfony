@@ -198,8 +198,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             }
         } elseif (\is_string($value)) {
             if ('%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
-                // Only array parameters are not inlined when dumped.
-                $value = [];
+                $value = $this->container->getParameter(substr($value, 1, -1));
             } elseif ($envPlaceholderUniquePrefix && false !== strpos($value, 'env_')) {
                 // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
                 // We don't need to change the value because it is already a string.

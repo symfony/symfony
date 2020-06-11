@@ -259,7 +259,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!empty($config['test'])) {
-            $loader->load('test.xml');
+            $phpLoader->load('test.php');
 
             if (!class_exists(AbstractBrowser::class)) {
                 $container->removeDefinition('test.client');

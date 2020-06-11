@@ -22,8 +22,8 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('throwExceptionOnInvalidIndex, set by the extension'),
                 service('cache.property_access')->ignoreOnInvalid(),
                 abstract_arg('throwExceptionOnInvalidPropertyPath, set by the extension'),
-                abstract_arg('propertyReadInfoExtractor'),
-                abstract_arg('propertyWriteInfoExtractor'),
+                abstract_arg('propertyReadInfoExtractor, set by the extension'),
+                abstract_arg('propertyWriteInfoExtractor, set by the extension'),
             ])
 
         ->alias(PropertyAccessorInterface::class, 'property_accessor')

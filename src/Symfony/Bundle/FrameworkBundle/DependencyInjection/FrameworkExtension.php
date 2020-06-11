@@ -410,7 +410,7 @@ class FrameworkExtension extends Extension
         ]);
 
         if (class_exists(MimeTypes::class)) {
-            $loader->load('mime_type.xml');
+            $phpLoader->load('mime_type.php');
         }
 
         $container->registerForAutoconfiguration(Command::class)

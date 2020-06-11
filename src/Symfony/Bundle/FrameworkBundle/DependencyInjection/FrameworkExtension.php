@@ -371,7 +371,7 @@ class FrameworkExtension extends Extension
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
-        $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
+        $this->registerDebugConfiguration($config['php_errors'], $container, $phpLoader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
@@ -821,9 +821,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerDebugConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('debug_prod.xml');
+        $loader->load('debug_prod.php');
 
         if (class_exists(Stopwatch::class)) {
             $container->register('debug.stopwatch', Stopwatch::class)
@@ -840,7 +840,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($debug && class_exists(Stopwatch::class)) {
-            $loader->load('debug.xml');
+            $loader->load('debug.php');
         }
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');

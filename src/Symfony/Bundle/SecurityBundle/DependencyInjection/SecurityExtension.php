@@ -177,7 +177,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if (class_exists(Application::class)) {
-            $loader->load('console.xml');
+            $phpLoader->load('console.php');
             $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
         }
 

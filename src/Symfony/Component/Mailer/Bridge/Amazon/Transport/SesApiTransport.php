@@ -115,6 +115,9 @@ class SesApiTransport extends AbstractApiTransport
         if ($email->getHtmlBody()) {
             $payload['Message.Body.Html.Data'] = $email->getHtmlBody();
         }
+        if ($email->getReplyTo()) {
+            $payload['ReplyToAddresses.member'] = $this->stringifyAddresses($email->getReplyTo());
+        }
 
         return $payload;
     }

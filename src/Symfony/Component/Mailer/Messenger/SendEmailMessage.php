@@ -22,9 +22,6 @@ class SendEmailMessage
     private $message;
     private $envelope;
 
-    /**
-     * @internal
-     */
     public function __construct(RawMessage $message, Envelope $envelope = null)
     {
         $this->message = $message;

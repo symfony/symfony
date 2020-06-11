@@ -11,21 +11,20 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
-use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait;
+use Symfony\Bridge\PhpUnit\Legacy\ExpectDeprecationTraitBeforeV8_4;
+use Symfony\Bridge\PhpUnit\Legacy\ExpectDeprecationTraitForV8_4;
 
-trait ExpectDeprecationTrait
-{
-    /**
-     * @param string $message
-     *
-     * @return void
-     */
-    protected function expectDeprecation($message)
+if (version_compare(\PHPUnit\Runner\Version::id(), '8.4.0', '<')) {
+    trait ExpectDeprecationTrait
     {
-        if (!SymfonyTestsListenerTrait::$previousErrorHandler) {
-            SymfonyTestsListenerTrait::$previousErrorHandler = set_error_handler([SymfonyTestsListenerTrait::class, 'handleError']);
-        }
-
-        SymfonyTestsListenerTrait::$expectedDeprecations[] = $message;
+        use ExpectDeprecationTraitBeforeV8_4;
+    }
+} else {
+    /**
+     * @method void expectDeprecation(string $message)
+     */
+    trait ExpectDeprecationTrait
+    {
+        use ExpectDeprecationTraitForV8_4;
     }
 }

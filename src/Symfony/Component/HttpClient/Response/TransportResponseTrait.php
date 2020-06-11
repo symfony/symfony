@@ -190,8 +190,9 @@ trait TransportResponseTrait
                                 continue;
                             }
 
-                            $response->offset += \strlen($chunk);
+                            $chunkLen = \strlen($chunk);
                             $chunk = new DataChunk($response->offset, $chunk);
+                            $response->offset += $chunkLen;
                         } elseif (null === $chunk) {
                             $e = $multi->handlesActivity[$j][0];
                             unset($responses[$j], $multi->handlesActivity[$j]);

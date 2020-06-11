@@ -363,4 +363,21 @@ class RouteCollectionTest extends TestCase
 
         $this->assertSame($expected, $collection2->all());
     }
+
+    public function testAddWithPriorityAndPrefix()
+    {
+        $collection3 = new RouteCollection();
+        $collection3->add('foo3', $foo3 = new Route('/foo'), 0);
+        $collection3->add('bar3', $bar3 = new Route('/bar'), 1);
+        $collection3->add('baz3', $baz3 = new Route('/baz'));
+        $collection3->addNamePrefix('prefix_');
+
+        $expected = [
+            'prefix_bar3' => $bar3,
+            'prefix_foo3' => $foo3,
+            'prefix_baz3' => $baz3,
+        ];
+
+        $this->assertSame($expected, $collection3->all());
+    }
 }

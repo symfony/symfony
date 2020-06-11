@@ -173,7 +173,7 @@ class FrameworkExtension extends Extension
 
         $phpLoader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
-        $loader->load('web.xml');
+        $phpLoader->load('web.php');
         $loader->load('services.xml');
         $phpLoader->load('fragment_renderer.php');
         $phpLoader->load('error_renderer.php');
@@ -398,7 +398,7 @@ class FrameworkExtension extends Extension
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed. Try running "composer require symfony/weblink".');
             }
 
-            $loader->load('web_link.xml');
+            $phpLoader->load('web_link.php');
         }
 
         $this->addAnnotatedClassesToCompile([

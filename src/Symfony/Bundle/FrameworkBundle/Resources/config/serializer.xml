@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="serializer.mapping.cache.file">%kernel.cache_dir%/serialization.php</parameter>
-        <parameter key="serializer.mapping.cache.prefix" />
     </parameters>
 
     <services>
@@ -97,7 +96,6 @@
         <!-- Class Metadata Factory -->
         <service id="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory">
             <argument type="service" id="serializer.mapping.chain_loader" />
-            <argument>null</argument>
         </service>
 
         <service id="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface" alias="serializer.mapping.class_metadata_factory" />

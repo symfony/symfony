@@ -364,7 +364,7 @@ class FrameworkExtension extends Extension
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
-        $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
+        $this->registerValidationConfiguration($config['validation'], $container, $phpLoader, $propertyInfoEnabled);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
@@ -586,7 +586,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->validatorConfigEnabled) {
-            $loader->load('validator_debug.xml');
+            $phpLoader->load('validator_debug.php');
         }
 
         if ($this->translationConfigEnabled) {
@@ -1195,7 +1195,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, bool $propertyInfoEnabled)
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)
     {
         if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
@@ -1209,7 +1209,7 @@ class FrameworkExtension extends Extension
             $config['email_validation_mode'] = 'loose';
         }
 
-        $loader->load('validator.xml');
+        $loader->load('validator.php');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
 

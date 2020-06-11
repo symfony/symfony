@@ -46,6 +46,11 @@ class UnusedTagsPassUtils
                     $tags[$match] = true;
                 }
             }
+            if (preg_match_all("{tagged_(?:locator|iterator)\('([^']+)'}", $contents, $matches)) {
+                foreach ($matches[1] as $match) {
+                    $tags[$match] = true;
+                }
+            }
         }
 
         // get all tags used in findTaggedServiceIds calls()

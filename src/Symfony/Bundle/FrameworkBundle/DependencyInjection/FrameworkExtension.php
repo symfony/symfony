@@ -88,6 +88,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
@@ -319,7 +320,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
+            $this->registerMessengerConfiguration($config['messenger'], $container, $phpLoader, $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_debug');
@@ -596,7 +597,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->messengerConfigEnabled) {
-            $loader->load('messenger_debug.xml');
+            $phpLoader->load('messenger_debug.php');
         }
 
         if ($this->mailerConfigEnabled) {
@@ -1629,13 +1630,13 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $validationConfig)
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
-        $loader->load('messenger.xml');
+        $loader->load('messenger.php');
 
         if (class_exists(AmqpTransportFactory::class)) {
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
@@ -1707,6 +1708,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');
+            $container->removeAlias(SerializerInterface::class);
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])

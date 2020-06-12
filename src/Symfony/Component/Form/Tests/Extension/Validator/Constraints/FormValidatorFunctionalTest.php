@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Test\ForwardCompatTestTrait;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -282,6 +283,51 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(1, $violations);
         $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
         $this->assertSame('children[field1].data', $violations[0]->getPropertyPath());
+    }
+
+    public function testContextIsPopulatedWithFormBeingValidated()
+    {
+        $form = $this->formFactory->create(FormType::class)
+            ->add('field1', null, [
+                'constraints' => [new Expression([
+                    'expression' => '!this.getParent().get("field2").getData()',
+                ])],
+            ])
+            ->add('field2')
+        ;
+
+        $form->submit([
+            'field1' => '',
+            'field2' => '',
+        ]);
+
+        $violations = $this->validator->validate($form);
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testContextIsPopulatedWithFormBeingValidatedUsingGroupSequence()
+    {
+        $form = $this->formFactory->create(FormType::class, null, [
+            'validation_groups' => new GroupSequence(['group1']),
+        ])
+            ->add('field1', null, [
+                'constraints' => [new Expression([
+                    'expression' => '!this.getParent().get("field2").getData()',
+                    'groups' => ['group1'],
+                ])],
+            ])
+            ->add('field2')
+        ;
+
+        $form->submit([
+            'field1' => '',
+            'field2' => '',
+        ]);
+
+        $violations = $this->validator->validate($form);
+
+        $this->assertCount(0, $violations);
     }
 }
 

@@ -368,7 +368,7 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
-        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
+        $this->registerTranslatorConfiguration($config['translator'], $container, $phpLoader, $config['default_locale']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader, $phpLoader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $phpLoader);
@@ -590,7 +590,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->translationConfigEnabled) {
-            $loader->load('translation_debug.xml');
+            $phpLoader->load('translation_debug.php');
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
@@ -1086,7 +1086,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $loader->load('translation.xml');
+        $loader->load('translation.php');
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);

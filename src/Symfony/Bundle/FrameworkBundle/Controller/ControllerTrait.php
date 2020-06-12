@@ -156,7 +156,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function addFlash(string $type, string $message)
+    protected function addFlash(string $type, $message)
     {
         if (!$this->container->has('session')) {
             throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');

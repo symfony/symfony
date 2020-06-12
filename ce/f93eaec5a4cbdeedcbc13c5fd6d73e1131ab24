@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-03-24T15:42:26Z
+
+Hi @fabpot,
+
+what do you think about removing the default transport in the `Transports` class?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-06-12T08:15:59Z
+
+@fabpot friendly ping :-)
+
+I changed the code according to your comment. WDYT?

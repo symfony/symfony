@@ -34,7 +34,7 @@ class FormValidatorFunctionalTest extends TestCase
     private $validator;
     private $formFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->validator = Validation::createValidatorBuilder()
             ->setMetadataFactory(new LazyLoadingMetadataFactory(new StaticMethodLoader()))

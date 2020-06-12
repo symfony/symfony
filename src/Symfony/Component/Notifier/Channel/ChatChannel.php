@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Channel;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Notification\ChatNotificationInterface;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -26,10 +25,6 @@ class ChatChannel extends AbstractChannel
 {
     public function notify(Notification $notification, Recipient $recipient, string $transportName = null): void
     {
-        if (null === $transportName) {
-            throw new LogicException('A Chat notification must have a transport defined.');
-        }
-
         $message = null;
         if ($notification instanceof ChatNotificationInterface) {
             $message = $notification->asChatMessage($recipient, $transportName);
@@ -39,7 +34,9 @@ class ChatChannel extends AbstractChannel
             $message = ChatMessage::fromNotification($notification);
         }
 
-        $message->transport($transportName);
+        if (null !== $transportName) {
+            $message->transport($transportName);
+        }
 
         if (null === $this->bus) {
             $this->transport->send($message);

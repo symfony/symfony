@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-12T14:19:41Z
+
+merging in master as it changes the behavior.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-12T14:21:01Z
+
+Can you rebase on master?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2020-06-12T14:39:43Z
+
+@fabpot done; I had to move it since it was refactored into a trait.

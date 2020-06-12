@@ -596,8 +596,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             $this->parseMinuteProvider(),
             $this->parseSecondProvider(),
             $this->parseTimezoneProvider(),
-            $this->parseAmPmProvider(),
-            $this->parseStandaloneAmPmProvider(),
+            $this->parseAmPmLowerCaseProvider(),
+            $this->parseStandaloneAmPmLowerCaseProvider(),
+            $this->parseAmPmUpperCaseProvider(),
+            $this->parseStandaloneUpperCaseCaseProvider(),
             $this->parseRegexMetaCharsProvider(),
             $this->parseQuoteCharsProvider(),
             $this->parseDashSlashProvider()
@@ -820,20 +822,37 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseAmPmProvider()
+    public function parseAmPmLowerCaseProvider()
     {
         return [
             // AM/PM (already covered by hours tests)
-            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 AM', 0],
-            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 PM', 43200],
+            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 am', 0],
+            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 pm', 43200],
         ];
     }
 
-    public function parseStandaloneAmPmProvider()
+    public function parseStandaloneAmPmLowerCaseProvider()
     {
         return [
-            ['a', 'AM', 0],
-            ['a', 'PM', 43200],
+            ['a', 'am', 0],
+            ['a', 'pm', 43200],
+        ];
+    }
+
+    public function parseAmPmUpperCaseProvider()
+    {
+        return [
+            // AM/PM (already covered by hours tests)
+            ['y-M-d HH:mm:ss A', '1970-1-1 00:00:00 AM', 0],
+            ['y-M-d HH:mm:ss A', '1970-1-1 00:00:00 PM', 43200],
+        ];
+    }
+
+    public function parseStandaloneUpperCaseCaseProvider()
+    {
+        return [
+            ['A', 'AM', 0],
+            ['A', 'PM', 43200],
         ];
     }
 

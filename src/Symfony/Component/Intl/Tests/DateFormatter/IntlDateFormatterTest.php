@@ -145,9 +145,14 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testFormatWithNonStandardTimezone();
     }
 
-    public function parseStandaloneAmPmProvider()
+    public function parseStandaloneAmPmLowerCaseProvider()
     {
-        return $this->notImplemented(parent::parseStandaloneAmPmProvider());
+        return $this->notImplemented(parent::parseStandaloneAmPmLowerCaseProvider());
+    }
+
+    public function parseStandaloneUpperCaseCaseProvider()
+    {
+        return $this->notImplemented(parent::parseStandaloneUpperCaseCaseProvider());
     }
 
     public function parseDayOfWeekProvider()

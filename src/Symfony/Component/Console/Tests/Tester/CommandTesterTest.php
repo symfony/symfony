@@ -67,9 +67,29 @@ class CommandTesterTest extends TestCase
         $this->assertEquals('foo'.PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
 
+    public function testGetDisplayWithoutCallingExecuteBefore()
+    {
+        $tester = new CommandTester(new Command());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Output not initialized');
+
+        $tester->getDisplay();
+    }
+
     public function testGetStatusCode()
     {
         $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
+    }
+
+    public function testGetStatusCodeWithoutCallingExecuteBefore()
+    {
+        $tester = new CommandTester(new Command());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Status code not initialized');
+
+        $tester->getStatusCode();
     }
 
     public function testCommandFromApplication()

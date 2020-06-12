@@ -315,7 +315,7 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
             }
 
-            $this->registerAssetsConfiguration($config['assets'], $container, $loader);
+            $this->registerAssetsConfiguration($config['assets'], $container, $phpLoader);
         }
 
         if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
@@ -990,9 +990,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('assets.xml');
+        $loader->load('assets.php');
 
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);

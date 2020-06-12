@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2020-06-11T13:40:32Z
+
+Please, check the fabbot report, there are other issues to solve: https://fabbot.io/report/symfony/symfony/37217/916dcec7c18845a635e11bb1bf796bbe426ab3f3
+
+---------------------------------------------------------------------------
+
+by simivar at 2020-06-11T14:42:33Z
+
+Shouldn't you remove old `session.xml` file?

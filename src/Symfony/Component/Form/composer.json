@@ -29,6 +29,7 @@
         "doctrine/collections": "~1.0",
         "symfony/validator": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/expression-language": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",

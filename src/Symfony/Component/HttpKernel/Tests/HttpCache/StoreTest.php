@@ -118,6 +118,39 @@ class StoreTest extends TestCase
         $this->assertNotNull($response);
     }
 
+    public function testWritingARestoredResponseDoesNotCorruptCache()
+    {
+        /*
+         * This covers the regression reported in https://github.com/symfony/symfony/issues/37174.
+         *
+         * A restored response does *not* load the body, but only keep the file path in a special X-Body-File
+         * header. For reasons (?), the file path was also used as the restored response body.
+         * It would be up to others (HttpCache...?) to honor this header and actually load the response content
+         * from there.
+         *
+         * When a restored response was stored again, the Store itself would ignore the header. In the first
+         * step, this would compute a new Content Digest based on the file path in the restored response body;
+         * this is covered by "Checkpoint 1" below. But, since the X-Body-File header was left untouched (Checkpoint 2), downstream
+         * code (HttpCache...) would not immediately notice.
+         *
+         * Only upon performing the lookup for a second time, we'd get a Response where the (wrong) Content Digest
+         * is also reflected in the X-Body-File header, this time also producing wrong content when the downstream
+         * evaluates it.
+         */
+        $this->store->write($this->request, $this->response);
+        $digest = $this->response->headers->get('X-Content-Digest');
+        $path = $this->getStorePath($digest);
+
+        $response = $this->store->lookup($this->request);
+        $this->store->write($this->request, $response);
+        $this->assertEquals($digest, $response->headers->get('X-Content-Digest')); // Checkpoint 1
+        $this->assertEquals($path, $response->headers->get('X-Body-File')); // Checkpoint 2
+
+        $response = $this->store->lookup($this->request);
+        $this->assertEquals($digest, $response->headers->get('X-Content-Digest'));
+        $this->assertEquals($path, $response->headers->get('X-Body-File'));
+    }
+
     public function testFindsAStoredEntryWithLookup()
     {
         $this->storeSimpleEntry();

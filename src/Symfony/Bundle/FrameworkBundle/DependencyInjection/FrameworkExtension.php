@@ -275,7 +275,7 @@ class FrameworkExtension extends Extension
             }
 
             $this->sessionConfigEnabled = true;
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
+            $this->registerSessionConfiguration($config['session'], $container, $phpLoader);
             if (!empty($config['test'])) {
                 $container->getDefinition('test.session.listener')->setArgument(1, '%session.storage.options%');
             }
@@ -932,9 +932,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSessionConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('session.xml');
+        $loader->load('session.php');
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);

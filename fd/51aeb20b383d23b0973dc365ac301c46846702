@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-12T06:08:28Z
+
+Looks like this breaks the tests.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-06-12T07:38:15Z
+
+Looks like I just needed to rebase after https://github.com/symfony/symfony/commit/2d781ddce67d6c04e564946ded1d484e54c65d9c.

@@ -18,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\Test\ForwardCompatTestTrait;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
@@ -32,8 +31,6 @@ use Symfony\Component\Validator\Validation;
 
 class FormValidatorFunctionalTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $validator;
     private $formFactory;
 

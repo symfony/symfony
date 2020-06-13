@@ -220,9 +220,9 @@ class RedirectControllerTest extends TestCase
         return [
             ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],
             ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''],
-            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'],
+            ['http://www.example.com/base/redirect-path?f.o=bar', '/redirect-path', 'f.o=bar'],
+            ['http://www.example.com/base/redirect-path?f.o=bar&a.c=example', '/redirect-path?f.o=bar', 'a.c=example'],
+            ['http://www.example.com/base/redirect-path?f.o=bar&a.c=example&b.z=def', '/redirect-path?f.o=bar', 'a.c=example&b.z=def'],
         ];
     }
 
@@ -246,29 +246,20 @@ class RedirectControllerTest extends TestCase
 
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request
-            ->expects($this->any())
-            ->method('getScheme')
-            ->willReturn($scheme);
-        $request
-            ->expects($this->any())
-            ->method('getHost')
-            ->willReturn($host);
-        $request
-            ->expects($this->any())
-            ->method('getPort')
-            ->willReturn($port);
-        $request
-            ->expects($this->any())
-            ->method('getBaseUrl')
-            ->willReturn($baseUrl);
-        $request
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->willReturn($queryString);
+        if ('' !== $queryString) {
+            parse_str($queryString, $query);
+        } else {
+            $query = [];
+        }
 
-        return $request;
+        return new Request($query, [], [], [], [], [
+            'HTTPS' => 'https' === $scheme,
+            'HTTP_HOST' => $host.($port ? ':'.$port : ''),
+            'SERVER_PORT' => $port,
+            'SCRIPT_FILENAME' => $baseUrl,
+            'REQUEST_URI' => $baseUrl,
+            'QUERY_STRING' => $queryString,
+        ]);
     }
 
     private function createRedirectController($httpPort = null, $httpsPort = null)

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
+
 5.1.0
 -----
 

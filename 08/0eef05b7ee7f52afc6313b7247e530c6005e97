@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-13T09:16:41Z
+
+That looks like the right fix, thanks for contributing this! However, can you please also tweak the if statements now (so they cover the correct service existence):
+
+* The if statement on line 30 should be removed and `&& !$container->has('security.csrf.token_storage')` should be added to the if statement on line 52
+* The if statement on line 40 should add `!$container->has('security.csrf.token_manager')`
+
+You can do so by adding a new commit to your branch (Ne-Lexa:5.1).
+
+_Quick tip for next time: it's often better to create a new branch specifically for this PR. That allows you to work on multiple PRs at the same time._
+
+(for the maintainers: I'm working on significantly extending the functional testsuite of SecurityBundle for the new system, to avoid errors like this in the feature)
+
+---------------------------------------------------------------------------
+
+by Ne-Lexa at 2020-06-13T10:13:29Z
+
+@wouterj, thank you for the advice about creating a new branch.
+I've made the changes you've proposed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-13T12:05:59Z
+
+@wouterj Can you check again?

@@ -19,9 +19,12 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ClearRememberMeTest extends AbstractWebTestCase
 {
-    public function testUserChangeClearsCookie()
+    /**
+     * @dataProvider provideClientOptions
+     */
+    public function testUserChangeClearsCookie(array $options)
     {
-        $client = $this->createClient(['test_case' => 'ClearRememberMe', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options);
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -35,6 +38,12 @@ class ClearRememberMeTest extends AbstractWebTestCase
         $client->request('GET', '/foo');
         $this->assertRedirect($client->getResponse(), '/login');
         $this->assertNull($cookieJar->get('REMEMBERME'));
+    }
+
+    public function provideClientOptions()
+    {
+        yield [['test_case' => 'ClearRememberMe', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'ClearRememberMe', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
     }
 }
 

@@ -26,5 +26,4 @@ security:
                 always_remember_me: true
                 secret: key
             logout: ~
-            anonymous: ~
             stateless: true

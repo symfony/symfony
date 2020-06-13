@@ -79,7 +79,14 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
     public function authenticate(Request $request): PassportInterface
     {
-        $credentials = $this->getCredentials($request);
+        try {
+            $credentials = $this->getCredentials($request);
+        } catch (BadRequestHttpException $e) {
+            $request->setRequestFormat('json');
+
+            throw $e;
+        }
+
         $user = $this->userProvider->loadUserByUsername($credentials['username']);
         if (!$user instanceof UserInterface) {
             throw new AuthenticationServiceException('The user provider must return a UserInterface object.');

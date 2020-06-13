@@ -15,7 +15,6 @@ security:
         default:
             form_login: ~
             logout: ~
-            anonymous: ~
 
     access_control:
         # the '256.357.458.559' IP is wrong on purpose, to check invalid IP errors

@@ -2,8 +2,9 @@ imports:
     - { resource: ./base_config.yml }
 
 security:
-    firewalls:
+  firewalls:
         default:
             form_login:
-                enable_csrf: true
+                csrf_token_generator: security.csrf.token_manager
                 csrf_parameter: "user_login[_token]"
+            anonymous: ~

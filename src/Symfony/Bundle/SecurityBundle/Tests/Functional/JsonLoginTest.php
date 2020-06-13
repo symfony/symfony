@@ -18,9 +18,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class JsonLoginTest extends AbstractWebTestCase
 {
-    public function testDefaultJsonLoginSuccess()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testDefaultJsonLoginSuccess(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
         $client->request('POST', '/chk', [], [], ['CONTENT_TYPE' => 'application/json'], '{"user": {"login": "dunglas", "password": "foo"}}');
         $response = $client->getResponse();
 
@@ -29,9 +32,12 @@ class JsonLoginTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    public function testDefaultJsonLoginFailure()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testDefaultJsonLoginFailure(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
         $client->request('POST', '/chk', [], [], ['CONTENT_TYPE' => 'application/json'], '{"user": {"login": "dunglas", "password": "bad"}}');
         $response = $client->getResponse();
 
@@ -40,9 +46,12 @@ class JsonLoginTest extends AbstractWebTestCase
         $this->assertSame(['error' => 'Invalid credentials.'], json_decode($response->getContent(), true));
     }
 
-    public function testCustomJsonLoginSuccess()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testCustomJsonLoginSuccess(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml']);
+        $client = $this->createClient($options + ['test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml']);
         $client->request('POST', '/chk', [], [], ['CONTENT_TYPE' => 'application/json'], '{"user": {"login": "dunglas", "password": "foo"}}');
         $response = $client->getResponse();
 
@@ -51,9 +60,12 @@ class JsonLoginTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Good game @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    public function testCustomJsonLoginFailure()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testCustomJsonLoginFailure(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml']);
+        $client = $this->createClient($options + ['test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml']);
         $client->request('POST', '/chk', [], [], ['CONTENT_TYPE' => 'application/json'], '{"user": {"login": "dunglas", "password": "bad"}}');
         $response = $client->getResponse();
 
@@ -62,9 +74,12 @@ class JsonLoginTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Something went wrong'], json_decode($response->getContent(), true));
     }
 
-    public function testDefaultJsonLoginBadRequest()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testDefaultJsonLoginBadRequest(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'JsonLogin', 'root_config' => 'config.yml']);
         $client->request('POST', '/chk', [], [], ['CONTENT_TYPE' => 'application/json'], 'Not a json content');
         $response = $client->getResponse();
 

@@ -27,29 +27,25 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('security.csrf.token_storage')) {
-            return;
-        }
-
         $this->registerCsrfProtectionListener($container);
         $this->registerLogoutHandler($container);
     }
 
     private function registerCsrfProtectionListener(ContainerBuilder $container)
     {
-        if (!$container->has('security.authenticator.manager')) {
+        if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_manager')) {
             return;
         }
 
         $container->register('security.listener.csrf_protection', CsrfProtectionListener::class)
-            ->addArgument(new Reference('security.csrf.token_storage'))
+            ->addArgument(new Reference('security.csrf.token_manager'))
             ->addTag('kernel.event_subscriber')
             ->setPublic(false);
     }
 
     protected function registerLogoutHandler(ContainerBuilder $container)
     {
-        if (!$container->has('security.logout_listener')) {
+        if (!$container->has('security.logout_listener') || !$container->has('security.csrf.token_storage')) {
             return;
         }
 

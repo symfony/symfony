@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+
 /**
  * ParameterBag is a container for key/value pairs.
  *
@@ -31,11 +33,23 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameters.
      *
+     * @param string|null $key The name of the parameter to return or null to get them all
+     *
      * @return array An array of parameters
      */
-    public function all()
+    public function all(/*string $key = null*/)
     {
-        return $this->parameters;
+        $key = \func_num_args() > 0 ? func_get_arg(0) : null;
+
+        if (null === $key) {
+            return $this->parameters;
+        }
+
+        if (!\is_array($value = $this->parameters[$key] ?? [])) {
+            throw new BadRequestException(sprintf('Unexpected value for parameter "%s": expecting "array", got "%s".', $key, get_debug_type($value)));
+        }
+
+        return $value;
     }
 
     /**

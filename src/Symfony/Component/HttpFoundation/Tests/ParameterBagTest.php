@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends TestCase
@@ -25,6 +26,21 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $bag->all(), '->all() gets all the input');
+    }
+
+    public function testAllWithInputKey()
+    {
+        $bag = new ParameterBag(['foo' => ['bar', 'baz'], 'null' => null]);
+
+        $this->assertEquals(['bar', 'baz'], $bag->all('foo'), '->all() gets the value of a parameter');
+        $this->assertEquals([], $bag->all('unknown'), '->all() returns an empty array if a parameter is not defined');
+    }
+
+    public function testAllThrowsForNonArrayValues()
+    {
+        $this->expectException(BadRequestException::class);
+        $bag = new ParameterBag(['foo' => 'bar', 'null' => null]);
+        $bag->all('foo');
     }
 
     public function testKeys()

@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -1255,6 +1257,11 @@ class RequestTest extends TestCase
     {
         $normalizedMethod = strtoupper($method);
 
+        $_POST = [];
+        $request = Request::createFromGlobals();
+        $this->assertNotInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
+
         $_GET['foo1'] = 'bar1';
         $_POST['foo2'] = 'bar2';
         $_COOKIE['foo3'] = 'bar3';
@@ -1267,6 +1274,8 @@ class RequestTest extends TestCase
         $this->assertEquals('bar3', $request->cookies->get('foo3'), '::fromGlobals() uses values from $_COOKIE');
         $this->assertEquals(['bar4'], $request->files->get('foo4'), '::fromGlobals() uses values from $_FILES');
         $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
+        $this->assertInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
 
@@ -1275,6 +1284,8 @@ class RequestTest extends TestCase
         $request = RequestContentProxy::createFromGlobals();
         $this->assertEquals($normalizedMethod, $request->getMethod());
         $this->assertEquals('mycontent', $request->request->get('content'));
+        $this->assertInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 

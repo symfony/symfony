@@ -75,7 +75,7 @@ class MemcachedFactoryTest extends TestCase
             'localhost',
             11222,
         ];
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -92,7 +92,7 @@ class MemcachedFactoryTest extends TestCase
             '/var/local/run/memcached.socket',
             0,
         ];
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',
@@ -123,5 +123,68 @@ class MemcachedFactoryTest extends TestCase
             'memcached(memcached://localhost:11222?socket_recv_size=1&socket_send_size=2)?retry_timeout=8',
             [\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8],
         ];
+    }
+
+    public function testMultiServerDsn()
+    {
+        $dsn = 'memcached:?host[localhost]&host[localhost:12345]&host[/some/memcached.sock:]=3';
+        $client = MemcachedFactory::create($dsn);
+
+        $expected = [
+            0 => [
+                'host' => 'localhost',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+            1 => [
+                'host' => 'localhost',
+                'port' => 12345,
+                'type' => 'TCP',
+            ],
+            2 => [
+                'host' => '/some/memcached.sock',
+                'port' => 0,
+                'type' => 'SOCKET',
+            ],
+        ];
+        $this->assertSame($expected, $client->getServerList());
+
+        $dsn = 'memcached://localhost?host[foo.bar]=3';
+        $client = MemcachedFactory::create($dsn);
+
+        $expected = [
+            0 => [
+                'host' => 'localhost',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+            1 => [
+                'host' => 'foo.bar',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+        ];
+        $this->assertSame($expected, $client->getServerList());
+
+        $dsn = 'memcached(memcached://localhost memcached://localhost:12345 memcached:///some/memcached.sock?weight=3)';
+        $client = MemcachedFactory::create($dsn);
+        $expected = [
+            0 => [
+                'host' => 'localhost',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+            1 => [
+                'host' => 'localhost',
+                'port' => 12345,
+                'type' => 'TCP',
+            ],
+            2 => [
+                'host' => '/some/memcached.sock',
+                'port' => 0,
+                'type' => 'SOCKET',
+            ],
+        ];
+        $this->assertSame($expected, $client->getServerList());
     }
 }

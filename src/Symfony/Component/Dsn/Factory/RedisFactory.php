@@ -19,8 +19,10 @@ use Symfony\Component\Dsn\Configuration\Path;
 use Symfony\Component\Dsn\Configuration\Url;
 use Symfony\Component\Dsn\ConnectionFactoryInterface;
 use Symfony\Component\Dsn\DsnParser;
+use Symfony\Component\Dsn\Exception\FailedToConnectException;
 use Symfony\Component\Dsn\Exception\FunctionNotSupportedException;
 use Symfony\Component\Dsn\Exception\InvalidArgumentException;
+use Symfony\Component\Dsn\Exception\InvalidDsnException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -44,10 +46,17 @@ class RedisFactory implements ConnectionFactoryInterface
         'failover' => 'none',
     ];
 
+    /**
+     * Example DSN strings.
+     *
+     * - redis://localhost:6379?timeout=10
+     * - redis(redis://127.0.0.1)?persistent_id=foobar
+     * - redis(redis://127.0.0.1/20 redis://127.0.0.2?timeout=10)?lazy=1
+     */
     public static function create(string $dsnString): object
     {
         $rootDsn = DsnParser::parseFunc($dsnString);
-        if ('dsn' !== $rootDsn->getName() && 'memcached' !== $rootDsn->getName()) {
+        if ('dsn' !== $rootDsn->getName() && 'redis' !== $rootDsn->getName()) {
             throw new FunctionNotSupportedException($dsnString, $rootDsn->getName());
         }
         $params = $rootDsn->getParameters() + self::$defaultConnectionOptions;
@@ -59,7 +68,7 @@ class RedisFactory implements ConnectionFactoryInterface
                 throw new InvalidArgumentException('Only one DSN function is allowed.');
             }
             if ('redis' !== $dsn->getScheme() && 'rediss' !== $dsn->getScheme()) {
-                throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s" does not start with "redis:" or "rediss".', $dsn));
+                throw new InvalidDsnException($dsn->__toString(), 'Invalid Redis DSN: The scheme must be "redis:" or "rediss".');
             }
 
             $auth = $dsn->getPassword() ?? $dsn->getUser();
@@ -74,27 +83,30 @@ class RedisFactory implements ConnectionFactoryInterface
                 array_unshift($hosts, ['scheme' => 'tcp', 'host' => $dsn->getHost(), 'port' => $dsn->getPort() ?? 6379]);
             } elseif ($dsn instanceof Path) {
                 array_unshift($hosts, ['scheme' => 'unix', 'path' => $path]);
-            } else {
-                foreach ($dsn->getParameter('hosts', []) as $host => $parameters) {
-                    if (\is_string($parameters)) {
-                        parse_str($parameters, $parameters);
-                    }
-                    if (false === $i = strrpos($host, ':')) {
-                        $hosts[$host] = ['scheme' => 'tcp', 'host' => $host, 'port' => 6379] + $parameters;
-                    } elseif ($port = (int) substr($host, 1 + $i)) {
-                        $hosts[$host] = ['scheme' => 'tcp', 'host' => substr($host, 0, $i), 'port' => $port] + $parameters;
-                    } else {
-                        $hosts[$host] = ['scheme' => 'unix', 'path' => substr($host, 0, $i)] + $parameters;
-                    }
-                }
-                $hosts = array_values($hosts);
             }
 
+            foreach ($dsn->getParameter('host', []) as $host => $parameters) {
+                if (\is_string($parameters)) {
+                    parse_str($parameters, $parameters);
+                }
+                if (false === $i = strrpos($host, ':')) {
+                    $hosts[$host] = ['scheme' => 'tcp', 'host' => $host, 'port' => 6379] + $parameters;
+                } elseif ($port = (int) substr($host, 1 + $i)) {
+                    $hosts[$host] = ['scheme' => 'tcp', 'host' => substr($host, 0, $i), 'port' => $port] + $parameters;
+                } else {
+                    $hosts[$host] = ['scheme' => 'unix', 'path' => substr($host, 0, $i)] + $parameters;
+                }
+            }
+            $hosts = array_values($hosts);
             $params = $dsn->getParameters() + $params;
         }
 
+        if (empty($hosts)) {
+            throw new InvalidDsnException($dsnString, 'Invalid Redis DSN: The DSN does not contain any hosts.');
+        }
+
         if (isset($params['redis_sentinel']) && !class_exists(\Predis\Client::class)) {
-            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package: "%s".', $dsn));
+            throw new InvalidArgumentException(sprintf('Redis Sentinel support requires the "predis/predis" package: "%s".', $dsn));
         }
 
         if (null === $params['class'] && !isset($params['redis_sentinel']) && \extension_loaded('redis')) {
@@ -111,7 +123,7 @@ class RedisFactory implements ConnectionFactoryInterface
                 try {
                     @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, (float) $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
                 } catch (\RedisException $e) {
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
+                    throw new FailedToConnectException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage(), 0, $e);
                 }
 
                 set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
@@ -119,7 +131,7 @@ class RedisFactory implements ConnectionFactoryInterface
                 restore_error_handler();
                 if (!$isConnected) {
                     $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
+                    throw new FailedToConnectException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
                 }
 
                 if ((null !== $auth && !$redis->auth($auth))
@@ -127,7 +139,7 @@ class RedisFactory implements ConnectionFactoryInterface
                     || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
+                    throw new FailedToConnectException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
                 }
 
                 if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {

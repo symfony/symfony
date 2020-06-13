@@ -93,23 +93,24 @@ class MemcachedFactory implements ConnectionFactoryInterface
                 } elseif ($dsn instanceof Path) {
                     $params['host'] = $path;
                     $servers[] = [$path, null, $params['weight']];
-                } else {
-                    foreach ($dsn->getParameter('hosts', []) as $host => $weight) {
-                        if (false === $port = strrpos($host, ':')) {
-                            $hosts[$host] = [$host, 11211, (int) $weight];
-                        } else {
-                            $hosts[$host] = [substr($host, 0, $port), (int) substr($host, 1 + $port), (int) $weight];
-                        }
-                    }
-                    $servers = array_merge($servers, array_values($hosts));
                 }
+
+                $hosts = [];
+                foreach ($dsn->getParameter('host', []) as $host => $weight) {
+                    if (false === $port = strrpos($host, ':')) {
+                        $hosts[$host] = [$host, 11211, (int) $weight];
+                    } else {
+                        $hosts[$host] = [substr($host, 0, $port), (int) substr($host, 1 + $port), (int) $weight];
+                    }
+                }
+                $servers = array_merge($servers, array_values($hosts));
 
                 $params += $dsn->getParameters();
                 $options = $dsn->getParameters() + $options;
             }
 
             // set client's options
-            unset($options['persistent_id'], $options['username'], $options['password'], $options['weight'], $options['lazy']);
+            unset($options['host'], $options['persistent_id'], $options['username'], $options['password'], $options['weight'], $options['lazy']);
             $options = array_change_key_case($options, CASE_UPPER);
             $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
             $client->setOption(\Memcached::OPT_NO_BLOCK, true);

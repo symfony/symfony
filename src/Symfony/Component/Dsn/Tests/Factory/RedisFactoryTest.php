@@ -12,7 +12,10 @@
 namespace Symfony\Component\Dsn\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Dsn\Exception\FailedToConnectException;
 use Symfony\Component\Dsn\Exception\InvalidArgumentException;
+use Symfony\Component\Dsn\Exception\InvalidDsnException;
 use Symfony\Component\Dsn\Factory\RedisFactory;
 
 /**
@@ -22,22 +25,30 @@ use Symfony\Component\Dsn\Factory\RedisFactory;
  */
 class RedisFactoryTest extends TestCase
 {
-    public function testCreate()
+    /**
+     * @dataProvider provideValidSchemes
+     */
+    public function testCreate(string $dsnScheme)
     {
+        $redis = RedisFactory::create($dsnScheme.':?host[h1]&host[h2]&host[/foo:]');
+        $this->assertInstanceOf(\RedisArray::class, $redis);
+        $this->assertSame(['h1:6379', 'h2:6379', '/foo'], $redis->_hosts());
+        @$redis = null; // some versions of phpredis connect on destruct, let's silence the warning
+
         $redisHost = getenv('REDIS_HOST');
 
-        $redis = RedisFactory::create('redis://'.$redisHost);
+        $redis = RedisFactory::create($dsnScheme.'://'.$redisHost);
         $this->assertInstanceOf(\Redis::class, $redis);
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 
-        $redis = RedisFactory::create('redis://'.$redisHost.'/2');
+        $redis = RedisFactory::create($dsnScheme.'://'.$redisHost.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
-        $redis = RedisFactory::create('redis://'.$redisHost.'?timeout=4');
+        $redis = RedisFactory::create($dsnScheme.'://'.$redisHost.'?timeout=4');
         $this->assertEquals(4, $redis->getTimeout());
 
-        $redis = RedisFactory::create('redis://'.$redisHost.'?read_timeout=5');
+        $redis = RedisFactory::create($dsnScheme.'://'.$redisHost.'?read_timeout=5');
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 
@@ -46,8 +57,8 @@ class RedisFactoryTest extends TestCase
      */
     public function testFailedCreate($dsn)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection failed');
+        $this->expectException(FailedToConnectException::class);
+        $this->expectExceptionMessage('Redis connection "'.$dsn.'" failed');
         RedisFactory::create($dsn);
     }
 
@@ -63,7 +74,7 @@ class RedisFactoryTest extends TestCase
      */
     public function testInvalidCreate($dsn)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidDsnException::class);
         $this->expectExceptionMessage('Invalid Redis DSN');
         RedisFactory::create($dsn);
     }
@@ -73,4 +84,14 @@ class RedisFactoryTest extends TestCase
         yield ['foo://localhost'];
         yield ['redis://'];
     }
+
+
+    public function provideValidSchemes(): array
+    {
+        return [
+            ['redis'],
+            ['rediss'],
+        ];
+    }
+
 }

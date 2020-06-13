@@ -94,19 +94,19 @@ class Connection
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $query);
         }
-
+        $options = $query + $options + self::DEFAULT_OPTIONS;
         $configuration = [
-            'buffer_size' => $options['buffer_size'] ?? (int) ($query['buffer_size'] ?? self::DEFAULT_OPTIONS['buffer_size']),
-            'wait_time' => $options['wait_time'] ?? (int) ($query['wait_time'] ?? self::DEFAULT_OPTIONS['wait_time']),
-            'poll_timeout' => $options['poll_timeout'] ?? ($query['poll_timeout'] ?? self::DEFAULT_OPTIONS['poll_timeout']),
-            'visibility_timeout' => $options['visibility_timeout'] ?? ($query['visibility_timeout'] ?? self::DEFAULT_OPTIONS['visibility_timeout']),
-            'auto_setup' => $options['auto_setup'] ?? (bool) ($query['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup']),
+            'buffer_size' => (int) $options['buffer_size'],
+            'wait_time' => (int) $options['wait_time'],
+            'poll_timeout' => $options['poll_timeout'],
+            'visibility_timeout' => $options['visibility_timeout'],
+            'auto_setup' => (bool) $options['auto_setup'],
         ];
 
         $clientConfiguration = [
-            'region' => $options['region'] ?? ($query['region'] ?? self::DEFAULT_OPTIONS['region']),
-            'accessKeyId' => $options['access_key'] ?? (urldecode($parsedUrl['user'] ?? '') ?: self::DEFAULT_OPTIONS['access_key']),
-            'accessKeySecret' => $options['secret_key'] ?? (urldecode($parsedUrl['pass'] ?? '') ?: self::DEFAULT_OPTIONS['secret_key']),
+            'region' => $options['region'],
+            'accessKeyId' => urldecode($parsedUrl['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
+            'accessKeySecret' => urldecode($parsedUrl['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
         unset($query['region']);
 

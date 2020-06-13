@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.1",
+        "php": ">=7.1",
         "psr/http-message": "^1.0",
         "symfony/http-foundation": "^4.4 || ^5.0"
     },

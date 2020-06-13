@@ -18,7 +18,6 @@ security:
                 remember_me: true
                 require_previous_session: false
             logout: ~
-            anonymous: ~
             stateless: true
 
     access_control:

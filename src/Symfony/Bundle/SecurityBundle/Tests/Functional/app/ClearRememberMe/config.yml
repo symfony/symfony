@@ -19,7 +19,6 @@ security:
             remember_me:
                 always_remember_me: true
                 secret: key
-            anonymous: ~
 
     access_control:
         - { path: ^/foo, roles: ROLE_USER }

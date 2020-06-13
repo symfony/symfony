@@ -27,13 +27,11 @@ security:
                 check_path: /login_check
                 default_target_path: /profile
             logout: ~
-            anonymous: ~
             lazy: true
 
         # This firewall is here just to check its the logout functionality
         second_area:
             http_basic: ~
-            anonymous: ~
             logout:
                 target: /second/target
                 path: /second/logout

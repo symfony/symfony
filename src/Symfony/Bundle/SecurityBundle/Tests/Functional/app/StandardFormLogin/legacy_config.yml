@@ -1,0 +1,9 @@
+imports:
+    - { resource: ./config.yml }
+
+security:
+    firewalls:
+        default:
+            anonymous: ~
+        second_area:
+            anonymous: ~

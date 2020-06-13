@@ -14,11 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class FormLoginTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLogin($config)
+    public function testFormLogin(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -33,11 +33,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLogout($config)
+    public function testFormLogout(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -66,11 +66,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -86,11 +86,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -106,11 +106,11 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
     }
 
-    public function getConfigs()
+    public function provideClientOptions()
     {
-        return [
-            ['config.yml'],
-            ['routes_as_path.yml'],
-        ];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
     }
 }

@@ -20,7 +20,6 @@ security:
             logout:
                 path: localized_logout_path
                 target: localized_logout_target_path
-            anonymous: ~
 
     access_control:
         - { path: '^/(?:[a-z]{2})/secure/.*', roles: ROLE_USER }

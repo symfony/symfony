@@ -67,7 +67,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), [('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')]);
+        return $this->services['test'] = new \stdClass(('file://'.$this->targetDirs[1]), [('file://'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')]);
     }
 
     public function getParameter($name)
@@ -131,7 +131,7 @@ class ProjectServiceContainer extends Container
     private function getDynamicParameter($name)
     {
         switch ($name) {
-            case 'foo': $value = ('wiz'.$this->targetDirs[1]); break;
+            case 'foo': $value = ('file://'.$this->targetDirs[1]); break;
             case 'buz': $value = $this->targetDirs[2]; break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }

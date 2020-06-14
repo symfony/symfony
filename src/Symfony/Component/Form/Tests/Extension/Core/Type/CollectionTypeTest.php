@@ -415,8 +415,8 @@ class CollectionTypeTest extends BaseTypeTest
 
         $expectedBlockPrefixes = [
             'form',
-            'text',
             'collection_entry',
+            'text',
             '_fields_entry',
         ];
 
@@ -436,8 +436,8 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertCount(1, $collectionView);
         $this->assertSame([
             'form',
-            'text',
             'collection_entry',
+            'text',
             'field',
             '_fields_entry',
         ], $collectionView[0]->vars['block_prefixes']);
@@ -454,8 +454,8 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertCount(1, $collectionView);
         $this->assertSame([
             'form',
-            'block_prefixed_foo_text',
             'collection_entry',
+            'block_prefixed_foo_text',
             'foo',
             '_fields_entry',
         ], $collectionView[0]->vars['block_prefixes']);

@@ -42,7 +42,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
 
         $properties = $value->getProperties();
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            if (!$reflectionProperty->hasType()) {
+            if (!($type = $reflectionProperty->getType()) instanceof \ReflectionNamedType) {
                 continue;
             }
             if (false === $doc = $reflectionProperty->getDocComment()) {
@@ -55,7 +55,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
                 continue;
             }
 
-            $type = $reflectionProperty->getType()->getName();
+            $type = $type->getName();
             $value->setProperty($name, new TypedReference($type, $type, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $name));
         }
 

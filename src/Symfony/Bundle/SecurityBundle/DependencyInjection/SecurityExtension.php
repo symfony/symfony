@@ -135,8 +135,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $phpLoader->load('templating_twig.php');
         }
 
-        $loader->load('collectors.xml');
-        $loader->load('guard.xml');
+        $phpLoader->load('collectors.php');
+        $phpLoader->load('guard.php');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('security_debug.xml');
@@ -177,7 +177,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if (class_exists(Application::class)) {
-            $loader->load('console.xml');
+            $phpLoader->load('console.php');
             $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
         }
 

@@ -282,7 +282,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['request'])) {
-            $this->registerRequestConfiguration($config['request'], $container, $loader);
+            $this->registerRequestConfiguration($config['request'], $container, $phpLoader);
         }
 
         if (null === $config['csrf_protection']['enabled']) {
@@ -980,10 +980,10 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
     }
 
-    private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if ($config['formats']) {
-            $loader->load('request.xml');
+            $loader->load('request.php');
 
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);

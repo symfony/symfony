@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-12T09:25:11Z
+
+I think you need to add a conflict with dependency-injection < 5.2 so that tests pass on low.

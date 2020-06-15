@@ -177,6 +177,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
                 if (!$parametersWithUndefinedConstants) {
                     yield preg_replace('/^  @@.*/m', '', $m);
                 } else {
+                    $t = \PHP_VERSION_ID >= 70000 ? $m->getReturnType() : '';
                     $stack = [
                         $m->getDocComment(),
                         $m->getName(),
@@ -187,15 +188,16 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
                         $m->isPrivate(),
                         $m->isProtected(),
                         $m->returnsReference(),
-                        \PHP_VERSION_ID >= 70000 && $m->hasReturnType() ? (\PHP_VERSION_ID >= 70100 ? $m->getReturnType()->getName() : (string) $m->getReturnType()) : '',
+                        $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t,
                     ];
 
                     foreach ($m->getParameters() as $p) {
                         if (!isset($parametersWithUndefinedConstants[$p->name])) {
                             $stack[] = (string) $p;
                         } else {
+                            $t = \PHP_VERSION_ID >= 70000 ? $p->getType() : '';
                             $stack[] = $p->isOptional();
-                            $stack[] = \PHP_VERSION_ID >= 70000 && $p->hasType() ? (\PHP_VERSION_ID >= 70100 ? $p->getType()->getName() : (string) $p->getType()) : '';
+                            $stack[] = $t instanceof \ReflectionNamedType ? $t->getName() : (string) $t;
                             $stack[] = $p->isPassedByReference();
                             $stack[] = \PHP_VERSION_ID >= 50600 ? $p->isVariadic() : '';
                             $stack[] = $p->getName();

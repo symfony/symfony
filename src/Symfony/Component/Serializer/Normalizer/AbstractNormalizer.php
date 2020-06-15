@@ -388,7 +388,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         try {
             if (\PHP_VERSION_ID < 70100 && null !== $parameterClass = $parameter->getClass()) {
                 $parameterClass = $parameterClass->name;
-            } elseif (\PHP_VERSION_ID >= 70100 && ($parameterType = $parameter->getType()) && !$parameterType->isBuiltin()) {
+            } elseif (\PHP_VERSION_ID >= 70100 && ($parameterType = $parameter->getType()) instanceof \ReflectionNamedType && !$parameterType->isBuiltin()) {
                 $parameterClass = $parameterType->getName();
                 new \ReflectionClass($parameterClass); // throws a \ReflectionException if the class doesn't exist
             } else {

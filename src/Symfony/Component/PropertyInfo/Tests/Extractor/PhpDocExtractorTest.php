@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
+use phpDocumentor\Reflection\DocBlock\StandardTagFactory;
+use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
 use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -44,6 +46,26 @@ class PhpDocExtractorTest extends TestCase
     public function testParamTagTypeIsOmitted()
     {
         $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
+    }
+
+    public function invalidTypesProvider()
+    {
+        return [
+            'pub' => ['pub', null, null],
+            'stat' => ['stat', null, null],
+            'foo' => ['foo', $this->isPhpDocumentorV5() ? 'Foo.' : null, null],
+            'bar' => ['bar', $this->isPhpDocumentorV5() ? 'Bar.' : null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidTypesProvider
+     */
+    public function testInvalid($property, $shortDescription, $longDescription)
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
     }
 
     /**
@@ -94,7 +116,7 @@ class PhpDocExtractorTest extends TestCase
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
-            ['emptyVar', null, null, null],
+            ['emptyVar', null, $this->isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
         ];
     }
 
@@ -249,6 +271,16 @@ class PhpDocExtractorTest extends TestCase
     public function testDocBlockFallback($property, $types)
     {
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
+    }
+
+    protected function isPhpDocumentorV5()
+    {
+        if (class_exists(InvalidTag::class)) {
+            return true;
+        }
+
+        return (new \ReflectionMethod(StandardTagFactory::class, 'create'))
+            ->hasReturnType();
     }
 }
 

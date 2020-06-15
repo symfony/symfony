@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-28T12:19:30Z
+
+Can you please check if this change applies to branch 3.4, and rebase+retarget if yes?
+
+---------------------------------------------------------------------------
+
+by DerManoMann at 2020-05-28T21:54:05Z
+
+> Can you please check if this change applies to branch 3.4, and rebase+retarget if yes?
+
+@nicolas-grekas I think it does.
+
+I also just found #36850 which makes this a duplicate - is it worth progressing this one too?
+
+One major problem both PRs are facing is the lowest/highest dep testing as it means we end up with different behaviour depending on used version of phpDocumentor.
+
+Is there a recipe for how to deal with that? Conditional tests sounds a bit ugly to me, although detecting the new `InvalidTag` class as conditional would make sense...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-04T15:34:16Z
+
+Conditional testing is the way to go yes.
+Can you please compare with #36850 and decide which PR should be moved forward if there are significant differences?
+
+---------------------------------------------------------------------------
+
+by DerManoMann at 2020-06-10T06:39:12Z
+
+@nicolas-grekas I know I said this applies to the 3.4 branch too, but I think things are more complicated.
+
+On 3.4 tests fails straight off due to BC breaking changes, for [example detection of `nullable`](https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/PropertyInfo/Util/PhpDocTypeHelper.php#L69). That is unrelated this issue and I will require bigger changes, IMHO.
+
+As far as this PR against 4.4 is concerned - I've made the tests conditional but struggle to find the right way to test for the new code. For some reason the PHP 7.1 tests on travis use phpdocumentor 5.0.0-alpha5. However, the new InvalidTag class was only introduced in alpha8...
+**EDIT:** I worked around this issue by detecting return type hints at runtime... alpha5 is the latest usable for PHP 7.1 as after that the requirements got bumped to PHP 7.2...
+
+Finally, there doesn't seem to be any progress on #36850, so I am happy to continue work on this PR if I could get some advice/guidance on the issues described above.
+
+---------------------------------------------------------------------------
+
+by DerManoMann at 2020-06-14T08:40:48Z
+
+@nicolas-grekas @stof not sure what the etiquette rules are here, but this needs a re-review and a call on whether 4.4 is the right place for it (it is, IMHO, as outlined in the previous comment)

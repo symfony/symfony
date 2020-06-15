@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-13T12:29:19Z
+
+Wont this make static analysis go crazy.. ???
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-13T22:45:21Z
+
+@gmponos you made me realize I missed updating the `@var` annotation. Fixed.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-14T08:06:24Z
+
+Always positive :) at least something good came out from my comment.. check my comment on the [related issue](https://github.com/symfony/symfony/issues/37100#issuecomment-643733532)
+
+Also I tried your changes locally at a project of mine and it seems that PHPStan is **not** complaining.

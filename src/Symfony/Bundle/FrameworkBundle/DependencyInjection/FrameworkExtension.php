@@ -178,6 +178,10 @@ class FrameworkExtension extends Extension
         $phpLoader->load('fragment_renderer.php');
         $phpLoader->load('error_renderer.php');
 
+        if (true === $container->getParameter('kernel.debug')) {
+            $phpLoader->load('welcome.php');
+        }
+
         if (interface_exists(PsrEventDispatcherInterface::class)) {
             $container->setAlias(PsrEventDispatcherInterface::class, 'event_dispatcher');
         }

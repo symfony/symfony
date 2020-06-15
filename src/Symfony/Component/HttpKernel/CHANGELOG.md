@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+ * Removed from `RouterListener` the function `onKernelException` and unsubscribed the
+'kernel.exception' from the `RouterListener`
+ * Added a `WelcomeListener` and subscribed the 'kernel.exception'
+
 5.1.0
 -----
 

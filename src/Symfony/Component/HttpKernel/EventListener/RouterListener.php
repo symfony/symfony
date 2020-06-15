@@ -15,17 +15,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -46,8 +42,6 @@ class RouterListener implements EventSubscriberInterface
     private $context;
     private $logger;
     private $requestStack;
-    private $projectDir;
-    private $debug;
 
     /**
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher    The Url or Request matcher
@@ -70,8 +64,6 @@ class RouterListener implements EventSubscriberInterface
         $this->context = $context ?: $matcher->getContext();
         $this->requestStack = $requestStack;
         $this->logger = $logger;
-        $this->projectDir = $projectDir;
-        $this->debug = $debug;
     }
 
     private function setCurrentRequest(Request $request = null)
@@ -141,35 +133,11 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    public function onKernelException(ExceptionEvent $event)
-    {
-        if (!$this->debug || !($e = $event->getThrowable()) instanceof NotFoundHttpException) {
-            return;
-        }
-
-        if ($e->getPrevious() instanceof NoConfigurationException) {
-            $event->setResponse($this->createWelcomeResponse());
-        }
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [['onKernelRequest', 32]],
             KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
-            KernelEvents::EXCEPTION => ['onKernelException', -64],
         ];
-    }
-
-    private function createWelcomeResponse(): Response
-    {
-        $version = Kernel::VERSION;
-        $projectDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;
-        $docVersion = substr(Kernel::VERSION, 0, 3);
-
-        ob_start();
-        include \dirname(__DIR__).'/Resources/welcome.html.php';
-
-        return new Response(ob_get_clean(), Response::HTTP_NOT_FOUND);
     }
 }

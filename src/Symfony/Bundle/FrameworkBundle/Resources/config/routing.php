@@ -151,8 +151,6 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 service('router.request_context')->ignoreOnInvalid(),
                 service('logger')->ignoreOnInvalid(),
-                param('kernel.project_dir'),
-                param('kernel.debug'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])

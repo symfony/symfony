@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+ * Added the configuration for welcome page inside the file `welcome.php`
+
 5.1.0
 -----
 

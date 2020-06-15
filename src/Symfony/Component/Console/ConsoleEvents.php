@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+
 /**
  * Contains all events dispatched by an Application.
  *
@@ -44,4 +48,15 @@ final class ConsoleEvents
      * @Event("Symfony\Component\Console\Event\ConsoleErrorEvent")
      */
     const ERROR = 'console.error';
+
+    /**
+     * Event aliases.
+     *
+     * These aliases can be consumed by RegisterListenersPass.
+     */
+    const ALIASES = [
+        ConsoleCommandEvent::class => self::COMMAND,
+        ConsoleErrorEvent::class => self::ERROR,
+        ConsoleTerminateEvent::class => self::TERMINATE,
+    ];
 }

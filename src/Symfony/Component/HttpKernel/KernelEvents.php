@@ -11,6 +11,15 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
+
 /**
  * Contains all events thrown in the HttpKernel component.
  *
@@ -100,4 +109,20 @@ final class KernelEvents
      * @Event("Symfony\Component\HttpKernel\Event\TerminateEvent")
      */
     const TERMINATE = 'kernel.terminate';
+
+    /**
+     * Event aliases.
+     *
+     * These aliases can be consumed by RegisterListenersPass.
+     */
+    const ALIASES = [
+        ControllerArgumentsEvent::class => self::CONTROLLER_ARGUMENTS,
+        ControllerEvent::class => self::CONTROLLER,
+        ResponseEvent::class => self::RESPONSE,
+        FinishRequestEvent::class => self::FINISH_REQUEST,
+        RequestEvent::class => self::REQUEST,
+        ViewEvent::class => self::VIEW,
+        ExceptionEvent::class => self::EXCEPTION,
+        TerminateEvent::class => self::TERMINATE,
+    ];
 }

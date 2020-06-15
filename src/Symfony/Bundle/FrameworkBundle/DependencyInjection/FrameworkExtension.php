@@ -174,7 +174,7 @@ class FrameworkExtension extends Extension
         $phpLoader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         $phpLoader->load('web.php');
-        $loader->load('services.xml');
+        $phpLoader->load('services.php');
         $phpLoader->load('fragment_renderer.php');
         $phpLoader->load('error_renderer.php');
 

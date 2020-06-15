@@ -356,7 +356,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
-            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+            $this->registerMailerConfiguration($config['mailer'], $container, $phpLoader);
         }
 
         if ($this->isConfigEnabled($container, $config['notifier'])) {
@@ -600,7 +600,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->mailerConfigEnabled) {
-            $loader->load('mailer_debug.xml');
+            $phpLoader->load('mailer_debug.php');
         }
 
         if ($this->httpClientConfigEnabled) {
@@ -1953,14 +1953,14 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMailerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!class_exists(Mailer::class)) {
             throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
         }
 
-        $loader->load('mailer.xml');
-        $loader->load('mailer_transports.xml');
+        $loader->load('mailer.php');
+        $loader->load('mailer_transports.php');
         if (!\count($config['transports']) && null === $config['dsn']) {
             $config['dsn'] = 'smtp://null';
         }

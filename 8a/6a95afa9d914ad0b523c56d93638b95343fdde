@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by rvanlaak at 2020-06-11T17:41:25Z
+
+@yceruto thank you for your review. Did address your comments, left one question. Can you let me know?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-11T23:18:13Z
+
+please rebase
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2020-06-12T09:01:00Z
+
+@yceruto @Tobion @stof thank you for all the reviews. I took a bit too much liberty in trying to get all service definitions working with autowiring because I really love the power of that feature. Did revert that now and handled the rest of all comments. I think this PR is according to standards and ready to go now.
+
+Let me know when the time is there to enable autowiring all over the place, I'm then happy to help!
+
+---------------------------------------------------------------------------
+
+by stof at 2020-06-12T09:08:51Z
+
+@rvanlaak working "with" autowiring is already the case. What you did is making them *use* autowiring. And the decision is to use explicit wiring in core, to reduce the risk of messing things if people redefine autowiring aliases in a weird way.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2020-06-12T10:07:26Z
+
+the failing tests on Appveyor do not seem related?

@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\Context;
@@ -88,10 +89,12 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         foreach ($docBlock->getTagsByName('var') as $var) {
-            $varDescription = $var->getDescription()->render();
+            if ($var && !$var instanceof InvalidTag) {
+                $varDescription = $var->getDescription()->render();
 
-            if (!empty($varDescription)) {
-                return $varDescription;
+                if (!empty($varDescription)) {
+                    return $varDescription;
+                }
             }
         }
 
@@ -142,7 +145,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $types = [];
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
-            if ($tag && null !== $tag->getType()) {
+            if ($tag && !$tag instanceof InvalidTag && null !== $tag->getType()) {
                 $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
             }
         }

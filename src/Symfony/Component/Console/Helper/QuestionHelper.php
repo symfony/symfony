@@ -507,14 +507,16 @@ class QuestionHelper extends Helper
 
     private function isTty(): bool
     {
-        $inputStream = !$this->inputStream && \defined('STDIN') ? STDIN : $this->inputStream;
+        if (!\defined('STDIN')) {
+            return true;
+        }
 
         if (\function_exists('stream_isatty')) {
-            return stream_isatty($inputStream);
+            return stream_isatty(fopen('php://input', 'r'));
         }
 
         if (\function_exists('posix_isatty')) {
-            return posix_isatty($inputStream);
+            return posix_isatty(fopen('php://input', 'r'));
         }
 
         return true;

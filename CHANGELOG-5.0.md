@@ -7,6 +7,28 @@ in 5.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.0.0...v5.0.1
 
+* 5.0.10 (2020-06-12)
+
+ * bug #37227 [DependencyInjection][CheckTypeDeclarationsPass] Handle unresolved parameters pointing to environment variables (fancyweb)
+ * bug #37103 [Form] switch the context when validating nested forms (xabbuh)
+ * bug #37182 [HttpKernel] Fix regression where Store does not return response body correctly (mpdude)
+ * bug #37193 [DependencyInjection][CheckTypeDeclarationsPass] Always resolve parameters (fancyweb)
+ * bug #37191 [HttpClient] fix offset computation for data chunks (nicolas-grekas)
+ * bug #37177 [Ldap] fix refreshUser() ignoring extra_fields (arkste)
+ * bug #37181 [Mailer] Remove an internal annot (fabpot)
+ * bug #36913 [FrameworkBundle] fix type annotation on ControllerTrait::addFlash() (ThomasLandauer)
+ * bug #37162 [Mailer] added the reply-to addresses to the API SES transport request. (ribeiropaulor)
+ * bug #37167 [Mime] use fromString when creating a new Address (fabpot)
+ * bug #37169 [Cache] fix forward compatibility with Doctrine DBAL 3 (xabbuh)
+ * bug #37159 [Mailer] Fixed generator bug when creating multiple transports using Transport::fromDsn (atailouloute)
+ * bug #37048 [HttpClient] fix monitoring timeouts when other streams are active (nicolas-grekas)
+ * bug #37085 [Form] properly cascade validation to child forms (xabbuh)
+ * bug #37095 [PhpUnitBridge] Fix undefined index when output of "composer show" cannot be parsed (nicolas-grekas)
+ * bug #37092 [PhpUnitBridge] fix undefined var on version 3.4 (nicolas-grekas)
+ * bug #37065 [HttpClient] Throw JsonException instead of TransportException on empty response in Response::toArray() (jeroennoten)
+ * bug #37077 [WebProfilerBundle] Move ajax clear event listener initialization on loadToolbar (Bruno BOUTAREL)
+ * bug #37049 [Serializer] take into account the context when preserving empty array objects (xabbuh)
+
 * 5.0.9 (2020-05-31)
 
  * bug #37008 [Security] Fixed AbstractToken::hasUserChanged() (wouterj)

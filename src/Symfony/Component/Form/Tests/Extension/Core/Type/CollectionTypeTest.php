@@ -415,8 +415,8 @@ class CollectionTypeTest extends BaseTypeTest
 
         $expectedBlockPrefixes = [
             'form',
-            'text',
             'collection_entry',
+            'text',
             '_fields_entry',
         ];
 
@@ -428,37 +428,66 @@ class CollectionTypeTest extends BaseTypeTest
     public function testEntriesBlockPrefixesWithCustomBlockPrefix()
     {
         $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], [
+            'allow_add' => true,
             'entry_options' => ['block_prefix' => 'field'],
         ])
             ->createView()
         ;
 
-        $this->assertCount(1, $collectionView);
-        $this->assertSame([
+        $expectedBlockPrefixes = [
             'form',
-            'text',
             'collection_entry',
+            'text',
             'field',
             '_fields_entry',
-        ], $collectionView[0]->vars['block_prefixes']);
+        ];
+
+        $this->assertCount(1, $collectionView);
+        $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testEntriesBlockPrefixesWithCustomBlockPrefixedType()
     {
         $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], [
+            'allow_add' => true,
             'entry_type' => BlockPrefixedFooTextType::class,
         ])
             ->createView()
         ;
 
-        $this->assertCount(1, $collectionView);
-        $this->assertSame([
+        $expectedBlockPrefixes = [
             'form',
-            'block_prefixed_foo_text',
             'collection_entry',
+            'block_prefixed_foo_text',
             'foo',
             '_fields_entry',
-        ], $collectionView[0]->vars['block_prefixes']);
+        ];
+
+        $this->assertCount(1, $collectionView);
+        $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+    }
+
+    public function testPrototypeBlockPrefixesWithCustomBlockPrefix()
+    {
+        $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [], [
+            'allow_add' => true,
+            'entry_options' => ['block_prefix' => 'field'],
+        ])
+            ->createView()
+        ;
+
+        $expectedBlockPrefixes = [
+            'form',
+            'collection_entry',
+            'text',
+            'field',
+            '_fields_entry',
+        ];
+
+        $this->assertCount(0, $collectionView);
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -54,7 +54,7 @@
 
         <service id="security.logout.listener.session" class="Symfony\Component\Security\Http\EventListener\SessionLogoutListener" abstract="true" />
 
-        <service id="security.logout.listener.cookie_clearing" class="Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler" abstract="true" />
+        <service id="security.logout.listener.cookie_clearing" class="Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener" abstract="true" />
 
         <service id="security.logout.listener.default" class="Symfony\Component\Security\Http\EventListener\DefaultLogoutListener" abstract="true">
             <argument type="service" id="security.http_utils" />

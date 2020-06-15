@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\InputBag;
 
 class InputBagTest extends TestCase
@@ -34,21 +33,6 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['foo' => ['bar' => 'moo']]);
 
         $this->assertNull($bag->get('foo[bar]'));
-    }
-
-    public function testAllWithInputKey()
-    {
-        $bag = new InputBag(['foo' => ['bar', 'baz'], 'null' => null]);
-
-        $this->assertEquals(['bar', 'baz'], $bag->all('foo'), '->all() gets the value of a parameter');
-        $this->assertEquals([], $bag->all('unknown'), '->all() returns an empty array if a parameter is not defined');
-    }
-
-    public function testAllThrowsForNonArrayValues()
-    {
-        $this->expectException(BadRequestException::class);
-        $bag = new InputBag(['foo' => 'bar', 'null' => null]);
-        $bag->all('foo');
     }
 
     public function testFilterArray()
@@ -77,7 +61,7 @@ class InputBagTest extends TestCase
     public function testGettingANonStringValueIsDeprecated()
     {
         $bag = new InputBag(['foo' => ['a', 'b']]);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Retrieving a non-string value from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" exception in Symfony 6.0, use "Symfony\Component\HttpFoundation\InputBag::all()" instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 5.1: Retrieving a non-string value from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" exception in Symfony 6.0, use "Symfony\Component\HttpFoundation\InputBag::all($key)" instead.');
         $bag->get('foo');
     }
 

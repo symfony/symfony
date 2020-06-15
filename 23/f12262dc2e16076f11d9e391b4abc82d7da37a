@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-15T08:22:43Z
+
+Please do not merge yet, I need to update the test to see if the cookie is deleted. I'm struggling quite hard to achieve that
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-15T08:29:44Z
+
+Test fixed, can be merged :)

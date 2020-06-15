@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\BrowserKit\Cookie;
+
 class LogoutTest extends AbstractWebTestCase
 {
     /**
@@ -62,11 +64,25 @@ class LogoutTest extends AbstractWebTestCase
      */
     public function testAccessControlDoesNotApplyOnLogout(array $options)
     {
-        $client = $this->createClient($options + ['test_case' => 'LogoutAccess', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');
 
         $this->assertRedirect($client->getResponse(), '/');
+    }
+
+    public function testCookieClearingOnLogout()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_cookie_clearing.yml']);
+
+        $cookieJar = $client->getCookieJar();
+        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'somedomain'));
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+        $client->request('GET', '/logout');
+
+        $this->assertRedirect($client->getResponse(), '/');
+        $this->assertNull($cookieJar->get('flavor'));
     }
 }

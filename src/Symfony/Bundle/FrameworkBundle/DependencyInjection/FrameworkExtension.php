@@ -365,7 +365,7 @@ class FrameworkExtension extends Extension
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
         $this->registerValidationConfiguration($config['validation'], $container, $phpLoader, $propertyInfoEnabled);
-        $this->registerEsiConfiguration($config['esi'], $container, $loader);
+        $this->registerEsiConfiguration($config['esi'], $container, $phpLoader);
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $phpLoader, $config['default_locale']);
@@ -532,7 +532,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('fragment.renderer.esi');
@@ -540,7 +540,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $loader->load('esi.xml');
+        $loader->load('esi.php');
     }
 
     private function registerSsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

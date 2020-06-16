@@ -12,6 +12,14 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 class AccessListenerTest extends TestCase
@@ -181,25 +189,51 @@ class AccessListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenTheSecurityTokenStorageHasNoToken()
+    public function testHandleWhenTheSecurityTokenStorageHasNoTokenAndOnAnAccessControlledPathShouldThrowException()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $tokenStorage
-            ->expects($this->any())
-            ->method('getToken')
-            ->willReturn(null)
-        ;
+        $accessMap = new AccessMap();
+        $accessMap->add(new RequestMatcher('/private'), ['ROLE_USER']);
 
-        $listener = new AccessListener(
-            $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
-            $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
+        $accessListener = new AccessListener(
+            $tokenStorage = new TokenStorage(),
+            $this->createMock(AccessDecisionManagerInterface::class),
+            $accessMap,
+            $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $request = Request::create('/private/profile');
+        $requestEvent = new GetResponseEvent(
+            $this->createMock(KernelInterface::class),
+            $request,
+            KernelInterface::MASTER_REQUEST
+        );
 
-        $listener->handle($event);
+        $accessListener->handle($requestEvent);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testHandleWhenTheSecurityTokenStorageHasNoTokenButOutOfAnAccessControlledPathShouldNotThrowException()
+    {
+        $accessMap = new AccessMap();
+        $accessMap->add(new RequestMatcher('/private'), ['ROLE_USER']);
+
+        $accessListener = new AccessListener(
+            $tokenStorage = new TokenStorage(),
+            $this->createMock(AccessDecisionManagerInterface::class),
+            $accessMap,
+            $this->createMock(AuthenticationManagerInterface::class)
+        );
+
+        $request = Request::create('/login');
+        $requestEvent = new GetResponseEvent(
+            $this->createMock(KernelInterface::class),
+            $request,
+            KernelInterface::MASTER_REQUEST
+        );
+
+        $accessListener->handle($requestEvent);
     }
 }

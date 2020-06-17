@@ -76,7 +76,7 @@ final class InputBag extends ParameterBag
      */
     public function set(string $key, $value)
     {
-        if (!is_scalar($value) && !\is_array($value) && !method_exists($value, '__toString')) {
+        if (null !== $value && !is_scalar($value) && !\is_array($value) && !method_exists($value, '__toString')) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Passing "%s" as a 2nd Argument to "%s()" is deprecated, pass a string or an array instead.', get_debug_type($value), __METHOD__);
         }
 

@@ -352,7 +352,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {
-            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader, $config['profiler']);
+            $this->registerHttpClientConfiguration($config['http_client'], $container, $phpLoader, $config['profiler']);
         }
 
         if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
@@ -604,7 +604,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->httpClientConfigEnabled) {
-            $loader->load('http_client_debug.xml');
+            $phpLoader->load('http_client_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -1904,9 +1904,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $profilerConfig)
+    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $profilerConfig)
     {
-        $loader->load('http_client.xml');
+        $loader->load('http_client.php');
 
         $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);
 

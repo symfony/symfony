@@ -72,7 +72,7 @@ final class InputBag extends ParameterBag
     /**
      * Sets an input by name.
      *
-     * @param string|array $value
+     * @param string|array|null $value
      */
     public function set(string $key, $value)
     {

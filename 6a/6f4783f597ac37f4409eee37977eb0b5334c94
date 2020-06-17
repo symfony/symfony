@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by NguyenTruongLinh at 2020-06-12T14:50:16Z
+
+> Thank you for working on this @NguyenTruongLinh. I have left some minor comments for a few things that need to be changed.
+
+Thank you, I have updated it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-15T14:58:26Z
+
+Commas are missing: https://fabbot.io/report/symfony/symfony/37255/ede897ca97ec592202fccb223b8ea59170a8dd98
+
+---------------------------------------------------------------------------
+
+by NguyenTruongLinh at 2020-06-17T08:29:40Z
+
+> fabbot coding style checks are still failing
+
+I have updated, but AppVeyor build test failed. What am I missing?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-17T10:49:24Z
+
+Test failure is unrelated

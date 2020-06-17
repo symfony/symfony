@@ -51,7 +51,7 @@ class InputBagTest extends TestCase
     public function testSetWithNonStringishOrArrayIsDeprecated()
     {
         $bag = new InputBag();
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing "Symfony\Component\HttpFoundation\InputBag" as a 2nd Argument to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated, pass a string or an array instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing "Symfony\Component\HttpFoundation\InputBag" as a 2nd Argument to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated, pass a string, array, or null instead.');
         $bag->set('foo', new InputBag());
     }
 

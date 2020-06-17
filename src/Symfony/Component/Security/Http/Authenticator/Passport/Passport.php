@@ -28,9 +28,11 @@ class Passport implements UserPassportInterface
 
     protected $user;
 
+    private $attributes = [];
+
     /**
      * @param CredentialsInterface $credentials the credentials to check for this authentication, use
-     *                                          SelfValidatingPassport if no credentials should be checked.
+     *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
     public function __construct(UserInterface $user, CredentialsInterface $credentials, array $badges = [])
@@ -46,5 +48,23 @@ class Passport implements UserPassportInterface
     public function getUser(): UserInterface
     {
         return $this->user;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setAttribute(string $name, $value): void
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $name, $default = null)
+    {
+        return $this->attributes[$name] ?? $default;
     }
 }

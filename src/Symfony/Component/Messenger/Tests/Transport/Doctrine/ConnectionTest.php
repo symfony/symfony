@@ -209,7 +209,7 @@ class ConnectionTest extends TestCase
             'expectedAutoSetup' => false,
         ];
 
-        yield 'options from options array wins over options from dsn' => [
+        yield 'options from dsn array wins over options from options' => [
             'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal&auto_setup=true',
             'options' => [
                 'table_name' => 'name_from_options',
@@ -218,10 +218,10 @@ class ConnectionTest extends TestCase
                 'auto_setup' => false,
             ],
             'expectedConnection' => 'default',
-            'expectedTableName' => 'name_from_options',
-            'expectedRedeliverTimeout' => 1800,
-            'expectedQueue' => 'important',
-            'expectedAutoSetup' => false,
+            'expectedTableName' => 'name_from_dsn',
+            'expectedRedeliverTimeout' => 1200,
+            'expectedQueue' => 'normal',
+            'expectedAutoSetup' => true,
         ];
 
         yield 'options from dsn with falsey boolean' => [

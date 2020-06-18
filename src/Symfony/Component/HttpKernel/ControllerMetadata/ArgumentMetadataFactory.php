@@ -45,7 +45,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      */
     private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function): ?string
     {
-        if (!$type = $parameter->getType()) {
+        if (!($type = $parameter->getType()) instanceof \ReflectionNamedType) {
             return null;
         }
         $name = $type->getName();

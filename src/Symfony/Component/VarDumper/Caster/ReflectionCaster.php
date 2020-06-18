@@ -97,7 +97,7 @@ class ReflectionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += [
-            $prefix.'name' => $c->getName(),
+            $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : (string) $c,
             $prefix.'allowsNull' => $c->allowsNull(),
             $prefix.'isBuiltin' => $c->isBuiltin(),
         ];
@@ -182,7 +182,7 @@ class ReflectionCaster
 
         if (isset($a[$prefix.'returnType'])) {
             $v = $a[$prefix.'returnType'];
-            $v = $v->getName();
+            $v = $v instanceof \ReflectionNamedType ? $v->getName() : (string) $v;
             $a[$prefix.'returnType'] = new ClassStub($a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v, [class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', '']);
         }
         if (isset($a[$prefix.'class'])) {
@@ -244,7 +244,7 @@ class ReflectionCaster
         ]);
 
         if ($v = $c->getType()) {
-            $a[$prefix.'typeHint'] = $v->getName();
+            $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : (string) $v;
         }
 
         if (isset($a[$prefix.'typeHint'])) {
@@ -320,10 +320,14 @@ class ReflectionCaster
             foreach ($a[$prefix.'parameters']->value as $k => $param) {
                 $signature .= ', ';
                 if ($type = $param->getType()) {
-                    if (!$param->isOptional() && $param->allowsNull()) {
-                        $signature .= '?';
+                    if (!$type instanceof \ReflectionNamedType) {
+                        $signature .= $type.' ';
+                    } else {
+                        if (!$param->isOptional() && $param->allowsNull()) {
+                            $signature .= '?';
+                        }
+                        $signature .= substr(strrchr('\\'.$type->getName(), '\\'), 1).' ';
                     }
-                    $signature .= substr(strrchr('\\'.$type->getName(), '\\'), 1).' ';
                 }
                 $signature .= $k;
 

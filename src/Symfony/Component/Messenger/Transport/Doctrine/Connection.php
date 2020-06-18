@@ -85,7 +85,7 @@ class Connection
         }
 
         $configuration = ['connection' => $components['host']];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+        $configuration += $query + $options + self::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], FILTER_VALIDATE_BOOLEAN);
 

@@ -25,6 +25,7 @@
         "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
+        "composer/package-versions-deprecated": "^1.8",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/cache": "^5.1",
         "symfony/config": "^4.4|^5.0",

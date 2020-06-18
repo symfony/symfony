@@ -47,6 +47,7 @@
         ]
     },
     "minimum-stability": "dev",
+    "version": "2.99",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

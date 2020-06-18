@@ -96,7 +96,7 @@ class Connection implements ResetInterface
         }
 
         $configuration = ['connection' => $components['host']];
-        $configuration += $options + $query + static::DEFAULT_OPTIONS;
+        $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], FILTER_VALIDATE_BOOLEAN);
 

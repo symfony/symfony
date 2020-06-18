@@ -187,7 +187,7 @@ class RegisterListenersPass implements CompilerPassInterface
             || !($r = $container->getReflectionClass($class, false))
             || !$r->hasMethod($method)
             || 1 > ($m = $r->getMethod($method))->getNumberOfParameters()
-            || !($type = $m->getParameters()[0]->getType())
+            || !($type = $m->getParameters()[0]->getType()) instanceof \ReflectionNamedType
             || $type->isBuiltin()
             || Event::class === ($name = $type->getName())
         ) {

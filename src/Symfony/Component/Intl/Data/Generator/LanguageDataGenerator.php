@@ -83,7 +83,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'za' => 'zha',
         'zh' => 'zho',
     ];
-    private static $blacklist = [
+    private static $denylist = [
         'root' => true, // Absolute root language
         'mul' => true, // Multiple languages
         'mis' => true, // Uncoded language
@@ -182,7 +182,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
     private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array
     {
-        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$blacklist);
+        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$denylist);
     }
 
     private function generateAlpha3Codes(array $languageCodes, ArrayAccessibleResourceBundle $metadataBundle): array

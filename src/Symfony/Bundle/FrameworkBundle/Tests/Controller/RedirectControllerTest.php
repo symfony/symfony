@@ -267,9 +267,9 @@ class RedirectControllerTest extends TestCase
         return [
             ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],
             ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''],
-            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'],
+            ['http://www.example.com/base/redirect-path?f.o=bar', '/redirect-path', 'f.o=bar'],
+            ['http://www.example.com/base/redirect-path?f.o=bar&a.c=example', '/redirect-path?f.o=bar', 'a.c=example'],
+            ['http://www.example.com/base/redirect-path?f.o=bar&a.c=example&b.z=def', '/redirect-path?f.o=bar', 'a.c=example&b.z=def'],
         ];
     }
 
@@ -302,17 +302,16 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
-        $request->query = new ParameterBag(['base' => 'zaza']);
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza');
         $request->attributes = new ParameterBag(['_route_params' => ['base2' => 'zaza']]);
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?base=zaza&base2=zaza')->with('/test', ['base' => 'zaza', 'base2' => 'zaza'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?b.se=zaza&base2=zaza')->with('/test', ['b.se' => 'zaza', 'base2' => 'zaza'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
-        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zaza&base2=zaza');
+        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?b.se=zaza&base2=zaza');
 
         $request->attributes->set('_route_params', ['base2' => 'zaza', 'route' => '/test', 'ignoreAttributes' => false, 'keepRequestMethod' => false, 'keepQueryParams' => true]);
-        $this->assertRedirectUrl($controller($request), '/test?base=zaza&base2=zaza');
+        $this->assertRedirectUrl($controller($request), '/test?b.se=zaza&base2=zaza');
     }
 
     public function testRedirectWithQueryWithRouteParamsOveriding()
@@ -322,17 +321,16 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
-        $request->query = new ParameterBag(['base' => 'zaza']);
-        $request->attributes = new ParameterBag(['_route_params' => ['base' => 'zouzou']]);
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza');
+        $request->attributes = new ParameterBag(['_route_params' => ['b.se' => 'zouzou']]);
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?base=zouzou')->with('/test', ['base' => 'zouzou'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?b.se=zouzou')->with('/test', ['b.se' => 'zouzou'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
-        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zouzou');
+        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?b.se=zouzou');
 
-        $request->attributes->set('_route_params', ['base' => 'zouzou', 'route' => '/test', 'ignoreAttributes' => false, 'keepRequestMethod' => false, 'keepQueryParams' => true]);
-        $this->assertRedirectUrl($controller($request), '/test?base=zouzou');
+        $request->attributes->set('_route_params', ['b.se' => 'zouzou', 'route' => '/test', 'ignoreAttributes' => false, 'keepRequestMethod' => false, 'keepQueryParams' => true]);
+        $this->assertRedirectUrl($controller($request), '/test?b.se=zouzou');
     }
 
     public function testMissingPathOrRouteParameter()
@@ -353,29 +351,20 @@ class RedirectControllerTest extends TestCase
 
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request
-            ->expects($this->any())
-            ->method('getScheme')
-            ->willReturn($scheme);
-        $request
-            ->expects($this->any())
-            ->method('getHost')
-            ->willReturn($host);
-        $request
-            ->expects($this->any())
-            ->method('getPort')
-            ->willReturn($port);
-        $request
-            ->expects($this->any())
-            ->method('getBaseUrl')
-            ->willReturn($baseUrl);
-        $request
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->willReturn($queryString);
+        if ('' !== $queryString) {
+            parse_str($queryString, $query);
+        } else {
+            $query = [];
+        }
 
-        return $request;
+        return new Request($query, [], [], [], [], [
+            'HTTPS' => 'https' === $scheme,
+            'HTTP_HOST' => $host.($port ? ':'.$port : ''),
+            'SERVER_PORT' => $port,
+            'SCRIPT_FILENAME' => $baseUrl,
+            'REQUEST_URI' => $baseUrl,
+            'QUERY_STRING' => $queryString,
+        ]);
     }
 
     private function createRedirectController($httpPort = null, $httpsPort = null)

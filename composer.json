@@ -100,6 +100,7 @@
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
+        "composer/package-versions-deprecated": "^1.8",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",

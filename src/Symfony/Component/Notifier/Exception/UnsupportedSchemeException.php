@@ -50,9 +50,9 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',
         ],
-        'freemobile' => [
+        'free-mobile' => [
             'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
-            'package' => 'symfony/freemobile-notifier',
+            'package' => 'symfony/free-mobile-notifier',
         ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,

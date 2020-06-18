@@ -7,6 +7,16 @@ in 5.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.1.0...v5.1.1
 
+* 5.1.2 (2020-06-15)
+
+ * bug #37265 [HttpFoundation] use InputBag for Request::$request only if data is coming from a form (nicolas-grekas)
+ * bug #37283 [SecurityBundle] Fix CookieClearingLogoutListener DI configuration (wouterj)
+ * bug #37160 Reset question validator attempts only for actual stdin (ostrolucky)
+ * bug #36975 [PropertyInfo] Make PhpDocExtractor compatible with phpDocumentor v5 (DerManoMann)
+ * bug #37279 [Form] Fixed prototype block prefixes hierarchy of the CollectionType (yceruto)
+ * bug #37276 [Form] Fixed block prefixes hierarchy of the CollectionType (yceruto)
+ * bug #37261 Fix register csrf protection listener (Ne-Lexa)
+
 * 5.1.1 (2020-06-12)
 
  * bug #37227 [DependencyInjection][CheckTypeDeclarationsPass] Handle unresolved parameters pointing to environment variables (fancyweb)

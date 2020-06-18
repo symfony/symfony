@@ -135,7 +135,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 $reflectionProperty = new \ReflectionProperty($class, $property);
                 $type = $reflectionProperty->getType();
                 if (null !== $type) {
-                    return [$this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass())];
+                    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass());
                 }
             } catch (\ReflectionException $e) {
                 // noop
@@ -393,11 +393,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
         $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
 
-        if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
-            $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type);
+        if (1 === \count($type) && \in_array($prefix, $this->arrayMutatorPrefixes)) {
+            $type = [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type[0])];
         }
 
-        return [$type];
+        return $type;
     }
 
     /**
@@ -413,7 +413,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         if ($reflectionType = $reflectionMethod->getReturnType()) {
-            return [$this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass())];
+            return $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
         }
 
         if (\in_array($prefix, ['is', 'can', 'has'])) {
@@ -448,7 +448,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
             $reflectionType = $parameter->getType();
 
-            return $reflectionType ? [$this->extractFromReflectionType($reflectionType, $constructor->getDeclaringClass())] : null;
+            return $reflectionType ? $this->extractFromReflectionType($reflectionType, $constructor->getDeclaringClass()) : null;
         }
 
         if ($parentClass = $reflectionClass->getParentClass()) {
@@ -477,22 +477,26 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return [new Type(static::MAP_TYPES[$type] ?? $type)];
     }
 
-    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionClass $declaringClass): Type
+    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionClass $declaringClass): array
     {
-        $phpTypeOrClass = $reflectionType->getName();
+        $types = [];
         $nullable = $reflectionType->allowsNull();
 
-        if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
-            $type = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
-        } elseif ('void' === $phpTypeOrClass) {
-            $type = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
-        } elseif ($reflectionType->isBuiltin()) {
-            $type = new Type($phpTypeOrClass, $nullable);
-        } else {
-            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $declaringClass));
+        foreach ($reflectionType instanceof \ReflectionUnionType ? $reflectionType->getTypes() : [$reflectionType] as $type) {
+            $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : (string) $type;
+
+            if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
+                $types[] = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
+            } elseif ('void' === $phpTypeOrClass || 'null' === $phpTypeOrClass) {
+                $types[] = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
+            } elseif ($reflectionType->isBuiltin()) {
+                $types[] = new Type($phpTypeOrClass, $nullable);
+            } else {
+                $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $declaringClass));
+            }
         }
 
-        return $type;
+        return $types;
     }
 
     private function resolveTypeName(string $name, \ReflectionClass $declaringClass): string

@@ -70,6 +70,15 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testDsnPrecedence()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue_dsn'], new SqsClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $httpClient)),
+            Connection::fromDsn('sqs://key_dsn:secret_dsn@default/queue_dsn?region=us-east-2', ['region' => 'eu-west-3', 'queue_name' => 'queue_options', 'access_key' => 'key_option', 'secret_key' => 'secret_option'], $httpClient)
+        );
+    }
+
     public function testFromDsnWithRegion()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();

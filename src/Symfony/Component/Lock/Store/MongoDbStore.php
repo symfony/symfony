@@ -120,8 +120,8 @@ class MongoDbStore implements BlockingStoreInterface
             if (isset($parsedUrl['query'])) {
                 parse_str($parsedUrl['query'], $query);
             }
-            $this->options['collection'] = $this->options['collection'] ?? $query['collection'] ?? null;
-            $this->options['database'] = $this->options['database'] ?? ltrim($parsedUrl['path'] ?? '', '/') ?: null;
+            $this->options['collection'] = $query['collection'] ?? $this->options['collection'] ?? null;
+            $this->options['database'] = ltrim($parsedUrl['path'] ?? '', '/') ?: $this->options['database'] ?? null;
             if (null === $this->options['database']) {
                 throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option when constructing with a URI.', __METHOD__));
             }

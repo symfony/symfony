@@ -227,7 +227,7 @@ class PhpDumper extends Dumper
                     $regex = preg_quote(\DIRECTORY_SEPARATOR.$dir[$i], '#').$regex;
                 } while (0 < --$i);
 
-                $this->targetDirRegex = '#'.preg_quote($dir[0], '#').$regex.'#';
+                $this->targetDirRegex = '#(^|file://|[:;, \|\r\n])'.preg_quote($dir[0], '#').$regex.'#';
             }
         }
 
@@ -2030,11 +2030,12 @@ EOF;
     private function export($value)
     {
         if (null !== $this->targetDirRegex && \is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
-            $prefix = $matches[0][1] ? $this->doExport(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = $matches[0][1] + \strlen($matches[0][0]);
+            $matches[0][1] += \strlen($matches[1][0]);
+            $prefix = $matches[0][1] ? $this->doExport(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = isset($value[$suffix]) ? '.'.$this->doExport(substr($value, $suffix), true) : '';
             $dirname = $this->asFiles ? '$this->containerDir' : '__DIR__';
-            $offset = 1 + $this->targetDirMaxMatches - \count($matches);
+            $offset = 2 + $this->targetDirMaxMatches - \count($matches);
 
             if (0 < $offset) {
                 $dirname = sprintf('\dirname(__DIR__, %d)', $offset + (int) $this->asFiles);

@@ -121,6 +121,19 @@ class MongoDbStoreTest extends AbstractStoreTest
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
     }
 
+    public function testDsnPrecedence()
+    {
+        $client = self::getMongoClient();
+
+        $store = new MongoDbStore('mongodb://localhost/test_dsn?collection=lock_dns', ['collection' => 'lock_option', 'database' => 'test_option']);
+        $r = new \ReflectionObject($store);
+        $p = $r->getProperty('options');
+        $p->setAccessible(true);
+        $options = $p->getValue($store);
+        $this->assertSame('lock_dns', $options['collection']);
+        $this->assertSame('test_dsn', $options['database']);
+    }
+
     /**
      * @dataProvider provideInvalidConstructorArgs
      */

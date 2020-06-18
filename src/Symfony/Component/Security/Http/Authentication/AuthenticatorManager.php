@@ -171,9 +171,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 $authenticatedToken->eraseCredentials();
             }
 
-            if (null !== $this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
-            }
+            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
 
             if (null !== $this->logger) {
                 $this->logger->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => \get_class($authenticator)]);

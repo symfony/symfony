@@ -206,7 +206,7 @@ class OptionsResolver implements Options
                 return $this;
             }
 
-            if (isset($params[0]) && null !== ($type = $params[0]->getType()) && self::class === $type->getName() && (!isset($params[1]) || (null !== ($type = $params[1]->getType()) && Options::class === $type->getName()))) {
+            if (isset($params[0]) && null !== ($type = $params[0]->getType()) && self::class === $type->getName() && (!isset($params[1]) || (($type = $params[1]->getType()) instanceof \ReflectionNamedType && Options::class === $type->getName()))) {
                 // Store closure for later evaluation
                 $this->nested[$option][] = $value;
                 $this->defaults[$option] = [];
@@ -1283,7 +1283,7 @@ class OptionsResolver implements Options
 
     private function getParameterClassName(\ReflectionParameter $parameter): ?string
     {
-        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+        if (!($type = $parameter->getType()) instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return null;
         }
 

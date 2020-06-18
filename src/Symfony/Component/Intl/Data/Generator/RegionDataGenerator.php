@@ -40,7 +40,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         'YE' => 'YEM',
     ];
 
-    private static $blacklist = [
+    private static $denylist = [
         // Exceptional reservations
         'AC' => true, // Ascension Island
         'CP' => true, // Clipperton Island
@@ -69,7 +69,7 @@ class RegionDataGenerator extends AbstractDataGenerator
 
     public static function isValidCountryCode($region)
     {
-        if (isset(self::$blacklist[$region])) {
+        if (isset(self::$denylist[$region])) {
             return false;
         }
 

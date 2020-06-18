@@ -418,7 +418,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                    $result[self::VALUE] = $object->$name;
+                    $result[self::VALUE] = $access->isStatic() ? $object::${$name} : $object->$name;
 
                     if (isset($zval[self::REF]) && $access->canBeReference()) {
                         $result[self::REF] = &$object->$name;
@@ -522,7 +522,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (PropertyWriteInfo::TYPE_METHOD === $type) {
                 $object->{$mutator->getName()}($value);
             } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
-                $object->{$mutator->getName()} = $value;
+                if ($mutator->isStatic()) {
+                    $object::${$mutator->getName()} = $value;
+                } else {
+                    $object->{$mutator->getName()} = $value;
+                }
             } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                 $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
             }

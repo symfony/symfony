@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-06-07T13:43:33Z
+
+Great questions
+
+The motivation case from many things, among them this tweet: https://twitter.com/leahculver/status/1269109776983547904?s=21
+One can find more about this topic here: https://tools.ietf.org/id/draft-knodel-terminology-00.html
+
+I consider it a “bug”, because I don’t think it is a new feature. Since we are just modifying private properties and internal names, this could be considered a CS fix.
+
+---------------------------------------------------------------------------
+
+by phansys at 2020-06-07T13:56:03Z
+
+I think there are a lot of other good examples ([Security_through_obscurity](https://en.wikipedia.org/wiki/Security_through_obscurity)), even from other scopes than software or IT in general ([Dark matter](https://en.wikipedia.org/wiki/Dark_matter)).
+My point is, I think if we think this way we are helping or contributing a inclusive cause, we are convalidating the lack of a clear perspective (see even the last adjective) from people which is not able to distinguish between a nature concept (like "light" and "dark") and the infinite possibilities the life can adopt in a human or other beings.
+I think it should not be necessary, but in order to avoid any doubt, I'm totally against in any manifestation of racism (even if that term is wrongly used).
+
+---------------------------------------------------------------------------
+
+by phansys at 2020-06-07T13:58:51Z
+
+Following the same reasoning, we could consider that the term "excluded" has a despective connotation about the excluded people (refugees and so). If we follow that way, we will end with no more terms to use from our current dictionary.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2020-06-07T18:10:46Z
+
+@phansys I am not sure what you concern is here. are you concerned that humanities wrong doing will leave no word not attached to a traumatic experience? if that is your argument, then don’t worry, human language is constantly evolving, so new words will be created.
+
+if your concern is about clarity, then I would wager that blocklist is clearer to the novice than blacklist.
+
+that being said, I personally would prefer using the term “denylist”.
+
+---------------------------------------------------------------------------
+
+by phansys at 2020-06-07T18:42:09Z
+
+>@phansys I am not sure what you concern is here. are you concerned that humanities wrong doing will leave no word not attached to a traumatic experience?
+
+My main concern is near your first statement and the effort it demand versus the gain we get. I don't think using the term "black" or "white", "left" or "right" should be associated to scopes or aspects that aren't related to what we are doing here.
+IMHO, adding more words to the "blocklist" of forbidden terms brings a bad DX.
+Personally, I don't consider as evolution the fact to convalidate any of the mentioned terms such something wrong, bad, despective, etc.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-06-07T18:53:49Z
+
+Thank you @phansys for your opinions. You are heard.
+
+I understand that you don't personally think it is an issue, but this is not only about you.
+
+=)
+
+-------------
+
+Some words are considered offensive by some people. Other people don't consider them offensive. Instead of using those kind of words, this PR suggest to use words that are not offensive to anyone.
+An added bonus it that the new words are more descriptive.
+
+---------------------------------------------------------------------------
+
+by phansys at 2020-06-07T19:00:14Z
+
+Understood. Thank you @Nyholm.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-09T10:18:43Z
+
+Should part of this target lower branches?
+I think so :)
+We should also fix the phpunit-bridge, which uses the term "blacklist" that phpunit deprecated recently.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-06-10T12:37:03Z
+
+@Nyholm thanks for this! As a minor suggestion, could we reconsider renaming "blocklist" as "denylist"? For some reasons:
+
+* "Allow" and "Deny" are commonly used together (e.g. Apache Allow + Deny directives, Symfony's voters use "Deny", Symfony Controller shortcut is "denyAccessUnless...()", etc.)
+* "Blocklist" looks like a typo of the more common "blacklist" ... so we may want to avoid confusion and unsolicited pull requests "fixing" this typo.
+* Other open source projects that did this before also use "allow" + "deny": https://www.google.com/search?q=allowlist+denylist
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-06-13T08:27:18Z
+
+Thank you for the reviews.
+I've updated the PR.
+
+I hope you dont mind if I leave PHPUnit out of this PR.

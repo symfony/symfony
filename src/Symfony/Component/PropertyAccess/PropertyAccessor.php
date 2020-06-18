@@ -467,7 +467,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             if ($item->isHit()) {
                 $unserialized = @unserialize($item->get());
                 
-                return $this->readPropertyCache[$key] = $unserialized !== false ? $unserialized : null;
+                return $this->readPropertyCache[$key] = false !== $unserialized ? $unserialized : null;
             }
         }
 

@@ -326,12 +326,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         foreach ($reflectionType instanceof \ReflectionUnionType ? $reflectionType->getTypes() : [$reflectionType] as $type) {
             $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : (string) $type;
+            if ('null' === $phpTypeOrClass) {
+                continue;
+            }
 
             if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
                 $types[] = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
-            } elseif ('void' === $phpTypeOrClass || 'null' === $phpTypeOrClass) {
+            } elseif ('void' === $phpTypeOrClass) {
                 $types[] = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
-            } elseif ($reflectionType->isBuiltin()) {
+            } elseif ($type->isBuiltin()) {
                 $types[] = new Type($phpTypeOrClass, $nullable);
             } else {
                 $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflectionMethod));

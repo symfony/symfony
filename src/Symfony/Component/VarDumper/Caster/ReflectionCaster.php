@@ -91,7 +91,7 @@ class ReflectionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += [
-            $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : $c->__toString(),
+            $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : (string) $c,
             $prefix.'allowsNull' => $c->allowsNull(),
             $prefix.'isBuiltin' => $c->isBuiltin(),
         ];
@@ -178,7 +178,7 @@ class ReflectionCaster
 
         if (isset($a[$prefix.'returnType'])) {
             $v = $a[$prefix.'returnType'];
-            $v = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
+            $v = $v instanceof \ReflectionNamedType ? $v->getName() : (string) $v;
             $a[$prefix.'returnType'] = new ClassStub($a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v, [class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', '']);
         }
         if (isset($a[$prefix.'class'])) {
@@ -247,7 +247,7 @@ class ReflectionCaster
 
         if (method_exists($c, 'getType')) {
             if ($v = $c->getType()) {
-                $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
+                $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : (string) $v;
             }
         } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $c, $v)) {
             $a[$prefix.'typeHint'] = $v[1];

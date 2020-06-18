@@ -1076,7 +1076,7 @@ class OptionsResolver implements Options
             return ($class = $parameter->getClass()) ? $class->name : null;
         }
 
-        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+        if (!($type = $parameter->getType()) instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return null;
         }
 

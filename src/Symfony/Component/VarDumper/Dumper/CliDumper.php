@@ -268,7 +268,8 @@ class CliDumper extends AbstractDumper
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource').($hasChild ? ' {' : ' ');
         } else {
-            $prefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? $this->style('note', 'array:'.$class).' [' : '[';
+            $unstyledPrefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? 'array:'.$class : '';
+            $prefix = $this->style('note', $unstyledPrefix).($unstyledPrefix ? ' [' : '[');
         }
 
         if ($cursor->softRefCount || 0 < $cursor->softRefHandle) {

@@ -236,6 +236,25 @@ class AutowirePassTest extends TestCase
         }
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testTypeNotGuessableUnionType()
+    {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA|Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB" but this class was not found.');
+        $container = new ContainerBuilder();
+
+        $container->register(CollisionA::class);
+        $container->register(CollisionB::class);
+
+        $aDefinition = $container->register('a', UnionClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
     public function testTypeNotGuessableWithTypeSet()
     {
         $container = new ContainerBuilder();
@@ -317,6 +336,40 @@ class AutowirePassTest extends TestCase
         $this->assertNull($definition->getArgument(0));
         $this->assertEquals(A::class, $definition->getArgument(1));
         $this->assertEquals(Foo::class, $definition->getArgument(2));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testParameterWithNullUnionIsSkipped()
+    {
+        $container = new ContainerBuilder();
+
+        $optDefinition = $container->register('opt', UnionNull::class);
+        $optDefinition->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertNull($definition->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testParameterWithNullUnionIsAutowired()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(CollisionInterface::class, CollisionA::class);
+
+        $optDefinition = $container->register('opt', UnionNull::class);
+        $optDefinition->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertEquals(CollisionInterface::class, $definition->getArgument(0));
     }
 
     public function testDontTriggerAutowiring()
@@ -433,6 +486,21 @@ class AutowirePassTest extends TestCase
         } catch (AutowiringFailedException $e) {
             $this->assertSame('Cannot autowire service "arg_no_type_hint": argument "$bar" of method "Symfony\Component\DependencyInjection\Tests\Compiler\MultipleArguments::__construct()" is type-hinted "array", you should configure its value explicitly.', (string) $e->getMessage());
         }
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionScalarArgsCannotBeAutowired()
+    {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
+        $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "int|float", you should configure its value explicitly.');
+        $container = new ContainerBuilder();
+
+        $container->register('union_scalars', UnionScalars::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
     }
 
     public function testNoTypeArgsCannotBeAutowired()

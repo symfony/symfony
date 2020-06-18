@@ -89,9 +89,6 @@ class PdoDbalAdapterTest extends AdapterTestCase
     {
         $connection = $this->createMock(Connection::class);
         $driver = $this->createMock(AbstractMySQLDriver::class);
-        $driver->expects($this->any())
-            ->method('getName')
-            ->willReturn('pdo_mysql');
         $connection->expects($this->any())
             ->method('getDriver')
             ->willReturn($driver);

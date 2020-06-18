@@ -465,7 +465,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         if ($this->cacheItemPool) {
             $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_READ.rawurlencode($key));
             if ($item->isHit()) {
-                return $this->readPropertyCache[$key] = @unserialize($item->get()) ?: null;
+                $unserialized = @unserialize($item->get());
+                
+                return $this->readPropertyCache[$key] = $unserialized !== false ? $unserialized : null;
             }
         }
 

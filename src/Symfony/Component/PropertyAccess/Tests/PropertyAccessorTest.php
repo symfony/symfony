@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\StaticProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidMethods;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
@@ -854,5 +855,16 @@ class PropertyAccessorTest extends TestCase
         $this->expectExceptionMessageMatches('/.*The method "setFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestClassSetValue" was found but does not have public access./');
         $object = new TestClassSetValue(0);
         $this->propertyAccessor->setValue($object, 'foo', 1);
+    }
+
+    public function testStaticProperty()
+    {
+        $object = new StaticProperty();
+
+        $this->assertEquals('value', $this->propertyAccessor->getValue($object, 'staticProperty'));
+
+        $this->propertyAccessor->setValue($object, 'staticProperty', 'new value');
+
+        $this->assertEquals('new value', $this->propertyAccessor->getValue($object, 'staticProperty'));
     }
 }

@@ -13,6 +13,9 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -328,6 +331,63 @@ class FormValidatorFunctionalTest extends TestCase
         $violations = $this->validator->validate($form);
 
         $this->assertCount(0, $violations);
+    }
+
+    public function testSubmitFormChoiceInvalid()
+    {
+        $form = $this->formFactory->create(DateType::class, null, [
+            'widget' => 'choice',
+            'years' => [2021],
+        ]);
+
+        $form->submit([
+            'year' => '2020',
+            'month' => '13',
+            'day' => '13',
+        ]);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(2, $form->getErrors());
+        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
+        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
+    }
+
+    public function testDoNotAddInvalidMessageIfChildFormIsAlreadyNotSynchronized()
+    {
+        $formBuilder = $this->formFactory->createBuilder()
+            ->add('field1')
+            ->add('field2')
+            ->addModelTransformer(new CallbackTransformer(
+                function () {
+                },
+                function () {
+                    throw new TransformationFailedException('This value is invalid.');
+                }
+            ));
+        $formBuilder->get('field2')->addModelTransformer(new CallbackTransformer(
+                function () {
+                },
+                function () {
+                    throw new TransformationFailedException('This value is invalid.');
+                }
+            ));
+        $form = $formBuilder->getForm();
+
+        $form->submit([
+            'field1' => 'foo',
+            'field2' => 'bar',
+        ]);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(0, $form->getErrors());
+        $this->assertTrue($form->get('field1')->isValid());
+        $this->assertCount(0, $form->get('field1')->getErrors());
+        $this->assertFalse($form->get('field2')->isValid());
+        $this->assertCount(1, $form->get('field2')->getErrors());
     }
 }
 

@@ -105,7 +105,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             if (!$type = $parameter->getType()) {
                 return null;
             }
-            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
             if ('array' === $name && !$type->isBuiltin()) {
                 // Special case for HHVM with variadics
                 return null;

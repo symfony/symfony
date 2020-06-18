@@ -197,7 +197,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
                         } else {
                             $t = \PHP_VERSION_ID >= 70000 ? $p->getType() : '';
                             $stack[] = $p->isOptional();
-                            $stack[] = $t instanceof \ReflectionNamedType ? $t->getName() : (string) $t;
+                            $stack[] = $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t;
                             $stack[] = $p->isPassedByReference();
                             $stack[] = \PHP_VERSION_ID >= 50600 ? $p->isVariadic() : '';
                             $stack[] = $p->getName();

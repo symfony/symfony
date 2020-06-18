@@ -2,6 +2,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+if (PHP_VERSION_ID >= 80000) {
+    require __DIR__.'/uniontype_classes.php';
+}
+
 class Foo
 {
 }

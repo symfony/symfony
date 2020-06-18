@@ -8,6 +8,7 @@ CHANGELOG
  * Added `framework.trusted_proxies` and `framework.trusted_headers` configuration options
  * Deprecated the public `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
    `cache_clearer`, `filesystem` and `validator` services to private.
+ * Added `TemplateAwareDataCollectorInterface` and `AbstractDataCollector` to simplify custom data collector creation and leverage autoconfiguration
 
 5.1.0
 -----

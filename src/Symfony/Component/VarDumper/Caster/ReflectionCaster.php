@@ -326,7 +326,7 @@ class ReflectionCaster
                         if (!$param->isOptional() && $param->allowsNull()) {
                             $signature .= '?';
                         }
-                        $signature .= substr(strrchr('\\'.$type->getName(), '\\'), 1);
+                        $signature .= substr(strrchr('\\'.$type->getName(), '\\'), 1).' ';
                     }
                 }
                 $signature .= $k;

@@ -205,6 +205,26 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider php80TypesProvider
+     * @requires PHP 8
+     */
+    public function testExtractPhp80Type($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy', $property, []));
+    }
+
+    public function php80TypesProvider()
+    {
+        return [
+            ['foo', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)]],
+            ['bar', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+            ['timeout', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]],
+            ['optional', [new Type(Type::BUILTIN_TYPE_INT, true), new Type(Type::BUILTIN_TYPE_FLOAT, true)]],
+            ['string', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Stringable'), new Type(Type::BUILTIN_TYPE_STRING)]],
+        ];
+    }
+
+    /**
      * @dataProvider getReadableProperties
      */
     public function testIsReadable($property, $expected)

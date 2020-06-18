@@ -27,7 +27,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class RegionDataGenerator extends AbstractDataGenerator
 {
-    private static $blacklist = [
+    private static $denylist = [
         // Look like countries, but are sub-continents
         'QO' => true, // Outlying Oceania
         'EU' => true, // European Union
@@ -50,7 +50,7 @@ class RegionDataGenerator extends AbstractDataGenerator
 
     public static function isValidCountryCode($region)
     {
-        if (isset(self::$blacklist[$region])) {
+        if (isset(self::$denylist[$region])) {
             return false;
         }
 

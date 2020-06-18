@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T13:12:18Z
+
+Can you provide a simple script to reproduce the issue? I failed at it.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-14T13:29:40Z
+
+Of course 🙂
+```php
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\AbstractDumper;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+
+require __DIR__.'/vendor/autoload.php';
+
+$cliDumper = new CliDumper(null, null, AbstractDumper::DUMP_LIGHT_ARRAY);
+$cliDumper->dump((new VarCloner())->cloneVar([]));
+$var = ['foo' => 'bar'];
+$cliDumper->dump((new VarCloner())->cloneVar(['foo' => 'bar']));
+```
+<img width="124" alt="Capture d’écran 2020-06-14 à 15 27 32" src="https://user-images.githubusercontent.com/15314293/84594586-9abfc880-ae53-11ea-8f27-17440aef9d54.png">
+[] and first opening bracket of ["foo" => "bar"] aren't colored.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T13:36:06Z
+
+Can you check the failures on Windows? Maybe you'd like to skip the test case there btw.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-15T06:53:34Z
+
+I didn't notice that the tests failed on windows; It's fixed, the test is now skipped on this environment.

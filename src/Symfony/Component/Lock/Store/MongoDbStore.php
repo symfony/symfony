@@ -72,8 +72,8 @@ class MongoDbStore implements BlockingStoreInterface
      *      driverOptions: Array of driver options. [used when $mongo is a URI]
      *
      * When using a URI string:
-     *      the database is determined from the "database" option, otherwise the uri's path is used.
-     *      the collection is determined from the "collection" option, otherwise the uri's "collection" querystring parameter is used.
+     *      The database is determined from the uri's path, otherwise the "database" option is used. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
+     *      The collection is determined from the uri's "collection" querystring parameter, otherwise the "collection" option is used.
      *
      * For example: mongodb://myuser:mypass@myhost/mydatabase?collection=mycollection
      *
@@ -104,34 +104,20 @@ class MongoDbStore implements BlockingStoreInterface
         if ($mongo instanceof Collection) {
             $this->collection = $mongo;
         } elseif ($mongo instanceof Client) {
-            if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" option when constructing with a "%s".', __METHOD__, Client::class));
-            }
-            if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" option when constructing with a "%s".', __METHOD__, Client::class));
-            }
-
             $this->client = $mongo;
         } elseif (\is_string($mongo)) {
-            if (false === $parsedUrl = parse_url($mongo)) {
-                throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $mongo));
-            }
-            $query = [];
-            if (isset($parsedUrl['query'])) {
-                parse_str($parsedUrl['query'], $query);
-            }
-            $this->options['collection'] = $query['collection'] ?? $this->options['collection'] ?? null;
-            $this->options['database'] = ltrim($parsedUrl['path'] ?? '', '/') ?: $this->options['database'] ?? null;
-            if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option when constructing with a URI.', __METHOD__));
-            }
-            if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option when constructing with a URI.', __METHOD__));
-            }
-
-            $this->uri = $mongo;
+            $this->uri = $this->skimUri($mongo);
         } else {
             throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, get_debug_type($mongo)));
+        }
+
+        if (!($mongo instanceof Collection)) {
+            if (null === $this->options['database']) {
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+            }
+            if (null === $this->options['collection']) {
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+            }
         }
 
         if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
@@ -141,6 +127,45 @@ class MongoDbStore implements BlockingStoreInterface
         if ($this->initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
+    }
+
+    /**
+     * Extract default database and collection from given connection URI and remove collection querystring.
+     *
+     * Non-standard parameters are removed from the URI to improve libmongoc's re-use of connections.
+     *
+     * @see https://www.php.net/manual/en/mongodb.connection-handling.php
+     */
+    private function skimUri(string $uri): string
+    {
+        if (false === $parsedUrl = parse_url($uri)) {
+            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+        }
+
+        $query = [];
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $query);
+        }
+
+        if (isset($query['collection'])) {
+            $this->options['collection'] = $query['collection'];
+            $queryStringPos = strrpos($uri, $parsedUrl['query']);
+            unset($query['collection']);
+            $prefix = substr($uri, 0, $queryStringPos);
+            $newQuery = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+            if (empty($newQuery)) {
+                $prefix = rtrim($prefix, '?');
+            }
+            $suffix = substr($uri, $queryStringPos + \strlen($parsedUrl['query']));
+            $uri = $prefix.$newQuery.$suffix;
+        }
+
+        $pathDb = ltrim($parsedUrl['path'] ?? '', '/') ?: null;
+        if (null !== $pathDb) {
+            $this->options['database'] = $pathDb;
+        }
+
+        return $uri;
     }
 
     /**

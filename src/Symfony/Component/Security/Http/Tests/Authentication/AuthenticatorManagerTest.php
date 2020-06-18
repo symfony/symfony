@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterf
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 class AuthenticatorManagerTest extends TestCase
@@ -154,6 +155,29 @@ class AuthenticatorManagerTest extends TestCase
         yield [false];
     }
 
+    public function testAuthenticateRequestCanModifyTokenFromEvent(): void
+    {
+        $authenticator = $this->createAuthenticator();
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
+
+        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+
+        $modifiedToken = $this->createMock(TokenInterface::class);
+        $listenerCalled = false;
+        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
+            $event->setAuthenticatedToken($modifiedToken);
+            $listenerCalled = true;
+        });
+
+        $this->tokenStorage->expects($this->once())->method('setToken')->with($this->identicalTo($modifiedToken));
+
+        $manager = $this->createManager([$authenticator]);
+        $this->assertNull($manager->authenticateRequest($this->request));
+        $this->assertTrue($listenerCalled, 'The AuthenticationTokenCreatedEvent listener is not called');
+    }
+
     public function testAuthenticateUser()
     {
         $authenticator = $this->createAuthenticator();
@@ -164,6 +188,26 @@ class AuthenticatorManagerTest extends TestCase
 
         $manager = $this->createManager([$authenticator]);
         $manager->authenticateUser($this->user, $authenticator, $this->request);
+    }
+
+    public function testAuthenticateUserCanModifyTokenFromEvent(): void
+    {
+        $authenticator = $this->createAuthenticator();
+        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('onAuthenticationSuccess')->willReturn($this->response);
+
+        $modifiedToken = $this->createMock(TokenInterface::class);
+        $listenerCalled = false;
+        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
+            $event->setAuthenticatedToken($modifiedToken);
+            $listenerCalled = true;
+        });
+
+        $this->tokenStorage->expects($this->once())->method('setToken')->with($this->identicalTo($modifiedToken));
+
+        $manager = $this->createManager([$authenticator]);
+        $manager->authenticateUser($this->user, $authenticator, $this->request);
+        $this->assertTrue($listenerCalled, 'The AuthenticationTokenCreatedEvent listener is not called');
     }
 
     public function testInteractiveAuthenticator()

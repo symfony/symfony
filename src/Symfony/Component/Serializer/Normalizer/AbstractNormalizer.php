@@ -522,7 +522,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
     {
         try {
-            if (($parameterType = $parameter->getType()) && !$parameterType->isBuiltin()) {
+            if (($parameterType = $parameter->getType()) instanceof \ReflectionNamedType && !$parameterType->isBuiltin()) {
                 $parameterClass = $parameterType->getName();
                 new \ReflectionClass($parameterClass); // throws a \ReflectionException if the class doesn't exist
 

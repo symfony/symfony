@@ -127,10 +127,10 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function matchAnyRegexps(string $class, array $regexps): bool
     {
-        $blacklisted = false !== strpos($class, 'Test');
+        $isTest = false !== strpos($class, 'Test');
 
         foreach ($regexps as $regex) {
-            if ($blacklisted && false === strpos($regex, 'Test')) {
+            if ($isTest && false === strpos($regex, 'Test')) {
                 continue;
             }
 

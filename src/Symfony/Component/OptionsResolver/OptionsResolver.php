@@ -1220,7 +1220,7 @@ class OptionsResolver implements Options
 
     private function getParameterClassName(\ReflectionParameter $parameter): ?string
     {
-        if (!($type = $parameter->getType()) || $type->isBuiltin()) {
+        if (!($type = $parameter->getType()) instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return null;
         }
 

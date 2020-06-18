@@ -56,7 +56,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.\dirname(__DIR__, 1)), [('wiz'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
+        return $this->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }
 
     public function getParameter($name)
@@ -109,7 +109,7 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters(): array
     {
         return [
-            'foo' => ('wiz'.\dirname(__DIR__, 1)),
+            'foo' => ('file://'.\dirname(__DIR__, 1)),
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
             'buz' => \dirname(__DIR__, 2),

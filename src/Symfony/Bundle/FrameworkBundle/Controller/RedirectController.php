@@ -117,8 +117,7 @@ class RedirectController
             $scheme = $request->getScheme();
         }
 
-        $qs = $request->getQueryString();
-        if ($qs) {
+        if ($qs = $request->server->get('QUERY_STRING') ?: $request->getQueryString()) {
             if (false === strpos($path, '?')) {
                 $qs = '?'.$qs;
             } else {

@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Version;
@@ -87,7 +88,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     private function createConnectionMock()
     {
         $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(Driver::class);
+        $driver = $this->createMock(AbstractMySQLDriver::class);
         $driver->expects($this->any())
             ->method('getName')
             ->willReturn('pdo_mysql');

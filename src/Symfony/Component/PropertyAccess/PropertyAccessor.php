@@ -430,7 +430,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $r = new \ReflectionProperty($matches[1], $matches[2]);
                     $type= ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
-                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $type, 0, $e);
+                    throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $type), 0, $e);
                 }
 
                 throw $e;

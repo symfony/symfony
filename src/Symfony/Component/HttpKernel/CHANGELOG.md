@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * made the public `http_cache` service handle requests when available
+
 5.1.0
 -----
 

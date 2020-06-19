@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Kernel;
@@ -72,12 +71,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     public function __wakeup()
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
-    public function __destruct()
-    {
-        $fs = new Filesystem();
-        $fs->remove($this->cacheDir);
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void

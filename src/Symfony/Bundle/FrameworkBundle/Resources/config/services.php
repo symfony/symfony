@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Closure;
+use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -46,6 +47,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -119,6 +121,20 @@ return static function (ContainerConfigurator $container) {
         ->set('request_stack', RequestStack::class)
             ->public()
         ->alias(RequestStack::class, 'request_stack')
+
+        ->set('http_cache', HttpCache::class)
+            ->args([
+                service('kernel'),
+                service('http_cache.store'),
+                service('esi')->nullOnInvalid(),
+                abstract_arg('options'),
+            ])
+            ->tag('container.hot_path')
+
+        ->set('http_cache.store', Store::class)
+        ->args([
+            param('kernel.cache_dir').'/http_cache',
+        ])
 
         ->set('url_helper', UrlHelper::class)
             ->args([

@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -29,9 +30,21 @@ require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
 {
+    private $kernel;
+
+    protected function tearDown(): void
+    {
+        if ($this->kernel) {
+            $kernel = $this->kernel;
+            $this->kernel = null;
+            $fs = new Filesystem();
+            $fs->remove($kernel->getCacheDir());
+        }
+    }
+
     public function test()
     {
-        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/');
@@ -44,7 +57,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testAsEventSubscriber()
     {
-        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/danger');
@@ -62,7 +75,7 @@ class MicroKernelTraitTest extends TestCase
             ->willReturn('framework');
         $container = new ContainerBuilder();
         $container->registerExtension($frameworkExtension);
-        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->registerContainerConfiguration(new ClosureLoader($container));
         $this->assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
     }
@@ -80,7 +93,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testSecretLoadedFromExtension()
     {
-        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
 
         self::assertSame('$ecret', $kernel->getContainer()->getParameter('kernel.secret'));

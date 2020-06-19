@@ -365,6 +365,7 @@ class FrameworkExtension extends Extension
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
         $this->registerValidationConfiguration($config['validation'], $container, $phpLoader, $propertyInfoEnabled);
+        $this->registerHttpCacheConfiguration($config['http_cache'], $container);
         $this->registerEsiConfiguration($config['esi'], $container, $phpLoader);
         $this->registerSsiConfiguration($config['ssi'], $container, $phpLoader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
@@ -530,6 +531,20 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.reset')
             ;
         }
+    }
+
+    private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container)
+    {
+        $options = $config;
+        unset($options['enabled']);
+
+        if (!$options['private_headers']) {
+            unset($options['private_headers']);
+        }
+
+        $container->getDefinition('http_cache')
+            ->setPublic($config['enabled'])
+            ->replaceArgument(3, $options);
     }
 
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

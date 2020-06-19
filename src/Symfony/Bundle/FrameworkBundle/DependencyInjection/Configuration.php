@@ -93,6 +93,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
+        $this->addHttpCacheSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
@@ -174,6 +175,36 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHttpCacheSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('http_cache')
+                    ->info('HTTP cache configuration')
+                    ->canBeEnabled()
+                    ->children()
+                        ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                        ->enumNode('trace_level')
+                            ->values(['none', 'short', 'full'])
+                        ->end()
+                        ->scalarNode('trace_header')->end()
+                        ->integerNode('default_ttl')->end()
+                        ->arrayNode('private_headers')
+                            ->performNoDeepMerging()
+                            ->requiresAtLeastOneElement()
+                            ->fixXmlConfig('private_header')
+                            ->scalarPrototype()->end()
+                        ->end()
+                        ->booleanNode('allow_reload')->end()
+                        ->booleanNode('allow_revalidate')->end()
+                        ->integerNode('stale_while_revalidate')->end()
+                        ->integerNode('stale_if_error')->end()
                     ->end()
                 ->end()
             ->end()

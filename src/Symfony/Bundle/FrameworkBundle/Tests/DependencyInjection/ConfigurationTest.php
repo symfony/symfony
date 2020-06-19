@@ -510,6 +510,11 @@ class ConfigurationTest extends TestCase
                 'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
                 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
+            'http_cache' => [
+                'enabled' => false,
+                'debug' => '%kernel.debug%',
+                'private_headers' => [],
+            ],
         ];
     }
 }

@@ -65,6 +65,7 @@ use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -241,6 +242,11 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
         $container->setParameter('kernel.error_controller', $config['error_controller']);
+
+        if (($config['trusted_proxies'] ?? false) && ($config['trusted_headers'] ?? false)) {
+            $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
+            $container->setParameter('kernel.trusted_headers', $this->resolveTrustedHeaders($config['trusted_headers']));
+        }
 
         if (!$container->hasParameter('debug.file_link_format')) {
             $links = [
@@ -2096,6 +2102,30 @@ class FrameworkExtension extends Extension
                 $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
             }
         }
+    }
+
+    private function resolveTrustedHeaders(array $headers): int
+    {
+        $trustedHeaders = 0;
+
+        foreach ($headers as $h) {
+            switch ($h) {
+                case 'forwarded': $trustedHeaders |= Request::HEADER_FORWARDED; break;
+                case 'x-forwarded-for': $trustedHeaders |= Request::HEADER_X_FORWARDED_FOR; break;
+                case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
+                case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
+                case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
+                case '!x-forwarded-host': $trustedHeaders &= ~Request::HEADER_X_FORWARDED_HOST; break;
+                case 'x-forwarded-all':
+                    if (!\in_array('!x-forwarded-prefix', $headers)) {
+                        throw new LogicException('When using "x-forwarded-all" in "framework.trusted_headers", "!x-forwarded-prefix" must be explicitly listed until support for X-Forwarded-Prefix is implemented.');
+                    }
+                    $trustedHeaders |= Request::HEADER_X_FORWARDED_ALL;
+                    break;
+            }
+        }
+
+        return $trustedHeaders;
     }
 
     /**

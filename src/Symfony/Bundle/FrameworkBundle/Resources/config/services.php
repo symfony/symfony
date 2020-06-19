@@ -132,9 +132,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.hot_path')
 
         ->set('http_cache.store', Store::class)
-        ->args([
-            param('kernel.cache_dir').'/http_cache',
-        ])
+            ->args([
+                param('kernel.cache_dir').'/http_cache',
+            ])
 
         ->set('url_helper', UrlHelper::class)
             ->args([

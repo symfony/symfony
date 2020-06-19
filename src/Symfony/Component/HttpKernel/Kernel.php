@@ -764,7 +764,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->initializeBundles();
         $this->initializeContainer();
 
-        return $this->container;
+        $container = $this->container;
+
+        if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
+            Request::setTrustedHosts($trustedHosts);
+        }
+
+        if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
+            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+        }
+
+        return $container;
     }
 
     /**

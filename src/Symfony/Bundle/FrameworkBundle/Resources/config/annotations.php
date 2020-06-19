@@ -24,7 +24,10 @@ use Symfony\Component\Cache\DoctrineProvider;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('annotations.reader', AnnotationReader::class)
-            ->call('addGlobalIgnoredName', ['', service('annotations.dummy_registry')])
+            ->call('addGlobalIgnoredName', [
+                'required',
+                service('annotations.dummy_registry'), // dummy arg to register class_exists as annotation loader only when required
+            ])
 
         ->set('annotations.dummy_registry', AnnotationRegistry::class)
             ->call('registerUniqueLoader', ['class_exists'])
@@ -33,25 +36,25 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('annotations.reader'),
                 inline_service(ArrayCache::class),
-                abstract_arg('debug flag'),
+                abstract_arg('Debug-Flag'),
             ])
 
         ->set('annotations.filesystem_cache', FilesystemCache::class)
             ->args([
-                abstract_arg('cache-directory'),
+                abstract_arg('Cache-Directory'),
             ])
 
         ->set('annotations.cache_warmer', AnnotationsCacheWarmer::class)
             ->args([
                 service('annotations.reader'),
                 param('kernel.cache_dir').'/annotations.php',
-                '#^Symfony\\(?:Component\\HttpKernel\\|Bundle\\FrameworkBundle\\Controller\\(?!.*Controller$))#',
+                '#^Symfony\\\\(?:Component\\\\HttpKernel\\\\|Bundle\\\\FrameworkBundle\\\\Controller\\\\(?!.*Controller$))#',
                 param('kernel.debug'),
             ])
 
         ->set('annotations.cache', DoctrineProvider::class)
             ->args([
-                inline_service()
+                inline_service(PhpArrayAdapter::class)
                     ->factory([PhpArrayAdapter::class, 'create'])
                     ->args([
                         param('kernel.cache_dir').'/annotations.php',

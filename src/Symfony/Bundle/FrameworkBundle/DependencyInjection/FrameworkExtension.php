@@ -1465,9 +1465,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('serializer.php');
 
-        $serializerExtractor = $container->getDefinition('property_info.serializer_extractor');
-        $serializerExtractor->setPublic(false);
-
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
         if (!class_exists(PropertyAccessor::class)) {

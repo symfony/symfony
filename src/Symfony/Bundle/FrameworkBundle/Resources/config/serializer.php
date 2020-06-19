@@ -73,31 +73,31 @@ return static function (ContainerConfigurator $container) {
         // Normalizer
         ->set('serializer.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
             ->args([[], service('serializer.name_converter.metadata_aware')])
-            ->tag('serializer.normalizer', ['priority' => '-915'])
+            ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.datetimezone', DateTimeZoneNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => '-915'])
+            ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.dateinterval', DateIntervalNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => '-915'])
+            ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.data_uri', DataUriNormalizer::class)
             ->args([service('mime_types')->nullOnInvalid()])
-            ->tag('serializer.normalizer', ['priority' => '-920'])
+            ->tag('serializer.normalizer', ['priority' => -920])
 
         ->set('serializer.normalizer.datetime', DateTimeNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => '-910'])
+            ->tag('serializer.normalizer', ['priority' => -910])
 
         ->set('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => '-900'])
+            ->tag('serializer.normalizer', ['priority' => -900])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
             ->args([param('kernel.debug')])
-            ->tag('serializer.normalizer', ['priority' => '-890'])
+            ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)
             ->args([service('serializer.property_accessor')])
-            ->tag('serializer.normalizer', ['priority' => '1000'])
+            ->tag('serializer.normalizer', ['priority' => 1000])
 
         ->set('serializer.normalizer.object', ObjectNormalizer::class)
             ->args([
@@ -109,12 +109,12 @@ return static function (ContainerConfigurator $container) {
                 null,
                 [],
             ])
-            ->tag('serializer.normalizer', ['priority' => '-1000'])
+            ->tag('serializer.normalizer', ['priority' => -1000])
 
         ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => '-990'])
+            ->tag('serializer.normalizer', ['priority' => -990])
 
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
@@ -164,7 +164,7 @@ return static function (ContainerConfigurator $container) {
         // PropertyInfo extractor
         ->set('property_info.serializer_extractor', SerializerExtractor::class)
             ->args([service('serializer.mapping.class_metadata_factory')])
-            ->tag('property_info.list_extractor', ['priority' => '-999'])
+            ->tag('property_info.list_extractor', ['priority' => -999])
 
         // ErrorRenderer integration
         ->alias('error_renderer', 'error_renderer.serializer')

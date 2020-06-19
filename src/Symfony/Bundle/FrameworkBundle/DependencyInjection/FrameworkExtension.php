@@ -373,7 +373,7 @@ class FrameworkExtension extends Extension
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $phpLoader);
         $this->registerRouterConfiguration($config['router'], $container, $phpLoader, $config['translator']['enabled_locales'] ?? []);
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
+        $this->registerAnnotationsConfiguration($config['annotations'], $container, $phpLoader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $phpLoader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $phpLoader);
 
@@ -1331,7 +1331,7 @@ class FrameworkExtension extends Extension
             throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
         }
 
-        $loader->load('annotations.xml');
+        $loader->load('annotations.php');
 
         if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
             $container->getDefinition('annotations.dummy_registry')

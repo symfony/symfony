@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by scheb at 2020-06-19T10:23:31Z
+
+Question on naming: Should we call it "firewall listener" or should we rather go with "authentication listener"? These listeners are not necessarily doing authentication, that's why I went with "firewall listener", because it's a listener executed in the firewall.
+
+Build is green, so I remove the draft state now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-19T12:09:16Z
+
+Firewall listener sounds good to me. Can you update the CHANGELOG?

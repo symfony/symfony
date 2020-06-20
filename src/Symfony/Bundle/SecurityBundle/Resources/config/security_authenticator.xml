@@ -54,9 +54,8 @@
             <argument type="service" id="security.encoder_factory" />
         </service>
 
-        <service id="security.listener.user_checker" class="Symfony\Component\Security\Http\EventListener\UserCheckerListener">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="Symfony\Component\Security\Core\User\UserCheckerInterface" />
+        <service id="security.listener.user_checker" class="Symfony\Component\Security\Http\EventListener\UserCheckerListener" abstract="true">
+            <argument type="abstract">user checker</argument>
         </service>
 
         <service id="security.listener.session"

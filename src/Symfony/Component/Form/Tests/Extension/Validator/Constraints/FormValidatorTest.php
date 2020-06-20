@@ -362,40 +362,6 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    // https://github.com/symfony/symfony/issues/4359
-    public function testDontMarkInvalidIfAnyChildIsNotSynchronized()
-    {
-        $object = new \stdClass();
-        $object->child = 'bar';
-
-        $failingTransformer = new CallbackTransformer(
-            function ($data) { return $data; },
-            function () { throw new TransformationFailedException(); }
-        );
-
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setData($object)
-            ->addViewTransformer($failingTransformer)
-            ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
-            ->add(
-                $this->getBuilder('child')
-                    ->addViewTransformer($failingTransformer)
-            )
-            ->getForm();
-
-        // Launch transformer
-        $form->submit(['child' => 'foo']);
-
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isSynchronized());
-        $this->expectNoValidate();
-
-        $this->validator->validate($form, new Form());
-
-        $this->assertNoViolation();
-    }
-
     public function testHandleGroupSequenceValidationGroups()
     {
         $object = new \stdClass();

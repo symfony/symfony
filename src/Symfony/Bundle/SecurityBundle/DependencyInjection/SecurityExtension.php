@@ -478,6 +478,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->replaceArgument(0, new Reference($managerId))
             ;
 
+            // user checker listener
+            $container
+                ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
+                ->replaceArgument(0, new Reference('security.user_checker.'.$id))
+                ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+
             $listeners[] = new Reference('security.firewall.authenticator.'.$id);
         }
 

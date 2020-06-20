@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserChecker;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
@@ -509,7 +511,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticationManager()
+    public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticatorManager()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
@@ -559,7 +561,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticationManager()
+    public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticatorManager()
     {
         $container = $this->getRawContainer();
 
@@ -580,7 +582,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->has('security.listener.session.'.$firewallId));
     }
 
-    public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticationManager()
+    public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticatorManager()
     {
         $container = $this->getRawContainer();
 
@@ -599,6 +601,37 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertTrue($container->has('security.listener.session.'.$firewallId));
+    }
+
+    /**
+     * @dataProvider provideUserCheckerConfig
+     */
+    public function testUserCheckerWithAuthenticatorManager(array $config, string $expectedUserCheckerClass)
+    {
+        $container = $this->getRawContainer();
+        $container->register(TestUserChecker::class);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'main' => array_merge([
+                    'pattern' => '/.*',
+                    'http_basic' => true,
+                ], $config),
+            ],
+        ]);
+
+        $container->compile();
+
+        $userCheckerId = (string) $container->getDefinition('security.listener.user_checker.main')->getArgument(0);
+        $this->assertTrue($container->has($userCheckerId));
+        $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
+    }
+
+    public function provideUserCheckerConfig()
+    {
+        yield [[], UserChecker::class];
+        yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];
     }
 
     protected function getRawContainer()
@@ -686,6 +719,17 @@ class NullAuthenticator implements GuardAuthenticatorInterface
     }
 
     public function supportsRememberMe()
+    {
+    }
+}
+
+class TestUserChecker implements UserCheckerInterface
+{
+    public function checkPreAuth(UserInterface $user)
+    {
+    }
+
+    public function checkPostAuth(UserInterface $user)
     {
     }
 }

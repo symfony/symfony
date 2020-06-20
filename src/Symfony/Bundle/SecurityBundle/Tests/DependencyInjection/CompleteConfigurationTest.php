@@ -56,7 +56,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
         // chain provider
         $this->assertEquals([new IteratorArgument([
-            new Reference('security.user.provider.concrete.service'),
+            new Reference('user.manager'),
             new Reference('security.user.provider.concrete.basic'),
         ])], $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
@@ -70,9 +70,9 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+            $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configDef = $container->getDefinition((string) $arguments[3]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -87,6 +87,14 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.user_checker',
                 '.security.request_matcher.xmi9dcw',
                 false,
+                false,
+                '',
+                '',
+                '',
+                '',
+                '',
+                [],
+                null,
             ],
             [
                 'secure',
@@ -657,9 +665,9 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+            $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configDef = $container->getDefinition((string) $arguments[3]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -708,6 +716,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->setParameter('request_listener.http_port', 80);
+        $container->setParameter('request_listener.https_port', 443);
 
         $security = new SecurityExtension();
         $container->registerExtension($security);
@@ -716,7 +726,6 @@ abstract class CompleteConfigurationTest extends TestCase
         $bundle->build($container); // Attach all default factories
         $this->getLoader($container)->load($file);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();

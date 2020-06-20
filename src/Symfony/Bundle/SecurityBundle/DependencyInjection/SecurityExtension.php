@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\EntryPointFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
@@ -570,6 +571,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         $listeners[] = new Reference($listenerId);
                         $authenticationProviders[] = $provider;
                     }
+
+                    if ($factory instanceof FirewallListenerFactoryInterface) {
+                        $firewallListenerIds = $factory->createListeners($container, $id, $firewall[$key]);
+                        foreach ($firewallListenerIds as $firewallListenerId) {
+                            $listeners[] = new Reference($firewallListenerId);
+                        }
+                    }
+
                     $hasListeners = true;
                 }
             }

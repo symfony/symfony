@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added `FirewallListenerFactoryInterface`, which can be implemented by security factories to add firewall listeners
+
 5.1.0
 -----
 

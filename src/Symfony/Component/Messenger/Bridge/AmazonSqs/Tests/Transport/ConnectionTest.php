@@ -124,6 +124,21 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithQueueNameOption()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default', ['queue_name' => 'queue'], $httpClient)
+        );
+
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default/queue', ['queue_name' => 'queue_ignored'], $httpClient)
+        );
+    }
+
     public function testKeepGettingPendingMessages()
     {
         $client = $this->createMock(SqsClient::class);

@@ -339,6 +339,10 @@ EOF;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
+if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+    return;
+}
+
 require $autoloadFile;
 require __DIR__.'/$preloadedFiles';
 

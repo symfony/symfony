@@ -73,7 +73,7 @@
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" />
 
         <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage">
-            <argument type="service" id="cache.security_expression_language"></argument>
+            <argument type="service" id="cache.security_expression_language" on-invalid="null" />
         </service>
 
         <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" public="true">

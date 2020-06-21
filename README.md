@@ -2,6 +2,15 @@
     <img src="https://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
+![GitHub tests status](https://github.com/symfony/symfony/workflows/Tests/badge.svg)
+[![Travis Status](https://travis-ci.org/symfony/symfony.svg?branch=master)](https://travis-ci.org/symfony/symfony)
+[![AppVeyor status](https://img.shields.io/appveyor/build/fabpot/symfony/master)](https://ci.appveyor.com/project/fabpot/symfony)
+[![GitHub forks](https://img.shields.io/github/forks/symfony/symfony)](https://github.com/symfony/symfony/network)
+[![GitHub stars](https://img.shields.io/github/stars/symfony/symfony)](https://github.com/symfony/symfony/stargazers)
+[![Packagist Downloads](https://img.shields.io/packagist/dm/symfony/symfony)](https://packagist.org/packages/symfony/symfony)
+[![Packagist Version](https://img.shields.io/packagist/v/symfony/symfony)](https://packagist.org/packages/symfony/symfony)
+[![GitHub license](https://img.shields.io/github/license/symfony/symfony)](https://github.com/symfony/symfony/blob/master/LICENSE)
+
 [Symfony][1] is a **PHP framework** for web and console applications and a set of reusable
 **PHP components**. Symfony is used by thousands of web applications (including
 BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including

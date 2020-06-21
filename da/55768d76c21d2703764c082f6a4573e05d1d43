@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by hyoa at 2020-06-17T10:30:15Z
+
+I took a look at the travis error.
+
+```
+Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\YamlFrameworkExtensionTest::testValidationService
+
+Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException: You have requested a non-existent service "messenger.default_serializer".
+```
+
+From what I understood,
+
+* when `messenger.default_serializer` was created using `messenger.xml`, it look like:
+
+```php
+Symfony\Component\DependencyInjection\Alias^ {#3889
+  -id: "messenger.default_serializer"
+  -public: false
+  -private: false
+  -deprecation: []
+}
+```
+
+* when created with `messenger.php` it look like
+
+```php
+Symfony\Component\DependencyInjection\Alias^ {#3006
+    -id: "messenger.default_serializer"
+    -public: true
+    -private: true
+    -deprecation: []
+  }
+```
+
+Changing `->alias(SerializerInterface::class, 'messenger.default_serializer')` by `->alias(SerializerInterface::class, 'messenger.default_serializer')->private()` fix the test, but I'm not sure if it is the good thing to do
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-21T17:27:59Z
+
+I pushed a fix to make tests green with this patch:
+![image](https://user-images.githubusercontent.com/243674/85231162-4e492f80-b3f5-11ea-9256-9f5775186b8d.png)

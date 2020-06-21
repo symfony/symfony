@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by mamontovdmitriy at 2020-06-11T14:45:05Z
+
+@Tobion , Thank you! I've corrected it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-11T15:12:51Z
+
+Tests are apparently broken by these changes.
+
+---------------------------------------------------------------------------
+
+by mamontovdmitriy at 2020-06-11T15:53:14Z
+
+> Tests are apparently broken by these changes.
+
+My fault :) Should I modify the tests or revert the commit 4696ec2, that includes a fix of the argument of `serializer.mapping.class_metadata_factory`? How should I ensure compatibility with #37214 ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-11T21:44:28Z
+
+I've merged ##37214  up to master and fixed the test. Please rebase your PR.
+
+---------------------------------------------------------------------------
+
+by mamontovdmitriy at 2020-06-12T06:52:33Z
+
+@Tobion , thank you :) I've rebased my branch. Review please

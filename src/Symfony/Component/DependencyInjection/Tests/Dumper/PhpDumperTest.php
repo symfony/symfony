@@ -699,7 +699,7 @@ class PhpDumperTest extends TestCase
     public function testInlinedDefinitionReferencingServiceContainer()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')->addMethodCall('add', [new Reference('service_container')])->setPublic(false);
+        $container->register('foo', 'stdClass')->addMethodCall('add', [new Reference('service_container')]);
         $container->register('bar', 'stdClass')->addArgument(new Reference('foo'))->setPublic(true);
         $container->compile();
 
@@ -833,7 +833,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
         $container->register('bar_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
-        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->register('baz_service', 'stdClass');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -856,7 +856,6 @@ class PhpDumperTest extends TestCase
         // no method calls
         $container->register('translator.loader_1', 'stdClass')->setPublic(true);
         $container->register('translator.loader_1_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_1' => new ServiceClosureArgument(new Reference('translator.loader_1')),
             ]);
@@ -867,7 +866,6 @@ class PhpDumperTest extends TestCase
         // one method calls
         $container->register('translator.loader_2', 'stdClass')->setPublic(true);
         $container->register('translator.loader_2_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_2' => new ServiceClosureArgument(new Reference('translator.loader_2')),
             ]);
@@ -879,7 +877,6 @@ class PhpDumperTest extends TestCase
         // two method calls
         $container->register('translator.loader_3', 'stdClass')->setPublic(true);
         $container->register('translator.loader_3_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_3' => new ServiceClosureArgument(new Reference('translator.loader_3')),
             ]);
@@ -891,7 +888,7 @@ class PhpDumperTest extends TestCase
 
         $nil->setValues([null]);
         $container->register('bar_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
-        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->register('baz_service', 'stdClass');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -913,8 +910,7 @@ class PhpDumperTest extends TestCase
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class)->setPublic(true);
 
-        $container->register(CustomDefinition::class, CustomDefinition::class)
-            ->setPublic(false);
+        $container->register(CustomDefinition::class, CustomDefinition::class);
 
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
@@ -924,8 +920,8 @@ class PhpDumperTest extends TestCase
              */
             public function process(ContainerBuilder $container)
             {
-                $container->setDefinition('late_alias', new Definition(TestDefinition1::class));
-                $container->setAlias(TestDefinition1::class, 'late_alias');
+                $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
+                $container->setAlias(TestDefinition1::class, 'late_alias')->setPublic(true);
             }
         }, PassConfig::TYPE_AFTER_REMOVING);
 
@@ -941,8 +937,7 @@ class PhpDumperTest extends TestCase
         require_once self::$fixturesPath.'/includes/classes.php';
 
         $container = new ContainerBuilder();
-        $container->register('not_invalid', 'BazClass')
-            ->setPublic(false);
+        $container->register('not_invalid', 'BazClass');
         $container->register('bar', 'BarClass')
             ->setPublic(true)
             ->addMethodCall('setBaz', [new Reference('not_invalid', SymfonyContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
@@ -973,10 +968,8 @@ class PhpDumperTest extends TestCase
     public function testExpressionReferencingPrivateService()
     {
         $container = new ContainerBuilder();
-        $container->register('private_bar', 'stdClass')
-            ->setPublic(false);
-        $container->register('private_foo', 'stdClass')
-            ->setPublic(false);
+        $container->register('private_bar', 'stdClass');
+        $container->register('private_foo', 'stdClass');
         $container->register('public_foo', 'stdClass')
             ->setPublic(true)
             ->addArgument(new Expression('service("private_foo").bar'));
@@ -1219,7 +1212,6 @@ class PhpDumperTest extends TestCase
         $this->expectDeprecation('The "foo" service is deprecated. You should stop using it, as it will be removed in the future.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')
-            ->setPublic(false)
             ->setDeprecated(true);
         $container->register('bar', 'stdClass')
             ->setPublic(true)

@@ -54,9 +54,9 @@ class ChildDefinitionTest extends TestCase
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertTrue($def->isPublic());
-        $this->assertSame($def, $def->setPublic(false));
         $this->assertFalse($def->isPublic());
+        $this->assertSame($def, $def->setPublic(true));
+        $this->assertTrue($def->isPublic());
         $this->assertSame(['public' => true], $def->getChanges());
     }
 

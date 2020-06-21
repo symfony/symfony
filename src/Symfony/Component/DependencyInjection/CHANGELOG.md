@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `param()` and `abstract_arg()` in the PHP-DSL
+ * deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
 
 5.1.0
 -----

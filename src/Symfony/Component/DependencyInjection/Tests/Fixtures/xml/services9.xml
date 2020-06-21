@@ -68,7 +68,7 @@
         <argument type="service" id="inlined"/>
       </call>
     </service>
-    <service id="inlined" class="Bar" public="false">
+    <service id="inlined" class="Bar">
       <property name="pub">pub</property>
       <call method="setBaz">
         <argument type="service" id="baz"/>
@@ -80,7 +80,7 @@
       </call>
     </service>
     <service id="request" class="Request" public="true" synthetic="true"/>
-    <service id="configurator_service" class="ConfClass" public="false">
+    <service id="configurator_service" class="ConfClass">
       <call method="setFoo">
         <argument type="service" id="baz"/>
       </call>
@@ -88,7 +88,7 @@
     <service id="configured_service" class="stdClass" public="true">
       <configurator service="configurator_service" method="configureStdClass"/>
     </service>
-    <service id="configurator_service_simple" class="ConfClass" public="false">
+    <service id="configurator_service_simple" class="ConfClass">
       <argument>bar</argument>
     </service>
     <service id="configured_service_simple" class="stdClass" public="true">
@@ -100,7 +100,7 @@
     <service id="deprecated_service" class="stdClass" public="true">
       <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
-    <service id="new_factory" class="FactoryClass" public="false">
+    <service id="new_factory" class="FactoryClass">
       <property name="foo">bar</property>
     </service>
     <service id="factory_service" class="Bar" public="true">
@@ -113,7 +113,7 @@
     <service id="service_from_static_method" class="Bar\FooClass" public="true">
       <factory class="Bar\FooClass" method="getInstance"/>
     </service>
-    <service id="factory_simple" class="SimpleFactoryClass" public="false">
+    <service id="factory_simple" class="SimpleFactoryClass">
       <argument>foo</argument>
       <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
@@ -139,7 +139,7 @@
     </service>
     <service id="bar2" class="stdClass" public="true"/>
     <service id="BAR2" class="stdClass" public="true"/>
-    <service id="tagged_iterator_foo" class="Bar" public="false">
+    <service id="tagged_iterator_foo" class="Bar">
       <tag name="foo"/>
     </service>
     <service id="tagged_iterator" class="Bar" public="true">
@@ -153,10 +153,10 @@
       <tag name="container.preload" class="Some\Sidekick1"/>
       <tag name="container.preload" class="Some\Sidekick2"/>
     </service>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false">
+    <service id="Psr\Container\ContainerInterface" alias="service_container">
       <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false">
+    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container">
       <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>
     <service id="alias_for_foo" alias="foo" public="true"/>

@@ -1,6 +1,5 @@
 services:
     _defaults:
-        public: false
         autowire: true
         tags:
             - name: foo

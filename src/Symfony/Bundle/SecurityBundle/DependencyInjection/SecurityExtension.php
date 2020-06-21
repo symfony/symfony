@@ -154,7 +154,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
-            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service'])->setPrivate(true);
+            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')

@@ -33,8 +33,7 @@ class Definition
     private $autoconfigured = false;
     private $configurator;
     private $tags = [];
-    private $public = true;
-    private $private = true;
+    private $public = false;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
@@ -586,7 +585,6 @@ class Definition
         $this->changes['public'] = true;
 
         $this->public = $boolean;
-        $this->private = false;
 
         return $this;
     }
@@ -604,18 +602,15 @@ class Definition
     /**
      * Sets if this service is private.
      *
-     * When set, the "private" state has a higher precedence than "public".
-     * In version 3.4, a "private" service always remains publicly accessible,
-     * but triggers a deprecation notice when accessed from the container,
-     * so that the service can be made really private in 4.0.
-     *
      * @return $this
+     *
+     * @deprecated since Symfony 5.2, use setPublic() instead
      */
     public function setPrivate(bool $boolean)
     {
-        $this->private = $boolean;
+        trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s()" method is deprecated, use "setPublic()" instead.', __METHOD__);
 
-        return $this;
+        return $this->setPublic(!$boolean);
     }
 
     /**
@@ -625,7 +620,7 @@ class Definition
      */
     public function isPrivate()
     {
-        return $this->private;
+        return !$this->public;
     }
 
     /**
@@ -661,6 +656,10 @@ class Definition
     public function setSynthetic(bool $boolean)
     {
         $this->synthetic = $boolean;
+
+        if (!isset($this->changes['public'])) {
+            $this->setPublic(true);
+        }
 
         return $this;
     }

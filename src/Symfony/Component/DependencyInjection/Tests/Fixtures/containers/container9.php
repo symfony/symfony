@@ -68,7 +68,6 @@ $container
     ->register('inlined', 'Bar')
     ->setProperty('pub', 'pub')
     ->addMethodCall('setBaz', [new Reference('baz')])
-    ->setPublic(false)
 ;
 $container
     ->register('baz', 'Baz')
@@ -82,7 +81,6 @@ $container
 ;
 $container
     ->register('configurator_service', 'ConfClass')
-    ->setPublic(false)
     ->addMethodCall('setFoo', [new Reference('baz')])
 ;
 $container
@@ -93,7 +91,6 @@ $container
 $container
     ->register('configurator_service_simple', 'ConfClass')
     ->addArgument('bar')
-    ->setPublic(false)
 ;
 $container
     ->register('configured_service_simple', 'stdClass')
@@ -122,7 +119,6 @@ $container
 $container
     ->register('new_factory', 'FactoryClass')
     ->setProperty('foo', 'bar')
-    ->setPublic(false)
 ;
 $container
     ->register('factory_service', 'Bar')
@@ -144,7 +140,6 @@ $container
     ->register('factory_simple', 'SimpleFactoryClass')
     ->addArgument('foo')
     ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
-    ->setPublic(false)
 ;
 $container
     ->register('factory_service_simple', 'Bar')
@@ -171,7 +166,6 @@ $container->register('BAR2', 'stdClass')->setPublic(true);
 $container
     ->register('tagged_iterator_foo', 'Bar')
     ->addTag('foo')
-    ->setPublic(false)
 ;
 $container
     ->register('tagged_iterator', 'Bar')

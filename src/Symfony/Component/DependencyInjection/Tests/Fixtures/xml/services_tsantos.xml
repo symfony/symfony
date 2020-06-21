@@ -4,25 +4,25 @@
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
     <service id="tsantos_serializer" class="TSantos\Serializer\EventEmitterSerializer" public="true">
       <argument type="service">
-        <service class="TSantos\Serializer\Encoder\JsonEncoder" public="false">
+        <service class="TSantos\Serializer\Encoder\JsonEncoder">
           <tag name="tsantos_serializer.encoder" format="json"/>
         </service>
       </argument>
       <argument type="service">
-        <service class="TSantos\Serializer\NormalizerRegistry" public="false">
+        <service class="TSantos\Serializer\NormalizerRegistry">
           <call method="add">
             <argument type="service">
-              <service class="TSantos\Serializer\Normalizer\ObjectNormalizer" public="false">
+              <service class="TSantos\Serializer\Normalizer\ObjectNormalizer">
                 <tag name="tsantos_serializer.normalizer" priority="-800"/>
                 <argument type="service">
-                  <service class="TSantos\SerializerBundle\Serializer\CircularReferenceHandler" public="false"/>
+                  <service class="TSantos\SerializerBundle\Serializer\CircularReferenceHandler"/>
                 </argument>
               </service>
             </argument>
           </call>
           <call method="add">
             <argument type="service">
-              <service class="TSantos\Serializer\Normalizer\CollectionNormalizer" public="false">
+              <service class="TSantos\Serializer\Normalizer\CollectionNormalizer">
                 <tag name="tsantos_serializer.normalizer" priority="-900"/>
                 <call method="setSerializer">
                   <argument type="service" id="tsantos_serializer"/>
@@ -32,7 +32,7 @@
           </call>
           <call method="add">
             <argument type="service">
-              <service class="TSantos\Serializer\Normalizer\JsonNormalizer" public="false">
+              <service class="TSantos\Serializer\Normalizer\JsonNormalizer">
                 <tag name="tsantos_serializer.normalizer" priority="-1000"/>
                 <call method="setSerializer">
                   <argument type="service" id="tsantos_serializer"/>
@@ -43,13 +43,13 @@
         </service>
       </argument>
       <argument type="service">
-        <service class="TSantos\Serializer\EventDispatcher\EventDispatcher" public="false">
+        <service class="TSantos\Serializer\EventDispatcher\EventDispatcher">
           <call method="addSubscriber">
             <argument type="service">
-              <service class="TSantos\SerializerBundle\EventListener\StopwatchListener" public="false">
+              <service class="TSantos\SerializerBundle\EventListener\StopwatchListener">
                 <tag name="tsantos_serializer.event_subscriber"/>
                 <argument type="service">
-                  <service class="Symfony\Component\Stopwatch\Stopwatch" public="false">
+                  <service class="Symfony\Component\Stopwatch\Stopwatch">
                     <tag name="kernel.reset" method="reset"/>
                     <argument>true</argument>
                   </service>

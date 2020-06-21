@@ -310,10 +310,10 @@ class XmlFileLoaderTest extends TestCase
         $aliases = $container->getAliases();
         $this->assertArrayHasKey('alias_for_foo', $aliases, '->load() parses <service> elements');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
-        $this->assertTrue($aliases['alias_for_foo']->isPublic());
+        $this->assertFalse($aliases['alias_for_foo']->isPublic());
         $this->assertArrayHasKey('another_alias_for_foo', $aliases);
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
-        $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
+        $this->assertTrue($aliases['another_alias_for_foo']->isPublic());
 
         $this->assertEquals(['decorated', null, 0], $services['decorator_service']->getDecoratedService());
         $this->assertEquals(['decorated', 'decorated.pif-pouf', 0], $services['decorator_service_with_name']->getDecoratedService());

@@ -1,6 +1,11 @@
 UPGRADE FROM 5.1 to 5.2
 =======================
 
+DependencyInjection
+-------------------
+
+ * Deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+
 Mime
 ----
 

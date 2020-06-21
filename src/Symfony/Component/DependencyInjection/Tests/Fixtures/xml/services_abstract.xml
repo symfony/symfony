@@ -3,10 +3,10 @@
   <services>
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
     <service id="foo" class="Foo" public="true" abstract="true"/>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false">
+    <service id="Psr\Container\ContainerInterface" alias="service_container">
       <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false">
+    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container">
       <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>
   </services>

@@ -10,10 +10,9 @@ services:
         arguments: [!tagged_iterator listener]
     .2_stdClass~%s:
         class: stdClass
-        public: false
         tags:
             - listener
     decorated:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator
         public: true
-        arguments: [!service { class: stdClass, public: false }]
+        arguments: [!service { class: stdClass }]

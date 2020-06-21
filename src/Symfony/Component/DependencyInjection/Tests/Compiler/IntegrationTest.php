@@ -55,12 +55,10 @@ class IntegrationTest extends TestCase
         $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
-            ->setPublic(false)
         ;
 
         $c = $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();
@@ -87,7 +85,6 @@ class IntegrationTest extends TestCase
 
         $c = $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();
@@ -114,12 +111,10 @@ class IntegrationTest extends TestCase
         $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
-            ->setPublic(false)
         ;
 
         $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();

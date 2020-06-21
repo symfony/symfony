@@ -1,7 +1,6 @@
 services:
     foo:
         class: stdClass
-        public: false
 
     bar:
         alias: foo

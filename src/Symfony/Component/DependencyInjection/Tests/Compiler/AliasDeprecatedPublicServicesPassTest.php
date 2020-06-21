@@ -65,7 +65,6 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
             ->addTag('container.private', ['package' => 'foo/bar', 'version' => '1.2']);
 
         (new AliasDeprecatedPublicServicesPass())->process($container);

@@ -3,13 +3,13 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
+        <service id="monolog.logger" parent="monolog.logger_prototype">
             <argument index="0">app</argument>
         </service>
 
         <service id="logger" alias="monolog.logger" />
 
-        <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
+        <service id="monolog.logger" parent="monolog.logger_prototype">
             <argument index="0">app</argument>
         </service>
         <service id="monolog.logger_prototype" class="Symfony\Bridge\Monolog\Logger" abstract="true">

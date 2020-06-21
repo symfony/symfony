@@ -34,7 +34,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
             $this->currentId = $id;
 
             if ($aliasId !== $defId = $this->getDefinitionId($aliasId, $container)) {
-                $container->setAlias($id, $defId)->setPublic($alias->isPublic())->setPrivate($alias->isPrivate());
+                $container->setAlias($id, $defId)->setPublic($alias->isPublic());
             }
         }
     }

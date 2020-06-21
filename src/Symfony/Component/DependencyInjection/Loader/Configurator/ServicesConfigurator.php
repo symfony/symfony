@@ -81,7 +81,6 @@ class ServicesConfigurator extends AbstractConfigurator
             }
 
             $id = sprintf('.%d_%s', ++$this->anonymousCount, preg_replace('/^.*\\\\/', '', $class).'~'.$this->anonymousHash);
-            $definition->setPublic(false);
         } elseif (!$defaults->isPublic() || !$defaults->isPrivate()) {
             $definition->setPublic($defaults->isPublic() && !$defaults->isPrivate());
         }

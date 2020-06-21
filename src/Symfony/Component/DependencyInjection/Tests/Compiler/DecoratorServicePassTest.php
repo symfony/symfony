@@ -25,7 +25,6 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $fooDefinition = $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $fooExtendedDefinition = $container
             ->register('foo.extended')
@@ -90,7 +89,6 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $fooDefinition = $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $barDefinition = $container
             ->register('bar')

@@ -13,9 +13,11 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Lock\Lock;
 
 /**
  * JSON descriptor.
@@ -143,6 +145,10 @@ class JsonDescriptor extends Descriptor
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
+
+        if (class_exists(Lock::class) && \in_array(LockableTrait::class, class_uses($command))) {
+            $command->getDefinition()->addOption(new InputOption('--skip-lock', '', InputOption::VALUE_NONE, 'Skip checking for and setting a lock'));
+        }
 
         return [
             'name' => $command->getName(),

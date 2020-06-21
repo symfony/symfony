@@ -13,11 +13,13 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Lock\Lock;
 
 /**
  * Text descriptor.
@@ -139,6 +141,10 @@ class TextDescriptor extends Descriptor
         $command->getSynopsis(true);
         $command->getSynopsis(false);
         $command->mergeApplicationDefinition(false);
+
+        if (class_exists(Lock::class) && \in_array(LockableTrait::class, class_uses($command))) {
+            $command->getDefinition()->addOption(new InputOption('--skip-lock', '', InputOption::VALUE_NONE, 'Skip checking for and setting a lock'));
+        }
 
         if ($description = $command->getDescription()) {
             $this->writeText('<comment>Description:</comment>', $options);

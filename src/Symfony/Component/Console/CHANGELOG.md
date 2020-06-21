@@ -7,6 +7,7 @@ CHANGELOG
  * `Command::setHidden()` is final since Symfony 5.1
  * Add `SingleCommandApplication`
  * Add `Cursor` class
+ * Add automatic locking to commands that use `LockableTrait` when Lock component is installed
 
 5.0.0
 -----

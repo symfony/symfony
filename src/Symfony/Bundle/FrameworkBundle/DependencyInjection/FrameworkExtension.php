@@ -382,7 +382,7 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
 
-            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
+            $this->registerSerializerConfiguration($config['serializer'], $container, $phpLoader);
         }
 
         if ($propertyInfoEnabled) {
@@ -1461,9 +1461,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('serializer.xml');
+        $loader->load('serializer.php');
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 

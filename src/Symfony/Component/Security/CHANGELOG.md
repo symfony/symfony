@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added attributes on ``Passport``
+
 5.1.0
 -----
 

@@ -88,6 +88,15 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnAsQueueUrl()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'us-east-2', 'endpoint' => 'https://sqs.us-east-2.amazonaws.com', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4', [], $httpClient)
+        );
+    }
+
     public function testFromDsnWithCustomEndpoint()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();

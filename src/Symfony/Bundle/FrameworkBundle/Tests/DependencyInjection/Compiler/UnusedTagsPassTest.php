@@ -35,21 +35,21 @@ class UnusedTagsPassTest extends TestCase
         $this->assertSame([sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)], $container->getCompiler()->getLog());
     }
 
-    public function testMissingWhitelistTags()
+    public function testMissingKnownTags()
     {
         if (\dirname((new \ReflectionClass(ContainerBuilder::class))->getFileName(), 3) !== \dirname(__DIR__, 5)) {
             $this->markTestSkipped('Tests are not run from the root symfony/symfony metapackage.');
         }
 
-        $this->assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getWhitelistTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-tags-whitelist.php.');
+        $this->assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getKnownTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-known-tags.php.');
     }
 
-    private function getWhitelistTags()
+    private function getKnownTags()
     {
         // get tags in UnusedTagsPass
         $target = \dirname(__DIR__, 3).'/DependencyInjection/Compiler/UnusedTagsPass.php';
         $contents = file_get_contents($target);
-        preg_match('{private \$whitelist = \[(.+?)\];}sm', $contents, $matches);
+        preg_match('{private \$knownTags = \[(.+?)\];}sm', $contents, $matches);
         $tags = array_values(array_filter(array_map(function ($str) {
             return trim(preg_replace('{^ +\'(.+)\',}', '$1', $str));
         }, explode("\n", $matches[1]))));

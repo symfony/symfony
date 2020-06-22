@@ -372,7 +372,7 @@ class FrameworkExtension extends Extension
         $this->registerFragmentsConfiguration($config['fragments'], $container, $phpLoader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $phpLoader, $config['default_locale']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader, $phpLoader);
-        $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
+        $this->registerWorkflowConfiguration($config['workflows'], $container, $phpLoader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $phpLoader);
         $this->registerRouterConfiguration($config['router'], $container, $phpLoader, $config['translator']['enabled_locales'] ?? []);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $phpLoader);
@@ -639,7 +639,7 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.reset', ['method' => 'reset']);
     }
 
-    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         if (!$config['enabled']) {
             $container->removeDefinition('console.command.workflow_dump');
@@ -651,7 +651,7 @@ class FrameworkExtension extends Extension
             throw new LogicException('Workflow support cannot be enabled as the Workflow component is not installed. Try running "composer require symfony/workflow".');
         }
 
-        $loader->load('workflow.xml');
+        $loader->load('workflow.php');
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 

@@ -163,8 +163,8 @@ class YamlDumper extends Dumper
     {
         $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
 
-        if ($id->isPrivate()) {
-            return sprintf("    %s: '@%s'\n%s", $alias, $id, $deprecated);
+        if (!$id->isDeprecated() && $id->isPrivate()) {
+            return sprintf("    %s: '@%s'\n", $alias, $id);
         }
 
         return sprintf("    %s:\n        alias: %s\n        public: %s\n%s", $alias, $id, $id->isPublic() ? 'true' : 'false', $deprecated);

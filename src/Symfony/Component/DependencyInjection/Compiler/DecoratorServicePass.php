@@ -104,7 +104,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 $decoratingDefinitions[$inner] = $definition;
             }
 
-            $container->setAlias($inner, $id)->setPublic($public)->setPrivate($private);
+            $container->setAlias($inner, $id)->setPublic($public);
         }
     }
 

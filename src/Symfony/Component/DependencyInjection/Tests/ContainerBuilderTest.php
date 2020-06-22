@@ -316,7 +316,7 @@ class ContainerBuilderTest extends TestCase
     public function testGetAliases()
     {
         $builder = new ContainerBuilder();
-        $builder->setAlias('bar', 'foo');
+        $builder->setAlias('bar', 'foo')->setPublic(true);
         $builder->setAlias('foobar', 'foo');
         $builder->setAlias('moo', new Alias('foo', false));
 
@@ -1099,8 +1099,6 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
 
-        $fooDefinition->setPublic(false);
-
         $container->addDefinitions([
             'bar' => $fooDefinition,
             'bar_user' => $fooUserDefinition->setPublic(true),
@@ -1350,7 +1348,7 @@ class ContainerBuilderTest extends TestCase
             ])
         ;
         $container->register('bar_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
-        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->register('baz_service', 'stdClass');
         $container->compile();
 
         $this->assertInstanceOf(ServiceLocator::class, $foo = $container->get('foo_service'));
@@ -1458,7 +1456,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setPublic(true);
-        $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(false);
+        $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'));
         $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'))->setPublic(true);
 
         $this->assertSame(['service_container', 'foo', 'Foo', 'fOO', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'], $container->getServiceIds());
@@ -1582,10 +1580,8 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')
-            ->setPublic(false)
             ->setProperty('bar', new Reference('foo'));
         $container->register('baz', 'stdClass')
-            ->setPublic(false)
             ->setProperty('inner', new Reference('baz.inner'))
             ->setDecoratedService('foo');
 

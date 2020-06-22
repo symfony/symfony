@@ -144,9 +144,9 @@ class DefinitionTest extends TestCase
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
-        $this->assertTrue($def->isPublic(), '->isPublic() returns true by default');
-        $this->assertSame($def, $def->setPublic(false), '->setPublic() implements a fluent interface');
-        $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
+        $this->assertFalse($def->isPublic(), '->isPublic() returns false by default');
+        $this->assertSame($def, $def->setPublic(true), '->setPublic() implements a fluent interface');
+        $this->assertTrue($def->isPublic(), '->isPublic() returns true if the service is public.');
     }
 
     public function testSetIsSynthetic()

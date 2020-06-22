@@ -25,15 +25,14 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $aDefinition = $container->register('a', '\stdClass');
+        $aDefinition = $container->register('a', '\stdClass')->setPublic(true);
         $aDefinition->setFactory([new Reference('b'), 'createA']);
 
         $bDefinition = new Definition('\stdClass');
-        $bDefinition->setPublic(false);
         $container->setDefinition('b', $bDefinition);
 
-        $container->setAlias('a_alias', 'a');
-        $container->setAlias('b_alias', 'b');
+        $container->setAlias('a_alias', 'a')->setPublic(true);
+        $container->setAlias('b_alias', 'b')->setPublic(true);
 
         $container->setAlias('container', 'service_container');
 

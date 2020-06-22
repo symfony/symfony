@@ -26,6 +26,7 @@ DependencyInjection
  * Removed `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead.
  * The `inline()` function from the PHP-DSL has been removed, use `inline_service()` instead.
  * The `ref()` function from the PHP-DSL has been removed, use `service()` instead.
+ * Removed `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
 
 Dotenv
 ------

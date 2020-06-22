@@ -132,7 +132,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         } else {
-            $def->setPrivate($definition->isPrivate() || $parentDef->isPrivate());
+            $def->setPublic($parentDef->isPublic());
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());

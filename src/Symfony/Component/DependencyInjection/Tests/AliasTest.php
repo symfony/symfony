@@ -24,7 +24,7 @@ class AliasTest extends TestCase
         $alias = new Alias('foo');
 
         $this->assertEquals('foo', (string) $alias);
-        $this->assertTrue($alias->isPublic());
+        $this->assertFalse($alias->isPublic());
     }
 
     public function testCanConstructANonPublicAlias()
@@ -41,7 +41,7 @@ class AliasTest extends TestCase
 
         $this->assertEquals('foo', (string) $alias);
         $this->assertFalse($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
+        $this->assertTrue($alias->isPrivate());
     }
 
     public function testCanSetPublic()

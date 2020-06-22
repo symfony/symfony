@@ -796,7 +796,6 @@ class FrameworkExtension extends Extension
             // Enable the AuditTrail
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
-                $listener->setPrivate(true);
                 $listener->addTag('monolog.logger', ['channel' => 'workflow']);
                 $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
                 $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
@@ -816,7 +815,6 @@ class FrameworkExtension extends Extension
                 }
 
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);
-                $guard->setPrivate(true);
 
                 $guard->setArguments([
                     $guardsConfiguration,
@@ -844,7 +842,6 @@ class FrameworkExtension extends Extension
         if (class_exists(Stopwatch::class)) {
             $container->register('debug.stopwatch', Stopwatch::class)
                 ->addArgument(true)
-                ->setPrivate(true)
                 ->addTag('kernel.reset', ['method' => 'reset']);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
@@ -953,7 +950,7 @@ class FrameworkExtension extends Extension
         $loader->load('session.php');
 
         // session storage
-        $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
+        $container->setAlias('session.storage', $config['storage_id']);
         $options = ['cache_limiter' => '0'];
         foreach (['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'cookie_samesite', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'sid_length', 'sid_bits_per_character'] as $key) {
             if (isset($config[$key])) {
@@ -985,9 +982,9 @@ class FrameworkExtension extends Extension
                 $container->getDefinition('session.abstract_handler')
                     ->replaceArgument(0, $container->hasDefinition($id) ? new Reference($id) : $config['handler_id']);
 
-                $container->setAlias('session.handler', 'session.abstract_handler')->setPrivate(true);
+                $container->setAlias('session.handler', 'session.abstract_handler');
             } else {
-                $container->setAlias('session.handler', $config['handler_id'])->setPrivate(true);
+                $container->setAlias('session.handler', $config['handler_id']);
             }
         }
 
@@ -1390,7 +1387,7 @@ class FrameworkExtension extends Extension
                 ->addTag('annotations.cached_reader')
             ;
 
-            $container->setAlias('annotation_reader', 'annotations.cached_reader')->setPrivate(true);
+            $container->setAlias('annotation_reader', 'annotations.cached_reader');
             $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
         } else {
             $container->removeDefinition('annotations.cached_reader');
@@ -1574,7 +1571,6 @@ class FrameworkExtension extends Extension
 
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
-            $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
         }

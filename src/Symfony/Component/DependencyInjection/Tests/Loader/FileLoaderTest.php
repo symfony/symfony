@@ -171,7 +171,6 @@ class FileLoaderTest extends TestCase
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
         $prototype = new Definition();
-        $prototype->setPublic(true)->setPrivate(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
 
         $this->assertTrue($container->has(Bar::class));
@@ -190,7 +189,7 @@ class FileLoaderTest extends TestCase
         $alias = $container->getAlias(FooInterface::class);
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
+        $this->assertTrue($alias->isPrivate());
     }
 
     public function testMissingParentClass()

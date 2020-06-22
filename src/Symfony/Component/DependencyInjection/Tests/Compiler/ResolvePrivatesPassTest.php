@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolvePrivatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @group legacy
+ */
 class ResolvePrivatesPassTest extends TestCase
 {
     public function testPrivateHasHigherPrecedenceThanPublic()
@@ -34,6 +37,6 @@ class ResolvePrivatesPassTest extends TestCase
         (new ResolvePrivatesPass())->process($container);
 
         $this->assertFalse($container->getDefinition('foo')->isPublic());
-        $this->assertFalse($container->getAlias('bar')->isPublic());
+        $this->assertTrue($container->getAlias('bar')->isPublic());
     }
 }

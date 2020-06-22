@@ -296,7 +296,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 $memcachedPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcached_port').'%';
                 $cacheDef = new Definition($memcachedClass);
                 $memcachedInstance = new Definition($memcachedInstanceClass);
-                $memcachedInstance->setPrivate(true);
                 $memcachedInstance->addMethodCall('addServer', [
                     $memcachedHost, $memcachedPort,
                 ]);
@@ -310,7 +309,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.redis_port').'%';
                 $cacheDef = new Definition($redisClass);
                 $redisInstance = new Definition($redisInstanceClass);
-                $redisInstance->setPrivate(true);
                 $redisInstance->addMethodCall('connect', [
                     $redisHost, $redisPort,
                 ]);

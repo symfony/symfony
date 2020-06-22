@@ -9,7 +9,6 @@ services:
         Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStubParent:
             autowire: false
             shared: false
-            public: false
             tags:
                 - { name: foo_tag, tag_option: from_instanceof }
             calls:

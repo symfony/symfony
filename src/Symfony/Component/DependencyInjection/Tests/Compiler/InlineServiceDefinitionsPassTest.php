@@ -27,7 +27,6 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $inlineable = $container
             ->register('inlinable.service')
-            ->setPublic(false)
         ;
 
         $container
@@ -46,11 +45,10 @@ class InlineServiceDefinitionsPassTest extends TestCase
     public function testProcessDoesNotInlinesWhenAliasedServiceIsShared()
     {
         $container = new ContainerBuilder();
-        $container
-            ->register('foo')
-            ->setPublic(false)
+        $container->register('foo');
+        $container->setAlias('moo', 'foo')
+            ->setPublic(true)
         ;
-        $container->setAlias('moo', 'foo');
 
         $container
             ->register('service')
@@ -68,11 +66,11 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
+            ->setPublic(true)
             ->setShared(false)
         ;
         $bar = $container
             ->register('bar')
-            ->setPublic(false)
             ->setShared(false)
         ;
         $container->setAlias('moo', 'bar');
@@ -98,12 +96,13 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
+            ->setPublic(true)
             ->addArgument(new Reference('bar'))
             ->setShared(false)
         ;
         $container
             ->register('bar')
-            ->setPublic(false)
+            ->setPublic(true)
             ->addMethodCall('setFoo', [new Reference('foo')])
         ;
 
@@ -151,6 +150,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         ;
         $container
             ->register('baz')
+            ->setPublic(true)
             ->setShared(false)
         ;
 
@@ -168,7 +168,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $a = $container->register('a')->setPublic(false);
+        $a = $container->register('a');
         $b = $container
             ->register('b')
             ->addArgument(new Reference('a'))
@@ -188,15 +188,15 @@ class InlineServiceDefinitionsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a')->setPublic(false);
+        $container->register('a');
         $b = $container
             ->register('b')
-            ->setPublic(false)
             ->setFactory([new Reference('a'), 'a'])
         ;
 
         $container
             ->register('foo')
+            ->setPublic(true)
             ->setArguments([
                 $ref = new Reference('b'),
             ]);
@@ -215,12 +215,12 @@ class InlineServiceDefinitionsPassTest extends TestCase
         ;
         $container
             ->register('b')
-            ->setPublic(false)
             ->setFactory([new Reference('a'), 'a'])
         ;
 
         $container
             ->register('foo')
+            ->setPublic(true)
             ->setArguments([
                     $ref1 = new Reference('b'),
                     $ref2 = new Reference('b'),
@@ -241,16 +241,15 @@ class InlineServiceDefinitionsPassTest extends TestCase
         ;
         $container
             ->register('b')
-            ->setPublic(false)
             ->setFactory([new Reference('a'), 'a'])
         ;
 
         $inlineFactory = new Definition();
-        $inlineFactory->setPublic(false);
         $inlineFactory->setFactory([new Reference('b'), 'b']);
 
         $container
             ->register('foo')
+            ->setPublic(true)
             ->setArguments([
                     $ref = new Reference('b'),
                     $inlineFactory,
@@ -267,12 +266,12 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
             ->setLazy(true)
         ;
 
         $container
             ->register('service')
+            ->setPublic(true)
             ->setArguments([$ref = new Reference('foo')])
         ;
 
@@ -287,7 +286,6 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
             ->addMethodCall('foo', [$ref = new Reference('foo')])
         ;
 

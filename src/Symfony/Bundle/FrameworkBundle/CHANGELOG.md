@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added `framework.http_cache` configuration tree
+
 5.1.0
 -----
 

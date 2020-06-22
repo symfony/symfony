@@ -33,6 +33,7 @@
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="http-cache" type="http_cache" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -576,4 +577,28 @@
             <xsd:element name="recipients" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="http_cache">
+        <xsd:sequence>
+            <xsd:element name="private-header" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="debug" type="xsd:boolean" />
+        <xsd:attribute name="trace-level" type="http_cache_trace_levels" />
+        <xsd:attribute name="trace-header" type="xsd:string" />
+        <xsd:attribute name="default-ttl" type="xsd:integer" />
+        <xsd:attribute name="allow-reload" type="xsd:boolean" />
+        <xsd:attribute name="allow-revalidate" type="xsd:boolean" />
+        <xsd:attribute name="stale-while-revalidate" type="xsd:integer" />
+        <xsd:attribute name="stale-if-error" type="xsd:integer" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="http_cache_trace_levels">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none" />
+            <xsd:enumeration value="short" />
+            <xsd:enumeration value="full" />
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

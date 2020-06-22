@@ -115,20 +115,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
             return;
         }
-        if ($this->debug) {
-            $this->startTime = microtime(true);
-        }
-        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
-            putenv('SHELL_VERBOSITY=3');
-            $_ENV['SHELL_VERBOSITY'] = 3;
-            $_SERVER['SHELL_VERBOSITY'] = 3;
-        }
 
-        // init bundles
-        $this->initializeBundles();
-
-        // init container
-        $this->initializeContainer();
+        if (null === $this->container) {
+            $this->preBoot();
+        }
 
         foreach ($this->getBundles() as $bundle) {
             $bundle->setContainer($this->container);
@@ -188,6 +178,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
     {
+        if (!$this->booted) {
+            $container = $this->container ?? $this->preBoot();
+
+            if ($container->has('http_cache')) {
+                return $container->get('http_cache')->handle($request, $type, $catch);
+            }
+        }
+
         $this->boot();
         ++$this->requestStackSize;
         $this->resetServices = true;
@@ -750,6 +748,23 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         ]);
 
         return new DelegatingLoader($resolver);
+    }
+
+    private function preBoot(): ContainerInterface
+    {
+        if ($this->debug) {
+            $this->startTime = microtime(true);
+        }
+        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
+            putenv('SHELL_VERBOSITY=3');
+            $_ENV['SHELL_VERBOSITY'] = 3;
+            $_SERVER['SHELL_VERBOSITY'] = 3;
+        }
+
+        $this->initializeBundles();
+        $this->initializeContainer();
+
+        return $this->container;
     }
 
     /**

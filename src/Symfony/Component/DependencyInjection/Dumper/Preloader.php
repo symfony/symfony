@@ -104,7 +104,7 @@ final class Preloader
                     self::preloadType($p->getType(), $preloaded);
                 }
 
-                self::preloadType($p->getReturnType(), $preloaded);
+                self::preloadType($m->getReturnType(), $preloaded);
             }
         } catch (\ReflectionException $e) {
             // ignore missing classes

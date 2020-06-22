@@ -101,6 +101,7 @@ class Connection
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => $options['visibility_timeout'],
             'auto_setup' => (bool) $options['auto_setup'],
+            'queue_name' => (string) $options['queue_name'],
         ];
 
         $clientConfiguration = [
@@ -119,8 +120,8 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0) {
-            $configuration['queue_name'] = end($parsedPath);
+        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
+            $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : null;
 

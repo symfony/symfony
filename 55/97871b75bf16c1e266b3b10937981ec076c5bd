@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by starred-gijs at 2020-06-17T09:07:25Z
+
+> Should `Connection::fromDsn()` set `Connection::$queueUrl` directly when it is given a queue url (to avoid calling `getQueueUrl()` on the SQS client when we already have it)?
+
+Did not consider that to be part of the purpose of this PR. I rather keep this PR as minimal as possible.
+The following DSN was already supported,
+`sqs://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4`
+this PR only extends that to support https DSN
+`https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4`
+
+---------------------------------------------------------------------------
+
+by RocKordier at 2020-06-18T07:33:28Z
+
+@starred-gijs for consistency reasons maybe  also this check https://github.com/symfony/symfony/blob/6d4b26d25f3dcc224d7c66eb1e3bd1665c0bea21/src/Symfony/Component/Messenger/Transport/TransportFactory.php#L48
+should be adjusted.
+What do you think?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-18T13:02:25Z
+
+Can you please add an entry in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Bridge/AmazonSqs/CHANGELOG.md?
+
+---------------------------------------------------------------------------
+
+by starred-gijs at 2020-06-18T14:24:45Z
+
+Wasn't sure how to update the changelog. Let me know if it needs to be different.

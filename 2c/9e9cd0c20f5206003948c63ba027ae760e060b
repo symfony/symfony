@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-06-19T13:58:35Z
+
+This looks nice 👍  Thanks for the config example in the description. This will help the Doc team when this feature has to be documented.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-20T12:52:10Z
+
+PR is ready.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-06-20T14:10:52Z
+
+Nice! I love the idea 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-21T14:17:37Z
+
+Since creating HttpCache outside of the framework was done for perf purpose, I did some benchmarks.
+Here are my numbers:
+
+ | Enabling point | index.php | framework.yaml
+| ------------- | --- | ---
+ | Without preloading | 2150 r/s | 1680 r/s
+ | With preloading | 2400 r/s | 2315 r/s

@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-03T14:33:20Z
+
+Sounds good to me. @jeremyFreeAgent Can you finish the PR?
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-05-03T20:12:29Z
+
+I have set `uniqid()` for transports that do not give back an identifier.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-05-06T09:57:48Z
+
+Is it still relevant for 5.1?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-06T11:27:17Z
+
+Still relevant, but not for 5.1, I think we need more time to validate what we want.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-09T06:00:23Z
+
+@jeremyFreeAgent Can you update this PR with the latest discussion from the comments?
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-06-13T09:10:12Z
+
+rebased!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-17T09:43:48Z
+
+@jeremyFreeAgent Next step would be to fix the tests :)
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-06-17T13:08:50Z
+
+Sorry I was working on something else at the same time. :trollface:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-23T05:13:26Z
+
+@jeremyFreeAgent Do you have time to have a look for the failing tests?
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-06-23T06:18:24Z
+
+The tests are failing because the bridges require the 5.2 version of notifier which is not yet merged. What is the solution to make them pass?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-23T06:32:56Z
+
+The deps=low should pass. It looks like you forgot to update the composer.json file for FreeMobile.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-06-23T06:57:49Z
+
+OMG thanks @fabpot ♥️

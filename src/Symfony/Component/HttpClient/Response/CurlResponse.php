@@ -43,6 +43,7 @@ final class CurlResponse implements ResponseInterface
         $this->multi = $multi;
 
         if (\is_resource($ch)) {
+            unset($multi->handlesActivity[(int) $ch]);
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
             if (0x074000 === $curlVersion) {

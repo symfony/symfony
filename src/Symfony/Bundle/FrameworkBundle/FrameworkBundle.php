@@ -95,10 +95,6 @@ class FrameworkBundle extends Bundle
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
         }
-
-        if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
-        }
     }
 
     public function build(ContainerBuilder $container)

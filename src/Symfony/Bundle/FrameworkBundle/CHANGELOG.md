@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `framework.http_cache` configuration tree
+ * Added `framework.trusted_proxies` and `framework.trusted_headers` configuration options
 
 5.1.0
 -----

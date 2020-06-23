@@ -30,10 +30,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
-        $this->assertEquals(
-            array_merge(['secret' => 's3cr3t', 'trusted_hosts' => []], self::getBundleDefaultConfig()),
-            $config
-        );
+        $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
     public function getTestValidSessionName()
@@ -341,6 +338,13 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'secret' => 's3cr3t',
+            'trusted_hosts' => [],
+            'trusted_headers' => [
+                'x-forwarded-all',
+                '!x-forwarded-host',
+                '!x-forwarded-prefix',
+            ],
             'csrf_protection' => [
                 'enabled' => false,
             ],

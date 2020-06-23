@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Transport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -51,17 +52,14 @@ final class Transports implements TransportInterface
         return false;
     }
 
-    public function send(MessageInterface $message): void
+    public function send(MessageInterface $message): SentMessage
     {
         if (!$transport = $message->getTransport()) {
             foreach ($this->transports as $transport) {
                 if ($transport->supports($message)) {
-                    $transport->send($message);
-
-                    return;
+                    return $transport->send($message);
                 }
             }
-
             throw new LogicException(sprintf('None of the available transports support the given message (available transports: "%s").', implode('", "', array_keys($this->transports))));
         }
 
@@ -73,6 +71,6 @@ final class Transports implements TransportInterface
             throw new LogicException(sprintf('The "%s" transport does not support the given message.', $transport));
         }
 
-        $this->transports[$transport]->send($message);
+        return $this->transports[$transport]->send($message);
     }
 }

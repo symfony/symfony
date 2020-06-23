@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -50,7 +51,7 @@ final class MattermostTransport extends AbstractTransport
     /**
      * @see https://api.mattermost.com
      */
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
@@ -74,5 +75,12 @@ final class MattermostTransport extends AbstractTransport
 
             throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
         }
+
+        $success = $response->toArray(false);
+
+        $message = new SentMessage($message, (string) $this);
+        $message->setMessageId($success['id']);
+
+        return $message;
     }
 }

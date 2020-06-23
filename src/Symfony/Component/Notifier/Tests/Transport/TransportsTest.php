@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Component\Notifier\Transport\Transports;
 
@@ -30,9 +31,12 @@ class TransportsTest extends TestCase
 
         $one->method('supports')->with($message)->willReturn(true);
 
-        $one->expects($this->once())->method('send');
+        $one->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'one'));
 
-        $transports->send($message);
+        $sentMessage = $transports->send($message);
+
+        $this->assertSame($message, $sentMessage->getOriginalMessage());
+        $this->assertSame('one', $sentMessage->getTransport());
     }
 
     public function testSendToFirstSupportedTransportIfMessageDoesNotDefineATransport(): void
@@ -47,10 +51,16 @@ class TransportsTest extends TestCase
         $one->method('supports')->with($message)->willReturn(false);
         $two->method('supports')->with($message)->willReturn(true);
 
-        $one->expects($this->never())->method('send');
-        $two->expects($this->once())->method('send');
+        $one->method('send')->with($message)->willReturn(new SentMessage($message, 'one'));
+        $two->method('send')->with($message)->willReturn(new SentMessage($message, 'two'));
 
-        $transports->send($message);
+        $one->expects($this->never())->method('send');
+        $two->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'two'));
+
+        $sentMessage = $transports->send($message);
+
+        $this->assertSame($message, $sentMessage->getOriginalMessage());
+        $this->assertSame('two', $sentMessage->getTransport());
     }
 
     public function testThrowExceptionIfNoSupportedTransportWasFound(): void

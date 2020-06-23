@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Twilio;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -51,7 +52,7 @@ final class TwilioTransport extends AbstractTransport
         return $message instanceof SmsMessage;
     }
 
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
@@ -72,5 +73,12 @@ final class TwilioTransport extends AbstractTransport
 
             throw new TransportException('Unable to send the SMS: '.$error['message'].sprintf(' (see %s).', $error['more_info']), $response);
         }
+
+        $success = $response->toArray(false);
+
+        $message = new SentMessage($message, (string) $this);
+        $message->setMessageId($success['sid']);
+
+        return $message;
     }
 }

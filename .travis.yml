@@ -22,19 +22,22 @@ env:
 
 matrix:
     include:
-        - php: 5.5
-          env: php_extra="5.6 7.0 7.1 7.2"
-          dist: trusty
-        - php: 7.3
-          env: deps=high
+#        - php: 5.5
+#          env: php_extra="5.6 7.0 7.1 7.2"
+#          dist: trusty
+#        - php: 7.3
+#          env: deps=high
+#        - php: 7.4
+#          env: deps=low
         - php: 7.4
-          env: deps=low
-        - php: nightly
-          services: [memcached]
+          os: linux
+          arch: arm64
+#        - php: nightly
+#          services: [memcached]
     fast_finish: true
-    allow_failures:
-        - php: nightly
-          services: [memcached]
+#    allow_failures:
+#        - php: nightly
+#          services: [memcached]
 
 cache:
     directories:
@@ -68,7 +71,7 @@ before_install:
     - |
       # General configuration
       set -e
-      stty cols 120
+      #stty cols 120
       mkdir /tmp/slapd
       slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
       [ -d ~/.composer ] || mkdir ~/.composer
@@ -218,10 +221,10 @@ before_install:
 
     - |
       # Load fixtures
-      if [[ ! $skip ]]; then
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif &&
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
-      fi
+#      if [[ ! $skip ]]; then
+#          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif &&
+#          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
+#      fi
 
 install:
     - |
@@ -347,4 +350,4 @@ install:
       export -f run_tests
 
 script:
-    echo $TRAVIS_PHP_VERSION $php_extra | xargs -n1 bash -c '(</dev/tty run_tests $0)' || false
+    echo $TRAVIS_PHP_VERSION $php_extra | xargs -n1 bash -c '(run_tests $0)' || false

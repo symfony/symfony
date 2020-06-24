@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-18T16:28:42Z
+
+Hello, I'm not sure I understand the linked issue: tests are green even with this new line. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by gabrielsolomon at 2020-06-19T07:33:42Z
+
+The test is that if the server returns the cookie with double quotes the values is preserved with the same format. This is because the server using this format will not accept a cookie with no quoutes.

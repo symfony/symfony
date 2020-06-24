@@ -303,7 +303,7 @@ class FrameworkExtension extends Extension
             }
 
             $this->formConfigEnabled = true;
-            $this->registerFormConfiguration($config, $container, $loader);
+            $this->registerFormConfiguration($config, $container, $phpLoader);
 
             if (class_exists('Symfony\Component\Validator\Validation')) {
                 $config['validation']['enabled'] = true;
@@ -513,16 +513,16 @@ class FrameworkExtension extends Extension
         return new Configuration($container->getParameter('kernel.debug'));
     }
 
-    private function registerFormConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerFormConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        $loader->load('form.xml');
+        $loader->load('form.php');
 
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-            $loader->load('form_csrf.xml');
+            $loader->load('form_csrf.php');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
             $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
@@ -604,7 +604,7 @@ class FrameworkExtension extends Extension
         $phpLoader->load('cache_debug.php');
 
         if ($this->formConfigEnabled) {
-            $loader->load('form_debug.xml');
+            $phpLoader->load('form_debug.php');
         }
 
         if ($this->validatorConfigEnabled) {

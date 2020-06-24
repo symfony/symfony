@@ -32,7 +32,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
      */
     public function testHandleWhenUsernameLength($username, $ok)
     {
-        $request = Request::create('/login_check', 'POST', ['_username' => $username]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 'symfony']);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
 
         $httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
@@ -161,7 +161,31 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ->method('__toString')
             ->willReturn('someUsername');
 
-        $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass, '_password' => 'symfony']);
+        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $listener = new UsernamePasswordFormAuthenticationListener(
+            new TokenStorage(),
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
+            $httpUtils = new HttpUtils(),
+            'foo',
+            new DefaultAuthenticationSuccessHandler($httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            ['require_previous_session' => false, 'post_only' => $postOnly]
+        );
+        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener->handle($event);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleWhenPasswordAreNull($postOnly)
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The key "_password" cannot be null; check that the password field name of the form matches.');
+
+        $request = Request::create('/login_check', 'POST', ['_username' => 'symfony', 'password' => 'symfony']);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),

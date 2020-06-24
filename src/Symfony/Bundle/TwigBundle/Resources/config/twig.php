@@ -63,6 +63,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => ExtensionSet::class])
             ->tag('container.preload', ['class' => Template::class])
             ->tag('container.preload', ['class' => TemplateWrapper::class])
+            ->tag('container.private', ['package' => 'symfony/twig-bundle', 'version' => '5.2'])
 
         ->alias('Twig_Environment', 'twig')
         ->alias(Environment::class, 'twig')

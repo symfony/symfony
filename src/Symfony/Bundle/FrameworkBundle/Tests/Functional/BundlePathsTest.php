@@ -40,7 +40,7 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundleTwigTemplatesDir()
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
-        $twig = static::$container->get('twig');
+        $twig = static::$container->get('twig.alias');
         $bundlesMetadata = static::$container->getParameter('kernel.bundles_metadata');
 
         $this->assertSame([$bundlesMetadata['LegacyBundle']['path'].'/Resources/views'], $twig->getLoader()->getPaths('Legacy'));

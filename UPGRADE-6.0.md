@@ -121,6 +121,11 @@ Security
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
  * Added a `logout(Request $request, Response $response, TokenInterface $token)` method to the `RememberMeServicesInterface`.
 
+TwigBundle
+----------
+
+ * The `twig` service is now private.
+
 Validator
 ---------
 

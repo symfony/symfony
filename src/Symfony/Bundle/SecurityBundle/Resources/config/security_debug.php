@@ -24,18 +24,18 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('debug.security.voter.vote_listener', VoteListener::class)
-            ->tag('kernel.event_subscriber')
             ->args([
                 service('debug.security.access.decision_manager'),
             ])
+            ->tag('kernel.event_subscriber')
 
         ->set('debug.security.firewall', TraceableFirewallListener::class)
-            ->tag('kernel.event_subscriber')
             ->args([
                 service('security.firewall.map'),
                 service('event_dispatcher'),
                 service('security.logout_url_generator'),
             ])
+            ->tag('kernel.event_subscriber')
         ->alias('security.firewall', 'debug.security.firewall')
     ;
 };

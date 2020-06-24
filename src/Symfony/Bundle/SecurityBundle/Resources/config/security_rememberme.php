@@ -22,7 +22,6 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('security.authentication.listener.rememberme', RememberMeListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.untracked_token_storage'),
                 service('security.authentication.rememberme'),
@@ -32,6 +31,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Catch exception flag set in RememberMeFactory'),
                 service('security.authentication.session_strategy'),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.provider.rememberme', RememberMeAuthenticationProvider::class)
             ->abstract()
@@ -41,7 +41,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.rememberme.services.abstract')
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 [], // User Providers
                 abstract_arg('Shared Token Key'),
@@ -49,6 +48,7 @@ return static function (ContainerConfigurator $container) {
                 [], // Options
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.rememberme.services.persistent', PersistentTokenBasedRememberMeServices::class)
             ->parent('security.authentication.rememberme.services.abstract')
@@ -58,6 +58,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('security.authentication.rememberme.services.abstract')
             ->abstract()
 
-        ->set('security.rememberme.response_listener', ResponseListener::class)->tag('kernel.event_subscriber')
+        ->set('security.rememberme.response_listener', ResponseListener::class)
+            ->tag('kernel.event_subscriber')
     ;
 };

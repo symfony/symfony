@@ -42,13 +42,13 @@ use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('security.authentication.listener.anonymous', AnonymousAuthenticationListener::class)
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.untracked_token_storage'),
                 abstract_arg('Key'),
                 service('logger')->nullOnInvalid(),
                 service('security.authentication.manager'),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.provider.anonymous', AnonymousAuthenticationProvider::class)
             ->args([abstract_arg('Key')])
@@ -62,17 +62,16 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
 
         ->set('security.channel_listener', ChannelListener::class)
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.access_map'),
                 service('security.authentication.retry_entry_point'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.access_map', AccessMap::class)
 
         ->set('security.context_listener', ContextListener::class)
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.untracked_token_storage'),
                 [],
@@ -81,6 +80,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher')->nullOnInvalid(),
                 service('security.authentication.trust_resolver'),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.logout_listener', LogoutListener::class)
             ->abstract()
@@ -91,9 +91,11 @@ return static function (ContainerConfigurator $container) {
                 [], // Options
             ])
 
-        ->set('security.logout.listener.session', SessionLogoutListener::class)->abstract()
+        ->set('security.logout.listener.session', SessionLogoutListener::class)
+            ->abstract()
 
-        ->set('security.logout.listener.cookie_clearing', CookieClearingLogoutListener::class)->abstract()
+        ->set('security.logout.listener.cookie_clearing', CookieClearingLogoutListener::class)
+            ->abstract()
 
         ->set('security.logout.listener.default', DefaultLogoutListener::class)
             ->abstract()
@@ -110,24 +112,24 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.listener.abstract')
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
                 service('security.authentication.session_strategy'),
                 service('security.http_utils'),
-                abstract_arg(''),
+                abstract_arg('Provider-shared Key'),
                 service('security.authentication.success_handler'),
                 service('security.authentication.failure_handler'),
                 [],
                 service('logger')->nullOnInvalid(),
                 service('event_dispatcher')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.custom_success_handler', CustomAuthenticationSuccessHandler::class)
             ->abstract()
             ->args([
-                abstract_arg('The custom success handler service id'),
+                abstract_arg('The custom success handler service'),
                 [], // Options
                 abstract_arg('Provider-shared Key'),
             ])
@@ -142,19 +144,19 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication.custom_failure_handler', CustomAuthenticationFailureHandler::class)
             ->abstract()
             ->args([
-                abstract_arg('The custom failure handler service id'),
+                abstract_arg('The custom failure handler service'),
                 [], // Options
             ])
 
         ->set('security.authentication.failure_handler', DefaultAuthenticationFailureHandler::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('http_kernel'),
                 service('security.http_utils'),
                 [], // Options
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.listener.form', UsernamePasswordFormAuthenticationListener::class)
             ->parent('security.authentication.listener.abstract')
@@ -162,7 +164,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.listener.x509', X509AuthenticationListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
@@ -172,10 +173,10 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 service('event_dispatcher')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.listener.json', UsernamePasswordJsonAuthenticationListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
@@ -188,10 +189,10 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher')->nullOnInvalid(),
                 service('property_accessor')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.listener.remote_user', RemoteUserAuthenticationListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
@@ -200,10 +201,10 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 service('event_dispatcher')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.listener.basic', BasicAuthenticationListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
@@ -211,6 +212,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Entry Point'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.provider.dao', DaoAuthenticationProvider::class)
             ->abstract()
@@ -244,22 +246,21 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.exception_listener', ExceptionListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.trust_resolver'),
                 service('security.http_utils'),
-                abstract_arg(''),
+                abstract_arg('Provider-shared Key'),
                 service('security.authentication.entry_point')->nullOnInvalid(),
                 param('security.access.denied_url'),
                 service('security.access.denied_handler')->nullOnInvalid(),
                 service('logger')->nullOnInvalid(),
                 false, // Stateless
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.switchuser_listener', SwitchUserListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
                 service('security.token_storage'),
                 abstract_arg('User Provider'),
@@ -267,19 +268,20 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Provider Key'),
                 service('security.access.decision_manager'),
                 service('logger')->nullOnInvalid(),
-                abstract_arg('_switch_user'),
-                abstract_arg('ROLE_ALLOWED_TO_SWITCH'),
+                '_switch_user',
+                'ROLE_ALLOWED_TO_SWITCH',
                 service('event_dispatcher')->nullOnInvalid(),
                 false, // Stateless
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.access_listener', AccessListener::class)
-        ->tag('monolog.logger', ['channel' => 'security'])
-        ->args([
-            service('security.token_storage'),
-            service('security.access.decision_manager'),
-            service('security.access_map'),
-            service('security.authentication.manager'),
-        ])
+            ->args([
+                service('security.token_storage'),
+                service('security.access.decision_manager'),
+                service('security.access_map'),
+                service('security.authentication.manager'),
+            ])
+            ->tag('monolog.logger', ['channel' => 'security'])
     ;
 };

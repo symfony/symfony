@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
+use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
@@ -35,15 +36,15 @@ return static function (ContainerConfigurator $container) {
         // Manager
         ->set('security.authenticator.manager', AuthenticatorManager::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
-                [], // authenticators
+                abstract_arg('authenticators'),
                 service('security.token_storage'),
                 service('event_dispatcher'),
-                null, // provider key
+                abstract_arg('provider key'),
                 service('logger')->nullOnInvalid(),
                 param('security.authentication.manager.erase_credentials'),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authenticator.managers_locator', ServiceLocator::class)
             ->args([[]])
@@ -62,15 +63,21 @@ return static function (ContainerConfigurator $container) {
         ->set('security.firewall.authenticator', AuthenticatorManagerListener::class)
             ->abstract()
             ->args([
-                null, // authenticator manager
+                abstract_arg('authenticator manager'),
             ])
 
         // Listeners
         ->set('security.listener.check_authenticator_credentials', CheckCredentialsListener::class)
-            ->tag('kernel.event_subscriber')
             ->args([
                service('security.encoder_factory'),
             ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('security.listener.password_migrating', PasswordMigratingListener::class)
+            ->args([
+                service('security.encoder_factory'),
+            ])
+            ->tag('kernel.event_subscriber')
 
         ->set('security.listener.user_checker', UserCheckerListener::class)
             ->abstract()
@@ -86,74 +93,74 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.listener.remember_me', RememberMeListener::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
-                [], // remember me services
+                abstract_arg('remember me services'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         // Authenticators
         ->set('security.authenticator.http_basic', HttpBasicAuthenticator::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
-                null, // realm name
-                null, // user provider
+                abstract_arg('realm name'),
+                abstract_arg('user provider'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authenticator.form_login', FormLoginAuthenticator::class)
             ->abstract()
             ->args([
                 service('security.http_utils'),
-                null, // user provider
-                null, // authentication success handler
-                null, // authentication failure handler
-                [], // options
+                abstract_arg('user provider'),
+                abstract_arg('authentication success handler'),
+                abstract_arg('authentication failure handler'),
+                abstract_arg('options'),
             ])
 
         ->set('security.authenticator.json_login', JsonLoginAuthenticator::class)
             ->abstract()
             ->args([
                 service('security.http_utils'),
-                null, // user provider
-                null, // authentication success handler
-                null, // authentication failure handler
-                [], // options
+                abstract_arg('user provider'),
+                abstract_arg('authentication success handler'),
+                abstract_arg('authentication failure handler'),
+                abstract_arg('options'),
                 service('property_accessor')->nullOnInvalid(),
             ])
 
         ->set('security.authenticator.remember_me', RememberMeAuthenticator::class)
             ->abstract()
             ->args([
-                [], // remember me services
+                abstract_arg('remember me services'),
                 param('kernel.secret'),
                 service('security.token_storage'),
-                [], // options
+                abstract_arg('options'),
                 service('security.authentication.session_strategy'),
             ])
 
         ->set('security.authenticator.x509', X509Authenticator::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
-                null, // user provider
+                abstract_arg('user provider'),
                 service('security.token_storage'),
-                null, // firewall name
-                null, // user key
-                null, // credentials key
+                abstract_arg('firewall name'),
+                abstract_arg('user key'),
+                abstract_arg('credentials key'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authenticator.remote_user', RemoteUserAuthenticator::class)
             ->abstract()
-            ->tag('monolog.logger', ['channel' => 'security'])
             ->args([
-                null, // user provider
+                abstract_arg('user provider'),
                 service('security.token_storage'),
-                null, // firewall name
-                null, // user key
+                abstract_arg('firewall name'),
+                abstract_arg('user key'),
                 service('logger')->nullOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'security'])
     ;
 };

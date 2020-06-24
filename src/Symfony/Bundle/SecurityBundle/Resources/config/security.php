@@ -106,7 +106,9 @@ return static function (ContainerConfigurator $container) {
             ->args(['none'])
 
         ->set('security.encoder_factory.generic', EncoderFactory::class)
-            ->args([[]])
+            ->args([
+                [],
+            ])
         ->alias('security.encoder_factory', 'security.encoder_factory.generic')
         ->alias(EncoderFactoryInterface::class, 'security.encoder_factory')
 
@@ -160,12 +162,12 @@ return static function (ContainerConfigurator $container) {
 
         // Firewall related services
         ->set('security.firewall', FirewallListener::class)
-            ->tag('kernel.event_subscriber')
             ->args([
                 service('security.firewall.map'),
                 service('event_dispatcher'),
                 service('security.logout_url_generator'),
             ])
+            ->tag('kernel.event_subscriber')
         ->alias(Firewall::class, 'security.firewall')
 
         ->set('security.firewall.map', FirewallMap::class)
@@ -238,7 +240,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('uid key'),
                 abstract_arg('filter'),
                 abstract_arg('password_attribute'),
-                [], // extra_fields (email etc)'),
+                abstract_arg('extra_fields (email etc)'),
             ])
 
         ->set('security.user.provider.chain', ChainUserProvider::class)
@@ -253,23 +255,24 @@ return static function (ContainerConfigurator $container) {
 
         // Validator
         ->set('security.validator.user_password', UserPasswordValidator::class)
-            ->tag('validator.constraint_validator', ['alias' => 'security.validator.user_password'])
             ->args([
                 service('security.token_storage'),
                 service('security.encoder_factory'),
             ])
+            ->tag('validator.constraint_validator', ['alias' => 'security.validator.user_password'])
 
         // Cache
         ->set('cache.security_expression_language')
             ->parent('cache.system')
+            ->private()
             ->tag('cache.pool')
 
         // Cache Warmers
         ->set('security.cache_warmer.expression', ExpressionCacheWarmer::class)
-            ->tag('kernel.cache_warmer')
             ->args([
                 [],
                 service('security.expression_language'),
             ])
+            ->tag('kernel.cache_warmer')
     ;
 };

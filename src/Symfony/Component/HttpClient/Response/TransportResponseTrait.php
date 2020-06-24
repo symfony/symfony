@@ -35,7 +35,7 @@ trait TransportResponseTrait
         'canceled' => false,
     ];
 
-    /** @var resource */
+    /** @var object|resource */
     private $handle;
     private $id;
     private $timeout = 0;

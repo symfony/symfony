@@ -241,6 +241,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewalls = $config['firewalls'];
         $providerIds = $this->createUserProviders($config, $container);
 
+        $container->setParameter('security.firewalls', array_keys($firewalls));
+
         // make the ContextListener aware of the configured user providers
         $contextListenerDefinition = $container->getDefinition('security.context_listener');
         $arguments = $contextListenerDefinition->getArguments();
@@ -353,8 +355,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Register Firewall-specific event dispatcher
         $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
         $container->register($firewallEventDispatcherId, EventDispatcher::class);
-        $container->setDefinition($firewallEventDispatcherId.'.event_bubbling_listener', new ChildDefinition('security.event_dispatcher.event_bubbling_listener'))
-            ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
         // Register listeners
         $listeners = [];

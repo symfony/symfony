@@ -30,6 +30,10 @@ matrix:
           env: deps=low
         - php: nightly
           services: [memcached]
+        - php: 7.4
+          os: linux
+          arch: arm64
+          env: deps=low
     fast_finish: true
     allow_failures:
         - php: nightly

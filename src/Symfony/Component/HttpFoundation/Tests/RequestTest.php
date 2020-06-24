@@ -807,7 +807,7 @@ class RequestTest extends TestCase
             ['foo=1&foo=2', 'foo=2', 'merges repeated parameters'],
             ['pa%3Dram=foo%26bar%3Dbaz&test=test', 'pa%3Dram=foo%26bar%3Dbaz&test=test', 'works with encoded delimiters'],
             ['0', '0=', 'allows "0"'],
-            ['Foo Bar&Foo%20Baz', 'Foo_Bar=&Foo_Baz=', 'normalizes encoding in keys'],
+            ['Foo Bar&Foo%20Baz', 'Foo%20Bar=&Foo%20Baz=', 'normalizes encoding in keys'],
             ['bar=Foo Bar&baz=Foo%20Baz', 'bar=Foo%20Bar&baz=Foo%20Baz', 'normalizes encoding in values'],
             ['foo=bar&&&test&&', 'foo=bar&test=', 'removes unneeded delimiters'],
             ['formula=e=m*c^2', 'formula=e%3Dm%2Ac%5E2', 'correctly treats only the first "=" as delimiter and the next as value'],

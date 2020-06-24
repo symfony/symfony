@@ -399,7 +399,7 @@ class Request
 
         $queryString = '';
         if (isset($components['query'])) {
-            parse_str(html_entity_decode($components['query']), $qs);
+            $qs = HeaderUtils::parseQuery(html_entity_decode($components['query']));
 
             if ($query) {
                 $query = array_replace($qs, $query);
@@ -660,7 +660,7 @@ class Request
             return '';
         }
 
-        parse_str($qs, $qs);
+        $qs = HeaderUtils::parseQuery($qs);
         ksort($qs);
 
         return http_build_query($qs, '', '&', PHP_QUERY_RFC3986);

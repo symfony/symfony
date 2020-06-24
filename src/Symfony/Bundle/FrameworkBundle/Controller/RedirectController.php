@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,7 +66,7 @@ class RedirectController
 
             if ($keepQueryParams) {
                 if ($query = $request->server->get('QUERY_STRING')) {
-                    $query = self::parseQuery($query);
+                    $query = HeaderUtils::parseQuery($query);
                 } else {
                     $query = $request->query->all();
                 }
@@ -184,50 +185,5 @@ class RedirectController
         }
 
         throw new \RuntimeException(sprintf('The parameter "path" or "route" is required to configure the redirect action in "%s" routing configuration.', $request->attributes->get('_route')));
-    }
-
-    private static function parseQuery(string $query)
-    {
-        $q = [];
-
-        foreach (explode('&', $query) as $v) {
-            if (false !== $i = strpos($v, "\0")) {
-                $v = substr($v, 0, $i);
-            }
-
-            if (false === $i = strpos($v, '=')) {
-                $k = urldecode($v);
-                $v = '';
-            } else {
-                $k = urldecode(substr($v, 0, $i));
-                $v = substr($v, $i);
-            }
-
-            if (false !== $i = strpos($k, "\0")) {
-                $k = substr($k, 0, $i);
-            }
-
-            $k = ltrim($k, ' ');
-
-            if (false === $i = strpos($k, '[')) {
-                $q[] = bin2hex($k).$v;
-            } else {
-                $q[] = substr_replace($k, bin2hex(substr($k, 0, $i)), 0, $i).$v;
-            }
-        }
-
-        parse_str(implode('&', $q), $q);
-
-        $query = [];
-
-        foreach ($q as $k => $v) {
-            if (false !== $i = strpos($k, '_')) {
-                $query[substr_replace($k, hex2bin(substr($k, 0, $i)).'[', 0, 1 + $i)] = $v;
-            } else {
-                $query[hex2bin($k)] = $v;
-            }
-        }
-
-        return $query;
     }
 }

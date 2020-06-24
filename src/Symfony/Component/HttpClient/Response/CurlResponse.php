@@ -36,13 +36,16 @@ final class CurlResponse implements ResponseInterface
     private $debugBuffer;
 
     /**
+     * @param \CurlHandle|resource|string $ch
+     *
      * @internal
      */
     public function __construct(CurlClientState $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null)
     {
         $this->multi = $multi;
 
-        if (\is_resource($ch)) {
+        if (\is_resource($ch) || $ch instanceof \CurlHandle) {
+            unset($multi->handlesActivity[(int) $ch]);
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
             if (0x074000 === $curlVersion) {

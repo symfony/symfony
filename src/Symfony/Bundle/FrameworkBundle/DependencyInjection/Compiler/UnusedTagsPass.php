@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class UnusedTagsPass implements CompilerPassInterface
 {
-    private $whitelist = [
+    private $knownTags = [
         'annotations.cached_reader',
         'auto_alias',
         'cache.pool',
@@ -91,11 +91,11 @@ class UnusedTagsPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $tags = array_unique(array_merge($container->findTags(), $this->whitelist));
+        $tags = array_unique(array_merge($container->findTags(), $this->knownTags));
 
         foreach ($container->findUnusedTags() as $tag) {
-            // skip whitelisted tags
-            if (\in_array($tag, $this->whitelist)) {
+            // skip known tags
+            if (\in_array($tag, $this->knownTags)) {
                 continue;
             }
 

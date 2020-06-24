@@ -111,16 +111,16 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $phpLoader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
-        $loader->load('security.xml');
-        $loader->load('security_listeners.xml');
-        $loader->load('security_rememberme.xml');
+        $phpLoader->load('security.php');
+        $phpLoader->load('security_listeners.php');
+        $phpLoader->load('security_rememberme.php');
 
         if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
             if ($config['always_authenticate_before_granting']) {
                 throw new InvalidConfigurationException('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
             }
 
-            $loader->load('security_authenticator.xml');
+            $phpLoader->load('security_authenticator.php');
 
             // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
             // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
@@ -129,7 +129,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->getDefinition('security.authorization_checker')->setArgument(4, false);
             $container->getDefinition('security.authorization_checker')->setArgument(5, false);
         } else {
-            $loader->load('security_legacy.xml');
+            $phpLoader->load('security_legacy.php');
         }
 
         if (class_exists(AbstractExtension::class)) {
@@ -140,7 +140,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $phpLoader->load('guard.php');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $loader->load('security_debug.xml');
+            $phpLoader->load('security_debug.php');
         }
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {

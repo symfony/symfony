@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-22T13:47:37Z
+
+Note: The php 8 build on Travis will fail until https://github.com/php/php-src/commit/26171c3690874743e1c71766e60248fbd974782f lands in their nightly build. I've run the tests locally.

@@ -42,9 +42,9 @@
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="test" type="xsd:boolean" />
         <xsd:attribute name="error-controller" type="xsd:string" />
-        <xsd:attribute name="trusted_hosts" type="xsd:string" />
-        <xsd:attribute name="trusted_proxies" type="xsd:string" />
-        <xsd:attribute name="trusted_headers" type="xsd:string" />
+        <xsd:attribute name="trusted-hosts" type="xsd:string" />
+        <xsd:attribute name="trusted-proxies" type="xsd:string" />
+        <xsd:attribute name="trusted-headers" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

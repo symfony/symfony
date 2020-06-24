@@ -1,0 +1,279 @@
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-13T19:06:10Z
+
+Ho nice !
+
+We should add a test with spaces in the key parameter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T07:17:37Z
+
+> the a\0b binary string, I guess this would unlikely happens in real world right ?
+
+Yes, that's a very unlikely edge case of parse_str() that I duplicated for parity.
+
+> parse and convert in every key parameters with \bin2hex(), and then let \parse_str() do its job, and then convert back. It would be also maybe faster than going to all those if conditions ? WDYT?
+
+I'm not sure what you mean sorry. About perf, those if are going to be very fast, much faster than using a regexp. But please prove me wrong if you want to give your idea a try!
+
+> Also, do you think such a feature will be backported in Symfony < 5.2 ?
+
+I don't think it should, that's a new feature.
+
+One should note also that I didn't change the createFromGlobals method. This means that dots will still be replaced by default. This is important to preserve BC. But at least ppl that care now have a helper to opt-in for the fixed parser.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-14T10:08:02Z
+
+Would you be interested into making this function work also with a query string like this?
+
+https://3v4l.org/86Tu5 and return an array containing `'test' => ['what', 'what2']`
+
+Since this is a valid URL http://localhost/myendpoint?test=what&test=what2
+
+Sorry if it already does that and I missed it.
+
+related also with my comment [here](https://github.com/symfony/symfony/issues/37029#issuecomment-636520304)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T10:22:36Z
+
+@gmponos I've been wondering about this also. This would be a too big API change when dealing with query/cookie/etc bags. But I wish we'll find a way to get there eventually yes (getting rid of `[]` to access to multiple submitted values.)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-06-14T10:37:11Z
+
+> But I whish we'll find a way to get there eventually yes
+
+The Go API is nice to handle these cases: https://golang.org/pkg/net/url/#URL.Query
+At a glance, we should always return an array of arrays:
+
+```php
+["test" => ["what", "what2"]]
+["foo" => ["bar"]]
+```
+
+Maybe could this set of features be included in the proposed URI component (#36999)?
+
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-14T11:01:15Z
+
+> Would you be interested into making this function work also with a query string like this?
+>
+> https://3v4l.org/86Tu5 and return an array containing `'test' => ['what', 'what2']`
+>
+> Since this is a valid URL http://localhost/myendpoint?test=what&test=what2
+>
+> Sorry if it already does that and I missed it.
+>
+> related also with my comment [here](https://github.com/symfony/symfony/issues/37029#issuecomment-636520304)
+
+I'm about to make a regex that does it all, I will submit my snippet tonight probably.
+
+This is the Father's day today and I might be away from computer...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T11:16:25Z
+
+> At a glance, we should always return an array of arrays:
+
+I'm not sure how this should play with the `[]` syntax. Eg how should `a[b]=c&a[b]=d` be parsed? There are several possible answers. This means this is not for this PR at least :) votes welcome.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-06-14T12:44:16Z
+
+The `[]` syntax is a PHP oddity, which isn't covered by any RFC. In "standard mode" (the component), I suggest to **not** support it. We could maybe also propose a PHP mode that just delegates to `parse_str()` and all is oddities (dot replacement, array syntax, etc).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T12:50:15Z
+
+> The [] syntax is a PHP oddity, which isn't covered by any RFC
+
+For sure - also no RFC should cover what happens server-side.
+
+But we cannot migrate away from it without a serious FC/BC plan.
+E.g. the form component relies on this syntax.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-06-14T12:54:02Z
+
+The PHP mode could be the default (so it's 100% BC). The "standard-compliant" mode is useful only for a small subset of use cases after all (but for instance both Mercure and Vulcain, as well a many other I-D and RFCs use repeated query parameters without the `[]` suffix, this currently requires custom code to parse such URLs with PHP/Symfony).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T13:03:19Z
+
+Would this make sense to you? Then it would be up to users to use this function when they create the request object:
+
+<details>
+
+```diff
+--- a/src/Symfony/Component/HttpFoundation/HeaderUtils.php
++++ b/src/Symfony/Component/HttpFoundation/HeaderUtils.php
+@@ -196,7 +196,7 @@ class HeaderUtils
+     /**
+      * Like parse_str(), but preserves dots in variable names.
+      */
+-    public static function parseQuery(string $query, string $separator = '&'): array
++    public static function parseQuery(string $query, bool $phpMode = true, string $separator = '&'): array
+     {
+         $q = [];
+
+@@ -217,6 +217,12 @@ class HeaderUtils
+                 $k = substr($k, 0, $i);
+             }
+
++            if (!$phpMode) {
++                $q[$k][] = urldecode(substr($v, 1));
++
++                continue;
++            }
++
+             $k = ltrim($k, ' ');
+
+             if (false === $i = strpos($k, '[')) {
+@@ -226,6 +232,10 @@ class HeaderUtils
+             }
+         }
+
++        if (!$phpMode) {
++            return $q;
++        }
++
+         parse_str(implode('&', $q), $q);
+
+         $query = [];
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-06-14T13:13:56Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-14T14:27:52Z
+
+Here I am,
+
+I just made a small example with a `preg_replace_callback()`: https://3v4l.org/d0W4Z
+
+Basically, [the regex](https://regex101.com/r/iXlLWs/1) will convert the relevant part of the keys to hexadecimal, then let parse_str() do its job, then convert back.
+
+There is only one test which produces (`a\0b=c`)a different result, but I guess we will never have this in real life and maybe we can decide all together to skip it if you prefer. Let me know what you think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T16:04:05Z
+
+@dunglas updated, please have a look.
+
+@drupol the code in https://3v4l.org/d0W4Z won't parse correctly the [`a%5Bb%5D=c`](https://3v4l.org/1QBUJ) query string + it's going to be way slower.
+
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-14T16:10:15Z
+
+> @drupol the code in https://3v4l.org/d0W4Z won't parse correctly the [`a%5Bb%5D=c`](https://3v4l.org/1QBUJ) query string + it's going to be way slower.
+
+Ok I fixed it... https://3v4l.org/Pam6Z
+
+But ok if it's slower, you decide :-)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-14T16:14:26Z
+
+> urldecode($keyValue)
+
+This line will lead to double decoding of the value (once here + twice done by `parse_str()`) - the implem in symfony/psr-http-message-bridge#80 has the same issue btw.
+
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-14T18:55:37Z
+
+> > urldecode($keyValue)
+>
+> This line will lead to double decoding of the value (once here + twice done by `parse_str()`) - the implem in [symfony/psr-http-message-bridge#80](https://github.com/symfony/psr-http-message-bridge/pull/80) has the same issue btw.
+
+Well done, I updated it: https://3v4l.org/p7uPM
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-06-15T23:42:05Z
+
+This change heads in a really good direction. Thank you. I have some random comments and questions.
+* Does `$ignoreBrackets=true` include the leading whitespace on purpose and why?
+* Most likely known but not documented - parseQuery preserves also subsequent whitespace beside dots while parseStr replaces them with `_`
+* What about naming `$ignoreBrackets` more to its achievement? I would have troubles to get an idea of its job without studying the documentation. Some deliberately (too) extreme name examples: groupAllParams, alwaysGroup, groupByParameterNames, groupWithoutBrackets alwaysGroupAndIgnoreBrackets.
+
+---------------------------------------------------------------------------
+
+by drupol at 2020-06-19T05:58:13Z
+
+I noticed that Firefox and Chrome behaves differently when it comes to parse the string `a%00b=c`.
+
+Try this javascript code:
+
+```javascript
+    const queryString = new URLSearchParams('?a%00b=c');
+    for (const [key, value] of queryString) {
+        console.log('key =', key, 'value = ', value);
+    }
+```
+
+Firefox:
+![image](https://user-images.githubusercontent.com/252042/84887506-20cb5180-b096-11ea-866d-ee67a589a113.png)
+
+Chrome:
+![image](https://user-images.githubusercontent.com/252042/84898395-78be8400-b0a7-11ea-8e3d-3e5643971e90.png)
+
+Shouldn't we mimic that behavior here?
+
+We could also check [WHATWG](https://url.spec.whatwg.org/#interface-urlsearchparams) doc about this ?
+
+And we could also check what [the webplatform test suite](https://github.com/web-platform-tests/wpt/tree/master/url) cover those cases ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-19T11:31:15Z
+
+@drupol there is no use case for the null char in URLs. I'm not even sure it's legal from an RFC pov. php-src uses C-strings internally in `parse_str()`, that's why null chars cut the string. I think we should stick to the behavior of php for this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-20T08:39:34Z
+
+Now rebased on top of  #37271, ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-23T20:23:59Z
+
+@simonberger I missed you comment:
+
+> Does $ignoreBrackets=true include the leading whitespace on purpose and why?
+
+fixed, trimming now happens unconditionally.
+
+> Most likely known but not documented - parseQuery preserves also subsequent whitespace beside dots while parseStr replaces them with _
+
+true, but nobody is using spaces in var names so I skipped advertising this.
+
+> What about naming $ignoreBrackets more to its achievement? I would have troubles to get an idea of its job without studying the documentation. Some deliberately (too) extreme name examples: groupAllParams, alwaysGroup, groupByParameterNames, groupWithoutBrackets alwaysGroupAndIgnoreBrackets.
+
+naming... :)
+I'm sorry I'm not convinced by any of the current proposals...

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by misekai at 2020-06-16T10:29:06Z
+
+Hi buddies,
+I failed the test with the message:
+
+```
+Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException: Invalid definition for service "form.extension": argument 1 of "Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension::__construct" accepts "Psr\Container\ContainerInterface", "Symfony\Component\DependencyInjection\Argument\AbstractArgument" passed.
+```
+
+I think I have failed to convert the XML to PHP at this place. Maybe the `abstract_arg` is not appropriate in this case.
+
+XML: https://github.com/symfony/symfony/blob/e60a876201b5b306d0c81a24d9a3db997192079c/src/Symfony/Bundle/FrameworkBundle/Resources/config/form.xml#L35
+
+PHP:
+https://github.com/symfony/symfony/pull/37302/files#diff-94fa4b98b53d4dda6798d67d0b49ad67R53
+
+Do you have any suggestion to fix this?
+Thank you!
+
+Updated:
+I try replacing the abstract_arg with `[]` (collection) and `iterator([])` (iterator) and it work:
+```
+            ->args([
+                abstract_arg('All services with tag "form.type" are stored in a service locator by FormPass'),
+                [], //All services with tag "form.type_extension" are stored here by FormPass
+                iterator([]), //All services with tag "form.type_guesser" are stored here by FormPass
+            ])
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-18T13:56:29Z
+
+@misekai using abstract_arg there fails because of https://github.com/symfony/symfony/blob/6d4b26d25f3dcc224d7c66eb1e3bd1665c0bea21/src/Symfony/Component/Form/DependencyInjection/FormPass.php#L55-L57 added in https://github.com/symfony/symfony/pull/22481
+
+This part does not seem relevant anymore as it's also deprecated in the sona-bundle and cannot be enabled with the latest symfony version anyway, see https://github.com/sonata-project/SonataCoreBundle/blob/37cecb2ae52d333ac481ca98ec51630c9a2a834e/src/CoreBundle/DependencyInjection/SonataCoreExtension.php#L143-L152
+
+So I suggest that you please remove the check in FormPass and then you are able to use abstract_arg for all three arguments as you intended.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-24T09:04:11Z
+
+@misekai Will you have time to finish this PR?
+
+---------------------------------------------------------------------------
+
+by misekai at 2020-06-24T12:03:17Z
+
+Yes, I am coming back to it!
+
+---------------------------------------------------------------------------
+
+by misekai at 2020-06-24T13:41:17Z
+
+> @misekai using abstract_arg there fails because of
+>
+> https://github.com/symfony/symfony/blob/6d4b26d25f3dcc224d7c66eb1e3bd1665c0bea21/src/Symfony/Component/Form/DependencyInjection/FormPass.php#L55-L57
+>
+> added in #22481
+> This part does not seem relevant anymore as it's also deprecated in the sona-bundle and cannot be enabled with the latest symfony version anyway, see https://github.com/sonata-project/SonataCoreBundle/blob/37cecb2ae52d333ac481ca98ec51630c9a2a834e/src/CoreBundle/DependencyInjection/SonataCoreExtension.php#L143-L152
+>
+> So I suggest that you please remove the check in FormPass and then you are able to use abstract_arg for all three arguments as you intended.
+
+Thank @Tobion . Very informative comment. Very appreciate it!
+Just updated the code.

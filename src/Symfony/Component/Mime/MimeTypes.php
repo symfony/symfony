@@ -1114,7 +1114,7 @@ final class MimeTypes implements MimeTypesInterface
         'audio/mp2' => ['mp2'],
         'audio/mp3' => ['mp3', 'mpga'],
         'audio/mp4' => ['m4a', 'mp4a', 'f4a'],
-        'audio/mpeg' => ['mpga', 'mp2', 'mp2a', 'mp3', 'm2a', 'm3a'],
+        'audio/mpeg' => ['mp3', 'mpga', 'mp2', 'mp2a', 'm2a', 'm3a'],
         'audio/mpegurl' => ['m3u', 'm3u8', 'vlc'],
         'audio/ogg' => ['oga', 'ogg', 'spx', 'opus'],
         'audio/prs.sid' => ['sid', 'psid'],

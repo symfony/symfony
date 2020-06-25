@@ -268,5 +268,3 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return $this->entityLoaders[$hash] ?? ($this->entityLoaders[$hash] = $this->getLoader($manager, $queryBuilder, $class));
     }
 }
-
-interface_exists(ObjectManager::class);

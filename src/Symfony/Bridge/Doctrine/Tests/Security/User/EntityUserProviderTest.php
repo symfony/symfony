@@ -189,7 +189,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->createMock([interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class, PasswordUpgraderInterface::class]);
+        $repository = $this->createMock([ObjectRepository::class, PasswordUpgraderInterface::class]);
         $repository->expects($this->once())
             ->method('upgradePassword')
             ->with($user, 'foobar');

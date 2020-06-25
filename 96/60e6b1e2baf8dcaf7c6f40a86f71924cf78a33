@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-25T08:52:17Z
+
+Looks like tests are broken for PHP < 7.4
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-06-25T09:44:13Z
+
+Tests on Travis CI pass now. Failures on AppVeyor do not look related.

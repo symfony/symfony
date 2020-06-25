@@ -48,9 +48,12 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
      */
     public function createRequest(Request $symfonyRequest)
     {
+        $uri = $symfonyRequest->server->get('QUERY_STRING', '');
+        $uri = $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getBaseUrl().$symfonyRequest->getPathInfo().('' !== $uri ? '?'.$uri : '');
+
         $request = $this->serverRequestFactory->createServerRequest(
             $symfonyRequest->getMethod(),
-            $symfonyRequest->getUri(),
+            $uri,
             $symfonyRequest->server->all()
         );
 

@@ -1,0 +1,403 @@
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2020-06-18T01:16:05Z
+
+> https://github.com/symfony/symfony/blob/a3afd8770a81053190c3cc7c73060a739d0a3868/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php#L34
+
+Should this doc be changed to `string[]` in Symfony 6?
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T07:10:12Z
+
+As I said, if we force typing on a `string[]`, we will break the backward compatibility of some voters including the voter [Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter](https://github.com/symfony/symfony/blob/a3afd8770a81053190c3cc7c73060a739d0a3868/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php) that wait for an instance of the class `Symfony\Component\ExpressionLanguage\Expression`.
+
+Only the helper `Voter` has this problem, because it is the only voter who expects a `string` to validate its use in the `supports` method. Either the `supports` method returns `false` if `$attribute` is not a string, either you must do the verification just before calling the `supports` method.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T07:57:58Z
+
+This change should be covered by a test. Also, your change might break some (probably rare) scenarios that would work right now:
+
+* `$attribute` could be a stringable object.
+* A voter could have removed the `string` type declaration from the `supports()` method signature.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T08:17:32Z
+
+@derrabus
+
+Of course, I'm going to add a test :-)
+
+> $attribute could be a stringable object.
+
+Indeed, we can very well have a stringable object, however, as has never been indicated in the documentation or the phpdoc, some voters are therefore not stringable.
+
+> A voter could have removed the string type declaration from the supports() method signature.
+
+It was my first intention, however, we will break the Backward Compatibility if some voters override the `supports()` method.. It is for this reason that I preferred to opt for a 'pre-test' of verification of the attribute.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T08:46:06Z
+
+> Indeed, we can very well have a stringable object, however, as has never been indicated in the documentation or the phpdoc, some voters are therefore not stringable.
+
+All voters that extend the abstract `Voter` class are. You are breaking that case: https://3v4l.org/2N1Hp
+
+> we will break the Backward Compatibility if some voters override the `supports()` method.
+
+I'm not suggesting to change the `supports()` method. This is the case you might break: https://3v4l.org/MrcDq
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T08:51:30Z
+
+Not all tests are passed in php 7.3, but these are tests for the Cache component. There was no error in the previous commit of this PR, so maybe just restart the tests for php 7.3 will remove the error `Error: Call to undefined method Doctrine\DBAL\Driver\PDOSqlite\Driver::getName()` (problem with a dependency version of Doctrine DBAL?).
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T08:58:33Z
+
+@derrabus We do indeed agree on the 2 points. However, send a non-stringable attribute to a voter extending the abstract class `Voter', and you will get the error:
+
+```
+Argument 1 passed to FooVoter::supports() must be of the type string, object given
+```
+
+Given that the `AccessDecisionManager` and the `AuthorizationChecker` classes accept attributes of any type (mixed), the problem with the attributes not stringable (see the test in this PR).
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2020-06-18T09:24:56Z
+
+> As I said, if we force typing on a string[], we will break the backward compatibility
+
+I know, This is why I said v6.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T09:35:54Z
+
+> However, send a non-stringable attribute to a voter extending the abstract class `Voter', and you will get the error:
+
+Not necessarily, please see the second 3v4l link I posted.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T09:36:18Z
+
+Why limit arbitrarily the type to an array of strings? It is only the aid class to build the Voter that has become blocking.
+
+In addition, if we just change the phpdoc to `string[]` for the `$attributes` argument of `Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::vote()`, we will also need to change the phpdoc for `Symfony/Component/Security/Core/Authorization/AuthorizationCheckerInterface::isGranted()` and `Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface::decide()`.
+
+The principle of the `supports()` method is precisely to validate if the subject and attributes are supported by the voter.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T09:38:03Z
+
+> Not necessarily, please see the second 3v4l link I posted.
+
+Remove my modification in the class `Voter` and run the test of this PR, and you get the error.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T09:49:10Z
+
+> > Not necessarily, please see the second 3v4l link I posted.
+>
+> Remove my modification in the class `Voter` and run the test of this PR, and you get the error.
+
+Again, please see the second 3v4l link I posted above. It shows you a voter that passes.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T09:55:17Z
+
+Sorry, but I will repeat myself :-), but the test passes with my modification, but without my modification you get:
+
+```
+1) Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTest::testVote with data set #9 (array(stdClass Object ()), 0, stdClass Object (), 'AC
+CESS_ABSTAIN if attributes ...trings')
+TypeError: Argument 1 passed to Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTest_Voter::supports() must be of the type string, object
+ given, called in E:\Git\php\symfony\symfony\src\Symfony\Component\Security\Core\Authorization\Voter\Voter.php on line 33
+
+E:\Git\php\symfony\symfony\src\Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTest.php:70
+E:\Git\php\symfony\symfony\src\Symfony\Component\Security\Core\Authorization\Voter\Voter.php:33
+E:\Git\php\symfony\symfony\src\Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTest.php:59
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T10:04:45Z
+
+All right, I give up. 🤷🏻‍♂️
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-06-18T11:53:20Z
+
+@francoispluchino try a testcase with a custom voter that removes the string type here; https://github.com/symfony/symfony/blob/73ce604b0c1a81d7e57d354c529d6e19ff6d867e/src/Symfony/Component/Security/Core/Tests/Authorization/Voter/VoterTest.php#L69
+
+we could simply remove the string types in core: https://github.com/symfony/symfony/blob/73ce604b0c1a81d7e57d354c529d6e19ff6d867e/src/Symfony/Component/Security/Core/Authorization/Voter/Voter.php#L57-L67 as this contradicts with the actual type of $attributes (array, not string[]).
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T11:54:18Z
+
+Yes, I had misunderstood the meaning of your answer, I am in the process of making the modification for this case.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T11:57:44Z
+
+@ro0NL If we delete the type `string`, we break the voters implementing the method `supports(string $attribute, $subject)` :
+
+```php
+PHP Fatal error:  Declaration of Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTest_Voter::supports(string $attribute, $object): bool m
+ust be compatible with Symfony\Component\Security\Core\Authorization\Voter\Voter::supports($attribute, $subject) in E:\Git\php\symfony\symfony\src\Symfo
+ny\Component\Security\Core\Tests\Authorization\Voter\VoterTest.php on line 72
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-06-18T12:01:47Z
+
+Ah true. We could reflect e.g. `$attributeMustBeString`, or just catch the type error.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T12:06:37Z
+
+I just added the test concerning the use case of attributes with a type `object` but stringable (in rapport with [this comment](https://github.com/symfony/symfony/pull/37325#issuecomment-645875051)).
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T12:17:22Z
+
+@derrabus
+
+> Not necessarily, please see the second 3v4l link I posted.
+
+As I point out to @ro0NL, your example can break compatibility with Voters implementing the new signature (see [this comment](https://github.com/symfony/symfony/pull/37325#issuecomment-645969239)).
+
+However, thank you for your example concerning the fact that a stringable object can no longer be validated by a Voter when it was the case before my PR. I just add this use case.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-06-18T12:21:06Z
+
+There's still the second case: https://3v4l.org/MrcDq, where attributes are just objects (non stringable), or maybe someone uses ints. `array $attributes` implies `mixed $attribute`. It can be anything, depending on the voter removing the typehint yes/no.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T12:35:10Z
+
+@ro0NL Yes, but in this case, the Voter cannot extend the abstract class `Voter`, and so, the problem does not exist. Precisely the error arrives when you want to validate an attribute with `object` type which is not stringable, and that a Voter extend the abstract class `Voter`. When this Voter tries to check out if the attribute is supported or not, the error occurs just before because the object cannot be converted to a string with the auto convertion by the type of the `$attribute` argument in the `supports()` method.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-06-18T12:40:22Z
+
+Im not sure i follow now :confused:
+
+https://3v4l.org/MrcDq bool(true)
+with your patch https://3v4l.org/1Ef7n bool(false)
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T12:45:37Z
+
+I don't think it is advisable to remove the typing from the method `Voter::supports()` and to update the phpdoc to indicate that the `$attribute` argument is now of type `mixed`. As indicated, we risk breaking compatibility with the classes being the new signature of `Voter::supports()`. It is a helper class, it should keep for the majority cases, namely the use of a string for the attribute. Personally, I have no preference as to whether or not to keep strong typing on the method `Voter::supports()`, but I would like to know the opinion of each as well as the Core team, if possible.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T12:47:46Z
+
+> Im not sure i follow now 😕
+>
+> https://3v4l.org/MrcDq bool(true)
+> with your patch https://3v4l.org/1Ef7n bool(false)
+
+You remove the type of the `$attribute` argument on the `supports` method. See my previous comment.
+
+**Note:** However, your example is still valid, but if we remove the type in the abstract class, an error is thrown if the Voter use the new signature. It is for this reason that I chose to do a test before calling the method `supports()`.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T13:09:27Z
+
+> if we remove the type in the abstract class
+
+We cannot do this and nobody suggested to do this.
+
+Yet, the type can be removed by userland code when implementing the voter. That is a valid this to do in php and that is all that my second example shows. And since the type declaration wasn't there in Symfony 2/3/4, there are probably quite a few voter implementations out there that do not have the type declaration.
+
+Expecting an object (or anything but a string) at this point might not be an execution path that was intended, but it's one that currently works and that will be broken by the change you're suggesting. But I don't really know how to deal with it. It might even be okay to break it.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T13:11:49Z
+
+Yes, I was looking for a solution when we delete the type. However, I don't see how to check whether the typing is present or not on the instantiated class.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T13:15:14Z
+
+The problem arises when we want to call the method `isGranted()` with an attribute which is an instance of a non-stringable object, and it passes in all voters including voters extending the abstract class `Voter`.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T13:19:10Z
+
+> However, I don't see how to check whether the typing is present or not on the instantiated class.
+
+You you catch and parse the `TypeError` though. But we probably want to avoid that kind of dark magic if we can. 😎
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T13:22:05Z
+
+It's not a problem to add the méthode `__toString()` on the class that is used for the `attribute` argument when it is own code, but it's a problem with third-party libraries. Givent that the method `isGranted()` accepts attributes with a type `mixed`, we cannot just say that it is enough to break compatibility for the  Symfony 5.x, alas.
+
+> You you catch and parse the TypeError though. But we probably want to avoid that kind of dark magic if we can. 😎
+
+Totally agree with you, but I don't see any other more elegant solution.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T13:31:39Z
+
+I just modified the PR to use a try/catch for the TypeError, and added tests for the attributes of type `object stringable` and `integer` (so that removes the type of the `$attribute` argument in the final class).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-18T13:32:50Z
+
+Apart from `ExpressionVoter`, are there other bundles/projects using non-string attributes? I recently had a (private) talk about `ExpressionVoter` and I'm convinced it's not necessarily correct, so we can/should change it. If there are no good use-cases for non-string attributes, I think it's good to consider deprecating non-string attributes.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2020-06-18T14:20:56Z
+
+@wouterj how would you implement the `ExpressionVoter` without allowing non-string attributes ?
+
+I'm all in favor of restricting what we can use as attributes but I'm not sure it's a reasonable move.
+
+Another thing to take into account is that PHP will probably add support for enums at some points and people will want to use enums as attributes.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-18T14:25:38Z
+
+Let's not take PHP enums into consideration. First of all, it'll take a while before it will be added (it's already discussed for many years). Secondly, as everyone is now migrating to strict typed code bases, they will need to provide compatibility with current day strict typing for enums (e.g. an enum of strings should be able to be passed to a `string` type check).
+
+About `ExpressionVoter`: I don't think it should be a voter. The only use-case is in `access_control`. In other cases, it's much better to just write plain PHP logic instead of using the expression language. Anyways, let's not hijack this ticket with proposed changes in something else - I'll create a PR once I have some time to work on it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-18T14:32:30Z
+
+> Another thing to take into account is that PHP will probably add support for enums at some points and people will want to use enums as attributes.
+
+That's a change we can hardly anticipate right now, can we? There are however libraries like `myclabs/php-enum` that emulate enums in php. They should work already because the enum instances are stringable.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2020-06-18T15:27:19Z
+
+@wouterj. I aggree with you, but for the moment, it is necessary to fix the bug, and depreciate or not for version 5.2 and prohibit the use of a non-string attribute in version 6.0, if we decide to take this direction.
+
+Personally I have a use case which led me to do it like voting `ExpressionVoter` when I used a string attribute before.
+
+**Example 1:**
+
+In my case, I use several voters including one which allows to validate permissions according to the subject. This subject can very well be a string (name of the class), an instance of a class, or an instance of a `FieldVote` class containing the name of the field and the instance or name of the class. In any case, we do have an authorization attribute and a subject.
+
+In attribute, I used a permission name in the same style as the `RoleVoter`, namely, the role name in uppercase prefixed with `ROLE_`. This scenario is "natural" because the name of the role has always been formed with the `ROLE_` prefix. However, for my `PermissionVoter`, I must indicate the name of the permission as an attribute. This gave for the`update` and `edit` permissions:
+
+```php
+// Check the authorization on the object
+$authorizationChecker->isGranted('perm_update', $entity);
+$authorizationChecker->isGranted('perm_update', PostInterface::class);
+
+// Check the authorization on the field of object
+$authorizationChecker->isGranted('perm_edit', new FieldVote($entity, 'title'));
+$authorizationChecker->isGranted('perm_edit', new FieldVote(PostInterface::class, 'title'));
+```
+
+As you can see, it is not "natural" for a user to have to do magic by prefixing the name of the permission with: `permission_`, `perm_`, `permission:`, `perm:`, `PERMISSION_`, `PERM_`, `PERMISSION:`, `PERM:`, `permission/`, `permission@`, etc... or any other symbol to separate.
+
+Of course, I could use an array of the style `['permission', 'update']` or any other style, but you see the problem, it's easy to make a mistake. Also, using simply the permission name as an attribute can behave unexpectedly with other Voters.
+
+Using the example below is much more meaningful and logical, while being certain of the expected behavior:
+
+```php
+// Check the authorization on the object
+$authorizationChecker->isGranted(new PermissionVote('update'), $entity);
+$authorizationChecker->isGranted(new PermissionVote('update'), PostInterface::class);
+
+// Check the authorization on the field of object
+$authorizationChecker->isGranted(new PermissionVote('edit'), new FieldVote($entity, 'title'));
+$authorizationChecker->isGranted(new PermissionVote('edit'), new FieldVote(PostInterface::class, 'title'));
+```
+
+You can see the old version of the component using the prefix `perm_` as attribute in [this bundle](https://github.com/fxpio/fxp-security-bundle/blob/master/Resources/doc/permissions.md) (the new version is not yet open source).
+
+The fact of define the permission in the attribute and leaving the subject to the `$subject` attribute that we want to validate, goes according to the logic initially planned by the Security component. However, we could have put an attribute of type `string` like for example `permission` and created a configurable object to include the name of the permission and the subject. But you find that it becomes an unintuitive hack by doing in this way, while not making it easier to use.
+
+Of course, it is possible to make the class `PermissionVote` stringable, which I just did to avoid the error with the current version of Symfony, but this is a workaround compared to the current documentation of the method `AuthorizationChecker::isGranted()`.
+
+**Example 2:**
+
+There is also another reason to use something other than an attribute string. This time, it's with a component validating Oauth2 scopes. The Voter waits in attribute for an instance of the class `ScopeVoter` which can be configurable, and no subject, because subject, is always the authenticated user.
+
+The class `ScopeVote` can have a string or a list of string in its constructor which are the required Oauth2 scopes. It also has an option to validate if at least one scope is in the list or if all scopes are required for the subject tested.
+
+You will therefore understand that there is still a possibility of unexpected behavior if we put in attribute, only the name of the scope without prefix like `scope_`, and it would also not be logical to put the "configuration" of the check with the subject tested in the `$subject` argument, that would be contrary to the original logic.
+
+```php
+// Check if the current user is authorized to read a Post with a his Oauth2 scopes
+$authorizationChecker->isGranted(new ScopeVote(['post', 'post.readonly'], false));
+// Check if the current user is authorized to manage a Post with a his Oauth2 scopes
+$authorizationChecker->isGranted(new ScopeVote('post'));
+```
+
+> **Note:**
+> - `post` scope is to manage the Post entity (read, create, update, delete, etc)
+> - `post.readonly` scope is to read only Post
+> - The second argument of the `ScopeVote` class is to check if all the scopes listed are required, by default, this value is `true`
+
+Another problem if we use a string instead of an instance of an object, it is likely easier that another Voter can validate the attribute and the subject when it was not intended for him. With an object, we can be certain that we reach the correct Voter which checks if the instance of the attribute is compatible, while making the code more readable and understandable. And as I said, put a `permission` string in attribute (or `scope` string in attribute), and in subject, an instance for the configuration and the subject does not correspond to the initial logic of the component. And using an array for the attribute will make the code more difficult to understand, in contrast to the class.
+
+For example, it is more complicated to have:
+
+```php
+$authorizationChecker->isGranted('permission', new PermissionVote('edit', new FieldVote(PostInterface::class, 'title')));
+$authorizationChecker->isGranted('scope', new ScopeVote('post'));
+```
+
+that:
+
+```php
+$authorizationChecker->isGranted(new PermissionVote('edit'), new FieldVote(PostInterface::class, 'title'));
+$authorizationChecker->isGranted(new ScopeVote('post'));
+```
+
+Regarding strict typing, I agree with you, and it is also for this reason that I used classes as an attribute, knowing that the documentation of Symfony authorized it. Of course, we can very well decide to deprecate the use of non-string attribute, but I think it would be more appropriate to allow at least stringable objects.
+
+This comment is very long, and I hope I have been understandable enough with my English and the wish to be as brief as possible, but it is ultimately quite difficult :-).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-18T17:22:03Z
+
+> @wouterj. I aggree with you, but for the moment, it is necessary to fix the bug, and depreciate or not for version 5.2 and prohibit the use of a non-string attribute in version 6.0, if we decide to take this direction.
+
+Yes, agreed. But I think the bug can be fixed a bit more "hacky" if we know we can clean it up in 6.0 :)
+
+Thanks for your interesting insights! I need some time to process all the information - I'll follow-up with an RFC issue. Let's finish this bug report - as I agree that a bug has been introduced.

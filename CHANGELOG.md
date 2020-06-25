@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+# 2.0.1 (2020-06-25)
+
+  * Don't normalize query string in PsrHttpFactory
+  * Fix conversion for HTTPS requests
+  * Fix populating default port and headers in HttpFoundationFactory
+
 # 2.0.0 (2020-01-02)
 
   * Remove DiactorosFactory

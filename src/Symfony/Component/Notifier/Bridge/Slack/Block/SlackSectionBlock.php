@@ -39,15 +39,14 @@ final class SlackSectionBlock extends AbstractSlackBlock
      */
     public function field(string $text, bool $markdown = true): self
     {
+        if (10 === \count($this->options['fields'])) {
+            throw new \LogicException('Maximum number of fields should not exceed 10.');
+        }
+
         $this->options['fields'][] = [
             'type' => $markdown ? 'mrkdwn' : 'plain_text',
             'text' => $text,
         ];
-
-        // Maximum number of items is 10
-        if (10 <= \count($this->options['fields'])) {
-            throw new \LogicException('Maximum number of fields should not exceed 10.');
-        }
 
         return $this;
     }

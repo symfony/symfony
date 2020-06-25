@@ -31,11 +31,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -107,20 +105,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
-        $phpLoader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-
-        $phpLoader->load('security.php');
-        $phpLoader->load('security_listeners.php');
-        $phpLoader->load('security_rememberme.php');
+        $loader->load('security.php');
+        $loader->load('security_listeners.php');
+        $loader->load('security_rememberme.php');
 
         if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
             if ($config['always_authenticate_before_granting']) {
                 throw new InvalidConfigurationException('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
             }
 
-            $phpLoader->load('security_authenticator.php');
+            $loader->load('security_authenticator.php');
 
             // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
             // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
@@ -129,18 +125,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->getDefinition('security.authorization_checker')->setArgument(4, false);
             $container->getDefinition('security.authorization_checker')->setArgument(5, false);
         } else {
-            $phpLoader->load('security_legacy.php');
+            $loader->load('security_legacy.php');
         }
 
         if (class_exists(AbstractExtension::class)) {
-            $phpLoader->load('templating_twig.php');
+            $loader->load('templating_twig.php');
         }
 
-        $phpLoader->load('collectors.php');
-        $phpLoader->load('guard.php');
+        $loader->load('collectors.php');
+        $loader->load('guard.php');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $phpLoader->load('security_debug.php');
+            $loader->load('security_debug.php');
         }
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
@@ -178,7 +174,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if (class_exists(Application::class)) {
-            $phpLoader->load('console.php');
+            $loader->load('console.php');
             $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
         }
 

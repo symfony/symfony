@@ -9,6 +9,11 @@ services:
         tags:
             - { name: form.type }
 
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController:
+        public: true
+        tags:
+            - { name: container.service_subscriber }
+
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext

@@ -11,6 +11,11 @@ Mime
 
  * Deprecated `Address::fromString()`, use `Address::create()` instead
 
+TwigBundle
+----------
+
+ * Deprecated the public `twig` service to private.
+
 Validator
 ---------
 

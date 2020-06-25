@@ -8,3 +8,8 @@ framework:
 
 twig:
     strict_variables: '%kernel.debug%'
+
+services:
+    twig.alias:
+        alias: twig
+        public: true

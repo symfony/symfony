@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2020-06-25T07:40:11Z
+
+@derrabus Hey, I tried but I don't know if I can easily simulate a master-slave connection with read-only slaves easily with the CI. If you have any clue on how to proceed, I'd be happy to do it!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-25T08:23:41Z
+
+:thinking: I don't have a good idea either.

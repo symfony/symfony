@@ -49,7 +49,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
         if ($uri instanceof UriInterface) {
             $server['SERVER_NAME'] = $uri->getHost();
-            $server['SERVER_PORT'] = $uri->getPort();
+            $server['SERVER_PORT'] = $uri->getPort() ?: ('https' === $uri->getScheme() ? 443 : 80);
             $server['REQUEST_URI'] = $uri->getPath();
             $server['QUERY_STRING'] = $uri->getQuery();
 
@@ -74,7 +74,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $server,
             $streamed ? $psrRequest->getBody()->detach() : $psrRequest->getBody()->__toString()
         );
-        $request->headers->replace($psrRequest->getHeaders());
+        $request->headers->add($psrRequest->getHeaders());
 
         return $request;
     }

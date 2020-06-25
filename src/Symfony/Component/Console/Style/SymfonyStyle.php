@@ -166,6 +166,14 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
+    public function info($message)
+    {
+        $this->block($message, 'INFO', 'fg=green', ' ', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function caution($message)
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);

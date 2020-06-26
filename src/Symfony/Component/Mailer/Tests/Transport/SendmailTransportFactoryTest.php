@@ -38,6 +38,11 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('sendmail+smtp', 'default'),
             new SendmailTransport(null, $this->getDispatcher(), $this->getLogger()),
         ];
+
+        yield [
+            new Dsn('sendmail+smtp', 'default', null, null, null, ['command' => '/usr/sbin/sendmail -oi -t']),
+            new SendmailTransport('/usr/sbin/sendmail -oi -t', $this->getDispatcher(), $this->getLogger()),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable

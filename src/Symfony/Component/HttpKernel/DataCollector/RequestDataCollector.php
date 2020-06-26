@@ -95,7 +95,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $this->data = [
             'method' => $request->getMethod(),
             'format' => $request->getRequestFormat(),
-            'content' => $content,
             'content_type' => $response->headers->get('Content-Type', 'text/html'),
             'status_text' => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
             'status_code' => $statusCode,
@@ -129,8 +128,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         if (isset($this->data['request_request']['_password'])) {
+            $encodedPassword = rawurlencode($this->data['request_request']['_password']);
+            $content = str_replace('_password='.$encodedPassword, '_password=******', $content);
             $this->data['request_request']['_password'] = '******';
         }
+
+        $this->data['content'] = $content;
 
         foreach ($this->data as $key => $value) {
             if (!\is_array($value)) {

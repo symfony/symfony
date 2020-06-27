@@ -300,7 +300,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooBarService()
     {
-        return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+        $this->factories['foo_bar'] = function () {
+            return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+        };
+
+        return $this->factories['foo_bar']();
     }
 
     /**
@@ -398,7 +402,11 @@ class ProjectServiceContainer extends Container
     {
         include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
 
-        return new \Bar\FooClass();
+        $this->factories['non_shared_foo'] = function () {
+            return new \Bar\FooClass();
+        };
+
+        return $this->factories['non_shared_foo']();
     }
 
     /**

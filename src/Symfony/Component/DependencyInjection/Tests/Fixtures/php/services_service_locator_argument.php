@@ -107,7 +107,11 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected function getFoo3Service()
     {
-        return new \stdClass();
+        $this->factories['service_container']['foo3'] = function () {
+            return new \stdClass();
+        };
+
+        return $this->factories['service_container']['foo3']();
     }
 
     /**

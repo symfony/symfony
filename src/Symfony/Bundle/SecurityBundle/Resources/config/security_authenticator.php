@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
+use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
@@ -98,6 +99,17 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        ->set('security.listener.login_throttling', LoginThrottlingListener::class)
+            ->abstract()
+            ->args([
+                service('request_stack'),
+                inline_service('cache.security.locked_sessions')
+                    ->parent('cache.system')
+                    ->tag('cache.pool'),
+                abstract_arg('threshold'),
+                abstract_arg('timeout'),
+            ])
 
         // Authenticators
         ->set('security.authenticator.http_basic', HttpBasicAuthenticator::class)

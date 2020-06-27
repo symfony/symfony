@@ -5,6 +5,9 @@ CHANGELOG
 -----
 
  * Added attributes on ``Passport``
+ * Added `LoginThrottlingBadge` and listener
+ * Marked `Http\CheckPassportEvent`, `Http\LoginFailureEvent` and `Http\LoginSuccessEvent` as `@final`
+ * [BC break] Added `?PassportInterface $passport` as 3rd argument in `Http\LoginFailureEvent`
 
 5.1.0
 -----

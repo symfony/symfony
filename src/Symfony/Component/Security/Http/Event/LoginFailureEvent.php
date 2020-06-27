@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -15,19 +16,23 @@ use Symfony\Contracts\EventDispatcher\Event;
  * failure (e.g. to implement login throttling).
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @final
  */
 class LoginFailureEvent extends Event
 {
     private $exception;
     private $authenticator;
+    private $passport;
     private $request;
     private $response;
     private $firewallName;
 
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName)
+    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, ?PassportInterface $passport, Request $request, ?Response $response, string $firewallName)
     {
         $this->exception = $exception;
         $this->authenticator = $authenticator;
+        $this->passport = $passport;
         $this->request = $request;
         $this->response = $response;
         $this->firewallName = $firewallName;
@@ -41,6 +46,11 @@ class LoginFailureEvent extends Event
     public function getAuthenticator(): AuthenticatorInterface
     {
         return $this->authenticator;
+    }
+
+    public function getPassport(): ?PassportInterface
+    {
+        return $this->passport;
     }
 
     public function getFirewallName(): string

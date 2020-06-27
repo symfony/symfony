@@ -23,6 +23,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * user checking)
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @final
  */
 class CheckPassportEvent extends Event
 {

@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\LoginThrottlingBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -85,7 +86,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
         }
 
-        $passport = new Passport($user, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
+        $passport = new Passport($user, new PasswordCredentials($credentials['password']), [new RememberMeBadge(), new LoginThrottlingBadge($credentials['username'])]);
         if ($this->options['enable_csrf']) {
             $passport->addBadge(new CsrfTokenBadge($this->options['csrf_token_id'], $credentials['csrf_token']));
         }

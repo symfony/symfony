@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
+
 class FormLoginTest extends AbstractWebTestCase
 {
     /**
@@ -104,6 +106,28 @@ class FormLoginTest extends AbstractWebTestCase
         $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
+    }
+
+    public function testLoginThrottling()
+    {
+        if (!class_exists(LoginThrottlingListener::class)) {
+            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
+        }
+
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'wrong';
+        $client->submit($form);
+
+        $client->followRedirect()->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'wrong';
+        $client->submit($form);
+
+        $text = $client->followRedirect()->text(null, true);
+        $this->assertStringContainsString('Too many failed login attempts, please try again in 10 minutes.', $text);
     }
 
     public function provideClientOptions()

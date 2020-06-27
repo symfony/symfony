@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\LoginThrottlingBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -92,7 +93,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
         }
 
-        $passport = new Passport($user, new PasswordCredentials($credentials['password']));
+        $passport = new Passport($user, new PasswordCredentials($credentials['password']), [new LoginThrottlingBadge($credentials['username'])]);
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($credentials['password'], $this->userProvider));
         }

@@ -21,6 +21,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * (such as migrating the password).
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @final
  */
 class LoginSuccessEvent extends Event
 {

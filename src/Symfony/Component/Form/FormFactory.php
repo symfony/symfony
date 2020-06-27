@@ -62,6 +62,11 @@ class FormFactory implements FormFactoryInterface
         }
 
         $type = $this->registry->getType($type);
+        $dataClass = isset($options['data_class']) ? $options['data_class'] : null;
+
+        if ($options['guess_options'] ?? false && null !== $dataClass && null !== $guesser = $this->registry->getTypeGuesser()) {
+            $options = $options + $this->guessOptions($guesser, $dataClass, $name, $options);
+        }
 
         $builder = $type->createBuilder($this, (string) $name, $options);
 
@@ -82,11 +87,30 @@ class FormFactory implements FormFactoryInterface
         }
 
         $typeGuess = $guesser->guessType($class, $property);
+
+        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
+
+        $options = $this->guessOptions($guesser, $class, $property, $options);
+
+        // user options may override guessed options
+        if ($typeGuess) {
+            $attrs = [];
+            $typeGuessOptions = $typeGuess->getOptions();
+            if (isset($typeGuessOptions['attr']) && isset($options['attr'])) {
+                $attrs = ['attr' => array_merge($typeGuessOptions['attr'], $options['attr'])];
+            }
+
+            $options = array_merge($typeGuessOptions, $options, $attrs);
+        }
+
+        return $this->createNamedBuilder($property, $type, $data, $options);
+    }
+
+    private function guessOptions(FormTypeGuesserInterface $guesser, string $class, string $property, array $options = []): array
+    {
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
-
-        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $pattern = $patternGuess ? $patternGuess->getValue() : null;
@@ -103,17 +127,6 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge(['required' => $requiredGuess->getValue()], $options);
         }
 
-        // user options may override guessed options
-        if ($typeGuess) {
-            $attrs = [];
-            $typeGuessOptions = $typeGuess->getOptions();
-            if (isset($typeGuessOptions['attr']) && isset($options['attr'])) {
-                $attrs = ['attr' => array_merge($typeGuessOptions['attr'], $options['attr'])];
-            }
-
-            $options = array_merge($typeGuessOptions, $options, $attrs);
-        }
-
-        return $this->createNamedBuilder($property, $type, $data, $options);
+        return $options;
     }
 }

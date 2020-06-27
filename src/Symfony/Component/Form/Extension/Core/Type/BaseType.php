@@ -125,6 +125,7 @@ abstract class BaseType extends AbstractType
             'block_name' => null,
             'block_prefix' => null,
             'disabled' => false,
+            'guess_options' => false,
             'label' => null,
             'label_format' => null,
             'row_attr' => [],
@@ -140,5 +141,6 @@ abstract class BaseType extends AbstractType
         $resolver->setAllowedTypes('attr', 'array');
         $resolver->setAllowedTypes('row_attr', 'array');
         $resolver->setAllowedTypes('label_html', 'bool');
+        $resolver->setAllowedTypes('guess_options', 'bool');
     }
 }

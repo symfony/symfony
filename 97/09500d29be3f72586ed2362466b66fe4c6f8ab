@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by gennadigennadigennadi at 2020-06-25T19:28:46Z
+
+I am not 100% sure if adding 9_3 is right or if it would be enough to just edit CommandForV9.
+I am looking forward to your feedback.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-28T11:56:07Z
+
+> I am not 100% sure if adding 9_3 is right or if it would be enough to just edit CommandForV9.
+
+I think editing the existing class would be good enough:
+`use PHPUnit\TextUI\Configuration\Configuration as LegacyConfiguration;` + a `class_exists()` check for the new class should be OK.

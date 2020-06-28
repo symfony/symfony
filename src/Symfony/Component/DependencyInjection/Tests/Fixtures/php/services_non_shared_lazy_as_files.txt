@@ -30,7 +30,11 @@ class getNonSharedFooService extends ProjectServiceContainer
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
-        return new \Bar\FooLazyClass();
+        $container->factories['non_shared_foo'] = function ($lazyLoad = true) {
+            return new \Bar\FooLazyClass();
+        };
+
+        return $container->factories['non_shared_foo']();
     }
 }
 

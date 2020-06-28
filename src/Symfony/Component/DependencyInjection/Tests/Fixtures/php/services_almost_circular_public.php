@@ -287,11 +287,15 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getFoo4Service()
     {
-        $instance = new \stdClass();
+        $this->factories['foo4'] = function () {
+            $instance = new \stdClass();
 
-        $instance->foobar = ($this->services['foobar4'] ?? $this->getFoobar4Service());
+            $instance->foobar = ($this->services['foobar4'] ?? $this->getFoobar4Service());
 
-        return $instance;
+            return $instance;
+        };
+
+        return $this->factories['foo4']();
     }
 
     /**

@@ -864,13 +864,23 @@ EOF;
             }
 
             if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-                $factoryCode = $asFile ? "\$this->load('%s', false)" : '$this->%s(false)';
-                $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
+                $factoryCode = $definition->isShared() ? ($asFile ? "\$this->load('%s', false)" : '$this->%s(false)') : '$this->factories[%2$s](false)';
+                $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
                 $code .= $asFile ? preg_replace('/function \(([^)]*+)\) {/', 'function (\1) use ($container) {', $factoryCode) : $factoryCode;
             }
 
             $code .= $this->addServiceInclude($id, $definition);
-            $code .= $this->addInlineService($id, $definition);
+            $c = $this->addInlineService($id, $definition);
+
+            if (!$definition->isShared()) {
+                $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
+                $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
+                $lazyloadInitialization = $definition->isLazy() ? '$lazyLoad = true' : '';
+
+                $c = sprintf("        %s = function (%s) {\n%s        };\n\n        return %1\$s();\n", $factory, $lazyloadInitialization, $c);
+            }
+
+            $code .= $c;
         }
 
         if ($asFile) {
@@ -1880,10 +1890,14 @@ EOF;
                     $code = sprintf('$this->%s[%s] = %s', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
                 }
                 $code = "($code)";
-            } elseif ($this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition)) {
-                $code = sprintf("\$this->load('%s')", $this->generateMethodName($id));
             } else {
-                $code = sprintf('$this->%s()', $this->generateMethodName($id));
+                $code = $this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition) ? "\$this->load('%s')" : '$this->%s()';
+                $code = sprintf($code, $this->generateMethodName($id));
+
+                if (!$definition->isShared()) {
+                    $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
+                    $code = sprintf('(isset(%s) ? %1$s() : %s)', $factory, $code);
+                }
             }
             if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
                 $code = sprintf('($this->%s[%s] ?? %s)', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);

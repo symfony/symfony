@@ -275,7 +275,11 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      */
     protected function getFooBarService()
     {
-        return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+        $this->factories['foo_bar'] = function () {
+            return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+        };
+
+        return $this->factories['foo_bar']();
     }
 
     /**

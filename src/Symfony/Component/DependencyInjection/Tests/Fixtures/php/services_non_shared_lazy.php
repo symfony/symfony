@@ -57,7 +57,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = new \stdClass($this->getFooService());
+        return $this->services['bar'] = new \stdClass((isset($this->factories['service_container']['foo']) ? $this->factories['service_container']['foo']() : $this->getFooService()));
     }
 
     /**
@@ -69,7 +69,11 @@ class ProjectServiceContainer extends Container
     {
         // lazy factory for stdClass
 
-        return new \stdClass();
+        $this->factories['service_container']['foo'] = function ($lazyLoad = true) {
+            return new \stdClass();
+        };
+
+        return $this->factories['service_container']['foo']();
     }
 }
 

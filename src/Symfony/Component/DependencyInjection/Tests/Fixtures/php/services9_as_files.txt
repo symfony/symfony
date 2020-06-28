@@ -402,7 +402,11 @@ class getFooBarService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return new \Bar\FooClass(($container->services['deprecated_service'] ?? $container->load('getDeprecatedServiceService')));
+        $container->factories['foo_bar'] = function () use ($container) {
+            return new \Bar\FooClass(($container->services['deprecated_service'] ?? $container->load('getDeprecatedServiceService')));
+        };
+
+        return $container->factories['foo_bar']();
     }
 }
 
@@ -574,7 +578,11 @@ class getNonSharedFooService extends ProjectServiceContainer
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-        return new \Bar\FooClass();
+        $container->factories['non_shared_foo'] = function () use ($container) {
+            return new \Bar\FooClass();
+        };
+
+        return $container->factories['non_shared_foo']();
     }
 }
 

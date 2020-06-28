@@ -164,7 +164,9 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats an info message.
+     *
+     * @param string|array $message
      */
     public function info($message)
     {

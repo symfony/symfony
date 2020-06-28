@@ -14,7 +14,7 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
-use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Command\LockableInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -43,7 +43,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\Lock\Lock;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -64,8 +63,6 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Application implements ResetInterface
 {
-    use LockableTrait;
-
     private $commands = [];
     private $wantHelps = false;
     private $runningCommand;
@@ -928,10 +925,10 @@ class Application implements ResetInterface
         $e = null;
 
         try {
-            if (class_exists(Lock::class) && \in_array(LockableTrait::class, class_uses($command))) {
+            if ($command instanceof LockableInterface) {
                 $command->getDefinition()->addOption(new InputOption('--skip-lock', '', InputOption::VALUE_NONE, 'Skip checking for and setting a lock'));
 
-                if (false === $input->hasParameterOption(['--skip-lock'], true) && false === $this->lock($command->getName().'_symfony')) {
+                if (false === $input->hasParameterOption(['--skip-lock'], true) && false === $command->lock($command->getName().'_symfony')) {
                     throw new RuntimeException(sprintf('Failed acquiring lock! Is another instance of "%s" running?', $command->getName()));
                 }
             }
@@ -958,6 +955,10 @@ class Application implements ResetInterface
 
         if (null !== $e) {
             throw $e;
+        }
+
+        if ($command instanceof LockableInterface) {
+            $command->release();
         }
 
         return $event->getExitCode();

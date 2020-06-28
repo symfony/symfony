@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-28T11:28:16Z
+
+This won't help: 5.1.1 will remain installable.
+But we *can* remove the `void` return type in 5.1 - that's not a BC break.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-06-28T11:37:39Z
+
+> This won't help: 5.1.1 will remain installable.
+
+Right. I'd suggest to add conflict rules to notifier 5.2 that prevent the installation of 5.1 bridges. That should do the trick.
+
+> But we *can* remove the `void` return type in 5.1 - that's not a BC break.
+
+That won't change anything. Even without the return type, a 5.1 bridge would be incompatible because Notifier 5.2 defines a return type that cannot be removed in a child class.

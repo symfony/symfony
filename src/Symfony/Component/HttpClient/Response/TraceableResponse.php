@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @internal
  */
-class TraceableResponse implements ResponseInterface
+class TraceableResponse implements ResponseInterface, StreamableInterface
 {
     private $client;
     private $response;
@@ -99,7 +99,7 @@ class TraceableResponse implements ResponseInterface
             $this->response->getHeaders(true);
         }
 
-        if (\is_callable([$this->response, 'toStream'])) {
+        if ($this->response instanceof StreamableInterface) {
             return $this->response->toStream(false);
         }
 

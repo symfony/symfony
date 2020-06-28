@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class AsyncResponse implements ResponseInterface
+final class AsyncResponse implements ResponseInterface, StreamableInterface
 {
     use CommonResponseTrait;
 
@@ -95,7 +95,7 @@ final class AsyncResponse implements ResponseInterface
         }
 
         $handle = function () {
-            $stream = StreamWrapper::createResource($this->response);
+            $stream = $this->response instanceof StreamableInterface ? $this->response->toStream(false) : StreamWrapper::createResource($this->response);
 
             return stream_get_meta_data($stream)['wrapper_data']->stream_cast(STREAM_CAST_FOR_SELECT);
         };

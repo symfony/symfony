@@ -30,7 +30,7 @@ trait LockableTrait
     /**
      * Locks a command.
      */
-    private function lock(string $name = null, bool $blocking = false): bool
+    public function lock(string $name = null, bool $blocking = false): bool
     {
         if (!class_exists(SemaphoreStore::class)) {
             throw new LogicException('To enable the locking feature you must install the symfony/lock component.');
@@ -59,7 +59,7 @@ trait LockableTrait
     /**
      * Releases the command lock if there is one.
      */
-    private function release()
+    public function release()
     {
         if ($this->lock) {
             $this->lock->release();

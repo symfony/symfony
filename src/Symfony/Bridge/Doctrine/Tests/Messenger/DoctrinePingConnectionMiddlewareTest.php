@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
@@ -47,8 +48,8 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
     public function testMiddlewarePingOk()
     {
         $this->connection->expects($this->once())
-            ->method('ping')
-            ->willReturn(false);
+            ->method('getDatabasePlatform')
+            ->will($this->throwException(new DBALException()));
 
         $this->connection->expects($this->once())
             ->method('close')
@@ -65,6 +66,10 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingResetEntityManager()
     {
+        $this->connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->throwException(new DBALException()));
+
         $this->entityManager->expects($this->once())
             ->method('isOpen')
             ->willReturn(false)

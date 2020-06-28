@@ -137,7 +137,7 @@ class Connection implements ResetInterface
                 'available_at' => '?',
             ]);
 
-        $this->executeQuery($queryBuilder->getSQL(), [
+        $this->executeUpdate($queryBuilder->getSQL(), [
             $body,
             json_encode($headers),
             $this->configuration['queue_name'],
@@ -194,7 +194,7 @@ class Connection implements ResetInterface
                 ->set('delivered_at', '?')
                 ->where('id = ?');
             $now = new \DateTime();
-            $this->executeQuery($queryBuilder->getSQL(), [
+            $this->executeUpdate($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
             ], [
@@ -364,6 +364,25 @@ class Connection implements ResetInterface
                 $this->setup();
             }
             $stmt = $this->driverConnection->executeQuery($sql, $parameters, $types);
+        }
+
+        return $stmt;
+    }
+
+    private function executeUpdate(string $sql, array $parameters = [], array $types = [])
+    {
+        try {
+            $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
+        } catch (TableNotFoundException $e) {
+            if ($this->driverConnection->isTransactionActive()) {
+                throw $e;
+            }
+
+            // create table
+            if ($this->autoSetup) {
+                $this->setup();
+            }
+            $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
         }
 
         return $stmt;

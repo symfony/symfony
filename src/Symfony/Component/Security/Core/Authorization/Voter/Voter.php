@@ -30,8 +30,21 @@ abstract class Voter implements VoterInterface
         $vote = self::ACCESS_ABSTAIN;
 
         foreach ($attributes as $attribute) {
-            if (!$this->supports($attribute, $subject)) {
-                continue;
+            try {
+                if (!$this->supports($attribute, $subject)) {
+                    continue;
+                }
+            } catch (\TypeError $e) {
+                if (\PHP_VERSION_ID < 80000) {
+                    if (0 === strpos($e->getMessage(), 'Argument 1 passed to')
+                        && false !== strpos($e->getMessage(), '::supports() must be of the type string')) {
+                        continue;
+                    }
+                } elseif (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
+                    continue;
+                }
+
+                throw $e;
             }
 
             // as soon as at least one attribute is supported, default is to deny access

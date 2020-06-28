@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-18T19:03:22Z
+
+Thank you for telling us about this.
+Could you please target branch 3.4 and add a test case also?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-23T05:03:15Z
+
+Any news? fabbot has also some fixes for you.
+
+---------------------------------------------------------------------------
+
+by juanmrad at 2020-06-23T14:44:58Z
+
+@nicolas-grekas I tried changing the base, but looks like 3.4 does not have that file. I'll be creating some test cases today and apply patches from fabbot as mentioned by @fabpot
+
+---------------------------------------------------------------------------
+
+by juanmrad at 2020-06-23T14:50:09Z
+
+NVM realized it is just on another place. I'll be doing the change in a bit.
+
+---------------------------------------------------------------------------
+
+by juanmrad at 2020-06-23T18:07:58Z
+
+@nicolas-grekas I have encountered 2 issues with my PR and would like to ask for suggestions.
+on PHP 5.6 there is an issue that docx and xml files are actually reported as application/zip as they are not being recognized.
+And looks like TravisCi is not running php 7.4 where this issue is present.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-23T18:14:10Z
+
+I'd suggest skipping the test on PHP5 by adding an `@requires PHP 7 annotation on the test case.
+PHP 7.4 runs on the deps=low job.
+
+---------------------------------------------------------------------------
+
+by juanmrad at 2020-06-24T21:03:34Z
+
+@nicolas-grekas Done thanks :).

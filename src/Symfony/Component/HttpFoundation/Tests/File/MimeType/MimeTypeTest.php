@@ -61,6 +61,11 @@ class MimeTypeTest extends TestCase
         $this->assertEquals('application/octet-stream', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/.unknownextension'));
     }
 
+    public function testGuessWithDuplicatedFileType()
+    {
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.wordprocessingml.document', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.docx'));
+    }
+
     public function testGuessWithIncorrectPath()
     {
         $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');

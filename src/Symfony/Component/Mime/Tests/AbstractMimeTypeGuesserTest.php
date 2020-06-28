@@ -79,6 +79,11 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         $this->assertEquals('application/octet-stream', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/.unknownextension'));
     }
 
+    public function testGuessWithDuplicatedFileType()
+    {
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/test.docx'));
+    }
+
     public function testGuessWithIncorrectPath()
     {
         if (!$this->getGuesser()->isGuesserSupported()) {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 
 class JsonManifestVersionStrategyTest extends TestCase
@@ -39,19 +40,24 @@ class JsonManifestVersionStrategyTest extends TestCase
 
     public function testMissingManifestFileThrowsException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(RuntimeException::class);
         $strategy = $this->createStrategy('non-existent-file.json');
         $strategy->getVersion('main.js');
     }
 
     public function testManifestFileWithBadJSONThrowsException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error parsing JSON');
         $strategy = $this->createStrategy('manifest-invalid.json');
         $strategy->getVersion('main.js');
     }
 
+    /**
+     * @param string $manifestFilename File name in the fixtures directory
+     *
+     * @return JsonManifestVersionStrategy
+     */
     private function createStrategy($manifestFilename)
     {
         return new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestFilename);

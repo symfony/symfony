@@ -35,7 +35,14 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class UrlPackage extends Package
 {
+    /**
+     * @var string[]
+     */
     private $baseUrls = [];
+
+    /**
+     * @var self|null Package with only SSL URLs
+     */
     private $sslPackage;
 
     /**
@@ -85,7 +92,7 @@ class UrlPackage extends Package
             return $url;
         }
 
-        if ($url && '/' != $url[0]) {
+        if ($url && '/' !== $url[0]) {
             $url = '/'.$url;
         }
 
@@ -123,6 +130,11 @@ class UrlPackage extends Package
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), \count($this->baseUrls));
     }
 
+    /**
+     * @param string[] $urls Base assets URLs
+     *
+     * @return string[] Filtered URLs with SSL
+     */
     private function getSslUrls($urls)
     {
         $sslUrls = [];

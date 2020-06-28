@@ -11,14 +11,22 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class PathPackageTest extends TestCase
 {
     /**
      * @dataProvider getConfigs
+     *
+     * @param string $basePath
+     * @param string $format
+     * @param string $path
+     * @param string $expected
      */
     public function testGetUrl($basePath, $format, $path, $expected)
     {
@@ -26,6 +34,9 @@ class PathPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
+    /**
+     * @return array[]
+     */
     public function getConfigs()
     {
         return [
@@ -50,6 +61,12 @@ class PathPackageTest extends TestCase
 
     /**
      * @dataProvider getContextConfigs
+     *
+     * @param string $basePathRequest
+     * @param string $basePath
+     * @param string $format
+     * @param string $path
+     * @param string $expected
      */
     public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
     {
@@ -58,6 +75,9 @@ class PathPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
+    /**
+     * @return array[]
+     */
     public function getContextConfigs()
     {
         return [
@@ -77,7 +97,7 @@ class PathPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->getMockBuilder('Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface')->getMock();
+        $versionStrategy = $this->getMockBuilder(VersionStrategyInterface::class)->getMock();
         $versionStrategy->expects($this->any())
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
@@ -86,9 +106,14 @@ class PathPackageTest extends TestCase
         $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
+    /**
+     * @param string $basePath
+     *
+     * @return MockObject&ContextInterface
+     */
     private function getContext($basePath)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Asset\Context\ContextInterface')->getMock();
+        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
         $context->expects($this->any())->method('getBasePath')->willReturn($basePath);
 
         return $context;

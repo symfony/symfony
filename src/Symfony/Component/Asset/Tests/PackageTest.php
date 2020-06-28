@@ -20,6 +20,11 @@ class PackageTest extends TestCase
 {
     /**
      * @dataProvider getConfigs
+     *
+     * @param string|null $version
+     * @param string      $format
+     * @param string      $path
+     * @param string      $expected
      */
     public function testGetUrl($version, $format, $path, $expected)
     {
@@ -27,6 +32,9 @@ class PackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
+    /**
+     * @return array[]
+     */
     public function getConfigs()
     {
         return [

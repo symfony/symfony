@@ -26,6 +26,10 @@ class StaticVersionStrategyTest extends TestCase
 
     /**
      * @dataProvider getConfigs
+     *
+     * @param string      $path
+     * @param string      $version
+     * @param string|null $format
      */
     public function testApplyVersion($path, $version, $format)
     {
@@ -34,6 +38,9 @@ class StaticVersionStrategyTest extends TestCase
         $this->assertSame($formatted, $staticVersionStrategy->applyVersion($path));
     }
 
+    /**
+     * @return array[]
+     */
     public function getConfigs()
     {
         return [

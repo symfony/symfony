@@ -24,7 +24,14 @@ namespace Symfony\Component\Asset\VersionStrategy;
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
+    /**
+     * @var string Absolute path to the manifest file
+     */
     private $manifestPath;
+
+    /**
+     * @var string[]|null
+     */
     private $manifestData;
 
     /**
@@ -50,6 +57,11 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
         return $this->getManifestPath($path) ?: $path;
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string|null
+     */
     private function getManifestPath($path)
     {
         if (null === $this->manifestData) {

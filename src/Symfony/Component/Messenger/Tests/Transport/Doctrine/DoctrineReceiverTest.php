@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\DeadlockException;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +76,7 @@ class DoctrineReceiverTest extends TestCase
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
-        $driverException = new PDOException(new \PDOException('Deadlock', 40001));
+        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
         $connection->method('get')->willThrowException(new DeadlockException('Deadlock', $driverException));
         $receiver = new DoctrineReceiver($connection, $serializer);
         $this->assertSame([], $receiver->get());

@@ -81,6 +81,10 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
 
     public function testGuessWithDuplicatedFileType()
     {
+        if (!$this->getGuesser()->isGuesserSupported()) {
+            $this->markTestSkipped('Guesser is not supported');
+        }
+
         $this->assertEquals('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/test.docx'));
     }
 

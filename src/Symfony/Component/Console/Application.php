@@ -953,12 +953,12 @@ class Application implements ResetInterface
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
         $this->dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
 
-        if (null !== $e) {
-            throw $e;
-        }
-
         if ($command instanceof LockableInterface) {
             $command->release();
+        }
+
+        if (null !== $e) {
+            throw $e;
         }
 
         return $event->getExitCode();

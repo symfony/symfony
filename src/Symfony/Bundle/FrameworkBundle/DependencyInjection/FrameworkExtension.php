@@ -1142,7 +1142,7 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('translation.php');
-        $loader->load('translation_remotes.xml');
+        $loader->load('translation_remotes.php');
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);

@@ -34,6 +34,8 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationPullCommand;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationPushCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
@@ -231,6 +233,29 @@ return static function (ContainerConfigurator $container) {
                 service('validator'),
             ])
             ->tag('console.command', ['command' => 'debug:validator'])
+
+        ->set('console.command.translation_pull', TranslationPullCommand::class)
+            ->args([
+                service('translation.remotes'),
+                service('translation.writer'),
+                service('translation.reader'),
+                param('kernel.default_locale'),
+                param('translator.default_path'),
+                [], // Translator paths
+                [], // Enabled locales
+            ])
+        ->tag('console.command', ['command' => 'translation:pull'])
+
+        ->set('console.command.translation_push', TranslationPushCommand::class)
+            ->args([
+                service('translation.remotes'),
+                service('translation.reader'),
+                param('kernel.default_locale'),
+                param('translator.default_path'),
+                [], // Translator paths
+                [], // Enabled locales
+            ])
+        ->tag('console.command', ['command' => 'translation:push'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->tag('console.command', ['command' => 'workflow:dump'])

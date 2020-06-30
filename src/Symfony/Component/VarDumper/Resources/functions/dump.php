@@ -37,6 +37,11 @@ if (!function_exists('dd')) {
         foreach ($vars as $v) {
             VarDumper::dump($v);
         }
+        
+        $debug = debug_backtrace();
+        $targetLine = $debug[0]['line'];
+        $targetFile = $debug[0]['file'];
+        VarDumper::dump(sprintf("%s@%s ",$targetFile,$targetLine));
 
         exit(1);
     }

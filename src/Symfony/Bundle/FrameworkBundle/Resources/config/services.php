@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Closure;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
@@ -224,8 +223,8 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.locale_aware')
         ->alias(SluggerInterface::class, 'slugger')
 
-        ->set('container.getenv', Closure::class)
-            ->factory([Closure::class, 'fromCallable'])
+        ->set('container.getenv', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
             ->args([
                 [service('service_container'), 'getEnv'],
             ])

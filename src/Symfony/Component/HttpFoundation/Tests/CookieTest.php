@@ -115,9 +115,6 @@ class CookieTest extends TestCase
         $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testConstructorWithDateTimeImmutable()
     {
         $expire = new \DateTimeImmutable();

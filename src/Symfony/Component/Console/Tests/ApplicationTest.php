@@ -1842,21 +1842,7 @@ class CustomApplicationWithCommand extends Application
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
-        return new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
-
-            new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'),
-        ]);
-    }
-
-    /**
-     * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
-     */
-    protected function getDefaultHelperSet(): HelperSet
-    {
-        return new HelperSet([new FormatterHelper()]);
+        return new InputDefinition([new InputArgument('command', InputArgument::REQUIRED, 'The command to execute')]);
     }
 }
 

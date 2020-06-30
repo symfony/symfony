@@ -61,6 +61,7 @@ class ApplicationTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
         require_once self::$fixturesPath.'/FooCommand.php';
         require_once self::$fixturesPath.'/FooOptCommand.php';
+        require_once self::$fixturesPath.'/FooVersionCommand.php';
         require_once self::$fixturesPath.'/Foo1Command.php';
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
@@ -1267,7 +1268,7 @@ class ApplicationTest extends TestCase
         $inputDefinition = $application->getDefinition();
 
         // check whether the default arguments and options are not returned any more
-        $this->assertFalse($inputDefinition->hasArgument('command'));
+        $this->assertTrue($inputDefinition->hasArgument('command'));
 
         $this->assertFalse($inputDefinition->hasOption('help'));
         $this->assertFalse($inputDefinition->hasOption('quiet'));
@@ -1302,6 +1303,21 @@ class ApplicationTest extends TestCase
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
+
+    public function testRemovedVersionFromCustomInputDefinitionWorksWithCommand()
+    {
+        $command = new \FooVersionCommand();
+
+        $application = new CustomApplication();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->setDefaultCommand($command->getName());
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo:version', '--version' => '1.2.3']);
+
+        $this->assertEquals('called'.PHP_EOL.'1.2.3'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
     public function testRunWithDispatcher()
@@ -1803,7 +1819,11 @@ class CustomApplication extends Application
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
-        return new InputDefinition([new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')]);
+        return new InputDefinition([
+            new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
+
+            new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'),
+        ]);
     }
 
     /**

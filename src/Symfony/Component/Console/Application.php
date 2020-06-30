@@ -199,6 +199,13 @@ class Application implements ResetInterface
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
+        // If no command was used, and the default version option was not overriden, print current version and return.
+        if ($this->hasDefaultOption('version') && true === $input->hasParameterOption(['--version', '-V'], true)) {
+            $output->writeln($this->getLongVersion());
+
+            return 0;
+        }
+
         try {
             // Makes ArgvInput::getFirstArgument() able to distinguish an option from an argument.
             $input->bind($this->getDefinition());
@@ -207,13 +214,6 @@ class Application implements ResetInterface
         }
 
         $name = $this->getCommandName($input);
-
-        // If no command was used, and the default version option was not overriden, print current version and return.
-        if (!$name && $this->hasDefaultOption('version') && true === $input->hasParameterOption(['--version', '-V'], true)) {
-            $output->writeln($this->getLongVersion());
-
-            return 0;
-        }
 
         if (true === $input->hasParameterOption(['--help', '-h'], true)) {
             if (!$name) {
@@ -1098,7 +1098,7 @@ class Application implements ResetInterface
         $this->defaultCommand = $commandName;
 
         if ($isSingleCommand) {
-            // Ensure the command exist
+            // Ensure the command exists
             $this->find($commandName);
 
             $this->singleCommand = true;

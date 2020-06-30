@@ -27,9 +27,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
-use Symfony\Component\HttpClient\Response\CommonResponseTrait;
+use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
-use Symfony\Component\HttpClient\Response\TraceableResponse;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -105,7 +104,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 }
             }
 
-            $body = $response instanceof TraceableResponse || isset(class_uses($response)[CommonResponseTrait::class]) ? $response->toStream(false) : StreamWrapper::createResource($response, $this->client);
+            $body = $response instanceof StreamableInterface ? $response->toStream(false) : StreamWrapper::createResource($response, $this->client);
             $body = $this->streamFactory->createStreamFromResource($body);
 
             if ($body->isSeekable()) {

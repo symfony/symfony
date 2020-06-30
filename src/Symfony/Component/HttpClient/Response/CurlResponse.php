@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @internal
  */
-final class CurlResponse implements ResponseInterface
+final class CurlResponse implements ResponseInterface, StreamableInterface
 {
     use CommonResponseTrait {
         getContent as private doGetContent;

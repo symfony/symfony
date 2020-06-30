@@ -429,18 +429,6 @@ class ErrorHandler
         }
         $scope = $this->scopedErrors & $type;
 
-        if (4 < $numArgs = \func_num_args()) {
-            $context = $scope ? (func_get_arg(4) ?: []) : [];
-        } else {
-            $context = [];
-        }
-
-        if (isset($context['GLOBALS']) && $scope) {
-            $e = $context;                  // Whatever the signature of the method,
-            unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
-            $context = $e;
-        }
-
         if (false !== strpos($message, "@anonymous\0")) {
             $logMessage = $this->parseAnonymousClass($message);
         } else {
@@ -501,6 +489,8 @@ class ErrorHandler
                         // given a caught $e exception in __toString(), quitting the method with
                         // `return trigger_error($e, E_USER_ERROR);` allows this error handler
                         // to make $e get through the __toString() barrier.
+
+                        $context = 4 < \func_num_args() ? (func_get_arg(4) ?: []) : [];
 
                         foreach ($context as $e) {
                             if ($e instanceof \Throwable && $e->__toString() === $message) {

@@ -430,8 +430,6 @@ class Command
      * This feature should be used only when creating a long process command,
      * like a daemon.
      *
-     * PHP 5.5+ or the proctitle PECL library is required
-     *
      * @return $this
      */
     public function setProcessTitle(string $title)

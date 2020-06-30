@@ -1268,7 +1268,7 @@ class ApplicationTest extends TestCase
         $inputDefinition = $application->getDefinition();
 
         // check whether the default arguments and options are not returned any more
-        $this->assertTrue($inputDefinition->hasArgument('command'));
+        $this->assertFalse($inputDefinition->hasArgument('command'));
 
         $this->assertFalse($inputDefinition->hasOption('help'));
         $this->assertFalse($inputDefinition->hasOption('quiet'));
@@ -1309,7 +1309,7 @@ class ApplicationTest extends TestCase
     {
         $command = new \FooVersionCommand();
 
-        $application = new CustomApplication();
+        $application = new CustomApplicationWithCommand();
         $application->setAutoExit(false);
         $application->add($command);
         $application->setDefaultCommand($command->getName());
@@ -1811,6 +1811,29 @@ class ApplicationTest extends TestCase
 }
 
 class CustomApplication extends Application
+{
+    /**
+     * Overwrites the default input definition.
+     *
+     * @return InputDefinition An InputDefinition instance
+     */
+    protected function getDefaultInputDefinition(): InputDefinition
+    {
+        return new InputDefinition([new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')]);
+    }
+
+    /**
+     * Gets the default helper set with the helpers that should always be available.
+     *
+     * @return HelperSet A HelperSet instance
+     */
+    protected function getDefaultHelperSet(): HelperSet
+    {
+        return new HelperSet([new FormatterHelper()]);
+    }
+}
+
+class CustomApplicationWithCommand extends Application
 {
     /**
      * Overwrites the default input definition.

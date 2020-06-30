@@ -7,9 +7,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FooVersionCommand extends Command
 {
-    public $input;
-    public $output;
-
     protected function configure()
     {
         $this
@@ -22,11 +19,8 @@ class FooVersionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input = $input;
-        $this->output = $output;
-
         $output->writeln('called');
-        $output->writeln($this->input->getOption('version'));
+        $output->writeln($input->getOption('version'));
 
         return 0;
     }

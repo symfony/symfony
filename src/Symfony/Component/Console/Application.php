@@ -184,13 +184,15 @@ class Application implements ResetInterface
     /**
      * Checks if the current application has the parameter in the default option.
      *
-     * @param string $option Option to check.
+     * @param string $option Option to check
      *
-     * @return bool True if the default definition contains the option, false otherwise.
+     * @return bool True if the default definition contains the option, false otherwise
      */
-    protected function hasDefaultOption( $option ) {
+    protected function hasDefaultOption($option)
+    {
         $defaultDefinition = $this->getDefaultInputDefinition();
-        return $defaultDefinition->hasOption( $option );
+
+        return $defaultDefinition->hasOption($option);
     }
 
     /**
@@ -210,7 +212,7 @@ class Application implements ResetInterface
         $name = $this->getCommandName($input);
 
         // If no command was used, and the default version option was not overriden, print current version and return.
-        if ( ! $name && $this->hasDefaultOption( 'version' ) && true === $input->hasParameterOption(['--version', '-V'], true)) {
+        if (!$name && $this->hasDefaultOption('version') && true === $input->hasParameterOption(['--version', '-V'], true)) {
             $output->writeln($this->getLongVersion());
 
             return 0;

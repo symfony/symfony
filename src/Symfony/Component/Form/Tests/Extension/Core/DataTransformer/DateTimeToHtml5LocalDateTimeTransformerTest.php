@@ -63,7 +63,6 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     /**
      * @dataProvider transformProvider
-     * @requires PHP 5.5
      */
     public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to)
     {

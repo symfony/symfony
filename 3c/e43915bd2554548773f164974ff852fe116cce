@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by flack at 2020-06-28T12:24:25Z
+
+@ostrolucky yeah, sure. This change won't turn console into an animation studio, but I figured that the output is made for people who stare at the screen while the program is running, so why not cap the frequency at what their screen can display (instead of the seemingly random 10fps). But you're right, for the moving image effect 25fps would work, too, so I can change the PR to use that if there is agreement
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-06-28T12:41:34Z
+
+Default is low because terminals are not designed to redraw too often. This is nothing new, check FPS of even some famous terminal ASCII animations, such as `towel.blinkenlights.nl`. Unlike Symfony ProgressBar, these are real animations and yet, they are kept to low refresh rate.
+
+High redraws impact runtime performance more than you would think. People would rather their script finish sooner than having super smooth animation, don't you think?
+
+---------------------------------------------------------------------------
+
+by flack at 2020-06-28T16:04:20Z
+
+to get some real numbers, I've made a small test:
+
+```php
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
+
+class test extends Command
+{
+    public function configure()
+    {
+        /*...*/
+    }
+
+    private function time(OutputInterface $output, int $fps)
+    {
+        $max = 100000;
+        $pb = new ProgressBar($output, $max, 1 / $fps);
+
+        $start = microtime(true);
+        foreach (range(0, 100000) as $i) {
+            $pb->advance();
+        }
+        $pb->finish();
+        $output->writeln(' ' . str_pad($fps, 3, ' ', STR_PAD_LEFT) . 'fps: ' . (microtime(true) - $start));
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->time($output, 5);
+        $this->time($output, 10);
+        $this->time($output, 25);
+        $this->time($output, 60);
+        $this->time($output, 144);
+
+        return 0;
+    }
+}
+```
+
+That gives the following output on my machine:
+
+```
+ 100001/100001 [============================] 100%   5fps: 0.31278800964355
+ 100001/100001 [============================] 100%  10fps: 0.31775808334351
+ 100001/100001 [============================] 100%  25fps: 0.32102704048157
+ 100001/100001 [============================] 100%  60fps: 0.3252899646759
+ 100001/100001 [============================] 100% 144fps: 0.3267650604248
+```
+
+So for 100000 iterations the difference between 10 and 25fps is around 33ms (so less than 1 "frame" at either 10 or 25fps ).
+
+Make of that what you will. I just thought it would be neat to (theoretically) provide smooth rendering, but I won't insist
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-06-28T16:25:20Z
+
+That's not as bad as I remember. Feel free to increase freq slightly then.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-28T18:32:08Z
+
+Is there actually a case where a progress bar that is redrawn 60 times a second actually shows something new every re-render? If we redraw the same image 10 times in a row, we're better of using 6 fps than 60 fps :) IIRC, I've never seen console progress toolbars update with a rate that would benefit from 60 fps.
+
+However, we can maybe increase it to e.g. 24 fps, a common default in the movie industry, instead of a crazy high like 60 fps?
+
+---------------------------------------------------------------------------
+
+by flack at 2020-06-28T19:32:20Z
+
+Alright, I've changed it to 25fps to minimize the performance overhead.
+
+@wouterj I know it's very subtle, but this change also has another effect: The throttling in ProgressBar works by throwing away updates inside the `$minSecondsBetweenRedraws` timeframe, so if you have e.g. three iterations, and the first two take 40ms each and the third one takes one minute, then at 10fps you would see the progress bar sitting at 0 for one minute and then suddenly jump to 100. It's of course a made-up scenario, but on a smaller scale something like this inevitably happens. Going from 10 to 25fps shortens the window for it quite a bit, which should also make it feel smoother
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2020-06-30T08:53:33Z
+
+TBH I see little benefit from having the progress bar be "smooth", I use it heavily and never thought:
+
+> Wish this animated smoother.
+
+If the performance penalty is insignificant, I'm not opposed to it, though. It should be measured with multiple progress bars running at the same time, IMO.

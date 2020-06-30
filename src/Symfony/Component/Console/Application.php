@@ -183,7 +183,6 @@ class Application implements ResetInterface
 
     /**
      * Checks if the current application has the parameter in the default option.
-     *
      */
     protected function hasDefaultOption(string $option): bool
     {

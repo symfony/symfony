@@ -182,18 +182,24 @@ class Application implements ResetInterface
     }
 
     /**
+     * Checks if the current application has the parameter in the default option.
+     *
+     * @param string $option Option to check.
+     *
+     * @return bool True if the default definition contains the option, false otherwise.
+     */
+    protected function hasDefaultOption( $option ) {
+        $defaultDefinition = $this->getDefaultInputDefinition();
+        return $defaultDefinition->hasOption( $option );
+    }
+
+    /**
      * Runs the current application.
      *
      * @return int 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-            $output->writeln($this->getLongVersion());
-
-            return 0;
-        }
-
         try {
             // Makes ArgvInput::getFirstArgument() able to distinguish an option from an argument.
             $input->bind($this->getDefinition());
@@ -202,6 +208,14 @@ class Application implements ResetInterface
         }
 
         $name = $this->getCommandName($input);
+
+        // If no command was used, and the default version option was not overriden, print current version and return.
+        if ( ! $name && $this->hasDefaultOption( 'version' ) && true === $input->hasParameterOption(['--version', '-V'], true)) {
+            $output->writeln($this->getLongVersion());
+
+            return 0;
+        }
+
         if (true === $input->hasParameterOption(['--help', '-h'], true)) {
             if (!$name) {
                 $name = 'help';

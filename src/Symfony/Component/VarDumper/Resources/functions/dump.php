@@ -41,8 +41,8 @@ if (!function_exists('dd')) {
         $debug = debug_backtrace();
         $targetLine = $debug[0]['line'];
         $targetFile = $debug[0]['file'];
-        
-        VarDumper::dump(sprintf("%s@%s ",$targetFile,$targetLine));
+
+        VarDumper::dump(sprintf('%s@%s ', $targetFile, $targetLine));
 
         exit(1);
     }

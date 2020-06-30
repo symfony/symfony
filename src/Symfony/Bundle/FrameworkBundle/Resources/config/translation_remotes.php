@@ -20,12 +20,14 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('http_client')->ignoreOnInvalid(),
                 service('translation.loader.xliff_raw'),
-                param('kernel.default_locale')
+                param('kernel.default_locale'),
             ])
             ->abstract()
 
         ->set('translation.remote_factory.loco', LocoRemoteFactory::class)
-            ->args([service('translator.data_collector')])
+            ->args([
+                service('translator.data_collector')->nullOnInvalid(),
+            ])
             ->parent('translation.remote_factory.abstract')
             ->tag('translation.remote_factory')
     ;

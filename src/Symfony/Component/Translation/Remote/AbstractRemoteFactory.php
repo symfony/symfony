@@ -11,11 +11,8 @@
 
 namespace Symfony\Component\Translation\Remote;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Translation\Exception\IncompleteDsnException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractRemoteFactory implements RemoteFactoryInterface

@@ -18,28 +18,21 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
-use Symfony\Component\Translation\Catalogue\TargetOperation;
-use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Remotes;
-use Symfony\Component\Translation\TranslatorBag;
-use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
  * @final
  */
 class TranslationPushCommand extends Command
 {
+    use TranslationTrait;
+
     protected static $defaultName = 'translation:push';
 
     private $remotes;
     private $reader;
-    private $defaultTransPath;
     private $transPaths;
     private $enabledLocales;
     private $arrayLoader;
@@ -48,10 +41,13 @@ class TranslationPushCommand extends Command
     {
         $this->remotes = $remotes;
         $this->reader = $reader;
-        $this->defaultTransPath = $defaultTransPath;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
         $this->arrayLoader = new ArrayLoader();
+
+        if (null !== $defaultTransPath) {
+            $this->transPaths[] = $defaultTransPath;
+        }
 
         parent::__construct();
     }
@@ -62,17 +58,17 @@ class TranslationPushCommand extends Command
     protected function configure()
     {
         $keys = $this->remotes->keys();
-        $defaultRemote = 1 === count($keys) ? $keys[0] : null;
+        $defaultRemote = 1 === \count($keys) ? $keys[0] : null;
 
         $this
             ->setDefinition([
-                new InputArgument('remote', null !== $defaultRemote ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The remote to pull translations from.', $defaultRemote),
-                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with updated ones'),
-                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available locally but not on remote'),
-                new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull'),
-                new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locels to pull', $this->enabledLocales),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf'),
-                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
+                new InputArgument('remote', null !== $defaultRemote ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The remote to push translations to.', $defaultRemote),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with local ones (it will delete not synchronized messages).'),
+                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available on remote but not locally.'),
+                new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to push.'),
+                new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to push.', $this->enabledLocales),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format.', 'xlf'),
+                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version.', '1.2'),
             ])
             ->setDescription('Push translations to a given remote.')
             ->setHelp(<<<'EOF'
@@ -111,70 +107,54 @@ EOF
 
         $io = new SymfonyStyle($input, $output);
 
-        $remoteStorage = $this->remotes->get($input->getArgument('remote'));
-
+        $remoteStorage = $this->remotes->get($remote = $input->getArgument('remote'));
+        $domains = $input->getOption('domains');
         $locales = $input->getOption('locales');
         $force = $input->getOption('force');
         $deleteObsolete = $input->getOption('delete-obsolete');
 
-        $transPaths = $this->transPaths;
-        if ($this->defaultTransPath) {
-            $transPaths[] = $this->defaultTransPath;
+        $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
+
+        if (!$domains) {
+            $domains = $localTranslations->getDomains();
         }
 
-        /** @var KernelInterface $kernel */
-        $kernel = $this->getApplication()->getKernel();
+        if (!$deleteObsolete && $force) {
+            $remoteStorage->write($localTranslations);
 
-        // Override with provided Bundle info
-        foreach ($kernel->getBundles() as $bundle) {
-            $bundleDir = $bundle->getPath();
-            $transPaths[] = is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundle->getPath().'/translations';
+            return 0;
         }
-
-        $localTranslations = new TranslatorBag();
-        foreach ($locales as $locale) {
-            $localTranslations->addCatalogue($this->loadCurrentMessages($locale, $transPaths));
-        }
-
-        $domains = $input->getOption('domains') ?: $localTranslations->getDomains();
 
         $remoteTranslations = $remoteStorage->read($domains, $locales);
 
-        foreach ($locales as $locale) {
-            $remoteCatalogue = $remoteTranslations->getCatalogue($locale);
-            $localCatalogue = $localTranslations->getCatalogue($locale);
+        if ($deleteObsolete) {
+            $obsoleteMessages = $remoteTranslations->diff($localTranslations);
+            $remoteStorage->delete($obsoleteMessages);
 
-            $operation = new TargetOperation($remoteCatalogue, $localCatalogue);
-            foreach ($domains as $domain) {
-                if ($force) {
-                    $messages = $operation->getMessages($domain);
-                } else {
-                    $messages = $operation->getNewMessages($domain);
-                }
-
-                $bag = new TranslatorBag();
-                $bag->addCatalogue($this->arrayLoader->load($messages, $locale, $domain));
-                $remoteStorage->write($bag);
-
-                if ($deleteObsolete) {
-                    $obsoleteMessages = $operation->getObsoleteMessages($domain);
-                    $bag = new TranslatorBag();
-                    $bag->addCatalogue($this->arrayLoader->load($obsoleteMessages, $locale, $domain));
-                    $remoteStorage->delete($bag);
-                }
-            }
+            $io->success(sprintf(
+                'Obsolete translations on %s are deleted (for [%s] locale(s), and [%s] domain(s)).',
+                $remote,
+                implode(', ', $locales),
+                implode(', ', $domains)
+            ));
         }
+
+        $translationsToWrite = $localTranslations->diff($remoteTranslations);
+
+        if ($force) {
+            $translationsToWrite->addBag($localTranslations->intersect($remoteTranslations));
+        }
+
+        $remoteStorage->write($translationsToWrite);
+
+        $io->success(sprintf(
+            '%s local translations are sent to %s (for [%s] locale(s), and [%s] domain(s)).',
+            $force ? 'All' : 'New',
+            $remote,
+            implode(', ', $locales),
+            implode(', ', $domains)
+        ));
 
         return 0;
-    }
-
-    private function loadCurrentMessages(string $locale, array $transPaths): MessageCatalogue
-    {
-        $currentCatalogue = new MessageCatalogue($locale);
-        foreach ($transPaths as $path) {
-            $this->reader->read($path, $currentCatalogue);
-        }
-
-        return $currentCatalogue;
     }
 }

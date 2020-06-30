@@ -12,11 +12,9 @@
 namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\Exception\RemoteException;
 use Symfony\Component\Translation\Exception\TransportException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\Message\MessageInterface;
-use Symfony\Component\Translation\Message\SmsMessage;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Remote\AbstractRemote;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -24,14 +22,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
+ * @final
  *
  * In Loco:
  * tags refers to Symfony's translation domains
  * assets refers to Symfony's translation keys
  * translations refers to Symfony's translation messages
  */
-final class LocoRemote extends AbstractRemote
+class LocoRemote extends AbstractRemote
 {
     protected const HOST = 'localise.biz';
 
@@ -58,8 +57,9 @@ final class LocoRemote extends AbstractRemote
      */
     public function write(TranslatorBag $translations, bool $override = false): void
     {
-        foreach ($translations->all() as $locale => $messages) {
-            foreach ($messages as $domain => $messages) {
+        foreach ($translations->getCatalogues() as $catalogue) {
+            foreach ($catalogue->all() as $domain => $messages) {
+                $locale = $catalogue->getLocale();
                 $ids = [];
 
                 foreach ($messages as $id => $message) {
@@ -68,7 +68,9 @@ final class LocoRemote extends AbstractRemote
                     $this->translateAsset($id, $message, $locale);
                 }
 
-                $this->tagsAssets($ids, $domain);
+                if (!empty($ids)) {
+                    $this->tagsAssets($ids, $domain);
+                }
             }
         }
     }
@@ -79,34 +81,23 @@ final class LocoRemote extends AbstractRemote
     public function read(array $domains, array $locales): TranslatorBag
     {
         $filter = $domains ? implode(',', $domains) : '*';
-
-        if (1 === count($locales)) {
-            $response = $this->client->request('GET', sprintf('https://%s/api/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locales[0], $filter), [
-                'headers' => [
-                    'Authorization' => 'Loco '.$this->apiKey,
-                ],
-            ]);
-        } else {
-            $response = $this->client->request('GET', sprintf('https://%s/api/export/all.xlf?filter=%s', $this->getEndpoint(), $filter), [
-                'headers' => [
-                    'Authorization' => 'Loco '.$this->apiKey,
-                ],
-            ]);
-        }
-
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException('Unable to read the Loco response: '.$response->getContent(false), $response);
-        }
-
         $translatorBag = new TranslatorBag();
 
         foreach ($locales as $locale) {
-            if (\count($domains) > 1) {
-                foreach ($domains as $domain) {
-                    $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domain));
-                }
-            } else {
-                $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domains[0] ?? 'messages')); // not sure
+            $response = $this->client->request('GET', sprintf('https://%s/api/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locale, $filter), [
+                'headers' => [
+                    'Authorization' => 'Loco '.$this->apiKey,
+                ],
+            ]);
+
+            $responseContent = $response->getContent(false);
+
+            if (Response::HTTP_OK !== $response->getStatusCode()) {
+                throw new TransportException('Unable to read the Loco response: '.$responseContent, $response);
+            }
+
+            foreach ($domains as $domain) {
+                $translatorBag->addCatalogue($this->loader->load($responseContent, $locale, $domain));
             }
         }
 
@@ -118,16 +109,24 @@ final class LocoRemote extends AbstractRemote
      */
     public function delete(TranslatorBag $translations): void
     {
+        $deletedIds = [];
+
         foreach ($translations->all() as $locale => $messages) {
             foreach ($messages as $domain => $messages) {
                 foreach ($messages as $id => $message) {
+                    if (\in_array($id, $deletedIds)) {
+                        continue;
+                    }
+
                     $this->deleteAsset($id);
+
+                    $deletedIds[] = $id;
                 }
             }
         }
     }
 
-    private function createAsset(string $id)
+    private function createAsset(string $id): void
     {
         $response = $this->client->request('POST', sprintf('https://%s/api/assets', $this->getEndpoint()), [
             'headers' => [
@@ -138,17 +137,17 @@ final class LocoRemote extends AbstractRemote
                 'id' => $id,
                 'type' => 'text',
                 'default' => 'untranslated',
-            ]
+            ],
         ]);
 
-        if ($response->getStatusCode() === Response::HTTP_CONFLICT) {
+        if (Response::HTTP_CONFLICT === $response->getStatusCode()) {
             // Translation key already exists in Loco, do nothing
-        } elseif ($response->getStatusCode() !== Response::HTTP_CREATED || $response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: %s', $id, $response->getContent(false)), $response);
+        } elseif (Response::HTTP_CREATED !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
-    private function translateAsset(string $id, string $message, string $locale)
+    private function translateAsset(string $id, string $message, string $locale): void
     {
         $response = $this->client->request('POST', sprintf('https://%s/api/translations/%s/%s', $this->getEndpoint(), $id, $locale), [
             'headers' => [
@@ -157,12 +156,12 @@ final class LocoRemote extends AbstractRemote
             'body' => $message,
         ]);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to add translation message (for key: %s) to Loco: %s', $id, $response->getContent(false)), $response);
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to add translation message (for key: "%s") to Loco: "%s".', $id, $response->getContent(false)), $response);
         }
     }
 
-    private function tagsAssets(array $ids, string $tag)
+    private function tagsAssets(array $ids, string $tag): void
     {
         $idsAsString = implode(',', array_unique($ids));
 
@@ -177,22 +176,24 @@ final class LocoRemote extends AbstractRemote
             'body' => $idsAsString,
         ]);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to add tag (%s) on translation keys (%s) to Loco: %s', $tag, $idsAsString, $response->getContent(false)), $response);
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to add tag (%s) on translation keys (%s) to Loco: "%s".', $tag, $idsAsString, $response->getContent(false)), $response);
         }
     }
 
-    private function createTag(string $tag)
+    private function createTag(string $tag): void
     {
         $response = $this->client->request('POST', sprintf('https://%s/api/tags.json', $this->getEndpoint(), $tag), [
             'headers' => [
                 'Authorization' => 'Loco '.$this->apiKey,
             ],
-            'name' => $tag,
+            'body' => [
+                'name' => $tag,
+            ],
         ]);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to create tag (%s) on Loco: %s', $tag, $response->getContent(false)), $response);
+        if (Response::HTTP_CREATED !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to create tag (%s) on Loco: "%s".', $tag, $response->getContent(false)), $response);
         }
     }
 
@@ -204,25 +205,25 @@ final class LocoRemote extends AbstractRemote
             ],
         ]);
 
-        $content = $response->getContent();
+        $content = $response->getContent(false);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to get tags on Loco: %s', $response->getContent(false)), $response);
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to get tags on Loco: "%s".', $content), $response);
         }
 
         return json_decode($content);
     }
 
-    private function deleteAsset(string $id)
+    private function deleteAsset(string $id): void
     {
         $response = $this->client->request('DELETE', sprintf('https://%s/api/assets/%s.json', $this->getEndpoint(), $id), [
             'headers' => [
                 'Authorization' => 'Loco '.$this->apiKey,
-            ]
+            ],
         ]);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: %s', $id, $response->getContent(false)), $response);
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: "%s".', $id, $response->getContent(false)), $response);
         }
     }
 }

@@ -11,25 +11,12 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Translation\Bridge\Firebase\FirebaseRemoteFactory;
-use Symfony\Component\Translation\Bridge\FreeMobile\FreeMobileRemoteFactory;
-use Symfony\Component\Translation\Bridge\Mattermost\MattermostRemoteFactory;
-use Symfony\Component\Translation\Bridge\Nexmo\NexmoRemoteFactory;
-use Symfony\Component\Translation\Bridge\OvhCloud\OvhCloudRemoteFactory;
-use Symfony\Component\Translation\Bridge\RocketChat\RocketChatRemoteFactory;
-use Symfony\Component\Translation\Bridge\Sinch\SinchRemoteFactory;
-use Symfony\Component\Translation\Bridge\Slack\SlackRemoteFactory;
-use Symfony\Component\Translation\Bridge\Telegram\TelegramRemoteFactory;
-use Symfony\Component\Translation\Bridge\Twilio\TwilioRemoteFactory;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Remote\Dsn;
-use Symfony\Component\Translation\Remote\FailoverRemote;
 use Symfony\Component\Translation\Remote\NullRemoteFactory;
-use Symfony\Component\Translation\Remote\RoundRobinRemote;
 use Symfony\Component\Translation\Remote\RemoteDecorator;
 use Symfony\Component\Translation\Remote\RemoteFactoryInterface;
 use Symfony\Component\Translation\Remote\RemoteInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RemotesFactory

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Catalogue\TargetOperation;
+
 final class TranslatorBag implements TranslatorBagInterface
 {
     /** @var MessageCatalogue[] */
@@ -18,7 +20,18 @@ final class TranslatorBag implements TranslatorBagInterface
 
     public function addCatalogue(MessageCatalogue $catalogue): void
     {
+        if (null !== $existingCatalogue = $this->getCatalogue($catalogue->getLocale())) {
+            $catalogue->addCatalogue($existingCatalogue);
+        }
+
         $this->catalogues[$catalogue->getLocale()] = $catalogue;
+    }
+
+    public function addBag(self $bag): void
+    {
+        foreach ($bag->getCatalogues() as $catalogue) {
+            $this->addCatalogue($catalogue);
+        }
     }
 
     public function getDomains(): array
@@ -26,7 +39,7 @@ final class TranslatorBag implements TranslatorBagInterface
         $domains = [];
 
         foreach ($this->catalogues as $catalogue) {
-            $domains += $catalogue->getDomains();
+            $domains += $catalogue->all();
         }
 
         return array_unique($domains);
@@ -35,25 +48,60 @@ final class TranslatorBag implements TranslatorBagInterface
     public function all(): array
     {
         $messages = [];
-
-        foreach ($this->catalogues as $catalogue) {
-            $locale = $catalogue->getLocale();
-            if (!isset($messages[$locale])) {
-                $messages[$locale] = $catalogue->all();
-            } else {
-                $messages[$locale] = array_merge($messages[$locale], $catalogue->all());
-            }
+        foreach ($this->catalogues as $locale => $catalogue) {
+            $messages[$locale] = $catalogue->all();
         }
 
         return $messages;
     }
 
-    public function getCatalogue(string $locale = null): ?MessageCatalogue
+    public function getCatalogue(string $locale): ?MessageCatalogue
     {
-        if (!$locale) {
-            return null;
+        return $this->catalogues[$locale] ?? null;
+    }
+
+    /**
+     * @return MessageCatalogueInterface[]
+     */
+    public function getCatalogues(): array
+    {
+        return array_values($this->catalogues);
+    }
+
+    public function diff(self $diffBag): self
+    {
+        $diff = new self();
+
+        foreach ($this->catalogues as $locale => $catalogue) {
+            if (null === $diffCatalogue = $diffBag->getCatalogue($locale)) {
+                $diff->addCatalogue($catalogue);
+
+                continue;
+            }
+
+            $operation = new TargetOperation($catalogue, $diffCatalogue);
+            $operation->moveMessagesToIntlDomainsIfPossible('obsolete');
+            $diff->addCatalogue($operation->getResult());
         }
 
-        return $this->catalogues[$locale];
+        return $diff;
+    }
+
+    public function intersect(self $intersectBag): self
+    {
+        $diff = new self();
+
+        foreach ($this->catalogues as $locale => $catalogue) {
+            if (null === $intersectCatalogue = $intersectBag->getCatalogue($locale)) {
+                continue;
+            }
+
+            $operation = new TargetOperation($catalogue, $intersectCatalogue);
+            $operation->moveMessagesToIntlDomainsIfPossible('obsolete');
+
+            $diff->addCatalogue($operation->getResult());
+        }
+
+        return $diff;
     }
 }

@@ -387,6 +387,7 @@ class ConfigurationTest extends TestCase
                     'parse_html' => false,
                     'localizable_html_attributes' => [],
                 ],
+                'remotes' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),

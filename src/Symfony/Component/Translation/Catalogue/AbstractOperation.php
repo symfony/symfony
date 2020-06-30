@@ -148,6 +148,48 @@ abstract class AbstractOperation implements OperationInterface
     }
 
     /**
+     * @param string             $domain
+     * @param OperationInterface $operation
+     * @param string             $batch     must be one of ['all', 'obsolete', 'new']
+     */
+    public function moveMessagesToIntlDomainsIfPossible(string $batch = 'all'): void
+    {
+        if (!class_exists(\MessageFormatter::class)) {
+            return;
+        }
+
+        if (!\in_array($batch, ['all', 'obsolete', 'new'])) {
+            throw new \InvalidArgumentException('$batch argument must be one of [\'all\', \'obsolete\', \'new\'].');
+        }
+
+        foreach ($this->getDomains() as $domain) {
+            $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+            switch ($batch) {
+                case 'obsolete':
+                    $messages = $this->getObsoleteMessages($domain);
+                    break;
+                case 'new':
+                    $messages = $this->getNewMessages($domain);
+                    break;
+                case 'all':
+                default:
+                    $messages = $this->getMessages($domain);
+                    break;
+            }
+
+            if ([] === $messages || ([] === $this->source->all($intlDomain) && [] !== $this->source->all($domain))) {
+                continue;
+            }
+
+            $result = $this->getResult();
+            $allIntlMessages = $result->all($intlDomain);
+            $currentMessages = array_diff_key($messages, $result->all($domain));
+            $result->replace($currentMessages, $domain);
+            $result->replace($allIntlMessages + $messages, $intlDomain);
+        }
+    }
+
+    /**
      * Performs operation on source and target catalogues for the given domain and
      * stores the results.
      *

@@ -250,7 +250,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('translation.remotes'),
                 service('translation.reader'),
-                param('kernel.default_locale'),
                 param('translator.default_path'),
                 [], // Translator paths
                 [], // Enabled locales

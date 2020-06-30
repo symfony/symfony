@@ -168,7 +168,7 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.remotes', Remotes::class)
             ->factory([service('translation.remotes_factory'), 'fromConfig'])
             ->args([
-                [], // transports
+                [], // Remotes
             ])
 
         ->set('translation.remotes_factory', RemotesFactory::class)

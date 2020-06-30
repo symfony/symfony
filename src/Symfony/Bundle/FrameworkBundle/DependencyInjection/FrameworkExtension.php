@@ -144,7 +144,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge\Loco\LocoRemoteFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
-use Symfony\Component\Translation\Remote\RemoteInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -1137,6 +1136,8 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
             $container->removeDefinition('console.command.translation_update');
+            $container->removeDefinition('console.command.translation_pull');
+            $container->removeDefinition('console.command.translation_push');
 
             return;
         }
@@ -1201,6 +1202,42 @@ class FrameworkExtension extends Extension
 
         if ($container->hasDefinition('console.command.translation_update')) {
             $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
+        }
+
+        if (!empty($config['remotes'])) {
+            if (empty($config['enabled_locales'])) {
+                throw new LogicException('You must specify framework.translator.enabled_locales in order to use remotes.');
+            }
+
+            if ($container->hasDefinition('console.command.translation_pull')) {
+                $container->getDefinition('console.command.translation_pull')
+                    ->replaceArgument(5, $transPaths)
+                    ->replaceArgument(6, $config['enabled_locales'])
+                ;
+            }
+
+            if ($container->hasDefinition('console.command.translation_push')) {
+                $container->getDefinition('console.command.translation_push')
+                    ->replaceArgument(3, $transPaths)
+                    ->replaceArgument(4, $config['enabled_locales'])
+                ;
+            }
+
+            $container->getDefinition('translation.remotes_factory')
+                ->replaceArgument(1, $config['enabled_locales'])
+            ;
+
+            $container->getDefinition('translation.remotes')->setArgument(0, $config['remotes']);
+
+            $classToServices = [
+                LocoRemoteFactory::class => 'translation.remote_factory.loco',
+            ];
+
+            foreach ($classToServices as $class => $service) {
+                if (!class_exists($class)) {
+                    $container->removeDefinition($service);
+                }
+            }
         }
 
         if ($container->fileExists($defaultDir)) {

@@ -14,7 +14,10 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Remote\RemoteInterface;
 
-final class Remotes
+/**
+ * @final
+ */
+class Remotes
 {
     private $remotes;
 
@@ -42,7 +45,7 @@ final class Remotes
     public function get(string $name): RemoteInterface
     {
         if (!$this->has($name)) {
-            throw new InvalidArgumentException(sprintf('Remote "%s" not found. Available: %s', $name, (string) $this));
+            throw new InvalidArgumentException(sprintf('Remote "%s" not found. Available: "%s".', $name, (string) $this));
         }
 
         return $this->remotes[$name];

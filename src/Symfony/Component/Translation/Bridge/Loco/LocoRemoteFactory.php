@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Bridge\Loco;
 
-use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Remote\AbstractRemoteFactory;
 use Symfony\Component\Translation\Remote\Dsn;

@@ -11,13 +11,8 @@
 
 namespace Symfony\Component\Translation\Remote;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\Translation\Event\MessageEvent;
 use Symfony\Component\Translation\Exception\LogicException;
-use Symfony\Component\Translation\Message\MessageInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractRemote implements RemoteInterface

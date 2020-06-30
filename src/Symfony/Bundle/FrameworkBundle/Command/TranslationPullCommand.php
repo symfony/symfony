@@ -12,47 +12,44 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
-use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Remotes;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
- * A command that parses templates to extract translation messages and adds them
- * into the translation files.
- *
  * @final
  */
 class TranslationPullCommand extends Command
 {
+    use TranslationTrait;
+
     protected static $defaultName = 'translation:pull';
 
     private $remotes;
     private $writer;
     private $reader;
     private $defaultLocale;
-    private $defaultTransPath;
+    private $transPaths;
     private $enabledLocales;
 
-    public function __construct(Remotes $remotes, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, string $defaultTransPath = null, array $enabledLocales = [])
+    public function __construct(Remotes $remotes, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
     {
         $this->remotes = $remotes;
         $this->writer = $writer;
-        $this->reader = $reader;
         $this->defaultLocale = $defaultLocale;
-        $this->defaultTransPath = $defaultTransPath;
+        $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
+
+        if (null !== $defaultTransPath) {
+            $this->transPaths[] = $defaultTransPath;
+        }
 
         parent::__construct();
     }
@@ -63,17 +60,17 @@ class TranslationPullCommand extends Command
     protected function configure()
     {
         $keys = $this->remotes->keys();
-        $defaultRemote = 1 === count($keys) ? $keys[0] : null;
+        $defaultRemote = 1 === \count($keys) ? $keys[0] : null;
 
         $this
             ->setDefinition([
                 new InputArgument('remote', null !== $defaultRemote ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The remote to pull translations from.', $defaultRemote),
-                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with updated ones'),
-                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available locally but not on remote'),
-                new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull'),
-                new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locels to pull'),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf'),
-                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with remote ones (it will delete not synchronized messages).'),
+                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available locally but not on remote.'),
+                new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull. (Do not forget +intl-icu suffix if nedded).'),
+                new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to pull.'),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format.', 'xlf'),
+                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version.', '1.2'),
             ])
             ->setDescription('Pull translations from a given remote.')
             ->setHelp(<<<'EOF'
@@ -106,50 +103,70 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $remoteStorage = $this->remotes->get($input->getArgument('remote'));
+        $io = new SymfonyStyle($input, $output);
 
-        $locales = $input->getOption('locales');
+        $remoteStorage = $this->remotes->get($remote = $input->getArgument('remote'));
+        $locales = $input->getOption('locales') ?: $this->enabledLocales;
         $domains = $input->getOption('domains');
         $force = $input->getOption('force');
         $deleteObsolete = $input->getOption('delete-obsolete');
 
+        $writeOptions = [
+            'path' => end($this->transPaths),
+        ];
+
+        if ($input->getOption('xliff-version')) {
+            $writeOptions['xliff_version'] = $input->getOption('xliff-version');
+        }
+
         $remoteTranslations = $remoteStorage->read($domains, $locales);
 
-        if ($deleteObsolete && $force) {
-            foreach ($locales as $locale) {
-                $options = [];
-
-                if ($input->getOption('xliff-version')) {
-                    $options['xliff_version'] = $input->getOption('xliff-version');
-                }
-
-                $this->writer->write($remoteTranslations->getCatalogue($locale), $input->getOption('output-format'), $options);
+        if ($force) {
+            if ($deleteObsolete) {
+                $io->note('The --delete-obsolete option is ineffective with --force');
             }
 
+            foreach ($remoteTranslations->getCatalogues() as $catalogue) {
+                $operation = new TargetOperation((new MessageCatalogue($catalogue->getLocale())), $catalogue);
+                $operation->moveMessagesToIntlDomainsIfPossible();
+                $this->writer->write($operation->getResult(), $input->getOption('output-format'), $writeOptions);
+            }
+
+            $io->success(sprintf(
+                'Local translations are up to date with %s (for [%s] locale(s), and [%s] domain(s)).',
+                $remote,
+                implode(', ', $locales),
+                implode(', ', $domains)
+            ));
+
             return 0;
         }
 
-        if ($force) {
-            // merge all messages from remote to local ones
-
-            return 0;
-        } else {
-            // merge only new messages from remote to local ones
-
-            return 0;
-        }
+        $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
         if ($deleteObsolete) {
-            // remove diff between local messages and remote ones
+            $obsoleteTranslations = $localTranslations->diff($remoteTranslations);
+            $translationsWithoutObsoleteToWrite = $localTranslations->diff($obsoleteTranslations);
 
-            return 0;
+            foreach ($translationsWithoutObsoleteToWrite->getCatalogues() as $catalogue) {
+                $this->writer->write($catalogue, $input->getOption('output-format'), $writeOptions);
+            }
+
+            $io->success('Obsolete translations are locally removed.');
         }
 
-        //$this->writer->write($operation->getResult(), $input->getOption('output-format'), [
-            //'path' => $bundleTransPath,
-            //'default_locale' => $this->defaultLocale,
-            //'xliff_version' => $input->getOption('xliff-version')
-        //]);
+        $translationsToWrite = $remoteTranslations->diff($localTranslations);
+
+        foreach ($translationsToWrite->getCatalogues() as $catalogue) {
+            $this->writer->write($catalogue, $input->getOption('output-format'), $writeOptions);
+        }
+
+        $io->success(sprintf(
+            'New remote translations from %s are written locally (for [%s] locale(s), and [%s] domain(s)).',
+            $remote,
+            implode(', ', $locales),
+            implode(', ', $domains)
+        ));
 
         return 0;
     }

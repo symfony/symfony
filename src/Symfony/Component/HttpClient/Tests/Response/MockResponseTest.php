@@ -33,6 +33,19 @@ class MockResponseTest extends TestCase
         $response->toArray();
     }
 
+    public function testUrlHttpMethodMockResponse(): void
+    {
+        $responseMock = new MockResponse(json_encode(['foo' => 'bar']));
+        $url = 'https://example.com/some-endpoint';
+        $response = MockResponse::fromRequest('GET', $url, [], $responseMock);
+
+        $this->assertSame('GET', $response->getInfo('http_method'));
+        $this->assertSame('GET', $responseMock->getRequestMethod());
+
+        $this->assertSame($url, $response->getInfo('url'));
+        $this->assertSame($url, $responseMock->getRequestUrl());
+    }
+
     public function toArrayErrors()
     {
         yield [

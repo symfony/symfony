@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -260,9 +261,13 @@ class SessionListenerTest extends TestCase
         $requestStack->push($request);
         $requestStack->push(new Request());
 
+        $collector = $this->createMock(RequestDataCollector::class);
+        $collector->expects($this->once())->method('collectSessionUsage');
+
         $container = new Container();
         $container->set('initialized_session', $session);
         $container->set('request_stack', $requestStack);
+        $container->set('session_collector', \Closure::fromCallable([$collector, 'collectSessionUsage']));
 
         $this->expectException(UnexpectedSessionUsageException::class);
         (new SessionListener($container, true))->onSessionUsage();
@@ -277,12 +282,16 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $request->attributes->set('_stateless', true);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
-        $requestStack->expects($this->never())->method('getMasterRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $collector = $this->createMock(RequestDataCollector::class);
+        $collector->expects($this->never())->method('collectSessionUsage');
 
         $container = new Container();
         $container->set('initialized_session', $session);
         $container->set('request_stack', $requestStack);
+        $container->set('session_collector', $collector);
 
         (new SessionListener($container))->onSessionUsage();
     }

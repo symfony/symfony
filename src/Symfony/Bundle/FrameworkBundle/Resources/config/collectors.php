@@ -29,8 +29,15 @@ return static function (ContainerConfigurator $container) {
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/config.html.twig', 'id' => 'config', 'priority' => -255])
 
         ->set('data_collector.request', RequestDataCollector::class)
+            ->args([
+                service('request_stack')->ignoreOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/request.html.twig', 'id' => 'request', 'priority' => 335])
+
+        ->set('data_collector.request.session_collector', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([[service('data_collector.request'), 'collectSessionUsage']])
 
         ->set('data_collector.ajax', AjaxDataCollector::class)
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/ajax.html.twig', 'id' => 'ajax', 'priority' => 315])

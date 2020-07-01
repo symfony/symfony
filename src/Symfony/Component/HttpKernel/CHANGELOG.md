@@ -4,6 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
+ * added session usage
  * made the public `http_cache` service handle requests when available
  * allowed enabling trusted hosts and proxies using new `kernel.trusted_hosts`,
    `kernel.trusted_proxies` and `kernel.trusted_headers` parameters

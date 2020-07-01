@@ -39,6 +39,7 @@ final class WorkflowExtension extends AbstractExtension
         return [
             new TwigFunction('workflow_can', [$this, 'canTransition']),
             new TwigFunction('workflow_transitions', [$this, 'getEnabledTransitions']),
+            new TwigFunction('workflow_transition', [$this, 'getEnabledTransition']),
             new TwigFunction('workflow_has_marked_place', [$this, 'hasMarkedPlace']),
             new TwigFunction('workflow_marked_places', [$this, 'getMarkedPlaces']),
             new TwigFunction('workflow_metadata', [$this, 'getMetadata']),
@@ -62,6 +63,11 @@ final class WorkflowExtension extends AbstractExtension
     public function getEnabledTransitions(object $subject, string $name = null): array
     {
         return $this->workflowRegistry->get($subject, $name)->getEnabledTransitions($subject);
+    }
+
+    public function getEnabledTransition(object $subject, string $transition, string $name = null): ?Transition
+    {
+        return $this->workflowRegistry->get($subject, $name)->getEnabledTransition($subject, $transition);
     }
 
     /**

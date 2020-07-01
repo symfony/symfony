@@ -37,10 +37,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
@@ -79,11 +75,9 @@ class SecurityBundle extends Bundle
         // must be registered after RegisterListenersPass (in the FrameworkBundle)
         $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
 
-        $container->addCompilerPass(new AddEventAliasesPass([
-            AuthenticationSuccessEvent::class => AuthenticationEvents::AUTHENTICATION_SUCCESS,
-            AuthenticationFailureEvent::class => AuthenticationEvents::AUTHENTICATION_FAILURE,
-            InteractiveLoginEvent::class => SecurityEvents::INTERACTIVE_LOGIN,
-            SwitchUserEvent::class => SecurityEvents::SWITCH_USER,
-        ]));
+        $container->addCompilerPass(new AddEventAliasesPass(array_merge(
+            AuthenticationEvents::ALIASES,
+            SecurityEvents::ALIASES
+        )));
     }
 }

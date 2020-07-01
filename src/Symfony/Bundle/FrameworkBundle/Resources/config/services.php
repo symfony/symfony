@@ -14,9 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
@@ -26,70 +24,34 @@ use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as EventDispatcherInterfaceComponentAlias;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\Event\PostSetDataEvent;
-use Symfony\Component\Form\Event\PostSubmitEvent;
-use Symfony\Component\Form\Event\PreSetDataEvent;
-use Symfony\Component\Form\Event\PreSubmitEvent;
-use Symfony\Component\Form\Event\SubmitEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
-use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\Event\TerminateEvent;
-use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Workflow\Event\AnnounceEvent;
-use Symfony\Component\Workflow\Event\CompletedEvent;
-use Symfony\Component\Workflow\Event\EnteredEvent;
-use Symfony\Component\Workflow\Event\EnterEvent;
-use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Event\LeaveEvent;
-use Symfony\Component\Workflow\Event\TransitionEvent;
+use Symfony\Component\Workflow\WorkflowEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 return static function (ContainerConfigurator $container) {
     // this parameter is used at compile time in RegisterListenersPass
-    $container->parameters()->set('event_dispatcher.event_aliases', [
-        ConsoleCommandEvent::class => 'console.command',
-        ConsoleErrorEvent::class => 'console.error',
-        ConsoleTerminateEvent::class => 'console.terminate',
-        PreSubmitEvent::class => 'form.pre_submit',
-        SubmitEvent::class => 'form.submit',
-        PostSubmitEvent::class => 'form.post_submit',
-        PreSetDataEvent::class => 'form.pre_set_data',
-        PostSetDataEvent::class => 'form.post_set_data',
-        ControllerArgumentsEvent::class => 'kernel.controller_arguments',
-        ControllerEvent::class => 'kernel.controller',
-        ResponseEvent::class => 'kernel.response',
-        FinishRequestEvent::class => 'kernel.finish_request',
-        RequestEvent::class => 'kernel.request',
-        ViewEvent::class => 'kernel.view',
-        ExceptionEvent::class => 'kernel.exception',
-        TerminateEvent::class => 'kernel.terminate',
-        GuardEvent::class => 'workflow.guard',
-        LeaveEvent::class => 'workflow.leave',
-        TransitionEvent::class => 'workflow.transition',
-        EnterEvent::class => 'workflow.enter',
-        EnteredEvent::class => 'workflow.entered',
-        CompletedEvent::class => 'workflow.completed',
-        AnnounceEvent::class => 'workflow.announce',
-    ]);
+    $container->parameters()->set('event_dispatcher.event_aliases', array_merge(
+        class_exists(ConsoleEvents::class) ? ConsoleEvents::ALIASES : [],
+        class_exists(FormEvents::class) ? FormEvents::ALIASES : [],
+        KernelEvents::ALIASES,
+        class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : []
+    ));
 
     $container->services()
 

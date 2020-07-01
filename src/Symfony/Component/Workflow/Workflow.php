@@ -235,6 +235,25 @@ class Workflow implements WorkflowInterface
         return $enabledTransitions;
     }
 
+    public function getEnabledTransition(object $subject, string $name): ?Transition
+    {
+        $marking = $this->getMarking($subject);
+
+        foreach ($this->definition->getTransitions() as $transition) {
+            if ($transition->getName() !== $name) {
+                continue;
+            }
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            if (!$transitionBlockerList->isEmpty()) {
+                continue;
+            }
+
+            return $transition;
+        }
+
+        return null;
+    }
+
     /**
      * {@inheritdoc}
      */

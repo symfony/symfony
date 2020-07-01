@@ -42,7 +42,7 @@
         "symfony/console": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/web-link": "^4.4|^5.0",
-        "symfony/workflow": "^4.4|^5.0",
+        "symfony/workflow": "^5.2",
         "twig/cssinliner-extra": "^2.12",
         "twig/inky-extra": "^2.12",
         "twig/markdown-extra": "^2.12"
@@ -53,7 +53,7 @@
         "symfony/http-foundation": "<4.4",
         "symfony/http-kernel": "<4.4",
         "symfony/translation": "<5.0",
-        "symfony/workflow": "<4.4"
+        "symfony/workflow": "<5.2"
     },
     "suggest": {
         "symfony/finder": "",

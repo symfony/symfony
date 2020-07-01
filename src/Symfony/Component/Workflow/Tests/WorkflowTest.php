@@ -592,6 +592,21 @@ class WorkflowTest extends TestCase
         $this->assertSame('t5', $transitions[0]->getName());
     }
 
+    public function testGetEnabledTransition()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $workflow = new Workflow($definition, new MethodMarkingStore());
+
+        $subject->setMarking(['d' => 1]);
+        $transition = $workflow->getEnabledTransition($subject, 't3');
+        $this->assertInstanceOf(Transition::class, $transition);
+        $this->assertSame('t3', $transition->getName());
+
+        $transition = $workflow->getEnabledTransition($subject, 'does_not_exist');
+        $this->assertNull($transition);
+    }
+
     public function testGetEnabledTransitionsWithSameNameTransition()
     {
         $definition = $this->createWorkflowWithSameNameTransition();

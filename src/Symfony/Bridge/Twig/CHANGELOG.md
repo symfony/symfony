@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added function `workflow_transition` to easily retrieve a specific transition object
+
 5.0.0
 -----
 
@@ -16,7 +21,7 @@ CHANGELOG
 
  * added a new `TwigErrorRenderer` for `html` format, integrated with the `ErrorHandler` component
  * marked all classes extending twig as `@final`
- * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
+ * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
  * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
  * deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
@@ -29,7 +34,7 @@ CHANGELOG
 
  * added the `form_parent()` function that allows to reliably retrieve the parent form in Twig templates
  * added the `workflow_transition_blockers()` function
- * deprecated the `$requestStack` and `$requestContext` arguments of the 
+ * deprecated the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
 

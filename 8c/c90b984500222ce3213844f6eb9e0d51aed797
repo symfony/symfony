@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-24T09:06:30Z
+
+@mtarld Do you have time to take comments into account? I would love to have this PR merged for 5.2. Thank you.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-06-24T09:22:38Z
+
+Yes of course. I'll try to do it ASAP.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-07-01T12:41:16Z
+
+> LGTM. Can you also change the implementation of `src/Symfony/Component/HttpKernel/EventListener/AbstractSessionListener.php` to simplify the implementation as well? (line 160-163)
+
+I don't know if I have to change the `AbstractSessionListener`, in fact as @nicolas-grekas said in [that comment](https://github.com/symfony/symfony/pull/36364#discussion_r446883425)
+> It's legit to be able to nest a stateless subrequest into a stateful one
+
+And I agree with him. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-01T13:12:56Z
+
+(I confirm that the current check in `AbstractSessionListener` is correct - it allows tracking "stateless" in subrequests.)

@@ -173,6 +173,10 @@ class FileValidator extends ConstraintValidator
             $mimeTypes = (array) $constraint->mimeTypes;
             $mime = $value->getMimeType();
 
+            if ($value instanceof UploadedFile) {
+                $mime = $value->getClientMimeType();
+            }
+
             foreach ($mimeTypes as $mimeType) {
                 if ($mimeType === $mime) {
                     return;

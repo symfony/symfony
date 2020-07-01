@@ -326,6 +326,37 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidMimeTypeWithUploadedFile()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->setConstructorArgs([__DIR__.'/Fixtures/temporary.tmp', __DIR__.'/Fixtures/foo', 'image/jpg'])
+            ->getMock();
+
+        $file
+            ->expects($this->once())
+            ->method('getClientMimeType')
+            ->willReturn('image/jpg');
+
+        $file
+            ->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->willReturn($this->path);
+
+        $constraint = new File([
+            'mimeTypes' => ['image/jpg'],
+        ]);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function testInvalidMimeType()
     {
         $file = $this

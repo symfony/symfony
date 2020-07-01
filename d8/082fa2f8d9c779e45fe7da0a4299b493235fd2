@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-18T12:19:14Z
+
+Would it make sense to do `$mock->info = &$response->info;` instead? That would allow checking any option from the response when having the mock at hand, via `getInfo()`. Can you give it a try?
+
+---------------------------------------------------------------------------
+
+by javespi at 2020-06-08T14:41:28Z
+
+Hi @nicolas-grekas, is there anything I can do to move forward this PR? Thanks! :smiley:

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by mvorisek at 2020-07-01T11:00:17Z
+
+Please verify AppVeyor tests and if ok, please merge asap.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-01T11:43:16Z
+
+Is this really enough? other parts of the component use shell_exec, and I'd suspect exec and shell_exec to be disabled at the same time.
+
+I'm not sure it makes much sense also to run console commands without exec: if you can run a Symfony command, it means you can run any command, isn't it?
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2020-07-01T11:55:09Z
+
+> I'm not sure it makes much sense also to run console commands without exec: if you can run a Symfony command, it means you can run any command, isn't it?
+
+Some users have these functions disabled for cli (like for web where it is very usual). Console library should not throw if exec is not available - because `stty` can not be called anyway then.
+
+Example of usecase: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/5030
+
+CS fixer and any library that does not need to start another process does not need `exec` or similar functions.
+
+> Is this really enough? other parts of the component use shell_exec, and I'd suspect exec and shell_exec to be disabled at the same time.
+
+Yes, only this one.

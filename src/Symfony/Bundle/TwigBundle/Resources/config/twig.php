@@ -98,7 +98,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/twig.html.twig', 'id' => 'twig', 'priority' => 257])
 
         ->set('twig.extension.trans', TranslationExtension::class)
-            ->args([service('translation')->nullOnInvalid()])
+            ->args([service('translator')->nullOnInvalid()])
             ->tag('twig.extension')
 
         ->set('twig.extension.assets', AssetExtension::class)

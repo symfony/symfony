@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by epitre at 2020-06-26T14:23:13Z
+
+Hi,
+if someone can help me with the travis build failed.
+I don't understand why it says that "Error: Call to undefined method Symfony\Component\Workflow\Workflow::getEnabledTransition()" as I did commit he method. You can see it here : https://github.com/symfony/symfony/pull/37428/files#diff-6d1e8dc0d2c0e7c4ab206d0efbb71516R241
+
+and I don't understand all the other errors regarding src/Symfony/Component/Notifier/Bridge/FreeMobile, src/Symfony/Component/Notifier/Bridge/Slack, etc....
+```PHP Fatal error:  Declaration of Symfony\Component\Notifier\Bridge\Slack\SlackTransport::doSend(Symfony\Component\Notifier\Message\MessageInterface $message): void must be compatible with Symfony\Component\Notifier\Transport\AbstractTransport::doSend(Symfony\Component\Notifier\Message\MessageInterface $message): Symfony\Component\Notifier\Message\SentMessage in /home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Slack/SlackTransport.php on line 34```
+
+I feel like it has nothing to do with this PR :/
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-06-26T14:48:54Z
+
+For the notifier code, recently the return signature of the method changed
+
+For the workflow part, i do not know :s
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-06-30T21:43:35Z
+
+> Thanks for your contribution.
+>
+> Instead of the current implementation, I would simplify a lot the code:
+> You could leverage the current [`getEnabledTransitions()`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Workflow/Workflow.php#L199) method in the bridge, without implementing a new method.
+>
+> Less code == less bug :)
+
+@lyrixx That's actually what I did first (and that's what I currently do in my project). And then I thought it would make more sense to have a dedicated function...
+What I need in a twig template, someone might need it in a service (or somewhere else ^^)
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-06-30T23:26:24Z
+
+Now, I have a problem with graphviz and PlantUML...
+
+Maybe I should not have changed the complex workflow ^^
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-01T08:03:25Z
+
+@lyrixx i updated the workflow changelog.
+What is the other changelog you want me to update ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-07-01T08:30:31Z
+
+The one in the bridge https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-01T08:38:45Z
+
+@lyrixx Done !

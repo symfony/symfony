@@ -27,6 +27,13 @@ class AuditTrailListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    public function onInitiate(Event $event)
+    {
+        foreach ($event->getMarking()->getPlaces() as $place => $nbToken) {
+            $this->logger->info(sprintf('Initiated "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
+        }    
+    }
+    
     public function onLeave(Event $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
@@ -49,6 +56,7 @@ class AuditTrailListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            'workflow.initiate' => ['onInitiate'],
             'workflow.leave' => ['onLeave'],
             'workflow.transition' => ['onTransition'],
             'workflow.enter' => ['onEnter'],

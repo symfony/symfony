@@ -400,18 +400,18 @@ class Workflow implements WorkflowInterface
             }
         }
     }
-    
+
     private function initiated(object $subject, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
         }
-        
+
         $event = new InitiatedEvent($subject, $marking, null, $this);
-        
+
         $this->dispatcher->dispatch($event, WorkflowEvents::INITITATED);
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.initiated', $this->name));
-        
+
         foreach ($marking->getPlaces() as $place => $nbToken) {
             $this->dispatcher->dispatch($event, sprintf('workflow.%s.initiated.%s', $this->name, $place));
         }

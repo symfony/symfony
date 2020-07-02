@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added function `getEnabledTransition` to easily retrieve a specific transition object
+ * Added and trigger `initiated` event for subject entering in the Workflow for the first time.
 
 5.1.0
 -----

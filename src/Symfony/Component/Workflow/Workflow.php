@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Event\CompletedEvent;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\EnterEvent;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Event\InitiatedEvent;
 use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
@@ -30,6 +31,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Marcel Berteler <pluk77@gmail.com>
  */
 class Workflow implements WorkflowInterface
 {
@@ -71,6 +73,7 @@ class Workflow implements WorkflowInterface
             // update the subject with the new marking
             $this->markingStore->setMarking($subject, $marking);
 
+            $this->initiated($subject, $marking);
             $this->entered($subject, null, $marking);
         }
 
@@ -395,6 +398,22 @@ class Workflow implements WorkflowInterface
             foreach ($transition->getTos() as $place) {
                 $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered.%s', $this->name, $place));
             }
+        }
+    }
+    
+    private function initiated(object $subject, Marking $marking): void
+    {
+        if (null === $this->dispatcher) {
+            return;
+        }
+        
+        $event = new InitiatedEvent($subject, $marking, null, $this);
+        
+        $this->dispatcher->dispatch($event, WorkflowEvents::INITITATED);
+        $this->dispatcher->dispatch($event, sprintf('workflow.%s.initiated', $this->name));
+        
+        foreach ($marking->getPlaces() as $place => $nbToken) {
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.initiated.%s', $this->name, $place));
         }
     }
 

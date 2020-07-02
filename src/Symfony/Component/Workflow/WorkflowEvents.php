@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Event\CompletedEvent;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\EnterEvent;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Event\InitiatedEvent;
 use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
 
@@ -49,6 +50,11 @@ final class WorkflowEvents
      * @Event("Symfony\Component\Workflow\Event\EnteredEvent")
      */
     const ENTERED = 'workflow.entered';
+    
+    /**
+     * @Event("Symfony\Component\Workflow\Event\InitiatedEvent")
+     */
+    const ENTERED = 'workflow.initiated';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\LeaveEvent")

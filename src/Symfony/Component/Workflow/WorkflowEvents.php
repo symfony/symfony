@@ -54,7 +54,7 @@ final class WorkflowEvents
     /**
      * @Event("Symfony\Component\Workflow\Event\InitiatedEvent")
      */
-    const ENTERED = 'workflow.initiated';
+    const INITIATED = 'workflow.initiated';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\LeaveEvent")

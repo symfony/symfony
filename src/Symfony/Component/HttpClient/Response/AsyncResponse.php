@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -69,7 +70,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         $headers = $this->response->getHeaders(false);
 
         if ($throw) {
-            $this->checkStatusCode($this->getInfo('http_code'));
+            $this->checkStatusCode();
         }
 
         return $headers;
@@ -126,31 +127,44 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
             return;
         }
 
-        $context = new AsyncContext($this->passthru, $client, $this->response, $this->info, $this->content, $this->offset);
-        if (null === $stream = ($this->passthru)(new LastChunk(), $context)) {
-            return;
-        }
-
-        if (!$stream instanceof \Iterator) {
-            throw new \LogicException(sprintf('A chunk passthru must return an "Iterator", "%s" returned.', get_debug_type($stream)));
-        }
-
         try {
-            foreach ($stream as $chunk) {
-                if ($chunk->isLast()) {
-                    break;
-                }
+            foreach (self::passthru($client, $this, new LastChunk()) as $chunk) {
+                // no-op
             }
 
-            $stream->next();
-
-            if ($stream->valid()) {
-                throw new \LogicException('A chunk passthru cannot yield after the last chunk.');
-            }
-
-            $stream = $this->passthru = null;
+            $this->passthru = null;
         } catch (ExceptionInterface $e) {
             // ignore any errors when canceling
+        }
+    }
+
+    public function __destruct()
+    {
+        $httpException = null;
+
+        if ($this->initializer && null === $this->getInfo('error')) {
+            try {
+                $this->getHeaders(true);
+            } catch (HttpExceptionInterface $httpException) {
+                // no-op
+            }
+        }
+
+        if ($this->passthru && null === $this->getInfo('error')) {
+            $this->info['canceled'] = true;
+            $this->info['error'] = 'Response has been canceled.';
+
+            try {
+                foreach (self::passthru($this->client, $this, new LastChunk()) as $chunk) {
+                    // no-op
+                }
+            } catch (ExceptionInterface $e) {
+                // ignore any errors when destructing
+            }
+        }
+
+        if (null !== $httpException) {
+            throw $httpException;
         }
     }
 
@@ -201,106 +215,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                     continue;
                 }
 
-                $context = new AsyncContext($r->passthru, $r->client, $r->response, $r->info, $r->content, $r->offset);
-                if (null === $stream = ($r->passthru)($chunk, $context)) {
-                    if ($r->response === $response && (null !== $chunk->getError() || $chunk->isLast())) {
-                        throw new \LogicException('A chunk passthru cannot swallow the last chunk.');
-                    }
-
-                    continue;
+                foreach (self::passthru($r->client, $r, $chunk, $asyncMap) as $chunk) {
+                    yield $r => $chunk;
                 }
-                $chunk = null;
-
-                if (!$stream instanceof \Iterator) {
-                    throw new \LogicException(sprintf('A chunk passthru must return an "Iterator", "%s" returned.', get_debug_type($stream)));
-                }
-
-                while (true) {
-                    try {
-                        if (null !== $chunk) {
-                            $stream->next();
-                        }
-
-                        if (!$stream->valid()) {
-                            break;
-                        }
-                    } catch (\Throwable $e) {
-                        $r->info['error'] = $e->getMessage();
-                        $r->response->cancel();
-
-                        yield $r => $chunk = new ErrorChunk($r->offset, $e);
-                        $chunk->didThrow() ?: $chunk->getContent();
-                        unset($asyncMap[$response]);
-                        break;
-                    }
-
-                    $chunk = $stream->current();
-
-                    if (!$chunk instanceof ChunkInterface) {
-                        throw new \LogicException(sprintf('A chunk passthru must yield instances of "%s", "%s" yielded.', ChunkInterface::class, get_debug_type($chunk)));
-                    }
-
-                    if (null !== $chunk->getError()) {
-                        // no-op
-                    } elseif ($chunk->isFirst()) {
-                        $e = $r->openBuffer();
-
-                        yield $r => $chunk;
-
-                        if (null === $e) {
-                            continue;
-                        }
-
-                        $r->response->cancel();
-                        $chunk = new ErrorChunk($r->offset, $e);
-                    } elseif ('' !== $content = $chunk->getContent()) {
-                        if (null !== $r->shouldBuffer) {
-                            throw new \LogicException('A chunk passthru must yield an "isFirst()" chunk before any content chunk.');
-                        }
-
-                        if (null !== $r->content && \strlen($content) !== fwrite($r->content, $content)) {
-                            $chunk = new ErrorChunk($r->offset, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
-                            $r->info['error'] = $chunk->getError();
-                            $r->response->cancel();
-                        }
-                    }
-
-                    if (null === $chunk->getError()) {
-                        $r->offset += \strlen($content);
-
-                        yield $r => $chunk;
-
-                        if (!$chunk->isLast()) {
-                            continue;
-                        }
-
-                        $stream->next();
-
-                        if ($stream->valid()) {
-                            throw new \LogicException('A chunk passthru cannot yield after an "isLast()" chunk.');
-                        }
-
-                        $r->passthru = null;
-                    } else {
-                        if ($chunk instanceof ErrorChunk) {
-                            $chunk->didThrow(false);
-                        } else {
-                            try {
-                                $chunk = new ErrorChunk($chunk->getOffset(), !$chunk->isTimeout() ?: $chunk->getError());
-                            } catch (TransportExceptionInterface $e) {
-                                $chunk = new ErrorChunk($chunk->getOffset(), $e);
-                            }
-                        }
-
-                        yield $r => $chunk;
-                        $chunk->didThrow() ?: $chunk->getContent();
-                    }
-
-                    unset($asyncMap[$response]);
-                    break;
-                }
-
-                $stream = $context = null;
 
                 if ($r->response !== $response && isset($asyncMap[$response])) {
                     break;
@@ -319,6 +236,114 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                     $responses[] = $asyncMap[$response];
                 }
             }
+        }
+    }
+
+    private static function passthru(HttpClientInterface $client, self $r, ChunkInterface $chunk, \SplObjectStorage $asyncMap = null): \Generator
+    {
+        $response = $r->response;
+        $context = new AsyncContext($r->passthru, $client, $r->response, $r->info, $r->content, $r->offset);
+        if (null === $stream = ($r->passthru)($chunk, $context)) {
+            if ($r->response === $response && (null !== $chunk->getError() || $chunk->isLast())) {
+                throw new \LogicException('A chunk passthru cannot swallow the last chunk.');
+            }
+
+            return;
+        }
+        $chunk = null;
+
+        if (!$stream instanceof \Iterator) {
+            throw new \LogicException(sprintf('A chunk passthru must return an "Iterator", "%s" returned.', get_debug_type($stream)));
+        }
+
+        while (true) {
+            try {
+                if (null !== $chunk) {
+                    $stream->next();
+                }
+
+                if (!$stream->valid()) {
+                    break;
+                }
+            } catch (\Throwable $e) {
+                $r->info['error'] = $e->getMessage();
+                $r->response->cancel();
+
+                yield $r => $chunk = new ErrorChunk($r->offset, $e);
+                $chunk->didThrow() ?: $chunk->getContent();
+                unset($asyncMap[$response]);
+                break;
+            }
+
+            $chunk = $stream->current();
+
+            if (!$chunk instanceof ChunkInterface) {
+                throw new \LogicException(sprintf('A chunk passthru must yield instances of "%s", "%s" yielded.', ChunkInterface::class, get_debug_type($chunk)));
+            }
+
+            if (null !== $chunk->getError()) {
+                // no-op
+            } elseif ($chunk->isFirst()) {
+                $e = $r->openBuffer();
+
+                yield $r => $chunk;
+
+                if ($r->initializer && null === $r->getInfo('error')) {
+                    // Ensure the HTTP status code is always checked
+                    $r->getHeaders(true);
+                }
+
+                if (null === $e) {
+                    continue;
+                }
+
+                $r->response->cancel();
+                $chunk = new ErrorChunk($r->offset, $e);
+            } elseif ('' !== $content = $chunk->getContent()) {
+                if (null !== $r->shouldBuffer) {
+                    throw new \LogicException('A chunk passthru must yield an "isFirst()" chunk before any content chunk.');
+                }
+
+                if (null !== $r->content && \strlen($content) !== fwrite($r->content, $content)) {
+                    $chunk = new ErrorChunk($r->offset, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
+                    $r->info['error'] = $chunk->getError();
+                    $r->response->cancel();
+                }
+            }
+
+            if (null === $chunk->getError()) {
+                $r->offset += \strlen($content);
+
+                yield $r => $chunk;
+
+                if (!$chunk->isLast()) {
+                    continue;
+                }
+
+                $stream->next();
+
+                if ($stream->valid()) {
+                    throw new \LogicException('A chunk passthru cannot yield after an "isLast()" chunk.');
+                }
+
+                $r->passthru = null;
+            } else {
+                if ($chunk instanceof ErrorChunk) {
+                    $chunk->didThrow(false);
+                } else {
+                    try {
+                        $chunk = new ErrorChunk($chunk->getOffset(), !$chunk->isTimeout() ?: $chunk->getError());
+                    } catch (TransportExceptionInterface $e) {
+                        $chunk = new ErrorChunk($chunk->getOffset(), $e);
+                    }
+                }
+
+                yield $r => $chunk;
+                $chunk->didThrow() ?: $chunk->getContent();
+            }
+
+            unset($asyncMap[$response]);
+            break;
         }
     }
 

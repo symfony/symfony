@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
+ * added `File::getContent()`
 
 5.1.0
 -----

@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -162,5 +163,23 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         }
         $this->assertTrue($chunk->isLast());
         $this->assertSame(1, $lastChunks);
+    }
+
+    public function testLastChunkIsYieldOnHttpExceptionAtDestructTime()
+    {
+        $lastChunk = null;
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$lastChunk) {
+            $lastChunk = $chunk;
+
+            yield $chunk;
+        });
+
+        try {
+            $client->request('GET', 'http://localhost:8057/404');
+            $this->fail(ClientExceptionInterface::class.' expected');
+        } catch (ClientExceptionInterface $e) {
+        }
+
+        $this->assertTrue($lastChunk->isLast());
     }
 }

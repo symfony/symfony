@@ -45,7 +45,6 @@ final class CurlResponse implements ResponseInterface
         $this->multi = $multi;
 
         if (\is_resource($ch) || $ch instanceof \CurlHandle) {
-            unset($multi->handlesActivity[(int) $ch]);
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
             if (0x074000 === $curlVersion) {
@@ -76,7 +75,17 @@ final class CurlResponse implements ResponseInterface
         }
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
-            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
+            if (0 !== substr_compare($data, "\r\n", -2)) {
+                return 0;
+            }
+
+            $len = 0;
+
+            foreach (explode("\r\n", substr($data, 0, -2)) as $data) {
+                $len += 2 + self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
+            }
+
+            return $len;
         });
 
         if (null === $options) {
@@ -319,10 +328,10 @@ final class CurlResponse implements ResponseInterface
             return \strlen($data); // Ignore HTTP trailers
         }
 
-        if ("\r\n" !== $data) {
+        if ('' !== $data) {
             try {
                 // Regular header line: add it to the list
-                self::addResponseHeaders([substr($data, 0, -2)], $info, $headers);
+                self::addResponseHeaders([$data], $info, $headers);
             } catch (TransportException $e) {
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = $e;
@@ -332,7 +341,7 @@ final class CurlResponse implements ResponseInterface
 
             if (0 !== strpos($data, 'HTTP/')) {
                 if (0 === stripos($data, 'Location:')) {
-                    $location = trim(substr($data, 9, -2));
+                    $location = trim(substr($data, 9));
                 }
 
                 return \strlen($data);

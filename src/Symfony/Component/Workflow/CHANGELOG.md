@@ -4,7 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
- * Added function `getEnabledTransition` to easily retrieve a specific transition object
+ * Added `Workflow::getEnabledTransition()` to easily retrieve a specific transition object
 
 5.1.0
 -----

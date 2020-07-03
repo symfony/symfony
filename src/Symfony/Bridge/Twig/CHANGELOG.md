@@ -4,7 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
- * Added function `workflow_transition` to easily retrieve a specific transition object
+ * added the `workflow_transition()` function to easily retrieve a specific transition object
 
 5.0.0
 -----

@@ -214,7 +214,7 @@ class Application implements ResetInterface
 
         $name = $this->getCommandName($input);
 
-        if (true === $input->hasParameterOption(['--help', '-h'], true)) {
+        if ($this->hasDefaultOption('help') && true === $input->hasParameterOption(['--help', '-h'], true)) {
             if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(['command_name' => $this->defaultCommand]);
@@ -860,13 +860,13 @@ class Application implements ResetInterface
      */
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
-        if (true === $input->hasParameterOption(['--ansi'], true)) {
+        if ($this->hasDefaultOption('ansi') && true === $input->hasParameterOption(['--ansi'], true)) {
             $output->setDecorated(true);
-        } elseif (true === $input->hasParameterOption(['--no-ansi'], true)) {
+        } elseif ($this->hasDefaultOption('no-ansi') && true === $input->hasParameterOption(['--no-ansi'], true)) {
             $output->setDecorated(false);
         }
 
-        if (true === $input->hasParameterOption(['--no-interaction', '-n'], true)) {
+        if ($this->hasDefaultOption('no-interaction') && true === $input->hasParameterOption(['--no-interaction', '-n'], true)) {
             $input->setInteractive(false);
         }
 
@@ -878,10 +878,10 @@ class Application implements ResetInterface
             default: $shellVerbosity = 0; break;
         }
 
-        if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
+        if ($this->hasDefaultOption('quiet') && true === $input->hasParameterOption(['--quiet', '-q'], true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;
-        } else {
+        } elseif ($this->hasDefaultOption('verbose')) {
             if ($input->hasParameterOption('-vvv', true) || $input->hasParameterOption('--verbose=3', true) || 3 === $input->getParameterOption('--verbose', false, true)) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
                 $shellVerbosity = 3;

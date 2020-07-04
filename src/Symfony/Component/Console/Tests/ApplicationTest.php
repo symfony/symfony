@@ -1305,7 +1305,7 @@ class ApplicationTest extends TestCase
         $this->assertTrue($inputDefinition->hasOption('custom'));
     }
 
-    public function testRemovedVersionFromCustomInputDefinitionWorksWithCommand()
+    public function testRemovedDefaultValuesFromInputDefinitionWorksWithCommand()
     {
         $command = new \FooVersionCommand();
 

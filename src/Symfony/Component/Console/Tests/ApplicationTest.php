@@ -1317,7 +1317,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo:version', '--version' => '1.2.3']);
 
-        $this->assertEquals('called'.PHP_EOL.'1.2.3'.PHP_EOL, $tester->getDisplay(), 'Application parses the version option properly for the command');
+        $this->assertSame('called'.PHP_EOL.'1.2.3'.PHP_EOL, $tester->getDisplay(), 'Application parses the version option properly for the command');
     }
 
     public function testRunWithDispatcher()

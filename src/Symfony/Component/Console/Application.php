@@ -199,7 +199,7 @@ class Application implements ResetInterface
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         // If no command was used, and the default version option was not overriden, print current version and return.
-        if ($this->hasDefaultOption('version') && true === $input->hasParameterOption(['--version', '-V'], true)) {
+        if ($this->hasDefaultOption('version') && $input->hasParameterOption(['--version', '-V'], true)) {
             $output->writeln($this->getLongVersion());
 
             return 0;
@@ -214,7 +214,7 @@ class Application implements ResetInterface
 
         $name = $this->getCommandName($input);
 
-        if ($this->hasDefaultOption('help') && true === $input->hasParameterOption(['--help', '-h'], true)) {
+        if ($this->hasDefaultOption('help') && $input->hasParameterOption(['--help', '-h'], true)) {
             if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(['command_name' => $this->defaultCommand]);
@@ -860,13 +860,13 @@ class Application implements ResetInterface
      */
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
-        if ($this->hasDefaultOption('ansi') && true === $input->hasParameterOption(['--ansi'], true)) {
+        if ($this->hasDefaultOption('ansi') && $input->hasParameterOption(['--ansi'], true)) {
             $output->setDecorated(true);
-        } elseif ($this->hasDefaultOption('no-ansi') && true === $input->hasParameterOption(['--no-ansi'], true)) {
+        } elseif ($this->hasDefaultOption('no-ansi') && $input->hasParameterOption(['--no-ansi'], true)) {
             $output->setDecorated(false);
         }
 
-        if ($this->hasDefaultOption('no-interaction') && true === $input->hasParameterOption(['--no-interaction', '-n'], true)) {
+        if ($this->hasDefaultOption('no-interaction') && $input->hasParameterOption(['--no-interaction', '-n'], true)) {
             $input->setInteractive(false);
         }
 
@@ -878,7 +878,7 @@ class Application implements ResetInterface
             default: $shellVerbosity = 0; break;
         }
 
-        if ($this->hasDefaultOption('quiet') && true === $input->hasParameterOption(['--quiet', '-q'], true)) {
+        if ($this->hasDefaultOption('quiet') && $input->hasParameterOption(['--quiet', '-q'], true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;
         } elseif ($this->hasDefaultOption('verbose')) {

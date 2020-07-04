@@ -34,6 +34,7 @@
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-cache" type="http_cache" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="rate-limiter" type="rate_limiter" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -634,4 +635,30 @@
             <xsd:enumeration value="full" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="rate_limiter">
+        <xsd:sequence>
+            <xsd:element name="limiter" type="rate_limiter_limiter" minOccurs="0"  maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="max-host-connections" type="xsd:integer" />
+        <xsd:attribute name="mock-response-factory" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="rate_limiter_limiter">
+        <xsd:sequence>
+            <xsd:element name="rate" type="rate_limiter_rate" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="lock" type="xsd:string" />
+        <xsd:attribute name="storage" type="xsd:string" />
+        <xsd:attribute name="strategy" type="xsd:string" />
+        <xsd:attribute name="limit" type="xsd:int" />
+        <xsd:attribute name="interval" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="rate_limiter_rate">
+        <xsd:attribute name="interval" type="xsd:string" />
+        <xsd:attribute name="amount" type="xsd:int" />
+    </xsd:complexType>
 </xsd:schema>

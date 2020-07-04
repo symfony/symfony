@@ -30,6 +30,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\RateLimiter\TokenBucketLimiter;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -134,6 +135,7 @@ class Configuration implements ConfigurationInterface
         $this->addMailerSection($rootNode);
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode);
+        $this->addRateLimiterSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1699,6 +1701,52 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('email')->cannotBeEmpty()->end()
                                     ->scalarNode('phone')->defaultValue('')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRateLimiterSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('rate_limiter')
+                    ->info('Rate limiter configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->fixXmlConfig('limiter')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']); })
+                        ->then(function (array $v) {
+                            $newV = [
+                                'enabled' => $v['enabled'],
+                            ];
+                            unset($v['enabled']);
+
+                            $newV['limiters'] = $v;
+
+                            return $newV;
+                        })
+                    ->end()
+                    ->children()
+                        ->arrayNode('limiters')
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('lock')->defaultValue('lock.factory')->end()
+                                    ->scalarNode('storage')->defaultValue('cache.app')->end()
+                                    ->scalarNode('strategy')->isRequired()->end()
+                                    ->integerNode('limit')->isRequired()->end()
+                                    ->scalarNode('interval')->end()
+                                    ->arrayNode('rate')
+                                        ->children()
+                                            ->scalarNode('interval')->isRequired()->end()
+                                            ->integerNode('amount')->defaultValue(1)->end()
+                                        ->end()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()

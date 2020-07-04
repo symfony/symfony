@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient;
 
 use GuzzleHttp\Promise\Promise as GuzzlePromise;
+use GuzzleHttp\Promise\RejectedPromise;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Client\HttpAsyncClient;
@@ -22,7 +23,6 @@ use Http\Message\RequestFactory;
 use Http\Message\StreamFactory;
 use Http\Message\UriFactory;
 use Http\Promise\Promise;
-use Http\Promise\RejectedPromise;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;
@@ -114,7 +114,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         try {
             $response = $this->sendPsr7Request($request, true);
         } catch (NetworkException $e) {
-            return new RejectedPromise($e);
+            return new HttplugPromise(new RejectedPromise($e));
         }
 
         $waitLoop = $this->waitLoop;

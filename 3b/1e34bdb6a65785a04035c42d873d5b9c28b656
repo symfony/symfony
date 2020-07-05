@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by gmponos at 2020-07-05T05:34:01Z
+
+> prevents projects from installing on PHP 8.0 unnecessarily.
+
+Have I lost something? This does not prevent.. but allows.. is it a typo?
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2020-07-05T09:27:16Z
+
+> Have I lost something? This does not prevent.. but allows.. is it a typo?
+
+^7.3 means >=7.3, <8
+
+So yeah, it prevents PHP 8
+
+https://getcomposer.org/doc/articles/versions.md#caret-version-range-

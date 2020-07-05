@@ -66,26 +66,21 @@
 {%- endblock choice_widget %}
 
 {%- block file_row -%}
-    {% set onChange = "document.getElementById('" ~ id ~ "_file_name').innerHTML = this.value;" %}
     <div class="column is-6">
-        <div class="field">
-            <div class="file has-name">
-                {{- form_errors(form) -}}
-                <label class="file-label">
-                    {{- form_widget(form, {attr: {'class': 'file-input', 'onchange': onChange }}) -}}
-                    <span class="file-cta">
-                            <span class="file-icon">
-                                <i class="fas fa-upload"></i>
-                            </span>
-                            <span class="file-label">
-                                {{- form_label(form) -}}
-                            </span>
-                        </span>
-                    <span class="file-name" id="{{ id ~ '_file_name'}}"></span>
-                </label>
-                {{- form_errors(form) -}}
-            </div>
+        <div class="file" id="{{ 'file-' ~ id }}">
+            <label class="file-label">
+                {{- form_widget(form, {attr: {'class': 'file-input'}}) -}}
+                <span class="file-cta">
+                    <span class="file-icon">
+                        <i class="fas fa-upload" id="{{ 'file-icon-' ~ id }}"></i>
+                    </span>
+                    <span class="file-label">
+                        {{- form_label(form, null, {label_attr: {'id': 'file-label-' ~ id}}) -}}
+                    </span>
+                </span>
+            </label>
         </div>
+        {{- form_errors(form) -}}
     </div>
 {%- endblock file_row -%}
 

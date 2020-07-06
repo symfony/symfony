@@ -40,6 +40,10 @@ class RememberMeLogoutListener implements EventSubscriberInterface
             return;
         }
 
+        if (!$event->getToken()) {
+            return;
+        }
+
         if (null === $event->getResponse()) {
             throw new LogicException(sprintf('No response was set for this logout action. Make sure the DefaultLogoutListener or another listener has set the response before "%s" is called.', __CLASS__));
         }

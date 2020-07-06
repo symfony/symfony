@@ -152,7 +152,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function getCallback()
     {
         return [
-            yield 'static function' => [static function(\stdClass $object) {
+            yield 'static function' => [static function (\stdClass $object) {
                 return [$object->name, $object->email];
             }],
             yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\Closure::execute'],

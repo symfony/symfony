@@ -61,12 +61,12 @@ class UniqueValidator extends ConstraintValidator
         $normalizer = $unique->valueNormalizer;
 
         if (null === $normalizer) {
-            return static function($value) {
+            return static function ($value) {
                 return $value;
             };
         }
 
-        if (is_callable($normalizer)) {
+        if (\is_callable($normalizer)) {
             return $normalizer;
         }
 

@@ -4,6 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
+ * added the `valueNormalizer` option to `Unique` Constraint
  * added a `Cascade` constraint to ease validating nested typed object properties
  * deprecated the `allowEmptyString` option of the `Length` constraint
 

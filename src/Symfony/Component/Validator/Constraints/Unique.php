@@ -28,4 +28,9 @@ class Unique extends Constraint
     ];
 
     public $message = 'This collection should contain only unique elements.';
+
+    /**
+     * @var string|callable
+     */
+    public $valueNormalizer;
 }

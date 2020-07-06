@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class Closure
+class CallableClass
 {
     public static function execute(\stdClass $object)
     {
@@ -155,9 +155,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'static function' => [static function (\stdClass $object) {
                 return [$object->name, $object->email];
             }],
-            yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\Closure::execute'],
-            yield 'callable with static notation' => [[Closure::class, 'execute']],
-            yield 'callable with object' => [[new Closure(), 'execute']],
+            yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
+            yield 'callable with static notation' => [[CallableClass::class, 'execute']],
+            yield 'callable with object' => [[new CallableClass(), 'execute']],
         ];
     }
 }

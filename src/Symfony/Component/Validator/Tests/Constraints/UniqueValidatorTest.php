@@ -96,7 +96,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getCallback
      */
-    public function testExpectsUniqueObjects($closure)
+    public function testExpectsUniqueObjects($callback)
     {
         $object1 = new \stdClass();
         $object1->name = 'Foo';
@@ -113,7 +113,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $value = [$object1, $object2, $object3];
 
         $this->validator->validate($value, new Unique([
-            'valueNormalizer' => $closure,
+            'valueNormalizer' => $callback,
         ]));
 
         $this->assertNoViolation();
@@ -122,7 +122,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getCallback
      */
-    public function testExpectsNonUniqueObjects($closure)
+    public function testExpectsNonUniqueObjects($callback)
     {
         $object1 = new \stdClass();
         $object1->name = 'Foo';
@@ -136,12 +136,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $object3->name = 'Foo';
         $object3->email = 'foo@email.com';
 
-
         $value = [$object1, $object2, $object3];
 
         $this->validator->validate($value, new Unique([
             'message' => 'myMessage',
-            'valueNormalizer' => $closure,
+            'valueNormalizer' => $callback,
         ]));
 
         $this->buildViolation('myMessage')

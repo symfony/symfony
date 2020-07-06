@@ -1,0 +1,171 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-24T09:04:38Z
+
+Can you please add a test for this? It should run on windows only.
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-24T09:06:39Z
+
+>
+>
+> Can you please add a test for this? It should run on windows only.
+
+Is there a group in PHPUnit to run only on Windows (like `@group windows`)? Else, how I can do it? I can also check if the function `sapi_windows_cp_get` exists...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-24T09:12:26Z
+
+If the function exists only on windows, it should be enough yes.
+If you aren't sure, you can use a `'\\' === DIRECTORY_SEPARATOR` additional check for both code and tests, see e.g. https://github.com/symfony/symfony/blob/3308b25fe47d4c95e7c6eb2ca38e47173b2f789d/src/Symfony/Component/Console/Tests/Helper/QuestionHelperTest.php#L418-L420
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-24T09:13:46Z
+
+Ok thank you! I'm writing it.
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-24T09:36:15Z
+
+It's difficult to test it because the stream used for QuestionHelper tests is the PHP memory `php://memory`. However, this issue is only present in the console with `php://stdin`.
+Does anyone have any idea?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-06-26T15:47:48Z
+
+You can try phpt test case similar as https://github.com/symfony/symfony/blob/80d1f449831fbceefd481544c82f8244759eda4d/src/Symfony/Component/Console/Tests/phpt/uses_stdin_as_interactive_input.phpt
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-26T17:02:23Z
+
+>
+>
+> You can try phpt test case similar as https://github.com/symfony/symfony/blob/80d1f449831fbceefd481544c82f8244759eda4d/src/Symfony/Component/Console/Tests/phpt/uses_stdin_as_interactive_input.phpt
+
+This solution does not work 😞
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-26T17:39:04Z
+
+Can you try the following test locally? Without your patch at first, in order to make sure it breaks under your setup.
+
+```
+--TEST--
+QuestionHelper should parse special chars on windows input.
+--STDIN--
+à é
+--FILE--
+<?php
+
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Question\Question;
+
+$vendor = __DIR__;
+while (!file_exists($vendor.'/vendor')) {
+    $vendor = dirname($vendor);
+}
+require $vendor.'/vendor/autoload.php';
+
+$output = new ConsoleOutput();
+$output->write((new QuestionHelper())->ask(new ArgvInput(), $output, new Question("Special chars\n")));
+exit(0);
+?>
+--EXPECTF--
+Special chars
+à é
+```
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-26T20:16:53Z
+
+>
+>
+> Can you try the following test locally? Without your patch at first, in order to make sure it breaks under your setup.
+>
+> ```
+> --TEST--
+> QuestionHelper should parse special chars on windows input.
+> --STDIN--
+> à é
+> --FILE--
+> <?php
+>
+> use Symfony\Component\Console\Input\ArgvInput;
+> use Symfony\Component\Console\Output\ConsoleOutput;
+> use Symfony\Component\Console\Helper\QuestionHelper;
+> use Symfony\Component\Console\Question\Question;
+>
+> $vendor = __DIR__;
+> while (!file_exists($vendor.'/vendor')) {
+>     $vendor = dirname($vendor);
+> }
+> require $vendor.'/vendor/autoload.php';
+>
+> $output = new ConsoleOutput();
+> $output->write((new QuestionHelper())->ask(new ArgvInput(), $output, new Question("Special chars\n")));
+> exit(0);
+> ?>
+> --EXPECTF--
+> Special chars
+> à é
+> ```
+
+No more results... I think PHPUnit ***simulate*** and standard input but does not take all behaviors of the `fgets` function.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T13:49:30Z
+
+[CP1252](https://en.wikipedia.org/wiki/Windows-1252) allows more diacritics and is already the default on my French VM. [CP850](https://en.wikipedia.org/wiki/Code_page_850) would be an alternate possibility.
+
+Can you try and take 1252 if possible, 850 otherwise?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T13:51:30Z
+
+Oh, note that [codepage 65001](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers) is UTF-8, it would be even better. Can you give it a try?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-07-01T07:41:10Z
+
+>
+>
+> [CP1252](https://en.wikipedia.org/wiki/Windows-1252) allows more diacritics and is already the default on my French VM. [CP850](https://en.wikipedia.org/wiki/Code_page_850) would be an alternate possibility.
+>
+> Can you try and take 1252 if possible, 850 otherwise?
+
+>
+>
+> Oh, note that [codepage 65001](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers) is UTF-8, it would be even better. Can you give it a try?
+
+Only 1252 and 850 work (and 437 of course). I think the better code page is 1252 because it provides a better characters support.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-01T07:48:29Z
+
+Does the function return false is your case with 65001?
+If yes, we could set(65001) ?: set(1252) maybe?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-07-01T07:53:30Z
+
+>
+>
+> Does the function return false is your case with 65001?
+> If yes, we could set(65001) ?: set(1252) maybe?
+
+No it returns true but replaces `à` by nothing or `\`.

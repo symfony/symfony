@@ -15,6 +15,14 @@ use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+class Closure
+{
+    public static function execute(\stdClass $object)
+    {
+        return [$object->name, $object->email];
+    }
+}
+
 class UniqueValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
@@ -82,6 +90,75 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'not unique string' => [['a', 'b', 'a']],
             yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]]],
             yield 'not unique objects' => [[$object, $object]],
+        ];
+    }
+
+    /**
+     * @dataProvider getCallback
+     */
+    public function testExpectsUniqueObjects($closure)
+    {
+        $object1 = new \stdClass();
+        $object1->name = 'Foo';
+        $object1->email = 'foo@email.com';
+
+        $object2 = new \stdClass();
+        $object2->name = 'Foo';
+        $object2->email = 'foobar@email.com';
+
+        $object3 = new \stdClass();
+        $object3->name = 'Bar';
+        $object3->email = 'foo@email.com';
+
+        $value = [$object1, $object2, $object3];
+
+        $this->validator->validate($value, new Unique([
+            'valueNormalizer' => $closure,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getCallback
+     */
+    public function testExpectsNonUniqueObjects($closure)
+    {
+        $object1 = new \stdClass();
+        $object1->name = 'Foo';
+        $object1->email = 'bar@email.com';
+
+        $object2 = new \stdClass();
+        $object2->name = 'Foo';
+        $object2->email = 'foo@email.com';
+
+        $object3 = new \stdClass();
+        $object3->name = 'Foo';
+        $object3->email = 'foo@email.com';
+
+
+        $value = [$object1, $object2, $object3];
+
+        $this->validator->validate($value, new Unique([
+            'message' => 'myMessage',
+            'valueNormalizer' => $closure,
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function getCallback()
+    {
+        return [
+            yield 'static function' => [static function(\stdClass $object) {
+                return [$object->name, $object->email];
+            }],
+            yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\Closure::execute'],
+            yield 'callable with static notation' => [[Closure::class, 'execute']],
+            yield 'callable with object' => [[new Closure(), 'execute']],
         ];
     }
 }

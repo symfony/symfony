@@ -46,6 +46,6 @@ final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInt
      */
     public function loadValuesForChoices(array $choices, callable $value = null)
     {
-        $this->getOption()->loadValuesForChoices($choices, $value);
+        return $this->getOption()->loadValuesForChoices($choices, $value);
     }
 }

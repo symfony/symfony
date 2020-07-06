@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.1.9
+-----
+
+ * fixed compat with PHP 8
+
 1.1.0
 -----
 

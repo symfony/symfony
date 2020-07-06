@@ -124,6 +124,21 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame($expectedData, $form->getData());
     }
 
+    public function testSubmitNullWithEmptyDataSetToNull()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'empty_data' => null,
+        ]);
+        $form->submit(null);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isValid());
+        $this->assertSame('', $form->getViewData());
+        $this->assertNull($form->getNormData());
+        $this->assertNull($form->getData());
+    }
+
     public function testSubmitNumericInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number']);

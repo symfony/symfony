@@ -56,6 +56,9 @@ class WindowsPipes extends AbstractPipes
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
 
                     if (!$h = fopen($file.'.lock', 'w')) {
+                        if (file_exists($file.'.lock')) {
+                            continue 2;
+                        }
                         restore_error_handler();
                         throw new RuntimeException('A temporary file could not be opened to write the process output: '.$lastError);
                     }

@@ -22,6 +22,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -70,12 +71,12 @@ class ViolationMapperTest extends TestCase
         $this->params = ['foo' => 'bar'];
     }
 
-    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = [], $inheritData = false, $synchronized = true)
+    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = [], $inheritData = false, $synchronized = true, array $options = [])
     {
         $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, [
             'error_mapping' => $errorMapping,
-        ]);
-        $config->setMapped(true);
+        ] + $options);
+        $config->setMapped(isset($options['mapped']) ? $options['mapped'] : true);
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
@@ -96,9 +97,9 @@ class ViolationMapperTest extends TestCase
      *
      * @return ConstraintViolation
      */
-    protected function getConstraintViolation($propertyPath)
+    protected function getConstraintViolation($propertyPath, $root = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, $root, $propertyPath, null);
     }
 
     /**
@@ -110,6 +111,33 @@ class ViolationMapperTest extends TestCase
         $error->setOrigin($form);
 
         return $error;
+    }
+
+    public function testMappingErrorsWhenFormIsNotMapped()
+    {
+        $form = $this->getForm('name', null, Issue::class, [
+            'child1' => 'child2',
+        ]);
+
+        $violation = $this->getConstraintViolation('children[child1].data', $form);
+
+        $child1Form = $this->getForm('child1', null, null, [], false, true, [
+            'mapped' => false,
+        ]);
+        $child2Form = $this->getForm('child2', null, null, [], false, true, [
+            'mapped' => false,
+        ]);
+
+        $form->add($child1Form);
+        $form->add($child2Form);
+
+        $form->submit([]);
+
+        $this->mapper->mapViolation($violation, $form);
+
+        $this->assertCount(0, $form->getErrors());
+        $this->assertCount(0, $form->get('child1')->getErrors());
+        $this->assertCount(1, $form->get('child2')->getErrors());
     }
 
     public function testMapToFormInheritingParentDataIfDataDoesNotMatch()

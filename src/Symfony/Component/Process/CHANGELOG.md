@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `Process::setOptions()` to set `Process` specific options
+ * added option `create_new_console` to allow a subprocess to continue
+   to run after the main script exited, both on Linux and on Windows
+
 5.1.0
 -----
 

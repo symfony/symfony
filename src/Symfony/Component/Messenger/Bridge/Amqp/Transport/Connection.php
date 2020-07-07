@@ -165,7 +165,7 @@ class Connection
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if ('amqp://' !== $dsn) {
+            if ('amqp://' !== $dsn || 'amqps://' !== $dsn) {
                 throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
             }
 
@@ -175,10 +175,11 @@ class Connection
         $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
         $exchangeName = $pathParts[1] ?? 'messages';
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+        $port = $parsedUrl['port'] ?? $dsn === 'amqps://' ? 5671 : 5672;
 
         $amqpOptions = array_replace_recursive([
             'host' => $parsedUrl['host'] ?? 'localhost',
-            'port' => $parsedUrl['port'] ?? 5672,
+            'port' => $port,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
             'exchange' => [
                 'name' => $exchangeName,

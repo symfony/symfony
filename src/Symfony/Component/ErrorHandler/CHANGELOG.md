@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added the ability to set `HtmlErrorRenderer::$template` to a custom template to render when not in debug mode.
+
 5.1.0
 -----
 

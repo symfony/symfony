@@ -193,7 +193,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         'requires' => ['php' => '*'],
     ];
 
-    if (1 === \count($info['versions'])) {
+    if (1 === count($info['versions'])) {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress -s dev phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     } else {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
@@ -251,16 +251,20 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
 define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
 
-if (!class_exists('SymfonyBlacklistPhpunit', false)) {
-    class SymfonyBlacklistPhpunit {}
+if (!class_exists('SymfonyExcludeListPhpunit', false)) {
+    class SymfonyExcludeListPhpunit {}
 }
-if (method_exists('PHPUnit\Util\Blacklist', 'addDirectory')) {
+if (method_exists('PHPUnit\Util\ExcludeList', 'addDirectory')) {
+    (new PHPUnit\Util\Excludelist())->getExcludedDirectories();
+    PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListPhpunit'))->getFileName()));
+    PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
+} elseif (method_exists('PHPUnit\Util\Blacklist', 'addDirectory')) {
     (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
-    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyBlacklistPhpunit'))->getFileName()));
-    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyBlacklistSimplePhpunit'))->getFileName()));
+    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListPhpunit'))->getFileName()));
+    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
 } else {
-    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;
-    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistSimplePhpunit'] = 1;
+    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListPhpunit'] = 1;
+    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListSimplePhpunit'] = 1;
 }
 
 Symfony\Bridge\PhpUnit\TextUI\Command::main();
@@ -372,8 +376,8 @@ if ($components) {
         }
     }
 } elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
-    if (!class_exists('SymfonyBlacklistSimplePhpunit', false)) {
-        class SymfonyBlacklistSimplePhpunit
+    if (!class_exists('SymfonyExcludeListSimplePhpunit', false)) {
+        class SymfonyExcludeListSimplePhpunit
         {
         }
     }

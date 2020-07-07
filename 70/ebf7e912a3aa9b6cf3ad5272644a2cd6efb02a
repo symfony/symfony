@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2020-07-06T09:07:23Z
+
+ready for review again :-) Thx.
+
+Any idea how long 5.2.0 release will take? Just so we can plan for the integration with the Joomla 4 release that's in development, need to see if the work needed to translate/customise the Joomla error page - which relies on this PR - is worth doing for the Joomla 4 release or waiting for Joomla 4.1 - Thanks again,.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-07-06T13:38:41Z
+
+About the release of 5.2 this will be out in November 2020 (https://symfony.com/releases/5.2)
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2020-07-06T13:57:07Z
+
+I have allowed a relative or absolute path to custom non-debug template with another light touch, simply checking if the file exists, this then has no knock on effects when used in a full Symfony stack or when no custom template is set.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2020-07-06T17:12:54Z
+
+Awesome - thanks!

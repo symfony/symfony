@@ -1994,6 +1994,24 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
+    public function testSubFormTranslationDomain()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'label' => 'label',
+            'translation_domain' => 'label_translation_domain',
+            'choices' => [
+                'choice1' => true,
+                'choice2' => false,
+            ],
+            'choice_translation_domain' => 'choice_translation_domain',
+            'expanded' => true,
+        ])->createView();
+
+        $this->assertCount(2, $form->children);
+        $this->assertSame('choice_translation_domain', $form->children[0]->vars['translation_domain']);
+        $this->assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
+    }
+
     /**
      * @dataProvider provideTrimCases
      */

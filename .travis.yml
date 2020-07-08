@@ -79,7 +79,7 @@ before_install:
       export COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       find ~/.phpenv -name xdebug.ini -delete
 
-      if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
+      if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then
           composer () {
               $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer config platform.php $(echo ' <?php echo preg_replace("/-.*/", "", PHP_VERSION);' | php /dev/stdin)
               $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer $*
@@ -169,17 +169,12 @@ before_install:
     - |
       # php.ini configuration
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          if [[ $PHP = hhvm* ]]; then
-              INI=/etc/hhvm/php.ini
-          else
-              phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
-              INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
-          fi
+          phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
+          INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           echo date.timezone = Europe/Paris >> $INI
           echo memory_limit = -1 >> $INI
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
-          echo hhvm.jit = 0 >> $INI
           echo apc.enable_cli = 1 >> $INI
           if [[ $PHP = 5.* ]]; then
               echo extension = redis.so >> $INI
@@ -195,9 +190,6 @@ before_install:
     - |
       # Install extra PHP extensions
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          if [[ $PHP = hhvm* ]]; then
-              continue
-          fi
           export PHP=$PHP
           phpenv global $PHP
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
@@ -304,7 +296,7 @@ install:
 
     - |
       # phpinfo
-      if [[ ! $TRAVIS_PHP_VERSION = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+      php -i
 
     - |
       run_tests () {
@@ -319,7 +311,7 @@ install:
               ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           fi
           tfold 'composer update' $COMPOSER_UP
-          if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
+          if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then
               tfold 'phpunit install' 'composer global remove symfony/flex && ./phpunit install && composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master'
           else
               tfold 'phpunit install' ./phpunit install
@@ -332,9 +324,6 @@ install:
               php .github/rm-invalid-lowest-lock-files.php $COMPONENTS
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
-          elif [[ $PHP = hhvm* ]]; then
-              rm src/Symfony/Bridge/PhpUnit -Rf
-              $PHPUNIT --exclude-group no-hhvm,benchmark,intl-data
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty

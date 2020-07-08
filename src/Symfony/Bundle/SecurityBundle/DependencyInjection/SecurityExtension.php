@@ -520,7 +520,7 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider = null, array $providerIds, $defaultEntryPoint, $contextListenerId = null)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $providerIds, $defaultEntryPoint, $contextListenerId = null)
     {
         $listeners = [];
         $hasListeners = false;

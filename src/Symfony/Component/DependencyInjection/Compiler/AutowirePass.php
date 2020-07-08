@@ -528,7 +528,7 @@ class AutowirePass extends AbstractRecursivePass
                 if (method_exists($parameter, 'getType')) {
                     $type = $parameter->getType();
                     if ($type && !$type->isBuiltin()) {
-                        $class = new \ReflectionClass(method_exists($type, 'getName') ? $type->getName() : (string) $type);
+                        $class = new \ReflectionClass($type instanceof \ReflectionNamedType ? $type->getName() : (string) $type);
                     } else {
                         $class = null;
                     }

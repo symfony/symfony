@@ -1080,6 +1080,6 @@ class OptionsResolver implements Options
             return null;
         }
 
-        return method_exists($type, 'getName') ? $type->getName() : (string) $type;
+        return $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
     }
 }

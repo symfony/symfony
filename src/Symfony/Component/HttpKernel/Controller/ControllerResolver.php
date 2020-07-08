@@ -274,7 +274,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
             return false;
         }
 
-        $class = new \ReflectionClass(method_exists($type, 'getName') ? $type->getName() : (string) $type);
+        $class = new \ReflectionClass($type instanceof \ReflectionNamedType ? $type->getName() : (string) $type);
 
         return $class && $class->isInstance($request);
     }

@@ -182,4 +182,18 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertTrue($lastChunk->isLast());
     }
+
+    public function testBufferPurePassthru()
+    {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            $context->passthru();
+
+            yield $chunk;
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
+        $this->assertStringContainsString('HTTP_HOST', $response->getContent());
+    }
 }

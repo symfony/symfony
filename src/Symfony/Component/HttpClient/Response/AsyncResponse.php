@@ -209,6 +209,10 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 if (!$r->passthru) {
                     if (null !== $chunk->getError() || $chunk->isLast()) {
                         unset($asyncMap[$response]);
+                    } elseif (null !== $r->content && '' !== ($content = $chunk->getContent()) && \strlen($content) !== fwrite($r->content, $content)) {
+                        $chunk = new ErrorChunk($r->offset, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
+                        $r->info['error'] = $chunk->getError();
+                        $r->response->cancel();
                     }
 
                     yield $r => $chunk;

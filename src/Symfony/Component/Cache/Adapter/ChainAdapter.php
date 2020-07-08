@@ -61,14 +61,10 @@ class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableIn
         $this->syncItem = \Closure::bind(
             static function ($sourceItem, $item) use ($defaultLifetime) {
                 $item->value = $sourceItem->value;
-                $item->expiry = $sourceItem->expiry;
                 $item->isHit = $sourceItem->isHit;
 
-                if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
-                    $defaultLifetime = $sourceItem->defaultLifetime;
-                }
-                if (0 < $defaultLifetime && ($item->defaultLifetime <= 0 || $defaultLifetime < $item->defaultLifetime)) {
-                    $item->defaultLifetime = $defaultLifetime;
+                if (0 < $defaultLifetime) {
+                    $item->expiresAfter($defaultLifetime);
                 }
 
                 return $item;

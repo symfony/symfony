@@ -48,12 +48,11 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
         $this->createCacheItem = \Closure::bind(
-            static function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->defaultLifetime = $defaultLifetime;
 
                 return $item;
             },
@@ -62,14 +61,16 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         );
         $getId = function ($key) { return $this->getId((string) $key); };
         $this->mergeByLifetime = \Closure::bind(
-            static function ($deferred, $namespace, &$expiredIds) use ($getId) {
+            static function ($deferred, $namespace, &$expiredIds) use ($getId, $defaultLifetime) {
                 $byLifetime = [];
                 $now = time();
                 $expiredIds = [];
 
                 foreach ($deferred as $key => $item) {
                     if (null === $item->expiry) {
-                        $byLifetime[0 < $item->defaultLifetime ? $item->defaultLifetime : 0][$getId($key)] = $item->value;
+                        $byLifetime[0 < $defaultLifetime ? $defaultLifetime : 0][$getId($key)] = $item->value;
+                    } elseif (0 === $item->expiry) {
+                        $byLifetime[0][$getId($key)] = $item->value;
                     } elseif ($item->expiry > $now) {
                         $byLifetime[$item->expiry - $now][$getId($key)] = $item->value;
                     } else {

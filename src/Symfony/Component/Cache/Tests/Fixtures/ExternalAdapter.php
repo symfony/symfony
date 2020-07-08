@@ -24,9 +24,9 @@ class ExternalAdapter implements CacheItemPoolInterface
 {
     private $cache;
 
-    public function __construct()
+    public function __construct($defaultLifetime = 0)
     {
-        $this->cache = new ArrayAdapter();
+        $this->cache = new ArrayAdapter($defaultLifetime);
     }
 
     public function getItem($key)

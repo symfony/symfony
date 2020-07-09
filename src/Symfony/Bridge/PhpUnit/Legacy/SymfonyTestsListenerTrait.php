@@ -208,6 +208,7 @@ class SymfonyTestsListenerTrait
             if ($this->willBeIsolated($test)) {
                 $this->runsInSeparateProcess = tempnam(sys_get_temp_dir(), 'deprec');
                 putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$this->runsInSeparateProcess);
+                putenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE='.tempnam(sys_get_temp_dir(), 'expectdeprec'));
             }
 
             $groups = Test::getGroups(\get_class($test), $test->getName(false));
@@ -249,6 +250,17 @@ class SymfonyTestsListenerTrait
 
     public function endTest($test, $time)
     {
+        if ($file = getenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE')) {
+            putenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE');
+            $expectedDeprecations = file_get_contents($file);
+            if ($expectedDeprecations) {
+                self::$expectedDeprecations = array_merge(self::$expectedDeprecations, unserialize($expectedDeprecations));
+                if (!self::$previousErrorHandler) {
+                    self::$previousErrorHandler = set_error_handler([self::class, 'handleError']);
+                }
+            }
+        }
+
         if (class_exists(DebugClassLoader::class, false)) {
             DebugClassLoader::checkClasses();
         }

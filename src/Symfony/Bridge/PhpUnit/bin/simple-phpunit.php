@@ -134,6 +134,7 @@ $defaultEnvs = [
     'COMPOSER' => 'composer.json',
     'COMPOSER_VENDOR_DIR' => 'vendor',
     'COMPOSER_BIN_DIR' => 'bin',
+    'SYMFONY_SIMPLE_PHPUNIT_BIN_DIR' => __DIR__,
 ];
 
 foreach ($defaultEnvs as $envName => $envValue) {

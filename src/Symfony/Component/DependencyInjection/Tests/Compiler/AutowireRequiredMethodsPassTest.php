@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
+use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -52,6 +53,29 @@ class AutowireRequiredMethodsPassTest extends TestCase
         );
         // test setFoo args
         $this->assertEquals([], $methodCalls[1][1]);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testSetterInjectionWithAttribute()
+    {
+        if (!class_exists(Required::class)) {
+            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('setter_injection', AutowireSetter::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
+        $this->assertSame([['setFoo', []]], $methodCalls);
     }
 
     public function testExplicitMethodInjection()
@@ -123,5 +147,27 @@ class AutowireRequiredMethodsPassTest extends TestCase
             ['setFoo', []],
         ];
         $this->assertSame($expected, $methodCalls);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testWitherInjectionWithAttribute()
+    {
+        if (!class_exists(Required::class)) {
+            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', AutowireWither::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $this->assertSame([['withFoo', [], true]], $container->getDefinition('wither')->getMethodCalls());
     }
 }

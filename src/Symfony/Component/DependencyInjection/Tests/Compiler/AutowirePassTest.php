@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\MultipleArgumentsOptionalScalarNotReallyOptional;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -638,6 +639,32 @@ class AutowirePassTest extends TestCase
             [new TypedReference(Foo::class, Foo::class)],
             $methodCalls[1][1]
         );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testSetterInjectionWithAttribute()
+    {
+        if (!class_exists(Required::class)) {
+            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('setter_injection', AutowireSetter::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
+        $this->assertCount(1, $methodCalls);
+        $this->assertSame('setFoo', $methodCalls[0][0]);
+        $this->assertSame(Foo::class, (string) $methodCalls[0][1][0]);
     }
 
     public function testWithNonExistingSetterAndAutowiring()

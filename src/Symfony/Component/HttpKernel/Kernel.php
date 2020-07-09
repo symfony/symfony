@@ -71,6 +71,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
+    private static $freshCache = [];
+
     const VERSION = '5.2.0-DEV';
     const VERSION_ID = 50200;
     const MAJOR_VERSION = 5;
@@ -429,11 +431,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
         $errorLevel = error_reporting(E_ALL ^ E_WARNING);
 
-        if ($this->checkCacheExist($cache, $cache->getPath())) {
-            $this->container->set('kernel', $this);
-            error_reporting($errorLevel);
+        try {
+            if ($this->checkCacheExistOrFresh($cache, $cache->getPath())) {
+                self::$freshCache[$cache->getPath()] = true;
+                $this->container->set('kernel', $this);
+                error_reporting($errorLevel);
 
-            return;
+                return;
+            }
+        } catch (\Throwable $e) {
         }
 
         $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
@@ -739,18 +745,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
-    private function checkCacheExist(ConfigCache $cache, string $cachePath): bool
+    private function checkCacheExistOrFresh(ConfigCache $cache, string $cachePath): bool
     {
-        try {
-            if (is_file($cachePath) && \is_object($this->container = include $cachePath)
-                && (!$this->debug || $cache->isFresh())
-            ) {
-                return true;
-            }
-        } catch (\Throwable $e) {
-        }
-
-        return false;
+        return is_file($cachePath) && \is_object($this->container = include $cachePath)
+            && (!$this->debug || (self::$freshCache[$cachePath] ?? $cache->isFresh()));
     }
 
     private function openAndLockCache(?resource &$lock, ?\ReflectionClass $oldContainer, string $cacheDir, string $cachePath, int $errorLevel): bool

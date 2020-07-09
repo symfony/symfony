@@ -429,14 +429,19 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
         $errorLevel = error_reporting(E_ALL ^ E_WARNING);
 
-        if ($this->checkCacheExist($cache, $cache->getPath(), $errorLevel)) {
+        if ($this->checkCacheExist($cache, $cache->getPath())) {
+            $this->container->set('kernel', $this);
+            error_reporting($errorLevel);
+
             return;
         }
 
         $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
 
         $lock = null;
-        if ($this->checkOldContainer($lock, $oldContainer, $cacheDir, $cache->getPath(), $errorLevel)) {
+        if ($this->openAndLockCache($lock, $oldContainer, $cacheDir, $cache->getPath(), $errorLevel)) {
+            $this->container->set('kernel', $this);
+
             return;
         }
 
@@ -734,15 +739,12 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
-    private function checkCacheExist(ConfigCache $cache, string $cachePath, int $errorLevel): bool
+    private function checkCacheExist(ConfigCache $cache, string $cachePath): bool
     {
         try {
             if (is_file($cachePath) && \is_object($this->container = include $cachePath)
                 && (!$this->debug || $cache->isFresh())
             ) {
-                $this->container->set('kernel', $this);
-                error_reporting($errorLevel);
-
                 return true;
             }
         } catch (\Throwable $e) {
@@ -751,7 +753,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return false;
     }
 
-    private function checkOldContainer(?resource &$lock, ?\ReflectionClass $oldContainer, string $cacheDir, string $cachePath, int $errorLevel): bool
+    private function openAndLockCache(?resource &$lock, ?\ReflectionClass $oldContainer, string $cacheDir, string $cachePath, int $errorLevel): bool
     {
         try {
             is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
@@ -767,7 +769,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
                     flock($lock, LOCK_UN);
                     fclose($lock);
-                    $this->container->set('kernel', $this);
 
                     return true;
                 }

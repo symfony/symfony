@@ -232,7 +232,7 @@ class SymfonyTestsListenerTrait
             if (isset($annotations['class']['expectedDeprecation'])) {
                 $test->getTestResultObject()->addError($test, new AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
             }
-            if (isset($annotations['method']['expectedDeprecation']) || $this->checkNumAssertions = \in_array(ExpectDeprecationTrait::class, class_uses($test), true)) {
+            if (isset($annotations['method']['expectedDeprecation']) || $this->checkNumAssertions = method_exists($test, 'expectDeprecation') && (new \ReflectionMethod($test, 'expectDeprecation'))->getFileName() === (new \ReflectionMethod(ExpectDeprecationTrait::class, 'expectDeprecation'))->getFileName()) {
                 if (isset($annotations['method']['expectedDeprecation'])) {
                     self::$expectedDeprecations = $annotations['method']['expectedDeprecation'];
                     self::$previousErrorHandler = set_error_handler([self::class, 'handleError']);

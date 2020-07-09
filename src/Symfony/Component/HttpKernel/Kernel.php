@@ -425,101 +425,24 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
-        $cachePath = $cache->getPath();
 
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
         $errorLevel = error_reporting(E_ALL ^ E_WARNING);
 
-        try {
-            if (is_file($cachePath) && \is_object($this->container = include $cachePath)
-                && (!$this->debug || $cache->isFresh())
-            ) {
-                $this->container->set('kernel', $this);
-                error_reporting($errorLevel);
-
-                return;
-            }
-        } catch (\Throwable $e) {
+        if ($this->checkCacheExist($cache, $cache->getPath(), $errorLevel)) {
+            return;
         }
 
         $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
 
-        try {
-            is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
-
-            if ($lock = fopen($cachePath.'.lock', 'w')) {
-                flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
-
-                if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
-                    fclose($lock);
-                    $lock = null;
-                } elseif (!\is_object($this->container = include $cachePath)) {
-                    $this->container = null;
-                } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
-                    flock($lock, LOCK_UN);
-                    fclose($lock);
-                    $this->container->set('kernel', $this);
-
-                    return;
-                }
-            }
-        } catch (\Throwable $e) {
-        } finally {
-            error_reporting($errorLevel);
+        $lock = null;
+        if ($this->checkOldContainer($lock, $oldContainer, $cacheDir, $cache->getPath(), $errorLevel)) {
+            return;
         }
 
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
-            $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
-                if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
-                    return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
-                }
-
-                if (isset($collectedLogs[$message])) {
-                    ++$collectedLogs[$message]['count'];
-
-                    return null;
-                }
-
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
-                // Clean the trace by removing first frames added by the error handler itself.
-                for ($i = 0; isset($backtrace[$i]); ++$i) {
-                    if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
-                        $backtrace = \array_slice($backtrace, 1 + $i);
-                        break;
-                    }
-                }
-                for ($i = 0; isset($backtrace[$i]); ++$i) {
-                    if (!isset($backtrace[$i]['file'], $backtrace[$i]['line'], $backtrace[$i]['function'])) {
-                        continue;
-                    }
-                    if (!isset($backtrace[$i]['class']) && 'trigger_deprecation' === $backtrace[$i]['function']) {
-                        $file = $backtrace[$i]['file'];
-                        $line = $backtrace[$i]['line'];
-                        $backtrace = \array_slice($backtrace, 1 + $i);
-                        break;
-                    }
-                }
-
-                // Remove frames added by DebugClassLoader.
-                for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
-                    if (\in_array($backtrace[$i]['class'] ?? null, [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
-                        $backtrace = [$backtrace[$i + 1]];
-                        break;
-                    }
-                }
-
-                $collectedLogs[$message] = [
-                    'type' => $type,
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                    'trace' => [$backtrace[0]],
-                    'count' => 1,
-                ];
-
-                return null;
-            });
+            $previousHandler = set_error_handler($this->errorHandlerFunction($collectedLogs, $previousHandler));
         }
 
         try {
@@ -542,34 +465,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             fclose($lock);
         }
 
-        $this->container = require $cachePath;
+        $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
-        if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
-            // Because concurrent requests might still be using them,
-            // old container files are not removed immediately,
-            // but on a next dump of the container.
-            static $legacyContainers = [];
-            $oldContainerDir = \dirname($oldContainer->getFileName());
-            $legacyContainers[$oldContainerDir.'.legacy'] = true;
-            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
-                if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
-                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
-                }
-            }
-
-            touch($oldContainerDir.'.legacy');
-        }
-
-        $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($this->container->getParameter('kernel.cache_dir')) : [];
-
-        if ($this->container->has('cache_warmer')) {
-            $preload = array_merge($preload, (array) $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir')));
-        }
-
-        if ($preload && method_exists(Preloader::class, 'append') && file_exists($preloadFile = $cacheDir.'/'.$class.'.preload.php')) {
-            Preloader::append($preloadFile, $preload);
-        }
+        $this->removeLegacyContainer($oldContainer);
+        $this->preparePreload($cacheDir, $class);
     }
 
     /**
@@ -830,6 +730,142 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         gc_mem_caches();
 
         return $output;
+    }
+
+    private function checkCacheExist(ConfigCache $cache, string $cachePath, int $errorLevel): bool
+    {
+        try {
+            if (is_file($cachePath) && \is_object($this->container = include $cachePath)
+                && (!$this->debug || $cache->isFresh())
+            ) {
+                $this->container->set('kernel', $this);
+                error_reporting($errorLevel);
+
+                return true;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        return false;
+    }
+
+    private function checkOldContainer(?resource &$lock, ?\ReflectionClass $oldContainer, string $cacheDir, string $cachePath, int $errorLevel): bool
+    {
+        try {
+            is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
+
+            if ($lock = fopen($cachePath.'.lock', 'w')) {
+                flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
+
+                if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
+                    fclose($lock);
+                    $lock = null;
+                } elseif (!\is_object($this->container = include $cachePath)) {
+                    $this->container = null;
+                } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
+                    flock($lock, LOCK_UN);
+                    fclose($lock);
+                    $this->container->set('kernel', $this);
+
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+        } finally {
+            error_reporting($errorLevel);
+        }
+
+        return false;
+    }
+
+    private function errorHandlerFunction(array &$collectedLogs, \Closure &$previousHandler): \Closure
+    {
+        return function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+            if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
+            }
+
+            if (isset($collectedLogs[$message])) {
+                ++$collectedLogs[$message]['count'];
+
+                return null;
+            }
+
+            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+            // Clean the trace by removing first frames added by the error handler itself.
+            for ($i = 0; isset($backtrace[$i]); ++$i) {
+                if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
+                    $backtrace = \array_slice($backtrace, 1 + $i);
+                    break;
+                }
+            }
+            for ($i = 0; isset($backtrace[$i]); ++$i) {
+                if (!isset($backtrace[$i]['file'], $backtrace[$i]['line'], $backtrace[$i]['function'])) {
+                    continue;
+                }
+                if (!isset($backtrace[$i]['class']) && 'trigger_deprecation' === $backtrace[$i]['function']) {
+                    $file = $backtrace[$i]['file'];
+                    $line = $backtrace[$i]['line'];
+                    $backtrace = \array_slice($backtrace, 1 + $i);
+                    break;
+                }
+            }
+
+            // Remove frames added by DebugClassLoader.
+            for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
+                if (\in_array(
+                    $backtrace[$i]['class'] ?? null,
+                    [DebugClassLoader::class, LegacyDebugClassLoader::class],
+                    true
+                )) {
+                    $backtrace = [$backtrace[$i + 1]];
+                    break;
+                }
+            }
+
+            $collectedLogs[$message] = [
+                'type' => $type,
+                'message' => $message,
+                'file' => $file,
+                'line' => $line,
+                'trace' => [$backtrace[0]],
+                'count' => 1,
+            ];
+
+            return null;
+        };
+    }
+
+    private function removeLegacyContainer(?\ReflectionClass $oldContainer): void
+    {
+        if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
+            // Because concurrent requests might still be using them,
+            // old container files are not removed immediately,
+            // but on a next dump of the container.
+            static $legacyContainers = [];
+            $oldContainerDir = \dirname($oldContainer->getFileName());
+            $legacyContainers[$oldContainerDir.'.legacy'] = true;
+            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
+                if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
+                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
+                }
+            }
+
+            touch($oldContainerDir.'.legacy');
+        }
+    }
+
+    private function preparePreload(string $cacheDir, string $class): void
+    {
+        $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($this->container->getParameter('kernel.cache_dir')) : [];
+
+        if ($this->container->has('cache_warmer')) {
+            $preload = array_merge($preload, (array) $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir')));
+        }
+
+        if ($preload && method_exists(Preloader::class, 'append') && file_exists($preloadFile = $cacheDir.'/'.$class.'.preload.php')) {
+            Preloader::append($preloadFile, $preload);
+        }
     }
 
     /**

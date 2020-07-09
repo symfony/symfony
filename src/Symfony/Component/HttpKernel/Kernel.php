@@ -468,7 +468,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
-        $this->removeLegacyContainer($oldContainer);
+        if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
+            $this->removeLegacyContainer($oldContainer);
+        }
         $this->preparePreload($cacheDir, $class);
     }
 
@@ -838,21 +840,19 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     private function removeLegacyContainer(?\ReflectionClass $oldContainer): void
     {
-        if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
-            // Because concurrent requests might still be using them,
-            // old container files are not removed immediately,
-            // but on a next dump of the container.
-            static $legacyContainers = [];
-            $oldContainerDir = \dirname($oldContainer->getFileName());
-            $legacyContainers[$oldContainerDir.'.legacy'] = true;
-            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
-                if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
-                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
-                }
+        // Because concurrent requests might still be using them,
+        // old container files are not removed immediately,
+        // but on a next dump of the container.
+        static $legacyContainers = [];
+        $oldContainerDir = \dirname($oldContainer->getFileName());
+        $legacyContainers[$oldContainerDir.'.legacy'] = true;
+        foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
+            if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
+                (new Filesystem())->remove(substr($legacyContainer, 0, -7));
             }
-
-            touch($oldContainerDir.'.legacy');
         }
+
+        touch($oldContainerDir.'.legacy');
     }
 
     private function preparePreload(string $cacheDir, string $class): void

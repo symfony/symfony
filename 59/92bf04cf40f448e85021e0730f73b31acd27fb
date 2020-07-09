@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2020-07-07T16:56:43Z
+
+The problem with the fix is that now the assertion count is wrong for tests not run in a separate process.
+
+For example:
+```
+./phpunit src/Symfony/Bridge/PhpUnit/Tests/ExpectDeprecationTraitTest.php --filter testOneWithAnnotation
+#!/usr/bin/env php
+PHPUnit 8.3.5 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Bridge\PhpUnit\Tests\ExpectDeprecationTraitTest
+.                                                                   1 / 1 (100%)
+
+Time: 52 ms, Memory: 6.00 MB
+
+OK (1 test, 3 assertions)
+```
+
+Before this change it was ```OK (1 test, 2 assertions)```
+
+---------------------------------------------------------------------------
+
+by alexpott at 2020-07-07T21:47:23Z
+
+Actually this has unearthed a significant but in the symfony expectDeprecation method in isolated tests - if you change the expectation to any value it'll still work because essentially the expectation is ignored.
+
+```
+    /**
+     * Do not remove this test in the next major version.
+     *
+     * @group legacy
+     * @runInSeparateProcess
+     */
+    public function testOneInIsolation()
+    {
+        $this->expectDeprecation('fdfdef2');
+        @trigger_error('foo', E_USER_DEPRECATED);
+    }
+```
+will happily pass.

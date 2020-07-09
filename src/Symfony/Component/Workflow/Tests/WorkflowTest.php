@@ -392,6 +392,7 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.a',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.t1',
@@ -463,6 +464,7 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.a',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.a-b',
@@ -528,6 +530,58 @@ class WorkflowTest extends TestCase
 
         foreach ($eventNames as $eventName) {
             $dispatcher->addListener($eventName, $assertWorkflowName);
+        }
+
+        $workflow->apply($subject, 't1');
+    }
+
+    public function testEventContext()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+        $name = 'workflow_name';
+        $context = ['context'];
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
+
+        $assertWorkflowContext = function (Event $event) use ($context) {
+            $this->assertEquals($context, $event->getContext());
+        };
+
+        $eventNames = [
+            'workflow.leave',
+            'workflow.transition',
+            'workflow.enter',
+            'workflow.entered',
+            'workflow.announce',
+        ];
+
+        foreach ($eventNames as $eventName) {
+            $dispatcher->addListener($eventName, $assertWorkflowContext);
+        }
+
+        $workflow->apply($subject, 't1', $context);
+    }
+
+    public function testEventDefaultInitialContext()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+        $name = 'workflow_name';
+        $context = Workflow::DEFAULT_INITIAL_CONTEXT;
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
+
+        $assertWorkflowContext = function (Event $event) use ($context) {
+            $this->assertEquals($context, $event->getContext());
+        };
+
+        $eventNames = [
+            'workflow.workflow_name.entered.a',
+        ];
+
+        foreach ($eventNames as $eventName) {
+            $dispatcher->addListener($eventName, $assertWorkflowContext);
         }
 
         $workflow->apply($subject, 't1');

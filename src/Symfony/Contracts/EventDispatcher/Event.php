@@ -27,6 +27,7 @@ use Psr\EventDispatcher\StoppableEventInterface;
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ * @author Joshua Behrens <behrens@heptacom.de>
  */
 class Event implements StoppableEventInterface
 {
@@ -50,5 +51,13 @@ class Event implements StoppableEventInterface
     public function stopPropagation(): void
     {
         $this->propagationStopped = true;
+    }
+    
+    /**
+     * Resumes the propagation.
+     */
+    public function resumePropagation(): void
+    {
+        $this->propagationStopped = false;
     }
 }

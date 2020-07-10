@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-07-10T07:51:49Z
+
+3c8bf2d29d5fa19d2ef9eaffec77cde358c525ba is required to be able to catch and parse the `TypeError` thrown by PHP.

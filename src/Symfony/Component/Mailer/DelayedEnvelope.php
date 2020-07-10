@@ -41,11 +41,11 @@ final class DelayedEnvelope extends Envelope
 
     public function getSender(): Address
     {
-        if ($this->senderSet) {
-            return parent::getSender();
+        if (!$this->senderSet) {
+            parent::setSender(self::getSenderFromHeaders($this->message->getHeaders()));
         }
 
-        return self::getSenderFromHeaders($this->message->getHeaders());
+        return parent::getSender();
     }
 
     public function setRecipients(array $recipients): void

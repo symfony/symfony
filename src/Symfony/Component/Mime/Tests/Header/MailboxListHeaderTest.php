@@ -55,11 +55,10 @@ class MailboxListHeaderTest extends TestCase
         $this->assertEquals(['Chris Corbyn <chris@xn--swftmailer-78a.org>'], $header->getAddressStrings());
     }
 
-    public function testUtf8CharsInLocalPartThrows()
+    public function testUtf8CharsInLocalPart()
     {
-        $this->expectException('Symfony\Component\Mime\Exception\AddressEncoderException');
         $header = new MailboxListHeader('From', [new Address('chrïs@swiftmailer.org', 'Chris Corbyn')]);
-        $header->getAddressStrings();
+        $this->assertSame(['Chris Corbyn <chrïs@swiftmailer.org>'], $header->getAddressStrings());
     }
 
     public function testGetMailboxesReturnsNameValuePairs()

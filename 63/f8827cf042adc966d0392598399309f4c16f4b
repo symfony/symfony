@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-04-02T14:23:12Z
+
+@fabpot seeing that you wrote this component: Any idea from your side about this issue?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-04-14T11:14:04Z
+
+@symfony/mergers anyone able to help with this one?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-05-03T16:45:23Z
+
+@dmaicher Python [supports this too](https://docs.python.org/3/library/smtplib.htm) via the `SMTPUTF8` extension.
+
+Go [supports it too](https://golang.org/src/net/mail/message.go):
+
+> // String formats the address as a valid RFC 5322 address.
+> // If the address's name contains non-ASCII characters
+> // the name will be rendered according to RFC 2047.
+
+And that's the RFC that describes this: https://www.ietf.org/rfc/rfc2047.txt
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-05-03T17:13:18Z
+
+@javiereguiluz as far as I understand rfc 2047 does not apply for email addresses?
+
+>    `+ An 'encoded-word' MUST NOT appear in any portion of an 'addr-spec'.`
+
+It would only apply for the "name" part of some recipient address header. But not the address itself.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-05-03T17:19:00Z
+
+@dmaicher I read too fast then. Sorry 😞
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-05-11T19:09:55Z
+
+@javiereguiluz any idea how to move this forward? This issue keeps me from using the `symfony/mailer` unfortunately :cry:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T14:28:00Z
+
+I think we can do this change, but only if we also forbid non-ASCII chars in the local part of the envelope *sender*. The reason is that there always must be a path to receive bounces, and the envelope-sender is their destination.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-06-30T17:36:39Z
+
+@nicolas-grekas first of all thank you for taking to time to look into this! :blush:
+
+> I think we can do this change, but only if we also forbid non-ASCII chars in the local part of the envelope sender. The reason is that there always must be a path to receive bounces, and the envelope-sender is their destination.
+
+Not sure I follow this comment. So currently this change should impact the envelope sender as well, right?
+
+Seeing that the envelope sender is also an `Address` and thus will use the encoder internally: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Mime/Address.php#L72
+
+So you mean we should change this behavior for the envelope sender?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T17:46:13Z
+
+We shouldn't necessarily change the behavior of going through the encoder, but we should add a check, in Mailer, to reject any local part with non-ASCII characters. This will ensure that any bounce message will be able to come back to the sender independently of whether SMTP hops are able to deal with UTF-8 or not. This looks like a critical property to me.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-06-30T17:54:09Z
+
+> We shouldn't necessarily change the behavior of going through the encoder, but we should add a check, in Mailer, to reject any local part with non-ASCII characters. This will ensure that any bounce message will be able to come back to the sender independently of whether SMTP hops are able to deal with UTF-8 or not. This looks like a critical property to me.
+
+Ok fair enough. That seems good to me :+1:
+
+How should we do this? Inside `Mailer` or inside `Envelope`? Should it throw `Symfony\Component\Mime\Exception\AddressEncoderException`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T18:01:25Z
+
+Inside Envelope? this would allow reusing `AddressEncoderException` isn't it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-01T17:19:13Z
+
+This is a new feature, so it must be rebased on master before merging.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-07-01T17:29:01Z
+
+> This is a new feature, so it must be rebased on master before merging.
+
+@fabpot would have been great to see this change in 4.4 LTS... but ok. Why do you think this cannot be treated as a bugfix?
+
+Anyway I rebased it :wink:

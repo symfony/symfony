@@ -22,7 +22,7 @@
         "symfony/options-resolver": "^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/property-access": "^5.0",
+        "symfony/property-access": "^5.0.8",
         "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {

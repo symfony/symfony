@@ -199,6 +199,8 @@ class FormType extends BaseType
             'help_attr' => [],
             'help_html' => false,
             'help_translation_parameters' => [],
+            'invalid_message' => 'This value is not valid.',
+            'invalid_message_parameters' => [],
             'is_empty_callback' => null,
         ]);
 

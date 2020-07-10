@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedString
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
@@ -57,6 +58,11 @@ class MoneyType extends AbstractType
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please enter a valid money amount.';
+            },
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [

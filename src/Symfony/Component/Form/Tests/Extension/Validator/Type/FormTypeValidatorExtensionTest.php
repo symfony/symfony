@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Forms;
@@ -29,6 +30,7 @@ use Symfony\Component\Validator\Validation;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
+    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     public function testSubmitValidatesData()
@@ -62,7 +64,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     public function testGroupSequenceWithConstraintsOption()
     {
         $form = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
@@ -131,6 +133,25 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertCount(1, $errors);
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
         $this->assertSame('children[lastName].data', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function testInvalidMessage()
+    {
+        $form = $this->createForm();
+
+        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyInvalidMessage()
+    {
+        $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
+
+        $form = $this->createForm(array('legacy_error_messages' => true));
+
+        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     protected function createForm(array $options = [])

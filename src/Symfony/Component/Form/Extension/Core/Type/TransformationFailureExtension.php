@@ -30,7 +30,7 @@ class TransformationFailureExtension extends AbstractTypeExtension
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!isset($options['invalid_message']) && !isset($options['invalid_message_parameters'])) {
+        if (!isset($options['constraints'])) {
             $builder->addEventSubscriber(new TransformationFailureListener($this->translator));
         }
     }

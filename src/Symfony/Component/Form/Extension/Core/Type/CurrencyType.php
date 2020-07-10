@@ -35,6 +35,11 @@ class CurrencyType extends AbstractType
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please select a valid currency.';
+            },
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

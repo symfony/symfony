@@ -514,6 +514,8 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.php');
 
+        $container->getDefinition('form.type_extension.form.validator')->setArgument(1, $config['form']['legacy_error_messages']);
+
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }

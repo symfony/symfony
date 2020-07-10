@@ -189,6 +189,18 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
+                        // to be set to false in Symfony 6.0
+                        ->booleanNode('legacy_error_messages')
+                            ->defaultTrue()
+                            ->validate()
+                                ->ifTrue()
+                                ->then(function ($v) {
+                                    @trigger_error('Since symfony/framework-bundle 5.2: Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

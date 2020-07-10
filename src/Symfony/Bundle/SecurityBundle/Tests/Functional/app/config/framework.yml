@@ -4,7 +4,9 @@ framework:
     validation: { enabled: true, enable_annotations: true }
     assets: ~
     csrf_protection: true
-    form: true
+    form:
+        enabled: true
+        legacy_error_messages: false
     test: ~
     default_locale: en
     session:

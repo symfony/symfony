@@ -85,6 +85,9 @@ EOF
         $container = $this->fileLinkFormatter ? \Closure::fromCallable([$this, 'getContainerBuilder']) : null;
         $sortOption = $input->getOption('sort');
         $routes = $this->sortRoutes($this->router->getRouteCollection(), $sortOption);
+        if ('priority' !== $sortOption) {
+            $io->caution('The routes list is not sorted in the parsing order.');
+        }
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {

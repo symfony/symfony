@@ -21,6 +21,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'priority'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo)/m', $tester->getDisplay(true));
+        $this->assertStringNotContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testSortingByName()
@@ -29,6 +30,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'name'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(alfa).*\n\W*(bravo).*\n\W*(charlie).*\n\W*(delta)/m', $tester->getDisplay(true));
+        $this->assertStringContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testSortingByPath()
@@ -37,6 +39,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'path'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(\/romeo).*\n.*(\/sierra).*\n.*(\/tango).*\n.*(\/uniform)/m', $tester->getDisplay(true));
+        $this->assertStringContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testThrowsExceptionWithInvalidParameter()
@@ -59,6 +62,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'priority'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo).*\n\W*(echo)/m', $tester->getDisplay(true));
+        $this->assertStringNotContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testSortingByNameWithDuplicatePath()
@@ -67,6 +71,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'name'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(alfa).*\n\W*(bravo).*\n\W*(charlie).*\n\W*(delta).*\n\W*(echo)/m', $tester->getDisplay(true));
+        $this->assertStringContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testSortingByPathWithDuplicatePath()
@@ -75,6 +80,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute(['--sort' => 'path'], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(\/romeo).*\n.*(\/sierra).*\n.*(\/tango).*\n.*(\/uniform).*\n.*(\/uniform)/m', $tester->getDisplay(true));
+        $this->assertStringContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     public function testWithoutCallingSortOptionExplicitly()
@@ -83,6 +89,7 @@ class RouterDebugCommandTest extends TestCase
         $result = $tester->execute([], ['decorated' => false]);
         $this->assertSame(0, $result, 'Returns 0 in case of success');
         $this->assertRegExp('/(charlie).*\n\W*(alfa).*\n\W*(delta).*\n\W*(bravo)/m', $tester->getDisplay(true));
+        $this->assertStringNotContainsString('! [CAUTION] The routes list is not sorted in the parsing order.', $tester->getDisplay(true));
     }
 
     private function createCommandTester(): CommandTester

@@ -150,6 +150,39 @@ class PhpDocExtractorTest extends TestCase
                 null,
                 null,
             ],
+            [
+                'arrayWithKeys',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(Type::BUILTIN_TYPE_STRING)
+                )],
+                null,
+                null,
+            ],
+            [
+                'arrayWithKeysAndComplexValue',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(
+                        Type::BUILTIN_TYPE_ARRAY,
+                        true,
+                        null,
+                        true,
+                        new Type(Type::BUILTIN_TYPE_INT),
+                        new Type(Type::BUILTIN_TYPE_STRING, true)
+                    )
+                )],
+                null,
+                null,
+            ],
         ];
     }
 

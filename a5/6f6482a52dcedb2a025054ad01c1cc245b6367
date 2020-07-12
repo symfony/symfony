@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2020-07-08T14:18:59Z
+
+I think this should be merged into 3.4 as a bugfix.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-07-08T14:20:35Z
+
+Can we add a test to prevent future regressions?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-07-08T14:20:51Z
+
+> I think this should be merged into 3.4 as a bugfix.
+
+I started my branch from the 3.4. I just took the wrong one for the PR. It's fixed :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-07-08T14:57:51Z
+
+> Can we add a test to prevent future regressions?
+
+Done @xabbuh

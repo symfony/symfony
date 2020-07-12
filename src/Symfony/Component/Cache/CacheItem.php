@@ -27,7 +27,6 @@ final class CacheItem implements ItemInterface
     protected $value;
     protected $isHit = false;
     protected $expiry;
-    protected $defaultLifetime;
     protected $metadata = [];
     protected $newMetadata = [];
     protected $innerItem;
@@ -78,7 +77,7 @@ final class CacheItem implements ItemInterface
     public function expiresAt($expiration): self
     {
         if (null === $expiration) {
-            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
+            $this->expiry = null;
         } elseif ($expiration instanceof \DateTimeInterface) {
             $this->expiry = (float) $expiration->format('U.u');
         } else {
@@ -96,7 +95,7 @@ final class CacheItem implements ItemInterface
     public function expiresAfter($time): self
     {
         if (null === $time) {
-            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
+            $this->expiry = null;
         } elseif ($time instanceof \DateInterval) {
             $this->expiry = microtime(true) + \DateTime::createFromFormat('U', 0)->add($time)->format('U.u');
         } elseif (\is_int($time)) {

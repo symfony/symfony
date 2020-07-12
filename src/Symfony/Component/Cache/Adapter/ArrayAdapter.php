@@ -26,20 +26,21 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     use ArrayTrait;
 
     private $createCacheItem;
+    private $defaultLifetime;
 
     /**
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
     public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
+        $this->defaultLifetime = $defaultLifetime;
         $this->storeSerialized = $storeSerialized;
         $this->createCacheItem = \Closure::bind(
-            static function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->defaultLifetime = $defaultLifetime;
 
                 return $item;
             },
@@ -131,8 +132,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
             return false;
         }
-        if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
-            $expiry = microtime(true) + $item["\0*\0defaultLifetime"];
+        if (null === $expiry && 0 < $this->defaultLifetime) {
+            $expiry = microtime(true) + $this->defaultLifetime;
         }
 
         $this->values[$key] = $value;

@@ -74,7 +74,11 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => \PDO::PARAM_STR];
-        $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        if (method_exists($this->conn, 'executeStatement')) {
+            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
+        } else {
+            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        }
     }
 
     /**
@@ -94,7 +98,11 @@ class DoctrineTokenProvider implements TokenProviderInterface
             'lastUsed' => Types::DATETIME_MUTABLE,
             'series' => \PDO::PARAM_STR,
         ];
-        $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        if (method_exists($this->conn, 'executeStatement')) {
+            $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
+        } else {
+            $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        }
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
         }
@@ -122,6 +130,10 @@ class DoctrineTokenProvider implements TokenProviderInterface
             'value' => \PDO::PARAM_STR,
             'lastUsed' => Types::DATETIME_MUTABLE,
         ];
-        $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        if (method_exists($this->conn, 'executeStatement')) {
+            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
+        } else {
+            $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        }
     }
 }

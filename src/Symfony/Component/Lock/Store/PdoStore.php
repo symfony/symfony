@@ -253,7 +253,11 @@ class PdoStore implements PersistingStoreInterface
             $this->addTableToSchema($schema);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
-                $conn->exec($sql);
+                if (method_exists($conn, 'executeStatement')) {
+                    $conn->executeStatement($sql);
+                } else {
+                    $conn->exec($sql);
+                }
             }
 
             return;
@@ -279,7 +283,11 @@ class PdoStore implements PersistingStoreInterface
                 throw new \DomainException(sprintf('Creating the lock table is currently not implemented for PDO driver "%s".', $driver));
         }
 
-        $conn->exec($sql);
+        if (method_exists($conn, 'executeStatement')) {
+            $conn->executeStatement($sql);
+        } else {
+            $conn->exec($sql);
+        }
     }
 
     /**
@@ -305,7 +313,12 @@ class PdoStore implements PersistingStoreInterface
     {
         $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
 
-        $this->getConnection()->exec($sql);
+        $conn = $this->getConnection();
+        if (method_exists($conn, 'executeStatement')) {
+            $conn->executeStatement($sql);
+        } else {
+            $conn->exec($sql);
+        }
     }
 
     private function getDriver(): string

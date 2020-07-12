@@ -34,6 +34,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     private $values = [];
     private $expiries = [];
     private $createCacheItem;
+    private $defaultLifetime;
     private $maxLifetime;
     private $maxItems;
 
@@ -50,16 +51,16 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             throw new InvalidArgumentException(sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
         }
 
+        $this->defaultLifetime = $defaultLifetime;
         $this->storeSerialized = $storeSerialized;
         $this->maxLifetime = $maxLifetime;
         $this->maxItems = $maxItems;
         $this->createCacheItem = \Closure::bind(
-            static function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->defaultLifetime = $defaultLifetime;
 
                 return $item;
             },
@@ -203,8 +204,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
             return false;
         }
-        if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
-            $expiry = $item["\0*\0defaultLifetime"];
+        if (null === $expiry && 0 < $this->defaultLifetime) {
+            $expiry = microtime(true) + $this->defaultLifetime;
             $expiry = $now + ($expiry > ($this->maxLifetime ?: $expiry) ? $this->maxLifetime : $expiry);
         } elseif ($this->maxLifetime && (null === $expiry || $expiry > $now + $this->maxLifetime)) {
             $expiry = $now + $this->maxLifetime;

@@ -137,7 +137,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $table->setPrimaryKey([$this->idCol]);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
-                $conn->exec($sql);
+                if (method_exists($conn, 'executeStatement')) {
+                    $conn->executeStatement($sql);
+                } else {
+                    $conn->exec($sql);
+                }
             }
 
             return;
@@ -168,7 +172,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
         }
 
-        $conn->exec($sql);
+        if (method_exists($conn, 'executeStatement')) {
+            $conn->executeStatement($sql);
+        } else {
+            $conn->exec($sql);
+        }
     }
 
     /**
@@ -280,7 +288,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         try {
-            $conn->exec($sql);
+            if (method_exists($conn, 'executeStatement')) {
+                $conn->executeStatement($sql);
+            } else {
+                $conn->exec($sql);
+            }
         } catch (TableNotFoundException $e) {
         } catch (\PDOException $e) {
         }

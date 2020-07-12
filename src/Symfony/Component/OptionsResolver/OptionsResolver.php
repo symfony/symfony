@@ -532,6 +532,7 @@ class OptionsResolver implements Options
         }
 
         if ($forcePrepend) {
+            $this->normalizers[$option] = $this->normalizers[$option] ?? [];
             array_unshift($this->normalizers[$option], $normalizer);
         } else {
             $this->normalizers[$option][] = $normalizer;

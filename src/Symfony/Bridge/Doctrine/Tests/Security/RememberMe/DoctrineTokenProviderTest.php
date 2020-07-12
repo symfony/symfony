@@ -72,7 +72,7 @@ class DoctrineTokenProviderTest extends TestCase
             'driver' => 'pdo_sqlite',
             'url' => 'sqlite:///:memory:',
         ]);
-        $connection->executeUpdate(<<< 'SQL'
+        $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<< 'SQL'
             CREATE TABLE rememberme_token (
                 series   char(88)     UNIQUE PRIMARY KEY NOT NULL,
                 value    char(88)     NOT NULL,

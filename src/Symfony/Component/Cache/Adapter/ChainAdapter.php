@@ -70,15 +70,11 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 unset($sourceMetadata[CacheItem::METADATA_TAGS]);
 
                 $item->value = $sourceItem->value;
-                $item->expiry = $sourceMetadata[CacheItem::METADATA_EXPIRY] ?? $sourceItem->expiry;
                 $item->isHit = $sourceItem->isHit;
                 $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
 
-                if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
-                    $defaultLifetime = $sourceItem->defaultLifetime;
-                }
-                if (0 < $defaultLifetime && ($item->defaultLifetime <= 0 || $defaultLifetime < $item->defaultLifetime)) {
-                    $item->defaultLifetime = $defaultLifetime;
+                if (0 < $defaultLifetime) {
+                    $item->expiresAfter($defaultLifetime);
                 }
 
                 return $item;

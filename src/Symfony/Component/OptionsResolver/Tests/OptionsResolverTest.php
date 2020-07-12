@@ -1512,6 +1512,17 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
     }
 
+    public function testForcePrependNormalizerForResolverWithoutPreviousNormalizers()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
+            return '1st-normalized-'.$value;
+        }, true);
+
+        $this->assertEquals(['foo' => '1st-normalized-bar'], $this->resolver->resolve());
+    }
+
     public function testAddNormalizerFailsIfUnknownOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');

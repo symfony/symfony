@@ -25,6 +25,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
     use ArrayTrait;
 
     private $createCacheItem;
+    private $defaultLifetime;
 
     /**
      * @param int  $defaultLifetime
@@ -32,14 +33,14 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
      */
     public function __construct($defaultLifetime = 0, $storeSerialized = true)
     {
+        $this->defaultLifetime = $defaultLifetime;
         $this->storeSerialized = $storeSerialized;
         $this->createCacheItem = \Closure::bind(
-            static function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->defaultLifetime = $defaultLifetime;
 
                 return $item;
             },
@@ -127,8 +128,8 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
                 return false;
             }
         }
-        if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
-            $expiry = time() + $item["\0*\0defaultLifetime"];
+        if (null === $expiry && 0 < $this->defaultLifetime) {
+            $expiry = time() + $this->defaultLifetime;
         }
 
         $this->values[$key] = $value;

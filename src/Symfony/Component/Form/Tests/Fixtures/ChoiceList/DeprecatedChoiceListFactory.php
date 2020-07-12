@@ -16,7 +16,7 @@ class DeprecatedChoiceListFactory implements ChoiceListFactoryInterface
     {
     }
 
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null, $labelTranslationParameters = [])
     {
     }
 }

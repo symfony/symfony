@@ -98,7 +98,7 @@ class FilesystemLoaderTest extends TestCase
     public function testTwigErrorIfTemplateDoesNotExist()
     {
         $this->expectException('Twig\Error\LoaderError');
-        $this->expectExceptionMessageRegExp('/Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/');
+        $this->expectExceptionMessageMatches('/Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/');
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
 

@@ -127,7 +127,7 @@ class SessionHandlerProxyTest extends TestCase
      */
     public function testValidateId()
     {
-        $mock = $this->getMockBuilder(['SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'])->getMock();
+        $mock = $this->getMockBuilder(TestSessionHandler::class)->getMock();
         $mock->expects($this->once())
             ->method('validateId');
 
@@ -142,7 +142,7 @@ class SessionHandlerProxyTest extends TestCase
      */
     public function testUpdateTimestamp()
     {
-        $mock = $this->getMockBuilder(['SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'])->getMock();
+        $mock = $this->getMockBuilder(TestSessionHandler::class)->getMock();
         $mock->expects($this->once())
             ->method('updateTimestamp')
             ->willReturn(false);
@@ -155,4 +155,8 @@ class SessionHandlerProxyTest extends TestCase
 
         $this->proxy->updateTimestamp('id', 'data');
     }
+}
+
+abstract class TestSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+{
 }

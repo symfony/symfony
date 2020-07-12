@@ -435,7 +435,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
     public function testProcessDetectsChildDefinitionIndirectCircularReference()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
-        $this->expectExceptionMessageRegExp('/^Circular reference detected for service "c", path: "c -> b -> a -> c"./');
+        $this->expectExceptionMessageMatches('/^Circular reference detected for service "c", path: "c -> b -> a -> c"./');
         $container = new ContainerBuilder();
 
         $container->register('a');

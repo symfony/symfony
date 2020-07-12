@@ -216,7 +216,7 @@ class GuardAuthenticationProviderTest extends TestCase
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
-        $this->expectExceptionMessageRegExp('/second_firewall_0/');
+        $this->expectExceptionMessageMatches('/second_firewall_0/');
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = [$authenticatorA];
 

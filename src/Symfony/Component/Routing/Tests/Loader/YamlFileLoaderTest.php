@@ -142,7 +142,7 @@ class YamlFileLoaderTest extends TestCase
     public function testOverrideControllerInDefaults()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "app_blog"/');
+        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "app_blog"/');
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.yml');
     }
@@ -174,7 +174,7 @@ class YamlFileLoaderTest extends TestCase
     public function testImportWithOverriddenController()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "_static"/');
+        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "_static"/');
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.yml');
     }

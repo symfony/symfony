@@ -232,7 +232,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected exception and not use the regex
         $resolver = $this->createControllerResolver();
         $this->expectException($exceptionName);
-        $this->expectExceptionMessageRegExp($exceptionMessage);
+        $this->expectExceptionMessageMatches($exceptionMessage);
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $controller);

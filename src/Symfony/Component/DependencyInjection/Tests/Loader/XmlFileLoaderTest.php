@@ -336,7 +336,7 @@ class XmlFileLoaderTest extends TestCase
     public function testParseTagWithEmptyNameThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/The tag name for service ".+" in .* must be a non-empty string/');
+        $this->expectExceptionMessageMatches('/The tag name for service ".+" in .* must be a non-empty string/');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('tag_with_empty_name.xml');

@@ -149,7 +149,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./');
+        $this->expectExceptionMessageMatches('/Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./');
         $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);

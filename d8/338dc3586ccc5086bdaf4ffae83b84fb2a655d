@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-13T08:03:14Z
+
+Thank you taking the time to send a PR.
+
+Since this is not a bugfix, it should target master.
+Can you look at the source code and update the other places where this kind of logic could happen? We should update all of them at once.
+Grep for `'is_'`, that should give you the places.
+
+---------------------------------------------------------------------------
+
+by drealecs at 2020-05-13T09:04:27Z
+
+Sure. I will have a look at other `is_` or `ctype_` dynamic constrctions.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-13T14:35:14Z
+
+I'm quite sure OptionsResolver has something like that too, for allowed types.
+
+---------------------------------------------------------------------------
+
+by drealecs at 2020-05-14T05:47:18Z
+
+This PR had from the start some BC breaks if the symfony component is not used as it was documented.
+The change done here brings the implementation in sync with the documentation https://symfony.com/doc/current/reference/constraints/Type.html#reference-constraint-type-type that states:
+> Each type is either the FQCN (fully qualified class name) of some PHP class/interface or a valid PHP datatype (checked by PHP's is_() functions).
+> Also, you can use ctype_*() functions from corresponding built-in PHP extension.
+
+As @nicolas-grekas suggested, I searched and found `is_` construct in other places:
+- Serializer Component used for `normalize` and `denormalize` operations but, as far as I checked, even if the construct is dynamic, the type concatenated with it is strictly checked agains a list: `PropertyInfo\Type::$builtinTypes` and `Serializer\Serializer::SCALAR_TYPES`
+
+In my opinion, there is no need to fix anything here. Let me know if you agree.
+
+- OptionsResolver Component used for type validation on options: https://symfony.com/doc/current/components/options_resolver.html#type-validation
+Here the documentation mentions:
+> You can pass any type for which an is_<type>() function is defined in PHP. You may also pass fully qualified class or interface names (which is checked using instanceof).
+
+The wording in OptionsResolver's documentation: `any type for which an is_<type>() function is defined in PHP` sounds more liberal than how it was defined for Validator Component: `a valid PHP datatype (checked by PHP's is_() functions)` but I think the intention was the same.
+I'll do later today changes related to OptionsResolver. If you think they are more risky, please let me know.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-05-14T14:20:41Z
+
+I confirm that the intention for OptionsResolver is the same.
+
+---------------------------------------------------------------------------
+
+by drealecs at 2020-06-01T19:37:41Z
+
+Hey @nicolas-grekas! Sorry to bother you again regarding this.
+When you have some time, please have a look at it again and let me know if there is something you think I should change further.
+Thank you!

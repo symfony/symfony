@@ -205,7 +205,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             return false;
         }
         if (null === $expiry && 0 < $this->defaultLifetime) {
-            $expiry = microtime(true) + $this->defaultLifetime;
+            $expiry = $this->defaultLifetime;
             $expiry = $now + ($expiry > ($this->maxLifetime ?: $expiry) ? $this->maxLifetime : $expiry);
         } elseif ($this->maxLifetime && (null === $expiry || $expiry > $now + $this->maxLifetime)) {
             $expiry = $now + $this->maxLifetime;

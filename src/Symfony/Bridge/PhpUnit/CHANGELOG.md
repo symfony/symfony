@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * polyfill new phpunit 9.1 assertions
+
 5.1.0
 -----
 
@@ -25,7 +30,7 @@ CHANGELOG
 -----
 
  * added `ClassExistsMock`
- * bumped PHP version from 5.3.3 to 5.5.9 
+ * bumped PHP version from 5.3.3 to 5.5.9
  * split simple-phpunit bin into php file with code and a shell script
 
 4.1.0

@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * It manages an environment made of application kernel and bundles.
  *
+ * @method string getMode()
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface KernelInterface extends HttpKernelInterface
@@ -87,6 +89,8 @@ interface KernelInterface extends HttpKernelInterface
      * Gets the environment.
      *
      * @return string The current environment
+     *
+     * @deprecated since Symfony 5.2, use getMode() instead.
      */
     public function getEnvironment();
 

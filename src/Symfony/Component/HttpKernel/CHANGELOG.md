@@ -10,6 +10,11 @@ CHANGELOG
    `kernel.trusted_proxies` and `kernel.trusted_headers` parameters
  * content of request parameter `_password` is now also hidden
    in the request profiler raw content section
+ * made parameter `kernel.environment` runtime-dependent when the `APP_RUNTIME_ENV` env var is set
+ * added parameter `kernel.mode`: it's the build-time equivalent of `kernel.environment`
+ * deprecated the `Kernel::$environment` property, use `Kernel::$mode` instead
+ * deprecated the `KernelInterface::getEnvironment()` method, use `KernelInterface::getMode()` instead
+ * deprecated the `ConfigDataCollector::getEnv()` method, use `ConfigDataCollector::getMode()` instead
 
 5.1.0
 -----

@@ -27,7 +27,7 @@ class ConfigDataCollectorTest extends TestCase
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 
-        $this->assertSame('test', $c->getEnv());
+        $this->assertSame('test', $c->getMode());
         $this->assertTrue($c->isDebug());
         $this->assertSame('config', $c->getName());
         $this->assertRegExp('~^'.preg_quote($c->getPhpVersion(), '~').'~', PHP_VERSION);

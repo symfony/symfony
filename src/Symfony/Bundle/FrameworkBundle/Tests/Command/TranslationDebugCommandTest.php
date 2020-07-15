@@ -92,7 +92,7 @@ class TranslationDebugCommandTest extends TestCase
     {
         $this->fs->mkdir($this->translationDir.'/customDir/translations');
         $this->fs->mkdir($this->translationDir.'/customDir/templates');
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo($this->translationDir.'/customDir'))
@@ -111,7 +111,7 @@ class TranslationDebugCommandTest extends TestCase
     public function testDebugInvalidDirectory()
     {
         $this->expectException('InvalidArgumentException');
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo('dir'))
@@ -170,7 +170,7 @@ class TranslationDebugCommandTest extends TestCase
                 ['foo', $this->getBundle($this->translationDir)],
                 ['test', $this->getBundle('test')],
             ];
-            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+            $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')

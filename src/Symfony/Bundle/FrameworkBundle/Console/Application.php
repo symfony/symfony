@@ -40,7 +40,8 @@ class Application extends BaseApplication
         parent::__construct('Symfony', Kernel::VERSION);
 
         $inputDefinition = $this->getDefinition();
-        $inputDefinition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
+        $inputDefinition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getMode()));
+        $inputDefinition->addOption(new InputOption('--mode', null, InputOption::VALUE_REQUIRED, 'The Mode name.', $kernel->getMode()));
         $inputDefinition->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
     }
 
@@ -147,7 +148,7 @@ class Application extends BaseApplication
      */
     public function getLongVersion()
     {
-        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
+        return parent::getLongVersion().sprintf(' (mode: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getMode(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     public function add(Command $command)

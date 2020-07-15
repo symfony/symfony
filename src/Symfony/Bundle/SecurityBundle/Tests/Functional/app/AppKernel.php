@@ -22,12 +22,14 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AppKernel extends Kernel
 {
+    protected $mode;
+
     private $varDir;
     private $testCase;
     private $rootConfig;
     private $authenticatorManagerEnabled;
 
-    public function __construct($varDir, $testCase, $rootConfig, $environment, $debug, $authenticatorManagerEnabled = false)
+    public function __construct($varDir, $testCase, $rootConfig, $mode, $debug, $authenticatorManagerEnabled = false)
     {
         if (!is_dir(__DIR__.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
@@ -42,7 +44,8 @@ class AppKernel extends Kernel
         $this->rootConfig = $rootConfig;
         $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
 
-        parent::__construct($environment, $debug);
+        $this->mode = $mode;
+        parent::__construct($mode, $debug);
     }
 
     /**
@@ -69,7 +72,7 @@ class AppKernel extends Kernel
 
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->environment;
+        return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->mode;
     }
 
     public function getLogDir(): string
@@ -92,7 +95,7 @@ class AppKernel extends Kernel
 
     public function serialize()
     {
-        return serialize([$this->varDir, $this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()]);
+        return serialize([$this->varDir, $this->testCase, $this->rootConfig, $this->mode, $this->isDebug()]);
     }
 
     public function unserialize($str)

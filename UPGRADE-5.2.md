@@ -6,6 +6,13 @@ DependencyInjection
 
  * Deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
 
+HttpKernel
+----------
+
+ * Deprecated the `Kernel::$environment` property, use `Kernel::$mode` instead
+ * Deprecated the `KernelInterface::getEnvironment()` method, use `KernelInterface::getMode()` instead
+ * Deprecated the `ConfigDataCollector::getEnv()` method, use `ConfigDataCollector::getMode()` instead
+
 Mime
 ----
 

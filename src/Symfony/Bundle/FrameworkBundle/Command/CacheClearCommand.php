@@ -60,11 +60,11 @@ class CacheClearCommand extends Command
             ])
             ->setDescription('Clears the cache')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command clears the application cache for a given environment
+The <info>%command.name%</info> command clears the application cache for a given mode
 and debug mode:
 
-  <info>php %command.full_name% --env=dev</info>
-  <info>php %command.full_name% --env=prod --no-debug</info>
+  <info>php %command.full_name% --mode=dev</info>
+  <info>php %command.full_name% --mode=prod --no-debug</info>
 EOF
             )
         ;
@@ -89,7 +89,7 @@ EOF
             throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realCacheDir));
         }
 
-        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->comment(sprintf('Clearing the cache for the <info>%s</info> mode with debug <info>%s</info>', $kernel->getMode(), var_export($kernel->isDebug(), true)));
         $this->cacheClearer->clear($realCacheDir);
 
         // The current event dispatcher is stale, let's not use it anymore
@@ -179,7 +179,7 @@ EOF
             $io->comment('Finished');
         }
 
-        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->success(sprintf('Cache for the "%s" mode (debug=%s) was successfully cleared.', $kernel->getMode(), var_export($kernel->isDebug(), true)));
 
         return 0;
     }

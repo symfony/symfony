@@ -104,6 +104,10 @@ abstract class KernelTestCase extends TestCase
 
         if (isset($options['environment'])) {
             $env = $options['environment'];
+        } elseif (isset($_ENV['APP_MODE'])) {
+            $env = $_ENV['APP_MODE'];
+        } elseif (isset($_SERVER['APP_MODE'])) {
+            $env = $_SERVER['APP_MODE'];
         } elseif (isset($_ENV['APP_ENV'])) {
             $env = $_ENV['APP_ENV'];
         } elseif (isset($_SERVER['APP_ENV'])) {

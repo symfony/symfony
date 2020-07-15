@@ -246,6 +246,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig');
         $container->setParameter('kernel.environment', 'test');
+        $container->setParameter('kernel.mode', 'test');
         $container->setParameter('debug.file_link_format', 'test');
         $container->setParameter('foo', 'FooClass');
         $container->register('http_kernel', 'FooClass');

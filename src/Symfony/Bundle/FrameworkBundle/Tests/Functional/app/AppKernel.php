@@ -64,7 +64,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
 
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->environment;
+        return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->mode;
     }
 
     public function getLogDir(): string
@@ -84,12 +84,12 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
 
     public function __sleep(): array
     {
-        return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
+        return ['varDir', 'testCase', 'rootConfig', 'mode', 'debug'];
     }
 
     public function __wakeup()
     {
-        $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug);
+        $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->mode, $this->debug);
     }
 
     protected function getKernelParameters(): array

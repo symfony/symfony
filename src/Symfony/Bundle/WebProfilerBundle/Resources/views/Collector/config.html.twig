@@ -38,7 +38,14 @@
                 </span>
             </div>
 
-            {% if 'n/a' is not same as(collector.env) %}
+            {% if collector.mode is defined %}
+                {% if 'n/a' is not same as(collector.mode) %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Mode</b>
+                        <span>{{ collector.mode }}</span>
+                    </div>
+                {% endif %}
+            {% elseif 'n/a' is not same as(collector.env) %}
                 <div class="sf-toolbar-info-piece">
                     <b>Environment</b>
                     <span>{{ collector.env }}</span>
@@ -116,7 +123,14 @@
             <span class="label">Symfony version</span>
         </div>
 
-        {% if 'n/a' != collector.env %}
+        {% if collector.mode is defined %}
+            {% if 'n/a' is not same as(collector.mode) %}
+                <div class="metric">
+                    <span class="value">{{ collector.mode }}</span>
+                    <span class="label">Mode</span>
+                </div>
+            {% endif %}
+        {% elseif 'n/a' != collector.env %}
             <div class="metric">
                 <span class="value">{{ collector.env }}</span>
                 <span class="label">Environment</span>

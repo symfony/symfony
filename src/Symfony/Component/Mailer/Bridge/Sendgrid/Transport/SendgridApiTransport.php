@@ -93,11 +93,16 @@ class SendgridApiTransport extends AbstractApiTransport
         if ($emails = array_map($addressStringifier, $email->getBcc())) {
             $personalization['bcc'] = $emails;
         }
+        if ($emails = array_map($addressStringifier, $email->getReplyTo())) {
+            // Email class supports an array of reply-to addresses,
+            // but SendGrid only supports a single address
+            $payload['reply_to'] = $emails[0];
+        }
 
         $payload['personalizations'][] = $personalization;
 
         // these headers can't be overwritten according to Sendgrid docs
-        // see https://developers.pepipost.com/migration-api/new-subpage/email-send
+        // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
         $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {

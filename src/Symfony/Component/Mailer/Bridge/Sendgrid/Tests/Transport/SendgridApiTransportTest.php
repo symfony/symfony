@@ -166,4 +166,30 @@ class SendgridApiTransportTest extends TestCase
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
+
+    public function testReplyTo()
+    {
+        $from = 'from@example.com';
+        $to = 'to@example.com';
+        $replyTo = 'replyto@example.com';
+        $email = new Email();
+        $email->from($from)
+            ->to($to)
+            ->replyTo($replyTo)
+            ->text('content');
+        $envelope = new Envelope(new Address($from), [new Address($to)]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('from', $payload);
+        $this->assertArrayHasKey('email', $payload['from']);
+        $this->assertSame($from, $payload['from']['email']);
+
+        $this->assertArrayHasKey('reply_to', $payload);
+        $this->assertArrayHasKey('email', $payload['reply_to']);
+        $this->assertSame($replyTo, $payload['reply_to']['email']);
+    }
 }

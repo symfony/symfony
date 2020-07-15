@@ -44,9 +44,13 @@ class Envelope
 
     public function setSender(Address $sender): void
     {
-        $this->sender = new Address($sender->getAddress());
+        $this->sender = $sender;
     }
 
+    /**
+     * @return Address Returns a "mailbox" as specified by RFC 2822
+     *                 Must be converted to an "addr-spec" when used as a "MAIL FROM" value in SMTP (use getAddress())
+     */
     public function getSender(): Address
     {
         return $this->sender;

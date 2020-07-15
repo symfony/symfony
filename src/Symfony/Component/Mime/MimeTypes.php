@@ -137,7 +137,7 @@ final class MimeTypes implements MimeTypesInterface
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new LogicException('Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).');
+            throw new LogicException('Unable to guess the MIME type as no guessers are available (have you enabled the php_fileinfo extension?).');
         }
 
         return null;

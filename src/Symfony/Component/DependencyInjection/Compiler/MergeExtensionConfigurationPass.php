@@ -79,11 +79,11 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     $container->getParameterBag()->mergeEnvPlaceholders($resolvingBag);
                 }
 
-                throw $e;
-            } finally {
                 if ($configAvailable) {
                     BaseNode::resetPlaceholders();
                 }
+
+                throw $e;
             }
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -93,6 +93,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             $container->merge($tmpContainer);
             $container->getParameterBag()->add($parameters);
+        }
+
+        if ($configAvailable) {
+            BaseNode::resetPlaceholders();
         }
 
         $container->addDefinitions($definitions);

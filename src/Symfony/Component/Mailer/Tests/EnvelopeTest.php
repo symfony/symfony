@@ -29,8 +29,8 @@ class EnvelopeTest extends TestCase
 
     public function testConstructorWithNamedAddressSender()
     {
-        $e = new Envelope(new Address('fabien@symfony.com', 'Fabien'), [new Address('thomas@symfony.com')]);
-        $this->assertEquals(new Address('fabien@symfony.com'), $e->getSender());
+        $e = new Envelope($sender = new Address('fabien@symfony.com', 'Fabien'), [new Address('thomas@symfony.com')]);
+        $this->assertEquals($sender, $e->getSender());
     }
 
     public function testConstructorWithAddressRecipients()
@@ -54,31 +54,31 @@ class EnvelopeTest extends TestCase
     public function testSenderFromHeaders()
     {
         $headers = new Headers();
-        $headers->addPathHeader('Return-Path', new Address('return@symfony.com', 'return'));
-        $headers->addMailboxListHeader('To', ['from@symfony.com']);
+        $headers->addPathHeader('Return-Path', $return = new Address('return@symfony.com', 'return'));
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
-        $this->assertEquals(new Address('return@symfony.com', 'return'), $e->getSender());
+        $this->assertEquals($return, $e->getSender());
 
         $headers = new Headers();
-        $headers->addMailboxHeader('Sender', new Address('sender@symfony.com', 'sender'));
-        $headers->addMailboxListHeader('To', ['from@symfony.com']);
+        $headers->addMailboxHeader('Sender', $sender = new Address('sender@symfony.com', 'sender'));
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
-        $this->assertEquals(new Address('sender@symfony.com', 'sender'), $e->getSender());
+        $this->assertEquals($sender, $e->getSender());
 
         $headers = new Headers();
-        $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);
-        $headers->addMailboxListHeader('To', ['from@symfony.com']);
+        $headers->addMailboxListHeader('From', [$from = new Address('from@symfony.com', 'from'), 'some@symfony.com']);
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
-        $this->assertEquals(new Address('from@symfony.com', 'from'), $e->getSender());
+        $this->assertEquals($from, $e->getSender());
     }
 
     public function testSenderFromHeadersWithoutFrom()
     {
         $headers = new Headers();
-        $headers->addMailboxListHeader('To', ['from@symfony.com']);
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create($message = new Message($headers));
-        $message->getHeaders()->addMailboxListHeader('From', [new Address('from@symfony.com', 'from')]);
-        $this->assertEquals(new Address('from@symfony.com', 'from'), $e->getSender());
+        $message->getHeaders()->addMailboxListHeader('From', [$from = new Address('from@symfony.com', 'from')]);
+        $this->assertEquals($from, $e->getSender());
     }
 
     public function testRecipientsFromHeaders()

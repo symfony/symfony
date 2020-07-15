@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-07-03T08:49:39Z
+
+So, what should I do?
+
+* `getContent()` => consistant with Symfony => :tada:
+* `getContents()` => consistant with PHP => :rocket:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-07-07T11:53:41Z
+
+OK, it looks like everyone prefer to have consistency with Symfony.
+The PR is ready

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-12T09:55:27Z
+
+There's a failure on deps=low to investigate.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-07-15T08:46:45Z
+
+The test cannot work with previous Config versions. We are not going to to bump the whole dependency for this. So the test is skipped conditionally. Remaining failures are unrelated.

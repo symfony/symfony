@@ -184,11 +184,9 @@ class Application implements ResetInterface
     /**
      * Checks if the current application has the parameter in the default option.
      */
-    final protected function hasDefaultOption(string $option): bool
+    private function hasDefaultOption(string $option): bool
     {
-        $defaultDefinition = $this->getDefaultInputDefinition();
-
-        return $defaultDefinition->hasOption($option);
+        return $this->getDefaultInputDefinition()->hasOption($option);
     }
 
     /**

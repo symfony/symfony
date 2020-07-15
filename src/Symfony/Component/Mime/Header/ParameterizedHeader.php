@@ -115,8 +115,6 @@ final class ParameterizedHeader extends UnstructuredHeader
 
         // If it's not already a valid parameter value...
         if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
-            // TODO: text, or something else??
-            // ... and it's not ascii
             if (!preg_match('/^[\x00-\x08\x0B\x0C\x0E-\x7F]*$/D', $value)) {
                 $encoded = true;
                 // Allow space for the indices, charset and language
@@ -158,9 +156,8 @@ final class ParameterizedHeader extends UnstructuredHeader
      */
     private function getEndOfParameterValue(string $value, bool $encoded = false, bool $firstLine = false): string
     {
-        if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
-            $value = '"'.$value.'"';
-        }
+        // we always quote the value, even when not needed for RFC 2231 to be compliant with HTTP requests as well
+        $value = '"'.$value.'"';
         $prepend = '=';
         if ($encoded) {
             $prepend = '*=';

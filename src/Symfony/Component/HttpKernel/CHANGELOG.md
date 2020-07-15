@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * made parameter `kernel.environment` runtime-dependent when the `APP_RUNTIME_ENV` env var is set
+ * added parameter `kernel.mode`: it's the build-time equivalent of `kernel.environment`
+ * deprecated the `Kernel::$environment` property, use `Kernel::$mode` instead
+ * deprecated the `KernelInterface::getEnvironment()` method, use `KernelInterface::getMode()` instead
+ * deprecated the `ConfigDataCollector::getEnv()` method, use `ConfigDataCollector::getMode()` instead
+
+
 5.2.0
 -----
 

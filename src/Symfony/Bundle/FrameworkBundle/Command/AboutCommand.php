@@ -78,7 +78,7 @@ EOT
             ['<info>Kernel</>'],
             new TableSeparator(),
             ['Type', \get_class($kernel)],
-            ['Environment', $kernel->getEnvironment()],
+            ['Mode', $kernel->getMode()],
             ['Debug', $kernel->isDebug() ? 'true' : 'false'],
             ['Charset', $kernel->getCharset()],
             ['Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'],

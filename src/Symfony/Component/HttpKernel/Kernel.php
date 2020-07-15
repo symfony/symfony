@@ -47,9 +47,9 @@ class_exists(ConfigCache::class);
 /**
  * The Kernel is the heart of the Symfony system.
  *
- * It manages an environment made of bundles.
+ * It manages a mode made of bundles.
  *
- * Environment names must always start with a letter and
+ * Mode names must always start with a letter and
  * they must only contain letters and numbers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -62,10 +62,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected $bundles = [];
 
     protected $container;
-    protected $environment;
     protected $debug;
     protected $booted = false;
     protected $startTime;
+    protected $mode;
+
+    /**
+     * @deprecated since Symfony 5.2, use $mode instead
+     */
+    protected $environment;
 
     private $projectDir;
     private $warmupDir;
@@ -84,9 +89,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     const END_OF_MAINTENANCE = '07/2021';
     const END_OF_LIFE = '07/2021';
 
-    public function __construct(string $environment, bool $debug)
+    public function __construct(string $mode, bool $debug)
     {
-        $this->environment = $environment;
+        $this->mode = $mode;
+        $this->environment = $mode;
         $this->debug = $debug;
     }
 
@@ -257,10 +263,22 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 5.2, use getMode() instead.
      */
     public function getEnvironment()
     {
-        return $this->environment;
+        trigger_deprecation('symfony/http-kernel', '5.2', 'The "%s()" method is deprecated, use getMode() instead.', __METHOD__);
+
+        return $this->mode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMode(): string
+    {
+        return $this->mode;
     }
 
     /**
@@ -331,7 +349,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getCacheDir()
     {
-        return $this->getProjectDir().'/var/cache/'.$this->environment;
+        return $this->getProjectDir().'/var/cache/'.$this->mode;
     }
 
     /**
@@ -405,10 +423,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         $class = static::class;
         $class = false !== strpos($class, "@anonymous\0") ? get_parent_class($class).str_replace('.', '_', ContainerBuilder::hash($class)) : $class;
-        $class = str_replace('\\', '_', $class).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
+        $class = str_replace('\\', '_', $class).ucfirst($this->mode).($this->debug ? 'Debug' : '').'Container';
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $class)) {
-            throw new \InvalidArgumentException(sprintf('The environment "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->environment));
+            throw new \InvalidArgumentException(sprintf('The mode "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->mode));
         }
 
         return $class;
@@ -605,7 +623,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         return [
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
-            'kernel.environment' => $this->environment,
+            'kernel.environment' => 'env(default:kernel.mode:APP_RUNTIME_ENV)',
+            'kernel.mode' => $this->mode,
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
             'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
@@ -854,11 +873,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function __sleep()
     {
-        return ['environment', 'debug'];
+        return ['mode', 'debug'];
     }
 
     public function __wakeup()
     {
-        $this->__construct($this->environment, $this->debug);
+        $this->__construct($this->environment ?? $this->mode, $this->debug);
     }
 }

@@ -4,6 +4,8 @@ CHANGELOG
 5.2.0
 -----
 
+ * the `app.env` variable is now runtime-dependent when the `APP_RUNTIME_ENV` env var is defined
+ * added the `app.mode` variable: it's the build-time equivalent of `app.env`
  * deprecated the public `twig` service to private
 
 5.0.0

@@ -71,6 +71,9 @@ HttpKernel
 
  * Made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
+ * Removed the `Kernel::$environment` property, use `Kernel::$mode` instead
+ * Removed the `KernelInterface::getEnvironment()` method, use `KernelInterface::getMode()` instead
+ * Removed the `ConfigDataCollector::getEnv()` method, use `ConfigDataCollector::getMode()` instead
 
 Inflector
 ---------

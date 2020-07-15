@@ -69,7 +69,7 @@ trait MicroKernelTrait
     public function getCacheDir(): string
     {
         if (isset($_SERVER['APP_CACHE_DIR'])) {
-            return $_SERVER['APP_CACHE_DIR'].'/'.$this->environment;
+            return $_SERVER['APP_CACHE_DIR'].'/'.$this->mode;
         }
 
         return parent::getCacheDir();
@@ -90,7 +90,7 @@ trait MicroKernelTrait
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';
         foreach ($contents as $class => $envs) {
-            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+            if ($envs[$this->mode] ?? $envs['all'] ?? false) {
                 yield new $class();
             }
         }

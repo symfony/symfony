@@ -85,7 +85,7 @@ To see environment variables used by the container, use the <info>--env-vars</in
 
 Display a specific environment variable by specifying its name with the <info>--env-var</info> option:
 
-  <info>php %command.full_name% --env-var=APP_ENV</info>
+  <info>php %command.full_name% --env-var=APP_MODE</info>
 
 Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
 

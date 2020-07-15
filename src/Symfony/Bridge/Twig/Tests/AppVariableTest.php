@@ -45,6 +45,13 @@ class AppVariableTest extends TestCase
         $this->assertEquals('dev', $this->appVariable->getEnvironment());
     }
 
+    public function testMode()
+    {
+        $this->appVariable->setMode('dev');
+
+        $this->assertEquals('dev', $this->appVariable->getMode());
+    }
+
     /**
      * @runInSeparateProcess
      */
@@ -118,6 +125,12 @@ class AppVariableTest extends TestCase
     {
         $this->expectException('RuntimeException');
         $this->appVariable->getEnvironment();
+    }
+
+    public function testModeNotSet()
+    {
+        $this->expectException('RuntimeException');
+        $this->appVariable->getMode();
     }
 
     public function testDebugNotSet()

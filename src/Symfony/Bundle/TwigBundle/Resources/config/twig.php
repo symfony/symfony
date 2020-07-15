@@ -70,6 +70,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.app_variable', AppVariable::class)
             ->call('setEnvironment', [param('kernel.environment')])
+            ->call('setMode', [param('kernel.mode')])
             ->call('setDebug', [param('kernel.debug')])
             ->call('setTokenStorage', [service('security.token_storage')->ignoreOnInvalid()])
             ->call('setRequestStack', [service('request_stack')->ignoreOnInvalid()])

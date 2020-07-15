@@ -27,6 +27,7 @@ class AppVariable
     private $tokenStorage;
     private $requestStack;
     private $environment;
+    private $mode;
     private $debug;
 
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
@@ -42,6 +43,11 @@ class AppVariable
     public function setEnvironment(string $environment)
     {
         $this->environment = $environment;
+    }
+
+    public function setMode(string $mode): void
+    {
+        $this->mode = $mode;
     }
 
     public function setDebug(bool $debug)
@@ -128,6 +134,18 @@ class AppVariable
         }
 
         return $this->environment;
+    }
+
+    /**
+     * Returns the current app mode name (e.g 'dev').
+     */
+    public function getMode(): string
+    {
+        if (null === $this->mode) {
+            throw new \RuntimeException('The "app.mode" variable is not available.');
+        }
+
+        return $this->mode;
     }
 
     /**

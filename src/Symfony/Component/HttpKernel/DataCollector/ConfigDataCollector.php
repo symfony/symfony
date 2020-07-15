@@ -46,7 +46,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
             'symfony_state' => 'unknown',
-            'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
+            'mode' => isset($this->kernel) ? $this->kernel->getMode() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => \PHP_VERSION,
             'php_architecture' => \PHP_INT_SIZE * 8,
@@ -207,14 +207,23 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['php_timezone'];
     }
 
+    public function getMode(): string
+    {
+        return $this->data['mode'];
+    }
+
     /**
      * Gets the environment.
      *
      * @return string The environment
+     *
+     * @deprecated since Symfony 5.2, use getMode() instead.
      */
     public function getEnv()
     {
-        return $this->data['env'];
+        trigger_deprecation('symfony/http-kernel', '5.2', 'The "%s()" method is deprecated, use getMode() instead.', __METHOD__);
+
+        return $this->data['mode'];
     }
 
     /**

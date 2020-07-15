@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
+use Symfony\Bundle\FrameworkBundle\Tests\Command\KernelInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -24,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
@@ -264,7 +264,7 @@ class ApplicationTest extends TestCase
             ->willReturnOnConsecutiveCalls([], [])
         ;
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('boot');
         $kernel
             ->expects($this->any())

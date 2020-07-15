@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -128,6 +129,23 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $this->assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
+
+    public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
+    {
+        if (!property_exists(BaseNode::class, 'placeholderUniquePrefixes')) {
+            $this->markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
+        }
+
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->registerExtension(new TestCccExtension());
+        $container->prependExtensionConfig('foo', ['bool_node' => '%env(bool:MY_ENV_VAR)%']);
+        $container->prependExtensionConfig('test_ccc', ['bool_node' => '%env(bool:MY_ENV_VAR)%']);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }
 
 class FooConfiguration implements ConfigurationInterface
@@ -139,6 +157,7 @@ class FooConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bar')->end()
                 ->scalarNode('baz')->end()
+                ->booleanNode('bool_node')->end()
             ->end();
 
         return $treeBuilder;
@@ -166,6 +185,8 @@ class FooExtension extends Extension
             $container->getParameterBag()->get('env(BOZ)');
             $container->resolveEnvPlaceholders($config['baz']);
         }
+
+        $container->setParameter('foo.param', 'ccc');
     }
 }
 
@@ -192,5 +213,38 @@ class ThrowingExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         throw new \Exception();
+    }
+}
+
+final class TestCccConfiguration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('test_ccc');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->booleanNode('bool_node')->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
+final class TestCccExtension extends Extension
+{
+    public function getAlias(): string
+    {
+        return 'test_ccc';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
+    {
+        return new TestCccConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $configuration = $this->getConfiguration($configs, $container);
+        $this->processConfiguration($configuration, $configs);
     }
 }

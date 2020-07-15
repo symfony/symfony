@@ -48,9 +48,13 @@ class Envelope
         if (!preg_match('/^[^@\x80-\xFF]++@/', $sender->getAddress())) {
             throw new InvalidArgumentException(sprintf('Invalid sender "%s": non-ASCII characters not supported in local-part of email.', $sender->getAddress()));
         }
-        $this->sender = new Address($sender->getAddress());
+        $this->sender = $sender;
     }
 
+    /**
+     * @return Address Returns a "mailbox" as specified by RFC 2822
+     *                 Must be converted to an "addr-spec" when used as a "MAIL FROM" value in SMTP (use getAddress())
+     */
     public function getSender(): Address
     {
         return $this->sender;

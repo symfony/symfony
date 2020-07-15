@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by desarrolla2 at 2020-06-26T08:33:02Z
+
+I preferred to use the "v1.44.0" tag instead of master because they recommend it, since there may be json format changes in the future.
+
+Maybe you prefer that I use master branch and this script fails, if format changes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-26T08:35:22Z
+
+Great! Can you apply fabbot's patch? Also, can you run the script to see the diff with what we have now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-26T09:06:59Z
+
+Thanks for working on this.
+About my comments above related to ordering, maybe we should send them to the upstream db?
+
+---------------------------------------------------------------------------
+
+by desarrolla2 at 2020-07-03T10:41:10Z
+
+should i rebase the commit to improve the history?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-07-03T12:28:12Z
+
+@desarrolla2 yes please
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-15T07:11:44Z
+
+@desarrolla2 I've fixed your last commit.

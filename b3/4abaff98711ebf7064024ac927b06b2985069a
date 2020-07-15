@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-15T10:10:25Z
+
+@dmaicher But tests are failing on deps=high, which is expected, right?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-07-15T10:18:12Z
+
+@fabpot ah of course. So they should pass once this fix has been merged up I guess? :blush:

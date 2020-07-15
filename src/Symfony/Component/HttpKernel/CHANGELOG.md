@@ -8,6 +8,8 @@ CHANGELOG
  * made the public `http_cache` service handle requests when available
  * allowed enabling trusted hosts and proxies using new `kernel.trusted_hosts`,
    `kernel.trusted_proxies` and `kernel.trusted_headers` parameters
+ * content of request parameter `_password` is now also hidden
+   in the request profiler raw content section
 
 5.1.0
 -----

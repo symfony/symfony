@@ -310,6 +310,27 @@ class RequestDataCollectorTest extends TestCase
         $this->assertTrue($collector->getStatelessCheck());
     }
 
+    public function testItHidesPassword()
+    {
+        $c = new RequestDataCollector();
+
+        $request = Request::create(
+            'http://test.com/login',
+            'POST',
+            ['_password' => ' _password@123'],
+            [],
+            [],
+            [],
+            '_password=%20_password%40123'
+        );
+
+        $c->collect($request, $this->createResponse());
+        $c->lateCollect();
+
+        $this->assertEquals('******', $c->getRequestRequest()->get('_password'));
+        $this->assertEquals('_password=******', $c->getContent());
+    }
+
     protected function createRequest($routeParams = ['name' => 'foo'])
     {
         $request = Request::create('http://test.com/foo?bar=baz');

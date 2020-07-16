@@ -62,11 +62,11 @@ class PhpExecutableFinderTest extends TestCase
         $f = new PhpExecutableFinder();
 
         if (\defined('HHVM_VERSION')) {
-            $this->assertEquals($f->findArguments(), ['--php'], '::findArguments() returns HHVM arguments');
+            $this->assertEquals(['--php'], $f->findArguments(), '::findArguments() returns HHVM arguments');
         } elseif ('phpdbg' === \PHP_SAPI) {
-            $this->assertEquals($f->findArguments(), ['-qrr'], '::findArguments() returns phpdbg arguments');
+            $this->assertEquals(['-qrr'], $f->findArguments(), '::findArguments() returns phpdbg arguments');
         } else {
-            $this->assertEquals($f->findArguments(), [], '::findArguments() returns no arguments');
+            $this->assertEquals([], $f->findArguments(), '::findArguments() returns no arguments');
         }
     }
 }

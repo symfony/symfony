@@ -50,7 +50,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $this->assertStringContainsString('[ERROR] The password must not be empty.', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertEquals($statusCode, 1);
+        $this->assertEquals(1, $statusCode);
     }
 
     public function testEncodePasswordBcrypt()

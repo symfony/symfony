@@ -170,25 +170,28 @@ class FormTest extends TestCase
         ');
 
         $this->assertEquals(
-            array_keys($form->all()),
-            ['foo[2]', 'foo[3]', 'bar[foo][0]', 'bar[foo][foobar]']
+            ['foo[2]', 'foo[3]', 'bar[foo][0]', 'bar[foo][foobar]'],
+            array_keys($form->all())
         );
 
-        $this->assertEquals($form->get('foo[2]')->getValue(), 'foo');
-        $this->assertEquals($form->get('foo[3]')->getValue(), 'foo');
-        $this->assertEquals($form->get('bar[foo][0]')->getValue(), 'foo');
-        $this->assertEquals($form->get('bar[foo][foobar]')->getValue(), 'foo');
+        $this->assertEquals('foo', $form->get('foo[2]')->getValue());
+        $this->assertEquals('foo', $form->get('foo[3]')->getValue());
+        $this->assertEquals('foo', $form->get('bar[foo][0]')->getValue());
+        $this->assertEquals('foo', $form->get('bar[foo][foobar]')->getValue());
 
         $form['foo[2]'] = 'bar';
         $form['foo[3]'] = 'bar';
 
-        $this->assertEquals($form->get('foo[2]')->getValue(), 'bar');
-        $this->assertEquals($form->get('foo[3]')->getValue(), 'bar');
+        $this->assertEquals('bar', $form->get('foo[2]')->getValue());
+        $this->assertEquals('bar', $form->get('foo[3]')->getValue());
 
         $form['bar'] = ['foo' => ['0' => 'bar', 'foobar' => 'foobar']];
 
-        $this->assertEquals($form->get('bar[foo][0]')->getValue(), 'bar');
-        $this->assertEquals($form->get('bar[foo][foobar]')->getValue(), 'foobar');
+        $this->assertEquals('bar', $form->get('bar[foo][0]')->getValue());
+        $this->assertEquals(
+            'foobar',
+            $form->get('bar[foo][foobar]')->getValue()
+        );
     }
 
     /**
@@ -967,7 +970,7 @@ class FormTest extends TestCase
 
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
-        $this->assertEquals($form->getPhpValues(), ['example' => '']);
+        $this->assertEquals(['example' => ''], $form->getPhpValues());
     }
 
     public function testGetReturnTypes()

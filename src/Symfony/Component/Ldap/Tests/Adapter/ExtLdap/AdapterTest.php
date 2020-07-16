@@ -87,12 +87,12 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
         $query = $ldap->createQuery('cn=Fabien Potencier,dc=symfony,dc=com', '(objectclass=*)', [
-           'scope' => Query::SCOPE_BASE,
+            'scope' => Query::SCOPE_BASE,
         ]);
         $result = $query->execute();
 
         $entry = $result[0];
-        $this->assertEquals($result->count(), 1);
+        $this->assertEquals(1, $result->count());
         $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
     }
 
@@ -109,7 +109,7 @@ class AdapterTest extends LdapTestCase
         $subtree_count = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)')->execute()->count();
 
         $this->assertNotEquals($one_level_result->count(), $subtree_count);
-        $this->assertEquals($one_level_result->count(), 1);
-        $this->assertEquals($one_level_result[0]->getAttribute('ou'), ['Ldap']);
+        $this->assertEquals(1, $one_level_result->count());
+        $this->assertEquals(['Ldap'], $one_level_result[0]->getAttribute('ou'));
     }
 }

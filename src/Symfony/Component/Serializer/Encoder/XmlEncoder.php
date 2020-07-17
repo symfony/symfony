@@ -50,6 +50,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     const LOAD_OPTIONS = 'load_options';
     const REMOVE_EMPTY_TAGS = 'remove_empty_tags';
+    const REMOVE_EMPTY_ATTRIBUTES = 'remove_empty_attributes';
     const ROOT_NODE_NAME = 'xml_root_node_name';
     const STANDALONE = 'xml_standalone';
     const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
@@ -61,6 +62,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::ENCODER_IGNORED_NODE_TYPES => [],
         self::LOAD_OPTIONS => LIBXML_NONET | LIBXML_NOBLANKS,
         self::REMOVE_EMPTY_TAGS => false,
+        self::REMOVE_EMPTY_ATTRIBUTES => false,
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CAST_ATTRIBUTES => true,
     ];
@@ -367,6 +369,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     {
         $append = true;
         $removeEmptyTags = $this->context[self::REMOVE_EMPTY_TAGS] ?? $this->defaultContext[self::REMOVE_EMPTY_TAGS] ?? false;
+        $removeEmptyAttributes = $this->context[self::REMOVE_EMPTY_ATTRIBUTES] ?? $this->defaultContext[self::REMOVE_EMPTY_ATTRIBUTES] ?? false;
         $encoderIgnoredNodeTypes = $this->context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
 
         if (\is_array($data) || ($data instanceof \Traversable && (null === $this->serializer || !$this->serializer->supportsNormalization($data, $this->format)))) {
@@ -376,7 +379,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     if (!is_scalar($data)) {
                         $data = $this->serializer->normalize($data, $this->format, $this->context);
                     }
-                    $parentNode->setAttribute($attributeName, $data);
+                    if (null !== $data || !$removeEmptyAttributes) {
+                        $parentNode->setAttribute($attributeName, $data);
+                    }
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif ('#comment' === $key) {

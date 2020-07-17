@@ -174,6 +174,28 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
     }
 
+    public function testEncodeRemovingEmptyAttributes()
+    {
+        $array = ['person' => ['@firstname' => 'Peter', '@lastname' => null]];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person firstname="Peter" /></response>'."\n";
+
+        $context = ['remove_empty_attributes' => true];
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
+    public function testEncodeNotRemovingEmptyAttributes()
+    {
+        $array = ['person' => ['@firstname' => 'Peter', '@lastname' => null]];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person firstname="Peter" lastname="" /></response>'."\n";
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
+    }
+
     public function testContext()
     {
         $array = ['person' => ['name' => 'George Abitbol']];

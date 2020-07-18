@@ -369,6 +369,14 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @dataProvider getTransICUTests
+     */
+    public function testTransICU(...$args)
+    {
+        $this->testTrans(...$args);
+    }
+
+    /**
      * @dataProvider getInvalidLocalesTests
      */
     public function testTransInvalidLocale($locale)
@@ -441,6 +449,17 @@ class TranslatorTest extends TestCase
             ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
             ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
             ['', null, '', [], 'fr', ''],
+        ];
+    }
+
+    public function getTransICUTests()
+    {
+        $id = '{apples, plural, =0 {There are no apples} one {There is one apple} other {There are # apples}}';
+
+        return [
+            ['There are no apples', $id, $id, ['{apples}' => 0], 'en', 'test'.MessageCatalogue::INTL_DOMAIN_SUFFIX],
+            ['There is one apple',  $id, $id, ['{apples}' => 1], 'en', 'test'.MessageCatalogue::INTL_DOMAIN_SUFFIX],
+            ['There are 3 apples',  $id, $id, ['{apples}' => 3], 'en', 'test'.MessageCatalogue::INTL_DOMAIN_SUFFIX],
         ];
     }
 

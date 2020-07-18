@@ -4,6 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
+ * added support for calling `trans` with ICU formatted messages
  * added `PseudoLocalizationTranslator`
 
 5.1.0

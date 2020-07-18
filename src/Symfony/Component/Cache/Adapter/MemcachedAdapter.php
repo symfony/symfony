@@ -172,7 +172,7 @@ class MemcachedAdapter extends AbstractAdapter
 
             // set client's options
             unset($options['persistent_id'], $options['username'], $options['password'], $options['weight'], $options['lazy']);
-            $options = array_change_key_case($options, CASE_UPPER);
+            $options = array_change_key_case($options, \CASE_UPPER);
             $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
             $client->setOption(\Memcached::OPT_NO_BLOCK, true);
             $client->setOption(\Memcached::OPT_TCP_NODELAY, true);
@@ -269,7 +269,7 @@ class MemcachedAdapter extends AbstractAdapter
 
             return $result;
         } catch (\Error $e) {
-            throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+            throw new \ErrorException($e->getMessage(), $e->getCode(), \E_ERROR, $e->getFile(), $e->getLine());
         }
     }
 

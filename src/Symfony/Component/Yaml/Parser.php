@@ -1080,19 +1080,19 @@ class Parser
     {
         if (false === $ret = preg_match($pattern, $subject, $matches, $flags, $offset)) {
             switch (preg_last_error()) {
-                case PREG_INTERNAL_ERROR:
+                case \PREG_INTERNAL_ERROR:
                     $error = 'Internal PCRE error.';
                     break;
-                case PREG_BACKTRACK_LIMIT_ERROR:
+                case \PREG_BACKTRACK_LIMIT_ERROR:
                     $error = 'pcre.backtrack_limit reached.';
                     break;
-                case PREG_RECURSION_LIMIT_ERROR:
+                case \PREG_RECURSION_LIMIT_ERROR:
                     $error = 'pcre.recursion_limit reached.';
                     break;
-                case PREG_BAD_UTF8_ERROR:
+                case \PREG_BAD_UTF8_ERROR:
                     $error = 'Malformed UTF-8 data.';
                     break;
-                case PREG_BAD_UTF8_OFFSET_ERROR:
+                case \PREG_BAD_UTF8_OFFSET_ERROR:
                     $error = 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.';
                     break;
                 default:

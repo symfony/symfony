@@ -95,7 +95,7 @@ class ResponseHeaderBag extends HeaderBag
         if (null !== $key) {
             $key = strtr($key, self::UPPER, self::LOWER);
 
-            return 'set-cookie' !== $key ? $headers[$key] ?? [] : array_map('strval', $this->getCookies());
+            return 'set-cookie' !== $key ? $headers[$key] ?? [] : array_map('\strval', $this->getCookies());
         }
 
         foreach ($this->getCookies() as $cookie) {

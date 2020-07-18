@@ -43,7 +43,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         ksort($headers);
-        $max = max(array_map('strlen', array_keys($headers))) + 1;
+        $max = max(array_map('\strlen', array_keys($headers))) + 1;
         $content = '';
         foreach ($headers as $name => $values) {
             $name = ucwords($name, '-');
@@ -198,7 +198,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return $default;
         }
 
-        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
+        if (false === $date = \DateTime::createFromFormat(\DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 

@@ -79,7 +79,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             if (!isset($array[$key]) && !\array_key_exists($key, $array)) {
-                throw new EnvNotFoundException(sprintf('Key "%s" not found in %s (resolved from "%s").', $key, json_encode($array), $next));
+                throw new EnvNotFoundException(sprintf('Key "%s" not found in "%s" (resolved from "%s").', $key, json_encode($array), $next));
             }
 
             return $array[$key];

@@ -69,7 +69,15 @@ class AccessorMapper implements DataMapperInterface
             // Write-back is disabled if the form is not synchronized (transformation failed),
             // if the form was not submitted and if the form is disabled (modification not allowed)
             if (null !== $this->set && $config->getMapped() && $form->isSubmitted() && $form->isSynchronized() && !$form->isDisabled()) {
-                ($this->set)($data, $form->getData());
+                $returnValue = ($this->set)($data, $form->getData());
+                $type = is_object($returnValue) ? get_class($returnValue) : gettype($returnValue);
+
+                if (
+                    (is_scalar($data) && gettype($data) === $type)
+                    || (is_array($data) && is_array($returnValue))
+                    || (is_object($data) && $returnValue instanceof $type)) {
+                    $data = $returnValue;
+                }
             }
         }
     }

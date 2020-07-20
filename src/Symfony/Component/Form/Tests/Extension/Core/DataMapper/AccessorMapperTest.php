@@ -195,6 +195,47 @@ class AccessorMapperTest extends TestCase
         $this->assertSame('bar', $data->getBar());
     }
 
+    public function testSetAccessorSupportsImmutableObjects()
+    {
+        $this->setupPropertyPathMapper($this->any(), $this->any());
+
+        $data = new class('petrol') {
+            private $engine;
+
+            public function __construct(string $engine)
+            {
+                $this->engine = $engine;
+            }
+
+            public function setEngineClosure($data)
+            {
+                return new self($data);
+            }
+
+            public function getEngineClosure()
+            {
+                return $this->engine;
+            }
+        };
+
+        $config = new FormConfigBuilder('car', null, $this->dispatcher);
+        $config->setCompound(true);
+        $config->setDataMapper($this->createMapper(true, true));
+        $config->setData($data);
+        $form = new Form($config);
+        $form
+            ->add(new Form(new FormConfigBuilder('engine', null, $this->dispatcher)));
+
+        $form->submit(['engine' => 'electric']);
+        $this->assertNull($form->getTransformationFailure());
+
+        $formData = $form->getData();
+
+        $this->assertNotSame($data, $formData);
+        $this->assertSame('electric', $formData->getEngineClosure());
+        $this->assertSame('petrol', $data->getEngineClosure());
+    }
+
     private function setupPropertyPathMapper(Invocation $dataToFormsMatcher, Invocation $formsToDataMatcher): void
     {
         $propertyPathMapper = new PropertyPathMapper($this->propertyAccessor);
@@ -217,7 +258,7 @@ class AccessorMapperTest extends TestCase
     {
         return new AccessorMapper(
             $useGetClosure ? function ($object) { return $object->getEngineClosure(); } : null,
-            $useSetClosure ? function ($object, $value) { $object->setEngineClosure($value); } : null,
+            $useSetClosure ? function ($object, $value) { return $object->setEngineClosure($value); } : null,
             $this->propertyPathMapper
         );
     }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-07-20T08:28:51Z
+
+the test failure on Travis CI looks related to these changes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-20T14:25:47Z
+
+@xabbuh Fixed now (I've changed the patch to avoid complexities in the tests).

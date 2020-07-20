@@ -3,7 +3,10 @@
 namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormError;
+use TypeError;
 
 class AccessorMapper implements DataMapperInterface
 {
@@ -69,7 +72,13 @@ class AccessorMapper implements DataMapperInterface
             // Write-back is disabled if the form is not synchronized (transformation failed),
             // if the form was not submitted and if the form is disabled (modification not allowed)
             if (null !== $this->set && $config->getMapped() && $form->isSubmitted() && $form->isSynchronized() && !$form->isDisabled()) {
-                $returnValue = ($this->set)($data, $form->getData());
+                try {
+                    $returnValue = ($this->set)($data, $form->getData());
+                } catch (ExceptionInterface | TypeError $e) {
+                    $form->addError(new FormError($e->getMessage()));
+                    continue;
+                }
+
                 $type = is_object($returnValue) ? get_class($returnValue) : gettype($returnValue);
 
                 if (

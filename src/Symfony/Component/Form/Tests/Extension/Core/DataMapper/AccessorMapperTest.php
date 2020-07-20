@@ -1,5 +1,8 @@
 <?php
 
+// Declare strict is necessary here to provoke type errors
+declare(strict_types = 1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -17,6 +20,7 @@ use stdClass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\AccessorMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Form;
@@ -234,6 +238,63 @@ class AccessorMapperTest extends TestCase
         $this->assertNotSame($data, $formData);
         $this->assertSame('electric', $formData->getEngineClosure());
         $this->assertSame('petrol', $data->getEngineClosure());
+    }
+
+    public static function invalidValueProvider(): \Generator
+    {
+        yield 'validation error' => ['#Corn is not a valid engine type#', 'corn'];
+        yield 'type error' => ['#Argument 1 passed to class@anonymous::setEngineClosure\(\) must be of the type string, object given#', new stdClass()];
+    }
+
+    /**
+     * @dataProvider InvalidValueProvider
+     */
+    public function testSetAccessorCatchesExceptions(string $errorMessagePattern, $value)
+    {
+        $this->setupPropertyPathMapper($this->any(), $this->any());
+
+        $data = new class('petrol') {
+            private $engine;
+
+            public function __construct(string $engine)
+            {
+                $this->engine = $engine;
+            }
+
+            public function setEngineClosure(string $data)
+            {
+                if ($data === 'corn') {
+                    throw new class extends RuntimeException
+                    {
+                        public function __construct()
+                        {
+                            parent::__construct('Corn is not a valid engine type');
+                        }
+                    };
+                }
+
+                $this->engine = $data;
+            }
+
+            public function getEngineClosure()
+            {
+                return $this->engine;
+            }
+        };
+
+        $config = new FormConfigBuilder('car', null, $this->dispatcher);
+        $config->setCompound(true);
+        $config->setDataMapper($this->createMapper(true, true));
+        $config->setData($data);
+        $form = new Form($config);
+        $form
+            ->add(new Form(new FormConfigBuilder('engine', null, $this->dispatcher)));
+
+        $form->submit(['engine' => $value]);
+        $this->assertFalse($form->isValid());
+        $this->assertSame('petrol', $data->getEngineClosure());
+
+        $this->assertMatchesRegularExpression($errorMessagePattern, (string) $form->get('engine')->getErrors());
     }
 
     private function setupPropertyPathMapper(Invocation $dataToFormsMatcher, Invocation $formsToDataMatcher): void

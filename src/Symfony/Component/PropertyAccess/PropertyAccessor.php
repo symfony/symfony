@@ -394,6 +394,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $object = $zval[self::VALUE];
         $class = \get_class($object);
         $access = $this->getReadInfo($class, $property);
+        $objectReflection = new \ReflectionObject($object);
 
         if (null !== $access) {
             $name = $access->getName();
@@ -435,13 +436,16 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 throw $e;
             }
-        } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
-            $result[self::VALUE] = $object->$property;
-            if (isset($zval[self::REF])) {
-                $result[self::REF] = &$object->$property;
+        } else {
+            $objectReflection = new \ReflectionObject($object);
+            if ($objectReflection->hasProperty($property) && $objectReflection->getProperty($property)->isPublic()) {
+                $result[self::VALUE] = $object->$property;
+                if (isset($zval[self::REF])) {
+                    $result[self::REF] = &$object->$property;
+                }
+            } elseif (!$ignoreInvalidProperty) {
+                throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
             }
-        } elseif (!$ignoreInvalidProperty) {
-            throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
         }
 
         // Objects are always passed around by reference

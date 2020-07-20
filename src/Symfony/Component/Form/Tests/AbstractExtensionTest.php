@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 
 class AbstractExtensionTest extends TestCase
@@ -33,12 +34,12 @@ class AbstractExtensionTest extends TestCase
 
 class ConcreteExtension extends AbstractExtension
 {
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [new FooType()];
     }
 
-    protected function loadTypeGuesser()
+    protected function loadTypeGuesser(): ?FormTypeGuesserInterface
     {
     }
 }

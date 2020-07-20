@@ -32,12 +32,10 @@ class MessageBusTest extends TestCase
         $this->assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
-    /**
-     * @expectedException \TypeError
-     * @expectedExceptionMessage Invalid argument provided to "Symfony\Component\Messenger\MessageBus::dispatch()": expected object, but got string.
-     */
     public function testItDispatchInvalidMessageType()
     {
+        $this->expectException('TypeError');
+        $this->expectExceptionMessage('Invalid argument provided to "Symfony\Component\Messenger\MessageBus::dispatch()": expected object, but got "string".');
         (new MessageBus())->dispatch('wrong');
     }
 
@@ -150,7 +148,7 @@ class MessageBusTest extends TestCase
         $this->assertCount(2, $finalEnvelope->all());
     }
 
-    public function provideConstructorDataStucture()
+    public function provideConstructorDataStucture(): iterable
     {
         yield 'iterator' => [new \ArrayObject([
             new SimpleMiddleware(),
@@ -169,7 +167,7 @@ class MessageBusTest extends TestCase
     }
 
     /** @dataProvider provideConstructorDataStucture */
-    public function testConstructDataStructure($dataStructure)
+    public function testConstructDataStructure(iterable $dataStructure)
     {
         $bus = new MessageBus($dataStructure);
         $envelope = new Envelope(new DummyMessage('Hello'));

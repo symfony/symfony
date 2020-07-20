@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 
 class FormWithSameParentType extends AbstractType
 {
-    public function getParent()
+    public function getParent(): ?string
     {
         return self::class;
     }

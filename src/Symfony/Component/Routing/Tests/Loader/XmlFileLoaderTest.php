@@ -47,6 +47,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
         $this->assertEquals(['https'], $route->getSchemes());
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
+        $this->assertTrue($route->getDefault('_stateless'));
     }
 
     public function testLoadWithNamespacePrefix()
@@ -98,6 +99,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('/defaults', $defaultsRoute->getPath());
         $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+        $this->assertTrue($defaultsRoute->getDefault('_stateless'));
     }
 
     public function testLoadingImportedRoutesWithDefaults()
@@ -111,9 +113,11 @@ class XmlFileLoaderTest extends TestCase
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
         $localeRoute->setDefault('_locale', 'g_locale');
         $localeRoute->setDefault('_format', 'g_format');
+        $localeRoute->setDefault('_stateless', true);
         $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
         $formatRoute->setDefault('_locale', 'g_locale');
         $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('_stateless', true);
         $formatRoute->setDefault('specific', 'imported');
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.xml'));
@@ -185,6 +189,9 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+
+        $this->assertEquals('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
+        $this->assertEquals('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedImportsOfNotLocalizedRoutes()
@@ -198,24 +205,27 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+
+        $this->assertSame('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
+        $this->assertSame('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
+        $this->expectException('InvalidArgumentException');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
     public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
     {
+        $this->expectException('InvalidArgumentException');
         $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
@@ -225,12 +235,10 @@ class XmlFileLoaderTest extends TestCase
         return [['nonvalidnode.xml'], ['nonvalidroute.xml'], ['nonvalid.xml'], ['missing_id.xml'], ['missing_path.xml']];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Document types are not allowed.
-     */
     public function testDocTypeIsNotAllowed()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Document types are not allowed.');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('withdoctype.xml');
     }
@@ -435,12 +443,10 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/
-     */
     public function testOverrideControllerInDefaults()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.xml');
     }
@@ -469,12 +475,10 @@ class XmlFileLoaderTest extends TestCase
         yield ['import__controller.xml'];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/
-     */
     public function testImportWithOverriddenController()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.xml');
     }
@@ -518,5 +522,45 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
         $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
+    }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostsInImporter()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 }

@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @group time-sensitive
@@ -56,9 +55,6 @@ class TraceableFirewallListenerTest extends TestCase
 
         $listeners = $firewall->getWrappedListeners();
         $this->assertCount(1, $listeners);
-        $this->assertSame($response, $listeners[0]['response']);
-        $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
-        $this->assertSame(\get_class($listener), (string) $listeners[0]['stub']);
-        $this->assertSame(1, $listenerCalled);
+        $this->assertSame($listener, $listeners[0]['stub']);
     }
 }

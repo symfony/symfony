@@ -21,7 +21,7 @@ class FilesystemTestCase extends TestCase
     protected $longPathNamesWindows = [];
 
     /**
-     * @var \Symfony\Component\Filesystem\Filesystem
+     * @var Filesystem
      */
     protected $filesystem = null;
 
@@ -40,7 +40,7 @@ class FilesystemTestCase extends TestCase
      */
     private static $symlinkOnWindows = null;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             self::$linkOnWindows = true;
@@ -69,7 +69,7 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -78,7 +78,7 @@ class FilesystemTestCase extends TestCase
         $this->workspace = realpath($this->workspace);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->longPathNamesWindows)) {
             foreach ($this->longPathNamesWindows as $path) {
@@ -105,22 +105,36 @@ class FilesystemTestCase extends TestCase
         );
     }
 
-    protected function getFileOwner($filepath)
+    protected function getFileOwnerId($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
         $infos = stat($filepath);
-        if ($datas = posix_getpwuid($infos['uid'])) {
-            return $datas['name'];
-        }
+
+        return $infos['uid'];
+    }
+
+    protected function getFileOwner($filepath)
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+    }
+
+    protected function getFileGroupId($filepath)
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $infos = stat($filepath);
+
+        return $infos['gid'];
     }
 
     protected function getFileGroup($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        $infos = stat($filepath);
-        if ($datas = posix_getgrgid($infos['gid'])) {
+        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
             return $datas['name'];
         }
 
@@ -144,7 +158,7 @@ class FilesystemTestCase extends TestCase
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }
 
-        // https://bugs.php.net/bug.php?id=69473
+        // https://bugs.php.net/69473
         if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === PHP_ZTS) {
             $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
         }

@@ -14,17 +14,18 @@ namespace Symfony\Component\Lock\Store;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
- * RetryTillSaveStore is a StoreInterface implementation which decorate a non blocking StoreInterface to provide a
+ * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
  * blocking storage.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -33,11 +34,10 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     private $retryCount;
 
     /**
-     * @param StoreInterface $decorated  The decorated StoreInterface
-     * @param int            $retrySleep Duration in ms between 2 retry
-     * @param int            $retryCount Maximum amount of retry
+     * @param int $retrySleep Duration in ms between 2 retry
+     * @param int $retryCount Maximum amount of retry
      */
-    public function __construct(StoreInterface $decorated, int $retrySleep = 100, int $retryCount = PHP_INT_MAX)
+    public function __construct(PersistingStoreInterface $decorated, int $retrySleep = 100, int $retryCount = PHP_INT_MAX)
     {
         $this->decorated = $decorated;
         $this->retrySleep = $retrySleep;
@@ -79,7 +79,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         $this->decorated->putOffExpiration($key, $ttl);
     }

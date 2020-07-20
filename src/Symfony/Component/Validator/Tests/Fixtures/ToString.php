@@ -15,7 +15,7 @@ class ToString
 {
     public $data;
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'toString';
     }

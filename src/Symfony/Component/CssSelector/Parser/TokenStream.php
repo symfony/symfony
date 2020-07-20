@@ -56,7 +56,7 @@ class TokenStream
      *
      * @return $this
      */
-    public function push(Token $token)
+    public function push(Token $token): self
     {
         $this->tokens[] = $token;
 
@@ -68,7 +68,7 @@ class TokenStream
      *
      * @return $this
      */
-    public function freeze()
+    public function freeze(): self
     {
         return $this;
     }
@@ -76,11 +76,9 @@ class TokenStream
     /**
      * Returns next token.
      *
-     * @return Token
-     *
      * @throws InternalErrorException If there is no more token
      */
-    public function getNext()
+    public function getNext(): Token
     {
         if ($this->peeking) {
             $this->peeking = false;
@@ -98,10 +96,8 @@ class TokenStream
 
     /**
      * Returns peeked token.
-     *
-     * @return Token
      */
-    public function getPeek()
+    public function getPeek(): Token
     {
         if (!$this->peeking) {
             $this->peeked = $this->getNext();
@@ -116,7 +112,7 @@ class TokenStream
      *
      * @return Token[]
      */
-    public function getUsed()
+    public function getUsed(): array
     {
         return $this->used;
     }
@@ -128,7 +124,7 @@ class TokenStream
      *
      * @throws SyntaxErrorException If next token is not an identifier
      */
-    public function getNextIdentifier()
+    public function getNextIdentifier(): string
     {
         $next = $this->getNext();
 
@@ -146,7 +142,7 @@ class TokenStream
      *
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      */
-    public function getNextIdentifierOrStar()
+    public function getNextIdentifierOrStar(): ?string
     {
         $next = $this->getNext();
 
@@ -155,7 +151,7 @@ class TokenStream
         }
 
         if ($next->isDelimiter(['*'])) {
-            return;
+            return null;
         }
 
         throw SyntaxErrorException::unexpectedToken('identifier or "*"', $next);

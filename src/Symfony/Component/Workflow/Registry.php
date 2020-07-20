@@ -27,27 +27,43 @@ class Registry
         $this->workflows[] = [$workflow, $supportStrategy];
     }
 
+    public function has(object $subject, string $workflowName = null): bool
+    {
+        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+            if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @return Workflow
      */
     public function get(object $subject, string $workflowName = null)
     {
-        $matched = null;
+        $matched = [];
 
         foreach ($this->workflows as list($workflow, $supportStrategy)) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
-                if ($matched) {
-                    throw new InvalidArgumentException('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
-                }
-                $matched = $workflow;
+                $matched[] = $workflow;
             }
         }
 
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_debug_type($subject)));
         }
 
-        return $matched;
+        if (2 <= \count($matched)) {
+            $names = array_map(static function (WorkflowInterface $workflow): string {
+                return $workflow->getName();
+            }, $matched);
+
+            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), get_debug_type($subject)));
+        }
+
+        return $matched[0];
     }
 
     /**
@@ -65,7 +81,7 @@ class Registry
         return $matched;
     }
 
-    private function supports(WorkflowInterface $workflow, $supportStrategy, $subject, $workflowName): bool
+    private function supports(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy, object $subject, ?string $workflowName): bool
     {
         if (null !== $workflowName && $workflowName !== $workflow->getName()) {
             return false;

@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class IntlGlobalsTest extends AbstractIntlGlobalsTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 

@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InteractiveLoginEvent extends Event
+final class InteractiveLoginEvent extends Event
 {
     private $request;
     private $authenticationToken;
@@ -29,22 +29,12 @@ class InteractiveLoginEvent extends Event
         $this->authenticationToken = $authenticationToken;
     }
 
-    /**
-     * Gets the request.
-     *
-     * @return Request A Request instance
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * Gets the authentication token.
-     *
-     * @return TokenInterface A TokenInterface instance
-     */
-    public function getAuthenticationToken()
+    public function getAuthenticationToken(): TokenInterface
     {
         return $this->authenticationToken;
     }

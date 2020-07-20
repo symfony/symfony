@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  *
  * @internal
  */
-class Locale
+abstract class Locale
 {
     const DEFAULT_LOCALE = null;
 
@@ -48,11 +48,11 @@ class Locale
      *
      * @return string The corresponding locale code
      *
-     * @see http://www.php.net/manual/en/locale.acceptfromhttp.php
+     * @see https://php.net/locale.acceptfromhttp
      *
      * @throws MethodNotImplementedException
      */
-    public static function acceptFromHttp($header)
+    public static function acceptFromHttp(string $header)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -63,14 +63,10 @@ class Locale
      * This polyfill doesn't implement the full-spec algorithm. It only
      * canonicalizes locale strings handled by the `LocaleBundle` class.
      *
-     * @param string $locale
-     *
      * @return string
      */
-    public static function canonicalize($locale)
+    public static function canonicalize(string $locale)
     {
-        $locale = (string) $locale;
-
         if ('' === $locale || '.' === $locale[0]) {
             return self::getDefault();
         }
@@ -97,7 +93,7 @@ class Locale
      *
      * @return string The corresponding locale code
      *
-     * @see http://www.php.net/manual/en/locale.composelocale.php
+     * @see https://php.net/locale.composelocale
      *
      * @throws MethodNotImplementedException
      */
@@ -109,17 +105,16 @@ class Locale
     /**
      * Not supported. Checks if a language tag filter matches with locale.
      *
-     * @param string $langtag      The language tag to check
-     * @param string $locale       The language range to check against
-     * @param bool   $canonicalize
+     * @param string $langtag The language tag to check
+     * @param string $locale  The language range to check against
      *
      * @return string The corresponding locale code
      *
-     * @see http://www.php.net/manual/en/locale.filtermatches.php
+     * @see https://php.net/locale.filtermatches
      *
      * @throws MethodNotImplementedException
      */
-    public static function filterMatches($langtag, $locale, $canonicalize = false)
+    public static function filterMatches(string $langtag, string $locale, bool $canonicalize = false)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -131,11 +126,11 @@ class Locale
      *
      * @return array The locale variants
      *
-     * @see http://www.php.net/manual/en/locale.getallvariants.php
+     * @see https://php.net/locale.getallvariants
      *
      * @throws MethodNotImplementedException
      */
-    public static function getAllVariants($locale)
+    public static function getAllVariants(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -145,7 +140,7 @@ class Locale
      *
      * @return string The default locale code. Always returns 'en'
      *
-     * @see http://www.php.net/manual/en/locale.getdefault.php
+     * @see https://php.net/locale.getdefault
      */
     public static function getDefault()
     {
@@ -160,11 +155,11 @@ class Locale
      *
      * @return string The localized language display name
      *
-     * @see http://www.php.net/manual/en/locale.getdisplaylanguage.php
+     * @see https://php.net/locale.getdisplaylanguage
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayLanguage($locale, $inLocale = null)
+    public static function getDisplayLanguage(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -177,11 +172,11 @@ class Locale
      *
      * @return string The localized locale display name
      *
-     * @see http://www.php.net/manual/en/locale.getdisplayname.php
+     * @see https://php.net/locale.getdisplayname
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayName($locale, $inLocale = null)
+    public static function getDisplayName(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -194,11 +189,11 @@ class Locale
      *
      * @return string The localized region display name
      *
-     * @see http://www.php.net/manual/en/locale.getdisplayregion.php
+     * @see https://php.net/locale.getdisplayregion
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayRegion($locale, $inLocale = null)
+    public static function getDisplayRegion(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -211,11 +206,11 @@ class Locale
      *
      * @return string The localized script display name
      *
-     * @see http://www.php.net/manual/en/locale.getdisplayscript.php
+     * @see https://php.net/locale.getdisplayscript
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayScript($locale, $inLocale = null)
+    public static function getDisplayScript(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -228,11 +223,11 @@ class Locale
      *
      * @return string The localized variant display name
      *
-     * @see http://www.php.net/manual/en/locale.getdisplayvariant.php
+     * @see https://php.net/locale.getdisplayvariant
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayVariant($locale, $inLocale = null)
+    public static function getDisplayVariant(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -244,11 +239,11 @@ class Locale
      *
      * @return array Associative array with the extracted variants
      *
-     * @see http://www.php.net/manual/en/locale.getkeywords.php
+     * @see https://php.net/locale.getkeywords
      *
      * @throws MethodNotImplementedException
      */
-    public static function getKeywords($locale)
+    public static function getKeywords(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -260,11 +255,11 @@ class Locale
      *
      * @return string|null The extracted language code or null in case of error
      *
-     * @see http://www.php.net/manual/en/locale.getprimarylanguage.php
+     * @see https://php.net/locale.getprimarylanguage
      *
      * @throws MethodNotImplementedException
      */
-    public static function getPrimaryLanguage($locale)
+    public static function getPrimaryLanguage(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -276,11 +271,11 @@ class Locale
      *
      * @return string|null The extracted region code or null if not present
      *
-     * @see http://www.php.net/manual/en/locale.getregion.php
+     * @see https://php.net/locale.getregion
      *
      * @throws MethodNotImplementedException
      */
-    public static function getRegion($locale)
+    public static function getRegion(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -292,11 +287,11 @@ class Locale
      *
      * @return string|null The extracted script code or null if not present
      *
-     * @see http://www.php.net/manual/en/locale.getscript.php
+     * @see https://php.net/locale.getscript
      *
      * @throws MethodNotImplementedException
      */
-    public static function getScript($locale)
+    public static function getScript(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -309,11 +304,11 @@ class Locale
      * @param bool   $canonicalize If true, the arguments will be converted to canonical form before matching
      * @param string $default      The locale to use if no match is found
      *
-     * @see http://www.php.net/manual/en/locale.lookup.php
+     * @see https://php.net/locale.lookup
      *
      * @throws MethodNotImplementedException
      */
-    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    public static function lookup(array $langtag, string $locale, bool $canonicalize = false, string $default = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -325,11 +320,11 @@ class Locale
      *
      * @return array Associative array with the extracted subtags
      *
-     * @see http://www.php.net/manual/en/locale.parselocale.php
+     * @see https://php.net/locale.parselocale
      *
      * @throws MethodNotImplementedException
      */
-    public static function parseLocale($locale)
+    public static function parseLocale(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -337,15 +332,13 @@ class Locale
     /**
      * Not supported. Sets the default runtime locale.
      *
-     * @param string $locale The locale code
-     *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/locale.setdefault.php
+     * @see https://php.net/locale.setdefault
      *
      * @throws MethodNotImplementedException
      */
-    public static function setDefault($locale)
+    public static function setDefault(string $locale)
     {
         if ('en' !== $locale) {
             throw new MethodNotImplementedException(__METHOD__);

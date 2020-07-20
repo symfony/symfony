@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Dumper\Preloader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -72,7 +73,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $fs = $this->filesystem;
         $io = new SymfonyStyle($input, $output);
@@ -85,7 +86,7 @@ EOF
         $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+            throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realCacheDir));
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
@@ -117,7 +118,11 @@ EOF
                 $warmer = $kernel->getContainer()->get('cache_warmer');
                 // non optional warmers already ran during container compilation
                 $warmer->enableOnlyOptionalWarmers();
-                $warmer->warmUp($realCacheDir);
+                $preload = (array) $warmer->warmUp($realCacheDir);
+
+                if ($preload && file_exists($preloadFile = $realCacheDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+                    Preloader::append($preloadFile, $preload);
+                }
             }
         } else {
             $fs->mkdir($warmupDir);
@@ -175,6 +180,8 @@ EOF
         }
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+
+        return 0;
     }
 
     private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
@@ -191,7 +198,11 @@ EOF
             $warmer = $kernel->getContainer()->get('cache_warmer');
             // non optional warmers already ran during container compilation
             $warmer->enableOnlyOptionalWarmers();
-            $warmer->warmUp($warmupDir);
+            $preload = (array) $warmer->warmUp($warmupDir);
+
+            if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
+                Preloader::append($preloadFile, $preload);
+            }
         }
 
         // fix references to cached files with the real cache directory name

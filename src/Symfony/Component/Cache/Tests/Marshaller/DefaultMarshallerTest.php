@@ -24,7 +24,7 @@ class DefaultMarshallerTest extends TestCase
             'b' => function () {},
         ];
 
-        $expected = ['a' => \extension_loaded('igbinary') ? igbinary_serialize(123) : serialize(123)];
+        $expected = ['a' => \extension_loaded('igbinary') && (\PHP_VERSION_ID < 70400 || version_compare('3.1.0', phpversion('igbinary'), '<=')) ? igbinary_serialize(123) : serialize(123)];
         $this->assertSame($expected, $marshaller->marshall($values, $failed));
         $this->assertSame(['b'], $failed);
     }
@@ -43,6 +43,10 @@ class DefaultMarshallerTest extends TestCase
      */
     public function testIgbinaryUnserialize()
     {
+        if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.0', phpversion('igbinary'), '>')) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+        }
+
         $marshaller = new DefaultMarshaller();
         $this->assertNull($marshaller->unmarshall(igbinary_serialize(null)));
         $this->assertFalse($marshaller->unmarshall(igbinary_serialize(false)));
@@ -50,33 +54,33 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(igbinary_serialize(0)));
     }
 
-    /**
-     * @expectedException \DomainException
-     * @expectedExceptionMessage Class not found: NotExistingClass
-     */
     public function testNativeUnserializeNotFoundClass()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
     /**
      * @requires extension igbinary
-     * @expectedException \DomainException
-     * @expectedExceptionMessage Class not found: NotExistingClass
      */
     public function testIgbinaryUnserializeNotFoundClass()
     {
+        if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.0', phpversion('igbinary'), '>')) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+        }
+
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall(rawurldecode('%00%00%00%02%17%10NotExistingClass%14%00'));
     }
 
-    /**
-     * @expectedException \DomainException
-     * @expectedExceptionMessage unserialize(): Error at offset 0 of 3 bytes
-     */
     public function testNativeUnserializeInvalid()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('unserialize(): Error at offset 0 of 3 bytes');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });
         try {
@@ -88,11 +92,15 @@ class DefaultMarshallerTest extends TestCase
 
     /**
      * @requires extension igbinary
-     * @expectedException \DomainException
-     * @expectedExceptionMessage igbinary_unserialize_zval: unknown type '61', position 5
      */
     public function testIgbinaryUnserializeInvalid()
     {
+        if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.0', phpversion('igbinary'), '>')) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+        }
+
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('igbinary_unserialize_zval: unknown type \'61\', position 5');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });
         try {

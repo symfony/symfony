@@ -21,7 +21,6 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  * This is useful when passed to Worker: messages received
  * from the transport can be sent to the correct bus.
  *
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 class RoutableMessageBus implements MessageBusInterface
@@ -29,9 +28,6 @@ class RoutableMessageBus implements MessageBusInterface
     private $busLocator;
     private $fallbackBus;
 
-    /**
-     * @param ContainerInterface $busLocator A locator full of MessageBusInterface objects
-     */
     public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
     {
         $this->busLocator = $busLocator;
@@ -41,7 +37,7 @@ class RoutableMessageBus implements MessageBusInterface
     public function dispatch($envelope, array $stamps = []): Envelope
     {
         if (!$envelope instanceof Envelope) {
-            throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
+            throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope.');
         }
 
         /** @var BusNameStamp|null $busNameStamp */

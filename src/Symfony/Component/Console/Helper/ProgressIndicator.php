@@ -73,8 +73,6 @@ class ProgressIndicator
 
     /**
      * Starts the indicator output.
-     *
-     * @param $message
      */
     public function start(string $message)
     {
@@ -181,18 +179,16 @@ class ProgressIndicator
             return;
         }
 
-        $self = $this;
-
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
-            if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                return $formatter($self);
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = self::getPlaceholderFormatterDefinition($matches[1])) {
+                return $formatter($this);
             }
 
             return $matches[0];
         }, $this->format));
     }
 
-    private function determineBestFormat()
+    private function determineBestFormat(): string
     {
         switch ($this->output->getVerbosity()) {
             // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
@@ -219,12 +215,12 @@ class ProgressIndicator
         }
     }
 
-    private function getCurrentTimeInMilliseconds()
+    private function getCurrentTimeInMilliseconds(): float
     {
         return round(microtime(true) * 1000);
     }
 
-    private static function initPlaceholderFormatters()
+    private static function initPlaceholderFormatters(): array
     {
         return [
             'indicator' => function (self $indicator) {
@@ -242,7 +238,7 @@ class ProgressIndicator
         ];
     }
 
-    private static function initFormats()
+    private static function initFormats(): array
     {
         return [
             'normal' => ' %indicator% %message%',

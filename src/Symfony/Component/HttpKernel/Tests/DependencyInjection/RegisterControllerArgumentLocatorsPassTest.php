@@ -25,12 +25,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Class "Symfony\Component\HttpKernel\Tests\DependencyInjection\NotFound" used for service "foo" cannot be found.
-     */
     public function testInvalidClass()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Class "Symfony\Component\HttpKernel\Tests\DependencyInjection\NotFound" used for service "foo" cannot be found.');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -42,12 +40,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing "action" attribute on tag "controller.service_arguments" {"argument":"bar"} for service "foo".
-     */
     public function testNoAction()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Missing "action" attribute on tag "controller.service_arguments" {"argument":"bar"} for service "foo".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -59,12 +55,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing "argument" attribute on tag "controller.service_arguments" {"action":"fooAction"} for service "foo".
-     */
     public function testNoArgument()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Missing "argument" attribute on tag "controller.service_arguments" {"action":"fooAction"} for service "foo".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -76,12 +70,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing "id" attribute on tag "controller.service_arguments" {"action":"fooAction","argument":"bar"} for service "foo".
-     */
     public function testNoService()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Missing "id" attribute on tag "controller.service_arguments" {"action":"fooAction","argument":"bar"} for service "foo".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -93,12 +85,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid "action" attribute on tag "controller.service_arguments" for service "foo": no public "barAction()" method found on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".
-     */
     public function testInvalidMethod()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid "action" attribute on tag "controller.service_arguments" for service "foo": no public "barAction()" method found on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -110,12 +100,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid "controller.service_arguments" tag for service "foo": method "fooAction()" has no "baz" argument on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".
-     */
     public function testInvalidArgument()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid "controller.service_arguments" tag for service "foo": method "fooAction()" has no "baz" argument on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -207,12 +195,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(['foo::fooAction'], array_keys($locator));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?
-     */
     public function testExceptionOnNonExistentTypeHint()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -221,14 +207,18 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".
-     */
     public function testExceptionOnNonExistentTypeHintDifferentNamespace()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
 
@@ -237,6 +227,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
     public function testNoExceptionOnNonExistentTypeHintOptionalArg()
@@ -272,7 +268,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testControllersAreMadePublic()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
             ->setPublic(false)
@@ -322,7 +318,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testBindScalarValueToControllerArgument($bindingKey)
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
             ->setBindings([$bindingKey => '%foo%'])
@@ -333,19 +329,13 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
 
-        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
 
-        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $container->compile();
 
-        // assert the locator has a someArg key
-        $arguments = $locator->getArgument(0);
-        $this->assertArrayHasKey('someArg', $arguments);
-        $this->assertInstanceOf(ServiceClosureArgument::class, $arguments['someArg']);
-        // get the Reference that someArg points to
-        $reference = $arguments['someArg']->getValues()[0];
-        // make sure this service *does* exist and returns the correct value
-        $this->assertTrue($container->has((string) $reference));
-        $this->assertSame('foo_val', $container->get((string) $reference));
+        $locator = $container->get($locatorId);
+        $this->assertSame('foo_val', $locator->get('foo::fooAction')->get('someArg'));
     }
 
     public function provideBindScalarValueToControllerArgument()
@@ -380,7 +370,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNotTaggedControllerServiceReceivesLocatorArgument()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
+        $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
@@ -388,6 +378,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locatorArgument = $container->getDefinition('argument_resolver.not_tagged_controller')->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $locatorArgument);
+    }
+
+    public function testAlias()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', RegisterTestController::class)
+            ->addTag('controller.service_arguments');
+
+        $container->setAlias(RegisterTestController::class, 'foo')->setPublic(true);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 }
 

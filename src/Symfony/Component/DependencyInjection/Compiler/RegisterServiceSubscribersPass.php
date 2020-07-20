@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -68,7 +71,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
 
         foreach ($class::getSubscribedServices() as $key => $type) {
             if (!\is_string($type) || !preg_match('/^\??[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $type)) {
-                throw new InvalidArgumentException(sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $this->currentId, $key, \is_string($type) ? $type : \gettype($type)));
+                throw new InvalidArgumentException(sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $this->currentId, $key, \is_string($type) ? $type : get_debug_type($type)));
             }
             if ($optionalBehavior = '?' === $type[0]) {
                 $type = substr($type, 1);
@@ -105,7 +108,14 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $value->addTag('container.service_subscriber.locator', ['id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)]);
+        $locatorRef = ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId);
+
+        $value->addTag('container.service_subscriber.locator', ['id' => (string) $locatorRef]);
+
+        $value->setBindings([
+            PsrContainerInterface::class => new BoundArgument($locatorRef, false),
+            ServiceProviderInterface::class => new BoundArgument($locatorRef, false),
+        ] + $value->getBindings());
 
         return parent::processValue($value);
     }

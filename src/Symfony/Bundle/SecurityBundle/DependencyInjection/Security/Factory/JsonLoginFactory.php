@@ -19,8 +19,10 @@ use Symfony\Component\DependencyInjection\Reference;
  * JsonLoginFactory creates services for JSON login authentication.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
-class JsonLoginFactory extends AbstractFactory
+class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
     public function __construct()
     {
@@ -49,7 +51,7 @@ class JsonLoginFactory extends AbstractFactory
     /**
      * {@inheritdoc}
      */
-    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -81,7 +83,7 @@ class JsonLoginFactory extends AbstractFactory
     /**
      * {@inheritdoc}
      */
-    protected function createListener($container, $id, $config, $userProvider)
+    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
     {
         $listenerId = $this->getListenerId();
         $listener = new ChildDefinition($listenerId);
@@ -95,5 +97,19 @@ class JsonLoginFactory extends AbstractFactory
         $container->setDefinition($listenerId, $listener);
 
         return $listenerId;
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
+    {
+        $authenticatorId = 'security.authenticator.json_login.'.$firewallName;
+        $options = array_intersect_key($config, $this->options);
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.json_login'))
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(2, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null)
+            ->replaceArgument(3, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null)
+            ->replaceArgument(4, $options);
+
+        return $authenticatorId;
     }
 }

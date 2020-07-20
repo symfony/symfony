@@ -46,7 +46,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         return new UserPasswordValidator($this->tokenStorage, $this->encoderFactory);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);
@@ -112,11 +112,9 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testUserIsNotValid()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $user = $this->getMockBuilder('Foo\Bar\User')->getMock();
 
         $this->tokenStorage = $this->createTokenStorage($user);

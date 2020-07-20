@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\CallbackInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -87,8 +87,8 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache = $this->createCachePool(0, __FUNCTION__);
 
         $v = $cache->get('k1', function () use (&$counter, $cache) {
-            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; });
-            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; });
+            $cache->get('k2', function () use (&$counter) { return ++$counter; });
+            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; }); // ensure the callback is called once
 
             return $v;
         });
@@ -109,7 +109,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->deleteItem('foo');
         $cache->get('foo', function ($item) {
             $item->expiresAfter(10);
-            sleep(1);
+            usleep(999000);
 
             return 'bar';
         });
@@ -120,7 +120,7 @@ abstract class AdapterTestCase extends CachePoolTest
             CacheItem::METADATA_EXPIRY => 9.5 + time(),
             CacheItem::METADATA_CTIME => 1000,
         ];
-        $this->assertEquals($expected, $item->getMetadata(), 'Item metadata should embed expiry and ctime.', .6);
+        $this->assertEqualsWithDelta($expected, $item->getMetadata(), .6, 'Item metadata should embed expiry and ctime.');
     }
 
     public function testDefaultLifeTime()
@@ -251,6 +251,26 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->prune();
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
+    }
+
+    public function testClearPrefix()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $item = $cache->getItem('foobar');
+        $cache->save($item->set(1));
+
+        $item = $cache->getItem('barfoo');
+        $cache->save($item->set(2));
+
+        $cache->clear('foo');
+        $this->assertFalse($cache->hasItem('foobar'));
+        $this->assertTrue($cache->hasItem('barfoo'));
     }
 }
 

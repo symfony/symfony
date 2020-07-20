@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Monolog\Processor;
 
 use Monolog\Processor\WebProcessor as BaseWebProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -31,7 +31,7 @@ class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
         parent::__construct([], $extraFields);
     }
 
-    public function onKernelRequest(ResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         if ($event->isMasterRequest()) {
             $this->serverData = $event->getRequest()->server->all();

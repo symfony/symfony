@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Workflow\Event;
 
-class AnnounceEvent extends Event
+final class AnnounceEvent extends Event
 {
 }

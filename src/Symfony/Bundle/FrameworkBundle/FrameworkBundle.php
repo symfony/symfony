@@ -14,27 +14,37 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorCatcherPass;
-use Symfony\Component\ErrorCatcher\ErrorHandler;
+use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
+use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
@@ -57,6 +67,19 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
+use Symfony\Component\VarExporter\Internal\Hydrator;
+use Symfony\Component\VarExporter\Internal\Registry;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(ApcuAdapter::class);
+class_exists(ArrayAdapter::class);
+class_exists(ChainAdapter::class);
+class_exists(PhpArrayAdapter::class);
+class_exists(PhpFilesAdapter::class);
+class_exists(Dotenv::class);
+class_exists(ErrorHandler::class);
+class_exists(Hydrator::class);
+class_exists(Registry::class);
 
 /**
  * Bundle.
@@ -72,25 +95,29 @@ class FrameworkBundle extends Bundle
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
         }
-
-        if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
-        }
     }
 
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
 
-        $hotPathEvents = [
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->setHotPathEvents([
             KernelEvents::REQUEST,
             KernelEvents::CONTROLLER,
             KernelEvents::CONTROLLER_ARGUMENTS,
             KernelEvents::RESPONSE,
             KernelEvents::FINISH_REQUEST,
-        ];
+        ]);
+        if (class_exists(ConsoleEvents::class)) {
+            $registerListenersPass->setNoPreloadEvents([
+                ConsoleEvents::COMMAND,
+                ConsoleEvents::TERMINATE,
+                ConsoleEvents::ERROR,
+            ]);
+        }
 
-        $container->addCompilerPass(new ErrorCatcherPass());
+        $container->addCompilerPass(new AssetsContextPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -98,7 +125,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
-        $container->addCompilerPass((new RegisterListenersPass())->setHotPathEvents($hotPathEvents), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass($registerListenersPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
@@ -127,9 +154,12 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
+        $this->addCompilerPassIfExists($container, HttpClientPass::class);
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
+        $container->addCompilerPass(new SessionPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);
@@ -139,7 +169,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    private function addCompilerPassIfExists(ContainerBuilder $container, $class, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, $priority = 0)
+    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $container->addResource(new ClassExistenceResource($class));
 

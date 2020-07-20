@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.71",
     "Names": {
         "arq": "Kiarabu cha Aljeria",
         "as": "Kiasamisi",
@@ -34,7 +33,6 @@
         "ses": "Kikoyraborosenni",
         "shu": "Kiarabu cha Chadi",
         "srn": "Kisranantongo",
-        "sw_CD": "Kiswahili cha Kongo",
         "swb": "Kikomoro",
         "syr": "Kisiria",
         "tw": "Kitwi",
@@ -42,5 +40,10 @@
         "udm": "Kiudumurti",
         "ug": "Kiuiguri",
         "zgh": "Kitamazighati Sanifu cha Moroko"
+    },
+    "LocalizedNames": {
+        "ar_001": "Kiarabu sanifu",
+        "ro_MD": "Kimoldova cha Romania",
+        "sw_CD": "Kiswahili cha Kongo"
     }
 }

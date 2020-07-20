@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * Stamp used to identify which bus it was passed to.
  *
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class BusNameStamp implements StampInterface

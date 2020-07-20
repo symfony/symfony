@@ -69,7 +69,7 @@ class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
+    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = [])
     {
         $builder = $this->proxiedType->createBuilder($factory, $name, $options);
 

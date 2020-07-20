@@ -23,51 +23,41 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class CollectionTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectInvalidFieldsOption()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Collection([
             'fields' => 'foo',
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectNonConstraints()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Collection([
             'foo' => 'bar',
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectValidConstraint()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Collection([
             'foo' => new Valid(),
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectValidConstraintWithinOptional()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Collection([
             'foo' => new Optional(new Valid()),
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectValidConstraintWithinRequired()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Collection([
             'foo' => new Required(new Valid()),
         ]);
@@ -109,5 +99,17 @@ class CollectionTest extends TestCase
         ]);
 
         $this->assertEquals($collection1, $collection2);
+    }
+
+    public function testConstraintHasDefaultGroupWithOptionalValues()
+    {
+        $constraint = new Collection([
+            'foo' => new Required(),
+            'bar' => new Optional(),
+        ]);
+
+        $this->assertEquals(['Default'], $constraint->groups);
+        $this->assertEquals(['Default'], $constraint->fields['foo']->groups);
+        $this->assertEquals(['Default'], $constraint->fields['bar']->groups);
     }
 }

@@ -40,7 +40,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected $serverParams;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
         $this->requestHandler = $this->getRequestHandler();
@@ -346,7 +346,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
             [1024, '1K', false],
             [null, '1K', false],
             [1024, '', false],
-            [1024, 0, false],
+            [1024, '0', false],
         ];
     }
 

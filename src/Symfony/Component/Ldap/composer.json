@@ -16,12 +16,17 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
+        "php": ">=7.2.5",
         "symfony/options-resolver": "^4.4|^5.0",
+        "symfony/polyfill-php80": "^1.15",
         "ext-ldap": "*"
     },
+    "require-dev": {
+        "symfony/security-core": "^5.0"
+    },
     "conflict": {
-        "symfony/options-resolver": "<4.4"
+        "symfony/options-resolver": "<4.4",
+        "symfony/security-core": "<5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },
@@ -32,7 +37,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

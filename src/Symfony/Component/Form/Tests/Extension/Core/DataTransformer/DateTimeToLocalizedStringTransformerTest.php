@@ -23,9 +23,15 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
+
+        // Normalize intl. configuration settings.
+        if (\extension_loaded('intl')) {
+            $this->iniSet('intl.use_exceptions', 0);
+            $this->iniSet('intl.error_level', 0);
+        }
 
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '57.1');
@@ -36,7 +42,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;
@@ -172,20 +178,18 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals($dateTime->format('d.m.Y, H:i'), $transformer->transform($input));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testTransformRequiresValidDateTime()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->transform('2010-01-01');
     }
 
     public function testTransformWrapsIntlErrors()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer();
-
         $this->markTestIncomplete('Checking for intl errors needs to be reimplemented');
+
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
         // HOW TO REPRODUCE?
 
@@ -282,58 +286,86 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->assertNull($transformer->reverseTransform(''));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformRequiresString()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform(12345);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformWrapsIntlErrors()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformWithNonExistingDate()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('31.04.10 04:05'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformOutOfTimestampRange()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
         $transformer->reverseTransform('1789-07-14');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformFiveDigitYears()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
         $transformer->reverseTransform('20107-03-21');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformFiveDigitYearsWithTimestamp()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd HH:mm:ss');
         $transformer->reverseTransform('20107-03-21 12:34:56');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.error_level', E_WARNING);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithExceptions()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.use_exceptions', 1);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
+    }
+
+    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
+    {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
+        $this->iniSet('intl.use_exceptions', 1);
+        $this->iniSet('intl.error_level', E_WARNING);
+
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform('12345');
     }
 }

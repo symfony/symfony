@@ -128,25 +128,12 @@ class LoggerTest extends TestCase
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
-        $this->assertNull($loggerChild->getLogs());
+        $this->assertSame([], $loggerChild->getLogs());
     }
 
     public function testInheritedClassCallCountErrorsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
         $this->assertEquals(0, $loggerChild->countErrors());
-    }
-}
-
-class ClassThatInheritLogger extends Logger
-{
-    public function getLogs(Request $request = null)
-    {
-        parent::getLogs($request);
-    }
-
-    public function countErrors(Request $request = null)
-    {
-        parent::countErrors($request);
     }
 }

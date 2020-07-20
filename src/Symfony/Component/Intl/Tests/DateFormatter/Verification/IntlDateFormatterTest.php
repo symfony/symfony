@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 
@@ -68,17 +68,17 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return $formatter;
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return intl_get_error_message();
     }
 
-    protected function getIntlErrorCode()
+    protected function getIntlErrorCode(): int
     {
         return intl_get_error_code();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return intl_is_failure($errorCode);
     }

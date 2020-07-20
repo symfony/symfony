@@ -19,7 +19,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
  */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

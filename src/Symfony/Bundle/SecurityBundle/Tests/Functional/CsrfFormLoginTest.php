@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class CsrfFormLoginTest extends WebTestCase
+class CsrfFormLoginTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginAndLogoutWithCsrfTokens($config)
+    public function testFormLoginAndLogoutWithCsrfTokens($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -29,13 +29,13 @@ class CsrfFormLoginTest extends WebTestCase
 
         $crawler = $client->followRedirect();
 
-        $text = $crawler->text();
-        $this->assertContains('Hello johannes!', $text);
-        $this->assertContains('You\'re browsing to path "/profile".', $text);
+        $text = $crawler->text(null, true);
+        $this->assertStringContainsString('Hello johannes!', $text);
+        $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
 
         $logoutLinks = $crawler->selectLink('Log out')->links();
         $this->assertCount(2, $logoutLinks);
-        $this->assertContains('_csrf_token=', $logoutLinks[0]->getUri());
+        $this->assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
         $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
 
         $client->click($logoutLinks[0]);
@@ -44,28 +44,32 @@ class CsrfFormLoginTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithInvalidCsrfToken($config)
+    public function testFormLoginWithInvalidCsrfToken($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
+        if ($options['enable_authenticator_manager'] ?? false) {
+            $form['user_login[username]'] = 'johannes';
+            $form['user_login[password]'] = 'test';
+        }
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), '/login');
 
-        $text = $client->followRedirect()->text();
-        $this->assertContains('Invalid CSRF token.', $text);
+        $text = $client->followRedirect()->text(null, true);
+        $this->assertStringContainsString('Invalid CSRF token.', $text);
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -75,17 +79,17 @@ class CsrfFormLoginTest extends WebTestCase
 
         $this->assertRedirect($client->getResponse(), '/foo');
 
-        $text = $client->followRedirect()->text();
-        $this->assertContains('Hello johannes!', $text);
-        $this->assertContains('You\'re browsing to path "/foo".', $text);
+        $text = $client->followRedirect()->text(null, true);
+        $this->assertStringContainsString('Hello johannes!', $text);
+        $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $client->request('GET', '/protected-resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -96,16 +100,16 @@ class CsrfFormLoginTest extends WebTestCase
         $client->submit($form);
         $this->assertRedirect($client->getResponse(), '/protected-resource');
 
-        $text = $client->followRedirect()->text();
-        $this->assertContains('Hello johannes!', $text);
-        $this->assertContains('You\'re browsing to path "/protected-resource".', $text);
+        $text = $client->followRedirect()->text(null, true);
+        $this->assertStringContainsString('Hello johannes!', $text);
+        $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
-    public function getConfigs()
+    public function provideClientOptions()
     {
-        return [
-            ['config.yml'],
-            ['routes_as_path.yml'],
-        ];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
     }
 }

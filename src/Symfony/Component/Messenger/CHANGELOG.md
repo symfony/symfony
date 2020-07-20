@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+* Moved AmqpExt transport to package `symfony/amqp-messenger`. All classes in `Symfony\Component\Messenger\Transport\AmqpExt` have been moved to `Symfony\Component\Messenger\Bridge\Amqp\Transport`
+* Moved Doctrine transport to package `symfony/doctrine-messenger`. All classes in `Symfony\Component\Messenger\Transport\Doctrine` have been moved to `Symfony\Component\Messenger\Bridge\Doctrine\Transport`
+* Moved RedisExt transport to package `symfony/redis-messenger`. All classes in `Symfony\Component\Messenger\Transport\RedisExt` have been moved to `Symfony\Component\Messenger\Bridge\Redis\Transport`
+* Added support for passing a `\Throwable` argument to `RetryStrategyInterface` methods. This allows to define strategies based on the reason of the handling failure.
+* Added `StopWorkerOnFailureLimitListener` to stop the worker after a specified amount of failed messages is reached.
+* Added `RecoverableExceptionInterface` interface to force retry.
+
 5.0.0
 -----
 
@@ -10,9 +20,26 @@ CHANGELOG
 4.4.0
 -----
 
- * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
-   pass a `RoutableMessageBus`  instance instead.
  * Added support for auto trimming of Redis streams.
+ * `InMemoryTransport` handle acknowledged and rejected messages.
+ * Made all dispatched worker event classes final.
+ * Added support for `from_transport` attribute on `messenger.message_handler` tag.
+ * Added support for passing `dbindex` as a query parameter to the redis transport DSN.
+ * Added `WorkerStartedEvent` and `WorkerRunningEvent`
+ * [BC BREAK] Removed `SendersLocatorInterface::getSenderByAlias` added in 4.3.
+ * [BC BREAK] Removed `$retryStrategies` argument from `Worker::__construct`.
+ * [BC BREAK] Changed arguments of `ConsumeMessagesCommand::__construct`.
+ * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
+ * [BC BREAK] Removed `UnknownSenderException`.
+ * [BC BREAK] Removed `WorkerInterface`.
+ * [BC BREAK] Removed `$onHandledCallback` of `Worker::run(array $options = [], callable $onHandledCallback = null)`.
+ * [BC BREAK] Removed `StopWhenMemoryUsageIsExceededWorker` in favor of `StopWorkerOnMemoryLimitListener`.
+ * [BC BREAK] Removed `StopWhenMessageCountIsExceededWorker` in favor of `StopWorkerOnMessageLimitListener`.
+ * [BC BREAK] Removed `StopWhenTimeLimitIsReachedWorker` in favor of `StopWorkerOnTimeLimitListener`.
+ * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
+ * The component is not marked as `@experimental` anymore.
+ * Marked the `MessengerDataCollector` class as `@final`.
+ * Added support for `DelayStamp` to the `redis` transport.
 
 4.3.0
 -----
@@ -45,11 +72,11 @@ CHANGELOG
  * Added `AmqpStamp` allowing to provide a routing key, flags and attributes on message publishing.
  * [BC BREAK] Removed publishing with a `routing_key` option from queue configuration, for
    AMQP. Use exchange `default_publish_routing_key` or `AmqpStamp` instead.
- * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can 
+ * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can
    therefore name the queue but also configure `binding_keys`, `flags` and `arguments`.
- * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection` 
+ * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection`
    have a new argument: the queue name.
- * Added optional parameter `prefetch_count` in connection configuration, 
+ * Added optional parameter `prefetch_count` in connection configuration,
    to setup channel prefetch count.
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`
    and `BusNameStamp` were added, which allow you to add a bus identifier
@@ -102,7 +129,7 @@ CHANGELOG
    only. Pass the `auto_setup` connection option to control this.
  * Added a `SetupTransportsCommand` command to setup the transports
  * Added a Doctrine transport. For example, use the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
- * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed. 
+ * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed.
  * [BC BREAK] A `HandlerFailedException` exception will be thrown if one or more handler fails.
  * [BC BREAK] The `HandlersLocationInterface::getHandlers` method needs to return `HandlerDescriptor`
    instances instead of callables.
@@ -114,7 +141,7 @@ CHANGELOG
 4.2.0
 -----
 
- * Added `HandleTrait` leveraging a message bus instance to return a single 
+ * Added `HandleTrait` leveraging a message bus instance to return a single
    synchronous message handling result
  * Added `HandledStamp` & `SentStamp` stamps
  * All the changes below are BC BREAKS

@@ -26,42 +26,48 @@ class TranslationDebugCommandTest extends TestCase
     public function testDebugMissingMessages()
     {
         $tester = $this->createCommandTester(['foo' => 'foo']);
-        $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
+        $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
+        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_MISSING, $res);
     }
 
     public function testDebugUnusedMessages()
     {
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
-        $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
+        $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_UNUSED, $res);
     }
 
     public function testDebugFallbackMessages()
     {
-        $tester = $this->createCommandTester([], ['foo' => 'foo']);
-        $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
+        $tester = $this->createCommandTester(['foo' => 'foo'], ['foo' => 'foo']);
+        $res = $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
 
         $this->assertRegExp('/fallback/', $tester->getDisplay());
+        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
     }
 
     public function testNoDefinedMessages()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
+        $res = $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
 
         $this->assertRegExp('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
+        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $res);
     }
 
     public function testDebugDefaultDirectory()
     {
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
-        $tester->execute(['locale' => 'en']);
+        $res = $tester->execute(['locale' => 'en']);
+        $expectedExitStatus = TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED;
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
         $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertEquals($expectedExitStatus, $res);
     }
 
     public function testDebugDefaultRootDirectory()
@@ -72,11 +78,14 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
+        $expectedExitStatus = TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED;
+
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
-        $tester->execute(['locale' => 'en']);
+        $res = $tester->execute(['locale' => 'en']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
         $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertEquals($expectedExitStatus, $res);
     }
 
     public function testDebugCustomDirectory()
@@ -89,18 +98,19 @@ class TranslationDebugCommandTest extends TestCase
             ->with($this->equalTo($this->translationDir.'/customDir'))
             ->willThrowException(new \InvalidArgumentException());
 
+        $expectedExitStatus = TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED;
+
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], $kernel);
-        $tester->execute(['locale' => 'en', 'bundle' => $this->translationDir.'/customDir']);
+        $res = $tester->execute(['locale' => 'en', 'bundle' => $this->translationDir.'/customDir']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
         $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertEquals($expectedExitStatus, $res);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDebugInvalidDirectory()
     {
+        $this->expectException('InvalidArgumentException');
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
@@ -111,7 +121,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
@@ -119,15 +129,12 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/templates');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->translationDir);
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $viewsPaths = [])
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $viewsPaths = []): CommandTester
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -176,8 +183,6 @@ class TranslationDebugCommandTest extends TestCase
             ->willReturn([]);
 
         $container = new Container();
-        $container->setParameter('kernel.root_dir', $this->translationDir);
-
         $kernel
             ->expects($this->any())
             ->method('getContainer')

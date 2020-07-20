@@ -51,12 +51,14 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         $io->table(['Pool name'], array_map(function ($pool) {
             return [$pool];
         }, $this->poolNames));
+
+        return 0;
     }
 }

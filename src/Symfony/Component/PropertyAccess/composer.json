@@ -16,8 +16,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
-        "symfony/inflector": "^4.4|^5.0"
+        "php": ">=7.2.5",
+        "symfony/polyfill-php80": "^1.15",
+        "symfony/property-info": "^5.1.1"
     },
     "require-dev": {
         "symfony/cache": "^4.4|^5.0"
@@ -34,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

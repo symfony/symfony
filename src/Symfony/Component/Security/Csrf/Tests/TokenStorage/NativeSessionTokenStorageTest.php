@@ -29,7 +29,7 @@ class NativeSessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $_SESSION = [];
 
@@ -86,11 +86,9 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->storage->getToken('token_id'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
-     */
     public function testGetNonExistingToken()
     {
+        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
         $this->storage->getToken('token_id');
     }
 

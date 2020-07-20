@@ -18,4 +18,4 @@ Resources
   * [Docker images with intl support](https://hub.docker.com/r/jakzal/php-intl)
     (for the Intl component development)
 
-[0]: http://www.php.net/manual/en/intl.setup.php
+[0]: https://php.net/intl.setup

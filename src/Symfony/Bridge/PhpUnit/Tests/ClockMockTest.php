@@ -21,12 +21,12 @@ use Symfony\Bridge\PhpUnit\ClockMock;
  */
 class ClockMockTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ClockMock::register(__CLASS__);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         ClockMock::withClockMock(1234567890.125);
     }

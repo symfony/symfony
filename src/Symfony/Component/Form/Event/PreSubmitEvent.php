@@ -20,6 +20,6 @@ use Symfony\Component\Form\FormEvent;
  *  - Change data from the request, before submitting the data to the form.
  *  - Add or remove form fields, before submitting the data to the form.
  */
-class PreSubmitEvent extends FormEvent
+final class PreSubmitEvent extends FormEvent
 {
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
@@ -49,18 +49,24 @@ class TimezoneType extends AbstractType
                 if ($options['intl']) {
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
                         return self::getIntlTimezones($input, $choiceTranslationLocale);
-                    });
+                    }), [$input, $choiceTranslationLocale]);
                 }
 
-                return new CallbackChoiceLoader(function () use ($input) {
+                return ChoiceList::lazy($this, function () use ($input) {
                     return self::getPhpTimezones($input);
-                });
+                }, $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please select a valid timezone.';
+            },
+            'regions' => \DateTimeZone::ALL,
         ]);
 
         $resolver->setAllowedTypes('intl', ['bool']);
@@ -89,7 +95,7 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\ChoiceType';
+        return ChoiceType::class;
     }
 
     /**

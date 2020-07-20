@@ -197,12 +197,12 @@ class ConsoleHandlerTest extends TestCase
 
         $event = new ConsoleCommandEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output);
         $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
-        $this->assertContains('Before command message.', $out = $output->fetch());
-        $this->assertContains('After command message.', $out);
+        $this->assertStringContainsString('Before command message.', $out = $output->fetch());
+        $this->assertStringContainsString('After command message.', $out);
 
         $event = new ConsoleTerminateEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output, 0);
         $dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
-        $this->assertContains('Before terminate message.', $out = $output->fetch());
-        $this->assertContains('After terminate message.', $out);
+        $this->assertStringContainsString('Before terminate message.', $out = $output->fetch());
+        $this->assertStringContainsString('After terminate message.', $out);
     }
 }

@@ -45,11 +45,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
      */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $this->loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };
@@ -90,12 +90,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals('/path', $routes->get('action')->getPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"
-     */
     public function testRequirementsWithoutPlaceholderName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
+
         $this->loader->load(RequirementsWithoutPlaceholderNameController::class);
     }
 
@@ -122,6 +121,9 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertCount(2, $routes);
         $this->assertEquals('/path', $routes->get('action.en')->getPath());
         $this->assertEquals('/pad', $routes->get('action.nl')->getPath());
+
+        $this->assertEquals('nl', $routes->get('action.nl')->getRequirement('_locale'));
+        $this->assertEquals('en', $routes->get('action.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedPathRoutesWithExplicitPathPropety()
@@ -145,7 +147,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testMethodActionControllers()
     {
         $routes = $this->loader->load(MethodActionControllers::class);
-        $this->assertCount(2, $routes);
+        $this->assertSame(['put', 'post'], array_keys($routes->all()));
         $this->assertEquals('/the/path', $routes->get('put')->getPath());
         $this->assertEquals('/the/path', $routes->get('post')->getPath());
     }
@@ -179,7 +181,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testUtf8RoutesLoadWithAnnotation()
     {
         $routes = $this->loader->load(Utf8ActionControllers::class);
-        $this->assertCount(2, $routes);
+        $this->assertSame(['one', 'two'], array_keys($routes->all()));
         $this->assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
         $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
     }
@@ -238,7 +240,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             ->willReturn([])
         ;
         $loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };
@@ -320,7 +322,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         ;
 
         $loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };

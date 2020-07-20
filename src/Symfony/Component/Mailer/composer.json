@@ -16,20 +16,26 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
-        "egulias/email-validator": "^2.0",
+        "php": ">=7.2.5",
+        "egulias/email-validator": "^2.1.10",
         "psr/log": "~1.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/mime": "^4.4|^5.0"
+        "symfony/mime": "^5.2",
+        "symfony/polyfill-php80": "^1.15",
+        "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
         "symfony/amazon-mailer": "^4.4|^5.0",
         "symfony/google-mailer": "^4.4|^5.0",
-        "symfony/http-client-contracts": "^1.1",
+        "symfony/http-client-contracts": "^1.1|^2",
         "symfony/mailgun-mailer": "^4.4|^5.0",
         "symfony/mailchimp-mailer": "^4.4|^5.0",
+        "symfony/messenger": "^4.4|^5.0",
         "symfony/postmark-mailer": "^4.4|^5.0",
         "symfony/sendgrid-mailer": "^4.4|^5.0"
+    },
+    "conflict": {
+        "symfony/http-kernel": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\": "" },
@@ -40,7 +46,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,8 +22,10 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @internal
  */
-class FormLoginFactory extends AbstractFactory
+class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
     public function __construct()
     {
@@ -30,6 +33,7 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_token_id', 'authenticate');
+        $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
     }
 
@@ -59,8 +63,12 @@ class FormLoginFactory extends AbstractFactory
         return 'security.authentication.listener.form';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
     {
+        if ($config['enable_csrf'] ?? false) {
+            throw new InvalidConfigurationException('The "enable_csrf" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "true", use "csrf_token_generator" instead.');
+        }
+
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
@@ -72,7 +80,7 @@ class FormLoginFactory extends AbstractFactory
         return $provider;
     }
 
-    protected function createListener($container, $id, $config, $userProvider)
+    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
 
@@ -84,7 +92,12 @@ class FormLoginFactory extends AbstractFactory
         return $listenerId;
     }
 
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    {
+        return $this->registerEntryPoint($container, $id, $config);
+    }
+
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
@@ -95,5 +108,23 @@ class FormLoginFactory extends AbstractFactory
         ;
 
         return $entryPointId;
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    {
+        if (isset($config['csrf_token_generator'])) {
+            throw new InvalidConfigurationException('The "csrf_token_generator" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "false", use "enable_csrf" instead.');
+        }
+
+        $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
+        $options = array_intersect_key($config, $this->options);
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
+            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
+            ->replaceArgument(4, $options);
+
+        return $authenticatorId;
     }
 }

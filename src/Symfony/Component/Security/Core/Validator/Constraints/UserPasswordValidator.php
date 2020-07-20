@@ -36,7 +36,7 @@ class UserPasswordValidator extends ConstraintValidator
     public function validate($password, Constraint $constraint)
     {
         if (!$constraint instanceof UserPassword) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');
+            throw new UnexpectedTypeException($constraint, UserPassword::class);
         }
 
         if (null === $password || '' === $password) {
@@ -53,7 +53,7 @@ class UserPasswordValidator extends ConstraintValidator
 
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        if (!$encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
+        if (null === $user->getPassword() || !$encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
             $this->context->addViolation($constraint->message);
         }
     }

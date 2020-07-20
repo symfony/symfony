@@ -42,7 +42,7 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter)
     {
         if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
             return false;
@@ -54,10 +54,10 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
             foreach ($loader->getMappedClasses() as $mappedClass) {
                 try {
                     $metadataFactory->getMetadataFor($mappedClass);
-                } catch (\ReflectionException $e) {
-                    // ignore failing reflection
                 } catch (AnnotationException $e) {
                     // ignore failing annotations
+                } catch (\Exception $e) {
+                    $this->ignoreAutoloadException($mappedClass, $e);
                 }
             }
         }
@@ -70,7 +70,7 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
      *
      * @return XmlFileLoader[]|YamlFileLoader[]
      */
-    private function extractSupportedLoaders(array $loaders)
+    private function extractSupportedLoaders(array $loaders): array
     {
         $supportedLoaders = [];
 

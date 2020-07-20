@@ -17,7 +17,7 @@ use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 
 class ManagerRegistryTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists('PHPUnit_Framework_TestCase')) {
             self::markTestSkipped('proxy-manager-bridge is not yet compatible with namespaced phpunit versions.');
@@ -51,7 +51,7 @@ class TestManagerRegistry extends ManagerRegistry
         $this->container = $container;
     }
 
-    public function getAliasNamespace($alias)
+    public function getAliasNamespace($alias): string
     {
         return 'Foo';
     }

@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\AbstractWebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class KernelBrowserTest extends WebTestCase
+class KernelBrowserTest extends AbstractWebTestCase
 {
     public function testRebootKernelBetweenRequests()
     {

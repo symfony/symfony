@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -15,7 +14,7 @@ class RegistryTest extends TestCase
 {
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new Registry();
 
@@ -24,9 +23,19 @@ class RegistryTest extends TestCase
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->registry = null;
+    }
+
+    public function testHasWithMatch()
+    {
+        $this->assertTrue($this->registry->has(new Subject1()));
+    }
+
+    public function testHasWithoutMatch()
+    {
+        $this->assertFalse($this->registry->has(new Subject1(), 'nope'));
     }
 
     public function testGetWithSuccess()
@@ -44,23 +53,19 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow2', $workflow->getName());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.
-     */
     public function testGetWithMultipleMatch()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Too many workflows (workflow2, workflow3) match this subject (Symfony\Component\Workflow\Tests\Subject2); set a different name on each and use the second (name) argument of this method.');
         $w1 = $this->registry->get(new Subject2());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unable to find a workflow for class "stdClass".
-     */
     public function testGetWithNoMatch()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Unable to find a workflow for class "stdClass".');
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());
@@ -69,7 +74,7 @@ class RegistryTest extends TestCase
     public function testAllWithOneMatchWithSuccess()
     {
         $workflows = $this->registry->all(new Subject1());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(1, $workflows);
         $this->assertInstanceOf(Workflow::class, $workflows[0]);
         $this->assertSame('workflow1', $workflows[0]->getName());
@@ -78,7 +83,7 @@ class RegistryTest extends TestCase
     public function testAllWithMultipleMatchWithSuccess()
     {
         $workflows = $this->registry->all(new Subject2());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(2, $workflows);
         $this->assertInstanceOf(Workflow::class, $workflows[0]);
         $this->assertInstanceOf(Workflow::class, $workflows[1]);
@@ -89,7 +94,7 @@ class RegistryTest extends TestCase
     public function testAllWithNoMatch()
     {
         $workflows = $this->registry->all(new \stdClass());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(0, $workflows);
     }
 

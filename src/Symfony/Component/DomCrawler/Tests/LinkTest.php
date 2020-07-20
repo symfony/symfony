@@ -16,11 +16,9 @@ use Symfony\Component\DomCrawler\Link;
 
 class LinkTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
     public function testConstructorWithANonATag()
     {
+        $this->expectException('LogicException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -36,11 +34,9 @@ class LinkTest extends TestCase
         $this->assertSame('https://example.com/foo', $link->getUri());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
     {
+        $this->expectException('InvalidArgumentException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 

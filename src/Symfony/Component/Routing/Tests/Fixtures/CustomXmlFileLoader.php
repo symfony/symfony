@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Loader\XmlFileLoader;
  */
 class CustomXmlFileLoader extends XmlFileLoader
 {
-    protected function loadFile($file)
+    protected function loadFile(string $file): \DOMDocument
     {
         return XmlUtils::loadFile($file, function () { return true; });
     }

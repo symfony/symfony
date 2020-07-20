@@ -11,10 +11,12 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+if (version_compare(\PHPUnit\Runner\Version::id(), '6.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV5', 'Symfony\Bridge\PhpUnit\TextUI\Command');
-} else {
+} elseif (version_compare(\PHPUnit\Runner\Version::id(), '9.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV6', 'Symfony\Bridge\PhpUnit\TextUI\Command');
+} else {
+    class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV9', 'Symfony\Bridge\PhpUnit\TextUI\Command');
 }
 
 if (false) {

@@ -72,8 +72,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * You may throw an AuthenticationException if you wish. If you return
      * null, then a UsernameNotFoundException is thrown for you.
      *
-     * @param mixed                 $credentials
-     * @param UserProviderInterface $userProvider
+     * @param mixed $credentials
      *
      * @throws AuthenticationException
      *
@@ -84,14 +83,12 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
     /**
      * Returns true if the credentials are valid.
      *
-     * If any value other than true is returned, authentication will
-     * fail. You may also throw an AuthenticationException if you wish
-     * to cause authentication to fail.
+     * If false is returned, authentication will fail. You may also throw
+     * an AuthenticationException if you wish to cause authentication to fail.
      *
      * The *credentials* are the return value from getCredentials()
      *
-     * @param mixed         $credentials
-     * @param UserInterface $user
+     * @param mixed $credentials
      *
      * @return bool
      *
@@ -116,13 +113,10 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * Called when authentication executed, but failed (e.g. wrong username password).
      *
      * This should return the Response sent back to the user, like a
-     * RedirectResponse to the login page or a 403 response.
+     * RedirectResponse to the login page or a 401 response.
      *
      * If you return null, the request will continue, but the user will
      * not be authenticated. This is probably not what you want to do.
-     *
-     * @param Request                 $request
-     * @param AuthenticationException $exception
      *
      * @return Response|null
      */

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
 
@@ -24,12 +25,12 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return new EqualToValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new EqualTo($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return EqualTo::NOT_EQUAL_ERROR;
     }
@@ -37,7 +38,7 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [3, 3],
@@ -54,7 +55,7 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],
@@ -64,15 +65,22 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
-            [1, '1', 2, '2', 'integer'],
+            [1, '1', 2, '2', 'int'],
             ['22', '"22"', '333', '"333"', 'string'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2001-01-01 UTC'), 'Jan 1, 2001, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+        ];
+    }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', false],
         ];
     }
 }

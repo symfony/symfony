@@ -32,6 +32,37 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpSortedMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc']);
+        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpReverseSortedMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'desc']);
+        $this->assertRegExp("/\*test\*foo\*bar/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpSortWithoutValueAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort']);
+        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpWrongSortAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test']);
+        $this->assertRegExp('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
+    }
+
     public function testDumpMessagesAndCleanInRootDirectory()
     {
         $this->fs->remove($this->translationDir);
@@ -88,7 +119,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
@@ -96,7 +127,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/templates');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->translationDir);
     }
@@ -163,7 +194,6 @@ class TranslationUpdateCommandTest extends TestCase
             ->willReturn([]);
 
         $container = new Container();
-        $container->setParameter('kernel.root_dir', $this->translationDir);
         $kernel
             ->expects($this->any())
             ->method('getContainer')

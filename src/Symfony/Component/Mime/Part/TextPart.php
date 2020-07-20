@@ -31,6 +31,7 @@ class TextPart extends AbstractPart
     private $disposition;
     private $name;
     private $encoding;
+    private $seekable;
 
     /**
      * @param resource|string $body
@@ -40,12 +41,13 @@ class TextPart extends AbstractPart
         parent::__construct();
 
         if (!\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body of "%s" must be a string or a resource (got "%s").', self::class, \is_object($body) ? \get_class($body) : \gettype($body)));
+            throw new \TypeError(sprintf('The body of "%s" must be a string or a resource (got "%s").', self::class, get_debug_type($body)));
         }
 
         $this->body = $body;
         $this->charset = $charset;
         $this->subtype = $subtype;
+        $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && 0 === fseek($body, 0, SEEK_CUR) : null;
 
         if (null === $encoding) {
             $this->encoding = $this->chooseEncoding();
@@ -93,11 +95,11 @@ class TextPart extends AbstractPart
 
     public function getBody(): string
     {
-        if (!\is_resource($this->body)) {
+        if (null === $this->seekable) {
             return $this->body;
         }
 
-        if (stream_get_meta_data($this->body)['seekable'] ?? false) {
+        if ($this->seekable) {
             rewind($this->body);
         }
 
@@ -111,8 +113,8 @@ class TextPart extends AbstractPart
 
     public function bodyToIterable(): iterable
     {
-        if (\is_resource($this->body)) {
-            if (stream_get_meta_data($this->body)['seekable'] ?? false) {
+        if (null !== $this->seekable) {
+            if ($this->seekable) {
                 rewind($this->body);
             }
             yield from $this->getEncoder()->encodeByteStream($this->body);
@@ -144,6 +146,19 @@ class TextPart extends AbstractPart
         return $headers;
     }
 
+    public function asDebugString(): string
+    {
+        $str = parent::asDebugString();
+        if (null !== $this->charset) {
+            $str .= ' charset: '.$this->charset;
+        }
+        if (null !== $this->disposition) {
+            $str .= ' disposition: '.$this->disposition;
+        }
+
+        return $str;
+    }
+
     private function getEncoder(): ContentEncoderInterface
     {
         if ('8bit' === $this->encoding) {
@@ -166,10 +181,13 @@ class TextPart extends AbstractPart
         return 'quoted-printable';
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         // convert resources to strings for serialization
-        if (\is_resource($this->body)) {
+        if (null !== $this->seekable) {
             $this->body = $this->getBody();
         }
 

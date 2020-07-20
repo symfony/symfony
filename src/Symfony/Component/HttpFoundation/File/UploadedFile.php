@@ -31,7 +31,7 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class UploadedFile extends File
 {
-    private $test = false;
+    private $test;
     private $originalName;
     private $mimeType;
     private $error;
@@ -76,7 +76,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return string|null The original name
+     * @return string The original name
      */
     public function getClientOriginalName()
     {
@@ -105,7 +105,7 @@ class UploadedFile extends File
      * For a trusted mime type, use getMimeType() instead (which guesses the mime
      * type based on the file content).
      *
-     * @return string|null The mime type
+     * @return string The mime type
      *
      * @see getMimeType()
      */
@@ -133,6 +133,10 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
+        if (!class_exists(MimeTypes::class)) {
+            throw new \LogicException('You cannot guess the extension as the Mime component is not installed. Try running "composer require symfony/mime".');
+        }
+
         return MimeTypes::getDefault()->getExtensions($this->getClientMimeType())[0] ?? null;
     }
 
@@ -164,14 +168,11 @@ class UploadedFile extends File
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
-     *
      * @return File A File object representing the new file
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move($directory, $name = null)
+    public function move(string $directory, string $name = null)
     {
         if ($this->isValid()) {
             if ($this->test) {
@@ -184,7 +185,7 @@ class UploadedFile extends File
             $moved = move_uploaded_file($this->getPathname(), $target);
             restore_error_handler();
             if (!$moved) {
-                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error)));
+                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
             }
 
             @chmod($target, 0666 & ~umask());
@@ -219,13 +220,24 @@ class UploadedFile extends File
      */
     public static function getMaxFilesize()
     {
-        $iniMax = strtolower(ini_get('upload_max_filesize'));
+        $sizePostMax = self::parseFilesize(ini_get('post_max_size'));
+        $sizeUploadMax = self::parseFilesize(ini_get('upload_max_filesize'));
 
-        if ('' === $iniMax) {
-            return PHP_INT_MAX;
+        return min($sizePostMax ?: PHP_INT_MAX, $sizeUploadMax ?: PHP_INT_MAX);
+    }
+
+    /**
+     * Returns the given size from an ini value in bytes.
+     */
+    private static function parseFilesize($size): int
+    {
+        if ('' === $size) {
+            return 0;
         }
 
-        $max = ltrim($iniMax, '+');
+        $size = strtolower($size);
+
+        $max = ltrim($size, '+');
         if (0 === strpos($max, '0x')) {
             $max = \intval($max, 16);
         } elseif (0 === strpos($max, '0')) {
@@ -234,7 +246,7 @@ class UploadedFile extends File
             $max = (int) $max;
         }
 
-        switch (substr($iniMax, -1)) {
+        switch (substr($size, -1)) {
             case 't': $max *= 1024;
             // no break
             case 'g': $max *= 1024;

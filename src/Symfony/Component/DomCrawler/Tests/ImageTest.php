@@ -16,11 +16,9 @@ use Symfony\Component\DomCrawler\Image;
 
 class ImageTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
     public function testConstructorWithANonImgTag()
     {
+        $this->expectException('LogicException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -36,11 +34,9 @@ class ImageTest extends TestCase
         $this->assertSame('https://example.com/foo', $image->getUri());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
     {
+        $this->expectException('InvalidArgumentException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="/foo" /></html>');
 

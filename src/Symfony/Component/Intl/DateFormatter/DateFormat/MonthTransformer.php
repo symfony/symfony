@@ -104,7 +104,7 @@ class MonthTransformer extends Transformer
                 $regExp = '[JFMASOND]';
                 break;
             default:
-                $regExp = '\d{'.$length.'}';
+                $regExp = '\d{1,'.$length.'}';
                 break;
         }
 

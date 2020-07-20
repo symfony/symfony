@@ -11,19 +11,19 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
- * ZookeeperStore is a StoreInterface implementation using Zookeeper as store engine.
+ * ZookeeperStore is a PersistingStoreInterface implementation using Zookeeper as store engine.
  *
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  */
-class ZookeeperStore implements StoreInterface
+class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
@@ -32,6 +32,24 @@ class ZookeeperStore implements StoreInterface
     public function __construct(\Zookeeper $zookeeper)
     {
         $this->zookeeper = $zookeeper;
+    }
+
+    public static function createConnection(string $dsn): \Zookeeper
+    {
+        if (0 !== strpos($dsn, 'zookeeper:')) {
+            throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
+        }
+
+        if (false === $params = parse_url($dsn)) {
+            throw new InvalidArgumentException(sprintf('Invalid Zookeeper DSN: "%s".', $dsn));
+        }
+
+        $host = $params['host'] ?? '';
+        if (isset($params['port'])) {
+            $host .= ':'.$params['port'];
+        }
+
+        return new \Zookeeper($host);
     }
 
     /**
@@ -85,15 +103,7 @@ class ZookeeperStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function waitAndSave(Key $key)
-    {
-        throw new NotSupportedException();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.
     }

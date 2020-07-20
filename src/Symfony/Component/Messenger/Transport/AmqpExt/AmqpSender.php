@@ -11,68 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpSender as BridgeAmqpSender;
 
-/**
- * Symfony Messenger sender to send messages to AMQP brokers using PHP's AMQP extension.
- *
- * @author Samuel Roze <samuel.roze@gmail.com>
- */
-class AmqpSender implements SenderInterface
-{
-    private $serializer;
-    private $connection;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpSender::class, BridgeAmqpSender::class);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer ?? new PhpSerializer();
-    }
+class_exists(BridgeAmqpSender::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/amqp-messenger instead.
      */
-    public function send(Envelope $envelope): Envelope
+    class AmqpSender
     {
-        $encodedMessage = $this->serializer->encode($envelope);
-
-        /** @var DelayStamp|null $delayStamp */
-        $delayStamp = $envelope->last(DelayStamp::class);
-        $delay = 0;
-        if (null !== $delayStamp) {
-            $delay = $delayStamp->getDelay();
-        }
-
-        $amqpStamp = $envelope->last(AmqpStamp::class);
-        if (isset($encodedMessage['headers']['Content-Type'])) {
-            $contentType = $encodedMessage['headers']['Content-Type'];
-            unset($encodedMessage['headers']['Content-Type']);
-
-            $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
-
-            if (!isset($attributes['content_type'])) {
-                $attributes['content_type'] = $contentType;
-
-                $amqpStamp = new AmqpStamp($amqpStamp ? $amqpStamp->getRoutingKey() : null, $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM, $attributes);
-            }
-        }
-
-        try {
-            $this->connection->publish(
-                $encodedMessage['body'],
-                $encodedMessage['headers'] ?? [],
-                $delay,
-                $amqpStamp
-            );
-        } catch (\AMQPException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        return $envelope;
     }
 }

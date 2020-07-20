@@ -13,14 +13,22 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testGetControllerServiceWithSingleColon()
     {
+        $this->expectDeprecation('Since symfony/http-kernel 5.1: Referencing controllers with a single colon is deprecated. Use "foo::action" instead.');
+
         $service = new ControllerTestService('foo');
 
         $container = $this->createMockContainer();
@@ -120,13 +128,38 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     }
 
     /**
-     * Tests where the fallback instantiation fails due to required constructor arguments.
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
+     * @dataProvider getControllers
      */
+    public function testInstantiateControllerWhenControllerStartsWithABackslash($controller)
+    {
+        $service = new ControllerTestService('foo');
+        $class = ControllerTestService::class;
+
+        $container = $this->createMockContainer();
+        $container->expects($this->once())->method('has')->with($class)->willReturn(true);
+        $container->expects($this->once())->method('get')->with($class)->willReturn($service);
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $controller);
+
+        $controller = $resolver->getController($request);
+
+        $this->assertInstanceOf(ControllerTestService::class, $controller[0]);
+        $this->assertSame('action', $controller[1]);
+    }
+
+    public function getControllers()
+    {
+        return [
+            ['\\'.ControllerTestService::class.'::action'],
+        ];
+    }
+
     public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->getMockBuilder(Container::class)->getMock();
         $container->expects($this->once())
             ->method('has')
@@ -147,14 +180,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $resolver->getController($request);
     }
 
-    /**
-     * Tests where the fallback instantiation fails due to non-existing class.
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
-     */
     public function testExceptionWhenUsingRemovedControllerService()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->getMockBuilder(Container::class)->getMock();
         $container->expects($this->once())
             ->method('has')

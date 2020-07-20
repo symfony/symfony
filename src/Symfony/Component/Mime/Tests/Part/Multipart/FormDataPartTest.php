@@ -26,7 +26,7 @@ class FormDataPartTest extends TestCase
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
         $f = new FormDataPart([
-            'foo' => $content = 'very very long content that will not be cut even if the length i way more than 76 characters, ok?',
+            'foo' => $content = 'very very long content that will not be cut even if the length is way more than 76 characters, ok?',
             'bar' => clone $b,
             'baz' => clone $c,
         ]);
@@ -47,6 +47,34 @@ class FormDataPartTest extends TestCase
         $this->assertEquals([$t, $b, $c], $f->getParts());
     }
 
+    public function testNestedArrayParts()
+    {
+        $p1 = new TextPart('content', 'utf-8', 'plain', '8bit');
+        $f = new FormDataPart([
+            'foo' => clone $p1,
+            'bar' => [
+                'baz' => [
+                    clone $p1,
+                    'qux' => clone $p1,
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('multipart', $f->getMediaType());
+        $this->assertEquals('form-data', $f->getMediaSubtype());
+
+        $p1->setName('foo');
+        $p1->setDisposition('form-data');
+
+        $p2 = clone $p1;
+        $p2->setName('bar[baz][0]');
+
+        $p3 = clone $p1;
+        $p3->setName('bar[baz][qux]');
+
+        $this->assertEquals([$p1, $p2, $p3], $f->getParts());
+    }
+
     public function testToString()
     {
         $p = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
@@ -62,5 +90,17 @@ class FormDataPartTest extends TestCase
         $parts = $f->getParts();
         $this->assertEquals($foo, $parts[0]->bodyToString());
         $this->assertEquals($bar, $parts[1]->bodyToString());
+    }
+
+    public function testBoundaryContentTypeHeader()
+    {
+        $f = new FormDataPart([
+            'file' => new DataPart('data.csv', 'data.csv', 'text/csv'),
+        ]);
+        $headers = $f->getPreparedHeaders()->toArray();
+        $this->assertRegExp(
+            '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
+            $headers[0]
+        );
     }
 }

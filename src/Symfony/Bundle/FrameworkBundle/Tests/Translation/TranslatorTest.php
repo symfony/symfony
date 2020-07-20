@@ -18,19 +18,20 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends TestCase
 {
     protected $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/sf_translation';
         $this->deleteTmpDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTmpDir();
     }
@@ -96,12 +97,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid "invalid locale" locale.
-     */
     public function testTransWithCachingWithInvalidLocale()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid "invalid locale" locale.');
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
 
@@ -110,7 +109,7 @@ class TranslatorTest extends TestCase
 
     public function testLoadResourcesWithoutCaching()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -131,12 +130,10 @@ class TranslatorTest extends TestCase
         $this->assertSame('en', $translator->getLocale());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The Translator does not support the following options: 'foo'
-     */
     public function testInvalidOptions()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
@@ -189,7 +186,7 @@ class TranslatorTest extends TestCase
 
     public function testCatalogResourcesAreAddedForScannedDirectories()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -208,6 +205,45 @@ class TranslatorTest extends TestCase
 
         $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
         $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
+    }
+
+    public function testCachedCatalogueIsReDumpedWhenScannedDirectoriesChange()
+    {
+        /** @var Translator $translator */
+        $translator = $this->getTranslator(new YamlFileLoader(), [
+            'cache_dir' => $this->tmpDir,
+            'resource_files' => [
+                'fr' => [
+                    __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+                ],
+            ],
+            'cache_vary' => [
+                'scanned_directories' => [
+                    '/Fixtures/Resources/translations/',
+                ],
+            ],
+        ], 'yml');
+
+        // Cached catalogue is dumped
+        $this->assertSame('répertoire', $translator->trans('folder', [], 'messages', 'fr'));
+
+        $translator = $this->getTranslator(new YamlFileLoader(), [
+            'cache_dir' => $this->tmpDir,
+            'resource_files' => [
+                'fr' => [
+                    __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+                    __DIR__.'/../Fixtures/Resources/translations2/ccc.fr.yml',
+                ],
+            ],
+            'cache_vary' => [
+                'scanned_directories' => [
+                    '/Fixtures/Resources/translations/',
+                    '/Fixtures/Resources/translations2/',
+                ],
+            ],
+        ], 'yml');
+
+        $this->assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
     }
 
     protected function getCatalogue($locale, $messages, $resources = [])
@@ -293,9 +329,9 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en')
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en', array $enabledLocales = [])
     {
-        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale);
+        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale, $enabledLocales);
 
         if ('loader' === $loaderFomat) {
             $translator->addResource('loader', 'foo', 'fr');
@@ -312,7 +348,7 @@ class TranslatorTest extends TestCase
 
     public function testWarmup()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
@@ -335,9 +371,34 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
+    public function testEnabledLocales()
+    {
+        $loader = new YamlFileLoader();
+        $resourceFiles = [
+            'fr' => [
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ],
+        ];
+
+        // prime the cache without configuring the enabled locales
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml', Translator::class, 'en', []);
+        $translator->setFallbackLocales(['fr']);
+        $translator->warmup($this->tmpDir);
+
+        $this->assertCount(2, glob($this->tmpDir.'/catalogue.*.*.php'), 'Both "en" and "fr" catalogues are generated.');
+
+        // prime the cache and configure the enabled locales
+        $this->deleteTmpDir();
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml', Translator::class, 'en', ['fr']);
+        $translator->setFallbackLocales(['fr']);
+        $translator->warmup($this->tmpDir);
+
+        $this->assertCount(1, glob($this->tmpDir.'/catalogue.*.*.php'), 'Only the "fr" catalogue is generated.');
+    }
+
     public function testLoadingTranslationFilesWithDotsInMessageDomain()
     {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $loader = new YamlFileLoader();
         $resourceFiles = [
             'en' => [
                 __DIR__.'/../Fixtures/Resources/translations/domain.with.dots.en.yml',
@@ -350,14 +411,15 @@ class TranslatorTest extends TestCase
         $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
     }
 
-    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader', $defaultLocale = 'en')
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])
     {
         if (null === $defaultLocale) {
             return new $translatorClass(
                 $this->getContainer($loader),
                 new MessageFormatter(),
                 [$loaderFomat => [$loaderFomat]],
-                $options
+                $options,
+                $enabledLocales
             );
         }
 
@@ -366,7 +428,8 @@ class TranslatorTest extends TestCase
             new MessageFormatter(),
             $defaultLocale,
             [$loaderFomat => [$loaderFomat]],
-            $options
+            $options,
+            $enabledLocales
         );
     }
 }
@@ -376,7 +439,7 @@ class TranslatorWithInvalidLocale extends Translator
     /**
      * {@inheritdoc}
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return 'invalid locale';
     }

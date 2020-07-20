@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added `framework.http_cache` configuration tree
+ * Added `framework.trusted_proxies` and `framework.trusted_headers` configuration options
+
+5.1.0
+-----
+
+ * Added link to source for controllers registered as named services
+ * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)
+ * Added the `framework.router.default_uri` configuration option to configure the default `RequestContext`
+ * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
+ * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
+ * Added flex-compatible default implementation for `MicroKernelTrait::registerBundles()`
+ * Deprecated passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * The `TemplateController` now accepts context argument
+ * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
+ * Added tag `routing.expression_language_function` to define functions available in route conditions
+ * Added `debug:container --deprecations` option to see compile-time deprecations.
+ * Made `BrowserKitAssertionsTrait` report the original error message in case of a failure
+ * Added ability for `config:dump-reference` and `debug:config` to dump and debug kernel container extension configuration.
+ * Deprecated `session.attribute_bag` service and `session.flash_bag` service.
+
 5.0.0
 -----
 
@@ -17,20 +41,39 @@ CHANGELOG
  * Removed cache-related compiler passes and `RequestDataCollector`
  * Removed the `translator.selector` and `session.save_listener` services
  * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
+ * Removed `routing.loader.service`.
+ * Service route loaders must be tagged with `routing.route_loader`.
+ * Added `slugger` service and `SluggerInterface` alias
+ * Removed the `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract` services.
+ * Removed the `router.cache_class_prefix` parameter.
 
 4.4.0
 -----
 
+ * Added `lint:container` command to check that services wiring matches type declarations
+ * Added `MailerAssertionsTrait`
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
  * Added support for configuring chained cache pools
+ * Deprecated calling `WebTestCase::createClient()` while a kernel has been booted, ensure the kernel is shut down before calling the method
+ * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
+ * Not tagging service route loaders with `routing.route_loader` has been deprecated.
+ * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
+ * Added new `error_controller` configuration to handle system exceptions
+ * Added sort option for `translation:update` command.
+ * [BC Break] The `framework.messenger.routing.senders` config key is not deeply merged anymore.
+ * Added `secrets:*` commands to deal with secrets seamlessly.
+ * Made `framework.session.handler_id` accept a DSN
+ * Marked the `RouterDataCollector` class as `@final`.
+ * [BC Break] The `framework.messenger.buses.<name>.middleware` config key is not deeply merged anymore.
+ * Moved `MailerAssertionsTrait` in `KernelTestCase`
 
 4.3.0
 -----
 
- * Deprecated the `framework.templating` option, use Twig instead.
+ * Deprecated the `framework.templating` option, configure the Twig bundle instead.
  * Added `WebTestAssertionsTrait` (included by default in `WebTestCase`)
  * Renamed `Client` to `KernelBrowser`
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
@@ -51,8 +94,8 @@ CHANGELOG
    options if you're using Symfony's serializer.
  * [BC Break] Removed the `framework.messenger.routing.send_and_handle` configuration.
    Instead of setting it to true, configure a `SyncTransport` and route messages to it.
- * Added information about deprecated aliases in `debug:autowiring` 
- * Added php ini session options `sid_length` and `sid_bits_per_character` 
+ * Added information about deprecated aliases in `debug:autowiring`
+ * Added php ini session options `sid_length` and `sid_bits_per_character`
    to the `session` section of the configuration
  * Added support for Translator paths, Twig paths in translation commands.
  * Added support for PHP files with translations in translation commands.

@@ -16,11 +16,9 @@ use Symfony\Component\Config\ConfigCacheFactory;
 
 class ConfigCacheFactoryTest extends TestCase
 {
-    /**
-     * @expectedException \TypeError
-     */
     public function testCacheWithInvalidCallback()
     {
+        $this->expectException('TypeError');
         $cacheFactory = new ConfigCacheFactory(true);
 
         $cacheFactory->cache('file', new \stdClass());

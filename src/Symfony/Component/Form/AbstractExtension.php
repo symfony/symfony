@@ -50,14 +50,14 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (null === $this->types) {
             $this->initTypes();
         }
 
         if (!isset($this->types[$name])) {
-            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension.', $name));
         }
 
         return $this->types[$name];
@@ -66,7 +66,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         if (null === $this->types) {
             $this->initTypes();
@@ -78,7 +78,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypeExtensions($name)
+    public function getTypeExtensions(string $name)
     {
         if (null === $this->typeExtensions) {
             $this->initTypeExtensions();
@@ -92,7 +92,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasTypeExtensions($name)
+    public function hasTypeExtensions(string $name)
     {
         if (null === $this->typeExtensions) {
             $this->initTypeExtensions();
@@ -140,6 +140,7 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     protected function loadTypeGuesser()
     {
+        return null;
     }
 
     /**

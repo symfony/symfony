@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;
@@ -25,37 +27,37 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ResolvedFormTypeTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dataMapper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     * @var MockObject|FormTypeInterface
      */
     private $parentType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     * @var MockObject|FormTypeInterface
      */
     private $type;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     * @var MockObject|FormTypeExtensionInterface
      */
     private $extension1;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     * @var MockObject|FormTypeExtensionInterface
      */
     private $extension2;
 
@@ -69,7 +71,7 @@ class ResolvedFormTypeTest extends TestCase
      */
     private $resolvedType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -179,12 +181,10 @@ class ResolvedFormTypeTest extends TestCase
         $this->assertSame('\stdClass', $builder->getDataClass());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage An error has occurred resolving the options of the form "stdClass": The required option "foo" is missing.
-     */
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
+        $this->expectExceptionMessage('An error has occurred resolving the options of the form "Symfony\Component\Form\Extension\Core\Type\HiddenType": The required option "foo" is missing.');
         $optionsResolver = (new OptionsResolver())
             ->setRequired('foo')
         ;
@@ -199,7 +199,7 @@ class ResolvedFormTypeTest extends TestCase
         ;
         $this->resolvedType->expects($this->once())
             ->method('getInnerType')
-            ->willReturn(new \stdClass())
+            ->willReturn(new HiddenType())
         ;
         $factory = $this->getMockFormFactory();
 
@@ -376,35 +376,26 @@ class ResolvedFormTypeTest extends TestCase
     public function provideTypeClassBlockPrefixTuples()
     {
         return [
-            [__NAMESPACE__.'\Fixtures\FooType', 'foo'],
-            [__NAMESPACE__.'\Fixtures\Foo', 'foo'],
-            [__NAMESPACE__.'\Fixtures\Type', 'type'],
-            [__NAMESPACE__.'\Fixtures\FooBarHTMLType', 'foo_bar_html'],
+            [Fixtures\FooType::class, 'foo'],
+            [Fixtures\Foo::class, 'foo'],
+            [Fixtures\Type::class, 'type'],
+            [Fixtures\FooBarHTMLType::class, 'foo_bar_html'],
             [__NAMESPACE__.'\Fixtures\Foo1Bar2Type', 'foo1_bar2'],
-            [__NAMESPACE__.'\Fixtures\FBooType', 'f_boo'],
+            [Fixtures\FBooType::class, 'f_boo'],
         ];
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
+    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType'): MockObject
     {
         return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getMockFormTypeExtension()
+    private function getMockFormTypeExtension(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\AbstractTypeExtension')->setMethods(['getExtendedTypes', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getMockFormFactory()
+    private function getMockFormFactory(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }

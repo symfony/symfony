@@ -23,7 +23,7 @@ class ValidValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Valid) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Valid');
+            throw new UnexpectedTypeException($constraint, Valid::class);
         }
 
         if (null === $value) {
@@ -33,6 +33,6 @@ class ValidValidator extends ConstraintValidator
         $this->context
             ->getValidator()
             ->inContext($this->context)
-            ->validate($value, null, [$this->context->getGroup()]);
+            ->validate($value, null, $this->context->getGroup());
     }
 }

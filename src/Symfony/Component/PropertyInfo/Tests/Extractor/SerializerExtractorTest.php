@@ -27,7 +27,7 @@ class SerializerExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->extractor = new SerializerExtractor($classMetadataFactory);
@@ -39,5 +39,10 @@ class SerializerExtractorTest extends TestCase
             ['collection'],
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', ['serializer_groups' => ['a']])
         );
+    }
+
+    public function testGetPropertiesWithAnyGroup()
+    {
+        $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy', ['serializer_groups' => null]));
     }
 }

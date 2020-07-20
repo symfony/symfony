@@ -26,21 +26,30 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class ControllerArgumentsEvent extends ControllerEvent
+final class ControllerArgumentsEvent extends KernelEvent
 {
+    private $controller;
     private $arguments;
 
     public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
     {
-        parent::__construct($kernel, $controller, $request, $requestType);
+        parent::__construct($kernel, $request, $requestType);
 
+        $this->controller = $controller;
         $this->arguments = $arguments;
     }
 
-    /**
-     * @return array
-     */
-    public function getArguments()
+    public function getController(): callable
+    {
+        return $this->controller;
+    }
+
+    public function setController(callable $controller)
+    {
+        $this->controller = $controller;
+    }
+
+    public function getArguments(): array
     {
         return $this->arguments;
     }

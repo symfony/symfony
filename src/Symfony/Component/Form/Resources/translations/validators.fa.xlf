@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>این فرم نباید فیلد اضافی داشته باشد.</target>
+                <target>این فرم نباید شامل فیلد اضافه ای باشد.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>فایل بارگذاری شده بسیار بزرگ است. لطفا فایل کوچکتری را بارگزاری کنید.</target>
+                <target>فایل بارگذاری شده بسیار بزرگ می باشد. لطفا فایل کوچکتری را بارگذاری نمایید.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>مقدار CSRF نامعتبر است. لطفا فرم را مجددا ارسال فرمایید..</target>
+                <target>توکن CSRF نامعتبر می باشد. لطفا فرم را مجددا ارسال نمایید.</target>
             </trans-unit>
         </body>
     </file>

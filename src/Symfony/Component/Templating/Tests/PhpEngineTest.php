@@ -14,6 +14,7 @@ namespace Symfony\Component\Templating\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\Loader;
+use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParser;
@@ -24,12 +25,12 @@ class PhpEngineTest extends TestCase
 {
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new ProjectTemplateLoader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->loader = null;
     }
@@ -93,7 +94,7 @@ class PhpEngineTest extends TestCase
 
     public function testExtendRender()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [], [new SlotsHelper()]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, []);
         try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
@@ -124,11 +125,11 @@ class PhpEngineTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider forbiddenParameterNames
      */
     public function testRenderForbiddenParameter($name)
     {
+        $this->expectException('InvalidArgumentException');
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', 'bar');
         $engine->render('foo.php', [$name => 'foo']);
@@ -194,7 +195,7 @@ class PhpEngineTest extends TestCase
 
 class ProjectTemplateEngine extends PhpEngine
 {
-    public function getLoader()
+    public function getLoader(): LoaderInterface
     {
         return $this->loader;
     }
@@ -219,7 +220,7 @@ class ProjectTemplateLoader extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return false;
     }

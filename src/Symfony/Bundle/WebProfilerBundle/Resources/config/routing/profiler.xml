@@ -37,11 +37,11 @@
     </route>
 
     <route id="_profiler_exception" path="/{token}/exception">
-        <default key="_controller">web_profiler.controller.exception::showAction</default>
+        <default key="_controller">web_profiler.controller.exception_panel::body</default>
     </route>
 
     <route id="_profiler_exception_css" path="/{token}/exception.css">
-        <default key="_controller">web_profiler.controller.exception::cssAction</default>
+        <default key="_controller">web_profiler.controller.exception_panel::stylesheet</default>
     </route>
 
 </routes>

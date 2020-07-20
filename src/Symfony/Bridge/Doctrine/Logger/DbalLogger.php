@@ -34,6 +34,8 @@ class DbalLogger implements SQLLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function startQuery($sql, array $params = null, array $types = null)
     {
@@ -48,6 +50,8 @@ class DbalLogger implements SQLLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function stopQuery()
     {
@@ -58,16 +62,13 @@ class DbalLogger implements SQLLogger
 
     /**
      * Logs a message.
-     *
-     * @param string $message A message to log
-     * @param array  $params  The context
      */
-    protected function log($message, array $params)
+    protected function log(string $message, array $params)
     {
         $this->logger->debug($message, $params);
     }
 
-    private function normalizeParams(array $params)
+    private function normalizeParams(array $params): array
     {
         foreach ($params as $index => $param) {
             // normalize recursively

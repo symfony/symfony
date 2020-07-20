@@ -26,5 +26,5 @@ interface RebootableInterface
      *
      * @param string|null $warmupDir pass null to reboot in the regular cache directory
      */
-    public function reboot($warmupDir);
+    public function reboot(?string $warmupDir);
 }

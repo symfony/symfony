@@ -15,10 +15,23 @@ class AbstractDummyFirstChild extends AbstractDummy
 {
     public $bar;
 
+    /** @var DummyFirstChildQuux|null */
+    public $quux;
+
     public function __construct($foo = null, $bar = null)
     {
         parent::__construct($foo);
 
         $this->bar = $bar;
+    }
+
+    public function getQuux(): ?DummyFirstChildQuux
+    {
+        return $this->quux;
+    }
+
+    public function setQuux(DummyFirstChildQuux $quux): void
+    {
+        $this->quux = $quux;
     }
 }

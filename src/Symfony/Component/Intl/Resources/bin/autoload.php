@@ -12,7 +12,7 @@
 $autoload = __DIR__.'/../../vendor/autoload.php';
 
 if (!file_exists($autoload)) {
-    bailout('You should run "composer install --dev" in the component before running this script.');
+    bailout('You should run "composer install" in the component before running this script.');
 }
 
 require_once $autoload;

@@ -26,7 +26,7 @@ class ResizeFormListenerTest extends TestCase
     private $factory;
     private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->form = $this->getBuilder()
@@ -35,7 +35,7 @@ class ResizeFormListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->factory = null;
         $this->form = null;
@@ -66,11 +66,9 @@ class ResizeFormListenerTest extends TestCase
         $this->assertTrue($this->form->has('2'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testPreSetDataRequiresArrayOrTraversable()
     {
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', [], false, false);
@@ -201,11 +199,9 @@ class ResizeFormListenerTest extends TestCase
         $this->assertEquals($data, $event->getData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testOnSubmitNormDataRequiresArrayOrTraversable()
     {
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', [], false, false);

@@ -19,12 +19,12 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 {
     private $previousLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->previousLocale = setlocale(LC_ALL, '0');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         setlocale(LC_ALL, $this->previousLocale);
     }
@@ -96,7 +96,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
     public function testFloatToIntConversionMismatchOnTransform()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null, null, MoneyToLocalizedStringTransformer::ROUND_DOWN, 100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_DOWN, 100);
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 

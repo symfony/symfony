@@ -443,6 +443,22 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->has('Age'));
     }
 
+    public function testRevalidatesResponsesWithNoCacheDirectiveEvenIfFresh()
+    {
+        $this->setNextResponse(200, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag'], 'OK');
+        $this->request('GET', '/'); // warm the cache
+
+        sleep(5);
+
+        $this->setNextResponse(304, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag']);
+        $this->request('GET', '/');
+
+        $this->assertHttpKernelIsCalled(); // no-cache -> MUST have revalidated at origin
+        $this->assertTraceContains('valid');
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertEquals(0, $this->response->getAge());
+    }
+
     public function testCachesResponsesWithAnExpirationHeader()
     {
         $time = \DateTime::createFromFormat('U', time() + 5);
@@ -660,7 +676,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
@@ -668,7 +684,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
 
         // expires the cache
         $values = $this->getMetaStorageValues();
@@ -688,7 +704,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('invalid');
         $this->assertTraceContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
 
         $this->setNextResponse();
 
@@ -698,7 +714,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
     }
 
     public function testAssignsDefaultTtlWhenResponseHasNoFreshnessInformationAndAfterTtlWasExpiredWithStatus304()
@@ -711,7 +727,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
@@ -739,7 +755,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
         $this->assertTraceNotContains('miss');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
@@ -747,7 +763,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
-        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
+        $this->assertRegExp('/s-maxage=(2|3)/', $this->response->headers->get('Cache-Control'));
     }
 
     public function testDoesNotAssignDefaultTtlWhenResponseHasMustRevalidateDirective()
@@ -843,10 +859,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testValidatesCachedResponsesUseSameHttpMethod()
     {
-        $test = $this;
-
-        $this->setNextResponse(200, [], 'Hello World', function ($request, $response) use ($test) {
-            $test->assertSame('OPTIONS', $request->getMethod());
+        $this->setNextResponse(200, [], 'Hello World', function ($request, $response) {
+            $this->assertSame('OPTIONS', $request->getMethod());
         });
 
         // build initial request
@@ -859,6 +873,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testValidatesCachedResponsesWithETagAndNoFreshnessInformation()
     {
         $this->setNextResponse(200, [], 'Hello World', function ($request, $response) {
+            $this->assertFalse($request->headers->has('If-Modified-Since'));
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('ETag', '"12345"');
             if ($response->getETag() == $request->headers->get('IF_NONE_MATCH')) {
@@ -1241,7 +1256,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', [], [], true);
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
         $this->assertNull($this->response->getTtl());
-        $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
@@ -1272,7 +1286,6 @@ class HttpCacheTest extends HttpCacheTestCase
         // This can neither be cached nor revalidated, so it should be private/no cache
         $this->assertEmpty($this->response->getContent());
         $this->assertNull($this->response->getTtl());
-        $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
@@ -1509,6 +1522,168 @@ class HttpCacheTest extends HttpCacheTestCase
         $cache->handle($request, HttpKernelInterface::SUB_REQUEST);
     }
 
+    public function testStaleIfErrorMustNotResetLifetime()
+    {
+        // Make sure we don't accidentally treat the response as fresh (revalidated) again
+        // when stale-if-error handling kicks in.
+
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                // This is cacheable and can be used in stale-if-error cases:
+                'headers' => ['Cache-Control' => 'public, max-age=10', 'ETag' => 'some-etag'],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10;
+
+        $this->request('GET', '/'); // warm cache
+
+        sleep(15); // now the entry is stale, but still within the grace period (10s max-age + 10s stale-if-error)
+
+        $this->request('GET', '/'); // hit backend error
+        $this->assertEquals(200, $this->response->getStatusCode()); // stale-if-error saved the day
+        $this->assertEquals(15, $this->response->getAge());
+
+        sleep(10); // now we're outside the grace period
+
+        $this->request('GET', '/'); // hit backend error
+        $this->assertEquals(500, $this->response->getStatusCode()); // fail
+    }
+
+    /**
+     * @dataProvider getResponseDataThatMayBeServedStaleIfError
+     */
+    public function testResponsesThatMayBeUsedStaleIfError($responseHeaders, $sleepBetweenRequests = null)
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => $responseHeaders,
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10; // after stale, may be served for 10s
+
+        $this->request('GET', '/'); // warm cache
+
+        if ($sleepBetweenRequests) {
+            sleep($sleepBetweenRequests);
+        }
+
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertTraceContains('stale-if-error');
+    }
+
+    public function getResponseDataThatMayBeServedStaleIfError()
+    {
+        // All data sets assume that a 10s stale-if-error grace period has been configured
+        yield 'public, max-age expired' => [['Cache-Control' => 'public, max-age=60'], 65];
+        yield 'public, validateable with ETag, no TTL' => [['Cache-Control' => 'public', 'ETag' => 'some-etag'], 5];
+        yield 'public, validateable with Last-Modified, no TTL' => [['Cache-Control' => 'public', 'Last-Modified' => 'yesterday'], 5];
+        yield 'public, s-maxage will be served stale-if-error, even if the RFC mandates otherwise' => [['Cache-Control' => 'public, s-maxage=20'], 25];
+    }
+
+    /**
+     * @dataProvider getResponseDataThatMustNotBeServedStaleIfError
+     */
+    public function testResponsesThatMustNotBeUsedStaleIfError($responseHeaders, $sleepBetweenRequests = null)
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => $responseHeaders,
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10; // after stale, may be served for 10s
+        $this->cacheConfig['strict_smaxage'] = true; // full RFC compliance for this feature
+
+        $this->request('GET', '/'); // warm cache
+
+        if ($sleepBetweenRequests) {
+            sleep($sleepBetweenRequests);
+        }
+
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(500, $this->response->getStatusCode());
+    }
+
+    public function getResponseDataThatMustNotBeServedStaleIfError()
+    {
+        // All data sets assume that a 10s stale-if-error grace period has been configured
+        yield 'public, no TTL but beyond grace period' => [['Cache-Control' => 'public'], 15];
+        yield 'public, validateable with ETag, no TTL but beyond grace period' => [['Cache-Control' => 'public', 'ETag' => 'some-etag'], 15];
+        yield 'public, validateable with Last-Modified, no TTL but beyond grace period' => [['Cache-Control' => 'public', 'Last-Modified' => 'yesterday'], 15];
+        yield 'public, stale beyond grace period' => [['Cache-Control' => 'public, max-age=10'], 30];
+
+        // Cache-control values that prohibit serving stale responses or responses without positive validation -
+        // see https://tools.ietf.org/html/rfc7234#section-4.2.4 and
+        // https://tools.ietf.org/html/rfc7234#section-5.2.2
+        yield 'no-cache requires positive validation' => [['Cache-Control' => 'public, no-cache', 'ETag' => 'some-etag']];
+        yield 'no-cache requires positive validation, even if fresh' => [['Cache-Control' => 'public, no-cache, max-age=10']];
+        yield 'must-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, must-revalidate'], 15];
+        yield 'proxy-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, proxy-revalidate'], 15];
+    }
+
+    public function testStaleIfErrorWhenStrictSmaxageDisabled()
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => ['Cache-Control' => 'public, s-maxage=20'],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10;
+        $this->cacheConfig['strict_smaxage'] = false;
+
+        $this->request('GET', '/'); // warm cache
+        sleep(25);
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertTraceContains('stale-if-error');
+    }
+
     public function testTraceHeaderNameCanBeChanged()
     {
         $this->cacheConfig['trace_header'] = 'X-My-Header';
@@ -1557,7 +1732,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
     }
 }

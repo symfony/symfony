@@ -25,6 +25,8 @@ use Twig\Profiler\Profile;
  * TwigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -41,7 +43,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
     }
 
@@ -147,7 +149,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->profile;
     }
 
-    private function getComputedData($index)
+    private function getComputedData(string $index)
     {
         if (null === $this->computed) {
             $this->computed = $this->computeData($this->getProfile());

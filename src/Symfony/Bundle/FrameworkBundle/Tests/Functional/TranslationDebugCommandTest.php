@@ -11,17 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @group functional
  */
-class TranslationDebugCommandTest extends WebTestCase
+class TranslationDebugCommandTest extends AbstractWebTestCase
 {
     private $application;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::createKernel(['test_case' => 'TransDebug', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
@@ -32,14 +33,18 @@ class TranslationDebugCommandTest extends WebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['locale' => 'en']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_subscriber_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_property_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_method_calls_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_controller', $tester->getDisplay());
-        $this->assertContains('unused     validators   This value should be blank.', $tester->getDisplay());
-        $this->assertContains('unused     security     Invalid CSRF token.', $tester->getDisplay());
+        $this->assertSame(
+            TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED,
+            $ret,
+            'Returns appropriate exit code in the event of error'
+        );
+        $this->assertStringContainsString('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_subscriber_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_property_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_method_calls_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_controller', $tester->getDisplay());
+        $this->assertStringContainsString('unused     validators   This value should be blank.', $tester->getDisplay());
+        $this->assertStringContainsString('unused     security     Invalid CSRF token.', $tester->getDisplay());
     }
 
     private function createCommandTester(): CommandTester

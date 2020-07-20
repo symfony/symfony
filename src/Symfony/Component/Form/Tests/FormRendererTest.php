@@ -29,12 +29,11 @@ class FormRendererTest extends TestCase
         $this->assertEquals('Is active', $renderer->humanize('isActive'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\BadMethodCallException
-     * @expectedExceptionMessage Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.
-     */
     public function testRenderARenderedField()
     {
+        $this->expectException('Symfony\Component\Form\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
+
         $formView = new FormView();
         $formView->vars['name'] = 'foo';
         $formView->setRendered();

@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader as TwigArrayLoader;
+use Twig\TemplateWrapper;
 
 class TranslationExtensionTest extends TestCase
 {
@@ -45,22 +47,18 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
     }
 
-    /**
-     * @expectedException        \Twig\Error\SyntaxError
-     * @expectedExceptionMessage Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.
-     */
     public function testTransUnknownKeyword()
     {
-        $output = $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
+        $this->expectException('Twig\Error\SyntaxError');
+        $this->expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
+        $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
 
-    /**
-     * @expectedException        \Twig\Error\SyntaxError
-     * @expectedExceptionMessage A message inside a trans tag must be a simple text in "index" at line 2.
-     */
     public function testTransComplexBody()
     {
-        $output = $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
+        $this->expectException('Twig\Error\SyntaxError');
+        $this->expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
+        $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
 
     public function getTransTests()
@@ -191,7 +189,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
-    protected function getTemplate($template, $translator = null)
+    private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper
     {
         if (null === $translator) {
             $translator = new Translator('en');
@@ -205,6 +203,6 @@ class TranslationExtensionTest extends TestCase
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new TranslationExtension($translator));
 
-        return $twig->loadTemplate('index');
+        return $twig->load('index');
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PasswordType extends AbstractType
@@ -36,6 +37,11 @@ class PasswordType extends AbstractType
         $resolver->setDefaults([
             'always_empty' => true,
             'trim' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'The password is invalid.';
+            },
         ]);
     }
 
@@ -44,7 +50,7 @@ class PasswordType extends AbstractType
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\TextType';
+        return TextType::class;
     }
 
     /**

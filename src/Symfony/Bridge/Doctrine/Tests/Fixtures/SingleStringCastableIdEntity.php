@@ -35,7 +35,7 @@ class SingleStringCastableIdEntity
         $this->name = $name;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->name;
     }
@@ -50,7 +50,7 @@ class StringCastableObjectIdentity
         $this->id = $id;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

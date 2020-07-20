@@ -8,11 +8,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
 use Symfony\Component\Workflow\EventListener\GuardExpression;
 use Symfony\Component\Workflow\EventListener\GuardListener;
-use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Tests\Subject;
 use Symfony\Component\Workflow\Transition;
@@ -25,7 +27,7 @@ class GuardListenerTest extends TestCase
     private $listener;
     private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = [
             'test_is_granted' => 'is_granted("something")',
@@ -46,7 +48,7 @@ class GuardListenerTest extends TestCase
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, $roleHierarchy, $this->validator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->authenticationChecker = null;
         $this->validator = null;
@@ -173,7 +175,7 @@ class GuardListenerTest extends TestCase
         $this->validator
             ->expects($this->once())
             ->method('validate')
-            ->willReturn($valid ? [] : ['a violation'])
+            ->willReturn(new ConstraintViolationList($valid ? [] : [new ConstraintViolation('a violation', null, [], '', null, '')]))
         ;
     }
 }

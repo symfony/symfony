@@ -124,10 +124,10 @@ class RouteTest extends TestCase
 
     /**
      * @dataProvider getInvalidRequirements
-     * @expectedException \InvalidArgumentException
      */
     public function testSetInvalidRequirement($req)
     {
+        $this->expectException('InvalidArgumentException');
         $route = new Route('/{foo}');
         $route->setRequirement('foo', $req);
     }
@@ -260,7 +260,7 @@ class RouteTest extends TestCase
      */
     public function testSerializedRepresentationKeepsWorking()
     {
-        $serialized = 'C:31:"Symfony\Component\Routing\Route":936:{a:8:{s:4:"path";s:13:"/prefix/{foo}";s:4:"host";s:20:"{locale}.example.net";s:8:"defaults";a:1:{s:3:"foo";s:7:"default";}s:12:"requirements";a:1:{s:3:"foo";s:3:"\d+";}s:7:"options";a:1:{s:14:"compiler_class";s:39:"Symfony\Component\Routing\RouteCompiler";}s:7:"schemes";a:0:{}s:7:"methods";a:0:{}s:8:"compiled";C:39:"Symfony\Component\Routing\CompiledRoute":571:{a:8:{s:4:"vars";a:2:{i:0;s:6:"locale";i:1;s:3:"foo";}s:11:"path_prefix";s:7:"/prefix";s:10:"path_regex";s:31:"#^/prefix(?:/(?P<foo>\d+))?$#sD";s:11:"path_tokens";a:2:{i:0;a:4:{i:0;s:8:"variable";i:1;s:1:"/";i:2;s:3:"\d+";i:3;s:3:"foo";}i:1;a:2:{i:0;s:4:"text";i:1;s:7:"/prefix";}}s:9:"path_vars";a:1:{i:0;s:3:"foo";}s:10:"host_regex";s:40:"#^(?P<locale>[^\.]++)\.example\.net$#sDi";s:11:"host_tokens";a:2:{i:0;a:2:{i:0;s:4:"text";i:1;s:12:".example.net";}i:1;a:4:{i:0;s:8:"variable";i:1;s:0:"";i:2;s:7:"[^\.]++";i:3;s:6:"locale";}}s:9:"host_vars";a:1:{i:0;s:6:"locale";}}}}}';
+        $serialized = 'C:31:"Symfony\Component\Routing\Route":936:{a:8:{s:4:"path";s:13:"/prefix/{foo}";s:4:"host";s:20:"{locale}.example.net";s:8:"defaults";a:1:{s:3:"foo";s:7:"default";}s:12:"requirements";a:1:{s:3:"foo";s:3:"\d+";}s:7:"options";a:1:{s:14:"compiler_class";s:39:"Symfony\Component\Routing\RouteCompiler";}s:7:"schemes";a:0:{}s:7:"methods";a:0:{}s:8:"compiled";C:39:"Symfony\Component\Routing\CompiledRoute":571:{a:8:{s:4:"vars";a:2:{i:0;s:6:"locale";i:1;s:3:"foo";}s:11:"path_prefix";s:7:"/prefix";s:10:"path_regex";s:31:"{^/prefix(?:/(?P<foo>\d+))?$}sD";s:11:"path_tokens";a:2:{i:0;a:4:{i:0;s:8:"variable";i:1;s:1:"/";i:2;s:3:"\d+";i:3;s:3:"foo";}i:1;a:2:{i:0;s:4:"text";i:1;s:7:"/prefix";}}s:9:"path_vars";a:1:{i:0;s:3:"foo";}s:10:"host_regex";s:40:"{^(?P<locale>[^\.]++)\.example\.net$}sDi";s:11:"host_tokens";a:2:{i:0;a:2:{i:0;s:4:"text";i:1;s:12:".example.net";}i:1;a:4:{i:0;s:8:"variable";i:1;s:0:"";i:2;s:7:"[^\.]++";i:3;s:6:"locale";}}s:9:"host_vars";a:1:{i:0;s:6:"locale";}}}}}';
         $unserialized = unserialize($serialized);
 
         $route = new Route('/prefix/{foo}', ['foo' => 'default'], ['foo' => '\d+']);
@@ -269,5 +269,66 @@ class RouteTest extends TestCase
 
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
+    }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleDefaultWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getDefault('_locale'));
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame('fr', $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleDefaultWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getDefault('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setDefault('_locale', 'fr');
+        $this->assertSame($expected, $route->getDefault('_locale'));
+    }
+
+    /**
+     * @dataProvider provideNonLocalizedRoutes
+     */
+    public function testLocaleRequirementWithNonLocalizedRoutes(Route $route)
+    {
+        $this->assertNotSame('fr', $route->getRequirement('_locale'));
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame('fr', $route->getRequirement('_locale'));
+    }
+
+    /**
+     * @dataProvider provideLocalizedRoutes
+     */
+    public function testLocaleRequirementWithLocalizedRoutes(Route $route)
+    {
+        $expected = $route->getRequirement('_locale');
+        $this->assertIsString($expected);
+        $this->assertNotSame('fr', $expected);
+        $route->setRequirement('_locale', 'fr');
+        $this->assertSame($expected, $route->getRequirement('_locale'));
+    }
+
+    public function provideNonLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))],
+            [(new Route('/foo'))->setDefault('_locale', 'en')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')],
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'foobar')],
+        ];
+    }
+
+    public function provideLocalizedRoutes()
+    {
+        return [
+            [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en')],
+        ];
     }
 }

@@ -1,0 +1,9 @@
+
+[33mRemaining deprecations (5)[39m
+[33m==========================[39m
+
+ * 3x: Some deprecation message.
+      in /path/to/some/file.php:39
+ * 2x: An other deprecation message.
+      in /path/to/an/other/file.php:25
+

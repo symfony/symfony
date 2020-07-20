@@ -19,12 +19,12 @@ abstract class MergeCollectionListenerTest extends TestCase
 {
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->getForm('axes');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->form = null;
     }
@@ -182,10 +182,10 @@ abstract class MergeCollectionListenerTest extends TestCase
 
     /**
      * @dataProvider getBooleanMatrix2
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
         $listener = new MergeCollectionListener($allowAdd, $allowDelete);

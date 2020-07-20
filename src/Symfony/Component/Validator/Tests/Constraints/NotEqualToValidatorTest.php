@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
 
@@ -24,12 +25,12 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return new NotEqualToValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new NotEqualTo($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return NotEqualTo::IS_EQUAL_ERROR;
     }
@@ -37,7 +38,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [1, 2],
@@ -53,7 +54,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [0],
@@ -63,16 +64,23 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
-            [3, '3', 3, '3', 'integer'],
-            ['2', '"2"', 2, '2', 'integer'],
+            [3, '3', 3, '3', 'int'],
+            ['2', '"2"', 2, '2', 'int'],
             ['a', '"a"', 'a', '"a"', 'string'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01 UTC'), 'Jan 1, 2000, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+        ];
+    }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', true],
         ];
     }
 }

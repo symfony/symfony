@@ -31,13 +31,13 @@ class EventDispatcherTest extends TestCase
 
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->listener = null;
@@ -270,7 +270,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /**
-     * @see https://bugs.php.net/bug.php?id=62976
+     * @see https://bugs.php.net/62976
      *
      * This bug affects:
      *  - The PHP 5.3 branch for versions < 5.3.18
@@ -319,17 +319,26 @@ class EventDispatcherTest extends TestCase
 
     public function testDispatchLazyListener()
     {
+        $dispatcher = new TestWithDispatcher();
         $called = 0;
-        $factory = function () use (&$called) {
+        $factory = function () use (&$called, $dispatcher) {
             ++$called;
 
-            return new TestWithDispatcher();
+            return $dispatcher;
         };
         $this->dispatcher->addListener('foo', [$factory, 'foo']);
         $this->assertSame(0, $called);
         $this->dispatcher->dispatch(new Event(), 'foo');
+        $this->assertFalse($dispatcher->invoked);
         $this->dispatcher->dispatch(new Event(), 'foo');
         $this->assertSame(1, $called);
+
+        $this->dispatcher->addListener('bar', [$factory]);
+        $this->assertSame(1, $called);
+        $this->dispatcher->dispatch(new Event(), 'bar');
+        $this->assertTrue($dispatcher->invoked);
+        $this->dispatcher->dispatch(new Event(), 'bar');
+        $this->assertSame(2, $called);
     }
 
     public function testRemoveFindsLazyListeners()
@@ -432,17 +441,25 @@ class TestWithDispatcher
 {
     public $name;
     public $dispatcher;
+    public $invoked = false;
 
     public function foo($e, $name, $dispatcher)
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;
     }
+
+    public function __invoke($e, $name, $dispatcher)
+    {
+        $this->name = $name;
+        $this->dispatcher = $dispatcher;
+        $this->invoked = true;
+    }
 }
 
 class TestEventSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return ['pre.foo' => 'preFoo', 'post.foo' => 'postFoo'];
     }
@@ -450,7 +467,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 
 class TestEventSubscriberWithPriorities implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'pre.foo' => ['preFoo', 10],
@@ -461,7 +478,7 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface
 
 class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return ['pre.foo' => [
             ['preFoo1'],

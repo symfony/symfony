@@ -144,9 +144,9 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('Some commands could not be registered:', $output);
-        $this->assertContains('throwing', $output);
-        $this->assertContains('fine', $output);
+        $this->assertStringContainsString('Some commands could not be registered:', $output);
+        $this->assertStringContainsString('throwing', $output);
+        $this->assertStringContainsString('fine', $output);
     }
 
     public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
@@ -172,8 +172,8 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertSame(1, $tester->getStatusCode());
-        $this->assertContains('Some commands could not be registered:', $output);
-        $this->assertContains('Command "fine" is not defined.', $output);
+        $this->assertStringContainsString('Some commands could not be registered:', $output);
+        $this->assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
     public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
@@ -203,12 +203,12 @@ class ApplicationTest extends TestCase
         $this->assertSame(0, $tester->getStatusCode());
         $display = explode('Lists commands', $tester->getDisplay());
 
-        $this->assertContains(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
+        $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }
 
     public function testSuggestingPackagesWithExactMatch()
     {
-        $result = $this->createEventForSuggestingPackages('server:dump', []);
+        $result = $this->createEventForSuggestingPackages('doctrine:fixtures', []);
         $this->assertRegExp('/You may be looking for a command provided by/', $result);
     }
 

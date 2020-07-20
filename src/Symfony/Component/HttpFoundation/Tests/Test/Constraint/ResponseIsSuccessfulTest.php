@@ -29,7 +29,7 @@ class ResponseIsSuccessfulTest extends TestCase
         try {
             $constraint->evaluate(new Response('', 404));
         } catch (ExpectationFailedException $e) {
-            $this->assertContains("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            $this->assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
 
             return;
         }

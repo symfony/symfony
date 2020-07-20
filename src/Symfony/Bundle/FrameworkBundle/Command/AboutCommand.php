@@ -54,7 +54,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -89,17 +89,9 @@ EOT
             ['Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'],
         ];
 
-        if ($dotenv = self::getDotenvVars()) {
-            $rows = array_merge($rows, [
-                new TableSeparator(),
-                ['<info>Environment (.env)</>'],
-                new TableSeparator(),
-            ], array_map(function ($value, $name) {
-                return [$name, $value];
-            }, $dotenv, array_keys($dotenv)));
-        }
-
         $io->table([], $rows);
+
+        return 0;
     }
 
     private static function formatPath(string $path, string $baseDir): string
@@ -123,20 +115,8 @@ EOT
 
     private static function isExpired(string $date): bool
     {
-        $date = \DateTime::createFromFormat('m/Y', $date);
+        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
 
         return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
-    }
-
-    private static function getDotenvVars(): array
-    {
-        $vars = [];
-        foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {
-            if ('' !== $name && false !== $value = getenv($name)) {
-                $vars[$name] = $value;
-            }
-        }
-
-        return $vars;
     }
 }

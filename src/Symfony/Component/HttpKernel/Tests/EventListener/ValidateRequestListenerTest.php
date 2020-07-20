@@ -21,16 +21,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ValidateRequestListenerTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Request::setTrustedProxies([], -1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
-     */
     public function testListenerThrowsWhenMasterRequestHasInconsistentClientIps()
     {
+        $this->expectException('Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException');
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
 

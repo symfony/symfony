@@ -28,12 +28,20 @@ abstract class AbstractStream
     protected $in;
     protected $out;
 
-    public function write(string $bytes): void
+    private $debug = '';
+
+    public function write(string $bytes, bool $debug = true): void
     {
+        if ($debug) {
+            foreach (explode("\n", trim($bytes)) as $line) {
+                $this->debug .= sprintf("> %s\n", $line);
+            }
+        }
+
         $bytesToWrite = \strlen($bytes);
         $totalBytesWritten = 0;
         while ($totalBytesWritten < $bytesToWrite) {
-            $bytesWritten = fwrite($this->in, substr($bytes, $totalBytesWritten));
+            $bytesWritten = @fwrite($this->in, substr($bytes, $totalBytesWritten));
             if (false === $bytesWritten || 0 === $bytesWritten) {
                 throw new TransportException('Unable to write bytes on the wire.');
             }
@@ -72,9 +80,22 @@ abstract class AbstractStream
             if ($metas['timed_out']) {
                 throw new TransportException(sprintf('Connection to "%s" timed out.', $this->getReadConnectionDescription()));
             }
+            if ($metas['eof']) {
+                throw new TransportException(sprintf('Connection to "%s" has been closed unexpectedly.', $this->getReadConnectionDescription()));
+            }
         }
 
+        $this->debug .= sprintf('< %s', $line);
+
         return $line;
+    }
+
+    public function getDebug(): string
+    {
+        $debug = $this->debug;
+        $this->debug = '';
+
+        return $debug;
     }
 
     public static function replace(string $from, string $to, iterable $chunks): \Generator

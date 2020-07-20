@@ -32,7 +32,7 @@ class PhpBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->writer = new PhpBundleWriter();
         $this->directory = sys_get_temp_dir().'/PhpBundleWriterTest/'.mt_rand(1000, 9999);
@@ -41,7 +41,7 @@ class PhpBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->filesystem->remove($this->directory);
     }

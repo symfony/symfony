@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.82",
     "Names": {
         "ak": "Lu-akaani",
         "am": "Lu-amhariki",
@@ -46,5 +45,6 @@
         "yo": "Luyoruba",
         "zh": "Lucayina",
         "zu": "Luzzulu"
-    }
+    },
+    "LocalizedNames": []
 }

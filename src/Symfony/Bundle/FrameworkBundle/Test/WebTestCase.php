@@ -23,9 +23,9 @@ abstract class WebTestCase extends KernelTestCase
 {
     use WebTestAssertionsTrait;
 
-    protected function doTearDown(): void
+    protected function tearDown(): void
     {
-        parent::doTearDown();
+        parent::tearDown();
         self::getClient(null);
     }
 
@@ -39,6 +39,10 @@ abstract class WebTestCase extends KernelTestCase
      */
     protected static function createClient(array $options = [], array $server = [])
     {
+        if (static::$booted) {
+            throw new \LogicException(sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
+        }
+
         $kernel = static::bootKernel($options);
 
         try {
@@ -47,7 +51,7 @@ abstract class WebTestCase extends KernelTestCase
             if (class_exists(KernelBrowser::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
             }
-            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit"');
+            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
         }
 
         $client->setServerParameters($server);

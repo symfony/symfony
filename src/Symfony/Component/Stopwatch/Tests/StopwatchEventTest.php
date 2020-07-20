@@ -73,7 +73,7 @@ class StopwatchEventTest extends TestCase
         $event->start();
         usleep(200000);
         $event->stop();
-        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
+        $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -83,7 +83,7 @@ class StopwatchEventTest extends TestCase
         $event->start();
         usleep(100000);
         $event->stop();
-        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
+        $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
     }
 
     public function testDurationBeforeStop()
@@ -91,7 +91,7 @@ class StopwatchEventTest extends TestCase
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         usleep(200000);
-        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
+        $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -99,15 +99,30 @@ class StopwatchEventTest extends TestCase
         $event->stop();
         usleep(50000);
         $event->start();
+        $this->assertEqualsWithDelta(100, $event->getDuration(), self::DELTA);
         usleep(100000);
-        $this->assertEquals(100, $event->getDuration(), '', self::DELTA);
+        $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
+    public function testDurationWithMultipleStarts()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        usleep(100000);
+        $event->start();
+        usleep(100000);
+        $this->assertEqualsWithDelta(300, $event->getDuration(), self::DELTA);
+        $event->stop();
+        $this->assertEqualsWithDelta(300, $event->getDuration(), self::DELTA);
+        usleep(100000);
+        $this->assertEqualsWithDelta(400, $event->getDuration(), self::DELTA);
+        $event->stop();
+        $this->assertEqualsWithDelta(400, $event->getDuration(), self::DELTA);
+    }
+
     public function testStopWithoutStart()
     {
+        $this->expectException('LogicException');
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->stop();
     }
@@ -134,7 +149,7 @@ class StopwatchEventTest extends TestCase
         $event->start();
         usleep(100000);
         $event->ensureStopped();
-        $this->assertEquals(300, $event->getDuration(), '', self::DELTA);
+        $this->assertEqualsWithDelta(300, $event->getDuration(), self::DELTA);
     }
 
     public function testStartTime()
@@ -151,7 +166,28 @@ class StopwatchEventTest extends TestCase
         $event->start();
         usleep(100000);
         $event->stop();
-        $this->assertEquals(0, $event->getStartTime(), '', self::DELTA);
+        $this->assertEqualsWithDelta(0, $event->getStartTime(), self::DELTA);
+    }
+
+    public function testStartTimeWhenStartedLater()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $this->assertLessThanOrEqual(0.5, $event->getStartTime());
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $event->start();
+        $event->stop();
+        $this->assertLessThanOrEqual(101, $event->getStartTime());
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $event->start();
+        usleep(100000);
+        $this->assertEqualsWithDelta(100, $event->getStartTime(), self::DELTA);
+        $event->stop();
+        $this->assertEqualsWithDelta(100, $event->getStartTime(), self::DELTA);
     }
 
     public function testHumanRepresentation()

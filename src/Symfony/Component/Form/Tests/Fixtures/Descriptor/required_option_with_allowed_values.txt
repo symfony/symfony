@@ -3,6 +3,8 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (foo)
 =============================================================
 
  ---------------- -----------%s
+  Info             -         %s
+ ---------------- -----------%s
   Required         true      %s
  ---------------- -----------%s
   Default          -         %s

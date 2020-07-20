@@ -27,7 +27,7 @@ class PhpSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
 
         $encoded = $serializer->encode($envelope);
-        $this->assertNotContains("\0", $encoded['body'], 'Does not contain the binary characters');
+        $this->assertStringNotContainsString("\0", $encoded['body'], 'Does not contain the binary characters');
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
@@ -44,7 +44,7 @@ class PhpSerializerTest extends TestCase
     public function testDecodingFailsWithBadFormat()
     {
         $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageRegExp('/Could not decode/');
+        $this->expectExceptionMessageMatches('/Could not decode/');
 
         $serializer = new PhpSerializer();
 
@@ -56,7 +56,7 @@ class PhpSerializerTest extends TestCase
     public function testDecodingFailsWithBadClass()
     {
         $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageRegExp('/class "ReceivedSt0mp" not found/');
+        $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
 
         $serializer = new PhpSerializer();
 
@@ -74,7 +74,7 @@ class PhpSerializerTest extends TestCase
         ]);
 
         $encoded = $serializer->encode($envelope);
-        $this->assertNotContains('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
 }
 

@@ -16,13 +16,18 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
+        "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/polyfill-intl-idn": "^1.10",
-        "symfony/polyfill-mbstring": "^1.0"
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "egulias/email-validator": "^2.0",
+        "egulias/email-validator": "^2.1.10",
         "symfony/dependency-injection": "^4.4|^5.0"
+    },
+    "conflict": {
+        "symfony/mailer": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },
@@ -33,7 +38,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

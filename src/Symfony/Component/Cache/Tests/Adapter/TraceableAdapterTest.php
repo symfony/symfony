@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
 
@@ -23,7 +24,7 @@ class TraceableAdapterTest extends AdapterTestCase
         'testPrune' => 'TraceableAdapter just proxies',
     ];
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new TraceableAdapter(new FilesystemAdapter('', $defaultLifetime));
     }

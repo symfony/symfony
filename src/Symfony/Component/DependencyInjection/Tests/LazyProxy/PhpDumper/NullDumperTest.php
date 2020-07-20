@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
- * Tests for {@see \Symfony\Component\DependencyInjection\PhpDumper\NullDumper}.
+ * Tests for {@see \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */

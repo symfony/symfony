@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,15 +29,54 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 abstract class FileLoader extends BaseFileLoader
 {
+    public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
+
     protected $container;
     protected $isLoadingInstanceof = false;
     protected $instanceof = [];
+    protected $interfaces = [];
+    protected $singlyImplemented = [];
+    protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {
         $this->container = $container;
 
         parent::__construct($locator);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
+     */
+    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null, $exclude = null)
+    {
+        $args = \func_get_args();
+
+        if ($ignoreNotFound = 'not_found' === $ignoreErrors) {
+            $args[2] = false;
+        } elseif (!\is_bool($ignoreErrors)) {
+            throw new \TypeError(sprintf('Invalid argument $ignoreErrors provided to "%s::import()": boolean or "not_found" expected, "%s" given.', static::class, get_debug_type($ignoreErrors)));
+        }
+
+        try {
+            parent::import(...$args);
+        } catch (LoaderLoadException $e) {
+            if (!$ignoreNotFound || !($prev = $e->getPrevious()) instanceof FileLocatorFileNotFoundException) {
+                throw $e;
+            }
+
+            foreach ($prev->getTrace() as $frame) {
+                if ('import' === ($frame['function'] ?? null) && is_a($frame['class'] ?? '', Loader::class, true)) {
+                    break;
+                }
+            }
+
+            if (__FILE__ !== $frame['file']) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -48,21 +90,19 @@ abstract class FileLoader extends BaseFileLoader
     public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
     {
         if ('\\' !== substr($namespace, -1)) {
-            throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": %s.', $namespace));
+            throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
         }
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
-            throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: %s.', $namespace));
+            throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: "%s".', $namespace));
         }
 
         $classes = $this->findClasses($namespace, $resource, (array) $exclude);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
-        $interfaces = [];
-        $singlyImplemented = [];
 
         foreach ($classes as $class => $errorMessage) {
             if (interface_exists($class, false)) {
-                $interfaces[] = $class;
+                $this->interfaces[] = $class;
             } else {
                 $this->setDefinition($class, $definition = unserialize($serializedPrototype));
                 if (null !== $errorMessage) {
@@ -71,23 +111,31 @@ abstract class FileLoader extends BaseFileLoader
                     continue;
                 }
                 foreach (class_implements($class, false) as $interface) {
-                    $singlyImplemented[$interface] = isset($singlyImplemented[$interface]) ? false : $class;
+                    $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
                 }
             }
         }
-        foreach ($interfaces as $interface) {
-            if (!empty($singlyImplemented[$interface])) {
-                $this->container->setAlias($interface, $singlyImplemented[$interface])
-                    ->setPublic(false);
+
+        if ($this->autoRegisterAliasesForSinglyImplementedInterfaces) {
+            $this->registerAliasesForSinglyImplementedInterfaces();
+        }
+    }
+
+    public function registerAliasesForSinglyImplementedInterfaces()
+    {
+        foreach ($this->interfaces as $interface) {
+            if (!empty($this->singlyImplemented[$interface]) && !$this->container->has($interface)) {
+                $this->container->setAlias($interface, $this->singlyImplemented[$interface]);
             }
         }
+
+        $this->interfaces = $this->singlyImplemented = [];
     }
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      */
     protected function setDefinition($id, Definition $definition)
     {
@@ -95,15 +143,15 @@ abstract class FileLoader extends BaseFileLoader
 
         if ($this->isLoadingInstanceof) {
             if (!$definition instanceof ChildDefinition) {
-                throw new InvalidArgumentException(sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, \get_class($definition)));
+                throw new InvalidArgumentException(sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, get_debug_type($definition)));
             }
             $this->instanceof[$id] = $definition;
         } else {
-            $this->container->setDefinition($id, $definition instanceof ChildDefinition ? $definition : $definition->setInstanceofConditionals($this->instanceof));
+            $this->container->setDefinition($id, $definition->setInstanceofConditionals($this->instanceof));
         }
     }
 
-    private function findClasses($namespace, $pattern, array $excludePatterns)
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns): array
     {
         $parameterBag = $this->container->getParameterBag();
 
@@ -111,7 +159,7 @@ abstract class FileLoader extends BaseFileLoader
         $excludePrefix = null;
         $excludePatterns = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePatterns));
         foreach ($excludePatterns as $excludePattern) {
-            foreach ($this->glob($excludePattern, true, $resource, false, true) as $path => $info) {
+            foreach ($this->glob($excludePattern, true, $resource, true, true) as $path => $info) {
                 if (null === $excludePrefix) {
                     $excludePrefix = $resource->getPrefix();
                 }
@@ -130,7 +178,7 @@ abstract class FileLoader extends BaseFileLoader
                 $prefixLen = \strlen($resource->getPrefix());
 
                 if ($excludePrefix && 0 !== strpos($excludePrefix, $resource->getPrefix())) {
-                    throw new InvalidArgumentException(sprintf('Invalid "exclude" pattern when importing classes for "%s": make sure your "exclude" pattern (%s) is a subset of the "resource" pattern (%s)', $namespace, $excludePattern, $pattern));
+                    throw new InvalidArgumentException(sprintf('Invalid "exclude" pattern when importing classes for "%s": make sure your "exclude" pattern (%s) is a subset of the "resource" pattern (%s).', $namespace, $excludePattern, $pattern));
                 }
             }
 
@@ -150,12 +198,7 @@ abstract class FileLoader extends BaseFileLoader
             try {
                 $r = $this->container->getReflectionClass($class);
             } catch (\ReflectionException $e) {
-                $classes[$class] = sprintf(
-                    'While discovering services from namespace "%s", an error was thrown when processing the class "%s": "%s".',
-                    $namespace,
-                    $class,
-                    $e->getMessage()
-                );
+                $classes[$class] = $e->getMessage();
                 continue;
             }
             // check to make sure the expected class exists

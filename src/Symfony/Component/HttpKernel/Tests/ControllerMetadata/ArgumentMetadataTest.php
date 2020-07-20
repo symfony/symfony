@@ -32,11 +32,9 @@ class ArgumentMetadataTest extends TestCase
         $this->assertSame('default value', $argument->getDefaultValue());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testDefaultValueUnavailable()
     {
+        $this->expectException('LogicException');
         $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
 
         $this->assertFalse($argument->isNullable());

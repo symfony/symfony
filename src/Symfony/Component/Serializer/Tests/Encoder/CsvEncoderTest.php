@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -24,7 +25,7 @@ class CsvEncoderTest extends TestCase
      */
     private $encoder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encoder = new CsvEncoder();
     }
@@ -36,15 +37,51 @@ class CsvEncoderTest extends TestCase
             'int' => 2,
             'false' => false,
             'true' => true,
+            'int_one' => 1,
+            'string_one' => '1',
         ];
 
         // Check that true and false are appropriately handled
-        $this->assertEquals(<<<'CSV'
-string,int,false,true
-foo,2,0,1
+        $this->assertSame($csv = <<<'CSV'
+string,int,false,true,int_one,string_one
+foo,2,0,1,1,1
 
 CSV
-    , $this->encoder->encode($data, 'csv'));
+        , $this->encoder->encode($data, 'csv'));
+
+        $this->assertSame([
+            'string' => 'foo',
+            'int' => '2',
+            'false' => '0',
+            'true' => '1',
+            'int_one' => '1',
+            'string_one' => '1',
+        ], $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testDoubleQuotesAndSlashes()
+    {
+        $this->assertSame($csv = <<<'CSV'
+0,1,2,3,4,5
+,"""","foo""","\""",\,foo\
+
+CSV
+        , $this->encoder->encode($data = ['', '"', 'foo"', '\\"', '\\', 'foo\\'], 'csv'));
+
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testSingleSlash()
+    {
+        $this->assertSame($csv = "0\n\\\n", $this->encoder->encode($data = ['\\'], 'csv'));
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
+        $this->assertSame($data, $this->encoder->decode(trim($csv), 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
     public function testSupportEncoding()
@@ -150,6 +187,24 @@ CSV
             CsvEncoder::ESCAPE_CHAR_KEY => '|',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
         ]));
+    }
+
+    public function testEncodeCustomSettingsPassedInConstructor()
+    {
+        $encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+        ]);
+        $value = ['a' => 'he\'llo', 'c' => ['d' => 'foo']];
+
+        $this->assertSame(<<<'CSV'
+a;c-d
+'he''llo';foo
+
+CSV
+        , $encoder->encode($value, 'csv'));
     }
 
     public function testEncodeEmptyArray()
@@ -309,6 +364,52 @@ CSV
             , $this->encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
                 CsvEncoder::NO_HEADERS_KEY => true,
             ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertSame(<<<'CSV'
+a,b
+c,d
+
+CSV
+            , $encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ]));
+    }
+
+    public function testEncodeArrayObject()
+    {
+        $value = new \ArrayObject(['foo' => 'hello', 'bar' => 'hey ho']);
+
+        $this->assertEquals(<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV
+            , $this->encoder->encode($value, 'csv'));
+
+        $value = new \ArrayObject();
+
+        $this->assertEquals("\n", $this->encoder->encode($value, 'csv'));
+    }
+
+    public function testEncodeNestedArrayObject()
+    {
+        $value = new \ArrayObject(['foo' => new \ArrayObject(['nested' => 'value']), 'bar' => new \ArrayObject(['another' => 'word'])]);
+
+        $this->assertEquals(<<<'CSV'
+foo.nested,bar.another
+value,word
+
+CSV
+            , $this->encoder->encode($value, 'csv'));
+    }
+
+    public function testEncodeEmptyArrayObject()
+    {
+        $value = new \ArrayObject();
+        $this->assertEquals("\n", $this->encoder->encode($value, 'csv'));
+
+        $value = ['foo' => new \ArrayObject()];
+        $this->assertEquals("\n\n", $this->encoder->encode($value, 'csv'));
     }
 
     public function testSupportsDecoding()
@@ -426,6 +527,23 @@ CSV
         ]));
     }
 
+    public function testDecodeCustomSettingsPassedInConstructor()
+    {
+        $encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+        ]);
+        $expected = [['a' => 'hell\'o', 'bar' => ['baz' => 'b']]];
+        $this->assertEquals($expected, $encoder->decode(<<<'CSV'
+a;bar-baz
+'hell''o';b;c
+CSV
+        , 'csv'));
+    }
+
     public function testDecodeMalformedCollection()
     {
         $expected = [
@@ -459,5 +577,48 @@ CSV
         , 'csv', [
             CsvEncoder::NO_HEADERS_KEY => true,
         ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertEquals([['a', 'b'], ['c', 'd']], $encoder->decode(<<<'CSV'
+a,b
+c,d
+
+CSV
+        , 'csv', [
+            CsvEncoder::NO_HEADERS_KEY => true,
+        ]));
+    }
+
+    public function testBOMIsAddedOnDemand()
+    {
+        $value = ['foo' => 'hello', 'bar' => 'hey ho'];
+
+        $this->assertEquals("\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV
+            , $this->encoder->encode($value, 'csv', [CsvEncoder::OUTPUT_UTF8_BOM_KEY => true]));
+    }
+
+    public function testBOMCanNotBeAddedToNonUtf8Csv()
+    {
+        $value = [mb_convert_encoding('ÄÖÜ', 'ISO-8859-1', 'UTF-8')];
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('You are trying to add a UTF-8 BOM to a non UTF-8 text.');
+        $this->encoder->encode($value, 'csv', [CsvEncoder::OUTPUT_UTF8_BOM_KEY => true]);
+    }
+
+    public function testBOMIsStripped()
+    {
+        $csv = "\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV;
+        $this->assertEquals(
+            ['foo' => 'hello', 'bar' => 'hey ho'],
+            $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false])
+        );
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 
 class RecursiveFormTypeBaz extends AbstractType
 {
-    public function getParent()
+    public function getParent(): ?string
     {
         return RecursiveFormTypeFoo::class;
     }

@@ -30,14 +30,16 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $busId = 'command_bus';
         $envelope = new Envelope(new DummyMessage('Hello'));
 
-        $middleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
-        $middleware->expects($this->once())
-            ->method('handle')
-            ->with($envelope, $this->anything())
-            ->willReturnCallback(function ($envelope, StackInterface $stack) {
+        $middleware = new class() implements MiddlewareInterface {
+            public $calls = 0;
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                ++$this->calls;
+
                 return $stack->next()->handle($envelope, $stack);
-            })
-        ;
+            }
+        };
 
         $stopwatch = $this->createMock(Stopwatch::class);
         $stopwatch->expects($this->once())->method('isStarted')->willReturn(true);
@@ -51,7 +53,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $stopwatch->expects($this->exactly(2))
             ->method('stop')
             ->withConsecutive(
-                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"')],
+                ['"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"'],
                 ['Tail on "command_bus"']
             )
         ;
@@ -59,14 +61,13 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $traced = new TraceableMiddleware($stopwatch, $busId);
 
         $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
+        $this->assertSame(1, $middleware->calls);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Thrown from next middleware.
-     */
     public function testHandleWithException()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Thrown from next middleware.');
         $busId = 'command_bus';
 
         $middleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();

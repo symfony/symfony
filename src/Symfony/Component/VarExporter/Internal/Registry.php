@@ -75,7 +75,7 @@ class Registry
         } elseif (!$isClass || $reflector->isAbstract()) {
             throw new NotInstantiableTypeException($class);
         } elseif ($reflector->name !== $class) {
-            $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, $instantiableWithoutConstructor, $cloneable);
+            $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, false, $cloneable);
             self::$cloneable[$class] = self::$cloneable[$name];
             self::$instantiableWithoutConstructor[$class] = self::$instantiableWithoutConstructor[$name];
             self::$prototypes[$class] = self::$prototypes[$name];
@@ -86,7 +86,7 @@ class Registry
                 $proto = $reflector->newInstanceWithoutConstructor();
                 $instantiableWithoutConstructor = true;
             } catch (\ReflectionException $e) {
-                $proto = $reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize')) ? 'C:' : 'O:';
+                $proto = $reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize') ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
                 } elseif (false === $proto = @unserialize($proto.\strlen($class).':"'.$class.'":0:{}')) {

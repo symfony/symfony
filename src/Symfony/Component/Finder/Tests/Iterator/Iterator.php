@@ -33,7 +33,7 @@ class Iterator implements \Iterator
         reset($this->values);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return false !== $this->current();
     }

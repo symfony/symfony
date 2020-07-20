@@ -27,6 +27,9 @@ $container->loadFromExtension('framework', [
             'json_manifest_strategy' => [
                 'json_manifest_path' => '/path/to/manifest.json',
             ],
+            'remote_manifest' => [
+                'json_manifest_path' => 'https://cdn.example.com/manifest.json',
+            ],
         ],
     ],
 ]);

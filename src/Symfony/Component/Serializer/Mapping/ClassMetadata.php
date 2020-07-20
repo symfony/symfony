@@ -50,9 +50,6 @@ class ClassMetadata implements ClassMetadataInterface
 
     /**
      * Constructs a metadata for the given class.
-     *
-     * @param string                         $class
-     * @param ClassDiscriminatorMapping|null $classDiscriminatorMapping
      */
     public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
@@ -63,7 +60,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -79,7 +76,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributesMetadata()
+    public function getAttributesMetadata(): array
     {
         return $this->attributesMetadata;
     }
@@ -101,7 +98,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getReflectionClass()
+    public function getReflectionClass(): \ReflectionClass
     {
         if (!$this->reflClass) {
             $this->reflClass = new \ReflectionClass($this->getName());
@@ -113,7 +110,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getClassDiscriminatorMapping()
+    public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping
     {
         return $this->classDiscriminatorMapping;
     }

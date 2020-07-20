@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Workflow\Event;
 
-class LeaveEvent extends Event
+final class LeaveEvent extends Event
 {
 }

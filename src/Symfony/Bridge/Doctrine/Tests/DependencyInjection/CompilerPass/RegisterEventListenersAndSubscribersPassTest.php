@@ -21,11 +21,9 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnAbstractTaggedSubscriber()
     {
+        $this->expectException('InvalidArgumentException');
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');
@@ -37,11 +35,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->process($container);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnAbstractTaggedListener()
     {
+        $this->expectException('InvalidArgumentException');
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');

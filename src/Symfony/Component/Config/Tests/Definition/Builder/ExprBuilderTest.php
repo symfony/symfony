@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\ExprBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ExprBuilderTest extends TestCase
@@ -148,7 +149,7 @@ class ExprBuilderTest extends TestCase
     /**
      * @dataProvider castToArrayValues
      */
-    public function testcastToArrayExpression($configValue, $expectedValue)
+    public function testCastToArrayExpression($configValue, $expectedValue)
     {
         $test = $this->getTestBuilder()
             ->castToArray()
@@ -164,11 +165,9 @@ class ExprBuilderTest extends TestCase
         yield [['value'], ['value']];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testThenInvalid()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $test = $this->getTestBuilder()
             ->ifString()
             ->thenInvalid('Invalid value')
@@ -185,21 +184,17 @@ class ExprBuilderTest extends TestCase
         $this->assertEquals([], $this->finalizeTestBuilder($test));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You must specify an if part.
-     */
     public function testEndIfPartNotSpecified()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('You must specify an if part.');
         $this->getTestBuilder()->end();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You must specify a then part.
-     */
     public function testEndThenPartNotSpecified()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('You must specify a then part.');
         $builder = $this->getTestBuilder();
         $builder->ifPart = 'test';
         $builder->end();
@@ -207,10 +202,8 @@ class ExprBuilderTest extends TestCase
 
     /**
      * Create a test treebuilder with a variable node, and init the validation.
-     *
-     * @return TreeBuilder
      */
-    protected function getTestBuilder()
+    protected function getTestBuilder(): ExprBuilder
     {
         $builder = new TreeBuilder('test');
 
@@ -231,7 +224,7 @@ class ExprBuilderTest extends TestCase
      *
      * @return array The finalized config values
      */
-    protected function finalizeTestBuilder($testBuilder, $config = null)
+    protected function finalizeTestBuilder($testBuilder, $config = null): array
     {
         return $testBuilder
             ->end()
@@ -246,10 +239,8 @@ class ExprBuilderTest extends TestCase
      * Return a closure that will return the given value.
      *
      * @param mixed $val The value that the closure must return
-     *
-     * @return \Closure
      */
-    protected function returnClosure($val)
+    protected function returnClosure($val): \Closure
     {
         return function ($v) use ($val) {
             return $val;

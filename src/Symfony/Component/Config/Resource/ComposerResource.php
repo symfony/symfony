@@ -50,7 +50,7 @@ class ComposerResource implements SelfCheckingResourceInterface
     {
         self::refresh();
 
-        return self::$runtimeVendors === $this->vendors;
+        return array_values(self::$runtimeVendors) === array_values($this->vendors);
     }
 
     private static function refresh()
@@ -60,8 +60,8 @@ class ComposerResource implements SelfCheckingResourceInterface
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
-                $v = \dirname(\dirname($r->getFileName()));
-                if (file_exists($v.'/composer/installed.json')) {
+                $v = \dirname($r->getFileName(), 2);
+                if (is_file($v.'/composer/installed.json')) {
                     self::$runtimeVendors[$v] = @filemtime($v.'/composer/installed.json');
                 }
             }

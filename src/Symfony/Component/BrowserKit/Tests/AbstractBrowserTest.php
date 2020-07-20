@@ -12,58 +12,9 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
-use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
-
-class TestClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-    protected $nextScript = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    public function setNextScript($script)
-    {
-        $this->nextScript = $script;
-    }
-
-    protected function doRequest($request)
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    protected function filterResponse($response)
-    {
-        return $response;
-    }
-
-    protected function getScript($request)
-    {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
-        $path = $r->getFileName();
-
-        return <<<EOF
-<?php
-
-require_once('$path');
-
-echo serialize($this->nextScript);
-EOF;
-    }
-}
 
 class AbstractBrowserTest extends TestCase
 {
@@ -92,12 +43,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getRequest()".
-     */
     public function testGetRequestNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getRequest());
     }
@@ -130,22 +80,20 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getResponse()".
-     */
     public function testGetResponseNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getResponse());
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalResponse()".
-     */
     public function testGetInternalResponseNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalResponse());
     }
@@ -168,12 +116,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($crawler, $client->getCrawler(), '->getCrawler() returns the Crawler of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getCrawler()".
-     */
     public function testGetCrawlerNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getCrawler()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getCrawler());
     }
@@ -266,6 +213,15 @@ class AbstractBrowserTest extends TestCase
         $client->request('GET', 'bar');
         $server = $client->getRequest()->getServer();
         $this->assertEquals('http://www.example.com/foo/foobar', $server['HTTP_REFERER'], '->request() sets the referer');
+    }
+
+    public function testRequestRefererCanBeOverridden()
+    {
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->request('GET', 'bar', [], [], ['HTTP_REFERER' => 'xyz']);
+        $server = $client->getRequest()->getServer();
+        $this->assertEquals('xyz', $server['HTTP_REFERER'], '->request() allows referer to be overridden');
     }
 
     public function testRequestHistory()
@@ -873,40 +829,12 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()".
-     */
     public function testInternalRequestNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalRequest());
-    }
-}
-
-class ClassThatInheritClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    protected function doRequest($request)
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    public function submit(DomCrawlerForm $form, array $values = [], array $serverParameters = [])
-    {
-        return parent::submit($form, $values, $serverParameters);
     }
 }

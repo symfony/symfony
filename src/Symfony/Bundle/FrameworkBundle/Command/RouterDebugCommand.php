@@ -33,6 +33,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterDebugCommand extends Command
 {
+    use BuildDebugContainerTrait;
+
     protected static $defaultName = 'debug:router';
     private $router;
     private $fileLinkFormatter;
@@ -73,12 +75,13 @@ EOF
      *
      * @throws InvalidArgumentException When route does not exist
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper($this->fileLinkFormatter);
         $routes = $this->router->getRouteCollection();
+        $container = $this->fileLinkFormatter ? \Closure::fromCallable([$this, 'getContainerBuilder']) : null;
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
@@ -96,6 +99,7 @@ EOF
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
                 'output' => $io,
+                'container' => $container,
             ]);
         } else {
             $helper->describe($io, $routes, [
@@ -103,8 +107,11 @@ EOF
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
                 'output' => $io,
+                'container' => $container,
             ]);
         }
+
+        return 0;
     }
 
     private function findRouteNameContaining(string $name, RouteCollection $routes): array

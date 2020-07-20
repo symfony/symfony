@@ -14,7 +14,12 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfTokenClearingLogoutHandlerPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\CustomAuthenticatorFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
@@ -29,7 +34,10 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMe
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Bundle.
@@ -53,12 +61,23 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
+        $extension->addSecurityListenerFactory(new AnonymousFactory());
+        $extension->addSecurityListenerFactory(new CustomAuthenticatorFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new RegisterCsrfTokenClearingLogoutHandlerPass());
+        $container->addCompilerPass(new RegisterCsrfFeaturesPass());
+        $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
+        $container->addCompilerPass(new RegisterLdapLocatorPass());
+        // must be registered after RegisterListenersPass (in the FrameworkBundle)
+        $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
+
+        $container->addCompilerPass(new AddEventAliasesPass(array_merge(
+            AuthenticationEvents::ALIASES,
+            SecurityEvents::ALIASES
+        )));
     }
 }

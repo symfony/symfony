@@ -12,11 +12,15 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(AnonymousToken::class);
 
 /**
  * AnonymousAuthenticationListener automatically adds a Token if none is
@@ -26,7 +30,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  *
  * @final
  */
-class AnonymousAuthenticationListener
+class AnonymousAuthenticationListener extends AbstractListener
 {
     private $tokenStorage;
     private $secret;
@@ -42,9 +46,17 @@ class AnonymousAuthenticationListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return null; // always run authenticate() lazily with lazy firewalls
+    }
+
+    /**
      * Handles anonymous authentication.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
             return;

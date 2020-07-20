@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -31,7 +31,7 @@ class RouterListenerTest extends TestCase
 {
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }
@@ -79,11 +79,9 @@ class RouterListenerTest extends TestCase
         return new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidMatcher()
     {
+        $this->expectException('InvalidArgumentException');
         new RouterListener(new \stdClass(), $this->requestStack);
     }
 
@@ -170,7 +168,7 @@ class RouterListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ValidateRequestListener());
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
-        $dispatcher->addSubscriber(new ExceptionListener(function () {
+        $dispatcher->addSubscriber(new ErrorListener(function () {
             return new Response('Exception handled', 400);
         }));
 
@@ -201,14 +199,12 @@ class RouterListenerTest extends TestCase
         $request = Request::create('http://localhost/');
         $response = $kernel->handle($request);
         $this->assertSame(404, $response->getStatusCode());
-        $this->assertContains('Welcome', $response->getContent());
+        $this->assertStringContainsString('Welcome', $response->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     */
     public function testRequestWithBadHost()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://bad host %22/');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);

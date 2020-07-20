@@ -11,10 +11,11 @@ $_SESSION is not empty
 write
 destroy
 close
-$_SESSION is not empty
+$_SESSION is empty
 Array
 (
     [0] => Content-Type: text/plain; charset=utf-8
     [1] => Cache-Control: max-age=0, private, must-revalidate
+    [2] => Set-Cookie: sid=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; secure; HttpOnly
 )
 shutdown

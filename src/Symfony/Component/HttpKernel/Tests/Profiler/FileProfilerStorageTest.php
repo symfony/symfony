@@ -20,7 +20,7 @@ class FileProfilerStorageTest extends TestCase
     private $tmpDir;
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/sf_profiler_file_storage';
         if (is_dir($this->tmpDir)) {
@@ -30,7 +30,7 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         self::cleanDir();
     }
@@ -52,10 +52,14 @@ class FileProfilerStorageTest extends TestCase
         $parentProfile = new Profile('token_parent');
         $parentProfile->setIp('127.0.0.1');
         $parentProfile->setUrl('http://foo.bar/parent');
+        $parentProfile->setStatusCode(200);
+        $parentProfile->setMethod('GET');
 
         $childProfile = new Profile('token_child');
         $childProfile->setIp('127.0.0.1');
         $childProfile->setUrl('http://foo.bar/child');
+        $childProfile->setStatusCode(200);
+        $childProfile->setMethod('GET');
 
         $parentProfile->addChild($childProfile);
 
@@ -82,21 +86,37 @@ class FileProfilerStorageTest extends TestCase
         // supposed to contain them)
         $profile = new Profile('simple_quote');
         $profile->setUrl('http://foo.bar/\'');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('simple_quote'), '->write() accepts single quotes in URL');
 
         $profile = new Profile('double_quote');
         $profile->setUrl('http://foo.bar/"');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('double_quote'), '->write() accepts double quotes in URL');
 
         $profile = new Profile('backslash');
         $profile->setUrl('http://foo.bar/\\');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('backslash'), '->write() accepts backslash in URL');
 
         $profile = new Profile('comma');
         $profile->setUrl('http://foo.bar/,');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('comma'), '->write() accepts comma in URL');
     }
@@ -105,6 +125,9 @@ class FileProfilerStorageTest extends TestCase
     {
         $profile = new Profile('token');
         $profile->setUrl('http://example.com/');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->assertTrue($this->storage->write($profile), '->write() returns true when the token is unique');
 
@@ -245,6 +268,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setIp('127.0.0.1');
         $profile->setUrl('http://example.com/');
         $profile->setMethod('GET');
+        $profile->setStatusCode(200);
         $this->storage->write($profile);
 
         $this->assertNotFalse($this->storage->read('token1'));
@@ -254,6 +278,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setIp('127.0.0.1');
         $profile->setUrl('http://example.net/');
         $profile->setMethod('GET');
+        $profile->setStatusCode(200);
         $this->storage->write($profile);
 
         $this->assertNotFalse($this->storage->read('token2'));

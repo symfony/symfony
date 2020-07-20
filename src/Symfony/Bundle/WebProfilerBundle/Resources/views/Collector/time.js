@@ -2,6 +2,7 @@
 
 class TimelineEngine {
     /**
+     * @param  {Theme} theme
      * @param  {Renderer} renderer
      * @param  {Legend} legend
      * @param  {Element} threshold
@@ -9,7 +10,8 @@ class TimelineEngine {
      * @param  {Number} eventHeight
      * @param  {Number} horizontalMargin
      */
-    constructor(renderer, legend, threshold, request, eventHeight = 36, horizontalMargin = 10) {
+    constructor(theme, renderer, legend, threshold, request, eventHeight = 36, horizontalMargin = 10) {
+        this.theme = theme;
         this.renderer = renderer;
         this.legend = legend;
         this.threshold = threshold;
@@ -81,7 +83,7 @@ class TimelineEngine {
         const lines = periods.map(period => this.createPeriod(period, category));
         const label = this.createLabel(this.getShortName(name), duration, memory, periods[0]);
         const title = this.renderer.createTitle(name);
-        const group = this.renderer.group([title, border, label].concat(lines), this.legend.getClassname(event.category));
+        const group = this.renderer.group([title, border, label].concat(lines), this.theme.getCategoryColor(event.category));
 
         event.elements = Object.assign(event.elements || {}, { group, label, border });
 
@@ -92,7 +94,7 @@ class TimelineEngine {
 
     createLabel(name, duration, memory, period) {
         const label = this.renderer.createText(name, period.start * this.scale, this.labelY, 'timeline-label');
-        const sublabel = this.renderer.createTspan(`  ${duration} ms / ${memory} Mb`, 'timeline-sublabel');
+        const sublabel = this.renderer.createTspan(`  ${duration} ms / ${memory} MiB`, 'timeline-sublabel');
 
         label.appendChild(sublabel);
 
@@ -100,7 +102,7 @@ class TimelineEngine {
     }
 
     createPeriod(period, category) {
-        const timeline = this.renderer.createPath(null, 'timeline-period');
+        const timeline = this.renderer.createPath(null, 'timeline-period', this.theme.getCategoryColor(category));
 
         period.draw = category === 'section' ? this.renderer.setSectionLine : this.renderer.setPeriodLine;
         period.elements = Object.assign(period.elements || {}, { timeline });
@@ -213,14 +215,15 @@ class TimelineEngine {
 }
 
 class Legend {
-    constructor(element, classnames) {
+    constructor(element, theme) {
         this.element = element;
-        this.classnames = classnames;
+        this.theme = theme;
 
         this.toggle = this.toggle.bind(this);
         this.createCategory = this.createCategory.bind(this);
 
-        this.categories = Array.from(Object.keys(classnames)).map(this.createCategory);
+        this.categories = [];
+        this.theme.getDefaultCategories().forEach(this.createCategory);
     }
 
     add(category) {
@@ -229,14 +232,16 @@ class Legend {
 
     createCategory(category) {
         const element = document.createElement('button');
-
-        element.className = `timeline-category ${this.getClassname(category)} active`;
+        element.className = `timeline-category active`;
+        element.style.borderColor = this.theme.getCategoryColor(category);
         element.innerText = category;
         element.value = category;
         element.type = 'button';
         element.addEventListener('click', this.toggle);
 
         this.element.appendChild(element);
+
+        this.categories.push(element);
 
         return element;
     }
@@ -253,23 +258,6 @@ class Legend {
 
     get(category) {
         return this.categories.find(element => element.value === category) || this.createCategory(category);
-    }
-
-    getClassname(category) {
-        return this.classnames[category] || '';
-    }
-
-    getSectionClassname() {
-        return this.classnames.section;
-    }
-
-    getDefaultClassname() {
-        return this.classnames.default;
-    }
-
-    getStandardClassenames() {
-        return Array.from(Object.values(this.classnames))
-            .filter(className => className !== this.getSectionClassname());
     }
 
     emit(name) {
@@ -390,11 +378,15 @@ class SvgRenderer {
         return element;
     }
 
-    createPath(path = null, className = null) {
+    createPath(path = null, className = null, color = null) {
         const element = this.create('path', className);
 
         if (path) {
             element.setAttribute('d', path);
+        }
+
+        if (color) {
+            element.setAttribute('fill', color);
         }
 
         return element;
@@ -408,5 +400,57 @@ class SvgRenderer {
         }
 
         return element;
+    }
+}
+
+class Theme {
+    constructor(element) {
+        this.reservedCategoryColors = {
+            'default': '#777',
+            'section': '#999',
+            'event_listener': '#00b8f5',
+            'template': '#66cc00',
+            'doctrine': '#ff6633',
+            'messenger_middleware': '#bdb81e',
+            'controller.argument_value_resolver': '#8c5de6',
+        };
+
+        this.customCategoryColors = [
+            '#dbab09', // dark yellow
+            '#ea4aaa', // pink
+            '#964b00', // brown
+            '#22863a', // dark green
+            '#0366d6', // dark blue
+            '#17a2b8', // teal
+        ];
+
+        this.getCategoryColor = this.getCategoryColor.bind(this);
+        this.getDefaultCategories = this.getDefaultCategories.bind(this);
+    }
+
+    getDefaultCategories() {
+        return Object.keys(this.reservedCategoryColors);
+    }
+
+    getCategoryColor(category) {
+        return this.reservedCategoryColors[category] || this.getRandomColor(category);
+    }
+
+    getRandomColor(category) {
+        // instead of pure randomness, colors are assigned deterministically based on the
+        // category name, to ensure that each custom category always displays the same color
+        return this.customCategoryColors[this.hash(category) % this.customCategoryColors.length];
+    }
+
+    // copied from https://github.com/darkskyapp/string-hash
+    hash(string) {
+        var hash = 5381;
+        var i = string.length;
+
+        while(i) {
+            hash = (hash * 33) ^ string.charCodeAt(--i);
+        }
+
+        return hash >>> 0;
     }
 }

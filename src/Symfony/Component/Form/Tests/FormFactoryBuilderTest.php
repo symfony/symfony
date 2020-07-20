@@ -21,7 +21,7 @@ class FormFactoryBuilderTest extends TestCase
     private $guesser;
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
         $this->registry = $factory->getProperty('registry');

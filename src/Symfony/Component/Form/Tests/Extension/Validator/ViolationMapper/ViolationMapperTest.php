@@ -61,7 +61,7 @@ class ViolationMapperTest extends TestCase
      */
     private $params;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->mapper = new ViolationMapper();
@@ -93,18 +93,13 @@ class ViolationMapperTest extends TestCase
 
     /**
      * @param $propertyPath
-     *
-     * @return ConstraintViolation
      */
-    protected function getConstraintViolation($propertyPath)
+    protected function getConstraintViolation($propertyPath): ConstraintViolation
     {
         return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
     }
 
-    /**
-     * @return FormError
-     */
-    protected function getFormError(ConstraintViolationInterface $violation, FormInterface $form)
+    protected function getFormError(ConstraintViolationInterface $violation, FormInterface $form): FormError
     {
         $error = new FormError($this->message, $this->messageTemplate, $this->params, null, $violation);
         $error->setOrigin($form);

@@ -53,12 +53,10 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports($request, $argument));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?
-     */
     public function testController()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
@@ -66,12 +64,10 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?
-     */
     public function testControllerWithATrailingBackSlash()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
@@ -79,12 +75,10 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?
-     */
     public function testControllerWithMethodNameStartUppercase()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
@@ -92,12 +86,10 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?
-     */
     public function testControllerNameIsAnArray()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);

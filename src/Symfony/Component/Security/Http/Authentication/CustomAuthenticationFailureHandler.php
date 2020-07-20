@@ -22,8 +22,7 @@ class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler
     private $handler;
 
     /**
-     * @param AuthenticationFailureHandlerInterface $handler An AuthenticationFailureHandlerInterface instance
-     * @param array                                 $options Options for processing a successful authentication attempt
+     * @param array $options Options for processing a successful authentication attempt
      */
     public function __construct(AuthenticationFailureHandlerInterface $handler, array $options)
     {

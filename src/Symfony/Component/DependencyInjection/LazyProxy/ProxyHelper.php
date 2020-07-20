@@ -21,7 +21,7 @@ class ProxyHelper
     /**
      * @return string|null The FQCN or builtin name of the type hint, or null when the type hint references an invalid self|parent context
      */
-    public static function getTypeHint(\ReflectionFunctionAbstract $r, \ReflectionParameter $p = null, bool $noBuiltin = false)
+    public static function getTypeHint(\ReflectionFunctionAbstract $r, \ReflectionParameter $p = null, bool $noBuiltin = false): ?string
     {
         if ($p instanceof \ReflectionParameter) {
             $type = $p->getType();
@@ -29,29 +29,38 @@ class ProxyHelper
             $type = $r->getReturnType();
         }
         if (!$type) {
-            return;
+            return null;
         }
-        if (!\is_string($type)) {
-            $name = $type->getName();
+
+        $types = [];
+
+        foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $type) {
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
             if ($type->isBuiltin()) {
-                return $noBuiltin ? null : $name;
+                if (!$noBuiltin) {
+                    $types[] = $name;
+                }
+                continue;
+            }
+
+            $lcName = strtolower($name);
+            $prefix = $noBuiltin ? '' : '\\';
+
+            if ('self' !== $lcName && 'parent' !== $lcName) {
+                $types[] = '' !== $prefix ? $prefix.$name : $name;
+                continue;
+            }
+            if (!$r instanceof \ReflectionMethod) {
+                continue;
+            }
+            if ('self' === $lcName) {
+                $types[] = $prefix.$r->getDeclaringClass()->name;
+            } else {
+                $types[] = ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix.$parent->name : null;
             }
         }
-        $lcName = strtolower($name);
-        $prefix = $noBuiltin ? '' : '\\';
 
-        if ('self' !== $lcName && 'parent' !== $lcName) {
-            return $prefix.$name;
-        }
-        if (!$r instanceof \ReflectionMethod) {
-            return;
-        }
-        if ('self' === $lcName) {
-            return $prefix.$r->getDeclaringClass()->name;
-        }
-        if ($parent = $r->getDeclaringClass()->getParentClass()) {
-            return $prefix.$parent->name;
-        }
+        return $types ? implode('|', $types) : null;
     }
 }

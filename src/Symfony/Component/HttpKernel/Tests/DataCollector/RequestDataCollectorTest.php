@@ -17,8 +17,11 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -99,7 +102,7 @@ class RequestDataCollectorTest extends TestCase
                 '"Regular" callable',
                 [$this, 'testControllerInspection'],
                 [
-                    'class' => __NAMESPACE__.'\RequestDataCollectorTest',
+                    'class' => self::class,
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
                     'line' => $r1->getStartLine(),
@@ -248,6 +251,86 @@ class RequestDataCollectorTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
+    public function testItCollectsTheSessionTraceProperly()
+    {
+        $collector = new RequestDataCollector();
+        $request = $this->createRequest();
+
+        // RequestDataCollectorTest doesn't implement SessionInterface or SessionBagInterface, therefore should do nothing.
+        $collector->collectSessionUsage();
+
+        $collector->collect($request, $this->createResponse());
+        $this->assertSame([], $collector->getSessionUsages());
+
+        $collector->reset();
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
+            $collector->collectSessionUsage();
+        });
+        $session->getMetadataBag();
+
+        $collector->collect($request, $this->createResponse());
+        $collector->lateCollect();
+
+        $usages = $collector->getSessionUsages();
+
+        $this->assertCount(1, $usages);
+        $this->assertSame(__FILE__, $usages[0]['file']);
+        $this->assertSame(__LINE__ - 9, $line = $usages[0]['line']);
+
+        $trace = $usages[0]['trace'];
+        $this->assertSame('getMetadataBag', $trace[0]['function']);
+        $this->assertSame(self::class, $class = $trace[1]['class']);
+
+        $this->assertSame(sprintf('%s:%s', $class, $line), $usages[0]['name']);
+    }
+
+    public function testStatelessCheck()
+    {
+        $requestStack = new RequestStack();
+        $request = $this->createRequest();
+        $requestStack->push($request);
+
+        $collector = new RequestDataCollector($requestStack);
+        $collector->collect($request, $response = $this->createResponse());
+        $collector->lateCollect();
+
+        $this->assertFalse($collector->getStatelessCheck());
+
+        $requestStack = new RequestStack();
+        $request = $this->createRequest();
+        $request->attributes->set('_stateless', true);
+        $requestStack->push($request);
+
+        $collector = new RequestDataCollector($requestStack);
+        $collector->collect($request, $response = $this->createResponse());
+        $collector->lateCollect();
+
+        $this->assertTrue($collector->getStatelessCheck());
+    }
+
+    public function testItHidesPassword()
+    {
+        $c = new RequestDataCollector();
+
+        $request = Request::create(
+            'http://test.com/login',
+            'POST',
+            ['_password' => ' _password@123'],
+            [],
+            [],
+            [],
+            '_password=%20_password%40123'
+        );
+
+        $c->collect($request, $this->createResponse());
+        $c->lateCollect();
+
+        $this->assertEquals('******', $c->getRequestRequest()->get('_password'));
+        $this->assertEquals('_password=******', $c->getContent());
+    }
+
     protected function createRequest($routeParams = ['name' => 'foo'])
     {
         $request = Request::create('http://test.com/foo?bar=baz');
@@ -305,7 +388,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
         throw new \LogicException('Unexpected method call');
     }
@@ -313,7 +396,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string $method, array $args)
     {
         throw new \LogicException('Unexpected method call');
     }

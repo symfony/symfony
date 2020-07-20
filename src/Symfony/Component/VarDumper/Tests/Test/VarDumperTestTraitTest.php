@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class VarDumperTestTraitTest extends TestCase
@@ -42,5 +44,35 @@ EODUMP;
     public function testAllowsNonScalarExpectation()
     {
         $this->assertDumpEquals(new \ArrayObject(['bim' => 'bam']), new \ArrayObject(['bim' => 'bam']));
+    }
+
+    public function testItCanBeConfigured()
+    {
+        $this->setUpVarDumper($casters = [
+            \DateTimeInterface::class => static function (\DateTimeInterface $date, array $a, Stub $stub): array {
+                $stub->class = 'DateTime';
+
+                return ['date' => $date->format('d/m/Y')];
+            },
+        ], CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
+
+        $this->assertSame(CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR, $this->varDumperConfig['flags']);
+        $this->assertSame($casters, $this->varDumperConfig['casters']);
+
+        $this->assertDumpEquals(<<<DUMP
+[
+  1,
+  2,
+  DateTime {
+    +date: "09/07/2019"
+  }
+]
+DUMP
+        , [1, 2, new \DateTime('2019-07-09T0:00:00+00:00')]);
+
+        $this->tearDownVarDumper();
+
+        $this->assertNull($this->varDumperConfig['flags']);
+        $this->assertSame([], $this->varDumperConfig['casters']);
     }
 }

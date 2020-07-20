@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
+    /**
+     * @group legacy
+     */
     public function testCreate()
     {
         $response = Response::create('foo', 301, ['Foo' => 'bar']);
@@ -370,6 +373,12 @@ class ResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Expires'), '->expire() removes the Expires header when the response is fresh');
     }
 
+    public function testNullExpireHeader()
+    {
+        $response = new Response(null, 200, ['Expires' => null]);
+        $this->assertNull($response->getExpires());
+    }
+
     public function testGetTtl()
     {
         $response = new Response();
@@ -455,18 +464,10 @@ class ResponseTest extends ResponseTestCase
 
     public function testDefaultContentType()
     {
-        $headerMock = $this->getMockBuilder('Symfony\Component\HttpFoundation\ResponseHeaderBag')->setMethods(['set'])->getMock();
-        $headerMock->expects($this->at(0))
-            ->method('set')
-            ->with('Content-Type', 'text/html');
-        $headerMock->expects($this->at(1))
-            ->method('set')
-            ->with('Content-Type', 'text/html; charset=UTF-8');
-
         $response = new Response('foo');
-        $response->headers = $headerMock;
-
         $response->prepare(new Request());
+
+        $this->assertSame('text/html; charset=UTF-8', $response->headers->get('Content-Type'));
     }
 
     public function testContentTypeCharset()
@@ -499,12 +500,25 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('content-type'));
     }
 
+    /**
+     * Same URL cannot produce different Content-Type based on the value of the Accept header,
+     * unless explicitly stated in the response object.
+     */
+    public function testPrepareDoesNotSetContentTypeBasedOnRequestAcceptHeader()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'application/json');
+        $response->prepare($request);
+
+        $this->assertSame('text/html; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
     public function testPrepareSetContentType()
     {
         $response = new Response('foo');
         $request = Request::create('/');
         $request->setRequestFormat('json');
-        $request->headers->remove('accept');
 
         $response->prepare($request);
 
@@ -533,7 +547,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode(101);
         $response->prepare($request);
         $this->assertEquals('', $response->getContent());
-        $this->assertFalse($response->headers->has('Content-Type'));
         $this->assertFalse($response->headers->has('Content-Type'));
 
         $response->setContent('content');
@@ -602,7 +615,7 @@ class ResponseTest extends ResponseTestCase
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
-            $this->assertContains('"wrong option"', $e->getMessage());
+            $this->assertStringContainsString('"wrong option"', $e->getMessage());
         }
 
         $options = ['etag' => '"whatever"'];
@@ -646,6 +659,25 @@ class ResponseTest extends ResponseTestCase
 
         $response->setCache(['immutable' => false]);
         $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
+
+        $directives = ['proxy_revalidate', 'must_revalidate', 'no_cache', 'no_store', 'no_transform'];
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => true]);
+
+            $this->assertTrue($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => false]);
+
+            $this->assertFalse($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        $response = new DefaultResponse();
+
+        $options = ['etag' => '"whatever"'];
+        $response->setCache($options);
+        $this->assertSame($response->getEtag(), '"whatever"');
     }
 
     public function testSendContent()
@@ -655,7 +687,7 @@ class ResponseTest extends ResponseTestCase
         ob_start();
         $response->sendContent();
         $string = ob_get_clean();
-        $this->assertContains('test response rendering', $string);
+        $this->assertStringContainsString('test response rendering', $string);
     }
 
     public function testSetPublic()
@@ -901,16 +933,6 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals((string) $content, $response->getContent());
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @dataProvider invalidContentProvider
-     */
-    public function testSetContentInvalid($content)
-    {
-        $response = new Response();
-        $response->setContent($content);
-    }
-
     public function testSettersAreChainable()
     {
         $response = new Response();
@@ -952,15 +974,6 @@ class ResponseTest extends ResponseTestCase
         ];
     }
 
-    public function invalidContentProvider()
-    {
-        return [
-            'obj' => [new \stdClass()],
-            'array' => [[]],
-            'bool' => [true, '1'],
-        ];
-    }
-
     protected function createDateTimeOneHourAgo()
     {
         return $this->createDateTimeNow()->sub(new \DateInterval('PT1H'));
@@ -991,11 +1004,11 @@ class ResponseTest extends ResponseTestCase
     }
 
     /**
-     * @see       http://github.com/zendframework/zend-diactoros for the canonical source repository
+     * @see http://github.com/zendframework/zend-diactoros for the canonical source repository
      *
-     * @author    Fábio Pacheco
+     * @author Fábio Pacheco
      * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
-     * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
+     * @license https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
      */
     public function ianaCodesReasonPhrasesProvider()
     {
@@ -1051,11 +1064,29 @@ class ResponseTest extends ResponseTestCase
     {
         $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
     }
+
+    public function testSetContentSafe()
+    {
+        $response = new Response();
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertFalse($response->headers->has('Vary'));
+
+        $response->setContentSafe();
+
+        $this->assertSame('safe', $response->headers->get('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
+
+        $response->setContentSafe(false);
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
+    }
 }
 
 class StringableObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'Foo';
     }

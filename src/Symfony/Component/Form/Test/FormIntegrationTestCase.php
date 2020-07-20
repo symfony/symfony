@@ -20,14 +20,12 @@ use Symfony\Component\Form\Forms;
  */
 abstract class FormIntegrationTestCase extends TestCase
 {
-    use TestCaseSetUpTearDownTrait;
-
     /**
      * @var FormFactoryInterface
      */
     protected $factory;
 
-    private function doSetUp()
+    protected function setUp(): void
     {
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())

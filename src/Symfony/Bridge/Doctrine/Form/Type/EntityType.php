@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\Options;
@@ -46,14 +46,16 @@ class EntityType extends DoctrineType
     /**
      * Return the default loader object.
      *
-     * @param ObjectManager $manager
-     * @param QueryBuilder  $queryBuilder
-     * @param string        $class
+     * @param QueryBuilder $queryBuilder
      *
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
+    public function getLoader(ObjectManager $manager, $queryBuilder, string $class)
     {
+        if (!$queryBuilder instanceof QueryBuilder) {
+            throw new \TypeError(sprintf('Expected an instance of "%s", but got "%s".', QueryBuilder::class, get_debug_type($queryBuilder)));
+        }
+
         return new ORMQueryBuilderLoader($queryBuilder);
     }
 
@@ -71,13 +73,15 @@ class EntityType extends DoctrineType
      *
      * @param QueryBuilder $queryBuilder
      *
-     * @return array
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
     {
+        if (!$queryBuilder instanceof QueryBuilder) {
+            throw new \TypeError(sprintf('Expected an instance of "%s", but got "%s".', QueryBuilder::class, get_debug_type($queryBuilder)));
+        }
+
         return [
             $queryBuilder->getQuery()->getSQL(),
             array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),
@@ -86,11 +90,11 @@ class EntityType extends DoctrineType
 
     /**
      * Converts a query parameter to an array.
-     *
-     * @return array The array representation of the parameter
      */
-    private function parameterToArray(Parameter $parameter)
+    private function parameterToArray(Parameter $parameter): array
     {
         return [$parameter->getName(), $parameter->getType(), $parameter->getValue()];
     }
 }
+
+interface_exists(ObjectManager::class);

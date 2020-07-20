@@ -54,7 +54,10 @@ class VariableNodeDefinition extends NodeDefinition
         $node->addEquivalentValue(true, $this->trueEquivalent);
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setRequired($this->required);
-        $node->setDeprecated($this->deprecationMessage);
+
+        if ($this->deprecation) {
+            $node->setDeprecated($this->deprecation['package'], $this->deprecation['version'], $this->deprecation['message']);
+        }
 
         if (null !== $this->validation) {
             $node->setFinalValidationClosures($this->validation->rules);

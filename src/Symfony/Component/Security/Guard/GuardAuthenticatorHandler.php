@@ -51,8 +51,6 @@ class GuardAuthenticatorHandler
 
     /**
      * Authenticates the given token in the system.
-     *
-     * @param string $providerKey The name of the provider/firewall being used for authentication
      */
     public function authenticateWithToken(TokenInterface $token, Request $request, string $providerKey = null)
     {
@@ -77,7 +75,7 @@ class GuardAuthenticatorHandler
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object. You returned %s.', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationSuccess()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), get_debug_type($response)));
     }
 
     /**
@@ -107,7 +105,7 @@ class GuardAuthenticatorHandler
             return $response;
         }
 
-        throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null or a Response object. You returned %s.', \get_class($guardAuthenticator), \is_object($response) ? \get_class($response) : \gettype($response)));
+        throw new \UnexpectedValueException(sprintf('The "%s::onAuthenticationFailure()" method must return null or a Response object. You returned "%s".', \get_class($guardAuthenticator), get_debug_type($response)));
     }
 
     /**
@@ -120,9 +118,9 @@ class GuardAuthenticatorHandler
         $this->sessionStrategy = $sessionStrategy;
     }
 
-    private function migrateSession(Request $request, TokenInterface $token, $providerKey)
+    private function migrateSession(Request $request, TokenInterface $token, ?string $providerKey)
     {
-        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession() || \in_array($providerKey, $this->statelessProviderKeys, true)) {
+        if (\in_array($providerKey, $this->statelessProviderKeys, true) || !$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
 

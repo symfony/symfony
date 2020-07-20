@@ -24,12 +24,12 @@ class ConsoleSectionOutputTest extends TestCase
 {
     private $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'r+b', false);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->stream = null;
     }
@@ -118,8 +118,8 @@ class ConsoleSectionOutputTest extends TestCase
     public function testAddingMultipleSections()
     {
         $sections = [];
-        $output1 = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
-        $output2 = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
 
         $this->assertCount(2, $sections);
     }

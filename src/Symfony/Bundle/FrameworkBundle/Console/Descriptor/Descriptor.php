@@ -64,6 +64,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ContainerBuilder && isset($options['parameter']):
                 $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options);
                 break;
+            case $object instanceof ContainerBuilder && isset($options['deprecations']):
+                $this->describeContainerDeprecations($object, $options);
+                break;
             case $object instanceof ContainerBuilder:
                 $this->describeContainerServices($object, $options);
                 break;
@@ -80,49 +83,26 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeCallable($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
     }
 
-    /**
-     * Returns the output.
-     *
-     * @return OutputInterface The output
-     */
-    protected function getOutput()
+    protected function getOutput(): OutputInterface
     {
         return $this->output;
     }
 
-    /**
-     * Writes content to output.
-     *
-     * @param string $content
-     * @param bool   $decorated
-     */
-    protected function write($content, $decorated = false)
+    protected function write(string $content, bool $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
 
-    /**
-     * Describes an InputArgument instance.
-     */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = []);
 
-    /**
-     * Describes an InputOption instance.
-     */
     abstract protected function describeRoute(Route $route, array $options = []);
 
-    /**
-     * Describes container parameters.
-     */
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = []);
 
-    /**
-     * Describes container tags.
-     */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = []);
 
     /**
@@ -132,8 +112,6 @@ abstract class Descriptor implements DescriptorInterface
      * * name: name of described service
      *
      * @param Definition|Alias|object $service
-     * @param array                   $options
-     * @param ContainerBuilder|null   $builder
      */
     abstract protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null);
 
@@ -145,24 +123,14 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = []);
 
-    /**
-     * Describes a service definition.
-     */
+    abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void;
+
     abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
 
-    /**
-     * Describes a service alias.
-     */
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
-    /**
-     * Describes a container parameter.
-     */
     abstract protected function describeContainerParameter($parameter, array $options = []);
 
-    /**
-     * Describes container environment variables.
-     */
     abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
     /**
@@ -176,8 +144,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a callable.
      *
-     * @param callable $callable
-     * @param array    $options
+     * @param mixed $callable
      */
     abstract protected function describeCallable($callable, array $options = []);
 
@@ -185,10 +152,8 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a value as string.
      *
      * @param mixed $value
-     *
-     * @return string
      */
-    protected function formatValue($value)
+    protected function formatValue($value): string
     {
         if (\is_object($value)) {
             return sprintf('object(%s)', \get_class($value));
@@ -205,10 +170,8 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a parameter.
      *
      * @param mixed $value
-     *
-     * @return string
      */
-    protected function formatParameter($value)
+    protected function formatParameter($value): string
     {
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
@@ -224,12 +187,9 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param string           $serviceId
-     *
      * @return mixed
      */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);
@@ -248,13 +208,7 @@ abstract class Descriptor implements DescriptorInterface
         return $builder->get($serviceId);
     }
 
-    /**
-     * @param ContainerBuilder $builder
-     * @param bool             $showHidden
-     *
-     * @return array
-     */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden)
+    protected function findDefinitionsByTag(ContainerBuilder $builder, bool $showHidden): array
     {
         $definitions = [];
         $tags = $builder->findTags();
@@ -294,9 +248,44 @@ abstract class Descriptor implements DescriptorInterface
         return $serviceIds;
     }
 
-    /**
-     * Gets class description from a docblock.
-     */
+    protected function sortTaggedServicesByPriority(array $services): array
+    {
+        $maxPriority = [];
+        foreach ($services as $service => $tags) {
+            $maxPriority[$service] = 0;
+            foreach ($tags as $tag) {
+                $currentPriority = $tag['priority'] ?? 0;
+                if ($maxPriority[$service] < $currentPriority) {
+                    $maxPriority[$service] = $currentPriority;
+                }
+            }
+        }
+        uasort($maxPriority, function ($a, $b) {
+            return $b <=> $a;
+        });
+
+        return array_keys($maxPriority);
+    }
+
+    protected function sortTagsByPriority(array $tags): array
+    {
+        $sortedTags = [];
+        foreach ($tags as $tagName => $tag) {
+            $sortedTags[$tagName] = $this->sortByPriority($tag);
+        }
+
+        return $sortedTags;
+    }
+
+    protected function sortByPriority(array $tag): array
+    {
+        usort($tag, function ($a, $b) {
+            return ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0);
+        });
+
+        return $tag;
+    }
+
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
         $resolvedClass = $class;

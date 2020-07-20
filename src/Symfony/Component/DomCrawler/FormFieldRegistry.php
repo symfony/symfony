@@ -55,7 +55,7 @@ class FormFieldRegistry
         $target = &$this->fields;
         while (\count($segments) > 1) {
             $path = array_shift($segments);
-            if (!\array_key_exists($path, $target)) {
+            if (!\is_array($target) || !\array_key_exists($path, $target)) {
                 return;
             }
             $target = &$target[$path];
@@ -66,7 +66,7 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualifed name and its children.
      *
-     * @return mixed The value of the field
+     * @return FormField|FormField[]|FormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
@@ -76,8 +76,8 @@ class FormFieldRegistry
         $target = &$this->fields;
         while ($segments) {
             $path = array_shift($segments);
-            if (!\array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+            if (!\is_array($target) || !\array_key_exists($path, $target)) {
+                throw new \InvalidArgumentException(sprintf('Unreachable field "%s".', $path));
             }
             $target = &$target[$path];
         }
@@ -90,7 +90,7 @@ class FormFieldRegistry
      *
      * @return bool Whether the form has the given field
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         try {
             $this->get($name);
@@ -114,8 +114,10 @@ class FormFieldRegistry
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
-            $fields = self::create($name, $value);
-            foreach ($fields->all() as $k => $v) {
+            $registry = new static();
+            $registry->base = $name;
+            $registry->fields = $value;
+            foreach ($registry->all() as $k => $v) {
                 $this->set($k, $v);
             }
         } else {
@@ -128,36 +130,15 @@ class FormFieldRegistry
      *
      * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    public function all()
+    public function all(): array
     {
         return $this->walk($this->fields, $this->base);
     }
 
     /**
-     * Creates an instance of the class.
-     *
-     * This function is made private because it allows overriding the $base and
-     * the $values properties without any type checking.
-     *
-     * @param array $values The values of the fields
-     *
-     * @return static
-     */
-    private static function create(string $base, array $values)
-    {
-        $registry = new static();
-        $registry->base = $base;
-        $registry->fields = $values;
-
-        return $registry;
-    }
-
-    /**
      * Transforms a PHP array in a list of fully qualified name / value.
-     *
-     * @return array The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    private function walk(array $array, string $base = '', array &$output = [])
+    private function walk(array $array, ?string $base = '', array &$output = []): array
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
@@ -178,7 +159,7 @@ class FormFieldRegistry
      *
      * @return string[] The list of segments
      */
-    private function getSegments(string $name)
+    private function getSegments(string $name): array
     {
         if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
             $segments = [$m['base']];

@@ -43,7 +43,7 @@ class ServerDumpPlaceholderCommand extends Command
         $this->setDescription($this->replacedCommand->getDescription());
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         (new SymfonyStyle($input, $output))->getErrorStyle()->warning('In order to use the VarDumper server, set the "debug.dump_destination" config option to "tcp://%env(VAR_DUMPER_SERVER)%"');
 

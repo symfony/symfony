@@ -25,12 +25,18 @@ use Symfony\Contracts\Service\ResetInterface;
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {
     private $token;
+    private $initializer;
 
     /**
      * {@inheritdoc}
      */
     public function getToken()
     {
+        if ($initializer = $this->initializer) {
+            $this->initializer = null;
+            $initializer();
+        }
+
         return $this->token;
     }
 
@@ -39,7 +45,18 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
      */
     public function setToken(TokenInterface $token = null)
     {
+        if ($token) {
+            // ensure any initializer is called
+            $this->getToken();
+        }
+
+        $this->initializer = null;
         $this->token = $token;
+    }
+
+    public function setInitializer(?callable $initializer): void
+    {
+        $this->initializer = $initializer;
     }
 
     public function reset()

@@ -68,6 +68,9 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function hasChildren()
     {
         return $this->isRecursive && $this->iterator->hasChildren();

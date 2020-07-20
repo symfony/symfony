@@ -48,13 +48,18 @@ class HeaderBagTest extends TestCase
         $this->assertInstanceOf('DateTime', $headerDate);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
+    public function testGetDateNull()
+    {
+        $bag = new HeaderBag(['foo' => null]);
+        $headerDate = $bag->getDate('foo');
+        $this->assertNull($headerDate);
+    }
+
     public function testGetDateException()
     {
+        $this->expectException('RuntimeException');
         $bag = new HeaderBag(['foo' => 'Tue']);
-        $headerDate = $bag->getDate('foo');
+        $bag->getDate('foo');
     }
 
     public function testGetCacheControlHeader()
@@ -88,16 +93,19 @@ class HeaderBagTest extends TestCase
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
         $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
         $this->assertEquals('bar', $bag->get('FoO'), '->get key in case insensitive');
-        $this->assertEquals(['bar'], $bag->get('foo', 'nope', false), '->get return the value as array');
+        $this->assertEquals(['bar'], $bag->all('foo'), '->get return the value as array');
 
         // defaults
         $this->assertNull($bag->get('none'), '->get unknown values returns null');
         $this->assertEquals('default', $bag->get('none', 'default'), '->get unknown values returns default');
-        $this->assertEquals(['default'], $bag->get('none', 'default', false), '->get unknown values returns default as array');
+        $this->assertEquals([], $bag->all('none'), '->get unknown values returns an empty array');
 
         $bag->set('foo', 'bor', false);
         $this->assertEquals('bar', $bag->get('foo'), '->get return first value');
-        $this->assertEquals(['bar', 'bor'], $bag->get('foo', 'nope', false), '->get return all values as array');
+        $this->assertEquals(['bar', 'bor'], $bag->all('foo'), '->get return all values as array');
+
+        $bag->set('baz', null);
+        $this->assertNull($bag->get('baz', 'nope'), '->get return null although different default value is given');
     }
 
     public function testSetAssociativeArray()
@@ -105,7 +113,7 @@ class HeaderBagTest extends TestCase
         $bag = new HeaderBag();
         $bag->set('foo', ['bad-assoc-index' => 'value']);
         $this->assertSame('value', $bag->get('foo'));
-        $this->assertEquals(['value'], $bag->get('foo', 'nope', false), 'assoc indices of multi-valued headers are ignored');
+        $this->assertSame(['value'], $bag->all('foo'), 'assoc indices of multi-valued headers are ignored');
     }
 
     public function testContains()

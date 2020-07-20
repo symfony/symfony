@@ -22,7 +22,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -50,15 +52,13 @@ class IntegrationTest extends TestCase
             ->setPublic(true)
         ;
 
-        $b = $container
+        $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
-            ->setPublic(false)
         ;
 
         $c = $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();
@@ -85,7 +85,6 @@ class IntegrationTest extends TestCase
 
         $c = $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();
@@ -112,12 +111,10 @@ class IntegrationTest extends TestCase
         $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
-            ->setPublic(false)
         ;
 
         $container
             ->register('c', '\stdClass')
-            ->setPublic(false)
         ;
 
         $container->compile();
@@ -140,6 +137,29 @@ class IntegrationTest extends TestCase
         $container->compile();
 
         $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+    }
+
+    public function testCanDecorateServiceLocator()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setPublic(true);
+
+        $container->register(ServiceLocator::class)
+            ->addTag('container.service_locator')
+            ->setArguments([[new Reference('foo')]])
+        ;
+
+        $container->register(DecoratedServiceLocator::class)
+            ->setDecoratedService(ServiceLocator::class)
+            ->setPublic(true)
+            ->setArguments([new Reference(DecoratedServiceLocator::class.'.inner')])
+        ;
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceLocator::class, $container->get(DecoratedServiceLocator::class));
+        $this->assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
     }
 
     /**
@@ -289,6 +309,56 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
+    public function testTaggedIteratorWithMultipleIndexAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar'])
+            ->addTag('foo_bar', ['foo' => 'bar_duplicate'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new TaggedIteratorArgument('foo_bar', 'foo'))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame(['bar' => $container->get(BarTagClass::class), 'bar_duplicate' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+    }
+
+    public function testTaggedServiceWithDefaultPriorityMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(FooBarTaggedForDefaultPriorityClass::class)
+            ->addArgument(new TaggedIteratorArgument('foo_bar', null, null, false, 'getPriority'))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedForDefaultPriorityClass::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame([$container->get(FooTagClass::class), $container->get(BarTagClass::class)], $param);
+    }
+
     public function testTaggedServiceLocatorWithIndexAttribute()
     {
         $container = new ContainerBuilder();
@@ -301,7 +371,7 @@ class IntegrationTest extends TestCase
             ->addTag('foo_bar')
         ;
         $container->register('foo_bar_tagged', FooBarTaggedClass::class)
-            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo')))
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', null, true)))
             ->setPublic(true)
         ;
 
@@ -311,13 +381,47 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar' => $serviceLocator->get('bar'),
             'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
         ];
         $this->assertSame(['bar' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
+    }
+
+    public function testTaggedServiceLocatorWithMultipleIndexAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar_tag', BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar'])
+            ->addTag('foo_bar', ['foo' => 'bar_duplicate'])
+        ;
+        $container->register('foo_tag', FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+            ->addTag('foo_bar')
+        ;
+        $container->register('foo_bar_tagged', FooBarTaggedClass::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', null, true)))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get('foo_bar_tagged');
+
+        /** @var ServiceLocator $serviceLocator */
+        $serviceLocator = $s->getParam();
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+
+        $same = [
+            'bar' => $serviceLocator->get('bar'),
+            'bar_duplicate' => $serviceLocator->get('bar_duplicate'),
+            'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
+        ];
+        $this->assertSame(['bar' => $container->get('bar_tag'), 'bar_duplicate' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
     public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
@@ -332,7 +436,7 @@ class IntegrationTest extends TestCase
             ->addTag('foo_bar', ['foo' => 'foo'])
         ;
         $container->register('foo_bar_tagged', FooBarTaggedClass::class)
-            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar')))
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar', true)))
             ->setPublic(true)
         ;
 
@@ -342,7 +446,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar_tab_class_with_defaultmethod' => $serviceLocator->get('bar_tab_class_with_defaultmethod'),
@@ -369,7 +473,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'bar_tag' => $container->get('bar_tag'),
@@ -395,7 +499,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'baz' => $container->get('bar_tag'),
@@ -406,7 +510,7 @@ class IntegrationTest extends TestCase
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [];
     }
@@ -414,6 +518,34 @@ class ServiceSubscriberStub implements ServiceSubscriberInterface
 
 class DecoratedServiceSubscriber
 {
+}
+
+class DecoratedServiceLocator implements ServiceProviderInterface
+{
+    /**
+     * @var ServiceLocator
+     */
+    private $locator;
+
+    public function __construct(ServiceLocator $locator)
+    {
+        $this->locator = $locator;
+    }
+
+    public function get($id)
+    {
+        return $this->locator->get($id);
+    }
+
+    public function has($id): bool
+    {
+        return $this->locator->has($id);
+    }
+
+    public function getProvidedServices(): array
+    {
+        return $this->locator->getProvidedServices();
+    }
 }
 
 class IntegrationTestStub extends IntegrationTestStubParent

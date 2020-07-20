@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Intl\Data\Bundle\Writer;
 
-use Symfony\Component\Intl\Exception\UnexpectedTypeException;
-
 /**
  * Writes .txt resource bundles.
  *
@@ -31,7 +29,7 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function write($path, $locale, $data, $fallback = true)
+    public function write(string $path, string $locale, $data, bool $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 
@@ -43,15 +41,12 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "resourceBundle" node.
      *
-     * @param resource $file       The file handle to write to
-     * @param string   $bundleName The name of the bundle
-     * @param mixed    $value      The value of the node
-     * @param bool     $fallback   Whether the resource bundle should be merged
-     *                             with the fallback locale
+     * @param resource $file  The file handle to write to
+     * @param mixed    $value The value of the node
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResourceBundle($file, $bundleName, $value, $fallback)
+    private function writeResourceBundle($file, string $bundleName, $value, bool $fallback)
     {
         fwrite($file, $bundleName);
 
@@ -63,14 +58,12 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "resource" node.
      *
-     * @param resource $file          The file handle to write to
-     * @param mixed    $value         The value of the node
-     * @param int      $indentation   The number of levels to indent
-     * @param bool     $requireBraces Whether to require braces to be printedaround the value
+     * @param resource $file  The file handle to write to
+     * @param mixed    $value The value of the node
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResource($file, $value, $indentation, $requireBraces = true)
+    private function writeResource($file, $value, int $indentation, bool $requireBraces = true)
     {
         if (\is_int($value)) {
             $this->writeInteger($file, $value);
@@ -117,12 +110,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes an "integer" node.
      *
-     * @param resource $file  The file handle to write to
-     * @param int      $value The value of the node
+     * @param resource $file The file handle to write to
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeInteger($file, $value)
+    private function writeInteger($file, int $value)
     {
         fprintf($file, ':int{%d}', $value);
     }
@@ -130,13 +122,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes an "intvector" node.
      *
-     * @param resource $file        The file handle to write to
-     * @param array    $value       The value of the node
-     * @param int      $indentation The number of levels to indent
+     * @param resource $file The file handle to write to
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeIntVector($file, array $value, $indentation)
+    private function writeIntVector($file, array $value, int $indentation)
     {
         fwrite($file, ":intvector{\n");
 
@@ -150,14 +140,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "string" node.
      *
-     * @param resource $file          The file handle to write to
-     * @param string   $value         The value of the node
-     * @param bool     $requireBraces Whether to require braces to be printed
-     *                                around the value
+     * @param resource $file The file handle to write to
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeString($file, $value, $requireBraces = true)
+    private function writeString($file, string $value, bool $requireBraces = true)
     {
         if ($requireBraces) {
             fprintf($file, '{"%s"}', $value);
@@ -171,13 +158,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes an "array" node.
      *
-     * @param resource $file        The file handle to write to
-     * @param array    $value       The value of the node
-     * @param int      $indentation The number of levels to indent
+     * @param resource $file The file handle to write to
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeArray($file, array $value, $indentation)
+    private function writeArray($file, array $value, int $indentation)
     {
         fwrite($file, "{\n");
 
@@ -195,21 +180,10 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "table" node.
      *
-     * @param resource $file        The file handle to write to
-     * @param iterable $value       The value of the node
-     * @param int      $indentation The number of levels to indent
-     * @param bool     $fallback    Whether the table should be merged
-     *                              with the fallback locale
-     *
-     * @throws UnexpectedTypeException when $value is not an array and not a
-     *                                 \Traversable instance
+     * @param resource $file The file handle to write to
      */
-    private function writeTable($file, $value, $indentation, $fallback = true)
+    private function writeTable($file, iterable $value, int $indentation, bool $fallback = true)
     {
-        if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array or \Traversable');
-        }
-
         if (!$fallback) {
             fwrite($file, ':table(nofallback)');
         }

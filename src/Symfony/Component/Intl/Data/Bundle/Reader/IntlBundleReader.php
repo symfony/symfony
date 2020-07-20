@@ -26,7 +26,7 @@ class IntlBundleReader implements BundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read($path, $locale)
+    public function read(string $path, string $locale)
     {
         // Point for future extension: Modify this class so that it works also
         // if the \ResourceBundle class is not available.

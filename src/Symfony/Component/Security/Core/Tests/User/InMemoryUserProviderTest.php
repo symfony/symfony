@@ -40,10 +40,7 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertFalse($refreshedUser->isCredentialsNonExpired());
     }
 
-    /**
-     * @return InMemoryUserProvider
-     */
-    protected function createProvider()
+    protected function createProvider(): InMemoryUserProvider
     {
         return new InMemoryUserProvider([
             'fabien' => [
@@ -63,21 +60,17 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertEquals('foo', $user->getPassword());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCreateUserAlreadyExist()
     {
+        $this->expectException('LogicException');
         $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
         $provider->createUser(new User('fabien', 'foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserByUsernameDoesNotExist()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');
     }

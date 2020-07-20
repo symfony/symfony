@@ -18,11 +18,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CheckReferenceValidityPassTest extends TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testProcessDetectsReferenceToAbstractDefinition()
     {
+        $this->expectException('RuntimeException');
         $container = new ContainerBuilder();
 
         $container->register('a')->setAbstract(true);

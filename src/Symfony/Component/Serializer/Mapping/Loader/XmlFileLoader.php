@@ -70,6 +70,10 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['serialized-name'])) {
                     $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
                 }
+
+                if (isset($attribute['ignore'])) {
+                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {
@@ -108,13 +112,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a XML File.
      *
-     * @param string $file Path of file
-     *
-     * @return \SimpleXMLElement
-     *
      * @throws MappingException
      */
-    private function parseFile($file)
+    private function parseFile(string $file): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($file, __DIR__.'/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd');
@@ -125,7 +125,7 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom);
     }
 
-    private function getClassesFromXml()
+    private function getClassesFromXml(): array
     {
         $xml = $this->parseFile($this->file);
         $classes = [];

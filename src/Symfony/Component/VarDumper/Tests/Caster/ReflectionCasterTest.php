@@ -49,8 +49,8 @@ ReflectionClass {
 %A]
   methods: array:%d [
 %A
-    "export" => ReflectionMethod {
-      +name: "export"
+    "__construct" => ReflectionMethod {
+      +name: "__construct"
       +class: "ReflectionClass"
 %A    parameters: {
         $%s: ReflectionParameter {
@@ -89,7 +89,7 @@ EOTXT
         }
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
-            (new \ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
+            (new \ReflectionMethod(__CLASS__, 'stub'))->getClosure(),
         ];
 
         $this->assertDumpMatchesFormat(
@@ -100,8 +100,9 @@ array:2 [
     file: "%sReflectionCasterTest.php"
     line: "%d to %d"
   }
-  1 => %sTestCase::tearDownAfterClass() {
-    file: "%sTestCase.php"
+  1 => Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest::stub(): void {
+    returnType: "void"
+    file: "%sReflectionCasterTest.php"
     line: "%d to %d"
   }
 ]
@@ -119,7 +120,7 @@ EOTXT
 
     public function testReflectionParameter()
     {
-        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
+        $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -183,12 +184,11 @@ EOTXT
 Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
-    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {
-      %sGeneratorDemo.php:14 {
-        › {
-        ›     yield from bar();
-        › }
-      }
+    %sGeneratorDemo.php:14 {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › {
+      ›     yield from bar();
+      › }
     }
   }
   closed: false
@@ -207,6 +207,7 @@ array:2 [
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
     trace: {
       %s%eTests%eFixtures%eGeneratorDemo.php:9 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         › {
         ›     yield 1;
         › }
@@ -218,12 +219,11 @@ array:2 [
   }
   1 => Generator {
     executing: {
-      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() {
-        %sGeneratorDemo.php:10 {
-          ›     yield 1;
-          › }
-          › 
-        }
+      %sGeneratorDemo.php:10 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        ›     yield 1;
+        › }
+        › 
       }
     }
     closed: false
@@ -243,6 +243,10 @@ Generator {
 }
 EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $generator);
+    }
+
+    public static function stub(): void
+    {
     }
 }
 

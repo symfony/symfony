@@ -29,34 +29,36 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $accessDecisionManager;
     private $authenticationManager;
     private $alwaysAuthenticate;
+    private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false, bool $exceptionOnNoToken = true)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->alwaysAuthenticate = $alwaysAuthenticate;
+        $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token
+     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
-    final public function isGranted($attributes, $subject = null): bool
+    final public function isGranted($attribute, $subject = null): bool
     {
         if (null === ($token = $this->tokenStorage->getToken())) {
-            throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
+            if ($this->exceptionOnNoToken) {
+                throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
+            }
+
+            return false;
         }
 
         if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
             $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
         }
 
-        if (!\is_array($attributes)) {
-            $attributes = [$attributes];
-        }
-
-        return $this->accessDecisionManager->decide($token, $attributes, $subject);
+        return $this->accessDecisionManager->decide($token, [$attribute], $subject);
     }
 }

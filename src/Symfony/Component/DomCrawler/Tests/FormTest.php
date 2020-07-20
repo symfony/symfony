@@ -12,12 +12,13 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\FormFieldRegistry;
 
 class FormTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         // Ensure that the private helper class FormFieldRegistry is loaded
         class_exists('Symfony\\Component\\DomCrawler\\Form');
@@ -39,14 +40,14 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('input');
 
         try {
-            $form = new Form($nodes->item(0), 'http://example.com');
+            new Form($nodes->item(0), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
         }
 
         try {
-            $form = new Form($nodes->item(1), 'http://example.com');
+            new Form($nodes->item(1), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
@@ -55,7 +56,7 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('button');
 
         try {
-            $form = new Form($nodes->item(0), 'http://example.com');
+            new Form($nodes->item(0), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
@@ -63,11 +64,18 @@ class FormTest extends TestCase
     }
 
     /**
-     * __construct() should throw \\LogicException if the form attribute is invalid.
+     * @dataProvider constructorThrowsExceptionIfNoRelatedFormProvider
      *
-     * @expectedException \LogicException
+     * __construct() should throw a \LogicException if the form attribute is invalid.
      */
-    public function testConstructorThrowsExceptionIfNoRelatedForm()
+    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
+    {
+        $this->expectException('LogicException');
+
+        new Form($node, 'http://example.com');
+    }
+
+    public function constructorThrowsExceptionIfNoRelatedFormProvider()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -82,8 +90,10 @@ class FormTest extends TestCase
 
         $nodes = $dom->getElementsByTagName('input');
 
-        $form = new Form($nodes->item(0), 'http://example.com');
-        $form = new Form($nodes->item(1), 'http://example.com');
+        return [
+            [$nodes->item(0)],
+            [$nodes->item(1)],
+        ];
     }
 
     public function testConstructorLoadsOnlyFieldsOfTheRightForm()
@@ -726,20 +736,16 @@ class FormTest extends TestCase
         $registry->remove('[t:dbt%3adate;]data_daterange_enddate_value');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
         $registry = new FormFieldRegistry();
         $registry->get('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
         $registry = new FormFieldRegistry();
         $registry->set('foo', null);
     }
@@ -816,24 +822,20 @@ class FormTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot set value on a compound field "foo[bar]".
-     */
     public function testFormRegistrySetValueOnCompoundField()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Cannot set value on a compound field "foo[bar]".');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[bar][baz]'));
 
         $registry->set('foo[bar]', 'fbb');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unreachable field "0"
-     */
     public function testFormRegistrySetArrayOnNotCompoundField()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Unreachable field "0"');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('bar'));
 
@@ -964,7 +966,7 @@ class FormTest extends TestCase
         return $dom;
     }
 
-    public function testgetPhpValuesWithEmptyTextarea()
+    public function testGetPhpValuesWithEmptyTextarea()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -978,5 +980,35 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertEquals($form->getPhpValues(), ['example' => '']);
+    }
+
+    public function testGetReturnTypes()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form>
+                    <textarea name="foo[collection][0][bar]">item 0</textarea>
+                </form>
+            </html>'
+        );
+
+        $nodes = $dom->getElementsByTagName('form');
+        $form = new Form($nodes->item(0), 'http://example.com');
+
+        // FormField
+        $this->assertInstanceOf(TextareaFormField::class, $textareaFormField = $form->get('foo[collection][0][bar]'));
+
+        // Array of FormField
+        $this->assertSame([
+            'bar' => $textareaFormField,
+        ], $form->get('foo[collection][0]'));
+
+        // Array of array of FormField
+        $this->assertSame([
+            [
+                'bar' => $textareaFormField,
+            ],
+        ], $form->get('foo[collection]'));
     }
 }

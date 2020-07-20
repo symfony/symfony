@@ -1,16 +1,36 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * polyfill new phpunit 9.1 assertions
+
+5.1.0
+-----
+
+ * ignore verbosity settings when the build fails because of deprecations
+ * added per-group verbosity
+ * added `ExpectDeprecationTrait` to be able to define an expected deprecation from inside a test
+ * deprecated the `@expectedDeprecation` annotation, use the `ExpectDeprecationTrait::expectDeprecation()` method instead
+
 5.0.0
 -----
 
  * removed `weak_vendor` mode, use `max[self]=0` instead
 
+4.4.0
+-----
+
+ * made the bridge act as a polyfill for newest PHPUnit features
+ * added `SetUpTearDownTrait` to allow working around the `void` return-type added by PHPUnit 8
+ * added namespace aliases for PHPUnit < 6
+
 4.3.0
 -----
 
  * added `ClassExistsMock`
- * bumped PHP version from 5.3.3 to 5.5.9 
+ * bumped PHP version from 5.3.3 to 5.5.9
  * split simple-phpunit bin into php file with code and a shell script
 
 4.1.0

@@ -18,7 +18,7 @@ class ConstraintC extends Constraint
 {
     public $option1;
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['option1'];
     }

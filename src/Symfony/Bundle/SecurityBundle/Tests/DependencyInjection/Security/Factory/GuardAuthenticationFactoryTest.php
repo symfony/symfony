@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 
 class GuardAuthenticationFactoryTest extends TestCase
 {
@@ -37,11 +38,11 @@ class GuardAuthenticationFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @dataProvider getInvalidConfigurationTests
      */
     public function testAddInvalidConfiguration(array $inputConfig)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $factory = new GuardAuthenticationFactory();
         $nodeDefinition = new ArrayNodeDefinition('guard');
         $factory->addConfiguration($nodeDefinition);
@@ -130,11 +131,9 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->assertEquals('some_default_entry_point', $entryPointId);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCannotOverrideDefaultEntryPoint()
     {
+        $this->expectException('LogicException');
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123'],
@@ -143,11 +142,9 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->executeCreate($config, 'some_default_entry_point');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testMultipleAuthenticatorsRequiresEntryPoint()
     {
+        $this->expectException('LogicException');
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123', 'authenticatorABC'],
@@ -163,8 +160,31 @@ class GuardAuthenticationFactoryTest extends TestCase
             'authenticators' => ['authenticator123', 'authenticatorABC'],
             'entry_point' => 'authenticatorABC',
         ];
-        list($container, $entryPointId) = $this->executeCreate($config, null);
+        list(, $entryPointId) = $this->executeCreate($config, null);
         $this->assertEquals('authenticatorABC', $entryPointId);
+    }
+
+    public function testAuthenticatorSystemCreate()
+    {
+        $container = new ContainerBuilder();
+        $firewallName = 'my_firewall';
+        $userProviderId = 'my_user_provider';
+        $config = [
+            'authenticators' => ['authenticator123'],
+            'entry_point' => null,
+        ];
+        $factory = new GuardAuthenticationFactory();
+
+        $authenticators = $factory->createAuthenticator($container, $firewallName, $config, $userProviderId);
+        $this->assertEquals('security.authenticator.guard.my_firewall.0', $authenticators[0]);
+
+        $entryPointId = $factory->registerEntryPoint($container, $firewallName, $config, null);
+        $this->assertEquals('authenticator123', $entryPointId);
+
+        $authenticatorDefinition = $container->getDefinition('security.authenticator.guard.my_firewall.0');
+        $this->assertEquals(GuardBridgeAuthenticator::class, $authenticatorDefinition->getClass());
+        $this->assertEquals('authenticator123', (string) $authenticatorDefinition->getArgument(0));
+        $this->assertEquals($userProviderId, (string) $authenticatorDefinition->getArgument(1));
     }
 
     private function executeCreate(array $config, $defaultEntryPointId)
@@ -176,7 +196,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $userProviderId = 'my_user_provider';
 
         $factory = new GuardAuthenticationFactory();
-        list($providerId, $listenerId, $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
+        list(, , $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 
         return [$container, $entryPointId];
     }

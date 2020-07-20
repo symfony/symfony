@@ -5,10 +5,10 @@ require_once __DIR__.'/../includes/foo.php';
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 $container = new ContainerBuilder();
@@ -16,6 +16,7 @@ $container
     ->register('foo', '\Bar\FooClass')
     ->addTag('foo', ['foo' => 'foo'])
     ->addTag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+    ->addTag('foo', ['name' => 'bar', 'baz' => 'baz'])
     ->setFactory(['Bar\\FooClass', 'getInstance'])
     ->setArguments(['foo', new Reference('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, new Reference('service_container')])
     ->setProperties(['foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%']])
@@ -67,7 +68,6 @@ $container
     ->register('inlined', 'Bar')
     ->setProperty('pub', 'pub')
     ->addMethodCall('setBaz', [new Reference('baz')])
-    ->setPublic(false)
 ;
 $container
     ->register('baz', 'Baz')
@@ -81,7 +81,6 @@ $container
 ;
 $container
     ->register('configurator_service', 'ConfClass')
-    ->setPublic(false)
     ->addMethodCall('setFoo', [new Reference('baz')])
 ;
 $container
@@ -92,7 +91,6 @@ $container
 $container
     ->register('configurator_service_simple', 'ConfClass')
     ->addArgument('bar')
-    ->setPublic(false)
 ;
 $container
     ->register('configured_service_simple', 'stdClass')
@@ -115,13 +113,12 @@ $container
 ;
 $container
     ->register('deprecated_service', 'stdClass')
-    ->setDeprecated(true)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
     ->setPublic(true)
 ;
 $container
     ->register('new_factory', 'FactoryClass')
     ->setProperty('foo', 'bar')
-    ->setPublic(false)
 ;
 $container
     ->register('factory_service', 'Bar')
@@ -142,8 +139,7 @@ $container
 $container
     ->register('factory_simple', 'SimpleFactoryClass')
     ->addArgument('foo')
-    ->setDeprecated(true)
-    ->setPublic(false)
+    ->setDeprecated('vendor/package', '1.1', 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.')
 ;
 $container
     ->register('factory_service_simple', 'Bar')
@@ -170,7 +166,6 @@ $container->register('BAR2', 'stdClass')->setPublic(true);
 $container
     ->register('tagged_iterator_foo', 'Bar')
     ->addTag('foo')
-    ->setPublic(false)
 ;
 $container
     ->register('tagged_iterator', 'Bar')
@@ -186,5 +181,10 @@ $container->register('runtime_error', 'stdClass')
 
 $container->register('errored_definition', 'stdClass')
     ->addError('Service "errored_definition" is broken.');
+
+$container->register('preload_sidekick', 'stdClass')
+    ->setPublic(true)
+    ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
+    ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
 
 return $container;

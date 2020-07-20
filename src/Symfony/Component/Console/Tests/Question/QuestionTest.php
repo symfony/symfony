@@ -12,14 +12,13 @@
 namespace Symfony\Component\Console\Tests\Question;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\Question;
 
 class QuestionTest extends TestCase
 {
     private $question;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->question = new Question('Test question');
@@ -140,7 +139,7 @@ class QuestionTest extends TestCase
     {
         return [
             ['Potato'],
-            [new \stdclass()],
+            [new \stdClass()],
             [false],
         ];
     }
@@ -150,10 +149,7 @@ class QuestionTest extends TestCase
      */
     public function testSetAutocompleterValuesInvalid($values)
     {
-        self::expectException(InvalidArgumentException::class);
-        self::expectExceptionMessage(
-            'Autocompleter values can be either an array, "null" or a "Traversable" object.'
-        );
+        self::expectException(\TypeError::class);
 
         $this->question->setAutocompleterValues($values);
     }
@@ -271,7 +267,7 @@ class QuestionTest extends TestCase
 
     public function providerSetMaxAttemptsInvalid()
     {
-        return [['Potato'], [0], [-1]];
+        return [[0], [-1]];
     }
 
     /**

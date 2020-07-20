@@ -519,7 +519,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertContains('<table id="form" class="foobar" data-foo="bar">', $html);
+        $this->assertStringContainsString('<table id="form" class="foobar" data-foo="bar">', $html);
     }
 
     public function testWidgetContainerAttributeNameRepeatedIfTrue()
@@ -531,6 +531,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertContains('<table id="form" foo="foo">', $html);
+        $this->assertStringContainsString('<table id="form" foo="foo">', $html);
     }
 }

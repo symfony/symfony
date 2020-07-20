@@ -24,7 +24,7 @@ class DateTimeNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DateTimeNormalizer();
     }
@@ -155,12 +155,10 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The object must implement the "\DateTimeInterface".
-     */
     public function testNormalizeInvalidObjectThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The object must implement the "\DateTimeInterface".');
         $this->normalizer->normalize(new \stdClass());
     }
 
@@ -236,37 +234,29 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     */
     public function testDenormalizeInvalidDataThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.
-     */
     public function testDenormalizeNullThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize(null, \DateTimeInterface::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.
-     */
     public function testDenormalizeEmptyStringThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('', \DateTimeInterface::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     */
     public function testDenormalizeFormatMismatchThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d|']);
     }
 }

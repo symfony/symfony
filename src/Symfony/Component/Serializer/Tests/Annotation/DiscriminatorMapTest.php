@@ -33,35 +33,27 @@ class DiscriminatorMapTest extends TestCase
         ], $annotation->getMapping());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testExceptionWithoutTypeProperty()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testExceptionWithEmptyTypeProperty()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testExceptionWithoutMappingProperty()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new DiscriminatorMap(['typeProperty' => 'type']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testExceptionWitEmptyMappingProperty()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => []]);
     }
 }

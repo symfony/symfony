@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -24,7 +25,7 @@ class ArrayAdapterTest extends AdapterTestCase
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
     ];
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new ArrayAdapter($defaultLifetime);
     }
@@ -53,5 +54,37 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertSame(serialize('::4711'), $values['foo']);
         $this->assertArrayHasKey('bar', $values);
         $this->assertNull($values['bar']);
+    }
+
+    public function testMaxLifetime()
+    {
+        $cache = new ArrayAdapter(0, false, 1);
+
+        $item = $cache->getItem('foo');
+        $item->expiresAfter(2);
+        $cache->save($item->set(123));
+
+        $this->assertTrue($cache->hasItem('foo'));
+        sleep(1);
+        $this->assertFalse($cache->hasItem('foo'));
+    }
+
+    public function testMaxItems()
+    {
+        $cache = new ArrayAdapter(0, false, 0, 2);
+
+        $cache->save($cache->getItem('foo'));
+        $cache->save($cache->getItem('bar'));
+        $cache->save($cache->getItem('buz'));
+
+        $this->assertFalse($cache->hasItem('foo'));
+        $this->assertTrue($cache->hasItem('bar'));
+        $this->assertTrue($cache->hasItem('buz'));
+
+        $cache->save($cache->getItem('foo'));
+
+        $this->assertFalse($cache->hasItem('bar'));
+        $this->assertTrue($cache->hasItem('buz'));
+        $this->assertTrue($cache->hasItem('foo'));
     }
 }

@@ -54,10 +54,8 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Returns true if a system call has been interrupted.
-     *
-     * @return bool
      */
-    protected function hasSystemCallBeenInterrupted()
+    protected function hasSystemCallBeenInterrupted(): bool
     {
         $lastError = $this->lastError;
         $this->lastError = null;
@@ -90,10 +88,10 @@ abstract class AbstractPipes implements PipesInterface
      *
      * @throws InvalidArgumentException When an input iterator yields a non supported value
      */
-    protected function write()
+    protected function write(): ?array
     {
         if (!isset($this->pipes[0])) {
-            return;
+            return null;
         }
         $input = $this->input;
 
@@ -105,7 +103,7 @@ abstract class AbstractPipes implements PipesInterface
             } elseif (!isset($this->inputBuffer[0])) {
                 if (!\is_string($input)) {
                     if (!is_scalar($input)) {
-                        throw new InvalidArgumentException(sprintf('%s yielded a value of type "%s", but only scalars and stream resources are supported', \get_class($this->input), \gettype($input)));
+                        throw new InvalidArgumentException(sprintf('"%s" yielded a value of type "%s", but only scalars and stream resources are supported.', get_debug_type($this->input), get_debug_type($input)));
                     }
                     $input = (string) $input;
                 }
@@ -122,7 +120,7 @@ abstract class AbstractPipes implements PipesInterface
 
         // let's have a look if something changed in streams
         if (false === @stream_select($r, $w, $e, 0, 0)) {
-            return;
+            return null;
         }
 
         foreach ($w as $stdin) {
@@ -166,6 +164,8 @@ abstract class AbstractPipes implements PipesInterface
         } elseif (!$w) {
             return [$this->pipes[0]];
         }
+
+        return null;
     }
 
     /**

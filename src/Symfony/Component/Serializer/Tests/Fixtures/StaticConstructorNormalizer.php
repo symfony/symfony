@@ -21,7 +21,7 @@ class StaticConstructorNormalizer extends ObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getConstructor(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod
     {
         if (is_a($class, StaticConstructorDummy::class, true)) {
             return new \ReflectionMethod($class, 'create');

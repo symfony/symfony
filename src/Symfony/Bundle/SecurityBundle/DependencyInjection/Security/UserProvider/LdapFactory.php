@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, string $id, array $config)
     {
         $container
             ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))
@@ -48,11 +48,13 @@ class LdapFactory implements UserProviderFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('extra_field')
+            ->fixXmlConfig('default_role')
             ->children()
                 ->scalarNode('service')->isRequired()->cannotBeEmpty()->defaultValue('ldap')->end()
                 ->scalarNode('base_dn')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('search_dn')->end()
-                ->scalarNode('search_password')->end()
+                ->scalarNode('search_dn')->defaultNull()->end()
+                ->scalarNode('search_password')->defaultNull()->end()
                 ->arrayNode('extra_fields')
                     ->prototype('scalar')->end()
                 ->end()

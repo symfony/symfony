@@ -46,7 +46,7 @@ class ArrayNode extends Node
         $compiler->raw(']');
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate(array $functions, array $values)
     {
         $result = [];
         foreach ($this->getKeyValuePairs() as $pair) {

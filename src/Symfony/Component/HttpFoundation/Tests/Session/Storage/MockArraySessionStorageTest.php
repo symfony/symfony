@@ -40,7 +40,7 @@ class MockArraySessionStorageTest extends TestCase
 
     private $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attributes = new AttributeBag();
         $this->flashes = new FlashBag();
@@ -56,7 +56,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->storage->setSessionData($this->data);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->data = null;
         $this->flashes = null;
@@ -121,11 +121,9 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertTrue($storage->isStarted());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUnstartedSave()
     {
+        $this->expectException('RuntimeException');
         $this->storage->save();
     }
 }

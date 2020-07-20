@@ -54,9 +54,9 @@ class ChildDefinitionTest extends TestCase
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertTrue($def->isPublic());
-        $this->assertSame($def, $def->setPublic(false));
         $this->assertFalse($def->isPublic());
+        $this->assertSame($def, $def->setPublic(true));
+        $this->assertTrue($def->isPublic());
         $this->assertSame(['public' => true], $def->getChanges());
     }
 
@@ -89,11 +89,9 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['index_0' => 'foo'], $def->getArguments());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
+        $this->expectException('InvalidArgumentException');
         $def = new ChildDefinition('foo');
 
         $def->replaceArgument('0', 'foo');
@@ -118,11 +116,9 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'], $def->getArguments());
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     */
     public function testGetArgumentShouldCheckBounds()
     {
+        $this->expectException('OutOfBoundsException');
         $def = new ChildDefinition('foo');
 
         $def->setArguments([0 => 'foo']);
@@ -131,21 +127,20 @@ class ChildDefinitionTest extends TestCase
         $def->getArgument(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
-     */
-    public function testCannotCallSetAutoconfigured()
+    public function testAutoconfigured()
     {
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
+
+        $this->assertTrue($def->isAutoconfigured());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
-     */
-    public function testCannotCallSetInstanceofConditionals()
+    public function testInstanceofConditionals()
     {
+        $conditionals = ['Foo' => new ChildDefinition('')];
         $def = new ChildDefinition('foo');
-        $def->setInstanceofConditionals(['Foo' => new ChildDefinition('')]);
+        $def->setInstanceofConditionals($conditionals);
+
+        $this->assertSame($conditionals, $def->getInstanceofConditionals());
     }
 }

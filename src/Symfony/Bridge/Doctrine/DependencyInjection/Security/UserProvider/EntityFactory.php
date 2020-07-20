@@ -33,7 +33,7 @@ class EntityFactory implements UserProviderFactoryInterface
         $this->providerId = $providerId;
     }
 
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, string $id, array $config)
     {
         $container
             ->setDefinition($id, new ChildDefinition($this->providerId))

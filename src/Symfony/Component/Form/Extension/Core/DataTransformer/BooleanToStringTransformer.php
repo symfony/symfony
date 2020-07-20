@@ -28,15 +28,14 @@ class BooleanToStringTransformer implements DataTransformerInterface
     private $falseValues;
 
     /**
-     * @param string $trueValue   The value emitted upon transform if the input is true
-     * @param array  $falseValues
+     * @param string $trueValue The value emitted upon transform if the input is true
      */
     public function __construct(string $trueValue, array $falseValues = [null])
     {
         $this->trueValue = $trueValue;
         $this->falseValues = $falseValues;
         if (\in_array($this->trueValue, $this->falseValues, true)) {
-            throw new InvalidArgumentException('The specified "true" value is contained in the false-values');
+            throw new InvalidArgumentException('The specified "true" value is contained in the false-values.');
         }
     }
 
@@ -45,14 +44,14 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @param bool $value Boolean value
      *
-     * @return string String value
+     * @return string|null String value
      *
      * @throws TransformationFailedException if the given value is not a Boolean
      */
     public function transform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         if (!\is_bool($value)) {

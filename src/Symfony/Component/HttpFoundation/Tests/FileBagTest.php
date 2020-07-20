@@ -23,11 +23,9 @@ use Symfony\Component\HttpFoundation\FileBag;
  */
 class FileBagTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFileMustBeAnArrayOrUploadedFile()
     {
+        $this->expectException('InvalidArgumentException');
         new FileBag(['file' => 'foo']);
     }
 
@@ -162,12 +160,12 @@ class FileBagTest extends TestCase
         return $tempFile;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         mkdir(sys_get_temp_dir().'/form_test', 0777, true);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
             unlink($file);

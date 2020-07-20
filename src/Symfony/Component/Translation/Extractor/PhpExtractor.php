@@ -82,7 +82,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @param mixed $token
      *
-     * @return string
+     * @return string|null
      */
     protected function normalizeToken($token)
     {
@@ -226,21 +226,17 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     }
 
     /**
-     * @param string $file
-     *
      * @return bool
      *
      * @throws \InvalidArgumentException
      */
-    protected function canBeExtracted($file)
+    protected function canBeExtracted(string $file)
     {
         return $this->isFile($file) && 'php' === pathinfo($file, PATHINFO_EXTENSION);
     }
 
     /**
-     * @param string|array $directory
-     *
-     * @return array
+     * {@inheritdoc}
      */
     protected function extractFromDirectory($directory)
     {

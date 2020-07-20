@@ -44,9 +44,9 @@ class ScopingHttpClientTest extends TestCase
         $client = new ScopingHttpClient($mockClient, $options);
 
         $response = $client->request('GET', $url);
-        $reuestedOptions = $response->getRequestOptions();
+        $requestedOptions = $response->getRequestOptions();
 
-        $this->assertEquals($reuestedOptions['case'], $options[$regexp]['case']);
+        $this->assertSame($options[$regexp]['case'], $requestedOptions['case']);
     }
 
     public function provideMatchingUrls()
@@ -64,8 +64,8 @@ class ScopingHttpClientTest extends TestCase
     public function testMatchingUrlsAndOptions()
     {
         $defaultOptions = [
-            '.*/foo-bar' => ['headers' => ['x-app' => 'unit-test-foo-bar']],
-            '.*' => ['headers' => ['content-type' => 'text/html']],
+            '.*/foo-bar' => ['headers' => ['X-FooBar' => 'unit-test-foo-bar']],
+            '.*' => ['headers' => ['Content-Type' => 'text/html']],
         ];
 
         $mockClient = new MockHttpClient();
@@ -73,20 +73,20 @@ class ScopingHttpClientTest extends TestCase
 
         $response = $client->request('GET', 'http://example.com/foo-bar', ['json' => ['url' => 'http://example.com']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertEquals($requestOptions['headers']['content-type'][0], 'application/json');
+        $this->assertSame('Content-Type: application/json', $requestOptions['headers'][1]);
         $requestJson = json_decode($requestOptions['body'], true);
-        $this->assertEquals($requestJson['url'], 'http://example.com');
-        $this->assertEquals($requestOptions['headers']['x-app'][0], $defaultOptions['.*/foo-bar']['headers']['x-app']);
+        $this->assertSame('http://example.com', $requestJson['url']);
+        $this->assertSame('X-FooBar: '.$defaultOptions['.*/foo-bar']['headers']['X-FooBar'], $requestOptions['headers'][0]);
 
-        $response = $client->request('GET', 'http://example.com/bar-foo', ['headers' => ['x-app' => 'unit-test']]);
+        $response = $client->request('GET', 'http://example.com/bar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertEquals($requestOptions['headers']['x-app'][0], 'unit-test');
-        $this->assertEquals($requestOptions['headers']['content-type'][0], 'text/html');
+        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
 
-        $response = $client->request('GET', 'http://example.com/foobar-foo', ['headers' => ['x-app' => 'unit-test']]);
+        $response = $client->request('GET', 'http://example.com/foobar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertEquals($requestOptions['headers']['x-app'][0], 'unit-test');
-        $this->assertEquals($requestOptions['headers']['content-type'][0], 'text/html');
+        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
     }
 
     public function testForBaseUri()

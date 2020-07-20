@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
+namespace Symfony\Component\Messenger\Tests\Transport\Sync;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;

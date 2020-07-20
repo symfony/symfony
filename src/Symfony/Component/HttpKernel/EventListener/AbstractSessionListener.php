@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Exception\UnexpectedSessionUsageException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -41,10 +42,12 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
     protected $container;
     private $sessionUsageStack = [];
+    private $debug;
 
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(ContainerInterface $container = null, bool $debug = false)
     {
         $this->container = $container;
+        $this->debug = $debug;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -82,15 +85,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
-            if ($autoCacheControl) {
-                $response
-                    ->setPrivate()
-                    ->setMaxAge(0)
-                    ->headers->addCacheControlDirective('must-revalidate');
-            }
-        }
-
         if ($session->isStarted()) {
             /*
              * Saves the session, in case it is still open, before sending the response/headers.
@@ -106,7 +100,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
              *    the one above. But by saving the session before long-running things in the terminate event,
              *    we ensure the session is not blocked longer than needed.
              *  * When regenerating the session ID no locking is involved in PHPs session design. See
-             *    https://bugs.php.net/bug.php?id=61470 for a discussion. So in this case, the session must
+             *    https://bugs.php.net/61470 for a discussion. So in this case, the session must
              *    be saved anyway before sending the headers with the new session ID. Otherwise session
              *    data could get lost again for concurrent requests with the new ID. One result could be
              *    that you get logged out after just logging in.
@@ -119,6 +113,30 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
              */
             $session->save();
         }
+
+        if ($session instanceof Session ? $session->getUsageIndex() === end($this->sessionUsageStack) : !$session->isStarted()) {
+            return;
+        }
+
+        if ($autoCacheControl) {
+            $response
+                ->setExpires(new \DateTime())
+                ->setPrivate()
+                ->setMaxAge(0)
+                ->headers->addCacheControlDirective('must-revalidate');
+        }
+
+        if (!$event->getRequest()->attributes->get('_stateless', false)) {
+            return;
+        }
+
+        if ($this->debug) {
+            throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
+        }
+
+        if ($this->container->has('logger')) {
+            $this->container->get('logger')->warning('Session was used while the request was declared stateless.');
+        }
     }
 
     public function onFinishRequest(FinishRequestEvent $event)
@@ -128,7 +146,42 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function onSessionUsage(): void
+    {
+        if (!$this->debug) {
+            return;
+        }
+
+        if ($this->container && $this->container->has('session_collector')) {
+            $this->container->get('session_collector')();
+        }
+
+        if (!$requestStack = $this->container && $this->container->has('request_stack') ? $this->container->get('request_stack') : null) {
+            return;
+        }
+
+        $stateless = false;
+        $clonedRequestStack = clone $requestStack;
+        while (null !== ($request = $clonedRequestStack->pop()) && !$stateless) {
+            $stateless = $request->attributes->get('_stateless');
+        }
+
+        if (!$stateless) {
+            return;
+        }
+
+        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $requestStack->getCurrentRequest()->getSession()) {
+            return;
+        }
+
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
+        throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 128],

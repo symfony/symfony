@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\NegativeOrZero;
 
 /**
@@ -18,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NegativeOrZero;
  */
 class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanOrEqualValidatorTest
 {
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new NegativeOrZero();
     }
@@ -26,7 +28,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [0, 0],
@@ -40,49 +42,45 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
-            [2, '2', 0, '0', 'integer'],
-            [2.5, '2.5', 0, '0', 'integer'],
-            [333, '333', 0, '0', 'integer'],
+            [2, '2', 0, '0', 'int'],
+            [2.5, '2.5', 0, '0', 'int'],
+            [333, '333', 0, '0', 'int'],
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage The "propertyPath" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.
-     */
     public function testThrowsConstraintExceptionIfPropertyPath()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('The "propertyPath" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.');
+
         return new NegativeOrZero(['propertyPath' => 'field']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage The "value" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.
-     */
     public function testThrowsConstraintExceptionIfValue()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('The "value" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.');
+
         return new NegativeOrZero(['value' => 0]);
     }
 
     /**
      * @dataProvider provideInvalidConstraintOptions
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage requires either the "value" or "propertyPath" option to be set.
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->markTestSkipped('Value option always set for NegativeOrZero constraint');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage requires only one of the "value" or "propertyPath" options to be set, not both.
-     */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
         $this->markTestSkipped('Value option is set for NegativeOrZero constraint automatically');
     }
 
@@ -105,9 +103,17 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     }
 
     /**
-     * @dataProvider provideValidComparisonsToPropertyPath
+     * @dataProvider throwsOnInvalidStringDatesProvider
      */
-    public function testValidComparisonToPropertyPathOnArray($comparedValue)
+    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
+    {
+        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
+    }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }

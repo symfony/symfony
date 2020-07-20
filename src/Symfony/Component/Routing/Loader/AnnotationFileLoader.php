@@ -46,7 +46,7 @@ class AnnotationFileLoader extends FileLoader
      * @param string      $file A PHP file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection|null A RouteCollection instance
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
@@ -58,7 +58,7 @@ class AnnotationFileLoader extends FileLoader
         if ($class = $this->findClass($path)) {
             $refl = new \ReflectionClass($class);
             if ($refl->isAbstract()) {
-                return;
+                return null;
             }
 
             $collection->addResource(new FileResource($path));
@@ -81,11 +81,9 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Returns the full class name for the first class in the file.
      *
-     * @param string $file A PHP file path
-     *
      * @return string|false Full class name if found, false otherwise
      */
-    protected function findClass($file)
+    protected function findClass(string $file)
     {
         $class = false;
         $namespace = false;

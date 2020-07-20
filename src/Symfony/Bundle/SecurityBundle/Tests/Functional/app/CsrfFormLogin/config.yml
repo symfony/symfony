@@ -1,47 +1,9 @@
 imports:
-    - { resource: ./../config/default.yml }
-
-services:
-    csrf_form_login.form.type:
-        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType
-        arguments:
-            - '@request_stack'
-        tags:
-            - { name: form.type }
+    - { resource: ./base_config.yml }
 
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
-
-    providers:
-        in_memory:
-            memory:
-                users:
-                    johannes: { password: test, roles: [ROLE_USER] }
-
     firewalls:
-        # This firewall doesn't make sense in combination with the rest of the
-        # configuration file, but it's here for testing purposes (do not use
-        # this file in a real world scenario though)
-        login_form:
-            pattern: ^/login$
-            security: false
-
         default:
             form_login:
-                check_path: /login_check
-                default_target_path: /profile
-                target_path_parameter: "user_login[_target_path]"
-                failure_path_parameter: "user_login[_failure_path]"
-                username_parameter: "user_login[username]"
-                password_parameter: "user_login[password]"
+                enable_csrf: true
                 csrf_parameter: "user_login[_token]"
-                csrf_token_generator: security.csrf.token_manager
-            anonymous: ~
-            logout:
-                path: /logout_path
-                target: /
-                csrf_token_generator: security.csrf.token_manager
-
-    access_control:
-        - { path: .*, roles: IS_AUTHENTICATED_FULLY }

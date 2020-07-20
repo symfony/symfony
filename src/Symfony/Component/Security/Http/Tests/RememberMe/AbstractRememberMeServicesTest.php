@@ -39,11 +39,20 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertNull($service->autoLogin(new Request()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
+    public function testAutoLoginReturnsNullAfterLoginFail()
+    {
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
+
+        $request = new Request();
+        $request->cookies->set('foo', 'foo');
+
+        $service->loginFail($request);
+        $this->assertNull($service->autoLogin($request));
+    }
+
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
+        $this->expectException('RuntimeException');
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $request->cookies->set('foo', 'foo');
@@ -126,7 +135,6 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())
@@ -261,18 +269,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService();
 
         $encoded = $this->callProtected($service, 'encodeCookie', [$cookieParts]);
-        $this->assertInternalType('string', $encoded);
+        $this->assertIsString($encoded);
 
         $decoded = $this->callProtected($service, 'decodeCookie', [$encoded]);
         $this->assertSame($cookieParts, $decoded);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage cookie delimiter
-     */
     public function testThereShouldBeNoCookieDelimiterInCookieParts()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('cookie delimiter');
         $cookieParts = ['aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc'];
         $service = $this->getService();
 

@@ -15,6 +15,7 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,14 +35,18 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     private $ldap;
     private $dnString;
     private $queryString;
+    private $searchDn;
+    private $searchPassword;
 
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, LdapInterface $ldap, string $dnString = '{username}', bool $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, LdapInterface $ldap, string $dnString = '{username}', bool $hideUserNotFoundExceptions = true, string $searchDn = '', string $searchPassword = '')
     {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
 
         $this->userProvider = $userProvider;
         $this->ldap = $ldap;
         $this->dnString = $dnString;
+        $this->searchDn = $searchDn;
+        $this->searchPassword = $searchPassword;
     }
 
     /**
@@ -58,7 +63,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     protected function retrieveUser(string $username, UsernamePasswordToken $token)
     {
         if (AuthenticationProviderInterface::USERNAME_NONE_PROVIDED === $username) {
-            throw new UsernameNotFoundException('Username can not be null');
+            throw new UsernameNotFoundException('Username can not be null.');
         }
 
         return $this->userProvider->loadUserByUsername($username);
@@ -77,9 +82,13 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         }
 
         try {
-            $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_DN);
-
             if ($this->queryString) {
+                if ('' !== $this->searchDn && '' !== $this->searchPassword) {
+                    $this->ldap->bind($this->searchDn, $this->searchPassword);
+                } else {
+                    throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
+                }
+                $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_FILTER);
                 $query = str_replace('{username}', $username, $this->queryString);
                 $result = $this->ldap->query($this->dnString, $query)->execute();
                 if (1 !== $result->count()) {
@@ -88,6 +97,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 
                 $dn = $result[0]->getDn();
             } else {
+                $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_DN);
                 $dn = str_replace('{username}', $username, $this->dnString);
             }
 

@@ -56,7 +56,7 @@ class TableStyle
     public function setPaddingChar(string $paddingChar)
     {
         if (!$paddingChar) {
-            throw new LogicException('The padding char must not be empty');
+            throw new LogicException('The padding char must not be empty.');
         }
 
         $this->paddingChar = $paddingChar;
@@ -124,7 +124,7 @@ class TableStyle
      *
      * @internal
      */
-    public function getBorderChars()
+    public function getBorderChars(): array
     {
         return [
             $this->horizontalOutsideBorderChar,
@@ -227,11 +227,9 @@ class TableStyle
     /**
      * Sets header cell format.
      *
-     * @param string $cellHeaderFormat
-     *
      * @return $this
      */
-    public function setCellHeaderFormat($cellHeaderFormat)
+    public function setCellHeaderFormat(string $cellHeaderFormat)
     {
         $this->cellHeaderFormat = $cellHeaderFormat;
 
@@ -250,8 +248,6 @@ class TableStyle
 
     /**
      * Sets row cell format.
-     *
-     * @param string $cellRowFormat
      *
      * @return $this
      */
@@ -275,8 +271,6 @@ class TableStyle
     /**
      * Sets row cell content format.
      *
-     * @param string $cellRowContentFormat
-     *
      * @return $this
      */
     public function setCellRowContentFormat(string $cellRowContentFormat)
@@ -298,8 +292,6 @@ class TableStyle
 
     /**
      * Sets table border format.
-     *
-     * @param string $borderFormat
      *
      * @return $this
      */

@@ -23,11 +23,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         $loader->load($file.'.php');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetsCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -38,11 +36,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetPackageCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -57,12 +53,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" where found on StateMachine "article".
-     */
     public function testWorkflowValidationStateMachine()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'workflows' => [

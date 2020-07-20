@@ -40,7 +40,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * If this property path only contains one item, null is returned.
      *
-     * @return PropertyPath The parent path or null
+     * @return self|null The parent path or null
      */
     public function getParent();
 

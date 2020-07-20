@@ -16,17 +16,19 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
-        "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/error-catcher": "^4.4|^5.0",
+        "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
+        "symfony/error-handler": "^4.4|^5.0",
+        "symfony/event-dispatcher": "^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-php73": "^1.9",
+        "symfony/polyfill-php80": "^1.15",
         "psr/log": "~1.0"
     },
     "require-dev": {
         "symfony/browser-kit": "^4.4|^5.0",
-        "symfony/config": "^4.4|^5.0",
+        "symfony/config": "^5.0",
         "symfony/console": "^4.4|^5.0",
         "symfony/css-selector": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
@@ -37,28 +39,34 @@
         "symfony/routing": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
-        "symfony/translation-contracts": "^1.1",
-        "symfony/var-dumper": "^4.4|^5.0",
+        "symfony/translation-contracts": "^1.1|^2",
         "psr/cache": "~1.0",
-        "twig/twig": "^2.4"
+        "twig/twig": "^2.4|^3.0"
     },
     "provide": {
         "psr/log-implementation": "1.0"
     },
     "conflict": {
         "symfony/browser-kit": "<4.4",
-        "symfony/config": "<4.4",
+        "symfony/cache": "<5.0",
+        "symfony/config": "<5.0",
+        "symfony/console": "<4.4",
+        "symfony/form": "<5.0",
         "symfony/dependency-injection": "<4.4",
-        "symfony/translation": "<4.4",
-        "symfony/var-dumper": "<4.4",
+        "symfony/doctrine-bridge": "<5.0",
+        "symfony/http-client": "<5.0",
+        "symfony/mailer": "<5.0",
+        "symfony/messenger": "<5.0",
+        "symfony/translation": "<5.0",
+        "symfony/twig-bridge": "<5.0",
+        "symfony/validator": "<5.0",
         "twig/twig": "<2.4"
     },
     "suggest": {
         "symfony/browser-kit": "",
         "symfony/config": "",
         "symfony/console": "",
-        "symfony/dependency-injection": "",
-        "symfony/var-dumper": ""
+        "symfony/dependency-injection": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpKernel\\": "" },
@@ -69,7 +77,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

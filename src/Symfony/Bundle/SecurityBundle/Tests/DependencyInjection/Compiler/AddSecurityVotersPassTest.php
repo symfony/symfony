@@ -15,18 +15,17 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AddSecurityVotersPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage No security voters found. You need to tag at least one with "security.voter".
-     */
     public function testNoVoters()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
@@ -128,12 +127,14 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be traced');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage stdClass must implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface when used as a voter.
-     */
     public function testVoterMissingInterface()
     {
+        $exception = LogicException::class;
+        $message = '"stdClass" must implement the "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" when used as a voter.';
+
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container
@@ -146,12 +147,5 @@ class AddSecurityVotersPassTest extends TestCase
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
-    }
-}
-
-class VoterWithoutInterface
-{
-    public function vote()
-    {
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -23,11 +24,11 @@ class ArrayDenormalizerTest extends TestCase
     private $denormalizer;
 
     /**
-     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SerializerInterface|MockObject
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')->getMock();
         $this->denormalizer = new ArrayDenormalizer();
@@ -67,7 +68,7 @@ class ArrayDenormalizerTest extends TestCase
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), __NAMESPACE__.'\ArrayDummy', $this->anything())
+            ->with($this->anything(), ArrayDummy::class, $this->anything())
             ->willReturn(true);
 
         $this->assertTrue(
@@ -103,7 +104,7 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(
                 ['foo' => 'one', 'bar' => 'two'],
-                __NAMESPACE__.'\ArrayDummy'
+                ArrayDummy::class
             )
         );
     }

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests;
+namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\CustomPathBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class CustomPathBundle extends Bundle
 {
-    public function getPath()
+    public function getPath(): string
     {
         return __DIR__.'/..';
     }

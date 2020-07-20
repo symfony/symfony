@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ResponseEvent extends KernelEvent
+final class ResponseEvent extends KernelEvent
 {
     private $response;
 
@@ -35,17 +35,12 @@ class ResponseEvent extends KernelEvent
         $this->setResponse($response);
     }
 
-    /**
-     * Returns the current response object.
-     *
-     * @return Response
-     */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
 
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

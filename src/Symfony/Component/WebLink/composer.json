@@ -15,9 +15,11 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "provide": {
+        "psr/link-implementation": "1.0"
+    },
     "require": {
-        "php": "^7.2.9",
-        "fig/link-util": "^1.0",
+        "php": ">=7.2.5",
         "psr/link": "^1.0"
     },
     "suggest": {
@@ -39,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

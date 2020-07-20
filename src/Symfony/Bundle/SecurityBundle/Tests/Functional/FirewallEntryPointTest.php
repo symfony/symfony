@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 
-class FirewallEntryPointTest extends WebTestCase
+class FirewallEntryPointTest extends AbstractWebTestCase
 {
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
     {
@@ -31,9 +31,12 @@ class FirewallEntryPointTest extends WebTestCase
         );
     }
 
-    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials(array $options)
     {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
+        $client = $this->createClient($options + ['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
 
         $client->request('GET', '/secure/resource');
 

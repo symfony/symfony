@@ -14,8 +14,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -39,11 +39,8 @@ class ProfilerListener implements EventSubscriberInterface
     protected $parents;
 
     /**
-     * @param Profiler                     $profiler           A Profiler instance
-     * @param RequestStack                 $requestStack       A RequestStack instance
-     * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance
-     * @param bool                         $onlyException      True if the profiler only collects data when an exception occurs, false otherwise
-     * @param bool                         $onlyMasterRequests True if the profiler only collects data when the request is a master request, false otherwise
+     * @param bool $onlyException      True if the profiler only collects data when an exception occurs, false otherwise
+     * @param bool $onlyMasterRequests True if the profiler only collects data when the request is a master request, false otherwise
      */
     public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMasterRequests = false)
     {
@@ -65,7 +62,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $this->exception = $event->getException();
+        $this->exception = $event->getThrowable();
     }
 
     /**

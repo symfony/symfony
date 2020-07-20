@@ -21,7 +21,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * Transport that immediately marks messages as received and dispatches for handling.
  *
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 class SyncTransport implements TransportInterface
@@ -57,7 +56,7 @@ class SyncTransport implements TransportInterface
     {
         /** @var SentStamp|null $sentStamp */
         $sentStamp = $envelope->last(SentStamp::class);
-        $alias = null === $sentStamp ? 'sync' : $sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass();
+        $alias = null === $sentStamp ? 'sync' : ($sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass());
 
         $envelope = $envelope->with(new ReceivedStamp($alias));
 

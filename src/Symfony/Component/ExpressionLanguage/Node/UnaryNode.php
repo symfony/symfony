@@ -45,7 +45,7 @@ class UnaryNode extends Node
         ;
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate(array $functions, array $values)
     {
         $value = $this->nodes['node']->evaluate($functions, $values);
         switch ($this->attributes['operator']) {

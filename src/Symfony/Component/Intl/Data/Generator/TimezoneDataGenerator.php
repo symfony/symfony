@@ -42,7 +42,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function scanLocales(LocaleScanner $scanner, $sourceDir)
+    protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
 
@@ -52,7 +52,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $filesystem = new Filesystem();
         $filesystem->mkdir($tempDir.'/region');
@@ -75,7 +75,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         if (!$this->zoneToCountryMapping) {
             $this->zoneToCountryMapping = self::generateZoneToCountryMapping($reader->read($tempDir, 'windowsZones'));
@@ -84,17 +84,16 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         // Don't generate aliases, as they are resolved during runtime
         // Unless an alias is needed as fallback for de-duplication purposes
         if (isset($this->localeAliases[$displayLocale]) && !$this->generatingFallback) {
-            return;
+            return null;
         }
 
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         if (!isset($localeBundle['zoneStrings']) || null === $localeBundle['zoneStrings']) {
-            return;
+            return null;
         }
 
         $data = [
-            'Version' => $localeBundle['Version'],
             'Names' => $this->generateZones($reader, $tempDir, $displayLocale),
             'Meta' => self::generateZoneMetadata($localeBundle),
         ];
@@ -115,7 +114,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             $data['Meta'] = array_diff($data['Meta'], $fallback['Meta']);
         }
         if (!$data['Names'] && !$data['Meta']) {
-            return;
+            return null;
         }
 
         $this->zoneIds = array_merge($this->zoneIds, array_keys($data['Names']));
@@ -126,12 +125,11 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
         return [
-            'Version' => $rootBundle['Version'],
             'Meta' => self::generateZoneMetadata($rootBundle),
         ];
     }
@@ -139,7 +137,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
@@ -149,7 +147,6 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         ksort($this->zoneToCountryMapping);
 
         $data = [
-            'Version' => $rootBundle['Version'],
             'Zones' => $this->zoneIds,
             'ZoneToCountry' => $this->zoneToCountryMapping,
             'CountryToZone' => self::generateCountryToZoneMapping($this->zoneToCountryMapping),

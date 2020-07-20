@@ -37,7 +37,7 @@ class GenrbCompiler implements BundleCompilerInterface
         exec('which '.$genrb, $output, $status);
 
         if (0 !== $status) {
-            throw new RuntimeException(sprintf('The command "%s" is not installed', $genrb));
+            throw new RuntimeException(sprintf('The command "%s" is not installed.', $genrb));
         }
 
         $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
@@ -46,7 +46,7 @@ class GenrbCompiler implements BundleCompilerInterface
     /**
      * {@inheritdoc}
      */
-    public function compile($sourcePath, $targetDir)
+    public function compile(string $sourcePath, string $targetDir)
     {
         if (is_dir($sourcePath)) {
             $sourcePath .= '/*.txt';
@@ -55,7 +55,7 @@ class GenrbCompiler implements BundleCompilerInterface
         exec($this->genrb.' --quiet -e UTF-8 -d '.$targetDir.' '.$sourcePath, $output, $status);
 
         if (0 !== $status) {
-            throw new RuntimeException(sprintf('genrb failed with status %d while compiling %s to %s.', $status, $sourcePath, $targetDir));
+            throw new RuntimeException(sprintf('genrb failed with status %d while compiling "%s" to "%s".', $status, $sourcePath, $targetDir));
         }
     }
 }

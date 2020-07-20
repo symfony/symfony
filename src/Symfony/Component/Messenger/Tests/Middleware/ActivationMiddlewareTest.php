@@ -42,7 +42,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
 
-        $activated = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $activated = $this->createPartialMock(ActivationMiddlewareTestCallable::class, ['__invoke']);
         $activated->expects($this->once())->method('__invoke')->with($envelope)->willReturn(true);
 
         $stack = $this->getStackMock(false);
@@ -66,5 +66,12 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $decorator = new ActivationMiddleware($middleware, false);
 
         $decorator->handle($envelope, $this->getStackMock());
+    }
+}
+
+class ActivationMiddlewareTestCallable
+{
+    public function __invoke()
+    {
     }
 }

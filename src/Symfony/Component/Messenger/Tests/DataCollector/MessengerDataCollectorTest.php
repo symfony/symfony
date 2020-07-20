@@ -28,7 +28,7 @@ class MessengerDataCollectorTest extends TestCase
     /** @var CliDumper */
     private $dumper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new CliDumper();
         $this->dumper->setColors(false);
@@ -55,9 +55,10 @@ class MessengerDataCollectorTest extends TestCase
 
         $file = __FILE__;
         $expected = <<<DUMP
-array:4 [
+array:5 [
   "bus" => "default"
   "stamps" => []
+  "stamps_after_dispatch" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -100,9 +101,10 @@ DUMP;
 
         $file = __FILE__;
         $this->assertStringMatchesFormat(<<<DUMP
-array:5 [
+array:6 [
   "bus" => "default"
   "stamps" => []
+  "stamps_after_dispatch" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A

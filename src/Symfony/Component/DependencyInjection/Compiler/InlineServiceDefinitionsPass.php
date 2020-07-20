@@ -152,10 +152,8 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
 
     /**
      * Checks if the definition is inlineable.
-     *
-     * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition(string $id, Definition $definition)
+    private function isInlineableDefinition(string $id, Definition $definition): bool
     {
         if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
             return false;

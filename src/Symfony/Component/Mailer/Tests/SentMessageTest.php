@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
@@ -22,7 +22,7 @@ class SentMessageTest extends TestCase
 {
     public function test()
     {
-        $m = new SentMessage($r = new RawMessage('Email'), $e = new SmtpEnvelope(new Address('fabien@example.com'), [new Address('helene@example.com')]));
+        $m = new SentMessage($r = new RawMessage('Email'), $e = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]));
         $this->assertSame($r, $m->getOriginalMessage());
         $this->assertSame($r, $m->getMessage());
         $this->assertSame($e, $m->getEnvelope());

@@ -25,7 +25,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     const FORMAT_KEY = 'dateinterval_format';
 
     private $defaultContext = [
-        self::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS',
+        self::FORMAT_KEY => '%rP%yY%mM%dDT%hH%iM%sS',
     ];
 
     public function __construct(array $defaultContext = [])
@@ -60,7 +60,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 
     /**
@@ -69,10 +69,10 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
-            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', get_debug_type($data)));
         }
 
         if (!$this->isISO8601($data)) {
@@ -81,12 +81,34 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 
         $dateIntervalFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
 
-        $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
+        $signPattern = '';
+        switch (substr($dateIntervalFormat, 0, 2)) {
+            case '%R':
+                $signPattern = '[-+]';
+                $dateIntervalFormat = substr($dateIntervalFormat, 2);
+                break;
+            case '%r':
+                $signPattern = '-?';
+                $dateIntervalFormat = substr($dateIntervalFormat, 2);
+                break;
+        }
+        $valuePattern = '/^'.$signPattern.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
         if (!preg_match($valuePattern, $data)) {
             throw new UnexpectedValueException(sprintf('Value "%s" contains intervals not accepted by format "%s".', $data, $dateIntervalFormat));
         }
 
         try {
+            if ('-' === $data[0]) {
+                $interval = new \DateInterval(substr($data, 1));
+                $interval->invert = 1;
+
+                return $interval;
+            }
+
+            if ('+' === $data[0]) {
+                return new \DateInterval(substr($data, 1));
+            }
+
             return new \DateInterval($data);
         } catch (\Exception $e) {
             throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
@@ -96,13 +118,13 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null)
     {
         return \DateInterval::class === $type;
     }
 
-    private function isISO8601($string)
+    private function isISO8601(string $string): bool
     {
-        return preg_match('/^P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
+        return preg_match('/^[\-+]?P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
     }
 }

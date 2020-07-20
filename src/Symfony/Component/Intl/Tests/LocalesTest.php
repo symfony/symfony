@@ -84,11 +84,9 @@ class LocalesTest extends ResourceBundleTestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithInvalidLocale()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Locales::getName('foo');
     }
 
@@ -102,6 +100,7 @@ class LocalesTest extends ResourceBundleTestCase
         $this->assertTrue(Locales::exists('nl_NL'));
         $this->assertTrue(Locales::exists('tl_PH'));
         $this->assertTrue(Locales::exists('fil_PH')); // alias for "tl_PH"
+        $this->assertTrue(Locales::exists('es_419'));
         $this->assertFalse(Locales::exists('zxx_ZZ'));
     }
 }

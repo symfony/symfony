@@ -105,12 +105,10 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
-     * @expectedExceptionMessage Unexpected end of expression around position 6 for expression `node.`.
-     */
     public function testParseThrowsInsteadOfNotice()
     {
+        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
+        $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
     }
@@ -160,7 +158,7 @@ class ExpressionLanguageTest extends TestCase
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
         $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
-        $savedParsedExpressions = [];
+        $savedParsedExpression = null;
 
         $cacheMock
             ->expects($this->exactly(2))
@@ -197,12 +195,23 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->compile($expression, ['B' => 'b', 'a']);
     }
 
+    public function testOperatorCollisions()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = 'foo.not in [bar]';
+        $compiled = $expressionLanguage->compile($expression, ['foo', 'bar']);
+        $this->assertSame('in_array($foo->not, [0 => $bar])', $compiled);
+
+        $result = $expressionLanguage->evaluate($expression, ['foo' => (object) ['not' => 'test'], 'bar' => 'test']);
+        $this->assertTrue($result);
+    }
+
     /**
      * @dataProvider getRegisterCallbacks
-     * @expectedException \LogicException
      */
     public function testRegisterAfterParse($registerCallback)
     {
+        $this->expectException('LogicException');
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', []);
         $registerCallback($el);
@@ -210,31 +219,29 @@ class ExpressionLanguageTest extends TestCase
 
     /**
      * @dataProvider getRegisterCallbacks
-     * @expectedException \LogicException
      */
     public function testRegisterAfterEval($registerCallback)
     {
+        $this->expectException('LogicException');
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
         $registerCallback($el);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessageRegExp  /Unable to call method "\w+" of object "\w+"./
-     */
     public function testCallBadCallable()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }
 
     /**
      * @dataProvider getRegisterCallbacks
-     * @expectedException \LogicException
      */
     public function testRegisterAfterCompile($registerCallback)
     {
+        $this->expectException('LogicException');
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);

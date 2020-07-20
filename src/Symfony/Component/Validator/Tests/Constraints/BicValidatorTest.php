@@ -103,12 +103,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time
-     */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time');
         new Bic([
             'iban' => 'value',
             'ibanPropertyPath' => 'propertyPath',
@@ -119,12 +117,8 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Bic(['ibanPropertyPath' => 'foo']);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(ConstraintDefinitionException::class);
-            $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
-        } else {
-            $this->setExpectedException(ConstraintDefinitionException::class, sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
-        }
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
 
         $object = new BicComparisonTestClass(5);
 
@@ -133,11 +127,9 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('UNCRIT2B912', $constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Bic());
     }
 
@@ -256,7 +248,7 @@ class BicComparisonTestClass
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->value;
     }

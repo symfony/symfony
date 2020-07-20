@@ -14,7 +14,9 @@ namespace Symfony\Component\Form\ChoiceList\Factory;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -23,29 +25,51 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  * Default implementation of {@link ChoiceListFactoryInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Jules Pietri <jules@heahprod.com>
  */
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @param callable|null $filter
      */
-    public function createListFromChoices($choices, $value = null)
+    public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/)
     {
+        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
+
+        if ($filter) {
+            // filter the choice list lazily
+            return $this->createListFromLoader(new FilterChoiceLoaderDecorator(
+                new CallbackChoiceLoader(static function () use ($choices) {
+                    return $choices;
+                }
+            ), $filter), $value);
+        }
+
         return new ArrayChoiceList($choices, $value);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param callable|null $filter
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/)
     {
+        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
+
+        if ($filter) {
+            $loader = new FilterChoiceLoaderDecorator($loader, $filter);
+        }
+
         return new LazyChoiceList($loader, $value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null)
     {
         $preferredViews = [];
         $preferredViewsOrder = [];
@@ -53,12 +77,16 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
-        if (!\is_callable($preferredChoices) && !empty($preferredChoices)) {
-            // make sure we have keys that reflect order
-            $preferredChoices = array_values($preferredChoices);
-            $preferredChoices = static function ($choice) use ($preferredChoices) {
-                return array_search($choice, $preferredChoices, true);
-            };
+        if (!\is_callable($preferredChoices)) {
+            if (empty($preferredChoices)) {
+                $preferredChoices = null;
+            } else {
+                // make sure we have keys that reflect order
+                $preferredChoices = array_values($preferredChoices);
+                $preferredChoices = static function ($choice) use ($preferredChoices) {
+                    return array_search($choice, $preferredChoices, true);
+                };
+            }
         }
 
         // The names are generated from an incrementing integer by default
@@ -76,7 +104,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 self::addChoiceViewsGroupedByCallable(
                     $groupBy,
                     $choice,
-                    (string) $value,
+                    $value,
                     $label,
                     $keys,
                     $index,
@@ -99,6 +127,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             foreach ($otherViews as $key => $view) {
                 if ($view instanceof ChoiceGroupView && 0 === \count($view->choices)) {
                     unset($otherViews[$key]);
+                }
+            }
+
+            foreach ($preferredViewsOrder as $key => $groupViewsOrder) {
+                if ($groupViewsOrder) {
+                    $preferredViewsOrder[$key] = min($groupViewsOrder);
+                } else {
+                    unset($preferredViewsOrder[$key]);
                 }
             }
         } else {
@@ -126,7 +162,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceView($choice, string $value, $label, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
@@ -154,15 +190,15 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
+        if (null !== $isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
             $preferredViewsOrder[$nextIndex] = $preferredKey;
-        } else {
-            $otherViews[$nextIndex] = $view;
         }
+
+        $otherViews[$nextIndex] = $view;
     }
 
-    private static function addChoiceViewsFromStructuredValues($values, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceViewsFromStructuredValues(array $values, $label, array $choices, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         foreach ($values as $key => $value) {
             if (null === $value) {
@@ -214,7 +250,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewsGroupedByCallable($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceViewsGroupedByCallable(callable $groupBy, $choice, string $value, $label, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         $groupLabels = $groupBy($choice, $keys[$value], $value);
 
@@ -245,6 +281,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $preferredViews[$groupLabel] = new ChoiceGroupView($groupLabel);
                 $otherViews[$groupLabel] = new ChoiceGroupView($groupLabel);
             }
+            if (!isset($preferredViewsOrder[$groupLabel])) {
+                $preferredViewsOrder[$groupLabel] = [];
+            }
 
             self::addChoiceView(
                 $choice,
@@ -255,7 +294,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $isPreferred,
                 $preferredViews[$groupLabel]->choices,
-                $preferredViewsOrder,
+                $preferredViewsOrder[$groupLabel],
                 $otherViews[$groupLabel]->choices
             );
         }

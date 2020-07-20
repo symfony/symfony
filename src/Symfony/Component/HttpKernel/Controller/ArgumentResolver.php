@@ -43,7 +43,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getArguments(Request $request, $controller): array
+    public function getArguments(Request $request, callable $controller): array
     {
         $arguments = [];
 
@@ -62,7 +62,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
 
                 if (!$atLeastOne) {
-                    throw new \InvalidArgumentException(sprintf('%s::resolve() must yield at least one value.', \get_class($resolver)));
+                    throw new \InvalidArgumentException(sprintf('"%s::resolve()" must yield at least one value.', get_debug_type($resolver)));
                 }
 
                 // continue to the next controller argument

@@ -1,13 +1,12 @@
 {
-    "Version": "2.1.47.82",
     "Names": {
         "PEN": [
             "PEN",
-            "PEN"
+            "Sol Peruano"
         ],
         "USD": [
             "$",
-            "USD"
+            "Dólar Americano"
         ]
     }
 }

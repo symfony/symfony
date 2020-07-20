@@ -15,10 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\VarDumper\Caster\LinkStub;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
 class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -26,12 +28,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      * @var KernelInterface
      */
     private $kernel;
-    private $hasVarDumper;
-
-    public function __construct()
-    {
-        $this->hasVarDumper = class_exists(LinkStub::class);
-    }
 
     /**
      * Sets the Kernel associated with this Request.
@@ -44,7 +40,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data = [
             'token' => $response->headers->get('X-Debug-Token'),
@@ -65,14 +61,14 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = $this->hasVarDumper ? new LinkStub($bundle->getPath()) : $bundle->getPath();
+                $this->data['bundles'][$name] = new ClassStub(\get_class($bundle));
             }
 
             $this->data['symfony_state'] = $this->determineSymfonyState();
             $this->data['symfony_minor_version'] = sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION);
             $this->data['symfony_lts'] = 4 === Kernel::MINOR_VERSION;
-            $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE);
-            $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE);
+            $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
+            $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
             $this->data['symfony_eom'] = $eom->format('F Y');
             $this->data['symfony_eol'] = $eol->format('F Y');
         }
@@ -99,7 +95,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the token.
      *
-     * @return string The token
+     * @return string|null The token
      */
     public function getToken()
     {
@@ -289,11 +285,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string One of: dev, stable, eom, eol
      */
-    private function determineSymfonyState()
+    private function determineSymfonyState(): string
     {
         $now = new \DateTime();
-        $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
-        $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE)->modify('last day of this month');
+        $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
+        $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->modify('last day of this month');
 
         if ($now > $eol) {
             $versionState = 'eol';

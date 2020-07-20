@@ -37,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class SwitchUserListener
+class SwitchUserListener extends AbstractListener
 {
     const EXIT_VALUE = '_exit';
 
@@ -71,18 +71,38 @@ class SwitchUserListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        // usernames can be falsy
+        $username = $request->get($this->usernameParameter);
+
+        if (null === $username || '' === $username) {
+            $username = $request->headers->get($this->usernameParameter);
+        }
+
+        // if it's still "empty", nothing to do.
+        if (null === $username || '' === $username) {
+            return false;
+        }
+
+        $request->attributes->set('_switch_user_username', $username);
+
+        return true;
+    }
+
+    /**
      * Handles the switch to another user.
      *
      * @throws \LogicException if switching to a user failed
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
-        $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
 
-        if (!$username) {
-            return;
-        }
+        $username = $request->attributes->get('_switch_user_username');
+        $request->attributes->remove('_switch_user_username');
 
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
@@ -94,7 +114,8 @@ class SwitchUserListener
             try {
                 $this->tokenStorage->setToken($this->attemptSwitchUser($request, $username));
             } catch (AuthenticationException $e) {
-                throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                // Generate 403 in any conditions to prevent user enumeration vulnerabilities
+                throw new AccessDeniedException('Switch User failed: '.$e->getMessage(), $e);
             }
         }
 
@@ -108,17 +129,12 @@ class SwitchUserListener
     }
 
     /**
-     * Attempts to switch to another user.
-     *
-     * @param Request $request  A Request instance
-     * @param string  $username
-     *
-     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     * Attempts to switch to another user and returns the new token if successfully switched.
      *
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request, $username): ?TokenInterface
+    private function attemptSwitchUser(Request $request, string $username): ?TokenInterface
     {
         $token = $this->tokenStorage->getToken();
         $originalToken = $this->getOriginalToken($token);
@@ -128,10 +144,27 @@ class SwitchUserListener
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // User already switched, exit before seamlessly switching to another user
+            $token = $this->attemptExitUser($request);
         }
 
-        $user = $this->provider->loadUserByUsername($username);
+        $currentUsername = $token->getUsername();
+        $nonExistentUsername = '_'.md5(random_bytes(8).$username);
+
+        // To protect against user enumeration via timing measurements
+        // we always load both successfully and unsuccessfully
+        try {
+            $user = $this->provider->loadUserByUsername($username);
+
+            try {
+                $this->provider->loadUserByUsername($nonExistentUsername);
+            } catch (\Exception $e) {
+            }
+        } catch (AuthenticationException $e) {
+            $this->provider->loadUserByUsername($currentUsername);
+
+            throw $e;
+        }
 
         if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
             $exception = new AccessDeniedException();
@@ -147,7 +180,7 @@ class SwitchUserListener
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-
+        $roles[] = 'ROLE_PREVIOUS_ADMIN';
         $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
 
         if (null !== $this->dispatcher) {
@@ -161,9 +194,7 @@ class SwitchUserListener
     }
 
     /**
-     * Attempts to exit from an already switched user.
-     *
-     * @return TokenInterface The original TokenInterface instance
+     * Attempts to exit from an already switched user and returns the original token.
      *
      * @throws AuthenticationCredentialsNotFoundException
      */

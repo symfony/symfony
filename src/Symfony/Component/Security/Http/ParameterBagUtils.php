@@ -29,23 +29,20 @@ final class ParameterBagUtils
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
      *
-     * @param ParameterBag $parameters The parameter bag
-     * @param string       $path       The key
-     *
      * @return mixed
      *
      * @throws InvalidArgumentException when the given path is malformed
      */
-    public static function getParameterBagValue(ParameterBag $parameters, $path)
+    public static function getParameterBagValue(ParameterBag $parameters, string $path)
     {
         if (false === $pos = strpos($path, '[')) {
-            return $parameters->get($path);
+            return $parameters->all()[$path] ?? null;
         }
 
         $root = substr($path, 0, $pos);
 
-        if (null === $value = $parameters->get($root)) {
-            return;
+        if (null === $value = $parameters->all()[$root] ?? null) {
+            return null;
         }
 
         if (null === self::$propertyAccessor) {
@@ -55,7 +52,7 @@ final class ParameterBagUtils
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
         } catch (AccessException $e) {
-            return;
+            return null;
         }
     }
 
@@ -64,14 +61,11 @@ final class ParameterBagUtils
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
      *
-     * @param Request $request The request
-     * @param string  $path    The key
-     *
      * @return mixed
      *
      * @throws InvalidArgumentException when the given path is malformed
      */
-    public static function getRequestParameterValue(Request $request, $path)
+    public static function getRequestParameterValue(Request $request, string $path)
     {
         if (false === $pos = strpos($path, '[')) {
             return $request->get($path);
@@ -80,7 +74,7 @@ final class ParameterBagUtils
         $root = substr($path, 0, $pos);
 
         if (null === $value = $request->get($root)) {
-            return;
+            return null;
         }
 
         if (null === self::$propertyAccessor) {
@@ -90,7 +84,7 @@ final class ParameterBagUtils
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
         } catch (AccessException $e) {
-            return;
+            return null;
         }
     }
 }

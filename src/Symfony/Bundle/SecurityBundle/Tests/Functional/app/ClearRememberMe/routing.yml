@@ -1,0 +1,7 @@
+login:
+    path: /login
+
+foo:
+    path: /foo
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\RememberMeFooController

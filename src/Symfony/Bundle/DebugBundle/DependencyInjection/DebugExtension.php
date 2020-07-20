@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 
+use Symfony\Bridge\Monolog\Command\ServerLogCommand;
 use Symfony\Bundle\DebugBundle\Command\ServerDumpPlaceholderCommand;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -36,8 +37,8 @@ class DebugExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.php');
 
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems', [$config['max_items']])
@@ -89,6 +90,10 @@ class DebugExtension extends Extension
                     'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
                 ]])
             ;
+        }
+
+        if (!class_exists(ServerLogCommand::class)) {
+            $container->removeDefinition('monolog.command.server_log');
         }
     }
 

@@ -116,7 +116,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function count()
     {
@@ -124,7 +124,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function offsetExists($offset)
     {

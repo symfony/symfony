@@ -38,7 +38,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     public function __construct(TranslatorInterface $translator)
     {
         if (!$translator instanceof TranslatorBagInterface || !$translator instanceof LocaleAwareInterface) {
-            throw new InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and LocaleAwareInterface.', \get_class($translator)));
+            throw new InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and LocaleAwareInterface.', get_debug_type($translator)));
         }
 
         $this->translator = $translator;
@@ -47,9 +47,9 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
     {
-        $trans = $this->translator->trans($id, $parameters, $domain, $locale);
+        $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters);
 
         return $trans;
@@ -58,7 +58,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale)
     {
         $this->translator->setLocale($locale);
     }
@@ -81,12 +81,16 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[]
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         if ($this->translator instanceof WarmableInterface) {
-            $this->translator->warmUp($cacheDir);
+            return (array) $this->translator->warmUp($cacheDir);
         }
+
+        return [];
     }
 
     /**
@@ -106,7 +110,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * Passes through all unknown calls onto the translator object.
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
         return $this->translator->{$method}(...$args);
     }
@@ -119,22 +123,15 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return $this->messages;
     }
 
-    /**
-     * @param string|null $locale
-     * @param string|null $domain
-     * @param string      $id
-     * @param string      $translation
-     * @param array|null  $parameters
-     */
-    private function collectMessage($locale, $domain, $id, $translation, $parameters = [])
+    private function collectMessage(?string $locale, ?string $domain, string $id, string $translation, ?array $parameters = [])
     {
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         $locale = $catalogue->getLocale();
+        $fallbackLocale = null;
         if ($catalogue->defines($id, $domain)) {
             $state = self::MESSAGE_DEFINED;
         } elseif ($catalogue->has($id, $domain)) {
@@ -143,10 +140,9 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             $fallbackCatalogue = $catalogue->getFallbackCatalogue();
             while ($fallbackCatalogue) {
                 if ($fallbackCatalogue->defines($id, $domain)) {
-                    $locale = $fallbackCatalogue->getLocale();
+                    $fallbackLocale = $fallbackCatalogue->getLocale();
                     break;
                 }
-
                 $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
             }
         } else {
@@ -155,6 +151,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
         $this->messages[] = [
             'locale' => $locale,
+            'fallbackLocale' => $fallbackLocale,
             'domain' => $domain,
             'id' => $id,
             'translation' => $translation,

@@ -23,7 +23,7 @@ class Valid extends Constraint
 {
     public $traverse = true;
 
-    public function __get($option)
+    public function __get(string $option)
     {
         if ('groups' === $option) {
             // when this is reached, no groups have been configured

@@ -23,21 +23,24 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class MockResponse implements ResponseInterface
+class MockResponse implements ResponseInterface, StreamableInterface
 {
-    use ResponseTrait {
+    use CommonResponseTrait;
+    use TransportResponseTrait {
         doDestruct as public __destruct;
     }
 
     private $body;
     private $requestOptions = [];
+    private $requestUrl;
+    private $requestMethod;
 
     private static $mainMulti;
     private static $idSequence = 0;
 
     /**
      * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
-     *                                       yielding an empty string simulates a timeout,
+     *                                       yielding an empty string simulates an idle timeout,
      *                                       exceptions are turned to TransportException
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
@@ -45,7 +48,7 @@ class MockResponse implements ResponseInterface
     public function __construct($body = '', array $info = [])
     {
         $this->body = is_iterable($body) ? $body : (string) $body;
-        $this->info = $info + $this->info;
+        $this->info = $info + ['http_code' => 200] + $this->info;
 
         if (!isset($info['response_headers'])) {
             return;
@@ -59,7 +62,8 @@ class MockResponse implements ResponseInterface
             }
         }
 
-        $this->info['response_headers'] = $responseHeaders;
+        $this->info['response_headers'] = [];
+        self::addResponseHeaders($responseHeaders, $this->info, $this->headers);
     }
 
     /**
@@ -68,6 +72,22 @@ class MockResponse implements ResponseInterface
     public function getRequestOptions(): array
     {
         return $this->requestOptions;
+    }
+
+    /**
+     * Returns the URL used when doing the request.
+     */
+    public function getRequestUrl(): string
+    {
+        return $this->requestUrl;
+    }
+
+    /**
+     * Returns the method used when doing the request.
+     */
+    public function getRequestMethod(): string
+    {
+        return $this->requestMethod;
     }
 
     /**
@@ -81,8 +101,19 @@ class MockResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
+    public function cancel(): void
+    {
+        $this->info['canceled'] = true;
+        $this->info['error'] = 'Response has been canceled.';
+        $this->body = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function close(): void
     {
+        $this->inflate = null;
         $this->body = [];
     }
 
@@ -94,16 +125,9 @@ class MockResponse implements ResponseInterface
         $response = new self([]);
         $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
-        $response->content = ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
+        $response->shouldBuffer = $options['buffer'] ?? true;
         $response->initializer = static function (self $response) {
-            if (null !== $response->info['error']) {
-                throw new TransportException($response->info['error']);
-            }
-
-            if (\is_array($response->body[0] ?? null)) {
-                // Consume the first chunk if it's not yielded yet
-                self::stream([$response])->current();
-            }
+            return \is_array($response->body[0] ?? null);
         };
 
         $response->info['redirect_count'] = 0;
@@ -116,6 +140,8 @@ class MockResponse implements ResponseInterface
 
         if ($mock instanceof self) {
             $mock->requestOptions = $response->requestOptions;
+            $mock->requestMethod = $method;
+            $mock->requestUrl = $url;
         }
 
         self::writeRequest($response, $options, $mock);
@@ -150,8 +176,11 @@ class MockResponse implements ResponseInterface
         foreach ($responses as $response) {
             $id = $response->id;
 
-            if (!$response->body) {
-                // Last chunk
+            if (null === $response->body) {
+                // Canceled response
+                $response->body = [];
+            } elseif ([] === $response->body) {
+                // Error chunk
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
             } elseif (null === $chunk = array_shift($response->body)) {
@@ -163,9 +192,14 @@ class MockResponse implements ResponseInterface
                 try {
                     $offset = 0;
                     $chunk[1]->getStatusCode();
-                    $response->headers = $chunk[1]->getHeaders(false);
+                    $chunk[1]->getHeaders(false);
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
                     $multi->handlesActivity[$id][] = new FirstChunk();
+                    $buffer = $response->requestOptions['buffer'] ?? null;
+
+                    if ($buffer instanceof \Closure && $response->content = $buffer($response->headers) ?: null) {
+                        $response->content = \is_resource($response->content) ? $response->content : fopen('php://temp', 'w+');
+                    }
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[$id][] = null;
                     $multi->handlesActivity[$id][] = $e;
@@ -173,11 +207,6 @@ class MockResponse implements ResponseInterface
             } else {
                 // Data or timeout chunk
                 $multi->handlesActivity[$id][] = $chunk;
-
-                if (\is_string($chunk) && null !== $response->content) {
-                    // Buffer response body
-                    fwrite($response->content, $chunk);
-                }
             }
         }
     }
@@ -220,7 +249,7 @@ class MockResponse implements ResponseInterface
         } elseif ($body instanceof \Closure) {
             while ('' !== $data = $body(16372)) {
                 if (!\is_string($data)) {
-                    throw new TransportException(sprintf('Return value of the "body" option callback must be string, %s returned.', \gettype($data)));
+                    throw new TransportException(sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
                 }
 
                 // "notify" upload progress
@@ -242,9 +271,9 @@ class MockResponse implements ResponseInterface
 
         // populate info related to headers
         $info = $mock->getInfo() ?: [];
-        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode(false) ?: 200;
+        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode() ?: 200;
         $response->addResponseHeaders($info['response_headers'] ?? [], $response->info, $response->headers);
-        $dlSize = isset($response->headers['content-encoding']) ? 0 : (int) ($response->headers['content-length'][0] ?? 0);
+        $dlSize = isset($response->headers['content-encoding']) || 'HEAD' === $response->info['http_method'] || \in_array($response->info['http_code'], [204, 304], true) ? 0 : (int) ($response->headers['content-length'][0] ?? 0);
 
         $response->info = [
             'start_time' => $response->info['start_time'],
@@ -265,8 +294,8 @@ class MockResponse implements ResponseInterface
         if (!\is_string($body)) {
             foreach ($body as $chunk) {
                 if ('' === $chunk = (string) $chunk) {
-                    // simulate a timeout
-                    $response->body[] = new ErrorChunk($offset);
+                    // simulate an idle timeout
+                    $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
                 } else {
                     $response->body[] = $chunk;
                     $offset += \strlen($chunk);
@@ -287,7 +316,7 @@ class MockResponse implements ResponseInterface
         $onProgress($offset, $dlSize, $response->info);
 
         if ($dlSize && $offset !== $dlSize) {
-            throw new TransportException(sprintf('Transfer closed with %s bytes remaining to read.', $dlSize - $offset));
+            throw new TransportException(sprintf('Transfer closed with %d bytes remaining to read.', $dlSize - $offset));
         }
     }
 }

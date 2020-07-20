@@ -9,12 +9,10 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterMappingsPassTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageould Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"
-     */
     public function testNoDriverParmeterException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"');
         $container = $this->createBuilder();
         $this->process($container, [
             'manager.param.one',

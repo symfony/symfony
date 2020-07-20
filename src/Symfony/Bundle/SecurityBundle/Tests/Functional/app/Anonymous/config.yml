@@ -1,0 +1,24 @@
+framework:
+    secret: test
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
+    validation: { enabled: true, enable_annotations: true }
+    csrf_protection: true
+    form: true
+    test: ~
+    default_locale: en
+    session:
+        storage_id: session.storage.mock_file
+    profiler: { only_exceptions: false }
+
+services:
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AnonymousBundle\AppCustomAuthenticator: ~
+
+security:
+    firewalls:
+        secure:
+            pattern: ^/
+            anonymous: false
+            stateless: true
+            guard:
+                authenticators:
+                    - Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AnonymousBundle\AppCustomAuthenticator

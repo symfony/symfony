@@ -30,9 +30,7 @@ class FunctionNode extends AbstractNode
     private $arguments;
 
     /**
-     * @param NodeInterface $selector
-     * @param string        $name
-     * @param Token[]       $arguments
+     * @param Token[] $arguments
      */
     public function __construct(NodeInterface $selector, string $name, array $arguments = [])
     {
@@ -54,7 +52,7 @@ class FunctionNode extends AbstractNode
     /**
      * @return Token[]
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }

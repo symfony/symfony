@@ -42,8 +42,8 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute([]);
         $display = $tester->getDisplay();
 
-        $this->assertContains('The "amqp" transport was setup successfully.', $display);
-        $this->assertContains('The "other_transport" transport does not support setup.', $display);
+        $this->assertStringContainsString('The "amqp" transport was set up successfully.', $display);
+        $this->assertStringContainsString('The "other_transport" transport does not support setup.', $display);
     }
 
     public function testReceiverNameArgument()
@@ -66,15 +66,13 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'amqp']);
         $display = $tester->getDisplay();
 
-        $this->assertContains('The "amqp" transport was setup successfully.', $display);
+        $this->assertStringContainsString('The "amqp" transport was set up successfully.', $display);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "not_found" transport does not exist.
-     */
     public function testReceiverNameArgumentNotFound()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The "not_found" transport does not exist.');
         // mock a service locator
         /** @var MockObject|ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);

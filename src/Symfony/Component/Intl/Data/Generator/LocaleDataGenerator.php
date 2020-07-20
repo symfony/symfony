@@ -36,7 +36,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function scanLocales(LocaleScanner $scanner, $sourceDir)
+    protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         $this->locales = $scanner->scanLocales($sourceDir.'/locales');
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
@@ -48,7 +48,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $filesystem = new Filesystem();
         $filesystem->mkdir([
@@ -67,19 +67,19 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Write parents locale file for the Translation component
         file_put_contents(
             __DIR__.'/../../../Translation/Resources/data/parents.json',
-            json_encode($this->localeParents, \JSON_PRETTY_PRINT).\PHP_EOL
+            json_encode($this->localeParents, JSON_PRETTY_PRINT).PHP_EOL
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         // Don't generate aliases, as they are resolved during runtime
         // Unless an alias is needed as fallback for de-duplication purposes
         if (isset($this->localeAliases[$displayLocale]) && !$this->generatingFallback) {
-            return;
+            return null;
         }
 
         // Generate locale names for all locales that have translations in
@@ -124,7 +124,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
             $data['Names'] = array_diff($data['Names'], $fallbackData['Names']);
         }
         if (!$data['Names']) {
-            return;
+            return null;
         }
 
         return $data;
@@ -133,14 +133,15 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         return [
             'Locales' => $this->locales,
@@ -148,10 +149,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         ];
     }
 
-    /**
-     * @return string
-     */
-    private function generateLocaleName(BundleEntryReaderInterface $reader, $tempDir, $locale, $displayLocale, $pattern, $separator)
+    private function generateLocaleName(BundleEntryReaderInterface $reader, string $tempDir, string $locale, string $displayLocale, string $pattern, string $separator): string
     {
         // Apply generic notation using square brackets as described per http://cldr.unicode.org/translation/language-names
         $name = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Languages', \Locale::getPrimaryLanguage($locale)]));
@@ -166,8 +164,8 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Discover the name of the region part of the locale
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
-            if (!RegionDataGenerator::isValidCountryCode($region)) {
-                throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
+            if (ctype_alpha($region) && !RegionDataGenerator::isValidCountryCode($region)) {
+                throw new MissingResourceException(sprintf('Skipping "%s" due an invalid country.', $locale));
             }
 
             $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));

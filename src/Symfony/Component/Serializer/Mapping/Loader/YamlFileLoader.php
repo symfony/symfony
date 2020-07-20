@@ -93,6 +93,14 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
                 }
+
+                if (isset($data['ignore'])) {
+                    if (!\is_bool($data['ignore'])) {
+                        throw new MappingException(sprintf('The "ignore" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setIgnore($data['ignore']);
+                }
             }
         }
 
@@ -128,7 +136,7 @@ class YamlFileLoader extends FileLoader
         return array_keys($this->classes);
     }
 
-    private function getClassesFromYaml()
+    private function getClassesFromYaml(): array
     {
         if (!stream_is_local($this->file)) {
             throw new MappingException(sprintf('This is not a local file "%s".', $this->file));

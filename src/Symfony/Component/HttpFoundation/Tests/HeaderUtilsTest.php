@@ -83,11 +83,9 @@ class HeaderUtilsTest extends TestCase
         $this->assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMakeDispositionInvalidDisposition()
     {
+        $this->expectException('InvalidArgumentException');
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
@@ -113,10 +111,10 @@ class HeaderUtilsTest extends TestCase
 
     /**
      * @dataProvider provideMakeDispositionFail
-     * @expectedException \InvalidArgumentException
      */
     public function testMakeDispositionFail($disposition, $filename)
     {
+        $this->expectException('InvalidArgumentException');
         HeaderUtils::makeDisposition($disposition, $filename);
     }
 
@@ -130,5 +128,42 @@ class HeaderUtilsTest extends TestCase
             ['attachment', '\foo.html'],
             ['attachment', 'föö.html'],
         ];
+    }
+
+    /**
+     * @dataProvider provideParseQuery
+     */
+    public function testParseQuery(string $query, string $expected = null)
+    {
+        $this->assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));
+    }
+
+    public function provideParseQuery()
+    {
+        return [
+            ['a=b&c=d'],
+            ['a.b=c'],
+            ['a+b=c'],
+            ["a\0b=c", 'a='],
+            ['a%00b=c', 'a=c'],
+            ['a[b=c', 'a%5Bb=c'],
+            ['a]b=c', 'a%5Db=c'],
+            ['a[b]=c', 'a%5Bb%5D=c'],
+            ['a[b][c.d]=c', 'a%5Bb%5D%5Bc.d%5D=c'],
+            ['a%5Bb%5D=c'],
+        ];
+    }
+
+    public function testParseCookie()
+    {
+        $query = 'a.b=c; def%5Bg%5D=h';
+        $this->assertSame($query, http_build_query(HeaderUtils::parseQuery($query, false, ';'), '', '; '));
+    }
+
+    public function testParseQueryIgnoreBrackets()
+    {
+        $this->assertSame(['a.b' => ['A', 'B']], HeaderUtils::parseQuery('a.b=A&a.b=B', true));
+        $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b[]=A', true));
+        $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b%5B%5D=A', true));
     }
 }

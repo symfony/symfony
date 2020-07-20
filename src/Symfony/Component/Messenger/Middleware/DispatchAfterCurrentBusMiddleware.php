@@ -81,12 +81,16 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
         // "Root dispatch" call is finished, dispatch stored messages.
         $exceptions = [];
         while (null !== $queueItem = array_shift($this->queue)) {
+            // Save how many messages are left in queue before handling the message
+            $queueLengthBefore = \count($this->queue);
             try {
                 // Execute the stored messages
                 $queueItem->getStack()->next()->handle($queueItem->getEnvelope(), $queueItem->getStack());
             } catch (\Exception $exception) {
                 // Gather all exceptions
                 $exceptions[] = $exception;
+                // Restore queue to previous state
+                $this->queue = \array_slice($this->queue, 0, $queueLengthBefore);
             }
         }
 

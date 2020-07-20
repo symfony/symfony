@@ -38,10 +38,8 @@ class ContentSecurityPolicyHandler
      *  - The request - In case HTML content is fetched via AJAX and inserted in DOM, it must use the same nonce as origin
      *  - The response -  A call to getNonces() has already been done previously. Same nonce are returned
      *  - They are otherwise randomly generated
-     *
-     * @return array
      */
-    public function getNonces(Request $request, Response $response)
+    public function getNonces(Request $request, Response $response): array
     {
         if ($request->headers->has('X-SymfonyProfiler-Script-Nonce') && $request->headers->has('X-SymfonyProfiler-Style-Nonce')) {
             return [
@@ -83,7 +81,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array Nonces used by the bundle in Content-Security-Policy header
      */
-    public function updateResponseHeaders(Request $request, Response $response)
+    public function updateResponseHeaders(Request $request, Response $response): array
     {
         if ($this->cspDisabled) {
             $this->removeCspHeaders($response);
@@ -113,10 +111,8 @@ class ContentSecurityPolicyHandler
 
     /**
      * Updates Content-Security-Policy headers in a response.
-     *
-     * @return array
      */
-    private function updateCspHeaders(Response $response, array $nonces = [])
+    private function updateCspHeaders(Response $response, array $nonces = []): array
     {
         $nonces = array_replace([
             'csp_script_nonce' => $this->generateNonce(),
@@ -128,17 +124,22 @@ class ContentSecurityPolicyHandler
         $headers = $this->getCspHeaders($response);
 
         foreach ($headers as $header => $directives) {
-            foreach (['script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce'] as $type => $tokenName) {
+            foreach (['script-src' => 'csp_script_nonce', 'script-src-elem' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce', 'style-src-elem' => 'csp_style_nonce'] as $type => $tokenName) {
                 if ($this->authorizesInline($directives, $type)) {
                     continue;
                 }
                 if (!isset($headers[$header][$type])) {
-                    if (isset($headers[$header]['default-src'])) {
-                        $headers[$header][$type] = $headers[$header]['default-src'];
-                    } else {
-                        // If there is no script-src/style-src and no default-src, no additional rules required.
+                    if (null === $fallback = $this->getDirectiveFallback($directives, $type)) {
                         continue;
                     }
+
+                    if (['\'none\''] === $fallback) {
+                        // Fallback came from "default-src: 'none'"
+                        // 'none' is invalid if it's not the only expression in the source list, so we leave it out
+                        $fallback = [];
+                    }
+
+                    $headers[$header][$type] = $fallback;
                 }
                 $ruleIsSet = true;
                 if (!\in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
@@ -161,22 +162,16 @@ class ContentSecurityPolicyHandler
 
     /**
      * Generates a valid Content-Security-Policy nonce.
-     *
-     * @return string
      */
-    private function generateNonce()
+    private function generateNonce(): string
     {
         return $this->nonceGenerator->generate();
     }
 
     /**
      * Converts a directive set array into Content-Security-Policy header.
-     *
-     * @param array $directives The directive set
-     *
-     * @return string The Content-Security-Policy header
      */
-    private function generateCspHeader(array $directives)
+    private function generateCspHeader(array $directives): string
     {
         return array_reduce(array_keys($directives), function ($res, $name) use ($directives) {
             return ('' !== $res ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name]));
@@ -185,12 +180,8 @@ class ContentSecurityPolicyHandler
 
     /**
      * Converts a Content-Security-Policy header value into a directive set array.
-     *
-     * @param string $header The header value
-     *
-     * @return array The directive set
      */
-    private function parseDirectives(string $header)
+    private function parseDirectives(string $header): array
     {
         $directives = [];
 
@@ -208,26 +199,19 @@ class ContentSecurityPolicyHandler
 
     /**
      * Detects if the 'unsafe-inline' is prevented for a directive within the directive set.
-     *
-     * @param array  $directivesSet The directive set
-     * @param string $type          The name of the directive to check
-     *
-     * @return bool
      */
-    private function authorizesInline(array $directivesSet, string $type)
+    private function authorizesInline(array $directivesSet, string $type): bool
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];
-        } elseif (isset($directivesSet['default-src'])) {
-            $directives = $directivesSet['default-src'];
-        } else {
+        } elseif (null === $directives = $this->getDirectiveFallback($directivesSet, $type)) {
             return false;
         }
 
         return \in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
     }
 
-    private function hasHashOrNonce(array $directives)
+    private function hasHashOrNonce(array $directives): bool
     {
         foreach ($directives as $directive) {
             if ('\'' !== substr($directive, -1)) {
@@ -244,13 +228,21 @@ class ContentSecurityPolicyHandler
         return false;
     }
 
+    private function getDirectiveFallback(array $directiveSet, $type)
+    {
+        if (\in_array($type, ['script-src-elem', 'style-src-elem'], true) || !isset($directiveSet['default-src'])) {
+            // Let the browser fallback on it's own
+            return null;
+        }
+
+        return $directiveSet['default-src'];
+    }
+
     /**
      * Retrieves the Content-Security-Policy headers (either X-Content-Security-Policy or Content-Security-Policy) from
      * a response.
-     *
-     * @return array An associative array of headers
      */
-    private function getCspHeaders(Response $response)
+    private function getCspHeaders(Response $response): array
     {
         $headers = [];
 

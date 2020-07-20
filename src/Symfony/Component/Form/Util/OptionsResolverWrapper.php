@@ -24,7 +24,10 @@ class OptionsResolverWrapper extends OptionsResolver
 {
     private $undefined = [];
 
-    public function setNormalizer($option, \Closure $normalizer)
+    /**
+     * @return $this
+     */
+    public function setNormalizer(string $option, \Closure $normalizer): self
     {
         try {
             parent::setNormalizer($option, $normalizer);
@@ -35,7 +38,10 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function setAllowedValues($option, $allowedValues)
+    /**
+     * @return $this
+     */
+    public function setAllowedValues(string $option, $allowedValues): self
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
@@ -46,7 +52,10 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function addAllowedValues($option, $allowedValues)
+    /**
+     * @return $this
+     */
+    public function addAllowedValues(string $option, $allowedValues): self
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
@@ -57,7 +66,10 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function setAllowedTypes($option, $allowedTypes)
+    /**
+     * @return $this
+     */
+    public function setAllowedTypes(string $option, $allowedTypes): self
     {
         try {
             parent::setAllowedTypes($option, $allowedTypes);
@@ -68,7 +80,10 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function addAllowedTypes($option, $allowedTypes)
+    /**
+     * @return $this
+     */
+    public function addAllowedTypes(string $option, $allowedTypes): self
     {
         try {
             parent::addAllowedTypes($option, $allowedTypes);
@@ -79,12 +94,12 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function resolve(array $options = [])
+    public function resolve(array $options = []): array
     {
         throw new AccessException('Resolve options is not supported.');
     }
 
-    public function getUndefinedOptions()
+    public function getUndefinedOptions(): array
     {
         return array_keys($this->undefined);
     }

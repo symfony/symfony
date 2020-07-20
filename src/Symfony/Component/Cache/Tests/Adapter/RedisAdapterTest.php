@@ -11,19 +11,23 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
+/**
+ * @group integration
+ */
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        parent::setupBeforeClass();
+        parent::setUpBeforeClass();
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['lazy' => true]);
     }
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         $adapter = parent::createCachePool($defaultLifetime);
         $this->assertInstanceOf(RedisProxy::class, self::$redis);
@@ -34,7 +38,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     /**
      * @dataProvider provideValidSchemes
      */
-    public function testCreateConnection($dsnScheme)
+    public function testCreateConnection(string $dsnScheme)
     {
         $redis = RedisAdapter::createConnection($dsnScheme.':?host[h1]&host[h2]&host[/foo:]');
         $this->assertInstanceOf(\RedisArray::class, $redis);
@@ -63,15 +67,15 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @dataProvider provideFailedCreateConnection
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Redis connection failed
      */
-    public function testFailedCreateConnection($dsn)
+    public function testFailedCreateConnection(string $dsn)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideFailedCreateConnection()
+    public function provideFailedCreateConnection(): array
     {
         return [
             ['redis://localhost:1234'],
@@ -82,15 +86,15 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @dataProvider provideInvalidCreateConnection
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid Redis DSN
      */
-    public function testInvalidCreateConnection($dsn)
+    public function testInvalidCreateConnection(string $dsn)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid Redis DSN');
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideValidSchemes()
+    public function provideValidSchemes(): array
     {
         return [
             ['redis'],
@@ -98,7 +102,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         ];
     }
 
-    public function provideInvalidCreateConnection()
+    public function provideInvalidCreateConnection(): array
     {
         return [
             ['foo://localhost'],

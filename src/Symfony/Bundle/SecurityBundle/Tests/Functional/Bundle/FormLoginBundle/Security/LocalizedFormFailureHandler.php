@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -27,7 +28,7 @@ class LocalizedFormFailureHandler implements AuthenticationFailureHandlerInterfa
         $this->router = $router;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return new RedirectResponse($this->router->generate('localized_login_path', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }

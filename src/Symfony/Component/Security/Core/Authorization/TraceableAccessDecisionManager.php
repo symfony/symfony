@@ -47,8 +47,10 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null)
+    public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/): bool
     {
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -58,7 +60,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->currentLog[] = &$currentDecisionLog;
 
-        $result = $this->manager->decide($token, $attributes, $object);
+        $result = $this->manager->decide($token, $attributes, $object, 3 < \func_num_args() && func_get_arg(3));
 
         $currentDecisionLog['result'] = $result;
 
@@ -70,9 +72,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * Adds voter vote and class to the voter details.
      *
-     * @param VoterInterface $voter      voter
-     * @param array          $attributes attributes used for the vote
-     * @param int            $vote       vote of the voter
+     * @param array $attributes attributes used for the vote
+     * @param int   $vote       vote of the voter
      */
     public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
     {
@@ -84,10 +85,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getStrategy()
+    public function getStrategy(): string
     {
         // The $strategy property is misleading because it stores the name of its
         // method (e.g. 'decideAffirmative') instead of the original strategy name
@@ -98,15 +96,12 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return iterable|VoterInterface[]
      */
-    public function getVoters()
+    public function getVoters(): iterable
     {
         return $this->voters;
     }
 
-    /**
-     * @return array
-     */
-    public function getDecisionLog()
+    public function getDecisionLog(): array
     {
         return $this->decisionLog;
     }

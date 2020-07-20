@@ -47,10 +47,11 @@ class CookieTest extends TestCase
         return [
             ['foo=bar; path=/'],
             ['foo=bar; path=/foo'],
-            ['foo=bar; domain=google.com; path=/'],
+            ['foo="Test"; path=/'],
+            ['foo=bar; domain=example.com; path=/'],
             ['foo=bar; domain=example.com; path=/; secure', 'https://example.com/'],
             ['foo=bar; path=/; httponly'],
-            ['foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'],
+            ['foo=bar; domain=example.com; path=/foo; secure; httponly', 'https://example.com/'],
             ['foo=bar=baz; path=/'],
             ['foo=bar%3Dbaz; path=/'],
         ];
@@ -197,13 +198,11 @@ class CookieTest extends TestCase
         $this->assertFalse($cookie->isExpired());
     }
 
-    /**
-     * @expectedException        \UnexpectedValueException
-     * @expectedExceptionMessage The cookie expiration time "string" is not valid.
-     */
     public function testConstructException()
     {
-        $cookie = new Cookie('foo', 'bar', 'string');
+        $this->expectException('UnexpectedValueException');
+        $this->expectExceptionMessage('The cookie expiration time "string" is not valid.');
+        new Cookie('foo', 'bar', 'string');
     }
 
     public function testSameSite()

@@ -69,7 +69,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
                 }
 
                 $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', [new Reference($id)]);
@@ -92,7 +92,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
                 }
                 $listenerRefs[$con][$id] = new Reference($id);
 
@@ -109,7 +109,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
     }
 
-    private function getEventManagerDef(ContainerBuilder $container, $name)
+    private function getEventManagerDef(ContainerBuilder $container, string $name)
     {
         if (!isset($this->eventManagers[$name])) {
             $this->eventManagers[$name] = $container->getDefinition(sprintf($this->managerTemplate, $name));
@@ -125,15 +125,10 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * and knowing that the \SplPriorityQueue class does not respect the FIFO method,
      * we should not use this class.
      *
-     * @see https://bugs.php.net/bug.php?id=53710
-     * @see https://bugs.php.net/bug.php?id=60926
-     *
-     * @param string           $tagName
-     * @param ContainerBuilder $container
-     *
-     * @return array
+     * @see https://bugs.php.net/53710
+     * @see https://bugs.php.net/60926
      */
-    private function findAndSortTags($tagName, ContainerBuilder $container)
+    private function findAndSortTags(string $tagName, ContainerBuilder $container): array
     {
         $sortedTags = [];
 

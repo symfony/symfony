@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');
@@ -142,11 +142,9 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->getClientOriginalExtension());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileException
-     */
     public function testMoveLocalFileIsNotAllowed()
     {
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileException');
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
@@ -154,7 +152,7 @@ class UploadedFileTest extends TestCase
             UPLOAD_ERR_OK
         );
 
-        $movedFile = $file->move(__DIR__.'/Fixtures/directory');
+        $file->move(__DIR__.'/Fixtures/directory');
     }
 
     public function failedUploadedFile()
@@ -320,5 +318,19 @@ class UploadedFileTest extends TestCase
         );
 
         $this->assertFalse($file->isValid());
+    }
+
+    public function testGetMaxFilesize()
+    {
+        $size = UploadedFile::getMaxFilesize();
+
+        $this->assertIsInt($size);
+        $this->assertGreaterThan(0, $size);
+
+        if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
+            $this->assertSame(PHP_INT_MAX, $size);
+        } else {
+            $this->assertLessThan(PHP_INT_MAX, $size);
+        }
     }
 }

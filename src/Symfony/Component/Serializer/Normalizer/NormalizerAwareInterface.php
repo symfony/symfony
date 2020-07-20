@@ -20,8 +20,6 @@ interface NormalizerAwareInterface
 {
     /**
      * Sets the owning Normalizer object.
-     *
-     * @param NormalizerInterface $normalizer
      */
     public function setNormalizer(NormalizerInterface $normalizer);
 }

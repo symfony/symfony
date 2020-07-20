@@ -15,11 +15,9 @@ use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 
 class CustomFilterIteratorTest extends IteratorTestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testWithInvalidFilter()
     {
+        $this->expectException('InvalidArgumentException');
         new CustomFilterIterator(new Iterator(), ['foo']);
     }
 

@@ -26,7 +26,7 @@ class HelperTest extends TestCase
 
 class ProjectTemplateHelper extends Helper
 {
-    public function getName()
+    public function getName(): string
     {
         return 'foo';
     }

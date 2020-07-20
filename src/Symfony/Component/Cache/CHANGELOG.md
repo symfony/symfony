@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added max-items + LRU + max-lifetime capabilities to `ArrayCache`
+ * added `CouchbaseBucketAdapter`
+ * added context `cache-adapter` to log messages
+
 5.0.0
 -----
 
@@ -13,6 +20,14 @@ CHANGELOG
 -----
 
  * added support for connecting to Redis Sentinel clusters
+ * added argument `$prefix` to `AdapterInterface::clear()`
+ * improved `RedisTagAwareAdapter` to support Redis server >= 2.8 and up to 4B items per tag
+ * added `TagAwareMarshaller` for optimized data storage when using `AbstractTagAwareAdapter`
+ * added `DeflateMarshaller` to compress serialized values
+ * removed support for phpredis 4 `compression`
+ * [BC BREAK] `RedisTagAwareAdapter` is not compatible with `RedisCluster` from `Predis` anymore, use `phpredis` instead
+ * Marked the `CacheDataCollector` class as `@final`.
+ * added `SodiumMarshaller` to encrypt/decrypt values using libsodium
 
 4.3.0
 -----

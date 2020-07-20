@@ -40,9 +40,6 @@ interface AuthenticationEntryPointInterface
      *
      *     return new Response('Auth header required', 401);
      *
-     * @param Request                 $request       The request that resulted in an AuthenticationException
-     * @param AuthenticationException $authException The exception that started the authentication process
-     *
      * @return Response
      */
     public function start(Request $request, AuthenticationException $authException = null);

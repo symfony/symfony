@@ -23,12 +23,10 @@ class PathHeaderTest extends TestCase
         $this->assertEquals($address, $header->getAddress());
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testAddressMustComplyWithRfc2822()
     {
-        $header = new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
+        $this->expectException('Exception');
+        new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
     }
 
     public function testValueIsAngleAddrWithValidAddress()
@@ -51,13 +49,10 @@ class PathHeaderTest extends TestCase
         $this->assertEquals('<chris@xn--swftmailer-78a.org>', $header->getBodyAsString());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Mime\Exception\AddressEncoderException
-     */
-    public function testAddressMustBeEncodable()
+    public function testAddressMustBeEncodableWithUtf8CharsInLocalPart()
     {
         $header = new PathHeader('Return-Path', new Address('chrïs@swiftmailer.org'));
-        $header->getBodyAsString();
+        $this->assertSame('<chrïs@swiftmailer.org>', $header->getBodyAsString());
     }
 
     public function testSetBody()

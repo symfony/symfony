@@ -4,6 +4,7 @@
     "options": {
         "own": [
             "choice_attr",
+            "choice_filter",
             "choice_label",
             "choice_loader",
             "choice_name",
@@ -22,6 +23,7 @@
                 "data_class",
                 "empty_data",
                 "error_bubbling",
+                "invalid_message",
                 "trim"
             ]
         },
@@ -42,15 +44,19 @@
                 "help_html",
                 "help_translation_parameters",
                 "inherit_data",
+                "invalid_message_parameters",
+                "is_empty_callback",
                 "label",
                 "label_attr",
                 "label_format",
+                "label_html",
                 "label_translation_parameters",
                 "mapped",
                 "method",
                 "post_max_size_message",
                 "property_path",
                 "required",
+                "row_attr",
                 "translation_domain",
                 "upload_max_size_message"
             ]

@@ -26,7 +26,7 @@ class LocaleAwareListenerTest extends TestCase
     private $localeAwareService;
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeAwareService = $this->getMockBuilder(LocaleAwareInterface::class)->getMock();
         $this->requestStack = new RequestStack();

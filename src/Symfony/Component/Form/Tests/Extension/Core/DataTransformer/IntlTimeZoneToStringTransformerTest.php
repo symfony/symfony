@@ -41,19 +41,15 @@ class IntlTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals([\IntlTimeZone::createTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testInvalidTimezone()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         (new IntlTimeZoneToStringTransformer())->transform(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testUnknownTimezone()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         (new IntlTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
 }

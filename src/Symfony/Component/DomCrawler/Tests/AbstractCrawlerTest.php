@@ -76,21 +76,17 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddInvalidType()
     {
+        $this->expectException('InvalidArgumentException');
         $crawler = $this->createCrawler();
         $crawler->add(1);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Attaching DOM nodes from multiple documents in the same crawler is forbidden.
-     */
     public function testAddMultipleDocumentNode()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Attaching DOM nodes from multiple documents in the same crawler is forbidden.');
         $crawler = $this->createTestCrawler();
         $crawler->addHtmlContent($this->getDoctype().'<html><div class="foo"></html>', 'UTF-8');
     }
@@ -255,6 +251,13 @@ abstract class AbstractCrawlerTest extends TestCase
 
         $this->assertEquals('Two', $crawler->eq(1)->text(), '->eq() returns the nth node of the list');
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
+    }
+
+    public function testNormalizeWhiteSpace()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//p');
+        $this->assertSame('Elsa <3', $crawler->text(null, true), '->text(null, true) returns the text with normalized whitespace');
+        $this->assertNotSame('Elsa <3', $crawler->text(null, false));
     }
 
     public function testEach()
@@ -722,22 +725,18 @@ HTML;
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidLink()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidLinks()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -795,7 +794,7 @@ HTML;
     public function testLinks()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
-        $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
+        $this->assertIsArray($crawler->links(), '->links() returns an array');
 
         $this->assertCount(4, $crawler->links(), '->links() returns an array');
         $links = $crawler->links();
@@ -807,7 +806,7 @@ HTML;
     public function testImages()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
-        $this->assertInternalType('array', $crawler->images(), '->images() returns an array');
+        $this->assertIsArray($crawler->images(), '->images() returns an array');
 
         $this->assertCount(4, $crawler->images(), '->images() returns an array');
         $images = $crawler->images();
@@ -838,12 +837,10 @@ HTML;
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidForm()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->form();
     }
@@ -888,6 +885,105 @@ HTML;
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->siblings() throws an \InvalidArgumentException if the node list is empty');
         }
+    }
+
+    public function provideMatchTests()
+    {
+        yield ['#foo', true, '#foo'];
+        yield ['#foo', true, '.foo'];
+        yield ['#foo', true, '.other'];
+        yield ['#foo', false, '.bar'];
+
+        yield ['#bar', true, '#bar'];
+        yield ['#bar', true, '.bar'];
+        yield ['#bar', true, '.other'];
+        yield ['#bar', false, '.foo'];
+    }
+
+    /** @dataProvider provideMatchTests */
+    public function testMatch(string $mainNodeSelector, bool $expected, string $selector)
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div id="foo" class="foo other">
+        <div>
+            <div id="bar" class="bar other"></div>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $node = $crawler->filter($mainNodeSelector);
+        $this->assertSame($expected, $node->matches($selector));
+    }
+
+    public function testClosest()
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div class="lorem2 ok">
+        <div>
+            <div class="lorem3 ko"></div>
+        </div>
+        <div class="lorem1 ok">
+            <div id="foo" class="newFoo ok">
+                <div class="lorem1 ko"></div>
+            </div>
+        </div>
+    </div>
+    <div class="lorem2 ko">
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $foo = $crawler->filter('#foo');
+
+        $newFoo = $foo->closest('#foo');
+        $this->assertInstanceOf(Crawler::class, $newFoo);
+        $this->assertSame('newFoo ok', $newFoo->attr('class'));
+
+        $lorem1 = $foo->closest('.lorem1');
+        $this->assertInstanceOf(Crawler::class, $lorem1);
+        $this->assertSame('lorem1 ok', $lorem1->attr('class'));
+
+        $lorem2 = $foo->closest('.lorem2');
+        $this->assertInstanceOf(Crawler::class, $lorem2);
+        $this->assertSame('lorem2 ok', $lorem2->attr('class'));
+
+        $lorem3 = $foo->closest('.lorem3');
+        $this->assertNull($lorem3);
+
+        $notFound = $foo->closest('.not-found');
+        $this->assertNull($notFound);
+    }
+
+    public function testOuterHtml()
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div class="foo">
+    <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+    </ul>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $bar = $crawler->filter('ul');
+        $output = $bar->outerHtml();
+        $output = str_replace([' ', "\n"], '', $output);
+        $expected = '<ul><li>1</li><li>2</li><li>3</li></ul>';
+        $this->assertSame($expected, $output);
     }
 
     public function testNextAll()
@@ -951,7 +1047,7 @@ HTML;
             $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
         } catch (\PHPUnit\Framework\Error\Notice $e) {
             $this->fail('->children() does not trigger a notice if the node has no children');
-        } catch (\PHPUnit_Framework_Error_Notice $e) {
+        } catch (\PHPUnit\Framework\Error\Notice $e) {
             $this->fail('->children() does not trigger a notice if the node has no children');
         }
     }
@@ -1092,11 +1188,9 @@ HTML;
         $this->assertSame('input', $crawler->first()->nodeName());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty()
     {
+        $this->expectException('LogicException');
         $this->createCrawler()->evaluate('//form/input[1]');
     }
 
@@ -1148,6 +1242,10 @@ HTML;
                         <li>Two Bis</li>
                         <li>Three Bis</li>
                     </ul>
+                    <p class="whitespace">
+                        Elsa
+                        &lt;3
+                    </p>
                     <div id="parent">
                         <div id="child"></div>
                         <div id="child2" xmlns:foo="http://example.com"></div>

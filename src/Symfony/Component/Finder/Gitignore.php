@@ -21,13 +21,11 @@ class Gitignore
     /**
      * Returns a regexp which is the equivalent of the gitignore pattern.
      *
-     * @param string $gitignoreFileContent
-     *
      * @return string The regexp
      */
     public static function toRegex(string $gitignoreFileContent): string
     {
-        $gitignoreFileContent = preg_replace('/^[^\\\\]*#.*/', '', $gitignoreFileContent);
+        $gitignoreFileContent = preg_replace('/^[^\\\r\n]*#.*/m', '', $gitignoreFileContent);
         $gitignoreLines = preg_split('/\r\n|\r|\n/', $gitignoreFileContent);
         $gitignoreLines = array_map('trim', $gitignoreLines);
         $gitignoreLines = array_filter($gitignoreLines);

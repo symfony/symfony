@@ -134,7 +134,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         if (null !== $locale) {
             do {
                 if (null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
-                    unset($parameters['_locale']);
                     break;
                 }
             } while (false !== $locale = strstr($locale, '_', true));
@@ -147,13 +146,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 
-        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostTokens(), $route->getSchemes());
+        $defaults = $route->getDefaults();
+        $variables = $compiledRoute->getVariables();
+
+        if (isset($defaults['_canonical_route']) && isset($defaults['_locale'])) {
+            if (!\in_array('_locale', $variables, true)) {
+                unset($parameters['_locale']);
+            } elseif (!isset($parameters['_locale'])) {
+                $parameters['_locale'] = $defaults['_locale'];
+            }
+        }
+
+        return $this->doGenerate($variables, $defaults, $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostTokens(), $route->getSchemes());
     }
 
     /**
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
+     *
+     * @return string
      */
     protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = [])
     {

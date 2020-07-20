@@ -53,7 +53,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
      *
      * @param array $localeAliases A mapping of locale aliases to locales
      */
-    public function setLocaleAliases($localeAliases)
+    public function setLocaleAliases(array $localeAliases)
     {
         $this->localeAliases = $localeAliases;
     }
@@ -61,7 +61,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read($path, $locale)
+    public function read(string $path, string $locale)
     {
         return $this->reader->read($path, $locale);
     }
@@ -69,7 +69,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function readEntry($path, $locale, array $indices, $fallback = true)
+    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true)
     {
         $entry = null;
         $isMultiValued = false;

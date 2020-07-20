@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class SessionHandlerProxyTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_Matcher
+     * @var \PHPUnit\Framework\MockObject\Matcher
      */
     private $mock;
 
@@ -34,13 +34,13 @@ class SessionHandlerProxyTest extends TestCase
      */
     private $proxy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $this->proxy = new SessionHandlerProxy($this->mock);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->mock = null;
         $this->proxy = null;
@@ -144,7 +144,8 @@ class SessionHandlerProxyTest extends TestCase
     {
         $mock = $this->getMockBuilder(['SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'])->getMock();
         $mock->expects($this->once())
-            ->method('updateTimestamp');
+            ->method('updateTimestamp')
+            ->willReturn(false);
 
         $proxy = new SessionHandlerProxy($mock);
         $proxy->updateTimestamp('id', 'data');

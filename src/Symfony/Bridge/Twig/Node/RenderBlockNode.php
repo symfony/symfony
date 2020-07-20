@@ -22,9 +22,9 @@ use Twig\Node\Expression\FunctionExpression;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RenderBlockNode extends FunctionExpression
+final class RenderBlockNode extends FunctionExpression
 {
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
         $arguments = iterator_to_array($this->getNode('arguments'));

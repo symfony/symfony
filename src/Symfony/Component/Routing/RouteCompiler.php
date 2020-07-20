@@ -19,6 +19,9 @@ namespace Symfony\Component\Routing;
  */
 class RouteCompiler implements RouteCompilerInterface
 {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0
+     */
     const REGEX_DELIMITER = '#';
 
     /**
@@ -59,6 +62,14 @@ class RouteCompiler implements RouteCompilerInterface
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];
+        }
+
+        $locale = $route->getDefault('_locale');
+        if (null !== $locale && null !== $route->getDefault('_canonical_route') && preg_quote($locale) === $route->getRequirement('_locale')) {
+            $requirements = $route->getRequirements();
+            unset($requirements['_locale']);
+            $route->setRequirements($requirements);
+            $route->setPath(str_replace('{_locale}', $locale, $route->getPath()));
         }
 
         $path = $route->getPath();
@@ -139,7 +150,7 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             if (\strlen($varName) > self::VARIABLE_MAXIMUM_LENGTH) {
-                throw new \DomainException(sprintf('Variable name "%s" cannot be longer than %s characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
+                throw new \DomainException(sprintf('Variable name "%s" cannot be longer than %d characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
             }
 
             if ($isSeparator && $precedingText !== $precedingChar) {
@@ -161,8 +172,8 @@ class RouteCompiler implements RouteCompilerInterface
                 $nextSeparator = self::findNextSeparator($followingPattern, $useUtf8);
                 $regexp = sprintf(
                     '[^%s%s]+',
-                    preg_quote($defaultSeparator, self::REGEX_DELIMITER),
-                    $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator, self::REGEX_DELIMITER) : ''
+                    preg_quote($defaultSeparator),
+                    $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator) : ''
                 );
                 if (('' !== $nextSeparator && !preg_match('#^\{\w+\}#', $followingPattern)) || '' === $followingPattern) {
                     // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive
@@ -217,7 +228,7 @@ class RouteCompiler implements RouteCompilerInterface
         for ($i = 0, $nbToken = \count($tokens); $i < $nbToken; ++$i) {
             $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
         }
-        $regexp = self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'sD'.($isHost ? 'i' : '');
+        $regexp = '{^'.$regexp.'$}sD'.($isHost ? 'i' : '');
 
         // enable Utf8 matching if really required
         if ($needsUtf8) {
@@ -289,14 +300,14 @@ class RouteCompiler implements RouteCompilerInterface
         $token = $tokens[$index];
         if ('text' === $token[0]) {
             // Text tokens
-            return preg_quote($token[1], self::REGEX_DELIMITER);
+            return preg_quote($token[1]);
         } else {
             // Variable tokens
             if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1]), $token[3], $token[2]);
             } else {
-                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1]), $token[3], $token[2]);
                 if ($index >= $firstOptional) {
                     // Enclose each optional token in a subpattern to make it optional.
                     // "?:" means it is non-capturing, i.e. the portion of the subject string that

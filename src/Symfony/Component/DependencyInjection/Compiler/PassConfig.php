@@ -49,17 +49,20 @@ class PassConfig
         ];
 
         $this->optimizationPasses = [[
+            new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
+            new ResolveDecoratorStackPass(),
             new ResolveChildDefinitionsPass(),
-            new ServiceLocatorTagPass(),
             new RegisterServiceSubscribersPass(),
-            new DecoratorServicePass(),
-            new ResolveParameterPlaceHoldersPass(false),
+            new ResolveParameterPlaceHoldersPass(false, false),
             new ResolveFactoryClassPass(),
-            new CheckDefinitionValidityPass(),
             new ResolveNamedArgumentsPass(),
             new AutowireRequiredMethodsPass(),
+            new AutowireRequiredPropertiesPass(),
             new ResolveBindingsPass(),
+            new ServiceLocatorTagPass(),
+            new DecoratorServicePass(),
+            new CheckDefinitionValidityPass(),
             new AutowirePass(false),
             new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
@@ -71,12 +74,6 @@ class PassConfig
             new CheckArgumentsValidityPass(false),
         ]];
 
-        $this->beforeRemovingPasses = [
-            -100 => [
-                new ResolvePrivatesPass(),
-            ],
-        ];
-
         $this->removingPasses = [[
             new RemovePrivateAliasesPass(),
             new ReplaceAliasByActualDefinitionPass(),
@@ -85,8 +82,13 @@ class PassConfig
             new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
             new AnalyzeServiceReferencesPass(),
             new DefinitionErrorExceptionPass(),
+        ]];
+
+        $this->afterRemovingPasses = [[
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
+            new ResolveNoPreloadPass(),
+            new AliasDeprecatedPublicServicesPass(),
         ]];
     }
 
@@ -249,7 +251,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    private function sortPasses(array $passes)
+    private function sortPasses(array $passes): array
     {
         if (0 === \count($passes)) {
             return [];

@@ -21,15 +21,14 @@ class SwitchUserToken extends UsernamePasswordToken
     private $originalToken;
 
     /**
-     * @param string|object  $user          The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed          $credentials   This usually is the password of the user
-     * @param string         $providerKey   The provider key
-     * @param string[]       $roles         An array of roles
-     * @param TokenInterface $originalToken The token of the user who switched to the current user
+     * @param string|object $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
+     * @param mixed         $credentials This usually is the password of the user
+     * @param string        $providerKey The provider key
+     * @param string[]      $roles       An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, string $providerKey, array $roles = [], TokenInterface $originalToken)
+    public function __construct($user, $credentials, string $providerKey, array $roles, TokenInterface $originalToken)
     {
         parent::__construct($user, $credentials, $providerKey, $roles);
 
@@ -55,6 +54,7 @@ class SwitchUserToken extends UsernamePasswordToken
     public function __unserialize(array $data): void
     {
         [$this->originalToken, $parentData] = $data;
+        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

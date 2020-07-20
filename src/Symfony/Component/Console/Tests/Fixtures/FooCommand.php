@@ -23,11 +23,13 @@ class FooCommand extends Command
         $output->writeln('interact called');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
 
         $output->writeln('called');
+
+        return 0;
     }
 }

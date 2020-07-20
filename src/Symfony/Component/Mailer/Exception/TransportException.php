@@ -16,4 +16,15 @@ namespace Symfony\Component\Mailer\Exception;
  */
 class TransportException extends RuntimeException implements TransportExceptionInterface
 {
+    private $debug = '';
+
+    public function getDebug(): string
+    {
+        return $this->debug;
+    }
+
+    public function appendDebug(string $debug): void
+    {
+        $this->debug .= $debug;
+    }
 }

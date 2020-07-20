@@ -22,7 +22,7 @@ class MemberMetadataTest extends TestCase
 {
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = new TestMemberMetadata(
             'Symfony\Component\Validator\Tests\Fixtures\Entity',
@@ -31,7 +31,7 @@ class MemberMetadataTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->metadata = null;
     }
@@ -78,7 +78,7 @@ class TestMemberMetadata extends MemberMetadata
     {
     }
 
-    protected function newReflectionMember($object)
+    protected function newReflectionMember($object): object
     {
     }
 }

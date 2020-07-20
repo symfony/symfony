@@ -12,12 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -54,6 +57,13 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed', 5, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->assertEquals(['foo', 'foo.renamed', 5, ContainerInterface::NULL_ON_INVALID_REFERENCE], $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
         $def->setDecoratedService('foo', 'foo.renamed', 5);
         $this->assertEquals(['foo', 'foo.renamed', 5], $def->getDecoratedService());
         $def->setDecoratedService(null);
@@ -74,12 +84,8 @@ class DefinitionTest extends TestCase
 
         $def = new Definition('stdClass');
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
-        } else {
-            $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
 
         $def->setDecoratedService('foo', 'foo');
     }
@@ -112,12 +118,10 @@ class DefinitionTest extends TestCase
         $this->assertEquals([['foobar', ['foobar'], true]], $def->getMethodCalls(), '->addMethodCall() adds a method to call');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Method name cannot be empty.
-     */
     public function testExceptionOnEmptyMethodCall()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Method name cannot be empty.');
         $def = new Definition('stdClass');
         $def->addMethodCall('');
     }
@@ -140,9 +144,9 @@ class DefinitionTest extends TestCase
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
-        $this->assertTrue($def->isPublic(), '->isPublic() returns true by default');
-        $this->assertSame($def, $def->setPublic(false), '->setPublic() implements a fluent interface');
-        $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
+        $this->assertFalse($def->isPublic(), '->isPublic() returns false by default');
+        $this->assertSame($def, $def->setPublic(true), '->setPublic() implements a fluent interface');
+        $this->assertTrue($def->isPublic(), '->isPublic() returns true if the service is public.');
     }
 
     public function testSetIsSynthetic()
@@ -173,21 +177,39 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
-        $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
+        $this->assertSame($def, $def->setDeprecated('vendor/package', '1.1', '%service_id%'), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
 
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message'], '->getDeprecation() should return an array with the formatted message template');
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetDeprecatedWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
+        $def = new Definition('stdClass');
         $def->setDeprecated(true, '%service_id%');
-        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
+
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     /**
      * @dataProvider invalidDeprecationMessageProvider
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $def = new Definition('stdClass');
-        $def->setDeprecated(false, $message);
+        $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
     public function invalidDeprecationMessageProvider()
@@ -268,35 +290,29 @@ class DefinitionTest extends TestCase
         $this->assertSame(['foo', 'bar'], $def->getArguments());
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     */
     public function testGetArgumentShouldCheckBounds()
     {
+        $this->expectException('OutOfBoundsException');
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
         $def->getArgument(1);
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage The index "1" is not in the range [0, 0].
-     */
     public function testReplaceArgumentShouldCheckBounds()
     {
+        $this->expectException('OutOfBoundsException');
+        $this->expectExceptionMessage('The index "1" is not in the range [0, 0].');
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
         $def->replaceArgument(1, 'bar');
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Cannot replace arguments if none have been configured yet.
-     */
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
+        $this->expectException('OutOfBoundsException');
+        $this->expectExceptionMessage('Cannot replace arguments if none have been configured yet.');
         $def = new Definition('stdClass');
         $def->replaceArgument(0, 'bar');
     }
@@ -346,7 +362,7 @@ class DefinitionTest extends TestCase
         $def->setAutowired(true);
         $def->setConfigurator('configuration_func');
         $def->setDecoratedService(null);
-        $def->setDeprecated(true);
+        $def->setDeprecated('vendor/package', '1.1', '%service_id%');
         $def->setFactory('factory_func');
         $def->setFile('foo.php');
         $def->setLazy(true);

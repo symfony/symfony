@@ -22,6 +22,8 @@ use Symfony\Contracts\Service\ResetInterface;
  * EventDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
 class EventDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -38,7 +40,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
         $this->data = [
@@ -94,8 +96,6 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Sets the not called listeners.
-     *
-     * @param array $listeners
      *
      * @see TraceableEventDispatcher
      */

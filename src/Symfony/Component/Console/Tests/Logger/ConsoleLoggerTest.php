@@ -32,10 +32,7 @@ class ConsoleLoggerTest extends TestCase
      */
     protected $output;
 
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         $this->output = new DummyOutput(OutputInterface::VERBOSITY_VERBOSE);
 
@@ -56,7 +53,7 @@ class ConsoleLoggerTest extends TestCase
      *
      * @return string[]
      */
-    public function getLogs()
+    public function getLogs(): array
     {
         return $this->output->getLogs();
     }
@@ -141,11 +138,9 @@ class ConsoleLoggerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Psr\Log\InvalidArgumentException
-     */
     public function testThrowsOnInvalidLevel()
     {
+        $this->expectException('Psr\Log\InvalidArgumentException');
         $logger = $this->getLogger();
         $logger->log('invalid level', 'Foo');
     }
@@ -164,7 +159,7 @@ class ConsoleLoggerTest extends TestCase
         if (method_exists($this, 'createPartialMock')) {
             $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
         } else {
-            $dummy = $this->getMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
+            $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
         }
         $dummy->method('__toString')->willReturn('DUMMY');
 
@@ -209,7 +204,7 @@ class ConsoleLoggerTest extends TestCase
 
 class DummyTest
 {
-    public function __toString()
+    public function __toString(): string
     {
     }
 }

@@ -29,12 +29,12 @@ class AddRequestFormatsListenerTest extends TestCase
      */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->listener = null;
     }

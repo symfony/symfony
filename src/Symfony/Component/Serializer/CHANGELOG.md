@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added support for scalar values denormalization
+ * added support for `\stdClass` to `ObjectNormalizer`
+ * added the ability to ignore properties using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Ignore`)
+ * added an option to serialize constraint violations payloads (e.g. severity)
+
 5.0.0
 -----
 
@@ -12,11 +20,19 @@ CHANGELOG
    `AbstractNormalizer::$camelizedAttributes`, `AbstractNormalizer::setCircularReferenceLimit()`,
    `AbstractNormalizer::setCircularReferenceHandler()`, `AbstractNormalizer::setCallbacks()` and
    `AbstractNormalizer::setIgnoredAttributes()`, use the default context instead.
- * removed `AbstractObjectNormalizer::$maxDepthHandler` and `AbstractObjectNormalizer::setMaxDepthHandler()`, 
+ * removed `AbstractObjectNormalizer::$maxDepthHandler` and `AbstractObjectNormalizer::setMaxDepthHandler()`,
    use the default context instead.
  * removed `XmlEncoder::setRootNodeName()` & `XmlEncoder::getRootNodeName()`, use the default context instead.
  * removed individual encoders/normalizers options as constructor arguments.
  * removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
+ * removed the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant. Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead.
+
+4.4.0
+-----
+
+ * deprecated the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant, use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead
+ * added option to output a UTF-8 BOM in CSV encoder via `CsvEncoder::OUTPUT_UTF8_BOM_KEY` context option
+ * added `ProblemNormalizer` to normalize errors according to the API Problem spec (RFC 7807)
 
 4.3.0
 -----
@@ -155,7 +171,7 @@ CHANGELOG
 
  * added `$context` support for XMLEncoder.
  * [DEPRECATION] JsonEncode and JsonDecode where modified to throw
-   an exception if error found. No need for get*Error() functions
+   an exception if error found. No need for `get*Error()` functions
 
 2.3.0
 -----

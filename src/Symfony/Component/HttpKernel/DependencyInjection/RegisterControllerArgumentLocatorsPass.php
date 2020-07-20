@@ -53,6 +53,13 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         $parameterBag = $container->getParameterBag();
         $controllers = [];
 
+        $publicAliases = [];
+        foreach ($container->getAliases() as $id => $alias) {
+            if ($alias->isPublic() && !$alias->isPrivate()) {
+                $publicAliases[(string) $alias][] = $id;
+            }
+        }
+
         foreach ($container->findTaggedServiceIds($this->controllerTag, true) as $id => $tags) {
             $def = $container->getDefinition($id);
             $def->setPublic(true);
@@ -170,15 +177,22 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                             $message .= ' Did you forget to add a use statement?';
                         }
 
-                        throw new InvalidArgumentException($message);
-                    }
+                        $container->register($erroredId = '.errored.'.$container->hash($message), $type)
+                            ->addError($message);
 
-                    $target = ltrim($target, '\\');
-                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $p->name) : new Reference($target, $invalidBehavior);
+                        $args[$p->name] = new Reference($erroredId, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE);
+                    } else {
+                        $target = ltrim($target, '\\');
+                        $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $p->name) : new Reference($target, $invalidBehavior);
+                    }
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {
                     $controllers[$id.'::'.$r->name] = ServiceLocatorTagPass::register($container, $args);
+
+                    foreach ($publicAliases[$id] ?? [] as $alias) {
+                        $controllers[$alias.'::'.$r->name] = clone $controllers[$id.'::'.$r->name];
+                    }
                 }
             }
         }

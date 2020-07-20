@@ -157,21 +157,21 @@ class OutputFormatterTest extends TestCase
     }
 
     /**
-     * @param string      $tag
-     * @param string|null $expected
-     * @param string|null $input
-     *
      * @dataProvider provideInlineStyleOptionsCases
      */
-    public function testInlineStyleOptions($tag, $expected = null, $input = null)
+    public function testInlineStyleOptions(string $tag, string $expected = null, string $input = null, bool $truecolor = false)
     {
+        if ($truecolor && 'truecolor' !== getenv('COLORTERM')) {
+            $this->markTestSkipped('The terminal does not support true colors.');
+        }
+
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
         $method = new \ReflectionMethod($formatter, 'createStyleFromString');
         $method->setAccessible(true);
         $result = $method->invoke($formatter, $styleString);
         if (null === $expected) {
-            $this->assertFalse($result);
+            $this->assertNull($result);
             $expected = $tag.$input.'</'.$styleString.'>';
             $this->assertSame($expected, $formatter->format($expected));
         } else {
@@ -193,6 +193,7 @@ class OutputFormatterTest extends TestCase
             ['<fg=green;options=reverse;>', "\033[32;7m<a>\033[39;27m", '<a>'],
             ['<fg=green;options=bold,underscore>', "\033[32;1;4mz\033[39;22;24m", 'z'],
             ['<fg=green;options=bold,underscore,reverse;>', "\033[32;1;4;7md\033[39;22;24;27m", 'd'],
+            ['<fg=#00ff00;bg=#00f>', "\033[38;2;0;255;0;48;2;0;0;255m[test]\033[39;49m", '[test]', true],
         ];
     }
 
@@ -343,7 +344,7 @@ EOF
 
 class TableCell
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '<info>some info</info>';
     }

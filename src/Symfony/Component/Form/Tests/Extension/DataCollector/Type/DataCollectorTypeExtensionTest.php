@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
 
@@ -22,11 +23,11 @@ class DataCollectorTypeExtensionTest extends TestCase
     private $extension;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dataCollector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataCollector = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface')->getMock();
         $this->extension = new DataCollectorTypeExtension($this->dataCollector);

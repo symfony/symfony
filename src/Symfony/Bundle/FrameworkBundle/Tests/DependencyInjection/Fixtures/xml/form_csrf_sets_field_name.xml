@@ -9,6 +9,6 @@
     <framework:config>
         <framework:csrf-protection field-name="_custom" />
         <framework:session />
-        <framework:form />
+        <framework:form legacy-error-messages="false" />
     </framework:config>
 </container>

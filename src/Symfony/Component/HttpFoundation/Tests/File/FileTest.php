@@ -42,6 +42,7 @@ class FileTest extends TestCase
     public function testConstructWhenFileNotExists()
     {
         $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+
         new File(__DIR__.'/Fixtures/not_here');
     }
 
@@ -82,6 +83,13 @@ class FileTest extends TestCase
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
+    }
+
+    public function testGetContent()
+    {
+        $file = new File(__FILE__);
+
+        $this->assertStringEqualsFile(__FILE__, $file->getContent());
     }
 
     public function getFilenameFixtures()

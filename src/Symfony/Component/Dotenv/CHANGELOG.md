@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added `Dotenv::bootEnv()` to check for `.env.local.php` before calling `Dotenv::loadEnv()`
+ * added `Dotenv::setProdEnvs()` and `Dotenv::usePutenv()`
+ * made Dotenv's constructor accept `$envKey` and `$debugKey` arguments, to define
+   the name of the env vars that configure the env name and debug settings
+ * deprecated passing `$usePutenv` argument to Dotenv's constructor
+
 5.0.0
 -----
 

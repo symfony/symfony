@@ -41,7 +41,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 
 class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
 {
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null): string
     {
         return 'translated max {{ max }}!';
     }
@@ -50,7 +50,7 @@ class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
     {
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
         return 'en';
     }

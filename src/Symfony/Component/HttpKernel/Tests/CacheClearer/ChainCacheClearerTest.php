@@ -18,12 +18,12 @@ class ChainCacheClearerTest extends TestCase
 {
     protected static $cacheDir;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf_cache_clearer_dir');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$cacheDir);
     }

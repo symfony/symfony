@@ -12,9 +12,10 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
-use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -54,10 +55,8 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      *
      * @param array $patterns The class patterns to expand
      * @param array $classes  The existing classes to match against the patterns
-     *
-     * @return array A list of classes derived from the patterns
      */
-    private function expandClasses(array $patterns, array $classes)
+    private function expandClasses(array $patterns, array $classes): array
     {
         $expanded = [];
 
@@ -83,7 +82,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_unique($expanded);
     }
 
-    private function getClassesInComposerClassMaps()
+    private function getClassesInComposerClassMaps(): array
     {
         $classes = [];
 
@@ -92,7 +91,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 continue;
             }
 
-            if ($function[0] instanceof DebugClassLoader) {
+            if ($function[0] instanceof DebugClassLoader || $function[0] instanceof LegacyDebugClassLoader) {
                 $function = $function[0]->getClassLoader();
             }
 
@@ -104,7 +103,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_keys($classes);
     }
 
-    private function patternsToRegexps($patterns)
+    private function patternsToRegexps(array $patterns): array
     {
         $regexps = [];
 
@@ -126,12 +125,12 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return $regexps;
     }
 
-    private function matchAnyRegexps($class, $regexps)
+    private function matchAnyRegexps(string $class, array $regexps): bool
     {
-        $blacklisted = false !== strpos($class, 'Test');
+        $isTest = false !== strpos($class, 'Test');
 
         foreach ($regexps as $regex) {
-            if ($blacklisted && false === strpos($regex, 'Test')) {
+            if ($isTest && false === strpos($regex, 'Test')) {
                 continue;
             }
 

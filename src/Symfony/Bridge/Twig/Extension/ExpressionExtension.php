@@ -20,30 +20,20 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExpressionExtension extends AbstractExtension
+final class ExpressionExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('expression', [$this, 'createExpression']),
         ];
     }
 
-    public function createExpression($expression)
+    public function createExpression(string $expression): Expression
     {
         return new Expression($expression);
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'expression';
     }
 }

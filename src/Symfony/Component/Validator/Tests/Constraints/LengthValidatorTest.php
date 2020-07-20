@@ -29,6 +29,9 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @group legacy
+     */
     public function testAllowEmptyString()
     {
         $this->validator->validate('', new Length(['value' => 6, 'allowEmptyString' => true]));
@@ -52,11 +55,9 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Length(['value' => 5]));
     }
 

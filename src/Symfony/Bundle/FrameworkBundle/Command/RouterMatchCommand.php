@@ -33,12 +33,14 @@ class RouterMatchCommand extends Command
     protected static $defaultName = 'router:match';
 
     private $router;
+    private $expressionLanguageProviders;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, iterable $expressionLanguageProviders = [])
     {
         parent::__construct();
 
         $this->router = $router;
+        $this->expressionLanguageProviders = $expressionLanguageProviders;
     }
 
     /**
@@ -71,7 +73,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -87,6 +89,9 @@ EOF
         }
 
         $matcher = new TraceableUrlMatcher($this->router->getRouteCollection(), $context);
+        foreach ($this->expressionLanguageProviders as $provider) {
+            $matcher->addExpressionLanguageProvider($provider);
+        }
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 
@@ -113,5 +118,7 @@ EOF
 
             return 1;
         }
+
+        return 0;
     }
 }

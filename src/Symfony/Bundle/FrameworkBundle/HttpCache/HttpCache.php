@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
+use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -28,33 +30,47 @@ class HttpCache extends BaseHttpCache
     protected $cacheDir;
     protected $kernel;
 
+    private $store;
+    private $surrogate;
+    private $options;
+
     /**
-     * @param KernelInterface $kernel   A KernelInterface instance
-     * @param string          $cacheDir The cache directory (default used if null)
+     * @param string|StoreInterface $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, string $cacheDir = null)
+    public function __construct(KernelInterface $kernel, $cache = null, SurrogateInterface $surrogate = null, array $options = null)
     {
         $this->kernel = $kernel;
-        $this->cacheDir = $cacheDir;
+        $this->surrogate = $surrogate;
+        $this->options = $options ?? [];
 
-        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge(['debug' => $kernel->isDebug()], $this->getOptions()));
+        if ($cache instanceof StoreInterface) {
+            $this->store = $cache;
+        } elseif (null !== $cache && !\is_string($cache)) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a string or a SurrogateInterface, "%s" given.', __METHOD__, get_debug_type($cache)));
+        } else {
+            $this->cacheDir = $cache;
+        }
+
+        if (null === $options && $kernel->isDebug()) {
+            $this->options = ['debug' => true];
+        }
+
+        if ($this->options['debug'] ?? false) {
+            $this->options += ['stale_if_error' => 0];
+        }
+
+        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge($this->options, $this->getOptions()));
     }
 
     /**
-     * Forwards the Request to the backend and returns the Response.
-     *
-     * @param Request  $request A Request instance
-     * @param bool     $raw     Whether to catch exceptions or not
-     * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
-     *
-     * @return Response A Response instance
+     * {@inheritdoc}
      */
-    protected function forward(Request $request, $raw = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null)
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);
 
-        return parent::forward($request, $raw, $entry);
+        return parent::forward($request, $catch, $entry);
     }
 
     /**
@@ -69,11 +85,11 @@ class HttpCache extends BaseHttpCache
 
     protected function createSurrogate()
     {
-        return new Esi();
+        return $this->surrogate ?? new Esi();
     }
 
     protected function createStore()
     {
-        return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
+        return $this->store ?? new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
     }
 }

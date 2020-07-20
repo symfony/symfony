@@ -26,21 +26,17 @@ class NotBlankTest extends TestCase
         $this->assertEquals('trim', $notBlank->normalizer);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("string" given).
-     */
     public function testInvalidNormalizerThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new NotBlank(['normalizer' => 'Unknown Callable']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("stdClass" given).
-     */
     public function testInvalidNormalizerObjectThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new NotBlank(['normalizer' => new \stdClass()]);
     }
 }

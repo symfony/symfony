@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
@@ -72,11 +73,12 @@ class MainConfiguration implements ConfigurationInterface
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
+                ->booleanNode('enable_authenticator_manager')->defaultFalse()->info('Enables the new Symfony Security system based on Authenticators, all used authenticators must support this before enabling this.')->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values([AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS])
+                            ->values($this->getAccessDecisionStrategies())
                         ->end()
                         ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
@@ -195,6 +197,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('entry_point')->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
+            ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
@@ -205,7 +208,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
-                    ->scalarNode('success_handler')->end()
+                    ->scalarNode('success_handler')->setDeprecated('symfony/security-bundle', '5.1', sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
                 ->end()
                 ->fixXmlConfig('delete_cookie')
@@ -221,6 +224,8 @@ class MainConfiguration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('path')->defaultNull()->end()
                                 ->scalarNode('domain')->defaultNull()->end()
+                                ->scalarNode('secure')->defaultFalse()->end()
+                                ->scalarNode('samesite')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()
@@ -228,14 +233,8 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('handler')
                 ->children()
                     ->arrayNode('handlers')
-                        ->prototype('scalar')->end()
+                        ->prototype('scalar')->setDeprecated('symfony/security-bundle', '5.1', sprintf('The "%%node%%" at path "%%path%%" is deprecated, register a listener on the "%s" event instead.', LogoutEvent::class))->end()
                     ->end()
-                ->end()
-            ->end()
-            ->arrayNode('anonymous')
-                ->canBeUnset()
-                ->children()
-                    ->scalarNode('secret')->defaultNull()->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')
@@ -244,10 +243,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
-                    ->booleanNode('stateless')
-                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1.')
-                        ->defaultValue(false)
-                    ->end()
                 ->end()
             ->end()
         ;
@@ -372,7 +367,17 @@ class MainConfiguration implements ConfigurationInterface
                         ->performNoDeepMerging()
                         ->beforeNormalization()->ifString()->then(function ($v) { return ['algorithm' => $v]; })->end()
                         ->children()
-                            ->scalarNode('algorithm')->cannotBeEmpty()->end()
+                            ->scalarNode('algorithm')
+                                ->cannotBeEmpty()
+                                ->validate()
+                                    ->ifTrue(function ($v) { return !\is_string($v); })
+                                    ->thenInvalid('You must provide a string value.')
+                                ->end()
+                            ->end()
+                            ->arrayNode('migrate_from')
+                                ->prototype('scalar')->end()
+                                ->beforeNormalization()->castToArray()->end()
+                            ->end()
                             ->scalarNode('hash_algorithm')->info('Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms.')->defaultValue('sha512')->end()
                             ->scalarNode('key_length')->defaultValue(40)->end()
                             ->booleanNode('ignore_case')->defaultFalse()->end()
@@ -391,5 +396,20 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function getAccessDecisionStrategies()
+    {
+        $strategies = [
+            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+            AccessDecisionManager::STRATEGY_CONSENSUS,
+            AccessDecisionManager::STRATEGY_UNANIMOUS,
+        ];
+
+        if (\defined(AccessDecisionManager::class.'::STRATEGY_PRIORITY')) {
+            $strategies[] = AccessDecisionManager::STRATEGY_PRIORITY;
+        }
+
+        return $strategies;
     }
 }

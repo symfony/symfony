@@ -1,0 +1,5 @@
+Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\LegacyBundle\Entity\LegacyPerson:
+    properties:
+        age:
+            - GreaterThan:
+                  value: 18

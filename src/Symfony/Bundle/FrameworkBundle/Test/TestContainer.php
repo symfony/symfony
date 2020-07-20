@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -41,7 +43,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return $this->getPublicContainer()->isCompiled();
     }
@@ -49,7 +51,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         return $this->getPublicContainer()->getParameterBag();
     }
@@ -57,7 +59,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
         return $this->getPublicContainer()->getParameter($name);
     }
@@ -65,7 +67,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function hasParameter($name)
+    public function hasParameter(string $name): bool
     {
         return $this->getPublicContainer()->hasParameter($name);
     }
@@ -73,7 +75,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
@@ -81,7 +83,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function set($id, $service)
+    public function set(string $id, $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }
@@ -89,7 +91,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
@@ -97,7 +99,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
+    public function get($id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }
@@ -105,7 +107,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function initialized($id)
+    public function initialized(string $id): bool
     {
         return $this->getPublicContainer()->initialized($id);
     }
@@ -115,13 +117,13 @@ class TestContainer extends Container
      */
     public function reset()
     {
-        $this->getPublicContainer()->reset();
+        // ignore the call
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return $this->getPublicContainer()->getServiceIds();
     }
@@ -129,12 +131,12 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return $this->getPublicContainer()->getRemovedIds();
     }
 
-    private function getPublicContainer()
+    private function getPublicContainer(): Container
     {
         if (null === $container = $this->kernel->getContainer()) {
             throw new \LogicException('Cannot access the container on a non-booted kernel. Did you forget to boot it?');
@@ -143,7 +145,7 @@ class TestContainer extends Container
         return $container;
     }
 
-    private function getPrivateContainer()
+    private function getPrivateContainer(): ContainerInterface
     {
         return $this->getPublicContainer()->get($this->privateServicesLocatorId);
     }

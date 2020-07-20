@@ -12,15 +12,31 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RangeType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please choose a valid range.';
+            },
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
-        return __NAMESPACE__.'\TextType';
+        return TextType::class;
     }
 
     /**

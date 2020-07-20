@@ -35,29 +35,12 @@ class XliffLintCommandTest extends TestCase
     {
         $command = new XliffLintCommand();
         $expected = <<<EOF
-The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
-the first encountered syntax error.
-
-You can validates XLIFF contents passed from STDIN:
-
-  <info>cat filename | php %command.full_name%</info>
-
-You can also validate the syntax of a file:
-
-  <info>php %command.full_name% filename</info>
-
-Or of a whole directory:
-
-  <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
-
 Or find all files in a bundle:
 
   <info>php %command.full_name% @AcmeDemoBundle</info>
-
 EOF;
 
-        $this->assertEquals($expected, $command->getHelp());
+        $this->assertStringContainsString($expected, $command->getHelp());
     }
 
     public function testLintFilesFromBundleDirectory()
@@ -69,13 +52,10 @@ EOF;
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
-        $this->assertContains('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($application = null)
+    private function createCommandTester($application = null): CommandTester
     {
         if (!$application) {
             $application = new BaseApplication();
@@ -131,13 +111,13 @@ EOF;
         return $application;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         @mkdir(sys_get_temp_dir().'/xliff-lint-test');
         $this->files = [];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

@@ -12,37 +12,34 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     */
+    use ExpectDeprecationTrait;
+
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
         $node = new ArrayNode('root');
         $node->normalize(false);
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unrecognized option "foo" under "root"
-     */
     public function testExceptionThrownOnUnrecognizedChild()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Unrecognized option "foo" under "root"');
         $node = new ArrayNode('root');
         $node->normalize(['foo' => 'bar']);
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Did you mean "alpha1", "alpha2"?
-     */
     public function testNormalizeWithProposals()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Did you mean "alpha1", "alpha2"?');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
@@ -50,12 +47,10 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['alpha3' => 'foo']);
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Available options are "alpha1", "alpha2".
-     */
     public function testNormalizeWithoutProposals()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Available options are "alpha1", "alpha2".');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
@@ -80,12 +75,8 @@ class ArrayNodeTest extends TestCase
     public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
     {
         if ($expected instanceof \Exception) {
-            if (method_exists($this, 'expectException')) {
-                $this->expectException(\get_class($expected));
-                $this->expectExceptionMessage($expected->getMessage());
-            } else {
-                $this->setExpectedException(\get_class($expected), $expected->getMessage());
-            }
+            $this->expectException(\get_class($expected));
+            $this->expectExceptionMessage($expected->getMessage());
         }
         $node = new ArrayNode('root');
         $node->setIgnoreExtraKeys($ignore, $remove);
@@ -205,24 +196,20 @@ class ArrayNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Child nodes must be named.
-     */
     public function testAddChildEmptyName()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Child nodes must be named.');
         $node = new ArrayNode('root');
 
         $childNode = new ArrayNode('');
         $node->addChild($childNode);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A child node named "foo" already exists.
-     */
     public function testAddChildNameAlreadyExists()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('A child node named "foo" already exists.');
         $node = new ArrayNode('root');
 
         $childNode = new ArrayNode('foo');
@@ -232,12 +219,10 @@ class ArrayNodeTest extends TestCase
         $node->addChild($childNodeWithSameName);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The node at path "foo" has no default value.
-     */
     public function testGetDefaultValueWithoutDefaultValue()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The node at path "foo" has no default value.');
         $node = new ArrayNode('foo');
         $node->getDefaultValue();
     }
@@ -245,10 +230,13 @@ class ArrayNodeTest extends TestCase
     public function testSetDeprecated()
     {
         $childNode = new ArrayNode('foo');
-        $childNode->setDeprecated('"%node%" is deprecated');
+        $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
 
         $this->assertTrue($childNode->isDeprecated());
-        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+        $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -272,5 +260,98 @@ class ArrayNodeTest extends TestCase
         $node->finalize(['foo' => []]);
         restore_error_handler();
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testUnDeprecateANode()
+    {
+        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+        $this->expectDeprecation('Since symfony/config 5.1: Passing a null message to un-deprecate a node is deprecated.');
+
+        $node = new ArrayNode('foo');
+        $node->setDeprecated('"%node%" is deprecated');
+        $node->setDeprecated(null);
+
+        $this->assertFalse($node->isDeprecated());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetDeprecatedWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
+        $node = new ArrayNode('foo');
+        $node->setDeprecated('"%node%" is deprecated');
+
+        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
+    }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithoutIgnoringExtraKeys($prenormalizeds, $merged)
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(false);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $r->invoke($node, ...$prenormalizeds);
+    }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithIgnoringAndRemovingExtraKeys($prenormalizeds, $merged)
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(true);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $r->invoke($node, ...$prenormalizeds);
+    }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithIgnoringExtraKeys($prenormalizeds, $merged)
+    {
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(true, false);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
+    }
+
+    public function getDataWithIncludedExtraKeys()
+    {
+        return [
+            [
+                [['foo' => 'bar', 'baz' => 'not foo'], ['bar' => 'baz', 'baz' => 'foo']],
+                ['foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo'],
+            ],
+        ];
     }
 }

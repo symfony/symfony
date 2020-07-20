@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 class TestClient extends HttpKernelBrowser
 {
-    protected function getScript($request)
+    protected function getScript($request): string
     {
         $script = parent::getScript($request);
 

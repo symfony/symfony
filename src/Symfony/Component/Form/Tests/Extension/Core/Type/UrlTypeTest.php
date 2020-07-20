@@ -73,11 +73,9 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('www.domain.com', $form->getViewData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => [],
         ]);

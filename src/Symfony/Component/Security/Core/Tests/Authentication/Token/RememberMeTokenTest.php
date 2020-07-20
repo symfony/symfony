@@ -28,11 +28,9 @@ class RememberMeTokenTest extends TestCase
         $this->assertTrue($token->isAuthenticated());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorSecretCannotBeEmptyString()
     {
+        $this->expectException('InvalidArgumentException');
         new RememberMeToken(
             $this->getUser(),
             '',

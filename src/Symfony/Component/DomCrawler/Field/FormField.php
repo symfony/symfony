@@ -72,9 +72,8 @@ abstract class FormField
         }
 
         $labels = $xpath->query('ancestor::label[1]', $this->node);
-        if ($labels->length > 0) {
-            return $labels->item(0);
-        }
+
+        return $labels->length > 0 ? $labels->item(0) : null;
     }
 
     /**
@@ -102,7 +101,7 @@ abstract class FormField
      */
     public function setValue(?string $value)
     {
-        $this->value = (string) $value;
+        $this->value = $value ?? '';
     }
 
     /**

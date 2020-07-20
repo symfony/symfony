@@ -50,11 +50,9 @@ class FragmentListenerTest extends TestCase
         $this->assertEquals($expected, $request->attributes->all());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAccessDeniedWithNonSafeMethods()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException');
         $request = Request::create('http://example.com/_fragment', 'POST');
 
         $listener = new FragmentListener(new UriSigner('foo'));
@@ -63,11 +61,9 @@ class FragmentListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAccessDeniedWithWrongSignature()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException');
         $request = Request::create('http://example.com/_fragment', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
 
         $listener = new FragmentListener(new UriSigner('foo'));

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Wraps a security listener for calls record.
@@ -23,19 +22,11 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 final class WrappedListener
 {
-    private $response;
-    private $listener;
-    private $time;
-    private $stub;
-    private static $hasVarDumper;
+    use TraceableListenerTrait;
 
     public function __construct(callable $listener)
     {
         $this->listener = $listener;
-
-        if (null === self::$hasVarDumper) {
-            self::$hasVarDumper = class_exists(ClassStub::class);
-        }
     }
 
     public function __invoke(RequestEvent $event)
@@ -44,31 +35,5 @@ final class WrappedListener
         ($this->listener)($event);
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
-    }
-
-    /**
-     * Proxies all method calls to the original listener.
-     */
-    public function __call($method, $arguments)
-    {
-        return $this->listener->{$method}(...$arguments);
-    }
-
-    public function getWrappedListener(): callable
-    {
-        return $this->listener;
-    }
-
-    public function getInfo(): array
-    {
-        if (null === $this->stub) {
-            $this->stub = self::$hasVarDumper ? new ClassStub(\get_class($this->listener)) : \get_class($this->listener);
-        }
-
-        return [
-            'response' => $this->response,
-            'time' => $this->time,
-            'stub' => $this->stub,
-        ];
     }
 }

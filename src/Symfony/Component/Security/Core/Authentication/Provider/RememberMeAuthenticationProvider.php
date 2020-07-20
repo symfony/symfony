@@ -15,7 +15,9 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -24,9 +26,8 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
     private $providerKey;
 
     /**
-     * @param UserCheckerInterface $userChecker An UserCheckerInterface interface
-     * @param string               $secret      A secret
-     * @param string               $providerKey A provider secret
+     * @param string $secret      A secret
+     * @param string $providerKey A provider secret
      */
     public function __construct(UserCheckerInterface $userChecker, string $secret, string $providerKey)
     {
@@ -49,6 +50,11 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         }
 
         $user = $token->getUser();
+
+        if (!$token->getUser() instanceof UserInterface) {
+            throw new LogicException(sprintf('Method "%s::getUser()" must return a "%s" instance, "%s" returned.', get_debug_type($token), UserInterface::class, get_debug_type($user)));
+        }
+
         $this->userChecker->checkPreAuth($user);
         $this->userChecker->checkPostAuth($user);
 

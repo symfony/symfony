@@ -33,9 +33,6 @@ class Version
      *     Version::compare('1.2.3', '1.2.4', '==', 2)
      *     // => true
      *
-     * @param string   $version1  A version string
-     * @param string   $version2  A version string to compare
-     * @param string   $operator  The comparison operator
      * @param int|null $precision The number of components to compare. Pass
      *                            NULL to compare the versions unchanged.
      *
@@ -43,7 +40,7 @@ class Version
      *
      * @see normalize()
      */
-    public static function compare($version1, $version2, $operator, $precision = null)
+    public static function compare(string $version1, string $version2, string $operator, ?int $precision = null)
     {
         $version1 = self::normalize($version1, $precision);
         $version2 = self::normalize($version2, $precision);
@@ -63,14 +60,13 @@ class Version
      *     Version::normalize('1.2.3', 2);
      *     // => '1.2'
      *
-     * @param string   $version   A version string
      * @param int|null $precision The number of components to include. Pass
      *                            NULL to return the version unchanged.
      *
      * @return string|null the normalized version or NULL if it couldn't be
      *                     normalized
      */
-    public static function normalize($version, $precision)
+    public static function normalize(string $version, ?int $precision)
     {
         if (null === $precision) {
             return $version;
@@ -83,7 +79,7 @@ class Version
         }
 
         if (!preg_match('/^'.$pattern.'/', $version, $matches)) {
-            return;
+            return null;
         }
 
         return $matches[0];

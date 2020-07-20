@@ -14,6 +14,9 @@ namespace Symfony\Component\Inflector\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Inflector\Inflector;
 
+/**
+ * @group legacy
+ */
 class InflectorTest extends TestCase
 {
     public function singularizeProvider()
@@ -38,7 +41,7 @@ class InflectorTest extends TestCase
             ['bases', ['bas', 'base', 'basis']],
             ['batches', ['batch', 'batche']],
             ['beaux', 'beau'],
-            ['bees', ['be', 'bee']],
+            ['bees', 'bee'],
             ['boxes', 'box'],
             ['boys', 'boy'],
             ['bureaus', 'bureau'],
@@ -68,7 +71,9 @@ class InflectorTest extends TestCase
             ['echoes', ['echo', 'echoe']],
             ['elves', ['elf', 'elve', 'elff']],
             ['emphases', ['emphas', 'emphase', 'emphasis']],
+            ['employees', 'employee'],
             ['faxes', 'fax'],
+            ['fees', 'fee'],
             ['feet', 'foot'],
             ['feedback', 'feedback'],
             ['foci', 'focus'],
@@ -93,6 +98,7 @@ class InflectorTest extends TestCase
             ['kisses', 'kiss'],
             ['knives', 'knife'],
             ['lamps', 'lamp'],
+            ['lessons', 'lesson'],
             ['leaves', ['leaf', 'leave', 'leaff']],
             ['lice', 'louse'],
             ['lives', 'life'],
@@ -115,6 +121,7 @@ class InflectorTest extends TestCase
             ['photos', 'photo'],
             ['pianos', 'piano'],
             ['plateaux', 'plateau'],
+            ['poisons', 'poison'],
             ['poppies', 'poppy'],
             ['prices', ['prex', 'prix', 'price']],
             ['quizzes', 'quiz'],
@@ -124,11 +131,13 @@ class InflectorTest extends TestCase
             ['sandwiches', ['sandwich', 'sandwiche']],
             ['scarves', ['scarf', 'scarve', 'scarff']],
             ['schemas', 'schema'], //schemata
+            ['seasons', 'season'],
             ['selfies', 'selfie'],
             ['series', 'series'],
             ['services', 'service'],
             ['sheriffs', 'sheriff'],
             ['shoes', ['sho', 'shoe']],
+            ['species', 'species'],
             ['spies', 'spy'],
             ['staves', ['staf', 'stave', 'staff']],
             ['stories', 'story'],
@@ -139,14 +148,15 @@ class InflectorTest extends TestCase
             ['teeth', 'tooth'],
             ['theses', ['thes', 'these', 'thesis']],
             ['thieves', ['thief', 'thieve', 'thieff']],
-            ['trees', ['tre', 'tree']],
+            ['treasons', 'treason'],
+            ['trees', 'tree'],
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],
             ['GrandChildren', 'GrandChild'],
-            ['SubTrees', ['SubTre', 'SubTree']],
+            ['SubTrees', 'SubTree'],
 
             // Known issues
             //['insignia', 'insigne'],
@@ -176,7 +186,7 @@ class InflectorTest extends TestCase
             ['batch', 'batches'],
             ['beau', ['beaus', 'beaux']],
             ['bee', 'bees'],
-            ['box', ['bocies', 'boxes']],
+            ['box', 'boxes'],
             ['boy', 'boys'],
             ['bureau', ['bureaus', 'bureaux']],
             ['bus', 'buses'],
@@ -226,6 +236,7 @@ class InflectorTest extends TestCase
             ['knife', 'knives'],
             ['lamp', 'lamps'],
             ['leaf', ['leafs', 'leaves']],
+            ['lesson', 'lessons'],
             ['life', 'lives'],
             ['louse', 'lice'],
             ['man', 'men'],
@@ -245,6 +256,7 @@ class InflectorTest extends TestCase
             ['photo', 'photos'],
             ['piano', 'pianos'],
             ['plateau', ['plateaus', 'plateaux']],
+            ['poison', 'poisons'],
             ['poppy', 'poppies'],
             ['price', 'prices'],
             ['quiz', 'quizzes'],
@@ -254,11 +266,13 @@ class InflectorTest extends TestCase
             ['sandwich', 'sandwiches'],
             ['scarf', ['scarfs', 'scarves']],
             ['schema', 'schemas'], //schemata
+            ['season', 'seasons'],
             ['selfie', 'selfies'],
             ['series', 'series'],
             ['service', 'services'],
             ['sheriff', 'sheriffs'],
             ['shoe', 'shoes'],
+            ['species', 'species'],
             ['spy', 'spies'],
             ['staff', 'staves'],
             ['story', 'stories'],
@@ -268,6 +282,7 @@ class InflectorTest extends TestCase
             ['tag', 'tags'],
             ['thief', ['thiefs', 'thieves']],
             ['tooth', 'teeth'],
+            ['treason', 'treasons'],
             ['tree', 'trees'],
             ['waltz', 'waltzes'],
             ['wife', 'wives'],
@@ -282,30 +297,30 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider singularizeProvider
      */
-    public function testSingularize($plural, $singular)
+    public function testSingularize($plural, $expectedSingular)
     {
-        $single = Inflector::singularize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $singular = Inflector::singularize($plural);
+        if (\is_string($expectedSingular) && \is_array($singular)) {
+            $this->fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
+        } elseif (\is_array($expectedSingular) && \is_string($singular)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedSingular, $singular);
     }
 
     /**
      * @dataProvider pluralizeProvider
      */
-    public function testPluralize($plural, $singular)
+    public function testPluralize($singular, $expectedPlural)
     {
-        $single = Inflector::pluralize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $plural = Inflector::pluralize($singular);
+        if (\is_string($expectedPlural) && \is_array($plural)) {
+            $this->fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
+        } elseif (\is_array($expectedPlural) && \is_string($plural)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedPlural, $plural);
     }
 }

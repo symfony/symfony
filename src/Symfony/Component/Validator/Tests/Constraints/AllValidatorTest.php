@@ -31,11 +31,9 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testThrowsExceptionIfNotTraversable()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate('foo.barbar', new All(new Range(['min' => 4])));
     }
 

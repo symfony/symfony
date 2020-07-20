@@ -1,6 +1,6 @@
 blog_show:
     path:         /blog/{slug}
-    defaults:     { _controller: "MyBundle:Blog:show" }
+    defaults:     { _controller: "MyBundle:Blog:show", _stateless: true }
     host:         "{locale}.example.com"
     requirements: { 'locale': '\w+' }
     methods:      ['GET','POST','put','OpTiOnS']

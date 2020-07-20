@@ -43,12 +43,10 @@ class TypeTest extends TestCase
         $this->assertSame('iterable', $type->getBuiltinType());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "foo" is not a valid PHP type.
-     */
     public function testInvalidType()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('"foo" is not a valid PHP type.');
         new Type('foo');
     }
 }

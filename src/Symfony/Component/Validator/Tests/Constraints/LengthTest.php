@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Length;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Validator\Constraints\Length;
  */
 class LengthTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testNormalizerCanBeSet()
     {
         $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
@@ -26,21 +29,36 @@ class LengthTest extends TestCase
         $this->assertEquals('trim', $length->normalizer);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("string" given).
-     */
     public function testInvalidNormalizerThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("stdClass" given).
-     */
     public function testInvalidNormalizerObjectThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider allowEmptyStringOptionData
+     */
+    public function testDeprecatedAllowEmptyStringOption(bool $value)
+    {
+        $this->expectDeprecation('Since symfony/validator 5.2: The "allowEmptyString" option of the "Symfony\Component\Validator\Constraints\Length" constraint is deprecated.');
+
+        new Length(['allowEmptyString' => $value, 'max' => 5]);
+    }
+
+    public function allowEmptyStringOptionData()
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 }

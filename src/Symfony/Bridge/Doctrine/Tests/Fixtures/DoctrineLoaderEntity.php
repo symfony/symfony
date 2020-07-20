@@ -36,13 +36,13 @@ class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 
     /**
      * @ORM\Column(length=20)
-     * @Assert\Length(min=5, allowEmptyString=true)
+     * @Assert\Length(min=5)
      */
     public $mergedMaxLength;
 
     /**
      * @ORM\Column(length=20)
-     * @Assert\Length(min=1, max=10, allowEmptyString=true)
+     * @Assert\Length(min=1, max=10)
      */
     public $alreadyMappedMaxLength;
 
@@ -69,4 +69,10 @@ class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 
     /** @ORM\Column(type="simple_array", length=100) */
     public $simpleArrayField = [];
+
+    /**
+     * @ORM\Column(length=10)
+     * @Assert\DisableAutoMapping
+     */
+    public $noAutoMapping;
 }

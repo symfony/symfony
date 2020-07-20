@@ -1,14 +1,24 @@
 #!/usr/bin/env php
 <?php
 
-// Cache-Id: https://github.com/symfony/phpunit-bridge/commit/da3d101c8db7e7612069406c4ca6b1986b6f4942
+// Cache-Id: 2020-04-10 20:30 UTC
 
 if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";
     exit(1);
 }
-if (\PHP_VERSION_ID >= 70000 && !getenv('SYMFONY_PHPUNIT_VERSION')) {
-    putenv('SYMFONY_PHPUNIT_VERSION=6.5');
+if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
+    if (\PHP_VERSION_ID >= 70200) {
+        if (false === getenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT') && false !== strpos(@file_get_contents(__DIR__.'/src/Symfony/Component/HttpKernel/Kernel.php'), 'const MAJOR_VERSION = 3;')) {
+            putenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1');
+        }
+        putenv('SYMFONY_PHPUNIT_VERSION=8.3');
+    } elseif (\PHP_VERSION_ID >= 70000) {
+        putenv('SYMFONY_PHPUNIT_VERSION=6.5');
+    }
+}
+if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
+    putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
 require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

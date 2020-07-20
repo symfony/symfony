@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Workflow\Event;
 
-class CompletedEvent extends Event
+final class CompletedEvent extends Event
 {
 }

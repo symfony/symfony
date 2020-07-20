@@ -8,4 +8,6 @@ return function (RoutingConfigurator $routes) {
 
     $add('foo', ['fr' => '/foo']);
     $add('bar', ['fr' => '/bar']);
+
+    $routes->add('non_localized', '/non-localized');
 };

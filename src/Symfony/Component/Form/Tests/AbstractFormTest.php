@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormTest extends TestCase
 {
@@ -29,62 +31,42 @@ abstract class AbstractFormTest extends TestCase
     protected $factory;
 
     /**
-     * @var \Symfony\Component\Form\FormInterface
+     * @var FormInterface
      */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->createForm();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->factory = null;
         $this->form = null;
     }
 
-    /**
-     * @return \Symfony\Component\Form\FormInterface
-     */
-    abstract protected function createForm();
+    abstract protected function createForm(): FormInterface;
 
-    /**
-     * @param string                   $name
-     * @param EventDispatcherInterface $dispatcher
-     * @param string|null              $dataClass
-     * @param array                    $options
-     *
-     * @return FormBuilder
-     */
-    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null, array $options = [])
+    protected function getBuilder(?string $name = 'name', EventDispatcherInterface $dispatcher = null, string $dataClass = null, array $options = []): FormBuilder
     {
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getDataMapper()
+    protected function getDataMapper(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getDataTransformer()
+    protected function getDataTransformer(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataTransformerInterface')->getMock();
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getFormValidator()
+    protected function getFormValidator(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormValidatorInterface')->getMock();
     }

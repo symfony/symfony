@@ -65,11 +65,9 @@ class EsiFragmentRendererTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
+        $this->expectException('LogicException');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -79,11 +77,9 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render(new ControllerReference('main_controller'), $request);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
+        $this->expectException('LogicException');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');

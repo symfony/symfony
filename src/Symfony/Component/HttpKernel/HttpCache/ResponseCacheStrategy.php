@@ -110,8 +110,6 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $response->headers->set('Age', $this->age);
 
         if ($this->isNotCacheableResponseEmbedded) {
-            $response->setExpires($response->getDate());
-
             if ($this->flagDirectives['no-store']) {
                 $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
             } else {
@@ -130,7 +128,6 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $response->headers->set('Cache-Control', implode(', ', array_keys($flags)));
 
         $maxAge = null;
-        $sMaxage = null;
 
         if (is_numeric($this->ageDirectives['max-age'])) {
             $maxAge = $this->ageDirectives['max-age'] + $this->age;
@@ -156,10 +153,8 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      * RFC2616, Section 13.4.
      *
      * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.4
-     *
-     * @return bool
      */
-    private function willMakeFinalResponseUncacheable(Response $response)
+    private function willMakeFinalResponseUncacheable(Response $response): bool
     {
         // RFC2616: A response received with a status code of 200, 203, 300, 301 or 410
         // MAY be stored by a cache […] unless a cache-control directive prohibits caching.
@@ -203,12 +198,8 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      *
      * If the value is lower than the currently stored value, we update the value, to keep a rolling
      * minimal value of each instruction. If the value is NULL, the directive will not be set on the final response.
-     *
-     * @param string   $directive
-     * @param int|null $value
-     * @param int      $age
      */
-    private function storeRelativeAgeDirective($directive, $value, $age)
+    private function storeRelativeAgeDirective(string $directive, ?int $value, int $age)
     {
         if (null === $value) {
             $this->ageDirectives[$directive] = false;

@@ -33,7 +33,7 @@ class SingleIntIdEntity
         $this->name = $name;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->name;
     }

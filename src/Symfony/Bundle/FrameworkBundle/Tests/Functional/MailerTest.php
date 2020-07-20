@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\SentMessage;
@@ -10,7 +11,7 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
-class MailerTest extends WebTestCase
+class MailerTest extends AbstractWebTestCase
 {
     public function testEnvelopeListener()
     {
@@ -42,6 +43,11 @@ class MailerTest extends WebTestCase
                 $this->onDoSend = $onDoSend;
             }
 
+            public function __toString(): string
+            {
+                return 'dummy://local';
+            }
+
             protected function doSend(SentMessage $message): void
             {
                 $onDoSend = $this->onDoSend;
@@ -49,7 +55,7 @@ class MailerTest extends WebTestCase
             }
         };
 
-        $mailer = new Mailer($testTransport, null);
+        $mailer = new Mailer($testTransport);
 
         $message = (new Email())
             ->subject('Test subject')
@@ -58,5 +64,39 @@ class MailerTest extends WebTestCase
             ->to('to@example.org');
 
         $mailer->send($message);
+    }
+
+    public function testMailerAssertions()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->request('GET', '/send_email');
+
+        $this->assertEmailCount(2);
+        $first = 0;
+        $second = 1;
+        if (!class_exists(FullStack::class)) {
+            $this->assertQueuedEmailCount(2);
+            $first = 1;
+            $second = 3;
+            $this->assertEmailIsQueued($this->getMailerEvent(0));
+            $this->assertEmailIsQueued($this->getMailerEvent(2));
+        }
+        $this->assertEmailIsNotQueued($this->getMailerEvent($first));
+        $this->assertEmailIsNotQueued($this->getMailerEvent($second));
+
+        $email = $this->getMailerMessage($first);
+        $this->assertEmailHasHeader($email, 'To');
+        $this->assertEmailHeaderSame($email, 'To', 'fabien@symfony.com');
+        $this->assertEmailHeaderNotSame($email, 'To', 'helene@symfony.com');
+        $this->assertEmailTextBodyContains($email, 'Bar');
+        $this->assertEmailTextBodyNotContains($email, 'Foo');
+        $this->assertEmailHtmlBodyContains($email, 'Foo');
+        $this->assertEmailHtmlBodyNotContains($email, 'Bar');
+        $this->assertEmailAttachmentCount($email, 1);
+
+        $email = $this->getMailerMessage($second);
+        $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
+        $this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
+        $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
     }
 }

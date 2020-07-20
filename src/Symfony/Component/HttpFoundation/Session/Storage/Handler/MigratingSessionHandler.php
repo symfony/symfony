@@ -39,7 +39,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function close()
     {
@@ -50,7 +50,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function destroy($sessionId)
     {
@@ -61,7 +61,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function gc($maxlifetime)
     {
@@ -72,7 +72,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function open($savePath, $sessionName)
     {
@@ -83,7 +83,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function read($sessionId)
     {
@@ -92,7 +92,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function write($sessionId, $sessionData)
     {
@@ -103,7 +103,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function validateId($sessionId)
     {
@@ -112,7 +112,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function updateTimestamp($sessionId, $sessionData)
     {

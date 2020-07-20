@@ -29,9 +29,8 @@ class TemplateIterator implements \IteratorAggregate
     private $defaultPath;
 
     /**
-     * @param KernelInterface $kernel      A KernelInterface instance
-     * @param array           $paths       Additional Twig paths to warm
-     * @param string|null     $defaultPath The directory where global templates can be stored
+     * @param array       $paths       Additional Twig paths to warm
+     * @param string|null $defaultPath The directory where global templates can be stored
      */
     public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
     {
@@ -40,10 +39,7 @@ class TemplateIterator implements \IteratorAggregate
         $this->defaultPath = $defaultPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (null !== $this->templates) {
             return $this->templates;
@@ -57,9 +53,11 @@ class TemplateIterator implements \IteratorAggregate
                 $name = substr($name, 0, -6);
             }
 
+            $bundleTemplatesDir = is_dir($bundle->getPath().'/Resources/views') ? $bundle->getPath().'/Resources/views' : $bundle->getPath().'/templates';
+
             $templates = array_merge(
                 $templates,
-                $this->findTemplatesInDirectory($bundle->getPath().'/Resources/views', $name),
+                $this->findTemplatesInDirectory($bundleTemplatesDir, $name),
                 null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name) : []
             );
         }

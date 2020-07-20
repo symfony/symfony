@@ -22,10 +22,10 @@ class MessagePartTest extends TestCase
 {
     public function testConstructor()
     {
-        $p = new MessagePart((new Email())->from('fabien@symfony.com')->text('content'));
-        $this->assertContains('content', $p->getBody());
-        $this->assertContains('content', $p->bodyToString());
-        $this->assertContains('content', implode('', iterator_to_array($p->bodyToIterable())));
+        $p = new MessagePart((new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content'));
+        $this->assertStringContainsString('content', $p->getBody());
+        $this->assertStringContainsString('content', $p->bodyToString());
+        $this->assertStringContainsString('content', implode('', iterator_to_array($p->bodyToIterable())));
         $this->assertEquals('message', $p->getMediaType());
         $this->assertEquals('rfc822', $p->getMediaSubType());
     }

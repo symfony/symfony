@@ -44,25 +44,19 @@ class MappingRule
      * If the rule matches, the form mapped by the rule is returned.
      * Otherwise this method returns false.
      *
-     * @param string $propertyPath The property path to match against the rule
-     *
      * @return FormInterface|null The mapped form or null
      */
-    public function match($propertyPath)
+    public function match(string $propertyPath)
     {
-        if ($propertyPath === $this->propertyPath) {
-            return $this->getTarget();
-        }
+        return $propertyPath === $this->propertyPath ? $this->getTarget() : null;
     }
 
     /**
      * Matches a property path against a prefix of the rule path.
      *
-     * @param string $propertyPath The property path to match against the rule
-     *
      * @return bool Whether the property path is a prefix of the rule or not
      */
-    public function isPrefix($propertyPath)
+    public function isPrefix(string $propertyPath)
     {
         $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);

@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\MigratingPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class MigratingPasswordEncoderTest extends TestCase
 {
@@ -65,9 +64,4 @@ class MigratingPasswordEncoderTest extends TestCase
 
         $this->assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
     }
-}
-
-interface TestPasswordEncoderInterface extends PasswordEncoderInterface
-{
-    public function needsRehash(string $encoded): bool;
 }

@@ -127,39 +127,39 @@ class TestPool implements CacheItemPoolInterface
 {
     use CacheTrait;
 
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
     }
 
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
     }
 
-    public function deleteItems(array $keys = [])
+    public function deleteItems(array $keys = []): bool
     {
     }
 
-    public function getItem($key)
+    public function getItem($key): CacheItemInterface
     {
     }
 
-    public function getItems(array $key = [])
+    public function getItems(array $key = []): iterable
     {
     }
 
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
     }
 
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
     }
 
-    public function commit()
+    public function commit(): bool
     {
     }
 
-    public function clear()
+    public function clear(): bool
     {
     }
 }

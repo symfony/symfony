@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -25,7 +25,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
     private $entityManager;
     private $middleware;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 
@@ -53,12 +53,10 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Thrown from next middleware.
-     */
     public function testTransactionIsRolledBackOnException()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Thrown from next middleware.');
         $this->connection->expects($this->once())
             ->method('beginTransaction')
         ;

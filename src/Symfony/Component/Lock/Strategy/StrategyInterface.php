@@ -21,12 +21,9 @@ interface StrategyInterface
     /**
      * Returns whether or not the quorum is met.
      *
-     * @param int $numberOfSuccess
-     * @param int $numberOfItems
-     *
      * @return bool
      */
-    public function isMet($numberOfSuccess, $numberOfItems);
+    public function isMet(int $numberOfSuccess, int $numberOfItems);
 
     /**
      * Returns whether or not the quorum *could* be met.
@@ -34,10 +31,7 @@ interface StrategyInterface
      * This method does not mean the quorum *would* be met for sure, but can be useful to stop a process early when you
      * known there is no chance to meet the quorum.
      *
-     * @param int $numberOfFailure
-     * @param int $numberOfItems
-     *
      * @return bool
      */
-    public function canBeMet($numberOfFailure, $numberOfItems);
+    public function canBeMet(int $numberOfFailure, int $numberOfItems);
 }

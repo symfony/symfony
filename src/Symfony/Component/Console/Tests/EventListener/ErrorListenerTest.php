@@ -138,11 +138,11 @@ class ErrorListenerTest extends TestCase
 
 class NonStringInput extends Input
 {
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
     }
 
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, $onlyParams = false): bool
     {
     }
 

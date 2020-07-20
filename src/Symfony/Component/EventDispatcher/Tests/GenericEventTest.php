@@ -29,7 +29,7 @@ class GenericEventTest extends TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subject = new \stdClass();
         $this->event = new GenericEvent($this->subject, ['name' => 'Event']);
@@ -38,7 +38,7 @@ class GenericEventTest extends TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->subject = null;
         $this->event = null;
@@ -61,14 +61,14 @@ class GenericEventTest extends TestCase
     public function testSetArguments()
     {
         $result = $this->event->setArguments(['foo' => 'bar']);
-        $this->assertAttributeSame(['foo' => 'bar'], 'arguments', $this->event);
+        $this->assertSame(['foo' => 'bar'], $this->event->getArguments());
         $this->assertSame($this->event, $result);
     }
 
     public function testSetArgument()
     {
         $result = $this->event->setArgument('foo2', 'bar2');
-        $this->assertAttributeSame(['name' => 'Event', 'foo2' => 'bar2'], 'arguments', $this->event);
+        $this->assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
         $this->assertEquals($this->event, $result);
     }
 
@@ -78,11 +78,9 @@ class GenericEventTest extends TestCase
         $this->assertEquals('Event', $this->event->getArgument('name'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetArgException()
     {
+        $this->expectException('\InvalidArgumentException');
         $this->event->getArgument('nameNotExist');
     }
 
@@ -99,13 +97,13 @@ class GenericEventTest extends TestCase
     public function testOffsetSet()
     {
         $this->event['foo2'] = 'bar2';
-        $this->assertAttributeSame(['name' => 'Event', 'foo2' => 'bar2'], 'arguments', $this->event);
+        $this->assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
     }
 
     public function testOffsetUnset()
     {
         unset($this->event['name']);
-        $this->assertAttributeSame([], 'arguments', $this->event);
+        $this->assertSame([], $this->event->getArguments());
     }
 
     public function testOffsetIsset()

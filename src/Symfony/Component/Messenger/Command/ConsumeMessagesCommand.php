@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Command;
 
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -23,13 +22,13 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Component\Messenger\Worker\StopWhenMemoryUsageIsExceededWorker;
-use Symfony\Component\Messenger\Worker\StopWhenMessageCountIsExceededWorker;
-use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
-use Symfony\Component\Messenger\Worker\StopWhenTimeLimitIsReachedWorker;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -42,26 +41,17 @@ class ConsumeMessagesCommand extends Command
     private $receiverLocator;
     private $logger;
     private $receiverNames;
-    private $retryStrategyLocator;
     private $eventDispatcher;
-    /** @var CacheItemPoolInterface|null */
-    private $restartSignalCachePool;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
-        $this->retryStrategyLocator = $retryStrategyLocator;
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
-    }
-
-    public function setCachePoolForRestartSignal(CacheItemPoolInterface $restartSignalCachePool)
-    {
-        $this->restartSignalCachePool = $restartSignalCachePool;
     }
 
     /**
@@ -75,10 +65,11 @@ class ConsumeMessagesCommand extends Command
             ->setDefinition([
                 new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names of the receivers/transports to consume in order of priority', $defaultReceiverName ? [$defaultReceiverName] : []),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
+                new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
-                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically.'),
+                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
             ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -93,6 +84,10 @@ To receive from multiple transports, pass each name:
 Use the --limit option to limit the number of messages received:
 
     <info>php %command.full_name% <receiver-name> --limit=10</info>
+
+Use the --failure-limit option to stop the worker when the given number of failed messages is reached:
+
+    <info>php %command.full_name% <receiver-name> --failure-limit=2</info>
 
 Use the --memory-limit option to stop the worker if it exceeds a given memory usage limit. You can use shorthand byte values [K, M or G]:
 
@@ -144,7 +139,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $receivers = [];
-        $retryStrategies = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
@@ -155,37 +149,31 @@ EOF
                 throw new RuntimeException($message);
             }
 
-            if (null !== $this->retryStrategyLocator && !$this->retryStrategyLocator->has($receiverName)) {
-                throw new RuntimeException(sprintf('Receiver "%s" does not have a configured retry strategy.', $receiverName));
-            }
-
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
-            $retryStrategies[$receiverName] = null !== $this->retryStrategyLocator ? $this->retryStrategyLocator->get($receiverName) : null;
         }
 
-        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
-
-        $worker = new Worker($receivers, $bus, $retryStrategies, $this->eventDispatcher, $this->logger);
         $stopsWhen = [];
         if ($limit = $input->getOption('limit')) {
             $stopsWhen[] = "processed {$limit} messages";
-            $worker = new StopWhenMessageCountIsExceededWorker($worker, $limit, $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
+        }
+
+        if ($failureLimit = $input->getOption('failure-limit')) {
+            $stopsWhen[] = "reached {$failureLimit} failed messages";
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnFailureLimitListener($failureLimit, $this->logger));
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
             $stopsWhen[] = "exceeded {$memoryLimit} of memory";
-            $worker = new StopWhenMemoryUsageIsExceededWorker($worker, $this->convertToBytes($memoryLimit), $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
         if ($timeLimit = $input->getOption('time-limit')) {
             $stopsWhen[] = "been running for {$timeLimit}s";
-            $worker = new StopWhenTimeLimitIsReachedWorker($worker, $timeLimit, $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
 
-        if (null !== $this->restartSignalCachePool) {
-            $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
-            $worker = new StopWhenRestartSignalIsReceived($worker, $this->restartSignalCachePool, $this->logger);
-        }
+        $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
@@ -202,9 +190,14 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
+        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
+
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
         $worker->run([
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);
+
+        return 0;
     }
 
     private function convertToBytes(string $memoryLimit): int

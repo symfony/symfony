@@ -69,11 +69,9 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testRenderExceptionNoIgnoreErrors()
     {
+        $this->expectException('RuntimeException');
         $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
 

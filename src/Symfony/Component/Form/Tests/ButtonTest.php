@@ -24,17 +24,15 @@ class ButtonTest extends TestCase
 
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
-     */
     public function testSetParentOnSubmittedButton()
     {
+        $this->expectException('Symfony\Component\Form\Exception\AlreadySubmittedException');
         $button = $this->getButtonBuilder('button')
             ->getForm()
         ;

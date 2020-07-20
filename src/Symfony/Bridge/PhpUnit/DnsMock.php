@@ -16,8 +16,8 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DnsMock
 {
-    private static $hosts = array();
-    private static $dnsTypes = array(
+    private static $hosts = [];
+    private static $dnsTypes = [
         'A' => DNS_A,
         'MX' => DNS_MX,
         'NS' => DNS_NS,
@@ -30,7 +30,7 @@ class DnsMock
         'NAPTR' => DNS_NAPTR,
         'TXT' => DNS_TXT,
         'HINFO' => DNS_HINFO,
-    );
+    ];
 
     /**
      * Configures the mock values for DNS queries.
@@ -68,7 +68,7 @@ class DnsMock
         if (!self::$hosts) {
             return \getmxrr($hostname, $mxhosts, $weight);
         }
-        $mxhosts = $weight = array();
+        $mxhosts = $weight = [];
 
         if (isset(self::$hosts[$hostname])) {
             foreach (self::$hosts[$hostname] as $record) {
@@ -125,7 +125,7 @@ class DnsMock
         $ips = false;
 
         if (isset(self::$hosts[$hostname])) {
-            $ips = array();
+            $ips = [];
 
             foreach (self::$hosts[$hostname] as $record) {
                 if ('A' === $record['type']) {
@@ -149,11 +149,11 @@ class DnsMock
             if (DNS_ANY === $type) {
                 $type = DNS_ALL;
             }
-            $records = array();
+            $records = [];
 
             foreach (self::$hosts[$hostname] as $record) {
                 if (isset(self::$dnsTypes[$record['type']]) && (self::$dnsTypes[$record['type']] & $type)) {
-                    $records[] = array_merge(array('host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']), $record);
+                    $records[] = array_merge(['host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']], $record);
                 }
             }
         }
@@ -165,7 +165,7 @@ class DnsMock
     {
         $self = \get_called_class();
 
-        $mockedNs = array(substr($class, 0, strrpos($class, '\\')));
+        $mockedNs = [substr($class, 0, strrpos($class, '\\'))];
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));

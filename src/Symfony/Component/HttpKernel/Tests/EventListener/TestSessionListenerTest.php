@@ -40,7 +40,7 @@ class TestSessionListenerTest extends TestCase
      */
     private $session;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();
@@ -123,7 +123,7 @@ class TestSessionListenerTest extends TestCase
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
 
-        $this->assertSame($expected, $response->headers->get('Set-Cookie', null, false));
+        $this->assertSame($expected, $response->headers->all()['set-cookie']);
     }
 
     public function anotherCookieProvider()

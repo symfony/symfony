@@ -91,7 +91,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
@@ -105,7 +105,7 @@ EOT
             $targetArg = $kernel->getProjectDir().'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
-                throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $targetArg));
             }
         }
 
@@ -133,7 +133,7 @@ EOT
         $validAssetDirs = [];
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
+            if (!is_dir($originDir = $bundle->getPath().'/Resources/public') && !is_dir($originDir = $bundle->getPath().'/public')) {
                 continue;
             }
 

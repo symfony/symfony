@@ -69,6 +69,11 @@ class TestClass
         return $this->publicAccessor;
     }
 
+    public function isPublicAccessor($param)
+    {
+        throw new \LogicException('This method should never have been called.');
+    }
+
     public function getPublicAccessorWithDefaultValue()
     {
         return $this->publicAccessorWithDefaultValue;

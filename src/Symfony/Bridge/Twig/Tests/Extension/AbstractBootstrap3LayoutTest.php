@@ -17,7 +17,7 @@ use Symfony\Component\Form\Tests\AbstractLayoutTest;
 
 abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 {
-    protected static $supportedFeatureSetVersion = 403;
+    protected static $supportedFeatureSetVersion = 404;
 
     public function testLabelOnForm()
     {
@@ -104,6 +104,39 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [.="[trans]Custom label[/trans]"]
 '
         );
+    }
+
+    public function testLabelHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"][.="[trans]<b>Bolded label</b>[/trans]"]');
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"]/b[.="Bolded label"]', 0);
+    }
+
+    public function testLabelHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+            'label_html' => true,
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class control-label required"]/b[.="Bolded label"]');
     }
 
     public function testHelp()
@@ -333,6 +366,21 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testCheckboxRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [@class="form-group"]
+    [
+        ./span[text() = "[trans]really helpful text[/trans]"]
+    ]
+'
+        );
+    }
+
     public function testSingleChoice()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
@@ -524,8 +572,34 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=3]
+    [count(./option)=4]
+'
+        );
+    }
+
+    public function testSingleChoiceWithSelectedPreferred()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+            'preferred_choices' => ['&a'],
+            'multiple' => false,
+            'expanded' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['separator' => '-- sep --', 'attr' => ['class' => 'my&class']],
+'/select
+    [@name="name"]
+    [@class="my&class form-control"]
+    [not(@required)]
+    [
+        ./option[@value="&a"][not(@selected)][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./option)=4]
 '
         );
     }
@@ -547,8 +621,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=2]
+    [count(./option)=3]
 '
         );
     }
@@ -571,8 +646,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=3]
+    [count(./option)=4]
 '
         );
     }
@@ -589,7 +665,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
 '/select
     [@class="my&class form-control"]
-    [count(./option)=2]
+    [count(./option)=5]
 '
         );
     }
@@ -2135,7 +2211,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/div
@@ -2157,7 +2233,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercentNoSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/input
     [@id="my&id"]
@@ -2171,7 +2247,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercentCustomSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/div
     [@class="input-group"]
@@ -2257,6 +2333,21 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
                     [@class="my&class"]
                     [@value="foo&bar"]
             ]
+    ]
+'
+        );
+    }
+
+    public function testRadioRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [@class="form-group"]
+    [
+        ./span[text() = "[trans]really helpful text[/trans]"]
     ]
 '
         );
@@ -2556,7 +2647,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testUrlWithDefaultProtocol()
     {
-        $url = 'http://www.google.com?foo1=bar1&foo2=bar2';
+        $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2564,7 +2655,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@type="text"]
     [@name="name"]
     [@class="my&class form-control"]
-    [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
+    [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
     [@inputmode="url"]
 '
         );
@@ -2572,7 +2663,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testUrlWithoutDefaultProtocol()
     {
-        $url = 'http://www.google.com?foo1=bar1&foo2=bar2';
+        $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2580,7 +2671,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@type="url"]
     [@name="name"]
     [@class="my&class form-control"]
-    [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
+    [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
 '
         );
     }
@@ -2603,6 +2694,31 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/button[@type="button"][@name="name"][.="Name"][@class="my&class btn"]'
         );
+    }
+
+    public function testButtonLabelHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
+            'label' => '<b>Click here!</b>',
+        ]);
+
+        $html = $this->renderWidget($form->createView(), ['attr' => ['class' => 'my&class']]);
+
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][.="[trans]<b>Click here!</b>[/trans]"][@class="my&class btn"]');
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][@class="my&class btn"]/b[.="Click here!"]', 0);
+    }
+
+    public function testButtonLabelHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
+            'label' => '<b>Click here!</b>',
+            'label_html' => true,
+        ]);
+
+        $html = $this->renderWidget($form->createView(), ['attr' => ['class' => 'my&class']]);
+
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][.="[trans]<b>Click here!</b>[/trans]"][@class="my&class btn"]', 0);
+        $this->assertMatchesXpath($html, '/button[@type="button"][@name="name"][@class="my&class btn"]/b[.="Click here!"]');
     }
 
     public function testSubmit()
@@ -2700,6 +2816,104 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@name="name"]
     [@class="my&class form-control"]
     [@value="#0000ff"]
+'
+        );
+    }
+
+    public function testWeekSingleText()
+    {
+        $this->requiresFeatureSet(404);
+
+        $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
+            'input' => 'string',
+            'widget' => 'single_text',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="week"]
+    [@name="holidays"]
+    [@class="my&class form-control"]
+    [@value="1970-W01"]
+    [not(@maxlength)]
+'
+        );
+    }
+
+    public function testWeekSingleTextNoHtml5()
+    {
+        $this->requiresFeatureSet(404);
+
+        $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
+            'input' => 'string',
+            'widget' => 'single_text',
+            'html5' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="text"]
+    [@name="holidays"]
+    [@class="my&class form-control"]
+    [@value="1970-W01"]
+    [not(@maxlength)]
+'
+        );
+    }
+
+    public function testWeekChoices()
+    {
+        $this->requiresFeatureSet(404);
+
+        $data = ['year' => (int) date('Y'), 'week' => 1];
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
+            'input' => 'array',
+            'widget' => 'choice',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class"]
+    [
+        ./select
+            [@id="name_year"]
+            [@class="form-control"]
+            [./option[@value="'.$data['year'].'"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_week"]
+            [@class="form-control"]
+            [./option[@value="'.$data['week'].'"][@selected="selected"]]
+    ]
+    [count(.//select)=2]'
+        );
+    }
+
+    public function testWeekText()
+    {
+        $this->requiresFeatureSet(404);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
+            'input' => 'string',
+            'widget' => 'text',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class"]
+    [
+        ./input
+            [@id="name_year"]
+            [@type="number"]
+            [@class="form-control"]
+            [@value="2000"]
+        /following-sibling::input
+            [@id="name_week"]
+            [@type="number"]
+            [@class="form-control"]
+            [@value="1"]
+    ]
+    [count(./input)=2]
 '
         );
     }

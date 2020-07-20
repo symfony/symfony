@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
 
 class UriSignerTest extends TestCase
@@ -20,9 +21,9 @@ class UriSignerTest extends TestCase
     {
         $signer = new UriSigner('foobar');
 
-        $this->assertContains('?_hash=', $signer->sign('http://example.com/foo'));
-        $this->assertContains('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
-        $this->assertContains('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo'));
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
+        $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
     }
 
     public function testCheck()
@@ -50,6 +51,15 @@ class UriSignerTest extends TestCase
             $signer->sign('http://example.com/foo?foo=bar&baz=bay')
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+    }
+
+    public function testCheckWithRequest()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo'))));
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar'))));
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar&0=integer'))));
     }
 
     public function testCheckWithDifferentParameter()

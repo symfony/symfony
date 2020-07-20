@@ -22,7 +22,7 @@ class PdoSessionHandlerTest extends TestCase
 {
     private $dbFile;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // make sure the temporary database file is deleted when it has been created (even when a test fails)
         if ($this->dbFile) {
@@ -48,22 +48,18 @@ class PdoSessionHandlerTest extends TestCase
         return $pdo;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testWrongPdoErrMode()
     {
+        $this->expectException('InvalidArgumentException');
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $storage = new PdoSessionHandler($pdo);
+        new PdoSessionHandler($pdo);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInexistentTable()
     {
+        $this->expectException('RuntimeException');
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), ['db_table' => 'inexistent_table']);
         $storage->open('', 'sid');
         $storage->read('id');
@@ -71,11 +67,9 @@ class PdoSessionHandlerTest extends TestCase
         $storage->close();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testCreateTableTwice()
     {
+        $this->expectException('RuntimeException');
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->createTable();
     }
@@ -323,15 +317,15 @@ class PdoSessionHandlerTest extends TestCase
     public function testUrlDsn($url, $expectedDsn, $expectedUser = null, $expectedPassword = null)
     {
         $storage = new PdoSessionHandler($url);
+        $reflection = new \ReflectionClass(PdoSessionHandler::class);
 
-        $this->assertAttributeEquals($expectedDsn, 'dsn', $storage);
-
-        if (null !== $expectedUser) {
-            $this->assertAttributeEquals($expectedUser, 'username', $storage);
-        }
-
-        if (null !== $expectedPassword) {
-            $this->assertAttributeEquals($expectedPassword, 'password', $storage);
+        foreach (['dsn' => $expectedDsn, 'username' => $expectedUser, 'password' => $expectedPassword] as $property => $expectedValue) {
+            if (!isset($expectedValue)) {
+                continue;
+            }
+            $property = $reflection->getProperty($property);
+            $property->setAccessible(true);
+            $this->assertSame($expectedValue, $property->getValue($storage));
         }
     }
 
@@ -352,6 +346,9 @@ class PdoSessionHandlerTest extends TestCase
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
+    /**
+     * @return resource
+     */
     private function createStream($content)
     {
         $stream = tmpfile();
@@ -368,7 +365,7 @@ class MockPdo extends \PDO
     private $driverName;
     private $errorMode;
 
-    public function __construct($driverName = null, $errorMode = null)
+    public function __construct(string $driverName = null, int $errorMode = null)
     {
         $this->driverName = $driverName;
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;

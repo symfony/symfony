@@ -92,17 +92,21 @@ EOF
         $filter = $input->getOption('filter');
 
         if (null !== $name && [] === $this->getFilesystemLoaders()) {
-            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s"', FilesystemLoader::class));
+            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
         switch ($input->getOption('format')) {
             case 'text':
-                return $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter);
+                $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter);
+                break;
             case 'json':
-                return $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter);
+                $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter);
+                break;
             default:
                 throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
         }
+
+        return 0;
     }
 
     private function displayPathsText(SymfonyStyle $io, string $name)
@@ -234,7 +238,7 @@ EOF
         }
     }
 
-    private function displayGeneralJson(SymfonyStyle $io, $filter)
+    private function displayGeneralJson(SymfonyStyle $io, ?string $filter)
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
@@ -288,22 +292,22 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata($type, $entity)
+    private function getMetadata(string $type, $entity)
     {
         if ('globals' === $type) {
             return $entity;
         }
         if ('tests' === $type) {
-            return;
+            return null;
         }
         if ('functions' === $type || 'filters' === $type) {
             $cb = $entity->getCallable();
             if (null === $cb) {
-                return;
+                return null;
             }
             if (\is_array($cb)) {
                 if (!method_exists($cb[0], $cb[1])) {
-                    return;
+                    return null;
                 }
                 $refl = new \ReflectionMethod($cb[0], $cb[1]);
             } elseif (\is_object($cb) && method_exists($cb, '__invoke')) {
@@ -313,7 +317,7 @@ EOF
             } elseif (\is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
                 $refl = new \ReflectionMethod($m[1], $m[2]);
             } else {
-                throw new \UnexpectedValueException('Unsupported callback type');
+                throw new \UnexpectedValueException('Unsupported callback type.');
             }
 
             $args = $refl->getParameters();
@@ -342,9 +346,11 @@ EOF
 
             return $args;
         }
+
+        return null;
     }
 
-    private function getPrettyMetadata($type, $entity, $decorated)
+    private function getPrettyMetadata(string $type, $entity, bool $decorated): ?string
     {
         if ('tests' === $type) {
             return '';
@@ -376,6 +382,8 @@ EOF
         if ('filters' === $type) {
             return $meta ? '('.implode(', ', $meta).')' : '';
         }
+
+        return null;
     }
 
     private function findWrongBundleOverrides(): array

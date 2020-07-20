@@ -1,5 +1,5 @@
 imports:
-    - { resource: ./../config/default.yml }
+    - { resource: ./../config/framework.yml }
 
 services:
     # alias the service so we can access it in the tests

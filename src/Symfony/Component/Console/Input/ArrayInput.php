@@ -39,13 +39,15 @@ class ArrayInput extends Input
      */
     public function getFirstArgument()
     {
-        foreach ($this->parameters as $key => $value) {
-            if ($key && '-' === $key[0]) {
+        foreach ($this->parameters as $param => $value) {
+            if ($param && \is_string($param) && '-' === $param[0]) {
                 continue;
             }
 
             return $value;
         }
+
+        return null;
     }
 
     /**
@@ -105,7 +107,7 @@ class ArrayInput extends Input
     {
         $params = [];
         foreach ($this->parameters as $param => $val) {
-            if ($param && '-' === $param[0]) {
+            if ($param && \is_string($param) && '-' === $param[0]) {
                 if (\is_array($val)) {
                     foreach ($val as $v) {
                         $params[] = $param.('' != $v ? '='.$this->escapeToken($v) : '');
@@ -132,7 +134,7 @@ class ArrayInput extends Input
             }
             if (0 === strpos($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
-            } elseif ('-' === $key[0]) {
+            } elseif (0 === strpos($key, '-')) {
                 $this->addShortOption(substr($key, 1), $value);
             } else {
                 $this->addArgument($key, $value);
@@ -142,8 +144,6 @@ class ArrayInput extends Input
 
     /**
      * Adds a short option value.
-     *
-     * @param mixed $value The value for the option
      *
      * @throws InvalidOptionException When option given doesn't exist
      */
@@ -158,8 +158,6 @@ class ArrayInput extends Input
 
     /**
      * Adds a long option value.
-     *
-     * @param mixed $value The value for the option
      *
      * @throws InvalidOptionException When option given doesn't exist
      * @throws InvalidOptionException When a required value is missing
@@ -188,8 +186,8 @@ class ArrayInput extends Input
     /**
      * Adds an argument value.
      *
-     * @param string $name  The argument name
-     * @param mixed  $value The value for the argument
+     * @param string|int $name  The argument name
+     * @param mixed      $value The value for the argument
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */

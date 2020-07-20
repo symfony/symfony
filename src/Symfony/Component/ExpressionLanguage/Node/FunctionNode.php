@@ -40,7 +40,7 @@ class FunctionNode extends Node
         $compiler->raw($function['compiler'](...$arguments));
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate(array $functions, array $values)
     {
         $arguments = [$values];
         foreach ($this->nodes['arguments']->nodes as $node) {

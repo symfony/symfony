@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.49.82",
     "Names": {
         "Africa\/Abidjan": "グリニッジ標準時（アビジャン）",
         "Africa\/Accra": "グリニッジ標準時（アクラ）",
@@ -62,7 +61,7 @@
         "America\/Argentina\/Rio_Gallegos": "アルゼンチン時間（リオガジェゴス）",
         "America\/Argentina\/Salta": "アルゼンチン時間（サルタ）",
         "America\/Argentina\/San_Juan": "アルゼンチン時間（サンファン）",
-        "America\/Argentina\/San_Luis": "西部アルゼンチン時間（サンルイス）",
+        "America\/Argentina\/San_Luis": "アルゼンチン時間（サンルイス）",
         "America\/Argentina\/Tucuman": "アルゼンチン時間（トゥクマン）",
         "America\/Argentina\/Ushuaia": "アルゼンチン時間（ウシュアイア）",
         "America\/Aruba": "大西洋時間（アルバ）",
@@ -232,7 +231,7 @@
         "Asia\/Brunei": "ブルネイ・ダルサラーム時間",
         "Asia\/Calcutta": "インド標準時（コルカタ）",
         "Asia\/Chita": "ヤクーツク時間（チタ）",
-        "Asia\/Choibalsan": "チョイバルサン時間",
+        "Asia\/Choibalsan": "ウランバートル時間（チョイバルサン）",
         "Asia\/Colombo": "インド標準時（コロンボ）",
         "Asia\/Damascus": "東ヨーロッパ時間（ダマスカス）",
         "Asia\/Dhaka": "バングラデシュ時間（ダッカ）",
@@ -271,7 +270,7 @@
         "Asia\/Pontianak": "インドネシア西部時間（ポンティアナック）",
         "Asia\/Pyongyang": "韓国時間（平壌）",
         "Asia\/Qatar": "アラビア時間（カタール）",
-        "Asia\/Qostanay": "東カザフスタン時間（Qostanay）",
+        "Asia\/Qostanay": "東カザフスタン時間（コスタナイ）",
         "Asia\/Qyzylorda": "西カザフスタン時間（クズロルダ）",
         "Asia\/Rangoon": "ミャンマー時間（ヤンゴン）",
         "Asia\/Riyadh": "アラビア時間（リヤド）",

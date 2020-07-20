@@ -48,8 +48,7 @@ class FormRegistry implements FormRegistryInterface
     private $checkedTypes = [];
 
     /**
-     * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
-     * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types
+     * @param FormExtensionInterface[] $extensions An array of FormExtensionInterface
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
@@ -68,7 +67,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (!isset($this->types[$name])) {
             $type = null;
@@ -99,14 +98,9 @@ class FormRegistry implements FormRegistryInterface
     }
 
     /**
-     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
-     * it with its parent type.
-     *
-     * @param FormTypeInterface $type The type to resolve
-     *
-     * @return ResolvedFormTypeInterface The resolved type
+     * Wraps a type into a ResolvedFormTypeInterface implementation and connects it with its parent type.
      */
-    private function resolveType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $typeExtensions = [];
         $parentType = $type->getParent();
@@ -140,7 +134,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         if (isset($this->types[$name])) {
             return true;

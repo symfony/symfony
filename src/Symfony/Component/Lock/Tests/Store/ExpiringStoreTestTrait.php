@@ -13,7 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -44,7 +44,7 @@ trait ExpiringStoreTestTrait
         $key = new Key(uniqid(__METHOD__, true));
         $clockDelay = $this->getClockDelay();
 
-        /** @var StoreInterface $store */
+        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -57,14 +57,13 @@ trait ExpiringStoreTestTrait
 
     /**
      * Tests the store thrown exception when TTL expires.
-     *
-     * @expectedException \Symfony\Component\Lock\Exception\LockExpiredException
      */
     public function testAbortAfterExpiration()
     {
+        $this->expectException('\Symfony\Component\Lock\Exception\LockExpiredException');
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var StoreInterface $store */
+        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -83,7 +82,7 @@ trait ExpiringStoreTestTrait
 
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var StoreInterface $store */
+        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -98,7 +97,7 @@ trait ExpiringStoreTestTrait
     {
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var StoreInterface $store */
+        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -114,7 +113,7 @@ trait ExpiringStoreTestTrait
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
-        /** @var StoreInterface $store */
+        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
         $key1->reduceLifetime(0);
 

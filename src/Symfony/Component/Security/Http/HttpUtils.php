@@ -33,7 +33,6 @@ class HttpUtils
     private $secureDomainRegexp;
 
     /**
-     * @param UrlGeneratorInterface                       $urlGenerator       A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher         The URL or Request matcher
      * @param string|null                                 $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
      * @param string|null                                 $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
@@ -54,13 +53,12 @@ class HttpUtils
     /**
      * Creates a redirect Response.
      *
-     * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
-     * @param int     $status  The status code
+     * @param string $path   A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param int    $status The status code
      *
      * @return RedirectResponse A RedirectResponse instance
      */
-    public function createRedirectResponse(Request $request, $path, $status = 302)
+    public function createRedirectResponse(Request $request, string $path, int $status = 302)
     {
         if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
@@ -75,19 +73,18 @@ class HttpUtils
     /**
      * Creates a Request.
      *
-     * @param Request $request The current Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return Request A Request instance
      */
-    public function createRequest(Request $request, $path)
+    public function createRequest(Request $request, string $path)
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
 
         static $setSession;
 
         if (null === $setSession) {
-            $setSession = \Closure::bind(function ($newRequest, $request) { $newRequest->session = $request->session; }, null, Request::class);
+            $setSession = \Closure::bind(static function ($newRequest, $request) { $newRequest->session = $request->session; }, null, Request::class);
         }
         $setSession($newRequest, $request);
 
@@ -114,12 +111,11 @@ class HttpUtils
     /**
      * Checks that a given path matches the Request.
      *
-     * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise
      */
-    public function checkRequestPath(Request $request, $path)
+    public function checkRequestPath(Request $request, string $path)
     {
         if ('/' !== $path[0]) {
             try {
@@ -144,14 +140,13 @@ class HttpUtils
     /**
      * Generates a URI, based on the given path or absolute URL.
      *
-     * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return string An absolute URL
      *
      * @throws \LogicException
      */
-    public function generateUri($request, $path)
+    public function generateUri(Request $request, string $path)
     {
         if (0 === strpos($path, 'http') || !$path) {
             return $path;

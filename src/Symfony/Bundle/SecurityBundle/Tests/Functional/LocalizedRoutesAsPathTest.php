@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class LocalizedRoutesAsPathTest extends WebTestCase
+class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getLocales
+     * @dataProvider getLocalesAndClientConfig
      */
-    public function testLoginLogoutProcedure($locale)
+    public function testLoginLogoutProcedure($locale, array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin'] + $options);
 
         $crawler = $client->request('GET', '/'.$locale.'/login');
         $form = $crawler->selectButton('login')->form();
@@ -35,11 +35,12 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getLocales
+     * @group issue-32995
+     * @dataProvider getLocalesAndClientConfig
      */
-    public function testLoginFailureWithLocalizedFailurePath($locale)
+    public function testLoginFailureWithLocalizedFailurePath($locale, array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => ($options['enable_authenticator_manager'] ? '' : 'legacy_').'localized_form_failure_handler.yml'] + $options);
 
         $crawler = $client->request('GET', '/'.$locale.'/login');
         $form = $crawler->selectButton('login')->form();
@@ -51,29 +52,32 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getLocales
+     * @dataProvider getLocalesAndClientConfig
      */
-    public function testAccessRestrictedResource($locale)
+    public function testAccessRestrictedResource($locale, array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin'] + $options);
 
         $client->request('GET', '/'.$locale.'/secure/');
         $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
     }
 
     /**
-     * @dataProvider getLocales
+     * @dataProvider getLocalesAndClientConfig
      */
-    public function testAccessRestrictedResourceWithForward($locale)
+    public function testAccessRestrictedResourceWithForward($locale, array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml'] + $options);
 
         $crawler = $client->request('GET', '/'.$locale.'/secure/');
         $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
-    public function getLocales()
+    public function getLocalesAndClientConfig()
     {
-        return [['en'], ['de']];
+        yield ['en', ['enable_authenticator_manager' => true, 'root_config' => 'localized_routes.yml']];
+        yield ['en', ['enable_authenticator_manager' => false, 'root_config' => 'legacy_localized_routes.yml']];
+        yield ['de', ['enable_authenticator_manager' => true, 'root_config' => 'localized_routes.yml']];
+        yield ['de', ['enable_authenticator_manager' => false, 'root_config' => 'legacy_localized_routes.yml']];
     }
 }

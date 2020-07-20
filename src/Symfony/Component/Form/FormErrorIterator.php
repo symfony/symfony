@@ -39,7 +39,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     private $errors;
 
     /**
-     * @param FormInterface      $form   The erroneous form
      * @param FormError[]|self[] $errors An array of form errors and instances
      *                                   of FormErrorIterator
      *
@@ -49,7 +48,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     {
         foreach ($errors as $error) {
             if (!($error instanceof FormError || $error instanceof self)) {
-                throw new InvalidArgumentException(sprintf('The errors must be instances of "Symfony\Component\Form\FormError" or "%s". Got: "%s".', __CLASS__, \is_object($error) ? \get_class($error) : \gettype($error)));
+                throw new InvalidArgumentException(sprintf('The errors must be instances of "Symfony\Component\Form\FormError" or "%s". Got: "%s".', __CLASS__, get_debug_type($error)));
             }
         }
 
@@ -70,7 +69,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
             if ($error instanceof FormError) {
                 $string .= 'ERROR: '.$error->getMessage()."\n";
             } else {
-                /** @var self $error */
+                /* @var self $error */
                 $string .= $error->form->getName().":\n";
                 $string .= self::indent((string) $error);
             }
@@ -272,12 +271,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Utility function for indenting multi-line strings.
-     *
-     * @param string $string The string
-     *
-     * @return string The indented string
      */
-    private static function indent($string)
+    private static function indent(string $string): string
     {
         return rtrim(self::INDENTATION.str_replace("\n", "\n".self::INDENTATION, $string), ' ');
     }

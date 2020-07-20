@@ -26,7 +26,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('stdClass', 'stdClass');
-        $container->register(parent::class, 'stdClass');
+        $container->register(TestCase::class, 'stdClass');
         $container->register('c1', RemoveTestController1::class)->addTag('controller.service_arguments');
         $container->register('c2', RemoveTestController2::class)->addTag('controller.service_arguments')
             ->addMethodCall('setTestCase', [new Reference('c1')]);

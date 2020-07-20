@@ -76,4 +76,54 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $this->assertFileExists($file);
     }
+
+    /**
+     * Test that the cache warming process is not broken if a class loader
+     * throws an exception (on class / file not found for example).
+     */
+    public function testClassAutoloadException()
+    {
+        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
+
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
+
+        spl_autoload_register($classloader = function ($class) use ($mappedClass) {
+            if ($class === $mappedClass) {
+                throw new \DomainException('This exception should be caught by the warmer.');
+            }
+        }, true, true);
+
+        $warmer->warmUp('foo');
+
+        spl_autoload_unregister($classloader);
+    }
+
+    /**
+     * Test that the cache warming process is broken if a class loader throws an
+     * exception but that is unrelated to the class load.
+     */
+    public function testClassAutoloadExceptionWithUnrelatedException()
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
+
+        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
+
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
+
+        spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
+            if ($class === $mappedClass) {
+                eval('class '.$mappedClass.'{}');
+                throw new \DomainException('This exception should not be caught by the warmer.');
+            }
+        }, true, true);
+
+        $warmer->warmUp('foo');
+
+        spl_autoload_unregister($classLoader);
+    }
 }

@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @internal
  */
-class VoteEvent extends Event
+final class VoteEvent extends Event
 {
     private $voter;
     private $subject;

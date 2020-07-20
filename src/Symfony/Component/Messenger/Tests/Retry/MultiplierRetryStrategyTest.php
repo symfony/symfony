@@ -21,25 +21,15 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testIsRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
 
-        $this->assertTrue($strategy->isRetryable($envelope));
-    }
-
-    public function testIsRetryableWithNullMax()
-    {
-        $strategy = new MultiplierRetryStrategy(null);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
-        $this->assertTrue($strategy->isRetryable($envelope));
-
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1, 'sender_alias')]);
         $this->assertTrue($strategy->isRetryable($envelope));
     }
 
     public function testIsNotRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3, 'sender_alias')]);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3)]);
 
         $this->assertFalse($strategy->isRetryable($envelope));
     }
@@ -47,7 +37,7 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testIsNotRetryableWithZeroMax()
     {
         $strategy = new MultiplierRetryStrategy(0);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
         $this->assertFalse($strategy->isRetryable($envelope));
     }
 
@@ -65,12 +55,12 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testGetWaitTime(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries, 'sender_alias')]);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
 
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }
 
-    public function getWaitTimeTests()
+    public function getWaitTimeTests(): iterable
     {
         // delay, multiplier, maxDelay, retries, expectedDelay
         yield [1000, 1, 5000, 0, 1000];

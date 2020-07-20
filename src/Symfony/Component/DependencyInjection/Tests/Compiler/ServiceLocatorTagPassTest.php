@@ -25,12 +25,10 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class ServiceLocatorTagPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set.
-     */
     public function testNoServices()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set.');
         $container = new ContainerBuilder();
 
         $container->register('foo', ServiceLocator::class)
@@ -40,12 +38,10 @@ class ServiceLocatorTagPassTest extends TestCase
         (new ServiceLocatorTagPass())->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set, "string" found for key "0".
-     */
     public function testInvalidServices()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set, "string" found for key "0".');
         $container = new ContainerBuilder();
 
         $container->register('foo', ServiceLocator::class)
@@ -118,6 +114,7 @@ class ServiceLocatorTagPassTest extends TestCase
             ->setArguments([[
                 'bar' => new Reference('baz'),
                 new Reference('bar'),
+                16 => new Reference('baz'),
             ]])
             ->addTag('container.service_locator')
         ;
@@ -128,6 +125,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $locator = $container->get('foo');
 
         $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
+        $this->assertSame(TestDefinition2::class, \get_class($locator(16)));
     }
 
     public function testBindingsAreCopied()

@@ -31,7 +31,7 @@ class ResponseStatusCodeSameTest extends TestCase
         try {
             $constraint->evaluate(new Response('', 404));
         } catch (ExpectationFailedException $e) {
-            $this->assertContains("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
 
             return;
         }

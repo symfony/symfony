@@ -38,12 +38,10 @@ class ExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The config array has no 'enabled' key.
-     */
     public function testIsConfigEnabledOnNonEnableableConfig()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The config array has no \'enabled\' key.');
         $extension = new EnableableExtension();
 
         $extension->isConfigEnabled(new ContainerBuilder(), []);
@@ -70,12 +68,11 @@ class ExtensionTest extends TestCase
         $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The extension configuration class "Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\InvalidConfig\Configuration" must implement "Symfony\Component\Config\Definition\ConfigurationInterface".
-     */
     public function testInvalidConfiguration()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectExceptionMessage('The extension configuration class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Extension\\InvalidConfig\\Configuration" must implement "Symfony\\Component\\Config\\Definition\\ConfigurationInterface".');
+
         $extension = new InvalidConfigExtension();
 
         $extension->getConfiguration([], new ContainerBuilder());
@@ -88,7 +85,7 @@ class EnableableExtension extends Extension
     {
     }
 
-    public function isConfigEnabled(ContainerBuilder $container, array $config)
+    public function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {
         return parent::isConfigEnabled($container, $config);
     }

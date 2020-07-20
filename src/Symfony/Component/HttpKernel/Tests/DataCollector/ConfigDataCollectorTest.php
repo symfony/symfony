@@ -46,11 +46,11 @@ class ConfigDataCollectorTest extends TestCase
 
 class KernelForTest extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
     }
 
-    public function getBundles()
+    public function getBundles(): array
     {
         return [];
     }

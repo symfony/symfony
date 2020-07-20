@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -63,17 +66,26 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
+
+            $kernel = $this->getApplication()->getKernel();
+            if ($kernel instanceof ExtensionInterface
+                && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)
+                && $kernel->getAlias()
+            ) {
+                $errorIo->table(['Kernel Extension'], [[$kernel->getAlias()]]);
+            }
+
             $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
             $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
 
-            return;
+            return 0;
         }
 
         $extension = $this->findExtension($name);
@@ -101,7 +113,7 @@ EOF
 
             $io->writeln(Yaml::dump([$extensionAlias => $config], 10));
 
-            return;
+            return 0;
         }
 
         try {
@@ -109,12 +121,14 @@ EOF
         } catch (LogicException $e) {
             $errorIo->error($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $io->title(sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
 
         $io->writeln(Yaml::dump($config, 10));
+
+        return 0;
     }
 
     private function compileContainer(): ContainerBuilder
@@ -143,7 +157,7 @@ EOF
 
         foreach ($steps as $step) {
             if (!\array_key_exists($step, $config)) {
-                throw new LogicException(sprintf('Unable to find configuration for "%s.%s"', $alias, $path));
+                throw new LogicException(sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
             }
 
             $config = $config[$step];

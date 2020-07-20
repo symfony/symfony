@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
@@ -38,11 +39,9 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
     public function testProcessThrowsExceptionOnInvalidReference()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
         $container = new ContainerBuilder();
 
         $container
@@ -53,11 +52,9 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
     public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
         $container = new ContainerBuilder();
 
         $def = new Definition();
@@ -85,12 +82,10 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".
-     */
     public function testWithErroredServiceLocator()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('baz')], 'bar');
@@ -100,18 +95,32 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage The service "bar" has a dependency on a non-existent service "foo".
-     */
     public function testWithErroredHiddenService()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('foo')], 'bar');
 
         (new AnalyzeServiceReferencesPass())->process($container);
         (new InlineServiceDefinitionsPass())->process($container);
+        $this->process($container);
+    }
+
+    public function testProcessThrowsExceptionOnInvalidReferenceWithAlternatives()
+    {
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "a" has a dependency on a non-existent service "@ccc". Did you mean this: "ccc"?');
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', '\stdClass')
+            ->addArgument(new Reference('@ccc'));
+
+        $container
+            ->register('ccc', '\stdClass');
+
         $this->process($container);
     }
 

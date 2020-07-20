@@ -27,7 +27,6 @@ final class CacheItem implements ItemInterface
     protected $value;
     protected $isHit = false;
     protected $expiry;
-    protected $defaultLifetime;
     protected $metadata = [];
     protected $newMetadata = [];
     protected $innerItem;
@@ -60,8 +59,10 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
-    public function set($value)
+    public function set($value): self
     {
         $this->value = $value;
 
@@ -70,15 +71,17 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration): self
     {
         if (null === $expiration) {
-            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
+            $this->expiry = null;
         } elseif ($expiration instanceof \DateTimeInterface) {
             $this->expiry = (float) $expiration->format('U.u');
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', \is_object($expiration) ? \get_class($expiration) : \gettype($expiration)));
+            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given.', get_debug_type($expiration)));
         }
 
         return $this;
@@ -86,17 +89,19 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time): self
     {
         if (null === $time) {
-            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
+            $this->expiry = null;
         } elseif ($time instanceof \DateInterval) {
             $this->expiry = microtime(true) + \DateTime::createFromFormat('U', 0)->add($time)->format('U.u');
         } elseif (\is_int($time)) {
             $this->expiry = $time + microtime(true);
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', \is_object($time) ? \get_class($time) : \gettype($time)));
+            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given.', get_debug_type($time)));
         }
 
         return $this;
@@ -115,16 +120,16 @@ final class CacheItem implements ItemInterface
         }
         foreach ($tags as $tag) {
             if (!\is_string($tag)) {
-                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given', \is_object($tag) ? \get_class($tag) : \gettype($tag)));
+                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given.', get_debug_type($tag)));
             }
             if (isset($this->newMetadata[self::METADATA_TAGS][$tag])) {
                 continue;
             }
             if ('' === $tag) {
-                throw new InvalidArgumentException('Cache tag length must be greater than zero');
+                throw new InvalidArgumentException('Cache tag length must be greater than zero.');
             }
-            if (false !== strpbrk($tag, '{}()/\@:')) {
-                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()/\@:', $tag));
+            if (false !== strpbrk($tag, self::RESERVED_CHARACTERS)) {
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters "%s".', $tag, self::RESERVED_CHARACTERS));
             }
             $this->newMetadata[self::METADATA_TAGS][$tag] = $tag;
         }
@@ -150,13 +155,13 @@ final class CacheItem implements ItemInterface
     public static function validateKey($key): string
     {
         if (!\is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', \is_object($key) ? \get_class($key) : \gettype($key)));
+            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));
         }
         if ('' === $key) {
-            throw new InvalidArgumentException('Cache key length must be greater than zero');
+            throw new InvalidArgumentException('Cache key length must be greater than zero.');
         }
-        if (false !== strpbrk($key, '{}()/\@:')) {
-            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters {}()/\@:', $key));
+        if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters "%s".', $key, self::RESERVED_CHARACTERS));
         }
 
         return $key;
@@ -167,7 +172,7 @@ final class CacheItem implements ItemInterface
      *
      * @internal
      */
-    public static function log(LoggerInterface $logger = null, $message, $context = [])
+    public static function log(?LoggerInterface $logger, string $message, array $context = [])
     {
         if ($logger) {
             $logger->warning($message, $context);

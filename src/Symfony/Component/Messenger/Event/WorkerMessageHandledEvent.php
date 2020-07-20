@@ -16,6 +16,6 @@ namespace Symfony\Component\Messenger\Event;
  *
  * The event name is the class name.
  */
-class WorkerMessageHandledEvent extends AbstractWorkerMessageEvent
+final class WorkerMessageHandledEvent extends AbstractWorkerMessageEvent
 {
 }

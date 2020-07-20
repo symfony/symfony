@@ -29,29 +29,38 @@ class EsmtpTransport extends SmtpTransport
     private $authenticators = [];
     private $username = '';
     private $password = '';
-    private $authMode;
 
-    public function __construct(string $host = 'localhost', int $port = 25, string $encryption = null, string $authMode = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct(null, $dispatcher, $logger);
 
+        // order is important here (roughly most secure and popular first)
         $this->authenticators = [
-            new Auth\PlainAuthenticator(),
-            new Auth\LoginAuthenticator(),
-            new Auth\XOAuth2Authenticator(),
             new Auth\CramMd5Authenticator(),
+            new Auth\LoginAuthenticator(),
+            new Auth\PlainAuthenticator(),
+            new Auth\XOAuth2Authenticator(),
         ];
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
+
+        if (null === $tls) {
+            if (465 === $port) {
+                $tls = true;
+            } else {
+                $tls = \defined('OPENSSL_VERSION_NUMBER') && 0 === $port && 'localhost' !== $host;
+            }
+        }
+        if (!$tls) {
+            $stream->disableTls();
+        }
+        if (0 === $port) {
+            $port = $tls ? 465 : 25;
+        }
+
         $stream->setHost($host);
         $stream->setPort($port);
-        if (null !== $encryption) {
-            $stream->setEncryption($encryption);
-        }
-        if (null !== $authMode) {
-            $this->setAuthMode($authMode);
-        }
     }
 
     public function setUsername(string $username): self
@@ -78,18 +87,6 @@ class EsmtpTransport extends SmtpTransport
         return $this->password;
     }
 
-    public function setAuthMode(string $mode): self
-    {
-        $this->authMode = $mode;
-
-        return $this;
-    }
-
-    public function getAuthMode(): string
-    {
-        return $this->authMode;
-    }
-
     public function addAuthenticator(AuthenticatorInterface $authenticator): void
     {
         $this->authenticators[] = $authenticator;
@@ -105,17 +102,23 @@ class EsmtpTransport extends SmtpTransport
             return;
         }
 
+        $capabilities = $this->getCapabilities($response);
+
         /** @var SocketStream $stream */
         $stream = $this->getStream();
-        if ($stream->isTLS()) {
+        // WARNING: !$stream->isTLS() is right, 100% sure :)
+        // if you think that the ! should be removed, read the code again
+        // if doing so "fixes" your issue then it probably means your SMTP server behaves incorrectly or is wrongly configured
+        if (!$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
 
             if (!$stream->startTLS()) {
-                throw new TransportException('Unable to connect with TLS encryption.');
+                throw new TransportException('Unable to connect with STARTTLS.');
             }
 
             try {
                 $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+                $capabilities = $this->getCapabilities($response);
             } catch (TransportExceptionInterface $e) {
                 parent::doHeloCommand();
 
@@ -123,13 +126,12 @@ class EsmtpTransport extends SmtpTransport
             }
         }
 
-        $capabilities = $this->getCapabilities($response);
         if (\array_key_exists('AUTH', $capabilities)) {
             $this->handleAuth($capabilities['AUTH']);
         }
     }
 
-    private function getCapabilities($ehloResponse): array
+    private function getCapabilities(string $ehloResponse): array
     {
         $capabilities = [];
         $lines = explode("\r\n", trim($ehloResponse));
@@ -153,7 +155,7 @@ class EsmtpTransport extends SmtpTransport
         $authNames = [];
         $errors = [];
         $modes = array_map('strtolower', $modes);
-        foreach ($this->getActiveAuthenticators() as $authenticator) {
+        foreach ($this->authenticators as $authenticator) {
             if (!\in_array(strtolower($authenticator->getAuthKeyword()), $modes, true)) {
                 continue;
             }
@@ -181,23 +183,5 @@ class EsmtpTransport extends SmtpTransport
         }
 
         throw new TransportException($message);
-    }
-
-    /**
-     * @return AuthenticatorInterface[]
-     */
-    private function getActiveAuthenticators(): array
-    {
-        if (!$mode = strtolower($this->authMode)) {
-            return $this->authenticators;
-        }
-
-        foreach ($this->authenticators as $authenticator) {
-            if (strtolower($authenticator->getAuthKeyword()) === $mode) {
-                return [$authenticator];
-            }
-        }
-
-        throw new TransportException(sprintf('Auth mode "%s" is invalid.', $mode));
     }
 }

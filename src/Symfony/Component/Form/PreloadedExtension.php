@@ -29,7 +29,6 @@ class PreloadedExtension implements FormExtensionInterface
      *
      * @param FormTypeInterface[]            $types          The types that the extension should support
      * @param FormTypeExtensionInterface[][] $typeExtensions The type extensions that the extension should support
-     * @param FormTypeGuesserInterface|null  $typeGuesser    The guesser that the extension should support
      */
     public function __construct(array $types, array $typeExtensions, FormTypeGuesserInterface $typeGuesser = null)
     {
@@ -44,10 +43,10 @@ class PreloadedExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (!isset($this->types[$name])) {
-            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension.', $name));
         }
 
         return $this->types[$name];
@@ -56,7 +55,7 @@ class PreloadedExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         return isset($this->types[$name]);
     }
@@ -64,7 +63,7 @@ class PreloadedExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypeExtensions($name)
+    public function getTypeExtensions(string $name)
     {
         return isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
@@ -74,7 +73,7 @@ class PreloadedExtension implements FormExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasTypeExtensions($name)
+    public function hasTypeExtensions(string $name)
     {
         return !empty($this->typeExtensions[$name]);
     }

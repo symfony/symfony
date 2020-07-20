@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
@@ -25,11 +26,10 @@ class FragmentRendererPassTest extends TestCase
     /**
      * Tests that content rendering not implementing FragmentRendererInterface
      * triggers an exception.
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testContentRendererWithoutInterface()
     {
+        $this->expectException('InvalidArgumentException');
         $builder = new ContainerBuilder();
         $fragmentHandlerDefinition = $builder->register('fragment.handler');
         $builder->register('my_content_renderer', 'Symfony\Component\DependencyInjection\Definition')
@@ -60,11 +60,11 @@ class FragmentRendererPassTest extends TestCase
 
 class RendererService implements FragmentRendererInterface
 {
-    public function render($uri, Request $request = null, array $options = [])
+    public function render($uri, Request $request = null, array $options = []): Response
     {
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'test';
     }

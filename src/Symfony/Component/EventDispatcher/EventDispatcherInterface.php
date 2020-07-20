@@ -23,11 +23,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
 interface EventDispatcherInterface extends ContractsEventDispatcherInterface
 {
     /**
-     * {@inheritdoc}
-     */
-    public function dispatch($event, string $eventName = null): object;
-
-    /**
      * Adds an event listener that listens on the specified events.
      *
      * @param callable $listener The listener

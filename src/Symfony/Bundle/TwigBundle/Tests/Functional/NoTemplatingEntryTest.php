@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -26,16 +27,16 @@ class NoTemplatingEntryTest extends TestCase
         $kernel->boot();
 
         $container = $kernel->getContainer();
-        $content = $container->get('twig')->render('index.html.twig');
-        $this->assertContains('{ a: b }', $content);
+        $content = $container->get('twig.alias')->render('index.html.twig');
+        $this->assertStringContainsString('{ a: b }', $content);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTempDir();
     }
@@ -53,14 +54,14 @@ class NoTemplatingEntryTest extends TestCase
 
 class NoTemplatingEntryKernel extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [new FrameworkBundle(), new TwigBundle()];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function ($container) {
+        $loader->load(function (ContainerBuilder $container) {
             $container
                 ->loadFromExtension('framework', [
                     'secret' => '$ecret',
@@ -69,16 +70,17 @@ class NoTemplatingEntryKernel extends Kernel
                 ->loadFromExtension('twig', [
                     'default_path' => __DIR__.'/templates',
                 ])
+                ->setAlias('twig.alias', 'twig')->setPublic(true)
             ;
         });
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel/cache/'.$this->environment;
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel/logs';
     }

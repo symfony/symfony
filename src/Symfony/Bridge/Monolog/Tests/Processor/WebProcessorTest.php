@@ -15,7 +15,8 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebProcessorTest extends TestCase
 {
@@ -71,7 +72,7 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
-    private function createRequestEvent($additionalServerParameters = []): array
+    private function createRequestEvent(array $additionalServerParameters = []): array
     {
         $server = array_merge(
             [
@@ -88,15 +89,7 @@ class WebProcessorTest extends TestCase
         $request->server->replace($server);
         $request->headers->replace($server);
 
-        $event = $this->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('isMasterRequest')
-            ->willReturn(true);
-        $event->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         return [$event, $server];
     }

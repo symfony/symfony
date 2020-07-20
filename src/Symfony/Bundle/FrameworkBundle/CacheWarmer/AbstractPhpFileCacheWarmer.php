@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -41,18 +42,20 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[] A list of classes to preload on PHP 7.4+
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         $arrayAdapter = new ArrayAdapter();
 
-        spl_autoload_register([PhpArrayAdapter::class, 'throwOnRequiredClass']);
+        spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
         try {
             if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
                 return;
             }
         } finally {
-            spl_autoload_unregister([PhpArrayAdapter::class, 'throwOnRequiredClass']);
+            spl_autoload_unregister([ClassExistenceResource::class, 'throwOnRequiredClass']);
         }
 
         // the ArrayAdapter stores the values serialized
@@ -60,19 +63,30 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         // so here we un-serialize the values first
         $values = array_map(function ($val) { return null !== $val ? unserialize($val) : null; }, $arrayAdapter->getValues());
 
-        $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
-    }
-
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
-    {
-        $phpArrayAdapter->warmUp($values);
+        return $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
     }
 
     /**
-     * @param string       $cacheDir
-     * @param ArrayAdapter $arrayAdapter
-     *
+     * @return string[] A list of classes to preload on PHP 7.4+
+     */
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    {
+        return (array) $phpArrayAdapter->warmUp($values);
+    }
+
+    /**
+     * @internal
+     */
+    final protected function ignoreAutoloadException(string $class, \Exception $exception): void
+    {
+        try {
+            ClassExistenceResource::throwOnRequiredClass($class, $exception);
+        } catch (\ReflectionException $e) {
+        }
+    }
+
+    /**
      * @return bool false if there is nothing to warm-up
      */
-    abstract protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter);
+    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter);
 }

@@ -48,7 +48,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if ('' === $data || null === $data) {
             throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed as a DateTimeZone.');
@@ -64,7 +64,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null)
     {
         return \DateTimeZone::class === $type;
     }
@@ -74,6 +74,6 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 }

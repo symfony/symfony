@@ -24,15 +24,11 @@ interface AttributeMetadataInterface
 {
     /**
      * Gets the attribute name.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Adds this attribute to the given group.
-     *
-     * @param string $group
      */
     public function addGroup(string $group);
 
@@ -41,12 +37,10 @@ interface AttributeMetadataInterface
      *
      * @return string[]
      */
-    public function getGroups();
+    public function getGroups(): array;
 
     /**
      * Sets the serialization max depth for this attribute.
-     *
-     * @param int|null $maxDepth
      */
     public function setMaxDepth(?int $maxDepth);
 
@@ -66,6 +60,16 @@ interface AttributeMetadataInterface
      * Gets the serialization name for this attribute.
      */
     public function getSerializedName(): ?string;
+
+    /**
+     * Sets if this attribute must be ignored or not.
+     */
+    public function setIgnore(bool $ignore);
+
+    /**
+     * Gets if this attribute is ignored or not.
+     */
+    public function isIgnored(): bool;
 
     /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.

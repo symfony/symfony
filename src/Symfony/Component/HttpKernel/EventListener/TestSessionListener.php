@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Sets the session in the request.
@@ -30,10 +31,10 @@ class TestSessionListener extends AbstractTestSessionListener
         parent::__construct($sessionOptions);
     }
 
-    protected function getSession()
+    protected function getSession(): ?SessionInterface
     {
         if (!$this->container->has('session')) {
-            return;
+            return null;
         }
 
         return $this->container->get('session');

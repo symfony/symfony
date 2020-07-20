@@ -24,7 +24,7 @@ class FileBag extends ParameterBag
     private static $fileKeys = ['error', 'name', 'size', 'tmp_name', 'type'];
 
     /**
-     * @param array $parameters An array of HTTP files
+     * @param array|UploadedFile[] $parameters An array of HTTP files
      */
     public function __construct(array $parameters = [])
     {
@@ -43,7 +43,7 @@ class FileBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         if (!\is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
@@ -75,8 +75,8 @@ class FileBag extends ParameterBag
             return $file;
         }
 
-        $file = $this->fixPhpFilesArray($file);
         if (\is_array($file)) {
+            $file = $this->fixPhpFilesArray($file);
             $keys = array_keys($file);
             sort($keys);
 
@@ -109,14 +109,12 @@ class FileBag extends ParameterBag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
+     * @param array $data
+     *
      * @return array
      */
     protected function fixPhpFilesArray($data)
     {
-        if (!\is_array($data)) {
-            return $data;
-        }
-
         $keys = array_keys($data);
         sort($keys);
 

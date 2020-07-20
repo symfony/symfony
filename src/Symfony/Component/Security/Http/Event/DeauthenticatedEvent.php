@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class DeauthenticatedEvent extends Event
+final class DeauthenticatedEvent extends Event
 {
     private $originalToken;
     private $refreshedToken;

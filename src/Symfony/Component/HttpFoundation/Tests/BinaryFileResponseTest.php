@@ -46,11 +46,9 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetContent()
     {
+        $this->expectException('LogicException');
         $response = new BinaryFileResponse(__FILE__);
         $response->setContent('foo');
     }
@@ -109,7 +107,7 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         $this->assertEquals(206, $response->getStatusCode());
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
-        $this->assertSame($length, $response->headers->get('Content-Length'));
+        $this->assertSame((string) $length, $response->headers->get('Content-Length'));
     }
 
     /**
@@ -263,7 +261,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->expectOutputString('');
         $response->sendContent();
 
-        $this->assertContains('README.md', $response->headers->get('X-Sendfile'));
+        $this->assertStringContainsString('README.md', $response->headers->get('X-Sendfile'));
     }
 
     public function provideXSendfileFiles()
@@ -357,7 +355,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {

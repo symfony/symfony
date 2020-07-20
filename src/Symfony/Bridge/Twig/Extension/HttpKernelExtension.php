@@ -20,9 +20,12 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpKernelExtension extends AbstractExtension
+final class HttpKernelExtension extends AbstractExtension
 {
-    public function getFunctions()
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('render', [HttpKernelRuntime::class, 'renderFragment'], ['is_safe' => ['html']]),
@@ -31,16 +34,8 @@ class HttpKernelExtension extends AbstractExtension
         ];
     }
 
-    public static function controller($controller, $attributes = [], $query = [])
+    public static function controller(string $controller, array $attributes = [], array $query = []): ControllerReference
     {
         return new ControllerReference($controller, $attributes, $query);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'http_kernel';
     }
 }

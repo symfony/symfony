@@ -16,12 +16,10 @@ use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 
 class BooleanNodeDefinitionTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to BooleanNodeDefinition.
-     */
     public function testCannotBeEmptyThrowsAnException()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
+        $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
         $def = new BooleanNodeDefinition('foo');
         $def->cannotBeEmpty();
     }
@@ -29,11 +27,14 @@ class BooleanNodeDefinitionTest extends TestCase
     public function testSetDeprecated()
     {
         $def = new BooleanNodeDefinition('foo');
-        $def->setDeprecated('The "%path%" node is deprecated.');
+        $def->setDeprecated('vendor/package', '1.1', 'The "%path%" node is deprecated.');
 
         $node = $def->getNode();
 
         $this->assertTrue($node->isDeprecated());
-        $this->assertSame('The "foo" node is deprecated.', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
+        $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
     }
 }

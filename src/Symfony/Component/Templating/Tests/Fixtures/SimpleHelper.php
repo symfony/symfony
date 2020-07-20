@@ -22,12 +22,12 @@ class SimpleHelper extends Helper
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'foo';
     }

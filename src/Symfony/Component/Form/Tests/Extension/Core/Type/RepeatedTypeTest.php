@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
@@ -22,7 +23,7 @@ class RepeatedTypeTest extends BaseTypeTest
      */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -78,33 +79,62 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertFalse($form['second']->isRequired());
     }
 
+    public function testMappedOverridesDefault()
+    {
+        $form = $this->factory->create(NotMappedType::class);
+        $this->assertFalse($form->getConfig()->getMapped());
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => NotMappedType::class,
+        ]);
+
+        $this->assertTrue($form['first']->getConfig()->getMapped());
+        $this->assertTrue($form['second']->getConfig()->getMapped());
+    }
+
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @dataProvider notMappedConfigurationKeys
      */
+    public function testNotMappedInnerIsOverridden($configurationKey)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => TextTypeTest::TESTED_TYPE,
+            $configurationKey => ['mapped' => false],
+        ]);
+
+        $this->assertTrue($form['first']->getConfig()->getMapped());
+        $this->assertTrue($form['second']->getConfig()->getMapped());
+    }
+
+    public function notMappedConfigurationKeys()
+    {
+        return [
+            ['first_options'],
+            ['second_options'],
+        ];
+    }
+
     public function testSetInvalidOptions()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'options' => 'bad value',
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testSetInvalidFirstOptions()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'first_options' => 'bad value',
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testSetInvalidSecondOptions()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'second_options' => 'bad value',

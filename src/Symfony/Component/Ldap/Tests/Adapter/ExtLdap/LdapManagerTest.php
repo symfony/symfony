@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Ldap\Tests;
+namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
@@ -19,6 +19,7 @@ use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
+use Symfony\Component\Ldap\Tests\LdapTestCase;
 
 /**
  * @requires extension ldap
@@ -28,7 +29,7 @@ class LdapManagerTest extends LdapTestCase
     /** @var Adapter */
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
@@ -209,7 +210,7 @@ class LdapManagerTest extends LdapTestCase
         $newEntry = $result[0];
         $originalCN = $entry->getAttribute('cn')[0];
 
-        $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
+        $this->assertStringContainsString($originalCN, $newEntry->getAttribute('cn'));
 
         $entryManager->rename($newEntry, 'cn='.$originalCN);
 
@@ -378,6 +379,6 @@ class LdapManagerTest extends LdapTestCase
 
         $result = $this->executeSearchQuery(1);
         $movedEntry = $result[0];
-        $this->assertContains('ou=Ldap', $movedEntry->getDn());
+        $this->assertStringContainsString('ou=Ldap', $movedEntry->getDn());
     }
 }

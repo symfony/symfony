@@ -50,6 +50,11 @@ abstract class AbstractPart
         yield from $this->bodyToIterable();
     }
 
+    public function asDebugString(): string
+    {
+        return $this->getMediaType().'/'.$this->getMediaSubtype();
+    }
+
     abstract public function bodyToString(): string;
 
     abstract public function bodyToIterable(): iterable;

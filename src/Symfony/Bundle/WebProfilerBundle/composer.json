@@ -16,24 +16,24 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
+        "php": ">=7.2.5",
         "symfony/config": "^4.4|^5.0",
+        "symfony/framework-bundle": "^5.1",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/routing": "^4.4|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0",
-        "twig/twig": "^2.10"
+        "twig/twig": "^2.10|^3.0"
     },
     "require-dev": {
+        "symfony/browser-kit": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/css-selector": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<4.4",
+        "symfony/form": "<4.4",
         "symfony/messenger": "<4.4",
-        "symfony/var-dumper": "<4.4",
-        "symfony/form": "<4.4"
+        "symfony/dependency-injection": "<5.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },
@@ -44,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

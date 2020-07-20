@@ -28,19 +28,29 @@ class RoundRobinTransportTest extends TestCase
         new RoundRobinTransport([]);
     }
 
+    public function testToString()
+    {
+        $t1 = $this->createMock(TransportInterface::class);
+        $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
+        $t2 = $this->createMock(TransportInterface::class);
+        $t2->expects($this->once())->method('__toString')->willReturn('t2://local');
+        $t = new RoundRobinTransport([$t1, $t2]);
+        $this->assertEquals('roundrobin(t1://local t2://local)', (string) $t);
+    }
+
     public function testSendAlternate()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->exactly(2))->method('send');
+        $t1->expects($this->atLeast(1))->method('send');
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('send');
+        $t2->expects($this->atLeast(1))->method('send');
         $t = new RoundRobinTransport([$t1, $t2]);
         $t->send(new RawMessage(''));
-        $this->assertTransports($t, 1, []);
+        $cursor = $this->assertTransports($t, -1, []);
         $t->send(new RawMessage(''));
-        $this->assertTransports($t, 0, []);
+        $cursor = $this->assertTransports($t, 0 === $cursor ? 1 : 0, []);
         $t->send(new RawMessage(''));
-        $this->assertTransports($t, 1, []);
+        $this->assertTransports($t, 0 === $cursor ? 1 : 0, []);
     }
 
     public function testSendAllDead()
@@ -63,6 +73,9 @@ class RoundRobinTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))->method('send');
         $t = new RoundRobinTransport([$t1, $t2]);
+        $p = new \ReflectionProperty($t, 'cursor');
+        $p->setAccessible(true);
+        $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, [$t1]);
         $t->send(new RawMessage(''));
@@ -78,6 +91,9 @@ class RoundRobinTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 60);
+        $p = new \ReflectionProperty($t, 'cursor');
+        $p->setAccessible(true);
+        $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
         $t->send(new RawMessage(''));
@@ -96,6 +112,9 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->at(0))->method('send')->will($this->throwException(new TransportException()));
         $t2->expects($this->at(1))->method('send');
         $t = new RoundRobinTransport([$t1, $t2], 3);
+        $p = new \ReflectionProperty($t, 'cursor');
+        $p->setAccessible(true);
+        $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
         $t->send(new RawMessage(''));
@@ -111,10 +130,15 @@ class RoundRobinTransportTest extends TestCase
     {
         $p = new \ReflectionProperty($transport, 'cursor');
         $p->setAccessible(true);
-        $this->assertSame($cursor, $p->getValue($transport));
+        if (-1 !== $cursor) {
+            $this->assertSame($cursor, $p->getValue($transport));
+        }
+        $cursor = $p->getValue($transport);
 
         $p = new \ReflectionProperty($transport, 'deadTransports');
         $p->setAccessible(true);
         $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
+
+        return $cursor;
     }
 }

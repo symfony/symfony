@@ -39,12 +39,12 @@ class MessageBus implements MessageBusInterface
                 private $middlewareHandlers;
                 private $cachedIterator;
 
-                public function __construct($middlewareHandlers)
+                public function __construct(\Traversable $middlewareHandlers)
                 {
                     $this->middlewareHandlers = $middlewareHandlers;
                 }
 
-                public function getIterator()
+                public function getIterator(): \Traversable
                 {
                     if (null === $this->cachedIterator) {
                         $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
@@ -62,7 +62,7 @@ class MessageBus implements MessageBusInterface
     public function dispatch($message, array $stamps = []): Envelope
     {
         if (!\is_object($message)) {
-            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
+            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got "%s".', __METHOD__, get_debug_type($message)));
         }
         $envelope = Envelope::wrap($message, $stamps);
         $middlewareIterator = $this->middlewareAggregate->getIterator();

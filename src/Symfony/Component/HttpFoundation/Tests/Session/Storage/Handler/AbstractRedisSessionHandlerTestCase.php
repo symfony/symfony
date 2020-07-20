@@ -35,14 +35,19 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     /**
      * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
      */
-    abstract protected function createRedisClient(string $host);
+    abstract protected function createRedisClient(string $host): object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
+        }
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
         }
 
         $host = getenv('REDIS_HOST') ?: 'localhost';
@@ -54,7 +59,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->redisClient = null;
         $this->storage = null;
@@ -139,7 +144,37 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     {
         return [
             [['prefix' => 'session'], true],
+            [['ttl' => 1000], true],
+            [['prefix' => 'sfs', 'ttl' => 1000], true],
             [['prefix' => 'sfs', 'foo' => 'bar'], false],
+            [['ttl' => 'sfs', 'foo' => 'bar'], false],
+        ];
+    }
+
+    /**
+     * @dataProvider getTtlFixtures
+     */
+    public function testUseTtlOption(int $ttl)
+    {
+        $options = [
+            'prefix' => self::PREFIX,
+            'ttl' => $ttl,
+        ];
+
+        $handler = new RedisSessionHandler($this->redisClient, $options);
+        $handler->write('id', 'data');
+        $redisTtl = $this->redisClient->ttl(self::PREFIX.'id');
+
+        $this->assertLessThan($redisTtl, $ttl - 5);
+        $this->assertGreaterThan($redisTtl, $ttl + 5);
+    }
+
+    public function getTtlFixtures(): array
+    {
+        return [
+            ['ttl' => 5000],
+            ['ttl' => 120],
+            ['ttl' => 60],
         ];
     }
 }

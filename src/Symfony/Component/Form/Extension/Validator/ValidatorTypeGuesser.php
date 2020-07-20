@@ -31,7 +31,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessType($class, $property)
+    public function guessType(string $class, string $property)
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessTypeForConstraint($constraint);
@@ -41,7 +41,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessRequired($class, $property)
+    public function guessRequired(string $class, string $property)
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessRequiredForConstraint($constraint);
@@ -53,7 +53,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessMaxLength($class, $property)
+    public function guessMaxLength(string $class, string $property)
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessMaxLengthForConstraint($constraint);
@@ -63,7 +63,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessPattern($class, $property)
+    public function guessPattern(string $class, string $property)
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessPatternForConstraint($constraint);
@@ -97,6 +97,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     case 'long':
                         return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\IntegerType', [], Guess::MEDIUM_CONFIDENCE);
 
+                    case \DateTime::class:
                     case '\DateTime':
                         return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', [], Guess::MEDIUM_CONFIDENCE);
 
@@ -122,7 +123,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\File':
             case 'Symfony\Component\Validator\Constraints\Image':
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\FileType', [], Guess::HIGH_CONFIDENCE);
+                $options = [];
+                if ($constraint->mimeTypes) {
+                    $options = ['attr' => ['accept' => implode(',', (array) $constraint->mimeTypes)]];
+                }
+
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\FileType', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Language':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\LanguageType', [], Guess::HIGH_CONFIDENCE);
@@ -153,6 +159,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\IsFalse':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CheckboxType', [], Guess::MEDIUM_CONFIDENCE);
         }
+
+        return null;
     }
 
     /**
@@ -168,6 +176,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\IsTrue':
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
         }
+
+        return null;
     }
 
     /**
@@ -196,6 +206,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 }
                 break;
         }
+
+        return null;
     }
 
     /**
@@ -232,14 +244,14 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 }
                 break;
         }
+
+        return null;
     }
 
     /**
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess.
      *
-     * @param string   $class        The class to read the constraints from
-     * @param string   $property     The property for which to find constraints
      * @param \Closure $closure      The closure that returns a guess
      *                               for a given constraint
      * @param mixed    $defaultValue The default value assumed if no other value
@@ -247,7 +259,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess|null The guessed value with the highest confidence
      */
-    protected function guess($class, $property, \Closure $closure, $defaultValue = null)
+    protected function guess(string $class, string $property, \Closure $closure, $defaultValue = null)
     {
         $guesses = [];
         $classMetadata = $this->metadataFactory->getMetadataFor($class);

@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.82",
     "Names": {
         "ak": "akankan",
         "am": "amarikikan",
@@ -46,5 +45,6 @@
         "yo": "yorubakan",
         "zh": "siniwakan",
         "zu": "zulukan"
-    }
+    },
+    "LocalizedNames": []
 }

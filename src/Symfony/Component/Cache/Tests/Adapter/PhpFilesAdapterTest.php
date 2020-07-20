@@ -23,17 +23,17 @@ class PhpFilesAdapterTest extends AdapterTestCase
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
     ];
 
-    public function createCachePool()
+    public function createCachePool(): CacheItemPoolInterface
     {
         return new PhpFilesAdapter('sf-cache');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
 
-    protected function isPruned(CacheItemPoolInterface $cache, $name)
+    protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
         $getFileMethod->setAccessible(true);

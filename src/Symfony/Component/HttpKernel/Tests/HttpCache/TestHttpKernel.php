@@ -54,7 +54,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         }
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false): Response
     {
         $this->catch = $catch;
         $this->backendRequest = [Request::getTrustedProxies(), Request::getTrustedHeaderSet(), $request];
@@ -72,7 +72,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return [$this, 'callController'];
     }
 
-    public function getArguments(Request $request, $controller)
+    public function getArguments(Request $request, callable $controller): array
     {
         return [$request];
     }

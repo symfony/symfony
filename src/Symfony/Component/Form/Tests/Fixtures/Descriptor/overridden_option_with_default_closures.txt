@@ -2,6 +2,8 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
 ====================================================================
 
  ---------------- ----------------------%s 
+  Info             -                    %s 
+ ---------------- ----------------------%s
   Required         false                %s 
  ---------------- ----------------------%s 
   Default          Value: null          %s 

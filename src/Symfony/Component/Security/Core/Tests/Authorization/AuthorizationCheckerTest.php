@@ -23,7 +23,7 @@ class AuthorizationCheckerTest extends TestCase
     private $authorizationChecker;
     private $tokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
         $this->accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
@@ -67,12 +67,17 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertSame($newToken, $this->tokenStorage->getToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
-     */
     public function testVoteWithoutAuthenticationToken()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
         $this->authorizationChecker->isGranted('ROLE_FOO');
+    }
+
+    public function testVoteWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    {
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
+
+        $this->assertFalse($authorizationChecker->isGranted('ROLE_FOO'));
     }
 
     /**
@@ -93,5 +98,20 @@ class AuthorizationCheckerTest extends TestCase
     public function isGrantedProvider()
     {
         return [[true], [false]];
+    }
+
+    public function testIsGrantedWithObjectAttribute()
+    {
+        $attribute = new \stdClass();
+
+        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->identicalTo($token), $this->identicalTo([$attribute]))
+            ->willReturn(true);
+        $this->tokenStorage->setToken($token);
+        $this->assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 }

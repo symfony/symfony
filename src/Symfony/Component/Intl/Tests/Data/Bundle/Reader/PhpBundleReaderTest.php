@@ -24,7 +24,7 @@ class PhpBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new PhpBundleReader();
     }
@@ -33,40 +33,32 @@ class PhpBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/php', 'en');
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertSame('Bar', $data['Foo']);
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
-     */
     public function testReadFailsIfNonExistingLocale()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
         $this->reader->read(__DIR__.'/Fixtures/php', 'foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
-     */
     public function testReadFailsIfNonExistingDirectory()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
         $this->reader->read(__DIR__.'/foo', 'en');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
-     */
     public function testReadFailsIfNotAFile()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
-     */
     public function testReaderDoesNotBreakOutOfGivenPath()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
         $this->reader->read(__DIR__.'/Fixtures/php', '../invalid_directory/en');
     }
 }

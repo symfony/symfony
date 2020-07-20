@@ -24,7 +24,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $node = $this->createNode('textarea', '');
         try {
-            $field = new FileFormField($node);
+            new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not an input field');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
@@ -32,7 +32,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $node = $this->createNode('input', '', ['type' => 'text']);
         try {
-            $field = new FileFormField($node);
+            new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not a file input field');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a file input field');
@@ -55,7 +55,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $this->assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
         $this->assertEquals('', $value['type'], "->$method() sets the type of the file field");
-        $this->assertInternalType('string', $value['tmp_name'], "->$method() sets the tmp_name of the file field");
+        $this->assertIsString($value['tmp_name'], "->$method() sets the tmp_name of the file field");
         $this->assertFileExists($value['tmp_name'], "->$method() creates a copy of the file at the tmp_name path");
         $this->assertEquals(0, $value['error'], "->$method() sets the error of the file field");
         $this->assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");

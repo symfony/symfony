@@ -11,100 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
-use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
-use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport as BridgeDoctrineTransport;
 
-/**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
- */
-class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
-{
-    private $connection;
-    private $serializer;
-    private $receiver;
-    private $sender;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The Doctrine transport has been moved to package "symfony/doctrine-messenger" and will not be included by default in 6.0. Run "composer require symfony/doctrine-messenger".', DoctrineTransport::class, BridgeDoctrineTransport::class);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer;
-    }
+class_exists(BridgeDoctrineTransport::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/doctrine-messenger instead.
      */
-    public function get(): iterable
+    class DoctrineTransport
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(Envelope $envelope): void
-    {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reject(Envelope $envelope): void
-    {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageCount(): int
-    {
-        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all(int $limit = null): iterable
-    {
-        return ($this->receiver ?? $this->getReceiver())->all($limit);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function find($id): ?Envelope
-    {
-        return ($this->receiver ?? $this->getReceiver())->find($id);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function send(Envelope $envelope): Envelope
-    {
-        return ($this->sender ?? $this->getSender())->send($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setup(): void
-    {
-        $this->connection->setup();
-    }
-
-    private function getReceiver(): DoctrineReceiver
-    {
-        return $this->receiver = new DoctrineReceiver($this->connection, $this->serializer);
-    }
-
-    private function getSender(): DoctrineSender
-    {
-        return $this->sender = new DoctrineSender($this->connection, $this->serializer);
     }
 }

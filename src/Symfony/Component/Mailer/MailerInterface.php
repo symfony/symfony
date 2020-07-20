@@ -26,5 +26,5 @@ interface MailerInterface
     /**
      * @throws TransportExceptionInterface
      */
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): void;
+    public function send(RawMessage $message, Envelope $envelope = null): void;
 }

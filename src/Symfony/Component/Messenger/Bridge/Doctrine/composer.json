@@ -1,0 +1,46 @@
+{
+    "name": "symfony/doctrine-messenger",
+    "type": "symfony-bridge",
+    "description": "Symfony Doctrine Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "doctrine/persistence": "^1.3",
+        "symfony/messenger": "^5.1",
+        "symfony/service-contracts": "^1.1|^2"
+    },
+    "require-dev": {
+        "doctrine/dbal": "^2.10|^3.0",
+        "doctrine/persistence": "^1.3",
+        "symfony/property-access": "^4.4|^5.0",
+        "symfony/serializer": "^4.4|^5.0"
+    },
+    "conflict": {
+        "doctrine/dbal": "<2.10",
+        "doctrine/persistence": "<1.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

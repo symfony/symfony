@@ -21,7 +21,7 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpFoundationExtension extends AbstractExtension
+final class HttpFoundationExtension extends AbstractExtension
 {
     private $urlHelper;
 
@@ -33,7 +33,7 @@ class HttpFoundationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
@@ -46,13 +46,9 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @param string $path The path
-     *
-     * @return string The absolute URL
-     *
      * @see Request::getUriForPath()
      */
-    public function generateAbsoluteUrl($path)
+    public function generateAbsoluteUrl(string $path): string
     {
         return $this->urlHelper->getAbsoluteUrl($path);
     }
@@ -62,24 +58,10 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @param string $path The path
-     *
-     * @return string The relative path
-     *
      * @see Request::getRelativeUriForPath()
      */
-    public function generateRelativePath($path)
+    public function generateRelativePath(string $path): string
     {
         return $this->urlHelper->getRelativePath($path);
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'request';
     }
 }

@@ -10,15 +10,13 @@
  */
 
 // load new map
-$data = file_get_contents('https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
+$data = json_decode(file_get_contents('https://cdn.jsdelivr.net/gh/jshttp/mime-db@v1.44.0/db.json'), true);
 $new = [];
-foreach (explode("\n", $data) as $line) {
-    if (!$line || '#' == $line[0]) {
+foreach ($data as $mimeType => $mimeTypeInformation) {
+    if (!array_key_exists('extensions', $mimeTypeInformation)) {
         continue;
     }
-    $mimeType = substr($line, 0, strpos($line, "\t"));
-    $extensions = explode(' ', substr($line, strrpos($line, "\t") + 1));
-    $new[$mimeType] = $extensions;
+    $new[$mimeType] = $mimeTypeInformation['extensions'];
 }
 
 $xml = simplexml_load_string(file_get_contents('https://raw.github.com/minad/mimemagic/master/script/freedesktop.org.xml'));
@@ -66,6 +64,17 @@ foreach (explode("\n", $data) as $line) {
 $map = array_replace_recursive($current, $new);
 ksort($map);
 
+// force an extension to be in the first position on the map
+$forceExtensionInFirstPositionByMimeType = [
+    'application/vnd.apple.keynote' => 'key',
+    'audio/mpeg' => 'mp3',
+    'text/markdown' => 'md',
+    'text/x-markdown' => 'md',
+];
+foreach ($forceExtensionInFirstPositionByMimeType as $mimeType => $extensionToRemove) {
+    $map[$mimeType] = array_unique(array_merge([$extensionToRemove], $map[$mimeType]));
+}
+
 $data = $pre;
 foreach ($map as $mimeType => $exts) {
     $data .= sprintf("        '%s' => ['%s'],\n", $mimeType, implode("', '", array_unique($exts)));
@@ -108,10 +117,6 @@ $exts = [
     'mp4' => ['video/mp4'],
     'mpeg' => ['video/mpeg'],
     'mpg' => ['video/mpeg'],
-    'odg' => ['vnd.oasis.opendocument.graphics'],
-    'odp' => ['vnd.oasis.opendocument.presentation'],
-    'ods' => ['vnd.oasis.opendocument.spreadsheet'],
-    'odt' => ['vnd.oasis.opendocument.text'],
     'ogg' => ['audio/ogg'],
     'pdf' => ['application/pdf'],
     'php' => ['application/x-php'],
@@ -142,6 +147,10 @@ $exts = [
 ];
 foreach ($map as $mimeType => $extensions) {
     foreach ($extensions as $extension) {
+        if ('application/octet-stream' === $mimeType && 'bin' !== $extension) {
+            continue;
+        }
+
         $exts[$extension][] = $mimeType;
     }
 }

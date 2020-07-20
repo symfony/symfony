@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,16 +34,16 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $tokenManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
         $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
@@ -51,7 +52,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->tokenManager = null;
         $this->translator = null;
@@ -144,7 +145,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('getToken')
             ->with('FORM_NAME')
-            ->willReturn('token');
+            ->willReturn(new CsrfToken('TOKEN_ID', 'token'));
 
         $view = $this->factory
             ->createNamed('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -162,7 +163,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('getToken')
             ->with('Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->willReturn('token');
+            ->willReturn(new CsrfToken('TOKEN_ID', 'token'));
 
         $view = $this->factory
             ->createNamed('', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [

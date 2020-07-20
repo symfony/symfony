@@ -110,10 +110,13 @@ class TextDescriptor extends Descriptor
         if ($definition['deprecated']) {
             $map = [
                 'Deprecated' => 'deprecated',
+                'Deprecation package' => 'deprecationPackage',
+                'Deprecation version' => 'deprecationVersion',
                 'Deprecation message' => 'deprecationMessage',
             ];
         }
         $map += [
+            'Info' => 'info',
             'Required' => 'required',
             'Default' => 'default',
             'Allowed types' => 'allowedTypes',
@@ -155,7 +158,7 @@ class TextDescriptor extends Descriptor
         return $tableRows;
     }
 
-    private function normalizeAndSortOptionsColumns(array $options)
+    private function normalizeAndSortOptionsColumns(array $options): array
     {
         foreach ($options as $group => $opts) {
             $sorted = false;

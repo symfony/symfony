@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\LessThanValidator;
 
@@ -24,12 +25,12 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return new LessThanValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new LessThan($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return LessThan::TOO_HIGH_ERROR;
     }
@@ -37,7 +38,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [1, 2],
@@ -53,7 +54,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [4],
@@ -63,11 +64,11 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
-            [3, '3', 2, '2', 'integer'],
-            [2, '2', 2, '2', 'integer'],
+            [3, '3', 2, '2', 'int'],
+            [2, '2', 2, '2', 'int'],
             [new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
@@ -77,6 +78,13 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             [new ComparisonTest_Class(6), '6', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['333', '"333"', '22', '"22"', 'string'],
+        ];
+    }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', true],
         ];
     }
 }

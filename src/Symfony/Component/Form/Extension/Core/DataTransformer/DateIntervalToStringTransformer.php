@@ -62,7 +62,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $value An ISO 8601 or date string like date interval presentation
      *
-     * @return \DateInterval An instance of \DateInterval
+     * @return \DateInterval|null An instance of \DateInterval
      *
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed
@@ -70,16 +70,16 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
         if (!\is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
         if ('' === $value) {
-            return;
+            return null;
         }
         if (!$this->isISO8601($value)) {
-            throw new TransformationFailedException('Non ISO 8601 date strings are not supported yet');
+            throw new TransformationFailedException('Non ISO 8601 date strings are not supported yet.');
         }
         $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $this->format).'$/';
         if (!preg_match($valuePattern, $value)) {
@@ -94,7 +94,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
         return $dateInterval;
     }
 
-    private function isISO8601($string)
+    private function isISO8601(string $string): bool
     {
         return preg_match('/^P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
     }

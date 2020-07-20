@@ -14,7 +14,7 @@ class InMemoryMetadataStoreTest extends TestCase
     private $store;
     private $transition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $workflowMetadata = [
             'title' => 'workflow title',
@@ -75,12 +75,10 @@ class InMemoryMetadataStoreTest extends TestCase
         $this->assertNull($this->store->getMetadata('description', new Transition('transition_2', [], [])));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not find a MetadataBag for the subject of type "boolean".
-     */
     public function testGetMetadataWithUnknownType()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Could not find a MetadataBag for the subject of type "bool".');
         $this->store->getMetadata('title', true);
     }
 }

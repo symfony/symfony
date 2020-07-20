@@ -26,7 +26,7 @@ class DoctrineExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,6 +37,7 @@ class DoctrineExtensionTest extends TestCase
                 'getObjectManagerElementName',
                 'getMappingObjectDefaultName',
                 'getMappingResourceExtension',
+                'getMetadataDriverClass',
                 'load',
             ])
             ->getMock()
@@ -49,11 +50,9 @@ class DoctrineExtensionTest extends TestCase
             });
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
+        $this->expectException('LogicException');
         $emConfigs = [
             'em1' => [
                 'auto_mapping' => true,
@@ -234,12 +233,10 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias('doctrine.orm.default_metadata_cache'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "unrecognized_type" is an unrecognized Doctrine cache driver.
-     */
     public function testUnrecognizedCacheDriverException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
         $objectManager = [
@@ -261,10 +258,7 @@ class DoctrineExtensionTest extends TestCase
         $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }
 
-    /**
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
-     */
-    protected function createContainer(array $data = [])
+    protected function createContainer(array $data = []): ContainerBuilder
     {
         return new ContainerBuilder(new ParameterBag(array_merge([
             'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],

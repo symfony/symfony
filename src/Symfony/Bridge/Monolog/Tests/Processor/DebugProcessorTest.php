@@ -19,6 +19,30 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DebugProcessorTest extends TestCase
 {
+    /**
+     * @dataProvider providerDatetimeFormatTests
+     */
+    public function testDatetimeFormat(array $record, $expectedTimestamp)
+    {
+        $processor = new DebugProcessor();
+        $processor($record);
+
+        $records = $processor->getLogs();
+        self::assertCount(1, $records);
+        self::assertSame($expectedTimestamp, $records[0]['timestamp']);
+    }
+
+    public function providerDatetimeFormatTests(): array
+    {
+        $record = $this->getRecord();
+
+        return [
+            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
+            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), 1546300860],
+            [array_merge($record, ['datetime' => 'foo']), false],
+        ];
+    }
+
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
@@ -66,7 +90,7 @@ class DebugProcessorTest extends TestCase
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
-        $this->assertNull($debugProcessorChild->getLogs());
+        $this->assertSame([], $debugProcessorChild->getLogs());
     }
 
     public function testInheritedClassCallCountErrorsWithoutArgument()
@@ -75,7 +99,7 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test')
+    private function getRecord($level = Logger::WARNING, $message = 'test'): array
     {
         return [
             'message' => $message,
@@ -86,18 +110,5 @@ class DebugProcessorTest extends TestCase
             'datetime' => new \DateTime(),
             'extra' => [],
         ];
-    }
-}
-
-class ClassThatInheritDebugProcessor extends DebugProcessor
-{
-    public function getLogs(Request $request = null)
-    {
-        parent::getLogs($request);
-    }
-
-    public function countErrors(Request $request = null)
-    {
-        parent::countErrors($request);
     }
 }

@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.77",
     "Names": {
         "arn": "mapudungun",
         "be": "bjeloruski",
@@ -16,5 +15,10 @@
         "xh": "isikosa",
         "zgh": "standardni marokanski tamašek",
         "zu": "isizulu"
+    },
+    "LocalizedNames": {
+        "sw_CD": "kisvahili",
+        "zh_Hans": "pojednostavljeni kineski",
+        "zh_Hant": "tradicionalni kineski"
     }
 }

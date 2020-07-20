@@ -36,11 +36,9 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Regex(['pattern' => '/^[0-9]+$/']));
     }
 
@@ -74,7 +72,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ['090909'],
             [90909],
             [new class() {
-                public function __toString()
+                public function __toString(): string
                 {
                     return '090909';
                 }
@@ -118,7 +116,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ['abcd'],
             ['090foo'],
             [new class() {
-                public function __toString()
+                public function __toString(): string
                 {
                     return 'abcd';
                 }

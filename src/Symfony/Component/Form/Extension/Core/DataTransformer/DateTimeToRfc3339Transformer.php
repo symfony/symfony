@@ -53,7 +53,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      *
      * @param string $rfc3339 Formatted string
      *
-     * @return \DateTime Normalized date
+     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
@@ -65,7 +65,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
         }
 
         if ('' === $rfc3339) {
-            return;
+            return null;
         }
 
         if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $rfc3339, $matches)) {

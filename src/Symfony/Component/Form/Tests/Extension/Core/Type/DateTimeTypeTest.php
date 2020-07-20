@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         \Locale::setDefault('en');
 
@@ -481,6 +482,37 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
+    public function testSingleTextWidgetWithSecondsShouldHaveRightStepAttribute()
+    {
+        $view = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'widget' => 'single_text',
+                'with_seconds' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertArrayHasKey('step', $view->vars['attr']);
+        $this->assertEquals(1, $view->vars['attr']['step']);
+    }
+
+    public function testSingleTextWidgetWithSecondsShouldNotOverrideStepAttribute()
+    {
+        $view = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'widget' => 'single_text',
+                'with_seconds' => true,
+                'attr' => [
+                    'step' => 30,
+                ],
+            ])
+            ->createView()
+        ;
+
+        $this->assertArrayHasKey('step', $view->vars['attr']);
+        $this->assertEquals(30, $view->vars['attr']['step']);
+    }
+
     public function testSingleTextWidgetWithCustomNonHtml5Format()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
@@ -659,6 +691,9 @@ class DateTimeTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
+        if ($emptyData instanceof \Closure) {
+            $emptyData = $emptyData($form);
+        }
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($expectedData, $form->getNormData());
         $this->assertEquals($expectedData, $form->getData());
@@ -667,11 +702,17 @@ class DateTimeTypeTest extends BaseTypeTest
     public function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '2018-11-11 21:23');
+        $lazyEmptyData = static function (FormInterface $form) {
+            return $form->getConfig()->getCompound() ? ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']] : '2018-11-11T21:23:00';
+        };
 
         return [
             'Simple field' => ['single_text', '2018-11-11T21:23:00', $expectedData],
             'Compound text field' => ['text', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
             'Compound choice field' => ['choice', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
+            'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
+            'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound choice field lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }
 

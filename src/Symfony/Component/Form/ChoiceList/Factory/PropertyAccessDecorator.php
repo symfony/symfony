@@ -59,45 +59,17 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param iterable                          $choices The choices
-     * @param callable|string|PropertyPath|null $value   The callable or path for
-     *                                                   generating the choice values
-     *
-     * @return ChoiceListInterface The choice list
-     */
-    public function createListFromChoices($choices, $value = null)
-    {
-        if (\is_string($value)) {
-            $value = new PropertyPath($value);
-        }
-
-        if ($value instanceof PropertyPath) {
-            $accessor = $this->propertyAccessor;
-            $value = function ($choice) use ($accessor, $value) {
-                // The callable may be invoked with a non-object/array value
-                // when such values are passed to
-                // ChoiceListInterface::getValuesForChoices(). Handle this case
-                // so that the call to getValue() doesn't break.
-                if (\is_object($choice) || \is_array($choice)) {
-                    return $accessor->getValue($choice, $value);
-                }
-            };
-        }
-
-        return $this->decoratedFactory->createListFromChoices($choices, $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param ChoiceLoaderInterface             $loader The choice loader
      * @param callable|string|PropertyPath|null $value  The callable or path for
      *                                                  generating the choice values
+     * @param callable|string|PropertyPath|null $filter The callable or path for
+     *                                                  filtering the choices
      *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
+    public function createListFromChoices(iterable $choices, $value = null/*, $filter = null*/)
     {
+        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
+
         if (\is_string($value)) {
             $value = new PropertyPath($value);
         }
@@ -109,19 +81,70 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (\is_object($choice) || \is_array($choice)) {
-                    return $accessor->getValue($choice, $value);
-                }
+                return \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
             };
         }
 
-        return $this->decoratedFactory->createListFromLoader($loader, $value);
+        if (\is_string($filter)) {
+            $filter = new PropertyPath($filter);
+        }
+
+        if ($filter instanceof PropertyPath) {
+            $accessor = $this->propertyAccessor;
+            $filter = static function ($choice) use ($accessor, $filter) {
+                return (\is_object($choice) || \is_array($choice)) && $accessor->getValue($choice, $filter);
+            };
+        }
+
+        return $this->decoratedFactory->createListFromChoices($choices, $value, $filter);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceListInterface                     $list             The choice list
+     * @param callable|string|PropertyPath|null $value  The callable or path for
+     *                                                  generating the choice values
+     * @param callable|string|PropertyPath|null $filter The callable or path for
+     *                                                  filtering the choices
+     *
+     * @return ChoiceListInterface The choice list
+     */
+    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/*, $filter = null*/)
+    {
+        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
+
+        if (\is_string($value)) {
+            $value = new PropertyPath($value);
+        }
+
+        if ($value instanceof PropertyPath) {
+            $accessor = $this->propertyAccessor;
+            $value = function ($choice) use ($accessor, $value) {
+                // The callable may be invoked with a non-object/array value
+                // when such values are passed to
+                // ChoiceListInterface::getValuesForChoices(). Handle this case
+                // so that the call to getValue() doesn't break.
+                return \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
+            };
+        }
+
+        if (\is_string($filter)) {
+            $filter = new PropertyPath($filter);
+        }
+
+        if ($filter instanceof PropertyPath) {
+            $accessor = $this->propertyAccessor;
+            $filter = static function ($choice) use ($accessor, $filter) {
+                return (\is_object($choice) || \is_array($choice)) && $accessor->getValue($choice, $filter);
+            };
+        }
+
+        return $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @param array|callable|string|PropertyPath|null $preferredChoices The preferred choices
      * @param callable|string|PropertyPath|null       $label            The callable or path generating the choice labels
      * @param callable|string|PropertyPath|null       $index            The callable or path generating the view indices
@@ -179,6 +202,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                     return $accessor->getValue($choice, $groupBy);
                 } catch (UnexpectedTypeException $e) {
                     // Don't group if path is not readable
+                    return null;
                 }
             };
         }

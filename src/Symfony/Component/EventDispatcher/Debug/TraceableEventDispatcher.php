@@ -13,12 +13,11 @@ namespace Symfony\Component\EventDispatcher\Debug;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -129,12 +128,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function dispatch($event, string $eventName = null): object
+    public function dispatch(object $event, string $eventName = null): object
     {
-        if (!\is_object($event)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
-        }
-
         $eventName = $eventName ?? \get_class($event);
 
         if (null === $this->callStack) {
@@ -143,7 +138,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
-        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if (null !== $this->logger && $event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 
@@ -171,9 +166,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Request|null $request The request to get listeners for
+     * @return array
      */
     public function getCalledListeners(Request $request = null)
     {
@@ -181,7 +174,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = $request ? spl_object_hash($request) : null;
         $called = [];
         foreach ($this->callStack as $listener) {
             list($eventName, $requestHash) = $this->callStack->getInfo();
@@ -194,9 +187,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Request|null $request The request to get listeners for
+     * @return array
      */
     public function getNotCalledListeners(Request $request = null)
     {
@@ -211,7 +202,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = $request ? spl_object_hash($request) : null;
         $calledListeners = [];
 
         if (null !== $this->callStack) {
@@ -241,12 +232,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         return $notCalled;
     }
 
-    /**
-     * @param Request|null $request The request to get orphaned events for
-     */
     public function getOrphanedEvents(Request $request = null): array
     {
-        if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
+        if ($request) {
             return $this->orphanedEvents[spl_object_hash($request)] ?? [];
         }
 

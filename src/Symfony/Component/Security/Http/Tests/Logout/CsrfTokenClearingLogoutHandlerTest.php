@@ -25,7 +25,7 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
     private $csrfTokenStorage;
     private $csrfTokenClearingLogoutHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->csrfTokenStorage = new SessionTokenStorage($this->session, 'foo');

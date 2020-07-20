@@ -16,8 +16,9 @@ use Doctrine\Common\Annotations\CachedReader;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class AutowiringTypesTest extends WebTestCase
+class AutowiringTypesTest extends AbstractWebTestCase
 {
     public function testAnnotationReaderAutowiring()
     {
@@ -56,7 +57,7 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $autowiredServices->getCachePool());
     }
 
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);
     }

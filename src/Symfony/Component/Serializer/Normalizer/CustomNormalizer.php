@@ -33,9 +33,9 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $object = $this->extractObjectToPopulate($class, $context) ?: new $class();
+        $object = $this->extractObjectToPopulate($type, $context) ?: new $type();
         $object->denormalize($this->serializer, $data, $format, $context);
 
         return $object;
@@ -63,7 +63,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @return bool
      */
-    public function supportsDenormalization($data, $type, string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null)
     {
         return is_subclass_of($type, DenormalizableInterface::class);
     }
@@ -73,6 +73,6 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 }

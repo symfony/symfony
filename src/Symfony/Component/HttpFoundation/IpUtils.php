@@ -30,12 +30,11 @@ class IpUtils
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
-     * @param string       $requestIp IP to check
-     * @param string|array $ips       List of IPs or subnets (can be a string if only a single one)
+     * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
      *
      * @return bool Whether the IP is valid
      */
-    public static function checkIp($requestIp, $ips)
+    public static function checkIp(?string $requestIp, $ips)
     {
         if (!\is_array($ips)) {
             $ips = [$ips];
@@ -56,12 +55,11 @@ class IpUtils
      * Compares two IPv4 addresses.
      * In case a subnet is given, it checks if it contains the request IP.
      *
-     * @param string $requestIp IPv4 address to check
-     * @param string $ip        IPv4 address or subnet in CIDR notation
+     * @param string $ip IPv4 address or subnet in CIDR notation
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
-    public static function checkIp4($requestIp, $ip)
+    public static function checkIp4(?string $requestIp, string $ip)
     {
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
@@ -102,14 +100,13 @@ class IpUtils
      *
      * @see https://github.com/dsp/v6tools
      *
-     * @param string $requestIp IPv6 address to check
-     * @param string $ip        IPv6 address or subnet in CIDR notation
+     * @param string $ip IPv6 address or subnet in CIDR notation
      *
      * @return bool Whether the IP is valid
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */
-    public static function checkIp6($requestIp, $ip)
+    public static function checkIp6(?string $requestIp, string $ip)
     {
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
@@ -152,5 +149,37 @@ class IpUtils
         }
 
         return self::$checkedIps[$cacheKey] = true;
+    }
+
+    /**
+     * Anonymizes an IP/IPv6.
+     *
+     * Removes the last byte for v4 and the last 8 bytes for v6 IPs
+     */
+    public static function anonymize(string $ip): string
+    {
+        $wrappedIPv6 = false;
+        if ('[' === substr($ip, 0, 1) && ']' === substr($ip, -1, 1)) {
+            $wrappedIPv6 = true;
+            $ip = substr($ip, 1, -1);
+        }
+
+        $packedAddress = inet_pton($ip);
+        if (4 === \strlen($packedAddress)) {
+            $mask = '255.255.255.0';
+        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff:ffff'))) {
+            $mask = '::ffff:ffff:ff00';
+        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff'))) {
+            $mask = '::ffff:ff00';
+        } else {
+            $mask = 'ffff:ffff:ffff:ffff:0000:0000:0000:0000';
+        }
+        $ip = inet_ntop($packedAddress & inet_pton($mask));
+
+        if ($wrappedIPv6) {
+            $ip = '['.$ip.']';
+        }
+
+        return $ip;
     }
 }

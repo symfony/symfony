@@ -37,7 +37,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
             // Enforcing uniqueness of the names of transitions starting at each node
             $from = reset($froms);
             if (isset($transitionFromNames[$from][$transition->getName()])) {
-                throw new InvalidDefinitionException(sprintf('A transition from a place/state must have an unique name. Multiple transitions named "%s" from place/state "%s" where found on StateMachine "%s".', $transition->getName(), $from, $name));
+                throw new InvalidDefinitionException(sprintf('A transition from a place/state must have an unique name. Multiple transitions named "%s" from place/state "%s" were found on StateMachine "%s".', $transition->getName(), $from, $name));
             }
 
             $transitionFromNames[$from][$transition->getName()] = true;
@@ -45,7 +45,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
 
         $initialPlaces = $definition->getInitialPlaces();
         if (2 <= \count($initialPlaces)) {
-            throw new InvalidDefinitionException(sprintf('The state machine "%s" can not store many places. But the definition has %s initial places. Only one is supported.', $name, \count($initialPlaces)));
+            throw new InvalidDefinitionException(sprintf('The state machine "%s" can not store many places. But the definition has %d initial places. Only one is supported.', $name, \count($initialPlaces)));
         }
     }
 }

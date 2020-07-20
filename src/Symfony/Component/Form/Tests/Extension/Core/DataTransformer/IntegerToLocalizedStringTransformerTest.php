@@ -19,13 +19,13 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
 {
     private $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }
@@ -34,50 +34,50 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     {
         return [
             // towards positive infinity (1.6 -> 2, -1.6 -> -1)
-            [1234.5, '1235', IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            [1234.4, '1235', IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            [-1234.5, '-1234', IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            [-1234.4, '-1234', IntegerToLocalizedStringTransformer::ROUND_CEILING],
+            [1234.5, '1235', \NumberFormatter::ROUND_CEILING],
+            [1234.4, '1235', \NumberFormatter::ROUND_CEILING],
+            [-1234.5, '-1234', \NumberFormatter::ROUND_CEILING],
+            [-1234.4, '-1234', \NumberFormatter::ROUND_CEILING],
             // towards negative infinity (1.6 -> 1, -1.6 -> -2)
-            [1234.5, '1234', IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            [1234.4, '1234', IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            [-1234.5, '-1235', IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            [-1234.4, '-1235', IntegerToLocalizedStringTransformer::ROUND_FLOOR],
+            [1234.5, '1234', \NumberFormatter::ROUND_FLOOR],
+            [1234.4, '1234', \NumberFormatter::ROUND_FLOOR],
+            [-1234.5, '-1235', \NumberFormatter::ROUND_FLOOR],
+            [-1234.4, '-1235', \NumberFormatter::ROUND_FLOOR],
             // away from zero (1.6 -> 2, -1.6 -> 2)
-            [1234.5, '1235', IntegerToLocalizedStringTransformer::ROUND_UP],
-            [1234.4, '1235', IntegerToLocalizedStringTransformer::ROUND_UP],
-            [-1234.5, '-1235', IntegerToLocalizedStringTransformer::ROUND_UP],
-            [-1234.4, '-1235', IntegerToLocalizedStringTransformer::ROUND_UP],
+            [1234.5, '1235', \NumberFormatter::ROUND_UP],
+            [1234.4, '1235', \NumberFormatter::ROUND_UP],
+            [-1234.5, '-1235', \NumberFormatter::ROUND_UP],
+            [-1234.4, '-1235', \NumberFormatter::ROUND_UP],
             // towards zero (1.6 -> 1, -1.6 -> -1)
-            [1234.5, '1234', IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            [1234.4, '1234', IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            [-1234.5, '-1234', IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            [-1234.4, '-1234', IntegerToLocalizedStringTransformer::ROUND_DOWN],
+            [1234.5, '1234', \NumberFormatter::ROUND_DOWN],
+            [1234.4, '1234', \NumberFormatter::ROUND_DOWN],
+            [-1234.5, '-1234', \NumberFormatter::ROUND_DOWN],
+            [-1234.4, '-1234', \NumberFormatter::ROUND_DOWN],
             // round halves (.5) to the next even number
-            [1234.6, '1235', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [1234.5, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [1234.4, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [1233.5, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [1232.5, '1232', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [-1234.6, '-1235', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [-1234.5, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [-1234.4, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [-1233.5, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            [-1232.5, '-1232', IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
+            [1234.6, '1235', \NumberFormatter::ROUND_HALFEVEN],
+            [1234.5, '1234', \NumberFormatter::ROUND_HALFEVEN],
+            [1234.4, '1234', \NumberFormatter::ROUND_HALFEVEN],
+            [1233.5, '1234', \NumberFormatter::ROUND_HALFEVEN],
+            [1232.5, '1232', \NumberFormatter::ROUND_HALFEVEN],
+            [-1234.6, '-1235', \NumberFormatter::ROUND_HALFEVEN],
+            [-1234.5, '-1234', \NumberFormatter::ROUND_HALFEVEN],
+            [-1234.4, '-1234', \NumberFormatter::ROUND_HALFEVEN],
+            [-1233.5, '-1234', \NumberFormatter::ROUND_HALFEVEN],
+            [-1232.5, '-1232', \NumberFormatter::ROUND_HALFEVEN],
             // round halves (.5) away from zero
-            [1234.6, '1235', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            [1234.5, '1235', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            [1234.4, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            [-1234.6, '-1235', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            [-1234.5, '-1235', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            [-1234.4, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
+            [1234.6, '1235', \NumberFormatter::ROUND_HALFUP],
+            [1234.5, '1235', \NumberFormatter::ROUND_HALFUP],
+            [1234.4, '1234', \NumberFormatter::ROUND_HALFUP],
+            [-1234.6, '-1235', \NumberFormatter::ROUND_HALFUP],
+            [-1234.5, '-1235', \NumberFormatter::ROUND_HALFUP],
+            [-1234.4, '-1234', \NumberFormatter::ROUND_HALFUP],
             // round halves (.5) towards zero
-            [1234.6, '1235', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [1234.5, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [1234.4, '1234', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [-1234.6, '-1235', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [-1234.5, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            [-1234.4, '-1234', IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
+            [1234.6, '1235', \NumberFormatter::ROUND_HALFDOWN],
+            [1234.5, '1234', \NumberFormatter::ROUND_HALFDOWN],
+            [1234.4, '1234', \NumberFormatter::ROUND_HALFDOWN],
+            [-1234.6, '-1235', \NumberFormatter::ROUND_HALFDOWN],
+            [-1234.5, '-1234', \NumberFormatter::ROUND_HALFDOWN],
+            [-1234.4, '-1234', \NumberFormatter::ROUND_HALFDOWN],
         ];
     }
 
@@ -130,50 +130,50 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     {
         return [
             // towards positive infinity (1.6 -> 2, -1.6 -> -1)
-            ['1234,5', 1235, IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            ['1234,4', 1235, IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            ['-1234,5', -1234, IntegerToLocalizedStringTransformer::ROUND_CEILING],
-            ['-1234,4', -1234, IntegerToLocalizedStringTransformer::ROUND_CEILING],
+            ['1234,5', 1235, \NumberFormatter::ROUND_CEILING],
+            ['1234,4', 1235, \NumberFormatter::ROUND_CEILING],
+            ['-1234,5', -1234, \NumberFormatter::ROUND_CEILING],
+            ['-1234,4', -1234, \NumberFormatter::ROUND_CEILING],
             // towards negative infinity (1.6 -> 1, -1.6 -> -2)
-            ['1234,5', 1234, IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            ['1234,4', 1234, IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            ['-1234,5', -1235, IntegerToLocalizedStringTransformer::ROUND_FLOOR],
-            ['-1234,4', -1235, IntegerToLocalizedStringTransformer::ROUND_FLOOR],
+            ['1234,5', 1234, \NumberFormatter::ROUND_FLOOR],
+            ['1234,4', 1234, \NumberFormatter::ROUND_FLOOR],
+            ['-1234,5', -1235, \NumberFormatter::ROUND_FLOOR],
+            ['-1234,4', -1235, \NumberFormatter::ROUND_FLOOR],
             // away from zero (1.6 -> 2, -1.6 -> 2)
-            ['1234,5', 1235, IntegerToLocalizedStringTransformer::ROUND_UP],
-            ['1234,4', 1235, IntegerToLocalizedStringTransformer::ROUND_UP],
-            ['-1234,5', -1235, IntegerToLocalizedStringTransformer::ROUND_UP],
-            ['-1234,4', -1235, IntegerToLocalizedStringTransformer::ROUND_UP],
+            ['1234,5', 1235, \NumberFormatter::ROUND_UP],
+            ['1234,4', 1235, \NumberFormatter::ROUND_UP],
+            ['-1234,5', -1235, \NumberFormatter::ROUND_UP],
+            ['-1234,4', -1235, \NumberFormatter::ROUND_UP],
             // towards zero (1.6 -> 1, -1.6 -> -1)
-            ['1234,5', 1234, IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            ['1234,4', 1234, IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            ['-1234,5', -1234, IntegerToLocalizedStringTransformer::ROUND_DOWN],
-            ['-1234,4', -1234, IntegerToLocalizedStringTransformer::ROUND_DOWN],
+            ['1234,5', 1234, \NumberFormatter::ROUND_DOWN],
+            ['1234,4', 1234, \NumberFormatter::ROUND_DOWN],
+            ['-1234,5', -1234, \NumberFormatter::ROUND_DOWN],
+            ['-1234,4', -1234, \NumberFormatter::ROUND_DOWN],
             // round halves (.5) to the next even number
-            ['1234,6', 1235, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['1234,5', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['1234,4', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['1233,5', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['1232,5', 1232, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['-1234,6', -1235, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['-1234,5', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['-1234,4', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['-1233,5', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
-            ['-1232,5', -1232, IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN],
+            ['1234,6', 1235, \NumberFormatter::ROUND_HALFEVEN],
+            ['1234,5', 1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['1234,4', 1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['1233,5', 1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['1232,5', 1232, \NumberFormatter::ROUND_HALFEVEN],
+            ['-1234,6', -1235, \NumberFormatter::ROUND_HALFEVEN],
+            ['-1234,5', -1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['-1234,4', -1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['-1233,5', -1234, \NumberFormatter::ROUND_HALFEVEN],
+            ['-1232,5', -1232, \NumberFormatter::ROUND_HALFEVEN],
             // round halves (.5) away from zero
-            ['1234,6', 1235, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            ['1234,5', 1235, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            ['1234,4', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            ['-1234,6', -1235, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            ['-1234,5', -1235, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
-            ['-1234,4', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_UP],
+            ['1234,6', 1235, \NumberFormatter::ROUND_HALFUP],
+            ['1234,5', 1235, \NumberFormatter::ROUND_HALFUP],
+            ['1234,4', 1234, \NumberFormatter::ROUND_HALFUP],
+            ['-1234,6', -1235, \NumberFormatter::ROUND_HALFUP],
+            ['-1234,5', -1235, \NumberFormatter::ROUND_HALFUP],
+            ['-1234,4', -1234, \NumberFormatter::ROUND_HALFUP],
             // round halves (.5) towards zero
-            ['1234,6', 1235, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            ['1234,5', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            ['1234,4', 1234, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            ['-1234,6', -1235, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            ['-1234,5', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
-            ['-1234,4', -1234, IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN],
+            ['1234,6', 1235, \NumberFormatter::ROUND_HALFDOWN],
+            ['1234,5', 1234, \NumberFormatter::ROUND_HALFDOWN],
+            ['1234,4', 1234, \NumberFormatter::ROUND_HALFDOWN],
+            ['-1234,6', -1235, \NumberFormatter::ROUND_HALFDOWN],
+            ['-1234,5', -1234, \NumberFormatter::ROUND_HALFDOWN],
+            ['-1234,4', -1234, \NumberFormatter::ROUND_HALFDOWN],
         ];
     }
 
@@ -187,21 +187,17 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformExpectsString()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformExpectsValidNumber()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform('foo');
@@ -209,10 +205,10 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
 
     /**
      * @dataProvider floatNumberProvider
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsInteger($number, $locale)
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault($locale);
@@ -230,41 +226,33 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformDisallowsNaN()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform('NaN');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformDisallowsNaN2()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform('nan');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformDisallowsInfinity()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform('∞');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformDisallowsNegativeInfinity()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $transformer->reverseTransform('-∞');

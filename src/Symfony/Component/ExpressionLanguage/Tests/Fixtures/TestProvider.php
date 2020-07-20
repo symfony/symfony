@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionPhpFunction;
 
 class TestProvider implements ExpressionFunctionProviderInterface
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new ExpressionFunction('identity', function ($input) {

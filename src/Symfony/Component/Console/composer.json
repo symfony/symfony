@@ -2,7 +2,7 @@
     "name": "symfony/console",
     "type": "library",
     "description": "Symfony Console Component",
-    "keywords": [],
+    "keywords": ["console", "cli", "command line", "terminal"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -16,10 +16,12 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
+        "php": ">=7.2.5",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.8",
-        "symfony/service-contracts": "^1.1"
+        "symfony/polyfill-php80": "^1.15",
+        "symfony/service-contracts": "^1.1|^2",
+        "symfony/string": "^5.1"
     },
     "require-dev": {
         "symfony/config": "^4.4|^5.0",
@@ -41,7 +43,9 @@
     },
     "conflict": {
         "symfony/dependency-injection": "<4.4",
+        "symfony/dotenv": "<5.1",
         "symfony/event-dispatcher": "<4.4",
+        "symfony/lock": "<4.4",
         "symfony/process": "<4.4"
     },
     "autoload": {
@@ -53,7 +57,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

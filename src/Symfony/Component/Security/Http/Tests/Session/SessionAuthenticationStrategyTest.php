@@ -25,12 +25,10 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, $this->getToken());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid session authentication strategy "foo"
-     */
     public function testUnsupportedStrategy()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Invalid session authentication strategy "foo"');
         $request = $this->getRequest();
         $request->expects($this->never())->method('getSession');
 

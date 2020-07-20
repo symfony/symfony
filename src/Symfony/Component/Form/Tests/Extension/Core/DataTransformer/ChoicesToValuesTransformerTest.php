@@ -20,7 +20,7 @@ class ChoicesToValuesTransformerTest extends TestCase
     protected $transformer;
     protected $transformerWithNull;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $list = new ArrayChoiceList(['', false, 'X']);
         $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
@@ -29,7 +29,7 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->transformerWithNull = new ChoicesToValuesTransformer($listWithNull);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transformer = null;
         $this->transformerWithNull = null;
@@ -53,11 +53,9 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->assertSame([], $this->transformer->transform(null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testTransformExpectsArray()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->transform('foobar');
     }
 
@@ -81,11 +79,9 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->assertSame([], $this->transformerWithNull->reverseTransform(null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformExpectsArray()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->reverseTransform('foobar');
     }
 }

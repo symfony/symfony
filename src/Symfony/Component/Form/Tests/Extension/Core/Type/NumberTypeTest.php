@@ -19,7 +19,7 @@ class NumberTypeTest extends BaseTypeTest
 
     private $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault('de_DE');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -77,24 +77,22 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a numeric string.
-     */
     public function testStringInputWithFloatData(): void
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a numeric string.');
+
         $this->factory->create(static::TESTED_TYPE, 12345.6789, [
             'input' => 'string',
             'scale' => 2,
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a numeric string.
-     */
     public function testStringInputWithIntData(): void
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a numeric string.');
+
         $this->factory->create(static::TESTED_TYPE, 12345, [
             'input' => 'string',
             'scale' => 2,
@@ -124,6 +122,21 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
+    }
+
+    public function testSubmitNullWithEmptyDataSetToNull()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'empty_data' => null,
+        ]);
+        $form->submit(null);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isValid());
+        $this->assertSame('', $form->getViewData());
+        $this->assertNull($form->getNormData());
+        $this->assertNull($form->getData());
     }
 
     public function testSubmitNumericInput(): void
@@ -179,11 +192,9 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345.55', $form->getViewData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     */
     public function testGroupingNotAllowedWithHtml5Widget()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,

@@ -22,7 +22,7 @@ class HandlersLocatorTest extends TestCase
 {
     public function testItYieldsHandlerDescriptors()
     {
-        $handler = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $handler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
         $locator = new HandlersLocator([
             DummyMessage::class => [$handler],
         ]);
@@ -32,13 +32,13 @@ class HandlersLocatorTest extends TestCase
 
     public function testItReturnsOnlyHandlersMatchingTransport()
     {
-        $firstHandler = $this->createPartialMock(\stdClass::class, ['__invoke']);
-        $secondHandler = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $firstHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+        $secondHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
 
         $locator = new HandlersLocator([
             DummyMessage::class => [
                 $first = new HandlerDescriptor($firstHandler, ['alias' => 'one']),
-                new HandlerDescriptor($this->createPartialMock(\stdClass::class, ['__invoke']), ['from_transport' => 'ignored', 'alias' => 'two']),
+                new HandlerDescriptor($this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']), ['from_transport' => 'ignored', 'alias' => 'two']),
                 $second = new HandlerDescriptor($secondHandler, ['from_transport' => 'transportName', 'alias' => 'three']),
             ],
         ]);
@@ -49,5 +49,12 @@ class HandlersLocatorTest extends TestCase
         ], iterator_to_array($locator->getHandlers(
             new Envelope(new DummyMessage('Body'), [new ReceivedStamp('transportName')])
         )));
+    }
+}
+
+class HandlersLocatorTestCallable
+{
+    public function __invoke()
+    {
     }
 }

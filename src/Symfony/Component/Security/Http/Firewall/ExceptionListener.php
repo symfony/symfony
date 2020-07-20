@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
@@ -89,14 +90,30 @@ class ExceptionListener
      */
     public function onKernelException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         do {
             if ($exception instanceof AuthenticationException) {
-                return $this->handleAuthenticationException($event, $exception);
-            } elseif ($exception instanceof AccessDeniedException) {
-                return $this->handleAccessDeniedException($event, $exception);
-            } elseif ($exception instanceof LogoutException) {
-                return $this->handleLogoutException($exception);
+                $this->handleAuthenticationException($event, $exception);
+
+                return;
+            }
+
+            if ($exception instanceof AccessDeniedException) {
+                $this->handleAccessDeniedException($event, $exception);
+
+                return;
+            }
+
+            if ($exception instanceof LazyResponseException) {
+                $event->setResponse($exception->getResponse());
+
+                return;
+            }
+
+            if ($exception instanceof LogoutException) {
+                $this->handleLogoutException($event, $exception);
+
+                return;
             }
         } while (null !== $exception = $exception->getPrevious());
     }
@@ -111,13 +128,13 @@ class ExceptionListener
             $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
             $event->allowCustomResponseCode();
         } catch (\Exception $e) {
-            $event->setException($e);
+            $event->setThrowable($e);
         }
     }
 
     private function handleAccessDeniedException(ExceptionEvent $event, AccessDeniedException $exception)
     {
-        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+        $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
         $token = $this->tokenStorage->getToken();
         if (!$this->authenticationTrustResolver->isFullFledged($token)) {
@@ -127,11 +144,13 @@ class ExceptionListener
 
             try {
                 $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
-                $insufficientAuthenticationException->setToken($token);
+                if (null !== $token) {
+                    $insufficientAuthenticationException->setToken($token);
+                }
 
                 $event->setResponse($this->startAuthentication($event->getRequest(), $insufficientAuthenticationException));
             } catch (\Exception $e) {
-                $event->setException($e);
+                $event->setThrowable($e);
             }
 
             return;
@@ -160,14 +179,16 @@ class ExceptionListener
                 $this->logger->error('An exception was thrown when handling an AccessDeniedException.', ['exception' => $e]);
             }
 
-            $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
+            $event->setThrowable(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
         }
     }
 
-    private function handleLogoutException(LogoutException $exception): void
+    private function handleLogoutException(ExceptionEvent $event, LogoutException $exception): void
     {
+        $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
         if (null !== $this->logger) {
-            $this->logger->info('A LogoutException was thrown.', ['exception' => $exception]);
+            $this->logger->info('A LogoutException was thrown; wrapping with AccessDeniedHttpException', ['exception' => $exception]);
         }
     }
 
@@ -197,9 +218,9 @@ class ExceptionListener
         $response = $this->authenticationEntryPoint->start($request, $authException);
 
         if (!$response instanceof Response) {
-            $given = \is_object($response) ? \get_class($response) : \gettype($response);
+            $given = get_debug_type($response);
 
-            throw new \LogicException(sprintf('The %s::start() method must return a Response object (%s returned)', \get_class($this->authenticationEntryPoint), $given));
+            throw new \LogicException(sprintf('The "%s::start()" method must return a Response object ("%s" returned).', get_debug_type($this->authenticationEntryPoint), $given));
         }
 
         return $response;

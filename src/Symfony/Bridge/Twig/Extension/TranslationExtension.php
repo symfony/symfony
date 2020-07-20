@@ -19,17 +19,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
 use Twig\NodeVisitor\NodeVisitorInterface;
-use Twig\TokenParser\AbstractTokenParser;
 use Twig\TwigFilter;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(TranslatorInterface::class);
 
 /**
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class TranslationExtension extends AbstractExtension
+final class TranslationExtension extends AbstractExtension
 {
     private $translator;
     private $translationNodeVisitor;
@@ -40,7 +40,7 @@ class TranslationExtension extends AbstractExtension
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
-    public function getTranslator(): ?TranslatorInterface
+    public function getTranslator(): TranslatorInterface
     {
         if (null === $this->translator) {
             if (!interface_exists(TranslatorInterface::class)) {
@@ -66,9 +66,7 @@ class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * Returns the token parser instance to add to the existing list.
-     *
-     * @return AbstractTokenParser[]
+     * {@inheritdoc}
      */
     public function getTokenParsers(): array
     {
@@ -94,20 +92,12 @@ class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null): string
+    public function trans(string $message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
         if (null !== $count) {
             $arguments['%count%'] = $count;
         }
 
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'translator';
     }
 }

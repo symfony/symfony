@@ -11,10 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
+use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -39,10 +38,12 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
@@ -62,7 +63,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * @internal
      * @required
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         $previous = $this->container;
         $this->container = $container;
@@ -78,7 +79,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', \get_class($this)));
+            throw new ServiceNotFoundException('parameter_bag.', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
         }
 
         return $this->container->get('parameter_bag')->get($name);
@@ -196,7 +197,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException
      */
-    protected function addFlash(string $type, string $message): void
+    protected function addFlash(string $type, $message): void
     {
         if (!$this->container->has('session')) {
             throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');
@@ -351,7 +352,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return mixed
+     * @return UserInterface|object|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *
@@ -364,12 +365,12 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
+            return null;
         }
 
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
-            return;
+            return null;
         }
 
         return $user;
@@ -410,7 +411,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @see https://tools.ietf.org/html/rfc5988
      */
-    protected function addLink(Request $request, Link $link): void
+    protected function addLink(Request $request, LinkInterface $link): void
     {
         if (!class_exists(AddLinkHeaderListener::class)) {
             throw new \LogicException('You can not use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');

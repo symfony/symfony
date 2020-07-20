@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
@@ -21,6 +23,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Service\ResetInterface;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(RewindableGenerator::class);
+class_exists(ArgumentServiceLocator::class);
 
 /**
  * Container is a dependency injection container.
@@ -140,10 +146,8 @@ class Container implements ContainerInterface, ResetInterface
      *
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
-     *
-     * @param object $service The service instance
      */
-    public function set(string $id, $service)
+    public function set(string $id, ?object $service)
     {
         // Runs the internal initializer; used by the dumped container to include always-needed files
         if (isset($this->privates['service_container']) && $this->privates['service_container'] instanceof \Closure) {
@@ -209,7 +213,7 @@ class Container implements ContainerInterface, ResetInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
@@ -275,6 +279,8 @@ class Container implements ContainerInterface, ResetInterface
 
             throw new ServiceNotFoundException($id, null, null, $alternatives);
         }
+
+        return null;
     }
 
     /**
@@ -319,11 +325,11 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets all service ids.
      *
-     * @return array An array of all defined service ids
+     * @return string[] An array of all defined service ids
      */
     public function getServiceIds()
     {
-        return array_unique(array_merge(['service_container'], array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->services)));
+        return array_map('strval', array_unique(array_merge(['service_container'], array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->aliases), array_keys($this->services))));
     }
 
     /**
@@ -362,8 +368,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Creates a service by requiring its factory file.
-     *
-     * @return object The service created by the file
      */
     protected function load($file)
     {
@@ -415,9 +419,14 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
+     * @param string|false $registry
+     * @param string|bool  $load
+     *
+     * @return mixed
+     *
      * @internal
      */
-    final protected function getService($registry, $id, $method, $load)
+    final protected function getService($registry, string $id, ?string $method, $load)
     {
         if ('service_container' === $id) {
             return $this;

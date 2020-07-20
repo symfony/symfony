@@ -19,7 +19,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * This Normalizer implements RFC7807 {@link https://tools.ietf.org/html/rfc7807}.
  *
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -29,6 +28,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     const STATUS = 'status';
     const TITLE = 'title';
     const TYPE = 'type';
+    const PAYLOAD_FIELDS = 'payload_fields';
 
     private $defaultContext;
     private $nameConverter;
@@ -42,8 +42,20 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
+        if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
+            $payloadFieldsToSerialize = $context[self::PAYLOAD_FIELDS];
+        } elseif (\array_key_exists(self::PAYLOAD_FIELDS, $this->defaultContext)) {
+            $payloadFieldsToSerialize = $this->defaultContext[self::PAYLOAD_FIELDS];
+        } else {
+            $payloadFieldsToSerialize = [];
+        }
+
+        if (\is_array($payloadFieldsToSerialize) && [] !== $payloadFieldsToSerialize) {
+            $payloadFieldsToSerialize = array_flip($payloadFieldsToSerialize);
+        }
+
         $violations = [];
         $messages = [];
         foreach ($object as $violation) {
@@ -56,6 +68,17 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             ];
             if (null !== $code = $violation->getCode()) {
                 $violationEntry['type'] = sprintf('urn:uuid:%s', $code);
+            }
+
+            $constraint = $violation->getConstraint();
+            if (
+                [] !== $payloadFieldsToSerialize &&
+                $constraint &&
+                $constraint->payload &&
+                // If some or all payload fields are whitelisted, add them
+                $payloadFields = null === $payloadFieldsToSerialize || true === $payloadFieldsToSerialize ? $constraint->payload : array_intersect_key($constraint->payload, $payloadFieldsToSerialize)
+            ) {
+                $violationEntry['payload'] = $payloadFields;
             }
 
             $violations[] = $violationEntry;
@@ -84,7 +107,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof ConstraintViolationListInterface;
     }
@@ -94,6 +117,6 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 }

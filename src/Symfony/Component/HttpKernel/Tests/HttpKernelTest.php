@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -29,21 +30,17 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class HttpKernelTest extends TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrue()
     {
+        $this->expectException('RuntimeException');
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); });
 
         $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsFalseAndNoListenerIsRegistered()
     {
+        $this->expectException('RuntimeException');
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); });
 
         $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
@@ -53,7 +50,7 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new Response($event->getException()->getMessage()));
+            $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('foo'); });
@@ -100,7 +97,7 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new Response($event->getException()->getMessage()));
+            $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new MethodNotAllowedHttpException(['POST']); });
@@ -126,7 +123,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($expectedStatusCode)
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) use ($expectedStatusCode) {
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (ExceptionEvent $event) use ($expectedStatusCode) {
             $event->allowCustomResponseCode();
             $event->setResponse(new Response('', $expectedStatusCode));
         });
@@ -158,11 +155,9 @@ class HttpKernelTest extends TestCase
         $this->assertEquals('hello', $kernel->handle(new Request())->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testHandleWhenNoControllerIsFound()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
         $dispatcher = new EventDispatcher();
         $kernel = $this->getHttpKernel($dispatcher, false);
 
@@ -224,7 +219,7 @@ class HttpKernelTest extends TestCase
 
             // `file` index the array starting at 0, and __FILE__ starts at 1
             $line = file($first['file'])[$first['line'] - 2];
-            $this->assertContains('// call controller', $line);
+            $this->assertStringContainsString('// call controller', $line);
         }
     }
 
@@ -319,11 +314,9 @@ class HttpKernelTest extends TestCase
         $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     */
     public function testInconsistentClientIpsOnMasterRequests()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
         $request = new Request();
         $request->setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);
         $request->server->set('REMOTE_ADDR', '1.1.1.1');

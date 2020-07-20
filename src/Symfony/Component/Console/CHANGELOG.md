@@ -1,17 +1,42 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * `Command::setHidden()` is final since Symfony 5.1
+ * Add `SingleCommandApplication`
+ * Add `Cursor` class
+
 5.0.0
 -----
 
+ * removed support for finding hidden commands using an abbreviation, use the full name instead
  * removed `TableStyle::setCrossingChar()` method in favor of `TableStyle::setDefaultCrossingChar()`
  * removed `TableStyle::setHorizontalBorderChar()` method in favor of `TableStyle::setDefaultCrossingChars()`
  * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`
  * removed `TableStyle::setVerticalBorderChar()` method in favor of `TableStyle::setVerticalBorderChars()`
  * removed `TableStyle::getVerticalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed support for returning `null` from `Command::execute()`, return `0` instead
  * `ProcessHelper::run()` accepts only `array|Symfony\Component\Process\Process` for its `command` argument
- * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` 
-    for its `dispatcher` argument
+ * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface`
+   for its `dispatcher` argument
+ * renamed `Application::renderException()` and `Application::doRenderException()`
+   to `renderThrowable()` and `doRenderThrowable()` respectively.
+
+4.4.0
+-----
+
+ * deprecated finding hidden commands using an abbreviation, use the full name instead
+ * added `Question::setTrimmable` default to true to allow the answer to be trimmed
+ * added method `minSecondsBetweenRedraws()` and `maxSecondsBetweenRedraws()` on `ProgressBar`
+ * `Application` implements `ResetInterface`
+ * marked all dispatched event classes as `@final`
+ * added support for displaying table horizontally
+ * deprecated returning `null` from `Command::execute()`, return `0` instead
+ * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
+   use `renderThrowable()` and `doRenderThrowable()` instead.
+ * added support for the `NO_COLOR` env var (https://no-color.org/)
 
 4.3.0
 -----
@@ -44,7 +69,7 @@ CHANGELOG
 
  * `OutputFormatter` throws an exception when unknown options are used
  * removed `QuestionHelper::setInputStream()/getInputStream()`
- * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
+ * removed `Application::getTerminalWidth()/getTerminalHeight()` and
   `Application::setTerminalDimensions()/getTerminalDimensions()`
 * removed `ConsoleExceptionEvent`
 * removed `ConsoleEvents::EXCEPTION`
@@ -70,7 +95,7 @@ CHANGELOG
   with value optional explicitly passed empty
 * added console.error event to catch exceptions thrown by other listeners
 * deprecated console.exception event in favor of console.error
-* added ability to handle `CommandNotFoundException` through the 
+* added ability to handle `CommandNotFoundException` through the
  `console.error` event
 * deprecated default validation in `SymfonyQuestionHelper::ask`
 
@@ -86,7 +111,7 @@ CHANGELOG
 -----
 
  * added truncate method to FormatterHelper
- * added setColumnWidth(s) method to Table 
+ * added setColumnWidth(s) method to Table
 
 2.8.3
 -----

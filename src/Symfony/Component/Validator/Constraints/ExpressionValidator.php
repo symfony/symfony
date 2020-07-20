@@ -35,7 +35,7 @@ class ExpressionValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Expression) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Expression');
+            throw new UnexpectedTypeException($constraint, Expression::class);
         }
 
         $variables = $constraint->values;
@@ -50,7 +50,7 @@ class ExpressionValidator extends ConstraintValidator
         }
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             $this->expressionLanguage = new ExpressionLanguage();

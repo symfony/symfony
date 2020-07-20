@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
@@ -39,7 +40,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-        $this->assertEquals($eventException, $event->getException());
+        $this->assertEquals($eventException, $event->getThrowable());
     }
 
     /**
@@ -58,7 +59,7 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('Forbidden', $event->getResponse()->getContent());
         $this->assertEquals(403, $event->getResponse()->getStatusCode());
-        $this->assertSame($exception, $event->getException());
+        $this->assertSame($exception, $event->getThrowable());
     }
 
     public function getAuthenticationExceptionProvider()
@@ -82,8 +83,8 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener(null, null, null, $entryPoint);
         $listener->onKernelException($event);
         // the exception has been replaced by our LogicException
-        $this->assertInstanceOf('LogicException', $event->getException());
-        $this->assertStringEndsWith('start() method must return a Response object (string returned)', $event->getException()->getMessage());
+        $this->assertInstanceOf('LogicException', $event->getThrowable());
+        $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
     }
 
     /**
@@ -97,7 +98,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -120,7 +121,7 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
         $this->assertEquals(401, $event->getResponse()->getStatusCode());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -137,7 +138,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('error', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -154,7 +155,18 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+    }
+
+    public function testLogoutException()
+    {
+        $event = $this->createEvent(new LogoutException('Invalid CSRF.'));
+
+        $listener = $this->createExceptionListener();
+        $listener->onKernelException($event);
+
+        $this->assertEquals('Invalid CSRF.', $event->getThrowable()->getMessage());
+        $this->assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
     public function getAccessDeniedExceptionProvider()

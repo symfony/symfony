@@ -52,12 +52,10 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\ValidationFailedException
-     * @expectedExceptionMessage Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.
-     */
     public function testValidationFailedException()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\ValidationFailedException');
+        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.');
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 

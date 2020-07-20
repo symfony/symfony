@@ -20,12 +20,10 @@ class VarExporterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @expectedException \Symfony\Component\VarExporter\Exception\ClassNotFoundException
-     * @expectedExceptionMessage Class "SomeNotExistingClass" not found.
-     */
     public function testPhpIncompleteClassesAreForbidden()
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\ClassNotFoundException');
+        $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
             Registry::unserialize([], ['O:20:"SomeNotExistingClass":0:{}']);
@@ -36,11 +34,11 @@ class VarExporterTest extends TestCase
 
     /**
      * @dataProvider provideFailingSerialization
-     * @expectedException \Symfony\Component\VarExporter\Exception\NotInstantiableTypeException
-     * @expectedExceptionMessageRegexp Type ".*" is not instantiable.
      */
     public function testFailingSerialization($value)
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
+        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
             VarExporter::export($value);
@@ -88,7 +86,14 @@ class VarExporterTest extends TestCase
 
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
-        $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+
+        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+        } elseif (\PHP_VERSION_ID < 70400) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
+        } else {
+            $this->markTestSkipped('PHP >= 7.4.6 required.');
+        }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -109,6 +114,7 @@ class VarExporterTest extends TestCase
     public function provideExport()
     {
         yield ['multiline-string', ["\0\0\r\nA" => "B\rC\n\n"], true];
+        yield ['lf-ending-string', "'BOOM'\n.var_dump(123)//'", true];
 
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];
@@ -206,7 +212,7 @@ class VarExporterTest extends TestCase
 
 class MySerializable implements \Serializable
 {
-    public function serialize()
+    public function serialize(): string
     {
         return '123';
     }
@@ -224,7 +230,7 @@ class MyWakeup
     public $baz;
     public $def = 234;
 
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['sub', 'baz'];
     }
@@ -302,7 +308,7 @@ class MyArrayObject extends \ArrayObject
 
 class GoodNight
 {
-    public function __sleep()
+    public function __sleep(): array
     {
         $this->good = 'night';
 
@@ -392,7 +398,7 @@ class FooSerializable implements \Serializable
 
 class Php74Serializable implements \Serializable
 {
-    public function __serialize()
+    public function __serialize(): array
     {
         return [$this->foo = new \stdClass()];
     }
@@ -402,7 +408,7 @@ class Php74Serializable implements \Serializable
         list($this->foo) = $data;
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException();
     }
@@ -412,7 +418,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function serialize()
+    public function serialize(): string
     {
         throw new \BadMethodCallException();
     }

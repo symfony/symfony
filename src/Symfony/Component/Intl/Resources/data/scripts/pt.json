@@ -1,7 +1,7 @@
 {
-    "Version": "2.1.48.42",
     "Names": {
         "Arab": "árabe",
+        "Aran": "nastaliq",
         "Armi": "armi",
         "Armn": "armênio",
         "Avst": "avéstico",
@@ -87,7 +87,7 @@
         "Ogam": "ogâmico",
         "Olck": "ol chiki",
         "Orkh": "orkhon",
-        "Orya": "oriya",
+        "Orya": "oriá",
         "Osma": "osmania",
         "Perm": "pérmico antigo",
         "Phag": "phags-pa",
@@ -97,6 +97,7 @@
         "Phnx": "fenício",
         "Plrd": "fonético pollard",
         "Prti": "prti",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongorongo",
         "Runr": "rúnico",

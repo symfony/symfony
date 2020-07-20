@@ -11,76 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
-use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport as BridgeRedisTransport;
 
-/**
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-class RedisTransport implements TransportInterface, SetupableTransportInterface
-{
-    private $serializer;
-    private $connection;
-    private $receiver;
-    private $sender;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisTransport::class, BridgeRedisTransport::class);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer ?? new PhpSerializer();
-    }
+class_exists(BridgeRedisTransport::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/redis-messenger instead.
      */
-    public function get(): iterable
+    class RedisTransport
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(Envelope $envelope): void
-    {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reject(Envelope $envelope): void
-    {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function send(Envelope $envelope): Envelope
-    {
-        return ($this->sender ?? $this->getSender())->send($envelope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setup(): void
-    {
-        $this->connection->setup();
-    }
-
-    private function getReceiver(): RedisReceiver
-    {
-        return $this->receiver = new RedisReceiver($this->connection, $this->serializer);
-    }
-
-    private function getSender(): RedisSender
-    {
-        return $this->sender = new RedisSender($this->connection, $this->serializer);
     }
 }

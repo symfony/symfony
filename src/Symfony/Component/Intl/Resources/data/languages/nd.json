@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.82",
     "Names": {
         "ak": "isi-Akhani",
         "am": "isi-Amaharikhi",
@@ -46,5 +45,6 @@
         "yo": "isi-Yorubha",
         "zh": "isi-China",
         "zu": "isi-Zulu"
-    }
+    },
+    "LocalizedNames": []
 }

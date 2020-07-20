@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -27,7 +27,7 @@ class RoundRobinTransport implements TransportInterface
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;
-    private $cursor = 0;
+    private $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -35,7 +35,7 @@ class RoundRobinTransport implements TransportInterface
     public function __construct(array $transports, int $retryPeriod = 60)
     {
         if (!$transports) {
-            throw new TransportException(__CLASS__.' must have at least one transport configured.');
+            throw new TransportException(sprintf('"%s" must have at least one transport configured.', static::class));
         }
 
         $this->transports = $transports;
@@ -43,7 +43,7 @@ class RoundRobinTransport implements TransportInterface
         $this->retryPeriod = $retryPeriod;
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         while ($transport = $this->getNextTransport()) {
             try {
@@ -56,11 +56,20 @@ class RoundRobinTransport implements TransportInterface
         throw new TransportException('All transports failed.');
     }
 
+    public function __toString(): string
+    {
+        return $this->getNameSymbol().'('.implode(' ', array_map('strval', $this->transports)).')';
+    }
+
     /**
      * Rotates the transport list around and returns the first instance.
      */
     protected function getNextTransport(): ?TransportInterface
     {
+        if (-1 === $this->cursor) {
+            $this->cursor = $this->getInitialCursor();
+        }
+
         $cursor = $this->cursor;
         while (true) {
             $transport = $this->transports[$cursor];
@@ -88,6 +97,18 @@ class RoundRobinTransport implements TransportInterface
     protected function isTransportDead(TransportInterface $transport): bool
     {
         return $this->deadTransports->contains($transport);
+    }
+
+    protected function getInitialCursor(): int
+    {
+        // the cursor initial value is randomized so that
+        // when are not in a daemon, we are still rotating the transports
+        return mt_rand(0, \count($this->transports) - 1);
+    }
+
+    protected function getNameSymbol(): string
+    {
+        return 'roundrobin';
     }
 
     private function moveCursor(int $cursor): int

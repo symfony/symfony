@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Exception\LogicException;
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\FilesystemTrait;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Stores tag id <> cache id relationship as a symlink, and lookup on invalidation calls.
@@ -27,8 +25,8 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use FilesystemTrait {
-        doSave as doSaveCache;
-        doDelete as doDeleteCache;
+        doClear as private doClearCache;
+        doSave as private doSaveCache;
     }
 
     /**
@@ -36,16 +34,60 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
      */
     private const TAG_FOLDER = 'tags';
 
-    /**
-     * @var Filesystem|null
-     */
-    private $fs;
-
     public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
     {
-        $this->marshaller = $marshaller ?? new DefaultMarshaller();
+        $this->marshaller = new TagAwareMarshaller($marshaller);
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doClear(string $namespace)
+    {
+        $ok = $this->doClearCache($namespace);
+
+        if ('' !== $namespace) {
+            return $ok;
+        }
+
+        set_error_handler(static function () {});
+        $chars = '+-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+        try {
+            foreach ($this->scanHashDir($this->directory.self::TAG_FOLDER.\DIRECTORY_SEPARATOR) as $dir) {
+                if (rename($dir, $renamed = substr_replace($dir, bin2hex(random_bytes(4)), -8))) {
+                    $dir = $renamed.\DIRECTORY_SEPARATOR;
+                } else {
+                    $dir .= \DIRECTORY_SEPARATOR;
+                    $renamed = null;
+                }
+
+                for ($i = 0; $i < 38; ++$i) {
+                    if (!is_dir($dir.$chars[$i])) {
+                        continue;
+                    }
+                    for ($j = 0; $j < 38; ++$j) {
+                        if (!is_dir($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
+                            continue;
+                        }
+                        foreach (scandir($d, SCANDIR_SORT_NONE) ?: [] as $link) {
+                            if ('.' !== $link && '..' !== $link && (null !== $renamed || !realpath($d.\DIRECTORY_SEPARATOR.$link))) {
+                                unlink($d.\DIRECTORY_SEPARATOR.$link);
+                            }
+                        }
+                        null === $renamed ?: rmdir($d);
+                    }
+                    null === $renamed ?: rmdir($dir.$chars[$i]);
+                }
+                null === $renamed ?: rmdir($renamed);
+            }
+        } finally {
+            restore_error_handler();
+        }
+
+        return $ok;
     }
 
     /**
@@ -55,7 +97,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     {
         $failed = $this->doSaveCache($values, $lifetime);
 
-        $fs = $this->getFilesystem();
         // Add Tags as symlinks
         foreach ($addTagData as $tagId => $ids) {
             $tagFolder = $this->getTagFolder($tagId);
@@ -65,12 +106,15 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 }
 
                 $file = $this->getFile($id);
-                $fs->symlink($file, $this->getFile($id, true, $tagFolder));
+
+                if (!@symlink($file, $tagLink = $this->getFile($id, true, $tagFolder)) && !is_link($tagLink)) {
+                    @unlink($file);
+                    $failed[] = $id;
+                }
             }
         }
 
         // Unlink removed Tags
-        $files = [];
         foreach ($removeTagData as $tagId => $ids) {
             $tagFolder = $this->getTagFolder($tagId);
             foreach ($ids as $id) {
@@ -78,10 +122,9 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                     continue;
                 }
 
-                $files[] = $this->getFile($id, false, $tagFolder);
+                @unlink($this->getFile($id, false, $tagFolder));
             }
         }
-        $fs->remove($files);
 
         return $failed;
     }
@@ -89,22 +132,59 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids, array $tagData = []): bool
+    protected function doDeleteYieldTags(array $ids): iterable
     {
-        $ok = $this->doDeleteCache($ids);
+        foreach ($ids as $id) {
+            $file = $this->getFile($id);
+            if (!is_file($file) || !$h = @fopen($file, 'rb')) {
+                continue;
+            }
 
-        // Remove tags
-        $files = [];
-        $fs = $this->getFilesystem();
-        foreach ($tagData as $tagId => $idMap) {
-            $tagFolder = $this->getTagFolder($tagId);
-            foreach ($idMap as $id) {
-                $files[] = $this->getFile($id, false, $tagFolder);
+            if ((\PHP_VERSION_ID >= 70300 || '\\' !== \DIRECTORY_SEPARATOR) && !@unlink($file)) {
+                fclose($h);
+                continue;
+            }
+
+            $meta = explode("\n", fread($h, 4096), 3)[2] ?? '';
+
+            // detect the compact format used in marshall() using magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
+            if (13 < \strlen($meta) && "\x9D" === $meta[0] && "\0" === $meta[5] && "\x5F" === $meta[9]) {
+                $meta[9] = "\0";
+                $tagLen = unpack('Nlen', $meta, 9)['len'];
+                $meta = substr($meta, 13, $tagLen);
+
+                if (0 < $tagLen -= \strlen($meta)) {
+                    $meta .= fread($h, $tagLen);
+                }
+
+                try {
+                    yield $id => '' === $meta ? [] : $this->marshaller->unmarshall($meta);
+                } catch (\Exception $e) {
+                    yield $id => [];
+                }
+            }
+
+            fclose($h);
+
+            if (\PHP_VERSION_ID < 70300 && '\\' === \DIRECTORY_SEPARATOR) {
+                @unlink($file);
             }
         }
-        $fs->remove($files);
+    }
 
-        return $ok;
+    /**
+     * {@inheritdoc}
+     */
+    protected function doDeleteTagRelations(array $tagData): bool
+    {
+        foreach ($tagData as $tagId => $idList) {
+            $tagFolder = $this->getTagFolder($tagId);
+            foreach ($idList as $id) {
+                @unlink($this->getFile($id, false, $tagFolder));
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -113,31 +193,43 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {
-            $tagsFolder = $this->getTagFolder($tagId);
-            if (!file_exists($tagsFolder)) {
+            if (!is_dir($tagFolder = $this->getTagFolder($tagId))) {
                 continue;
             }
 
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($tagsFolder, \FilesystemIterator::SKIP_DOTS)) as $itemLink) {
-                if (!$itemLink->isLink()) {
-                    throw new LogicException('Expected a (sym)link when iterating over tag folder, non link found: '.$itemLink);
+            set_error_handler(static function () {});
+
+            try {
+                if (rename($tagFolder, $renamed = substr_replace($tagFolder, bin2hex(random_bytes(4)), -9))) {
+                    $tagFolder = $renamed.\DIRECTORY_SEPARATOR;
+                } else {
+                    $renamed = null;
                 }
 
-                $valueFile = $itemLink->getRealPath();
-                if ($valueFile && file_exists($valueFile)) {
-                    @unlink($valueFile);
+                foreach ($this->scanHashDir($tagFolder) as $itemLink) {
+                    unlink(realpath($itemLink) ?: $itemLink);
+                    unlink($itemLink);
                 }
 
-                @unlink((string) $itemLink);
+                if (null === $renamed) {
+                    continue;
+                }
+
+                $chars = '+-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+                for ($i = 0; $i < 38; ++$i) {
+                    for ($j = 0; $j < 38; ++$j) {
+                        rmdir($tagFolder.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j]);
+                    }
+                    rmdir($tagFolder.$chars[$i]);
+                }
+                rmdir($renamed);
+            } finally {
+                restore_error_handler();
             }
         }
 
         return true;
-    }
-
-    private function getFilesystem(): Filesystem
-    {
-        return $this->fs ?? $this->fs = new Filesystem();
     }
 
     private function getTagFolder(string $tagId): string

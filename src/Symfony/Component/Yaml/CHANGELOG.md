@@ -1,10 +1,40 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added support for parsing numbers prefixed with `0o` as octal numbers.
+ * Deprecated support for parsing numbers starting with `0` as octal numbers. They will be parsed as strings as of Symfony 6.0. Prefix numbers with `0o`
+   so that they are parsed as octal numbers.
+
+   Before:
+
+   ```yaml
+   Yaml::parse('072');
+   ```
+
+   After:
+
+   ```yaml
+   Yaml::parse('0o72');
+   ```
+
+ * Added `yaml-lint` binary.
+ * Deprecated using the `!php/object` and `!php/const` tags without a value.
+
 5.0.0
 -----
 
  * Removed support for mappings inside multi-line strings.
+ * removed support for implicit STDIN usage in the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.
+
+4.4.0
+-----
+
+ * Added support for parsing the inline notation spanning multiple lines.
+ * Added support to dump `null` as `~` by using the `Yaml::DUMP_NULL_AS_TILDE` flag.
+ * deprecated accepting STDIN implicitly when using the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.
 
 4.3.0
 -----

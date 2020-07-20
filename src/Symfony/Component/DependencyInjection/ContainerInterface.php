@@ -32,10 +32,8 @@ interface ContainerInterface extends PsrContainerInterface
 
     /**
      * Sets a service.
-     *
-     * @param object $service The service instance
      */
-    public function set(string $id, $service);
+    public function set(string $id, ?object $service);
 
     /**
      * Gets a service.
@@ -43,7 +41,7 @@ interface ContainerInterface extends PsrContainerInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined

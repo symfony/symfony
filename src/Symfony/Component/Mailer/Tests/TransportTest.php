@@ -12,345 +12,123 @@
 namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Bridge\Amazon;
-use Symfony\Component\Mailer\Bridge\Google;
-use Symfony\Component\Mailer\Bridge\Mailchimp;
-use Symfony\Component\Mailer\Bridge\Mailgun;
-use Symfony\Component\Mailer\Bridge\Postmark;
-use Symfony\Component\Mailer\Bridge\Sendgrid;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
-use Symfony\Component\Mailer\Exception\LogicException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mime\Email;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
 class TransportTest extends TestCase
 {
-    public function testFromDsnNull()
+    /**
+     * @dataProvider fromStringProvider
+     */
+    public function testFromString(string $dsn, TransportInterface $transport): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://null', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Transport\NullTransport::class, $transport);
-        $p = new \ReflectionProperty(Transport\AbstractTransport::class, 'dispatcher');
-        $p->setAccessible(true);
-        $this->assertSame($dispatcher, $p->getValue($transport));
+        $transportFactory = new Transport([new DummyTransportFactory()]);
+
+        $this->assertEquals($transport, $transportFactory->fromString($dsn));
     }
 
-    public function testFromDsnSendmail()
+    public function fromStringProvider(): iterable
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://sendmail', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Transport\SendmailTransport::class, $transport);
-        $p = new \ReflectionProperty(Transport\AbstractTransport::class, 'dispatcher');
-        $p->setAccessible(true);
-        $this->assertSame($dispatcher, $p->getValue($transport));
+        $transportA = new DummyTransport('a');
+        $transportB = new DummyTransport('b');
+
+        yield 'simple transport' => [
+            'dummy://a',
+            $transportA,
+        ];
+
+        yield 'failover transport' => [
+            'failover(dummy://a dummy://b)',
+            new FailoverTransport([$transportA, $transportB]),
+        ];
+
+        yield 'round robin transport' => [
+            'roundrobin(dummy://a dummy://b)',
+            new RoundRobinTransport([$transportA, $transportB]),
+        ];
+
+        yield 'mixed transport' => [
+            'roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)',
+            new RoundRobinTransport([$transportA, new FailoverTransport([$transportB, $transportA]), $transportB]),
+        ];
     }
 
-    public function testFromDsnSmtp()
+    /**
+     * @dataProvider fromDsnProvider
+     */
+    public function testFromDsn(string $dsn, TransportInterface $transport): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://localhost:44?auth_mode=plain&encryption=tls', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Transport\Smtp\SmtpTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger);
-        $this->assertEquals('localhost', $transport->getStream()->getHost());
-        $this->assertEquals('plain', $transport->getAuthMode());
-        $this->assertTrue($transport->getStream()->isTLS());
-        $this->assertEquals(44, $transport->getStream()->getPort());
+        $this->assertEquals($transport, Transport::fromDsn($dsn));
     }
 
-    public function testFromInvalidDsn()
+    public function fromDsnProvider(): iterable
     {
+        yield 'multiple transports' => [
+            'failover(smtp://a smtp://b)',
+            new FailoverTransport([new Transport\Smtp\EsmtpTransport('a'), new Transport\Smtp\EsmtpTransport('b')]),
+        ];
+    }
+
+    /**
+     * @dataProvider fromWrongStringProvider
+     */
+    public function testFromWrongString(string $dsn, string $error): void
+    {
+        $transportFactory = new Transport([new DummyTransportFactory()]);
+
+        $this->expectExceptionMessage($error);
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "some://" mailer DSN is invalid.');
-        Transport::fromDsn('some://');
+        $transportFactory->fromString($dsn);
     }
 
-    public function testNoScheme()
+    public function fromWrongStringProvider(): iterable
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "//sendmail" mailer DSN must contain a transport scheme.');
-        Transport::fromDsn('//sendmail');
+        yield 'garbage at the end' => ['dummy://a some garbage here', 'The DSN has some garbage at the end: " some garbage here".'];
+
+        yield 'not a valid DSN' => ['something not a dsn', 'The "something" mailer DSN must contain a scheme.'];
+
+        yield 'failover not closed' => ['failover(dummy://a', 'The "(dummy://a" mailer DSN must contain a scheme.'];
+
+        yield 'not a valid keyword' => ['foobar(dummy://a)', 'The "foobar" keyword is not valid (valid ones are "failover", "roundrobin")'];
+    }
+}
+
+class DummyTransport implements Transport\TransportInterface
+{
+    private $host;
+
+    public function __construct(string $host)
+    {
+        $this->host = $host;
     }
 
-    public function testFromInvalidDsnNoHost()
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "file:///some/path" mailer DSN must contain a mailer name.');
-        Transport::fromDsn('file:///some/path');
+        throw new \BadMethodCallException('This method newer should be called.');
     }
 
-    public function testFromInvalidTransportName()
+    public function __toString(): string
     {
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('api://foobar');
+        return sprintf('dummy://local');
+    }
+}
+
+class DummyTransportFactory implements Transport\TransportFactoryInterface
+{
+    public function create(Dsn $dsn): TransportInterface
+    {
+        return new DummyTransport($dsn->getHost());
     }
 
-    public function testFromDsnGmail()
+    public function supports(Dsn $dsn): bool
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@gmail', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Google\Smtp\GmailTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('http://gmail');
-    }
-
-    public function testFromDsnMailgun()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Mailgun\Smtp\MailgunTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, null, $logger);
-        $this->assertEquals('smtp.mailgun.org', $transport->getStream()->getHost());
-
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, null, $logger);
-        $this->assertEquals('smtp.eu.mailgun.org', $transport->getStream()->getHost());
-
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, null, $logger);
-        $this->assertEquals('smtp.mailgun.org', $transport->getStream()->getHost());
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailgun\Http\MailgunTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'domain' => 'pa$s',
-            'client' => $client,
-        ]);
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->any())->method('getStatusCode')->willReturn(200);
-        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->text('Hello you');
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.eu.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailgun\Http\Api\MailgunTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'domain' => 'pa$s',
-            'client' => $client,
-        ]);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.eu.mailgun.net/v3/pa%24s/messages')->willReturn($response);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html('test');
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $stream = fopen('data://text/plain,'.$message->getTextBody(), 'r');
-        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html($stream);
-        $client = $this->createMock(HttpClientInterface::class);
-        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
-        $transport->send($message);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('foo://mailgun');
-    }
-
-    public function testFromDsnPostmark()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').'@postmark', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Postmark\Smtp\PostmarkTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('u$er', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').'@postmark', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Postmark\Http\Api\PostmarkTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'client' => $client,
-        ]);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('http://postmark');
-    }
-
-    public function testFromDsnSendgrid()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').'@sendgrid', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Sendgrid\Smtp\SendgridTransport::class, $transport);
-        $this->assertEquals('apikey', $transport->getUsername());
-        $this->assertEquals('u$er', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').'@sendgrid', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Sendgrid\Http\Api\SendgridTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'client' => $client,
-        ]);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('http://sendgrid');
-    }
-
-    public function testFromDsnAmazonSes()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@ses?region=sun', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Amazon\Smtp\SesTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertContains('.sun.', $transport->getStream()->getHost());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@ses?region=sun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Amazon\Http\SesTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'accessKey' => 'u$er',
-            'secretKey' => 'pa$s',
-            'region' => 'sun',
-            'client' => $client,
-        ]);
-
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@ses?region=sun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Amazon\Http\Api\SesTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'accessKey' => 'u$er',
-            'secretKey' => 'pa$s',
-            'region' => 'sun',
-            'client' => $client,
-        ]);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('foo://ses');
-    }
-
-    public function testFromDsnMailchimp()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mandrill', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Mailchimp\Smtp\MandrillTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
-        $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').'@mandrill', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailchimp\Http\MandrillTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'client' => $client,
-        ]);
-
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').'@mandrill', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailchimp\Http\Api\MandrillTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'client' => $client,
-        ]);
-
-        $this->expectException(LogicException::class);
-        Transport::fromDsn('foo://mandrill');
-    }
-
-    public function testFromDsnFailover()
-    {
-        $user = 'user';
-        $pass = 'pass';
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://example.com || smtp://'.urlencode($user).'@example.com || smtp://'.urlencode($user).':'.urlencode($pass).'@example.com', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Transport\FailoverTransport::class, $transport);
-        $p = new \ReflectionProperty(Transport\RoundRobinTransport::class, 'transports');
-        $p->setAccessible(true);
-        $transports = $p->getValue($transport);
-        $this->assertCount(3, $transports);
-        foreach ($transports as $transport) {
-            $this->assertProperties($transport, $dispatcher, $logger);
-        }
-        $this->assertSame('', $transports[0]->getUsername());
-        $this->assertSame('', $transports[0]->getPassword());
-        $this->assertSame($user, $transports[1]->getUsername());
-        $this->assertSame('', $transports[1]->getPassword());
-        $this->assertSame($user, $transports[2]->getUsername());
-        $this->assertSame($pass, $transports[2]->getPassword());
-    }
-
-    public function testFromDsnRoundRobin()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://null && smtp://null && smtp://null', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Transport\RoundRobinTransport::class, $transport);
-        $p = new \ReflectionProperty(Transport\RoundRobinTransport::class, 'transports');
-        $p->setAccessible(true);
-        $transports = $p->getValue($transport);
-        $this->assertCount(3, $transports);
-        foreach ($transports as $transport) {
-            $this->assertProperties($transport, $dispatcher, $logger);
-        }
-    }
-
-    private function assertProperties(Transport\TransportInterface $transport, EventDispatcherInterface $dispatcher, LoggerInterface $logger, array $props = [])
-    {
-        $p = new \ReflectionProperty(Transport\AbstractTransport::class, 'dispatcher');
-        $p->setAccessible(true);
-        $this->assertSame($dispatcher, $p->getValue($transport));
-
-        $p = new \ReflectionProperty(Transport\AbstractTransport::class, 'logger');
-        $p->setAccessible(true);
-        $this->assertSame($logger, $p->getValue($transport));
-
-        foreach ($props as $prop => $value) {
-            $p = new \ReflectionProperty($transport, $prop);
-            $p->setAccessible(true);
-            $this->assertEquals($value, $p->getValue($transport));
-        }
+        return 'dummy' === $dsn->getScheme();
     }
 }

@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ControllerEvent extends KernelEvent
+final class ControllerEvent extends KernelEvent
 {
     private $controller;
 
@@ -36,17 +36,12 @@ class ControllerEvent extends KernelEvent
         $this->setController($controller);
     }
 
-    /**
-     * Returns the current controller.
-     *
-     * @return callable
-     */
-    public function getController()
+    public function getController(): callable
     {
         return $this->controller;
     }
 
-    public function setController(callable $controller)
+    public function setController(callable $controller): void
     {
         $this->controller = $controller;
     }

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class TerminateEvent extends KernelEvent
+final class TerminateEvent extends KernelEvent
 {
     private $response;
 
@@ -34,12 +34,7 @@ class TerminateEvent extends KernelEvent
         $this->response = $response;
     }
 
-    /**
-     * Returns the response for which this event was thrown.
-     *
-     * @return Response
-     */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }

@@ -28,6 +28,8 @@ class YamlEncoderTest extends TestCase
 
         $this->assertEquals('foo', $encoder->encode('foo', 'yaml'));
         $this->assertEquals('{ foo: 1 }', $encoder->encode(['foo' => 1], 'yaml'));
+        $this->assertEquals('null', $encoder->encode(new \ArrayObject(['foo' => 1]), 'yaml'));
+        $this->assertEquals('{ foo: 1 }', $encoder->encode(new \ArrayObject(['foo' => 1]), 'yaml', ['preserve_empty_objects' => true]));
     }
 
     public function testSupportsEncoding()

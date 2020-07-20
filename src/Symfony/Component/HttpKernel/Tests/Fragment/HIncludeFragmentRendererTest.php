@@ -21,11 +21,9 @@ use Twig\Loader\ArrayLoader;
 
 class HIncludeFragmentRendererTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
+        $this->expectException('LogicException');
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }

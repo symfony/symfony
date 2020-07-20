@@ -12,45 +12,44 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
-use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @final
  */
-class Worker implements WorkerInterface
+class Worker
 {
     private $receivers;
     private $bus;
-    private $retryStrategies;
     private $eventDispatcher;
     private $logger;
     private $shouldStop = false;
 
     /**
-     * @param ReceiverInterface[]      $receivers       Where the key is the transport name
-     * @param RetryStrategyInterface[] $retryStrategies Retry strategies for each receiver (array keys must match)
+     * @param ReceiverInterface[] $receivers Where the key is the transport name
      */
-    public function __construct(array $receivers, MessageBusInterface $bus, array $retryStrategies = [], EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
-        $this->retryStrategies = $retryStrategies;
-        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
+        $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
     }
 
     /**
@@ -59,27 +58,13 @@ class Worker implements WorkerInterface
      * Valid options are:
      *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
      */
-    public function run(array $options = [], callable $onHandledCallback = null): void
+    public function run(array $options = []): void
     {
+        $this->dispatchEvent(new WorkerStartedEvent($this));
+
         $options = array_merge([
             'sleep' => 1000000,
         ], $options);
-
-        if (\function_exists('pcntl_signal')) {
-            pcntl_signal(SIGTERM, function () {
-                $this->stop();
-            });
-        }
-
-        $onHandled = function (?Envelope $envelope) use ($onHandledCallback) {
-            if (\function_exists('pcntl_signal_dispatch')) {
-                pcntl_signal_dispatch();
-            }
-
-            if (null !== $onHandledCallback) {
-                $onHandledCallback($envelope);
-            }
-        };
 
         while (false === $this->shouldStop) {
             $envelopeHandled = false;
@@ -89,8 +74,12 @@ class Worker implements WorkerInterface
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
 
-                    $this->handleMessage($envelope, $receiver, $transportName, $this->retryStrategies[$transportName] ?? null);
-                    $onHandled($envelope);
+                    $this->handleMessage($envelope, $receiver, $transportName);
+                    $this->dispatchEvent(new WorkerRunningEvent($this, false));
+
+                    if ($this->shouldStop) {
+                        break 2;
+                    }
                 }
 
                 // after handling a single receiver, quit and start the loop again
@@ -102,16 +91,16 @@ class Worker implements WorkerInterface
             }
 
             if (false === $envelopeHandled) {
-                $onHandled(null);
+                $this->dispatchEvent(new WorkerRunningEvent($this, true));
 
                 usleep($options['sleep']);
             }
         }
 
-        $this->dispatchEvent(new WorkerStoppedEvent());
+        $this->dispatchEvent(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName, ?RetryStrategyInterface $retryStrategy): void
+    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->dispatchEvent($event);
@@ -120,45 +109,23 @@ class Worker implements WorkerInterface
             return;
         }
 
-        $message = $envelope->getMessage();
-        $context = [
-            'message' => $message,
-            'class' => \get_class($message),
-        ];
-
         try {
-            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName)));
+            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp()));
         } catch (\Throwable $throwable) {
+            $rejectFirst = $throwable instanceof RejectRedeliveredMessageException;
+            if ($rejectFirst) {
+                // redelivered messages are rejected first so that continuous failures in an event listener or while
+                // publishing for retry does not cause infinite redelivery loops
+                $receiver->reject($envelope);
+            }
+
             if ($throwable instanceof HandlerFailedException) {
                 $envelope = $throwable->getEnvelope();
             }
 
-            $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);
+            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable));
 
-            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable, $shouldRetry));
-
-            $retryCount = RedeliveryStamp::getRetryCountFromEnvelope($envelope);
-            if ($shouldRetry) {
-                ++$retryCount;
-                $delay = $retryStrategy->getWaitingTime($envelope);
-                if (null !== $this->logger) {
-                    $this->logger->error('Error thrown while handling message {class}. Dispatching for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
-                }
-
-                // add the delay and retry stamp info + remove ReceivedStamp
-                $retryEnvelope = $envelope->with(new DelayStamp($delay))
-                    ->with(new RedeliveryStamp($retryCount, $transportName))
-                    ->withoutAll(ReceivedStamp::class);
-
-                // re-send the message
-                $this->bus->dispatch($retryEnvelope);
-                // acknowledge the previous message has received
-                $receiver->ack($envelope);
-            } else {
-                if (null !== $this->logger) {
-                    $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
-                }
-
+            if (!$rejectFirst) {
                 $receiver->reject($envelope);
             }
 
@@ -168,6 +135,11 @@ class Worker implements WorkerInterface
         $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $transportName));
 
         if (null !== $this->logger) {
+            $message = $envelope->getMessage();
+            $context = [
+                'message' => $message,
+                'class' => \get_class($message),
+            ];
             $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
         }
 
@@ -179,21 +151,12 @@ class Worker implements WorkerInterface
         $this->shouldStop = true;
     }
 
-    private function dispatchEvent($event)
+    private function dispatchEvent(object $event): void
     {
         if (null === $this->eventDispatcher) {
             return;
         }
 
         $this->eventDispatcher->dispatch($event);
-    }
-
-    private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
-    {
-        if ($e instanceof UnrecoverableExceptionInterface) {
-            return false;
-        }
-
-        return $retryStrategy->isRetryable($envelope);
     }
 }

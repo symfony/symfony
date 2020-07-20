@@ -29,7 +29,7 @@ class DataUriNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DataUriNormalizer();
     }
@@ -111,21 +111,19 @@ class DataUriNormalizerTest extends TestCase
         $this->assertSame(file_get_contents(self::TEST_GIF_DATA), $this->getContent($file->openFile()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The provided "data:" URI is not valid.
-     */
     public function testGiveNotAccessToLocalFiles()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectExceptionMessage('The provided "data:" URI is not valid.');
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
 
     /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @dataProvider invalidUriProvider
      */
     public function testInvalidData($uri)
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $this->normalizer->denormalize($uri, 'SplFileObject');
     }
 

@@ -20,7 +20,7 @@ class ExtraAttributesException extends RuntimeException
 {
     private $extraAttributes;
 
-    public function __construct(array $extraAttributes, \Exception $previous = null)
+    public function __construct(array $extraAttributes, \Throwable $previous = null)
     {
         $msg = sprintf('Extra attributes are not allowed ("%s" are unknown).', implode('", "', $extraAttributes));
 

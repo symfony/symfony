@@ -38,11 +38,9 @@ class PlaintextPasswordEncoderTest extends TestCase
         $this->assertSame('foo', $encoder->encodePassword('foo', ''));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testEncodePasswordLength()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = new PlaintextPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

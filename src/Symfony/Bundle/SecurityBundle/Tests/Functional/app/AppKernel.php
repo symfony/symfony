@@ -25,8 +25,9 @@ class AppKernel extends Kernel
     private $varDir;
     private $testCase;
     private $rootConfig;
+    private $authenticatorManagerEnabled;
 
-    public function __construct($varDir, $testCase, $rootConfig, $environment, $debug)
+    public function __construct($varDir, $testCase, $rootConfig, $environment, $debug, $authenticatorManagerEnabled = false)
     {
         if (!is_dir(__DIR__.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
@@ -39,6 +40,7 @@ class AppKernel extends Kernel
             throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
         }
         $this->rootConfig = $rootConfig;
+        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
 
         parent::__construct($environment, $debug);
     }
@@ -46,12 +48,12 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function getContainerClass()
+    public function getContainerClass(): string
     {
-        return parent::getContainerClass().substr(md5($this->rootConfig), -16);
+        return parent::getContainerClass().substr(md5($this->rootConfig.$this->authenticatorManagerEnabled), -16);
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         if (!is_file($filename = $this->getProjectDir().'/'.$this->testCase.'/bundles.php')) {
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
@@ -60,17 +62,17 @@ class AppKernel extends Kernel
         return include $filename;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->environment;
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/logs';
     }
@@ -78,6 +80,14 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->rootConfig);
+
+        if ($this->authenticatorManagerEnabled) {
+            $loader->load(function ($container) {
+                $container->loadFromExtension('security', [
+                    'enable_authenticator_manager' => true,
+                ]);
+            });
+        }
     }
 
     public function serialize()
@@ -91,7 +101,7 @@ class AppKernel extends Kernel
         $this->__construct($a[0], $a[1], $a[2], $a[3], $a[4]);
     }
 
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
         $parameters['kernel.test_case'] = $this->testCase;

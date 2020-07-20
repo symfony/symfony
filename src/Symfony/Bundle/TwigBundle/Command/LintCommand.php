@@ -42,7 +42,7 @@ EOF
         ;
     }
 
-    protected function findFiles($filename)
+    protected function findFiles(string $filename): iterable
     {
         if (0 === strpos($filename, '@')) {
             $dir = $this->getApplication()->getKernel()->locateResource($filename);

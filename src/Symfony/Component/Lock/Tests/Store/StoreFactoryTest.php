@@ -16,6 +16,8 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
+use Symfony\Component\Lock\Store\MongoDbStore;
+use Symfony\Component\Lock\Store\PdoStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Store\StoreFactory;
@@ -48,14 +50,39 @@ class StoreFactoryTest extends TestCase
         if (class_exists(\Memcached::class)) {
             yield [new \Memcached(), MemcachedStore::class];
         }
+        if (class_exists(\MongoDB\Collection::class)) {
+            yield [$this->createMock(\MongoDB\Collection::class), MongoDbStore::class];
+            yield ['mongodb://localhost/test?collection=lock', MongoDbStore::class];
+        }
         if (class_exists(\Zookeeper::class)) {
             yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
+            yield ['zookeeper://localhost:2181', ZookeeperStore::class];
         }
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];
         }
         if (class_exists(\Memcached::class) && class_exists(AbstractAdapter::class)) {
             yield ['memcached://server.com', MemcachedStore::class];
+        }
+        if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
+            yield ['redis://localhost', RedisStore::class];
+        }
+        if (class_exists(\PDO::class)) {
+            yield ['sqlite:/tmp/sqlite.db', PdoStore::class];
+            yield ['sqlite::memory:', PdoStore::class];
+            yield ['mysql:host=localhost;dbname=test;', PdoStore::class];
+            yield ['pgsql:host=localhost;dbname=test;', PdoStore::class];
+            yield ['oci:host=localhost;dbname=test;', PdoStore::class];
+            yield ['sqlsrv:server=localhost;Database=test', PdoStore::class];
+            yield ['mysql://server.com/test', PdoStore::class];
+            yield ['mysql2://server.com/test', PdoStore::class];
+            yield ['pgsql://server.com/test', PdoStore::class];
+            yield ['postgres://server.com/test', PdoStore::class];
+            yield ['postgresql://server.com/test', PdoStore::class];
+            yield ['sqlite:///tmp/test', PdoStore::class];
+            yield ['sqlite3:///tmp/test', PdoStore::class];
+            yield ['oci:///server.com/test', PdoStore::class];
+            yield ['mssql:///server.com/test', PdoStore::class];
         }
 
         yield ['flock', FlockStore::class];

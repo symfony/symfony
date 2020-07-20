@@ -23,9 +23,7 @@ interface ViolationMapperInterface
      * Maps a constraint violation to a form in the form tree under
      * the given form.
      *
-     * @param ConstraintViolation $violation            The violation to map
-     * @param FormInterface       $form                 The root form of the tree to map it to
-     * @param bool                $allowNonSynchronized Whether to allow mapping to non-synchronized forms
+     * @param bool $allowNonSynchronized Whether to allow mapping to non-synchronized forms
      */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false);
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false);
 }

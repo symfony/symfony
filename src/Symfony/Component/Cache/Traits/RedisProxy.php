@@ -28,7 +28,7 @@ class RedisProxy
         $this->initializer = $initializer;
     }
 
-    public function __call($method, array $args)
+    public function __call(string $method, array $args)
     {
         $this->ready ?: $this->ready = $this->initializer->__invoke($this->redis);
 

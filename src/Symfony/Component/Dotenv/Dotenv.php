@@ -35,15 +35,47 @@ final class Dotenv
     private $data;
     private $end;
     private $values;
-    private $usePutenv = true;
+    private $envKey;
+    private $debugKey;
+    private $prodEnvs = ['prod'];
+    private $usePutenv = false;
 
     /**
-     * @var bool If `putenv()` should be used to define environment variables or not.
-     *           Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     * @param string $envKey
      */
-    public function __construct(bool $usePutenv = false)
+    public function __construct($envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
+    {
+        if (\in_array($envKey = (string) $envKey, ['1', ''], true)) {
+            trigger_deprecation('symfony/dotenv', '5.1', 'Passing a boolean to the constructor of "%s" is deprecated, use "Dotenv::usePutenv()".', __CLASS__);
+            $this->usePutenv = (bool) $envKey;
+            $envKey = 'APP_ENV';
+        }
+
+        $this->envKey = $envKey;
+        $this->debugKey = $debugKey;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setProdEnvs(array $prodEnvs): self
+    {
+        $this->prodEnvs = $prodEnvs;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
+     *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *
+     * @return $this
+     */
+    public function usePutenv($usePutenv = true): self
     {
         $this->usePutenv = $usePutenv;
+
+        return $this;
     }
 
     /**
@@ -66,42 +98,70 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string $path       A file to load
-     * @param string $varName    The name of the env vars that defines the app env
-     * @param string $defaultEnv The app env to use when none is defined
-     * @param array  $testEnvs   A list of app envs for which .env.local should be ignored
+     * @param string $path        A file to load
+     * @param string $envKey|null The name of the env vars that defines the app env
+     * @param string $defaultEnv  The app env to use when none is defined
+     * @param array  $testEnvs    A list of app envs for which .env.local should be ignored
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = ['test']): void
+    public function loadEnv(string $path, string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
     {
-        if (file_exists($path) || !file_exists($p = "$path.dist")) {
+        $k = $envKey ?? $this->envKey;
+
+        if (is_file($path) || !is_file($p = "$path.dist")) {
             $this->load($path);
         } else {
             $this->load($p);
         }
 
-        if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
-            $this->populate([$varName => $env = $defaultEnv]);
+        if (null === $env = $_SERVER[$k] ?? $_ENV[$k] ?? null) {
+            $this->populate([$k => $env = $defaultEnv]);
         }
 
-        if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
+        if (!\in_array($env, $testEnvs, true) && is_file($p = "$path.local")) {
             $this->load($p);
-            $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
+            $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
         }
 
         if ('local' === $env) {
             return;
         }
 
-        if (file_exists($p = "$path.$env")) {
+        if (is_file($p = "$path.$env")) {
             $this->load($p);
         }
 
-        if (file_exists($p = "$path.$env.local")) {
+        if (is_file($p = "$path.$env.local")) {
             $this->load($p);
         }
+    }
+
+    /**
+     * Loads env vars from .env.local.php if the file exists or from the other .env files otherwise.
+     *
+     * This method also configures the APP_DEBUG env var according to the current APP_ENV.
+     *
+     * See method loadEnv() for rules related to .env files.
+     */
+    public function bootEnv(string $path, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
+    {
+        $p = $path.'.local.php';
+        $env = is_file($p) ? include $p : null;
+        $k = $this->envKey;
+
+        if (\is_array($env) && (!isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+            $this->populate($env);
+        } else {
+            $this->loadEnv($path, $k, $defaultEnv, $testEnvs);
+        }
+
+        $_SERVER += $_ENV;
+
+        $k = $this->debugKey;
+        $debug = $_SERVER[$k] ?? !\in_array($_SERVER[$this->envKey], $this->prodEnvs, true);
+        $_SERVER[$k] = $_ENV[$k] = (int) $debug || (!\is_bool($debug) && filter_var($debug, FILTER_VALIDATE_BOOLEAN)) ? '1' : '0';
     }
 
     /**
@@ -252,32 +312,30 @@ final class Dotenv
             throw $this->createFormatException('Whitespace are not supported before the value');
         }
 
+        $loadedVars = array_flip(explode(',', isset($_SERVER['SYMFONY_DOTENV_VARS']) ? $_SERVER['SYMFONY_DOTENV_VARS'] : (isset($_ENV['SYMFONY_DOTENV_VARS']) ? $_ENV['SYMFONY_DOTENV_VARS'] : '')));
+        unset($loadedVars['']);
         $v = '';
 
         do {
             if ("'" === $this->data[$this->cursor]) {
-                $value = '';
-                ++$this->cursor;
+                $len = 0;
 
-                while ("\n" !== $this->data[$this->cursor]) {
-                    if ("'" === $this->data[$this->cursor]) {
-                        break;
-                    }
-                    $value .= $this->data[$this->cursor];
-                    ++$this->cursor;
+                do {
+                    if ($this->cursor + ++$len === $this->end) {
+                        $this->cursor += $len;
 
-                    if ($this->cursor === $this->end) {
                         throw $this->createFormatException('Missing quote to end the value');
                     }
-                }
-                if ("\n" === $this->data[$this->cursor]) {
-                    throw $this->createFormatException('Missing quote to end the value');
-                }
-                ++$this->cursor;
-                $v .= $value;
+                } while ("'" !== $this->data[$this->cursor + $len]);
+
+                $v .= substr($this->data, 1 + $this->cursor, $len - 1);
+                $this->cursor += 1 + $len;
             } elseif ('"' === $this->data[$this->cursor]) {
                 $value = '';
-                ++$this->cursor;
+
+                if (++$this->cursor === $this->end) {
+                    throw $this->createFormatException('Missing quote to end the value');
+                }
 
                 while ('"' !== $this->data[$this->cursor] || ('\\' === $this->data[$this->cursor - 1] && '\\' !== $this->data[$this->cursor - 2])) {
                     $value .= $this->data[$this->cursor];
@@ -290,8 +348,8 @@ final class Dotenv
                 ++$this->cursor;
                 $value = str_replace(['\\"', '\r', '\n'], ['"', "\r", "\n"], $value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue);
-                $resolvedValue = $this->resolveCommands($resolvedValue);
+                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+                $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
                 $v .= $resolvedValue;
             } else {
@@ -313,8 +371,8 @@ final class Dotenv
                 }
                 $value = rtrim($value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue);
-                $resolvedValue = $this->resolveCommands($resolvedValue);
+                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+                $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
 
                 if ($resolvedValue === $value && preg_match('/\s+/', $value)) {
@@ -367,7 +425,7 @@ final class Dotenv
         }
     }
 
-    private function resolveCommands($value)
+    private function resolveCommands(string $value, array $loadedVars): string
     {
         if (false === strpos($value, '$')) {
             return $value;
@@ -383,7 +441,7 @@ final class Dotenv
             )
         /x';
 
-        return preg_replace_callback($regex, function ($matches) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars) {
             if ('\\' === $matches[1]) {
                 return substr($matches[0], 1);
             }
@@ -397,8 +455,20 @@ final class Dotenv
             }
 
             $process = method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
-            $process->inheritEnvironmentVariables(true);
-            $process->setEnv($this->values);
+
+            if (!method_exists(Process::class, 'fromShellCommandline')) {
+                // Symfony 3.4 does not inherit env vars by default:
+                $process->inheritEnvironmentVariables();
+            }
+
+            $env = [];
+            foreach ($this->values as $name => $value) {
+                if (isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')))) {
+                    $env[$name] = $value;
+                }
+            }
+            $process->setEnv($env);
+
             try {
                 $process->mustRun();
             } catch (ProcessException $e) {
@@ -409,7 +479,7 @@ final class Dotenv
         }, $value);
     }
 
-    private function resolveVariables($value)
+    private function resolveVariables(string $value, array $loadedVars): string
     {
         if (false === strpos($value, '$')) {
             return $value;
@@ -422,10 +492,11 @@ final class Dotenv
             (?!\()                             # no opening parenthesis
             (?P<opening_brace>\{)?             # optional brace
             (?P<name>'.self::VARNAME_REGEX.')? # var name
+            (?P<default_value>:[-=][^\}]++)?   # optional default value
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
-        $value = preg_replace_callback($regex, function ($matches) {
+        $value = preg_replace_callback($regex, function ($matches) use ($loadedVars) {
             // odd number of backslashes means the $ character is escaped
             if (1 === \strlen($matches['backslashes']) % 2) {
                 return substr($matches[0], 1);
@@ -441,14 +512,29 @@ final class Dotenv
             }
 
             $name = $matches['name'];
-            if (isset($this->values[$name])) {
+            if (isset($loadedVars[$name]) && isset($this->values[$name])) {
                 $value = $this->values[$name];
-            } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
-                $value = $_SERVER[$name];
             } elseif (isset($_ENV[$name])) {
                 $value = $_ENV[$name];
+            } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
+                $value = $_SERVER[$name];
+            } elseif (isset($this->values[$name])) {
+                $value = $this->values[$name];
             } else {
                 $value = (string) getenv($name);
+            }
+
+            if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
+                $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
+                if (false !== $unsupportedChars) {
+                    throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
+                }
+
+                $value = substr($matches['default_value'], 2);
+
+                if ('=' === $matches['default_value'][1]) {
+                    $this->values[$name] = $value;
+                }
             }
 
             if (!$matches['opening_brace'] && isset($matches['closing_brace'])) {
@@ -461,13 +547,13 @@ final class Dotenv
         return $value;
     }
 
-    private function moveCursor($text)
+    private function moveCursor(string $text)
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 
-    private function createFormatException($message): FormatException
+    private function createFormatException(string $message): FormatException
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }

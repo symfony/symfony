@@ -49,7 +49,7 @@ class Query extends AbstractQuery
                 continue;
             }
             if (!ldap_free_result($result)) {
-                throw new LdapException(sprintf('Could not free results: %s.', ldap_error($con)));
+                throw new LdapException('Could not free results: '.ldap_error($con));
             }
         }
         $this->results = null;
@@ -123,7 +123,7 @@ class Query extends AbstractQuery
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
                 }
 
                 $this->results[] = $search;
@@ -153,7 +153,7 @@ class Query extends AbstractQuery
      *
      * @internal
      */
-    public function getResource($idx = 0)
+    public function getResource(int $idx = 0)
     {
         if (null === $this->results || $idx >= \count($this->results)) {
             return null;
@@ -169,7 +169,7 @@ class Query extends AbstractQuery
      *
      * @internal
      */
-    public function getResources()
+    public function getResources(): array
     {
         return $this->results;
     }

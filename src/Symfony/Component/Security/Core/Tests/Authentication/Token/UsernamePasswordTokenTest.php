@@ -27,11 +27,9 @@ class UsernamePasswordTokenTest extends TestCase
         $this->assertEquals('key', $token->getProviderKey());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetAuthenticatedToTrue()
     {
+        $this->expectException('LogicException');
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(true);
     }

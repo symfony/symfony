@@ -21,7 +21,7 @@ class ChainLoaderTest extends TestCase
     protected $loader1;
     protected $loader2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
         $this->loader1 = new FilesystemLoader($fixturesPath.'/null/%name%');

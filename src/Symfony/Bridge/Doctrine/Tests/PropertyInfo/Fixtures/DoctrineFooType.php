@@ -28,7 +28,7 @@ class DoctrineFooType extends Type
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -36,7 +36,7 @@ class DoctrineFooType extends Type
     /**
      * {@inheritdoc}
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return $platform->getClobTypeDeclarationSQL([]);
     }
@@ -47,10 +47,10 @@ class DoctrineFooType extends Type
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (null === $value) {
-            return;
+            return null;
         }
         if (!$value instanceof Foo) {
-            throw new ConversionException(sprintf('Expected %s, got %s', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', \gettype($value)));
+            throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', get_debug_type($value)));
         }
 
         return $foo->bar;
@@ -62,7 +62,7 @@ class DoctrineFooType extends Type
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         if (null === $value) {
-            return;
+            return null;
         }
         if (!\is_string($value)) {
             throw ConversionException::conversionFailed($value, self::NAME);
@@ -77,7 +77,7 @@ class DoctrineFooType extends Type
     /**
      * {@inheritdoc}
      */
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
     }

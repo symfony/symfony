@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Mime;
 
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\NamedAddress;
 use Twig\Environment;
 
 /**
@@ -33,9 +32,7 @@ final class WrappedTemplatedEmail
 
     public function toName(): string
     {
-        $to = $this->message->getTo()[0];
-
-        return $to instanceof NamedAddress ? $to->getName() : '';
+        return $this->message->getTo()[0]->getName();
     }
 
     public function image(string $image, string $contentType = null): string
@@ -63,7 +60,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setSubject(string $subject): object
+    public function setSubject(string $subject): self
     {
         $this->message->subject($subject);
 
@@ -78,7 +75,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setReturnPath(string $address): object
+    public function setReturnPath(string $address): self
     {
         $this->message->returnPath($address);
 
@@ -93,15 +90,15 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addFrom(string $address, string $name = null): object
+    public function addFrom(string $address, string $name = ''): self
     {
-        $this->message->addFrom($name ? new NamedAddress($address, $name) : new Address($address));
+        $this->message->addFrom(new Address($address, $name));
 
         return $this;
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getFrom(): array
     {
@@ -111,7 +108,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addReplyTo(string $address): object
+    public function addReplyTo(string $address): self
     {
         $this->message->addReplyTo($address);
 
@@ -129,15 +126,15 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addTo(string $address, string $name = null): object
+    public function addTo(string $address, string $name = ''): self
     {
-        $this->message->addTo($name ? new NamedAddress($address, $name) : new Address($address));
+        $this->message->addTo(new Address($address, $name));
 
         return $this;
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getTo(): array
     {
@@ -147,15 +144,15 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addCc(string $address, string $name = null): object
+    public function addCc(string $address, string $name = ''): self
     {
-        $this->message->addCc($name ? new NamedAddress($address, $name) : new Address($address));
+        $this->message->addCc(new Address($address, $name));
 
         return $this;
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getCc(): array
     {
@@ -165,15 +162,15 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addBcc(string $address, string $name = null): object
+    public function addBcc(string $address, string $name = ''): self
     {
-        $this->message->addBcc($name ? new NamedAddress($address, $name) : new Address($address));
+        $this->message->addBcc(new Address($address, $name));
 
         return $this;
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getBcc(): array
     {
@@ -183,7 +180,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setPriority(int $priority): object
+    public function setPriority(int $priority): self
     {
         $this->message->setPriority($priority);
 

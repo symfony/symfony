@@ -11,11 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-/**
- * Ideas borrowed from Laravel Dusk's assertions.
- *
- * @see https://laravel.com/docs/5.7/dusk#available-assertions
- */
 trait WebTestAssertionsTrait
 {
     use BrowserKitAssertionsTrait;

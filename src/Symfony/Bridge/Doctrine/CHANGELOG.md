@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * the `getMetadataDriverClass()` method is abstract and must be implemented by class extending `AbstractDoctrineExtension`
  * passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field, throws an exception; pass `null` instead
  * not explicitly passing an instance of `IdReader` to `DoctrineChoiceLoader` when it can optimize single id field, will not apply any optimization
  * `DoctrineExtractor` now requires an `EntityManagerInterface` on instantiation
@@ -11,8 +12,11 @@ CHANGELOG
 4.4.0
 -----
 
- * added `DoctrineClearEntityManagerMiddleware`
-
+ * [BC BREAK] using null as `$classValidatorRegexp` value in `DoctrineLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
+ * added `DoctrineClearEntityManagerWorkerSubscriber`
+ * deprecated `RegistryInterface`, use `Doctrine\Persistence\ManagerRegistry`
+ * added support for invokable event listeners
+ * added `getMetadataDriverClass` method to deprecate class parameters in service configuration files
 
 4.3.0
 -----

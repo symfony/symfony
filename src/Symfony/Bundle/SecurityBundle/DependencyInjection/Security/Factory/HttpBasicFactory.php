@@ -20,10 +20,12 @@ use Symfony\Component\DependencyInjection\Reference;
  * HttpBasicFactory creates services for HTTP basic authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
-class HttpBasicFactory implements SecurityFactoryInterface
+class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, EntryPointFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -34,7 +36,10 @@ class HttpBasicFactory implements SecurityFactoryInterface
         ;
 
         // entry point
-        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+        $entryPointId = $defaultEntryPoint;
+        if (null === $entryPointId) {
+            $entryPointId = $this->registerEntryPoint($container, $id, $config);
+        }
 
         // listener
         $listenerId = 'security.authentication.listener.basic.'.$id;
@@ -44,6 +49,17 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
 
         return [$provider, $listenerId, $entryPointId];
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    {
+        $authenticatorId = 'security.authenticator.http_basic.'.$firewallName;
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.http_basic'))
+            ->replaceArgument(0, $config['realm'])
+            ->replaceArgument(1, new Reference($userProviderId));
+
+        return $authenticatorId;
     }
 
     public function getPosition()
@@ -66,12 +82,8 @@ class HttpBasicFactory implements SecurityFactoryInterface
         ;
     }
 
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
-        if (null !== $defaultEntryPoint) {
-            return $defaultEntryPoint;
-        }
-
         $entryPointId = 'security.authentication.basic_entry_point.'.$id;
         $container
             ->setDefinition($entryPointId, new ChildDefinition('security.authentication.basic_entry_point'))

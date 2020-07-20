@@ -21,7 +21,7 @@ class ConsensusStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function isMet($numberOfSuccess, $numberOfItems)
+    public function isMet(int $numberOfSuccess, int $numberOfItems)
     {
         return $numberOfSuccess > ($numberOfItems / 2);
     }
@@ -29,7 +29,7 @@ class ConsensusStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function canBeMet($numberOfFailure, $numberOfItems)
+    public function canBeMet(int $numberOfFailure, int $numberOfItems)
     {
         return $numberOfFailure < ($numberOfItems / 2);
     }

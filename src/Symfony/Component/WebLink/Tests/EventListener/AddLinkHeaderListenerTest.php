@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\WebLink\Tests\EventListener;
 
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -33,10 +34,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $subscriber = new AddLinkHeaderListener();
 
-        $event = $this->getMockBuilder(ResponseEvent::class)->disableOriginalConstructor()->getMock();
-        $event->method('isMasterRequest')->willReturn(true);
-        $event->method('getRequest')->willReturn($request);
-        $event->method('getResponse')->willReturn($response);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST, $response);
 
         $subscriber->onKernelResponse($event);
 
@@ -47,7 +45,7 @@ class AddLinkHeaderListenerTest extends TestCase
             '</foo>; rel="preload"',
         ];
 
-        $this->assertEquals($expected, $response->headers->get('Link', null, false));
+        $this->assertEquals($expected, $response->headers->all()['link']);
     }
 
     public function testSubscribedEvents()

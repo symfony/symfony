@@ -152,9 +152,11 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);
+
+        return 0;
     }
 
-    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, $shortClassName)
+    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName): string
     {
         $classes = [];
         sort($this->namespaces);
@@ -189,13 +191,13 @@ EOF
             return $classes[0];
         }
         if (!$input->isInteractive()) {
-            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s", $shortClassName, implode("\n    ", $classes)));
+            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
         }
 
         return $io->choice(sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
     }
 
-    private function getCoreTypes()
+    private function getCoreTypes(): array
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
@@ -223,7 +225,7 @@ EOF
         return $typesWithDeprecatedOptions;
     }
 
-    private function findAlternatives($name, array $collection)
+    private function findAlternatives(string $name, array $collection): array
     {
         $alternatives = [];
         foreach ($collection as $item) {

@@ -21,16 +21,12 @@ interface NameConverterInterface
     /**
      * Converts a property name to its normalized value.
      *
-     * @param string $propertyName
-     *
      * @return string
      */
     public function normalize(string $propertyName);
 
     /**
      * Converts a property name to its denormalized value.
-     *
-     * @param string $propertyName
      *
      * @return string
      */

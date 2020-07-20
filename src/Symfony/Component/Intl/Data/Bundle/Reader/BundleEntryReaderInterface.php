@@ -38,7 +38,6 @@ interface BundleEntryReaderInterface extends BundleReaderInterface
      *     $reader->readEntry('...', 'en', ['TopLevel', 'NestedLevel', 'Entry']);
      *
      * @param string   $path     The path to the resource bundle
-     * @param string   $locale   The locale to read
      * @param string[] $indices  The indices to read from the bundle
      * @param bool     $fallback Whether to merge the value with the value from
      *                           the fallback locale (e.g. "en" for "en_GB").
@@ -51,5 +50,5 @@ interface BundleEntryReaderInterface extends BundleReaderInterface
      *
      * @throws MissingResourceException If the indices cannot be accessed
      */
-    public function readEntry($path, $locale, array $indices, $fallback = true);
+    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true);
 }

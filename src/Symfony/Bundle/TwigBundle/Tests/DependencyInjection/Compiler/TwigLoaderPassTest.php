@@ -31,7 +31,7 @@ class TwigLoaderPassTest extends TestCase
      */
     private $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ContainerBuilder();
         $this->builder->register('twig');
@@ -87,11 +87,9 @@ class TwigLoaderPassTest extends TestCase
         $this->assertEquals('test_loader_1', (string) $calls[1][1][0]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     */
     public function testMapperPassWithZeroTaggedLoaders()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
         $this->pass->process($this->builder);
     }
 }

@@ -21,21 +21,17 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
  */
 class ExpressionFunctionTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage PHP function "fn_does_not_exist" does not exist.
-     */
     public function testFunctionDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('PHP function "fn_does_not_exist" does not exist.');
         ExpressionFunction::fromPhp('fn_does_not_exist');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is namespaced.
-     */
     public function testFunctionNamespaced()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is namespaced.');
         ExpressionFunction::fromPhp('Symfony\Component\ExpressionLanguage\Tests\fn_namespaced');
     }
 }

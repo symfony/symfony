@@ -225,7 +225,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function __toString()
     {
-        $class = \get_class($this);
+        $class = static::class;
         $class = substr($class, strrpos($class, '\\') + 1);
 
         $roles = [];
@@ -252,7 +252,7 @@ abstract class AbstractToken implements TokenInterface
         $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
-    private function hasUserChanged(UserInterface $user)
+    private function hasUserChanged(UserInterface $user): bool
     {
         if (!($this->user instanceof UserInterface)) {
             throw new \BadMethodCallException('Method "hasUserChanged" should be called when current user class is instance of "UserInterface".');
@@ -267,6 +267,16 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user->getSalt() !== $user->getSalt()) {
+            return true;
+        }
+
+        $userRoles = array_map('strval', (array) $user->getRoles());
+
+        if ($this instanceof SwitchUserToken) {
+            $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
+        }
+
+        if (\count($userRoles) !== \count($this->getRoleNames()) || \count($userRoles) !== \count(array_intersect($userRoles, $this->getRoleNames()))) {
             return true;
         }
 

@@ -69,7 +69,7 @@ class DataTest extends TestCase
 
         $children = $data->getValue();
 
-        $this->assertInternalType('array', $children);
+        $this->assertIsArray($children);
 
         $this->assertInstanceOf(Data::class, $children[0]);
         $this->assertInstanceOf(Data::class, $children[1]);

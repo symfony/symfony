@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 
@@ -39,22 +39,22 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         parent::testGetTextAttribute();
     }
 
-    protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null)
+    protected function getNumberFormatter(?string $locale = 'en', string $style = null, string $pattern = null): \NumberFormatter
     {
         return new \NumberFormatter($locale, $style, $pattern);
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return intl_get_error_message();
     }
 
-    protected function getIntlErrorCode()
+    protected function getIntlErrorCode(): int
     {
         return intl_get_error_code();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return intl_is_failure($errorCode);
     }

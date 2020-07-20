@@ -24,7 +24,7 @@ class TransSubscriberService implements ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return ['translator' => TranslatorInterface::class];
     }

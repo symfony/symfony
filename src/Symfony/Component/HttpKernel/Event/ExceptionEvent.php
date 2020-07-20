@@ -21,69 +21,55 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * current request. The propagation of this event is stopped as soon as a
  * response is set.
  *
- * You can also call setException() to replace the thrown exception. This
+ * You can also call setThrowable() to replace the thrown exception. This
  * exception will be thrown if no response is set during processing of this
  * event.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ExceptionEvent extends RequestEvent
+final class ExceptionEvent extends RequestEvent
 {
-    /**
-     * The exception object.
-     *
-     * @var \Exception
-     */
-    private $exception;
+    private $throwable;
 
     /**
      * @var bool
      */
     private $allowCustomResponseCode = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Exception $e)
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Throwable $e)
     {
         parent::__construct($kernel, $request, $requestType);
 
-        $this->setException($e);
+        $this->setThrowable($e);
     }
 
-    /**
-     * Returns the thrown exception.
-     *
-     * @return \Exception The thrown exception
-     */
-    public function getException()
+    public function getThrowable(): \Throwable
     {
-        return $this->exception;
+        return $this->throwable;
     }
 
     /**
      * Replaces the thrown exception.
      *
      * This exception will be thrown if no response is set in the event.
-     *
-     * @param \Exception $exception The thrown exception
      */
-    public function setException(\Exception $exception)
+    public function setThrowable(\Throwable $exception): void
     {
-        $this->exception = $exception;
+        $this->throwable = $exception;
     }
 
     /**
      * Mark the event as allowing a custom response code.
      */
-    public function allowCustomResponseCode()
+    public function allowCustomResponseCode(): void
     {
         $this->allowCustomResponseCode = true;
     }
 
     /**
      * Returns true if the event allows a custom response code.
-     *
-     * @return bool
      */
-    public function isAllowingCustomResponseCode()
+    public function isAllowingCustomResponseCode(): bool
     {
         return $this->allowCustomResponseCode;
     }

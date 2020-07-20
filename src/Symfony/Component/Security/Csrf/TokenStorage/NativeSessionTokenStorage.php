@@ -88,7 +88,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         }
 
         if (!isset($_SESSION[$this->namespace][$tokenId])) {
-            return;
+            return null;
         }
 
         $token = (string) $_SESSION[$this->namespace][$tokenId];

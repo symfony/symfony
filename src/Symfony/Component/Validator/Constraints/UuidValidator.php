@@ -68,7 +68,7 @@ class UuidValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Uuid) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Uuid');
+            throw new UnexpectedTypeException($constraint, Uuid::class);
         }
 
         if (null === $value || '' === $value) {
@@ -94,7 +94,7 @@ class UuidValidator extends ConstraintValidator
         $this->validateLoose($value, $constraint);
     }
 
-    private function validateLoose($value, Uuid $constraint)
+    private function validateLoose(string $value, Uuid $constraint)
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -165,7 +165,7 @@ class UuidValidator extends ConstraintValidator
         }
     }
 
-    private function validateStrict($value, Uuid $constraint)
+    private function validateStrict(string $value, Uuid $constraint)
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS

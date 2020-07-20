@@ -39,7 +39,7 @@ class DockBlockFallback
     /**
      * @return int
      */
-    public function getProtAcc()
+    public function getProtAcc(): int
     {
         return $this->protAcc;
     }

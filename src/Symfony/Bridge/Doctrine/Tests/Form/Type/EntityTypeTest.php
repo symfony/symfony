@@ -12,10 +12,11 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -53,13 +54,20 @@ class EntityTypeTest extends BaseTypeTest
     private $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var MockObject|ManagerRegistry
      */
     private $emRegistry;
 
-    protected static $supportedFeatureSetVersion = 304;
+    protected static $supportedFeatureSetVersion = 404;
 
-    protected function setUp()
+    public static function setUpBeforeClass(): void
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+    }
+
+    protected function setUp(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
@@ -89,7 +97,7 @@ class EntityTypeTest extends BaseTypeTest
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -115,19 +123,15 @@ class EntityTypeTest extends BaseTypeTest
         // be managed!
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     */
     public function testClassOptionIsRequired()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
         $this->factory->createNamed('name', static::TESTED_TYPE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
-     */
     public function testInvalidClassOption()
     {
+        $this->expectException('Symfony\Component\Form\Exception\RuntimeException');
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => 'foo',
         ]);
@@ -187,23 +191,19 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals([1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')], $view->vars['choices']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -848,7 +848,7 @@ class EntityTypeTest extends BaseTypeTest
         ]);
 
         $this->assertEquals([3 => new ChoiceView($entity3, '3', 'Baz'), 2 => new ChoiceView($entity2, '2', 'Bar')], $field->createView()->vars['preferred_choices']);
-        $this->assertEquals([1 => new ChoiceView($entity1, '1', 'Foo')], $field->createView()->vars['choices']);
+        $this->assertEquals([1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar'), 3 => new ChoiceView($entity3, '3', 'Baz')], $field->createView()->vars['choices']);
     }
 
     public function testOverrideChoicesWithPreferredChoices()
@@ -868,7 +868,7 @@ class EntityTypeTest extends BaseTypeTest
         ]);
 
         $this->assertEquals([3 => new ChoiceView($entity3, '3', 'Baz')], $field->createView()->vars['preferred_choices']);
-        $this->assertEquals([2 => new ChoiceView($entity2, '2', 'Bar')], $field->createView()->vars['choices']);
+        $this->assertEquals([2 => new ChoiceView($entity2, '2', 'Bar'), 3 => new ChoiceView($entity3, '3', 'Baz')], $field->createView()->vars['choices']);
     }
 
     public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier()
@@ -951,6 +951,56 @@ class EntityTypeTest extends BaseTypeTest
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
                 ->where('e.id IN (1, 2)'),
+            'choice_label' => 'name',
+        ]);
+
+        $field->submit('3');
+
+        $this->assertFalse($field->isSynchronized());
+        $this->assertNull($field->getData());
+    }
+
+    public function testSingleIdentifierWithLimit()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist([$entity1, $entity2, $entity3]);
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2, 3)')
+                ->setMaxResults(1),
+            'choice_label' => 'name',
+        ]);
+
+        $field->submit('1');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertSame($entity1, $field->getData());
+    }
+
+    public function testDisallowChoicesThatAreNotIncludedByQueryBuilderSingleIdentifierWithLimit()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist([$entity1, $entity2, $entity3]);
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2, 3)')
+                ->setMaxResults(1),
             'choice_label' => 'name',
         ]);
 
@@ -1162,13 +1212,13 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     public function testLoaderCachingWithParameters()
@@ -1222,18 +1272,18 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
@@ -1635,7 +1685,7 @@ class EntityTypeTest extends BaseTypeTest
         ]);
         $form->setData($emptyArray);
         $form->submit(null);
-        $this->assertInternalType('array', $form->getData());
+        $this->assertIsArray($form->getData());
         $this->assertEquals([], $form->getData());
         $this->assertEquals([], $form->getNormData());
         $this->assertSame([], $form->getViewData(), 'View data is always an array');
@@ -1653,7 +1703,7 @@ class EntityTypeTest extends BaseTypeTest
         $existing = [0 => $entity1];
         $form->setData($existing);
         $form->submit(null);
-        $this->assertInternalType('array', $form->getData());
+        $this->assertIsArray($form->getData());
         $this->assertEquals([], $form->getData());
         $this->assertEquals([], $form->getNormData());
         $this->assertSame([], $form->getViewData(), 'View data is always an array');

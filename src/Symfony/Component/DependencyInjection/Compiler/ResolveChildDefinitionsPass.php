@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -52,11 +53,9 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     /**
      * Resolves the definition.
      *
-     * @return Definition
-     *
      * @throws RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ChildDefinition $definition)
+    private function resolveDefinition(ChildDefinition $definition): Definition
     {
         try {
             return $this->doResolveDefinition($definition);
@@ -71,7 +70,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         }
     }
 
-    private function doResolveDefinition(ChildDefinition $definition)
+    private function doResolveDefinition(ChildDefinition $definition): Definition
     {
         if (!$this->container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
@@ -103,7 +102,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
         if ($parentDef->isDeprecated()) {
-            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
+            $deprecation = $parentDef->getDeprecation('%service_id%');
+            $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
@@ -132,13 +132,18 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         } else {
-            $def->setPrivate($definition->isPrivate() || $parentDef->isPrivate());
+            $def->setPublic($parentDef->isPublic());
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
         if (isset($changes['deprecated'])) {
-            $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
+            if ($definition->isDeprecated()) {
+                $deprecation = $definition->getDeprecation('%service_id%');
+                $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
+            } else {
+                $def->setDeprecated(false);
+            }
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());
@@ -151,7 +156,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             if (null === $decoratedService) {
                 $def->setDecoratedService($decoratedService);
             } else {
-                $def->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2]);
+                $def->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2], $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
             }
         }
 

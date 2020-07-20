@@ -35,5 +35,5 @@ interface UserPasswordEncoderInterface
     /**
      * Checks if an encoded password would benefit from rehashing.
      */
-    public function needsRehash(UserInterface $user, string $encoded): bool;
+    public function needsRehash(UserInterface $user): bool;
 }

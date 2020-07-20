@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
@@ -30,11 +31,11 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      */
     private $em;
 
-    protected static $supportedFeatureSetVersion = 304;
+    protected static $supportedFeatureSetVersion = 404;
 
     protected function getExtensions()
     {
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $manager = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 
         $manager->expects($this->any())
             ->method('getManager')
@@ -50,7 +51,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
         ];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
 

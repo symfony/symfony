@@ -12,8 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -22,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AppKernel extends Kernel
+class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {
     private $varDir;
     private $testCase;
@@ -45,7 +48,7 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         if (!file_exists($filename = $this->getProjectDir().'/'.$this->testCase.'/bundles.php')) {
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
@@ -54,17 +57,17 @@ class AppKernel extends Kernel
         return include $filename;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/cache/'.$this->environment;
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/logs';
     }
@@ -79,7 +82,7 @@ class AppKernel extends Kernel
         $container->register('logger', NullLogger::class);
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }
@@ -89,11 +92,39 @@ class AppKernel extends Kernel
         $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug);
     }
 
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
         $parameters['kernel.test_case'] = $this->testCase;
 
         return $parameters;
+    }
+
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder('foo');
+        $rootNode = $treeBuilder->getRootNode();
+        $rootNode->children()->scalarNode('foo')->defaultValue('bar')->end()->end();
+
+        return $treeBuilder;
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+    }
+
+    public function getNamespace()
+    {
+        return '';
+    }
+
+    public function getXsdValidationBasePath()
+    {
+        return false;
+    }
+
+    public function getAlias()
+    {
+        return 'foo';
     }
 }

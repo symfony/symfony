@@ -21,6 +21,9 @@
         <env name="MEMCACHED_HOST" value="localhost" />
         <env name="MONGODB_HOST" value="localhost" />
         <env name="ZOOKEEPER_HOST" value="localhost" />
+        <env name="COUCHBASE_HOST" value="localhost" />
+        <env name="COUCHBASE_USER" value="Administrator" />
+        <env name="COUCHBASE_PASS" value="111111" />
     </php>
 
     <testsuites>
@@ -75,6 +78,7 @@
                             <element key="5"><string>Symfony\Component\Cache\Traits</string></element>
                             <element key="6"><string>Symfony\Component\Console</string></element>
                             <element key="7"><string>Symfony\Component\HttpFoundation</string></element>
+                            <element key="8"><string>Symfony\Component\Uid</string></element>
                         </array>
                     </element>
                 </array>

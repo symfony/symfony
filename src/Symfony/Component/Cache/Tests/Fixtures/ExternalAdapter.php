@@ -29,47 +29,47 @@ class ExternalAdapter implements CacheItemPoolInterface
         $this->cache = new ArrayAdapter($defaultLifetime);
     }
 
-    public function getItem($key)
+    public function getItem($key): CacheItemInterface
     {
         return $this->cache->getItem($key);
     }
 
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         return $this->cache->getItems($keys);
     }
 
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         return $this->cache->hasItem($key);
     }
 
-    public function clear()
+    public function clear(): bool
     {
         return $this->cache->clear();
     }
 
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         return $this->cache->deleteItem($key);
     }
 
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         return $this->cache->deleteItems($keys);
     }
 
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         return $this->cache->save($item);
     }
 
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         return $this->cache->saveDeferred($item);
     }
 
-    public function commit()
+    public function commit(): bool
     {
         return $this->cache->commit();
     }

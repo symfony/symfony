@@ -26,8 +26,12 @@ use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationListenerTest extends TestCase
@@ -58,7 +62,7 @@ class ValidationListenerTest extends TestCase
 
     private $params;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
@@ -136,12 +140,12 @@ class ValidationListenerTest extends TestCase
 
 class SubmittedNotSynchronizedForm extends Form
 {
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return true;
     }
 
-    public function isSynchronized()
+    public function isSynchronized(): bool
     {
         return false;
     }
@@ -156,32 +160,32 @@ class DummyValidator implements ValidatorInterface
         $this->violation = $violation;
     }
 
-    public function getMetadataFor($value)
+    public function getMetadataFor($value): MetadataInterface
     {
     }
 
-    public function hasMetadataFor($value)
+    public function hasMetadataFor($value): bool
     {
     }
 
-    public function validate($value, $constraints = null, $groups = null)
+    public function validate($value, $constraints = null, $groups = null): ConstraintViolationListInterface
     {
-        return [$this->violation];
+        return new ConstraintViolationList([$this->violation]);
     }
 
-    public function validateProperty($object, $propertyName, $groups = null)
-    {
-    }
-
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null)
+    public function validateProperty($object, $propertyName, $groups = null): ConstraintViolationListInterface
     {
     }
 
-    public function startContext()
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null): ConstraintViolationListInterface
     {
     }
 
-    public function inContext(ExecutionContextInterface $context)
+    public function startContext(): ContextualValidatorInterface
+    {
+    }
+
+    public function inContext(ExecutionContextInterface $context): ContextualValidatorInterface
     {
     }
 }

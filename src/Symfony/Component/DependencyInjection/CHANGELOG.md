@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `param()` and `abstract_arg()` in the PHP-DSL
+ * deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+
+5.1.0
+-----
+
+ * deprecated `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * allow decorators to reference their decorated service using the special `.inner` id
+ * added support to autowire public typed properties in php 7.4
+ * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
+ * added possibility to define abstract service arguments
+ * allowed mixing "parent" and instanceof-conditionals/defaults/bindings
+ * updated the signature of method `Definition::setDeprecated()` to `Definition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `Alias::setDeprecated()` to `Alias::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `DeprecateTrait::deprecate()` to `DeprecateTrait::deprecation(string $package, string $version, string $message)`
+ * deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
+   configure them explicitly instead
+ * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
+ * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
+ * allowed loading and dumping tags with an attribute named "name"
+ * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * deprecated PHP-DSL's `inline()` function, use `service()` instead
+ * added support of PHP8 static return type for withers
+ * added `AliasDeprecatedPublicServicesPass` to deprecate public services to private
+
 5.0.0
 -----
 
@@ -16,9 +45,18 @@ CHANGELOG
 4.4.0
 -----
 
+ * added `CheckTypeDeclarationsPass` to check injected parameters type during compilation
+ * added support for opcache.preload by generating a preloading script in the cache folder
+ * added support for dumping the container in one file instead of many files
  * deprecated support for short factories and short configurators in Yaml
- * deprecated `tagged` in favor of `tagged_iterator`
+ * added `tagged_iterator` alias for `tagged` which might be deprecated in a future version
  * deprecated passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition`
+ * added support for binding iterable and tagged services
+ * made singly-implemented interfaces detection be scoped by file
+ * added ability to define a static priority method for tagged service
+ * added support for improved syntax to define method calls in Yaml
+ * made the `%env(base64:...)%` processor able to decode base64url
+ * added ability to choose behavior of decorations on non existent decorated services
 
 4.3.0
 -----

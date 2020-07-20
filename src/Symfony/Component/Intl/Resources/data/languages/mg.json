@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.4",
     "Names": {
         "ak": "Akan",
         "am": "Amharika",
@@ -46,5 +45,6 @@
         "yo": "Yôrobà",
         "zh": "Sinoa, Mandarin",
         "zu": "Zolò"
-    }
+    },
+    "LocalizedNames": []
 }

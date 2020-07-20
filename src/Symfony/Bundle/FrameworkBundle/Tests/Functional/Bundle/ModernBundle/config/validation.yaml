@@ -1,0 +1,5 @@
+Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ModernBundle\src\Entity\ModernPerson:
+    properties:
+        age:
+            - GreaterThan:
+                  value: 18

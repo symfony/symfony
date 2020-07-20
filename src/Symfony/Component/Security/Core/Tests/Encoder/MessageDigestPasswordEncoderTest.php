@@ -35,20 +35,16 @@ class MessageDigestPasswordEncoderTest extends TestCase
         $this->assertSame(hash('sha256', hash('sha256', 'password', true).'password'), $encoder->encodePassword('password', ''));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testEncodePasswordAlgorithmDoesNotExist()
     {
+        $this->expectException('LogicException');
         $encoder = new MessageDigestPasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testEncodePasswordLength()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = new MessageDigestPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

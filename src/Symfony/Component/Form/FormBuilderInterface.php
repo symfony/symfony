@@ -23,53 +23,44 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * If you add a nested group, this group should also be represented in the
      * object hierarchy.
      *
-     * @param string|int|FormBuilderInterface $child
-     * @param string|null                     $type
-     * @param array                           $options
+     * @param string|FormBuilderInterface $child
      *
      * @return self
      */
-    public function add($child, $type = null, array $options = []);
+    public function add($child, string $type = null, array $options = []);
 
     /**
      * Creates a form builder.
      *
-     * @param string      $name    The name of the form or the name of the property
-     * @param string|null $type    The type of the form or null if name is a property
-     * @param array       $options The options
+     * @param string      $name The name of the form or the name of the property
+     * @param string|null $type The type of the form or null if name is a property
      *
      * @return self
      */
-    public function create($name, $type = null, array $options = []);
+    public function create(string $name, string $type = null, array $options = []);
 
     /**
      * Returns a child by name.
-     *
-     * @param string $name The name of the child
      *
      * @return self
      *
      * @throws Exception\InvalidArgumentException if the given child does not exist
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Removes the field with the given name.
      *
-     * @param string $name
-     *
      * @return self
      */
-    public function remove($name);
+    public function remove(string $name);
 
     /**
      * Returns whether a field with the given name exists.
      *
-     * @param string $name
-     *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name);
 
     /**
      * Returns the children.

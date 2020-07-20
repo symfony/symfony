@@ -37,13 +37,13 @@ class SessionTest extends TestCase
      */
     protected $session;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage = new MockArraySessionStorage();
         $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->storage = null;
         $this->session = null;
@@ -281,7 +281,7 @@ class SessionTest extends TestCase
         $bag->setName('foo');
 
         $storage = new MockArraySessionStorage();
-        $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex));
+        $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex, null));
 
         $this->assertSame($bag, (new Session($storage))->getBag('foo'));
     }

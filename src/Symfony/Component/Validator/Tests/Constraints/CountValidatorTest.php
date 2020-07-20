@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\CountValidator;
+use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -34,11 +35,9 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsCountableType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 
@@ -203,5 +202,24 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->assertEquals(5, $constraint->min);
         $this->assertEquals(5, $constraint->max);
         $this->assertEquals('message', $constraint->exactMessage);
+    }
+
+    // Since the contextual validator is mocked, this test only asserts that it
+    // is called with the right DivisibleBy constraint.
+    public function testDivisibleBy()
+    {
+        $constraint = new Count([
+            'divisibleBy' => 123,
+            'divisibleByMessage' => 'foo {{ compared_value }}',
+        ]);
+
+        $this->expectValidateValue(0, 3, [new DivisibleBy([
+            'value' => 123,
+            'message' => 'foo {{ compared_value }}',
+        ])], $this->group);
+
+        $this->validator->validate(['foo', 'bar', 'ccc'], $constraint);
+
+        $this->assertNoViolation();
     }
 }

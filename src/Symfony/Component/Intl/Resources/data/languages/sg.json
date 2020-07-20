@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.82",
     "Names": {
         "ak": "Akâan",
         "am": "Amarîki",
@@ -46,5 +45,6 @@
         "yo": "Yoruba",
         "zh": "Shinuäa",
         "zu": "Zûlu"
-    }
+    },
+    "LocalizedNames": []
 }

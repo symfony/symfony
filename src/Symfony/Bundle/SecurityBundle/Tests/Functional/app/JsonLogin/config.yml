@@ -1,5 +1,8 @@
 imports:
-    - { resource: ./../config/default.yml }
+    - { resource: ./../config/framework.yml }
+
+framework:
+    serializer: ~
 
 security:
     encoders:
@@ -14,7 +17,6 @@ security:
     firewalls:
         main:
             pattern: ^/
-            anonymous: true
             json_login:
                check_path:    /chk
                username_path: user.login

@@ -24,7 +24,7 @@ class Ticket5775Object
     {
     }
 
-    public function __set($property, $value)
+    public function __set(string $property, $value)
     {
         $this->$property = $value;
     }

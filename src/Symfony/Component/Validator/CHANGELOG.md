@@ -1,6 +1,44 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * deprecated the `allowEmptyString` option of the `Length` constraint
+
+   Before:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Length(min=5, allowEmptyString=true)
+    */
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\AtLeastOneOf({
+    *     @Assert\Blank(),
+    *     @Assert\Length(min=5)
+    * })
+    */
+   ```
+
+5.1.0
+-----
+
+ * added the `Hostname` constraint and validator
+ * added the `alpha3` option to the `Country` and `Language` constraints
+ * allow to define a reusable set of constraints by extending the `Compound` constraint
+ * added `Sequentially` constraint, to sequentially validate a set of constraints (any violation raised will prevent further validation of the nested constraints)
+ * added the `divisibleBy` option to the `Count` constraint
+ * added the `ExpressionLanguageSyntax` constraint
+
 5.0.0
 -----
 
@@ -15,18 +53,35 @@ CHANGELOG
  * removed `ValidatorBuilderInterface`
  * passing a null message when instantiating a `ConstraintViolation` is not allowed
  * changed the default value of `Length::$allowEmptyString` to `false` and made it optional
+ * removed `Symfony\Component\Validator\Mapping\Cache\CacheInterface` in favor of PSR-6.
+ * removed `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
 
 4.4.0
 -----
 
+ * [BC BREAK] using null as `$classValidatorRegexp` value in `PropertyInfoLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
+ * added `EnableAutoMapping` and `DisableAutoMapping` constraints to enable or disable auto mapping for class or a property
  * using anything else than a `string` as the code of a `ConstraintViolation` is deprecated, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
    method in 5.0
  * deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. Pass it as the first argument instead.
- * added the `compared_value_path` parameter in violations when using any 
+ * added the `compared_value_path` parameter in violations when using any
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`
  * added a new `allowEmptyString` option to the `Length` constraint to allow rejecting empty strings when `min` is set, by setting it to `false`.
+ * Added new `minPropertyPath` and `maxPropertyPath` options
+   to `Range` constraint in order to get the value to compare
+   from an array or object
+ * added the `min_limit_path` and `max_limit_path` parameters in violations when using
+   `Range` constraint with respectively the `minPropertyPath` and
+   `maxPropertyPath` options
+ * added a new `notInRangeMessage` option to the `Range` constraint that will
+   be used in the violation builder when both `min` and `max` are not null
+ * added ability to use stringable objects as violation messages
+ * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
+ * deprecated `Symfony\Component\Validator\Mapping\Cache\CacheInterface` in favor of PSR-6.
+ * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
+ * Marked the `ValidatorDataCollector` class as `@final`.
 
 4.3.0
 -----

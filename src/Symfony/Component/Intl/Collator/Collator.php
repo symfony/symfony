@@ -33,7 +33,7 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @internal
  */
-class Collator
+abstract class Collator
 {
     /* Attribute constants */
     const FRENCH_COLLATION = 0;
@@ -70,7 +70,7 @@ class Collator
     const SORT_STRING = 1;
 
     /**
-     * @param string $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
+     * @param string|null $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      */
@@ -84,15 +84,15 @@ class Collator
     /**
      * Static constructor.
      *
-     * @param string $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
+     * @param string|null $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      *
-     * @return self
+     * @return static
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      */
-    public static function create($locale)
+    public static function create(?string $locale)
     {
-        return new self($locale);
+        return new static($locale);
     }
 
     /**
@@ -106,12 +106,12 @@ class Collator
      *
      * @return bool True on success or false on failure
      */
-    public function asort(&$array, $sortFlag = self::SORT_REGULAR)
+    public function asort(array &$array, int $sortFlag = self::SORT_REGULAR)
     {
         $intlToPlainFlagMap = [
-            self::SORT_REGULAR => \SORT_REGULAR,
-            self::SORT_NUMERIC => \SORT_NUMERIC,
-            self::SORT_STRING => \SORT_STRING,
+            self::SORT_REGULAR => SORT_REGULAR,
+            self::SORT_NUMERIC => SORT_NUMERIC,
+            self::SORT_STRING => SORT_STRING,
         ];
 
         $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;
@@ -130,11 +130,11 @@ class Collator
      *                  0 if $str1 is equal than $str2
      *                  -1 if $str1 is less than $str2
      *
-     * @see http://www.php.net/manual/en/collator.compare.php
+     * @see https://php.net/collator.compare
      *
      * @throws MethodNotImplementedException
      */
-    public function compare($str1, $str2)
+    public function compare(string $str1, string $str2)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -146,11 +146,11 @@ class Collator
      *
      * @return bool|int The attribute value on success or false on error
      *
-     * @see http://www.php.net/manual/en/collator.getattribute.php
+     * @see https://php.net/collator.getattribute
      *
      * @throws MethodNotImplementedException
      */
-    public function getAttribute($attr)
+    public function getAttribute(int $attr)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -183,7 +183,7 @@ class Collator
      * @return string The locale used to create the collator. Currently always
      *                returns "en".
      */
-    public function getLocale($type = Locale::ACTUAL_LOCALE)
+    public function getLocale(int $type = Locale::ACTUAL_LOCALE)
     {
         return 'en';
     }
@@ -195,11 +195,11 @@ class Collator
      *
      * @return string The collation key for $string
      *
-     * @see http://www.php.net/manual/en/collator.getsortkey.php
+     * @see https://php.net/collator.getsortkey
      *
      * @throws MethodNotImplementedException
      */
-    public function getSortKey($string)
+    public function getSortKey(string $string)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -209,7 +209,7 @@ class Collator
      *
      * @return bool|int The current collator's strength or false on failure
      *
-     * @see http://www.php.net/manual/en/collator.getstrength.php
+     * @see https://php.net/collator.getstrength
      *
      * @throws MethodNotImplementedException
      */
@@ -226,11 +226,11 @@ class Collator
      *
      * @return bool True on success or false on failure
      *
-     * @see http://www.php.net/manual/en/collator.setattribute.php
+     * @see https://php.net/collator.setattribute
      *
      * @throws MethodNotImplementedException
      */
-    public function setAttribute($attr, $val)
+    public function setAttribute(int $attr, int $val)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -248,11 +248,11 @@ class Collator
      *
      * @return bool True on success or false on failure
      *
-     * @see http://www.php.net/manual/en/collator.setstrength.php
+     * @see https://php.net/collator.setstrength
      *
      * @throws MethodNotImplementedException
      */
-    public function setStrength($strength)
+    public function setStrength(int $strength)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -264,11 +264,11 @@ class Collator
      *
      * @return bool True on success or false on failure
      *
-     * @see http://www.php.net/manual/en/collator.sortwithsortkeys.php
+     * @see https://php.net/collator.sortwithsortkeys
      *
      * @throws MethodNotImplementedException
      */
-    public function sortWithSortKeys(&$arr)
+    public function sortWithSortKeys(array &$arr)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -284,11 +284,11 @@ class Collator
      *
      * @return bool True on success or false on failure
      *
-     * @see http://www.php.net/manual/en/collator.sort.php
+     * @see https://php.net/collator.sort
      *
      * @throws MethodNotImplementedException
      */
-    public function sort(&$arr, $sortFlag = self::SORT_REGULAR)
+    public function sort(array &$arr, int $sortFlag = self::SORT_REGULAR)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

@@ -17,18 +17,23 @@ use Symfony\Component\Lock\Store\RedisStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension redis
+ * @group integration
  */
 class RedisStoreTest extends AbstractRedisStoreTest
 {
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
-            $e = error_get_last();
-            self::markTestSkipped($e['message']);
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 
-    protected function getRedisConnection()
+    /**
+     * @return \Redis
+     */
+    protected function getRedisConnection(): object
     {
         $redis = new \Redis();
         $redis->connect(getenv('REDIS_HOST'));
@@ -36,11 +41,9 @@ class RedisStoreTest extends AbstractRedisStoreTest
         return $redis;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
-     */
     public function testInvalidTtl()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
         new RedisStore($this->getRedisConnection(), -1);
     }
 }

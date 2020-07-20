@@ -1,0 +1,14 @@
+main:
+    path: /
+    defaults:
+        _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+        path: /app
+profile:
+    path: /profile
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AuthenticationController::profileAction
+
+manual_login:
+    path: /manual_login
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AuthenticationController::manualLoginAction

@@ -151,28 +151,22 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testInvalidConstraint()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
         $this->validator->validate(null, new Luhn());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testInvalidValue()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
         $this->validator->validate([], new NotCompromisedPassword());
     }
 
-    /**
-     * @expectedException \Symfony\Contracts\HttpClient\Exception\ExceptionInterface
-     * @expectedExceptionMessage Problem contacting the Have I been Pwned API.
-     */
     public function testApiError()
     {
+        $this->expectException('Symfony\Contracts\HttpClient\Exception\ExceptionInterface');
+        $this->expectExceptionMessage('Problem contacting the Have I been Pwned API.');
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 

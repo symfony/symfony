@@ -11,11 +11,17 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
+    use ExpectDeprecationTrait;
+
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = [
@@ -60,7 +66,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -73,28 +79,24 @@ class ChoiceTypeTest extends BaseTypeTest
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->objectChoices = null;
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => new \stdClass(),
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_loader' => new \stdClass(),
         ]);
@@ -1731,7 +1733,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $this->assertEquals([
             0 => new ChoiceView('a', 'a', 'A'),
+            1 => new ChoiceView('b', 'b', 'B'),
             2 => new ChoiceView('c', 'c', 'C'),
+            3 => new ChoiceView('d', 'd', 'D'),
         ], $view->vars['choices']);
         $this->assertEquals([
             1 => new ChoiceView('b', 'b', 'B'),
@@ -1750,9 +1754,11 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals([
             'Symfony' => new ChoiceGroupView('Symfony', [
                 0 => new ChoiceView('a', 'a', 'Bernhard'),
+                1 => new ChoiceView('b', 'b', 'Fabien'),
                 2 => new ChoiceView('c', 'c', 'Kris'),
             ]),
             'Doctrine' => new ChoiceGroupView('Doctrine', [
+                3 => new ChoiceView('d', 'd', 'Jon'),
                 4 => new ChoiceView('e', 'e', 'Roman'),
             ]),
         ], $view->vars['choices']);
@@ -1997,6 +2003,24 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
+    public function testSubFormTranslationDomain()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'label' => 'label',
+            'translation_domain' => 'label_translation_domain',
+            'choices' => [
+                'choice1' => true,
+                'choice2' => false,
+            ],
+            'choice_translation_domain' => 'choice_translation_domain',
+            'expanded' => true,
+        ])->createView();
+
+        $this->assertCount(2, $form->children);
+        $this->assertSame('choice_translation_domain', $form->children[0]->vars['translation_domain']);
+        $this->assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
+    }
+
     /**
      * @dataProvider provideTrimCases
      */
@@ -2048,5 +2072,108 @@ class ChoiceTypeTest extends BaseTypeTest
             'Simple expanded' => [false, true],
             'Multiple expanded' => [true, true],
         ];
+    }
+
+    /**
+     * @dataProvider expandedIsEmptyWhenNoRealChoiceIsSelectedProvider
+     */
+    public function testExpandedIsEmptyWhenNoRealChoiceIsSelected($expected, $submittedData, $multiple, $required, $placeholder)
+    {
+        $options = [
+            'expanded' => true,
+            'choices' => [
+                'foo' => 'bar',
+            ],
+            'multiple' => $multiple,
+            'required' => $required,
+        ];
+
+        if (!$multiple) {
+            $options['placeholder'] = $placeholder;
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, $options);
+
+        $form->submit($submittedData);
+
+        $this->assertSame($expected, $form->isEmpty());
+    }
+
+    public function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
+    {
+        // Some invalid cases are voluntarily not tested:
+        //   - multiple with placeholder
+        //   - required with placeholder
+        return [
+            'Nothing submitted / single / not required / without a placeholder -> should be empty' => [true, null, false, false, null],
+            'Nothing submitted / single / not required / with a placeholder -> should not be empty' => [false, null, false, false, 'ccc'], // It falls back on the placeholder
+            'Nothing submitted / single / required / without a placeholder -> should be empty' => [true, null, false, true, null],
+            'Nothing submitted / single / required / with a placeholder -> should be empty' => [true, null, false, true, 'ccc'],
+            'Nothing submitted / multiple / not required / without a placeholder -> should be empty' => [true, null, true, false, null],
+            'Nothing submitted / multiple / required / without a placeholder -> should be empty' => [true, null, true, true, null],
+            'Placeholder submitted / single / not required / with a placeholder -> should not be empty' => [false, '', false, false, 'ccc'], // The placeholder is a selected value
+        ];
+    }
+
+    public function testFilteredChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredGroupedChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->groupedChoices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ])], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredChoiceLoader()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testUsingDeprecatedChoiceListFactory()
+    {
+        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
+        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromLoader()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
+        $this->expectDeprecation('Since symfony/form 5.1: Not defining a third parameter "callable|null $filter" in "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" is deprecated.');
+
+        new ChoiceType(new DeprecatedChoiceListFactory());
     }
 }

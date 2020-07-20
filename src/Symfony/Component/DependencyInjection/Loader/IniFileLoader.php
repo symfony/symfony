@@ -49,7 +49,7 @@ class IniFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string  $type = null)
+    public function supports($resource, string $type = null)
     {
         if (!\is_string($resource)) {
             return false;
@@ -66,8 +66,10 @@ class IniFileLoader extends FileLoader
      * Note that the following features are not supported:
      *  * strings with escaped quotes are not supported "foo\"bar";
      *  * string concatenation ("foo" "bar").
+     *
+     * @return mixed
      */
-    private function phpize($value)
+    private function phpize(string $value)
     {
         // trim on the right as comments removal keep whitespaces
         if ($value !== $v = rtrim($value)) {

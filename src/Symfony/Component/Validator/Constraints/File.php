@@ -71,7 +71,7 @@ class File extends Constraint
         }
     }
 
-    public function __set($option, $value)
+    public function __set(string $option, $value)
     {
         if ('maxSize' === $option) {
             $this->normalizeBinaryFormat($value);
@@ -82,7 +82,7 @@ class File extends Constraint
         parent::__set($option, $value);
     }
 
-    public function __get($option)
+    public function __get(string $option)
     {
         if ('maxSize' === $option) {
             return $this->maxSize;
@@ -91,7 +91,7 @@ class File extends Constraint
         return parent::__get($option);
     }
 
-    public function __isset($option)
+    public function __isset(string $option)
     {
         if ('maxSize' === $option) {
             return true;
@@ -105,8 +105,10 @@ class File extends Constraint
         $factors = [
             'k' => 1000,
             'ki' => 1 << 10,
-            'm' => 1000000,
+            'm' => 1000 * 1000,
             'mi' => 1 << 20,
+            'g' => 1000 * 1000 * 1000,
+            'gi' => 1 << 30,
         ];
         if (ctype_digit((string) $maxSize)) {
             $this->maxSize = (int) $maxSize;
@@ -115,7 +117,7 @@ class File extends Constraint
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
             $this->binaryFormat = null === $this->binaryFormat ? 2 === \strlen($unit) : $this->binaryFormat;
         } else {
-            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
+            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $this->maxSize));
         }
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-@trigger_error('deprecated', E_USER_DEPRECATED);
+trigger_deprecation('', '', 'deprecated');
 
 class DeprecatedClass
 {

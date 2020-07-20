@@ -24,8 +24,9 @@ class DisallowRobotsIndexingListenerTest extends TestCase
     /**
      * @dataProvider provideResponses
      */
-    public function testInvoke(?string $expected, Response $response): void
+    public function testInvoke(?string $expected, array $responseArgs)
     {
+        $response = new Response(...$responseArgs);
         $listener = new DisallowRobotsIndexingListener();
 
         $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $this->createMock(Request::class), KernelInterface::MASTER_REQUEST, $response);
@@ -37,11 +38,11 @@ class DisallowRobotsIndexingListenerTest extends TestCase
 
     public function provideResponses(): iterable
     {
-        yield 'No header' => ['noindex', new Response()];
+        yield 'No header' => ['noindex', []];
 
         yield 'Header already set' => [
             'something else',
-            new Response('', 204, ['X-Robots-Tag' => 'something else']),
+            ['', 204, ['X-Robots-Tag' => 'something else']],
         ];
     }
 }

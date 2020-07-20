@@ -106,19 +106,15 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads the YAML class descriptions from the given file.
      *
-     * @param string $path The path of the YAML file
-     *
-     * @return array The class descriptions
-     *
      * @throws \InvalidArgumentException If the file could not be loaded or did
      *                                   not contain a YAML array
      */
-    private function parseFile($path)
+    private function parseFile(string $path): array
     {
         try {
             $classes = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: ', $path).$e->getMessage(), 0, $e);
         }
 
         // empty file

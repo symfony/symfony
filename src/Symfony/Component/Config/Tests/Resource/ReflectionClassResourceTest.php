@@ -64,8 +64,12 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature($changeExpected, $changedLine, $changedCode)
+    public function testHashedSignature($changeExpected, $changedLine, $changedCode, $setContext = null)
     {
+        if ($setContext) {
+            $setContext();
+        }
+
         $code = <<<'EOPHP'
 /* 0*/
 /* 1*/  class %s extends ErrorException
@@ -83,7 +87,9 @@ class ReflectionClassResourceTest extends TestCase
 /*13*/      protected function prot($a = []) {}
 /*14*/
 /*15*/      private function priv() {}
-/*16*/  }
+/*16*/
+/*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
+/*18*/  }
 EOPHP;
 
         static $expectedSignature, $generateSignature;
@@ -98,7 +104,9 @@ EOPHP;
         }
 
         $code = explode("\n", $code);
-        $code[$changedLine] = $changedCode;
+        if (null !== $changedCode) {
+            $code[$changedLine] = $changedCode;
+        }
         eval(sprintf(implode("\n", $code), $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
@@ -134,6 +142,18 @@ EOPHP;
         yield [1, 13, 'protected function prot($a = [123]) {}'];
         yield [0, 14, '/** priv docblock */'];
         yield [0, 15, ''];
+
+        if (\PHP_VERSION_ID >= 70400) {
+            // PHP7.4 typed properties without default value are
+            // undefined, make sure this doesn't throw an error
+            yield [1, 5, 'public array $pub;'];
+            yield [0, 7, 'protected int $prot;'];
+            yield [0, 9, 'private string $priv;'];
+        }
+
+        yield [1, 17, 'public function ccc($bar = 187) {}'];
+        yield [1, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
+        yield [1, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
     public function testEventSubscriber()
@@ -177,6 +197,15 @@ EOPHP;
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
         $this->assertTrue($res->isFresh(0));
     }
+
+    public function testIgnoresObjectsInSignature()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceWithStaticProperty::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestServiceWithStaticProperty::$initializedObject = new TestServiceWithStaticProperty();
+        $this->assertTrue($res->isFresh(0));
+    }
 }
 
 interface DummyInterface
@@ -187,7 +216,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 {
     public static $subscribedEvents = [];
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return self::$subscribedEvents;
     }
@@ -211,8 +240,13 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 {
     public static $subscribedServices = [];
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return self::$subscribedServices;
     }
+}
+
+class TestServiceWithStaticProperty
+{
+    public static $initializedObject;
 }

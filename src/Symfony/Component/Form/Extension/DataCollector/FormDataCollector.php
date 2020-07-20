@@ -70,7 +70,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     public function __construct(FormDataExtractorInterface $dataExtractor)
     {
         if (!class_exists(ClassStub::class)) {
-            throw new \LogicException(sprintf('The VarDumper component is needed for using the %s class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
+            throw new \LogicException(sprintf('The VarDumper component is needed for using the "%s" class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
         }
 
         $this->dataExtractor = $dataExtractor;
@@ -81,7 +81,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * Does nothing. The data is collected during the form event listeners.
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
     }
 
@@ -131,7 +131,8 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         $hash = spl_object_hash($form);
 
         if (!isset($this->dataByForm[$hash])) {
-            $this->dataByForm[$hash] = [];
+            // field was created by form event
+            $this->collectConfiguration($form);
         }
 
         $this->dataByForm[$hash] = array_replace(
@@ -226,7 +227,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getData(): array
+    public function getData()
     {
         return $this->data;
     }
@@ -234,7 +235,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         foreach ($this->data['forms_by_hash'] as &$form) {
             if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {

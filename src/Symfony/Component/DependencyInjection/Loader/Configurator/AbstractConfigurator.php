@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -22,16 +23,21 @@ abstract class AbstractConfigurator
 {
     const FACTORY = 'unknown';
 
+    /**
+     * @var callable(mixed $value, bool $allowService)|null
+     */
+    public static $valuePreProcessor;
+
     /** @internal */
     protected $definition;
 
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
         if (method_exists($this, 'set'.$method)) {
             return $this->{'set'.$method}(...$args);
         }
 
-        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', \get_class($this), $method));
+        throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
 
     /**
@@ -49,7 +55,11 @@ abstract class AbstractConfigurator
                 $value[$k] = static::processValue($v, $allowServices);
             }
 
-            return $value;
+            return self::$valuePreProcessor ? (self::$valuePreProcessor)($value, $allowServices) : $value;
+        }
+
+        if (self::$valuePreProcessor) {
+            $value = (self::$valuePreProcessor)($value, $allowServices);
         }
 
         if ($value instanceof ReferenceConfigurator) {
@@ -76,12 +86,13 @@ abstract class AbstractConfigurator
             case $value instanceof Definition:
             case $value instanceof Expression:
             case $value instanceof Parameter:
+            case $value instanceof AbstractArgument:
             case $value instanceof Reference:
                 if ($allowServices) {
                     return $value;
                 }
         }
 
-        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', \is_object($value) ? \get_class($value) : \gettype($value)));
+        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
     }
 }

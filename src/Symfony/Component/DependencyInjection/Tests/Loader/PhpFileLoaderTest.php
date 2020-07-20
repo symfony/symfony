@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -79,29 +82,69 @@ class PhpFileLoaderTest extends TestCase
         yield ['lazy_fqcn'];
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.
-     */
-    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    public function testAutoConfigureAndChildDefinition()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator());
         $loader->load($fixtures.'/config/services_autoconfigure_with_parent.php');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[ref('factory'), 'method']" instead.
-     */
     public function testFactoryShortNotationNotAllowed()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'factory\'), \'method\']" instead.');
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator());
         $loader->load($fixtures.'/config/factory_short_notation.php');
         $container->compile();
+    }
+
+    public function testStack()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'));
+        $loader->load('stack.php');
+
+        $container->compile();
+
+        $expected = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'C',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $container->get('stack_a'));
+        $this->assertEquals($expected, $container->get('stack_b'));
+
+        $expected = (object) [
+            'label' => 'Z',
+            'inner' => $expected,
+        ];
+        $this->assertEquals($expected, $container->get('stack_c'));
+
+        $expected = $expected->inner;
+        $expected->label = 'Z';
+        $this->assertEquals($expected, $container->get('stack_d'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
     }
 }

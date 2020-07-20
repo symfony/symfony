@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+/**
+ * @group integration
+ */
 class RedisArrayAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setupBeforeClass();
         if (!class_exists('RedisArray')) {

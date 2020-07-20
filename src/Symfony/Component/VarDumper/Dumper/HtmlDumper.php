@@ -319,12 +319,16 @@ return function (root, x) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
                 f(e.target.parentNode, e);
-            } else if ((n = e.target.nextElementSibling) && 'A' == n.tagName) {
-                if (!/\bsf-dump-toggle\b/.test(n.className)) {
-                    n = n.nextElementSibling;
-                }
+            } else {
+                n = /\bsf-dump-ellipsis\b/.test(e.target.className) ? e.target.parentNode : e.target;
 
-                f(n, e, true);
+                if ((n = n.nextElementSibling) && 'A' == n.tagName) {
+                    if (!/\bsf-dump-toggle\b/.test(n.className)) {
+                        n = n.nextElementSibling || n;
+                    }
+
+                    f(n, e, true);
+                }
             }
         });
     };
@@ -420,18 +424,12 @@ return function (root, x) {
                 a.innerHTML += ' ';
             }
             a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
-            a.innerHTML += '<span>▼</span>';
+            a.innerHTML += elt.className == 'sf-dump-compact' ? '<span>▶</span>' : '<span>▼</span>';
             a.className += ' sf-dump-toggle';
 
             x = 1;
             if ('sf-dump' != elt.parentNode.className) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
-            }
-            elt.setAttribute('data-depth', x);
-            var className = elt.className;
-            elt.className = 'sf-dump-expanded';
-            if (className ? 'sf-dump-expanded' !== className : (x > options.maxDepth)) {
-                toggle(a);
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
             a = a.substr(1);
@@ -473,7 +471,7 @@ return function (root, x) {
                     return this.current();
                 }
                 this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : 0;
-        
+
                 return this.current();
             },
             previous: function () {
@@ -481,7 +479,7 @@ return function (root, x) {
                     return this.current();
                 }
                 this.idx = this.idx > 0 ? this.idx - 1 : (this.nodes.length - 1);
-        
+
                 return this.current();
             },
             isEmpty: function () {
@@ -565,11 +563,11 @@ return function (root, x) {
                     "sf-dump-protected",
                     "sf-dump-private",
                 ].map(xpathHasClass).join(' or ');
-                
+
                 var xpathResult = doc.evaluate('.//span[' + classMatches + '][contains(translate(child::text(), ' + xpathString(searchQuery.toUpperCase()) + ', ' + xpathString(searchQuery.toLowerCase()) + '), ' + xpathString(searchQuery.toLowerCase()) + ')]', root, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
                 while (node = xpathResult.iterateNext()) state.nodes.push(node);
-                
+
                 showCurrent(state);
             }, 400);
         });
@@ -588,6 +586,15 @@ return function (root, x) {
             var isSearchActive = !/\bsf-dump-search-hidden\b/.test(search.className);
             if ((114 === e.keyCode && !isSearchActive) || (isCtrlKey(e) && 70 === e.keyCode)) {
                 /* F3 or CMD/CTRL + F */
+                if (70 === e.keyCode && document.activeElement === searchInput) {
+                   /*
+                    * If CMD/CTRL + F is hit while having focus on search input,
+                    * the user probably meant to trigger browser search instead.
+                    * Let the browser execute its behavior:
+                    */
+                    return;
+                }
+
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();
@@ -661,17 +668,19 @@ pre.sf-dump span {
 pre.sf-dump .sf-dump-compact {
     display: none;
 }
-pre.sf-dump abbr {
-    text-decoration: none;
-    border: none;
-    cursor: help;
-}
 pre.sf-dump a {
     text-decoration: none;
     cursor: pointer;
     border: 0;
     outline: none;
     color: inherit;
+}
+pre.sf-dump img {
+    max-width: 50em;
+    max-height: 50em;
+    margin: .5em 0 0 0;
+    padding: 0;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAAHUlEQVQY02O8zAABilCaiQEN0EeA8QuUcX9g3QEAAjcC5piyhyEAAAAASUVORK5CYII=) #D3D3D3;
 }
 pre.sf-dump .sf-dump-ellipsis {
     display: inline-block;
@@ -779,6 +788,7 @@ EOHTML
         foreach ($this->styles as $class => $style) {
             $line .= 'pre.sf-dump'.('default' === $class ? ', pre.sf-dump' : '').' .sf-dump-'.$class.'{'.$style.'}';
         }
+        $line .= 'pre.sf-dump .sf-dump-ellipsis-note{'.$this->styles['note'].'}';
 
         return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
     }
@@ -786,22 +796,41 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    public function enterHash(Cursor $cursor, $type, $class, $hasChild)
+    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
     {
+        if ('' === $str && isset($cursor->attr['img-data'], $cursor->attr['content-type'])) {
+            $this->dumpKey($cursor);
+            $this->line .= $this->style('default', $cursor->attr['img-size'] ?? '', []);
+            $this->line .= $cursor->depth >= $this->displayOptions['maxDepth'] ? ' <samp class=sf-dump-compact>' : ' <samp class=sf-dump-expanded>';
+            $this->endValue($cursor);
+            $this->line .= $this->indentPad;
+            $this->line .= sprintf('<img src="data:%s;base64,%s" /></samp>', $cursor->attr['content-type'], base64_encode($cursor->attr['img-data']));
+            $this->endValue($cursor);
+        } else {
+            parent::dumpString($cursor, $str, $bin, $cut);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enterHash(Cursor $cursor, int $type, $class, bool $hasChild)
+    {
+        if (Cursor::HASH_OBJECT === $type) {
+            $cursor->attr['depth'] = $cursor->depth;
+        }
         parent::enterHash($cursor, $type, $class, false);
 
-        if ($cursor->skipChildren) {
+        if ($cursor->skipChildren || $cursor->depth >= $this->displayOptions['maxDepth']) {
             $cursor->skipChildren = false;
             $eol = ' class=sf-dump-compact>';
-        } elseif ($this->expandNextHash) {
+        } else {
             $this->expandNextHash = false;
             $eol = ' class=sf-dump-expanded>';
-        } else {
-            $eol = '>';
         }
 
         if ($hasChild) {
-            $this->line .= '<samp';
+            $this->line .= '<samp data-depth='.($cursor->depth + 1);
             if ($cursor->refIndex) {
                 $r = Cursor::HASH_OBJECT !== $type ? 1 - (Cursor::HASH_RESOURCE !== $type) : 2;
                 $r .= $r && 0 < $cursor->softRefHandle ? $cursor->softRefHandle : $cursor->refIndex;
@@ -816,7 +845,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut)
+    public function leaveHash(Cursor $cursor, int $type, $class, bool $hasChild, int $cut)
     {
         $this->dumpEllipsis($cursor, $hasChild, $cut);
         if ($hasChild) {
@@ -851,14 +880,13 @@ EOHTML
             $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {
             $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
-        } elseif ('note' === $style && false !== $c = strrpos($v, '\\')) {
-            if (isset($attr['file']) && $link = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
-                $link = sprintf('<a href="%s" rel="noopener noreferrer">^</a>', esc($this->utf8Encode($link)));
-            } else {
-                $link = '';
-            }
-
-            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>%s', $v, $style, substr($v, $c + 1), $link);
+        } elseif ('note' === $style && 0 < ($attr['depth'] ?? 0) && false !== $c = strrpos($value, '\\')) {
+            $style .= ' title=""';
+            $attr += [
+                'ellipsis' => \strlen($value) - $c,
+                'ellipsis-type' => 'note',
+                'ellipsis-tail' => 1,
+            ];
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {
@@ -879,7 +907,7 @@ EOHTML
 
             if (!empty($attr['ellipsis-tail'])) {
                 $tail = \strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
-                $v .= sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($label, 0, $tail), substr($label, $tail));
+                $v .= sprintf('<span class=%s>%s</span>%s', $class, substr($label, 0, $tail), substr($label, $tail));
             } else {
                 $v .= $label;
             }
@@ -924,7 +952,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    protected function dumpLine($depth, $endOfValue = false)
+    protected function dumpLine(int $depth, bool $endOfValue = false)
     {
         if (-1 === $this->lastDepth) {
             $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
@@ -951,7 +979,7 @@ EOHTML
         AbstractDumper::dumpLine($depth);
     }
 
-    private function getSourceLink($file, $line)
+    private function getSourceLink(string $file, int $line)
     {
         $options = $this->extraDisplayOptions + $this->displayOptions;
 

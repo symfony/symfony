@@ -66,7 +66,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      *
      * @param string $dateTimeLocal Formatted string
      *
-     * @return \DateTime Normalized date
+     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
@@ -78,7 +78,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
         }
 
         if ('' === $dateTimeLocal) {
-            return;
+            return null;
         }
 
         // to maintain backwards compatibility we do not strictly validate the submitted date

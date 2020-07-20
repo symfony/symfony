@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
@@ -53,7 +54,7 @@ class HtmlDumperTest extends TestCase
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-<foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp>
+<foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp data-depth=1 class=sf-dump-expanded>
   "<span class=sf-dump-key>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-key>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
   "<span class=sf-dump-key>const</span>" => <span class=sf-dump-num>1.1</span>
@@ -65,11 +66,11 @@ class HtmlDumperTest extends TestCase
   <span class=sf-dump-key>6</span> => <span class=sf-dump-num>{$intMax}</span>
   "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="5 characters">d&%s;j&%s;<span class="sf-dump-default sf-dump-ns">\\n</span></span>"
   <span class=sf-dump-key>7</span> => b"""
-    <span class=sf-dump-str title="11 binary or non-UTF-8 characters">&eacute;<span class="sf-dump-default">\\x00</span>test<span class="sf-dump-default">\\t</span><span class="sf-dump-default sf-dump-ns">\\n</span></span>
+    <span class=sf-dump-str title="11 binary or non-UTF-8 characters">&eacute;<span class="sf-dump-default">\\x01</span>test<span class="sf-dump-default">\\t</span><span class="sf-dump-default sf-dump-ns">\\n</span></span>
     <span class=sf-dump-str title="11 binary or non-UTF-8 characters">ing</span>
     """
   "<span class=sf-dump-key>[]</span>" => []
-  "<span class=sf-dump-key>res</span>" => <span class=sf-dump-note>stream resource</span> <a class=sf-dump-ref>@{$res}</a><samp>
+  "<span class=sf-dump-key>res</span>" => <span class=sf-dump-note>stream resource</span> <a class=sf-dump-ref>@{$res}</a><samp data-depth=2 class=sf-dump-compact>
 %A  <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
     <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str title="5 characters">STDIO</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
@@ -77,27 +78,30 @@ class HtmlDumperTest extends TestCase
     <span class=sf-dump-meta>seekable</span>: <span class=sf-dump-const>true</span>
 %A  <span class=sf-dump-meta>options</span>: []
   </samp>}
-  "<span class=sf-dump-key>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
+  "<span class=sf-dump-key>obj</span>" => <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Fixture</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>DumbFoo</span> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp data-depth=2 id={$dumpId}-ref2%d class=sf-dump-compact>
     +<span class=sf-dump-public title="Public property">foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
-  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure(\$a, PDO &amp;\$b = null)</span> {<a class=sf-dump-ref>#%d</a><samp>
+  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure(\$a, PDO &amp;\$b = null)</span> {<a class=sf-dump-ref>#%d</a><samp data-depth=2 class=sf-dump-compact>
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest
-55 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Dumper</span><span class=sf-dump-ellipsis>\</span>HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &%s;}
+55 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Dumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-class">\</span>HtmlDumperTest</span>"
+    <span class=sf-dump-meta>this</span>: <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Dumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>HtmlDumperTest</span> {<a class=sf-dump-ref>#%d</a> &%s;}
     <span class=sf-dump-meta>file</span>: "<span class=sf-dump-str title="{$var['file']}
-%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eFixtures%edumb-var.php</span>"
+%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eFixtures%edumb-var.php</span>"
     <span class=sf-dump-meta>line</span>: "<span class=sf-dump-str title="%d characters">{$var['line']} to {$var['line']}</span>"
   </samp>}
   "<span class=sf-dump-key>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
-  "<span class=sf-dump-key>nobj</span>" => <span class=sf-dump-note>array:1</span> [<samp>
+  "<span class=sf-dump-key>nobj</span>" => <span class=sf-dump-note>array:1</span> [<samp data-depth=2 class=sf-dump-compact>
     <span class=sf-dump-index>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   </samp>]
-  "<span class=sf-dump-key>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp id={$dumpId}-ref04>
+  "<span class=sf-dump-key>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp data-depth=2 id={$dumpId}-ref04 class=sf-dump-compact>
     <span class=sf-dump-index>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a>]
   </samp>]
   <span class=sf-dump-key>8</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-key>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
+  "<span class=sf-dump-key>sobj</span>" => <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Fixture</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>DumbFoo</span> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
   "<span class=sf-dump-key>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
@@ -159,5 +163,28 @@ EOTXT
             ,
             $out
         );
+    }
+
+    /**
+     * @dataProvider varToDumpProvider
+     */
+    public function testDumpString($var, $needle)
+    {
+        $dumper = new HtmlDumper();
+        $cloner = new VarCloner();
+
+        ob_start();
+        $dumper->dump($cloner->cloneVar($var));
+        $out = ob_get_clean();
+
+        $this->assertStringContainsString($needle, $out);
+    }
+
+    public function varToDumpProvider()
+    {
+        return [
+            [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],
+            ['foo', '<span class=sf-dump-str title="3 characters">foo</span>'],
+        ];
     }
 }

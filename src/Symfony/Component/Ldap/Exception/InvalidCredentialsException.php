@@ -12,10 +12,10 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * ConnectionException is thrown if binding to ldap has been done with invalid credentials .
+ * InvalidCredentialsException is thrown if binding to ldap has been done with invalid credentials.
  *
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class InvalidCredentialsException extends ConnectionException implements ExceptionInterface
+class InvalidCredentialsException extends ConnectionException
 {
 }

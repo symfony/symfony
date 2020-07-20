@@ -22,12 +22,12 @@ class ResourceStub implements SelfCheckingResourceInterface
         $this->fresh = $isFresh;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'stub';
     }
 
-    public function isFresh($timestamp)
+    public function isFresh($timestamp): bool
     {
         return $this->fresh;
     }

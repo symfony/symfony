@@ -88,6 +88,22 @@ class ObjectsProvider
         ];
     }
 
+    public static function getContainerDeprecations()
+    {
+        $builderWithDeprecations = new ContainerBuilder();
+        $builderWithDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithDeprecations->setParameter('kernel.container_class', 'KernelContainerWith');
+
+        $builderWithoutDeprecations = new ContainerBuilder();
+        $builderWithoutDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithoutDeprecations->setParameter('kernel.container_class', 'KernelContainerWithout');
+
+        return [
+            'deprecations' => $builderWithDeprecations,
+            'deprecations_empty' => $builderWithoutDeprecations,
+        ];
+    }
+
     public static function getContainerBuilders()
     {
         $builder1 = new ContainerBuilder();
@@ -141,6 +157,50 @@ class ObjectsProvider
                 ->addMethodCall('setMailer', [new Reference('mailer')])
                 ->setFactory([new Reference('factory.service'), 'get']),
             'definition_without_class' => new Definition(),
+        ];
+    }
+
+    public static function getContainerBuildersWithPriorityTags()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinitions(self::getContainerDefinitionsWithPriorityTags());
+
+        return ['builder' => $builder];
+    }
+
+    public static function getContainerDefinitionsWithPriorityTags()
+    {
+        $definition1 = new Definition('Full\\Qualified\\Class1');
+        $definition2 = new Definition('Full\\Qualified\\Class2');
+        $definition3 = new Definition('Full\\Qualified\\Class3');
+
+        return [
+            'definition_1' => $definition1
+                ->setPublic(true)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', ['attr1' => 'val1', 'priority' => 30])
+                ->addTag('tag1', ['attr2' => 'val2'])
+                ->addTag('tag2')
+                ->addMethodCall('setMailer', [new Reference('mailer')])
+                ->setFactory([new Reference('factory.service'), 'get']),
+            'definition_2' => $definition2
+                ->setPublic(true)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2', 'priority' => -20]),
+            'definition_3' => $definition3
+                ->setPublic(true)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2', 'priority' => 0])
+                ->addTag('tag1', ['attr3' => 'val3', 'priority' => 40]),
         ];
     }
 
@@ -202,7 +262,7 @@ class ExtendedCallableClass extends CallableClass
 
 class RouteStub extends Route
 {
-    public function compile()
+    public function compile(): CompiledRoute
     {
         return new CompiledRoute('', '#PATH_REGEX#', [], [], '#HOST_REGEX#');
     }

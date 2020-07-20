@@ -11,29 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp as BridgeAmqpReceivedStamp;
 
-/**
- * Stamp applied when a message is received from Amqp.
- */
-class AmqpReceivedStamp implements NonSendableStampInterface
-{
-    private $amqpEnvelope;
-    private $queueName;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated,use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpReceivedStamp::class, BridgeAmqpReceivedStamp::class);
 
-    public function __construct(\AMQPEnvelope $amqpEnvelope, string $queueName)
+class_exists(BridgeAmqpReceivedStamp::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/amqp-messenger instead.
+     */
+    class AmqpReceivedStamp
     {
-        $this->amqpEnvelope = $amqpEnvelope;
-        $this->queueName = $queueName;
-    }
-
-    public function getAmqpEnvelope(): \AMQPEnvelope
-    {
-        return $this->amqpEnvelope;
-    }
-
-    public function getQueueName(): string
-    {
-        return $this->queueName;
     }
 }

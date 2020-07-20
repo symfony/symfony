@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.4",
     "Names": {
         "ak": "chiAkani",
         "am": "chiAmaric",
@@ -46,5 +45,6 @@
         "yo": "chiYoruba",
         "zh": "chiChinese",
         "zu": "chiZulu"
-    }
+    },
+    "LocalizedNames": []
 }

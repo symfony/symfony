@@ -11,12 +11,12 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
-use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
+use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -40,7 +40,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties(string $class, array $context = [])
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -62,7 +62,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes(string $class, string $property, array $context = [])
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -103,7 +103,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         $typeOfField = $subMetadata->getTypeOfField($indexProperty);
                     }
 
-                    $collectionKeyType = $this->getPhpType($typeOfField);
+                    if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
+                        return null;
+                    }
                 }
             }
 
@@ -123,46 +125,55 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
+
+            if (!$builtinType = $this->getPhpType($typeOfField)) {
+                return null;
+            }
+
             $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
 
-            switch ($typeOfField) {
-                case DBALType::DATE:
-                case DBALType::DATETIME:
-                case DBALType::DATETIMETZ:
-                case 'vardatetime':
-                case DBALType::TIME:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+            switch ($builtinType) {
+                case Type::BUILTIN_TYPE_OBJECT:
+                    switch ($typeOfField) {
+                        case Types::DATE_MUTABLE:
+                        case Types::DATETIME_MUTABLE:
+                        case Types::DATETIMETZ_MUTABLE:
+                        case 'vardatetime':
+                        case Types::TIME_MUTABLE:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
 
-                case 'date_immutable':
-                case 'datetime_immutable':
-                case 'datetimetz_immutable':
-                case 'time_immutable':
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
+                        case Types::DATE_IMMUTABLE:
+                        case Types::DATETIME_IMMUTABLE:
+                        case Types::DATETIMETZ_IMMUTABLE:
+                        case Types::TIME_IMMUTABLE:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
 
-                case 'dateinterval':
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+                        case Types::DATEINTERVAL:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+                    }
 
-                case DBALType::TARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
+                    break;
+                case Type::BUILTIN_TYPE_ARRAY:
+                    switch ($typeOfField) {
+                        case Types::ARRAY:
+                        case Types::JSON_ARRAY:
+                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
-                case DBALType::SIMPLE_ARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
-
-                case DBALType::JSON_ARRAY:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
-
-                default:
-                    $builtinType = $this->getPhpType($typeOfField);
-
-                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
+                        case Types::SIMPLE_ARRAY:
+                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
+                    }
             }
+
+            return [new Type($builtinType, $nullable)];
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = [])
+    public function isReadable(string $class, string $property, array $context = [])
     {
         return null;
     }
@@ -170,7 +181,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = [])
+    public function isWritable(string $class, string $property, array $context = [])
     {
         if (
             null === ($metadata = $this->getMetadata($class))
@@ -223,29 +234,44 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     private function getPhpType(string $doctrineType): ?string
     {
         switch ($doctrineType) {
-            case DBALType::SMALLINT:
-            case DBALType::INTEGER:
+            case Types::SMALLINT:
+            case Types::INTEGER:
                 return Type::BUILTIN_TYPE_INT;
 
-            case DBALType::FLOAT:
+            case Types::FLOAT:
                 return Type::BUILTIN_TYPE_FLOAT;
 
-            case DBALType::BIGINT:
-            case DBALType::STRING:
-            case DBALType::TEXT:
-            case DBALType::GUID:
-            case DBALType::DECIMAL:
+            case Types::BIGINT:
+            case Types::STRING:
+            case Types::TEXT:
+            case Types::GUID:
+            case Types::DECIMAL:
                 return Type::BUILTIN_TYPE_STRING;
 
-            case DBALType::BOOLEAN:
+            case Types::BOOLEAN:
                 return Type::BUILTIN_TYPE_BOOL;
 
-            case DBALType::BLOB:
-            case 'binary':
+            case Types::BLOB:
+            case Types::BINARY:
                 return Type::BUILTIN_TYPE_RESOURCE;
 
-            case DBALType::OBJECT:
+            case Types::OBJECT:
+            case Types::DATE_MUTABLE:
+            case Types::DATETIME_MUTABLE:
+            case Types::DATETIMETZ_MUTABLE:
+            case 'vardatetime':
+            case Types::TIME_MUTABLE:
+            case Types::DATE_IMMUTABLE:
+            case Types::DATETIME_IMMUTABLE:
+            case Types::DATETIMETZ_IMMUTABLE:
+            case Types::TIME_IMMUTABLE:
+            case Types::DATEINTERVAL:
                 return Type::BUILTIN_TYPE_OBJECT;
+
+            case Types::ARRAY:
+            case Types::SIMPLE_ARRAY:
+            case Types::JSON_ARRAY:
+                return Type::BUILTIN_TYPE_ARRAY;
         }
 
         return null;

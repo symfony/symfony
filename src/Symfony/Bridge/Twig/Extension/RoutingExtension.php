@@ -23,7 +23,7 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoutingExtension extends AbstractExtension
+final class RoutingExtension extends AbstractExtension
 {
     private $generator;
 
@@ -33,11 +33,9 @@ class RoutingExtension extends AbstractExtension
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
@@ -45,26 +43,12 @@ class RoutingExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $relative
-     *
-     * @return string
-     */
-    public function getPath($name, $parameters = [], $relative = false)
+    public function getPath(string $name, array $parameters = [], bool $relative = false): string
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $schemeRelative
-     *
-     * @return string
-     */
-    public function getUrl($name, $parameters = [], $schemeRelative = false)
+    public function getUrl(string $name, array $parameters = [], bool $schemeRelative = false): string
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -90,8 +74,6 @@ class RoutingExtension extends AbstractExtension
      * @param Node $argsNode The arguments of the path/url function
      *
      * @return array An array with the contexts the URL is safe
-     *
-     * @final
      */
     public function isUrlGenerationSafe(Node $argsNode): array
     {
@@ -107,13 +89,5 @@ class RoutingExtension extends AbstractExtension
         }
 
         return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'routing';
     }
 }

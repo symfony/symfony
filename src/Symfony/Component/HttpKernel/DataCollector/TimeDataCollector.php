@@ -15,11 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
- * TimeDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -35,7 +36,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
@@ -77,7 +78,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Sets the request events.
      *
-     * @param array $events The request events
+     * @param StopwatchEvent[] $events The request events
      */
     public function setEvents(array $events)
     {
@@ -91,7 +92,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request events.
      *
-     * @return array The request events
+     * @return StopwatchEvent[] The request events
      */
     public function getEvents()
     {
@@ -133,7 +134,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request time.
      *
-     * @return int The time
+     * @return float
      */
     public function getStartTime()
     {

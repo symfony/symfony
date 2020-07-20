@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class HttpExceptionTraitTest extends TestCase
 {
-    public function provideParseError()
+    public function provideParseError(): iterable
     {
         yield ['application/ld+json', '{"hydra:title": "An error occurred", "hydra:description": "Some details"}'];
         yield ['application/problem+json', '{"title": "An error occurred", "detail": "Some details"}'];

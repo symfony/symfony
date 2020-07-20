@@ -20,8 +20,6 @@ interface DenormalizerAwareInterface
 {
     /**
      * Sets the owning Denormalizer object.
-     *
-     * @param DenormalizerInterface $denormalizer
      */
     public function setDenormalizer(DenormalizerInterface $denormalizer);
 }

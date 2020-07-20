@@ -29,7 +29,7 @@ class HandlerFailedException extends RuntimeException
             1 === \count($exceptions)
                 ? $firstFailure->getMessage()
                 : sprintf('%d handlers failed. First failure is: "%s"', \count($exceptions), $firstFailure->getMessage()),
-            $firstFailure->getCode(),
+            (int) $firstFailure->getCode(),
             $firstFailure
         );
 

@@ -22,14 +22,14 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class CollatorTest extends AbstractCollatorTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 
         parent::setUp();
     }
 
-    protected function getCollator($locale)
+    protected function getCollator(?string $locale): \Collator
     {
         return new \Collator($locale);
     }

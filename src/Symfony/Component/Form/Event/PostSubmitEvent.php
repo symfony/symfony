@@ -19,6 +19,6 @@ use Symfony\Component\Form\FormEvent;
  *
  * It can be used to fetch data after denormalization.
  */
-class PostSubmitEvent extends FormEvent
+final class PostSubmitEvent extends FormEvent
 {
 }

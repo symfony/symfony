@@ -7,5 +7,6 @@ return function (RoutingConfigurator $routes) {
         ->prefix('/defaults')
         ->locale('g_locale')
         ->format('g_format')
+        ->stateless(true)
     ;
 };

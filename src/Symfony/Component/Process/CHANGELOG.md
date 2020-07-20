@@ -1,12 +1,24 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added `Process::getStartTime()` to retrieve the start time of the process as float
+
 5.0.0
 -----
 
+ * removed `Process::inheritEnvironmentVariables()`
  * removed `PhpProcess::setPhpBinary()`
  * `Process` must be instantiated with a command array, use `Process::fromShellCommandline()` when the command should be parsed by the shell
  * removed `Process::setCommandLine()`
+
+4.4.0
+-----
+
+ * deprecated `Process::inheritEnvironmentVariables()`: env variables are always inherited.
+ * added `Process::getLastOutputTime()` method
 
 4.2.0
 -----

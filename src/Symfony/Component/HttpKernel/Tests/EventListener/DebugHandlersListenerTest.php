@@ -12,15 +12,16 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\ErrorCatcher\ErrorHandler;
-use Symfony\Component\ErrorCatcher\ExceptionHandler;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -38,9 +39,7 @@ class DebugHandlersListenerTest extends TestCase
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
-        $xHandler = new ExceptionHandler();
         $eHandler = new ErrorHandler();
-        $eHandler->setExceptionHandler([$xHandler, 'handle']);
 
         $exception = null;
         set_error_handler([$eHandler, 'handleError']);
@@ -56,7 +55,7 @@ class DebugHandlersListenerTest extends TestCase
             throw $exception;
         }
 
-        $this->assertSame($userHandler, $xHandler->setHandler('var_dump'));
+        $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
 
         $loggers = $eHandler->setLoggers([]);
 
@@ -104,7 +103,6 @@ class DebugHandlersListenerTest extends TestCase
         $xListeners = [
             KernelEvents::REQUEST => [[$listener, 'configure']],
             ConsoleEvents::COMMAND => [[$listener, 'configure']],
-            KernelEvents::EXCEPTION => [[$listener, 'onKernelException']],
         ];
         $this->assertSame($xListeners, $dispatcher->getListeners());
 
@@ -127,7 +125,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertInstanceOf('Closure', $xHandler);
 
         $app->expects($this->once())
-            ->method('renderException');
+            ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
 
         $xHandler(new \Exception());
     }
@@ -152,5 +150,90 @@ class DebugHandlersListenerTest extends TestCase
         }
 
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
+    }
+
+    public function provideLevelsAssignedToLoggers(): array
+    {
+        return [
+            [false, false, '0', null, null],
+            [false, false, E_ALL, null, null],
+            [false, false, [], null, null],
+            [false, false, [E_WARNING => LogLevel::WARNING, E_USER_DEPRECATED => LogLevel::NOTICE], null, null],
+
+            [true, false, E_ALL, E_ALL, null],
+            [true, false, E_DEPRECATED, E_DEPRECATED, null],
+            [true, false, [], null, null],
+            [true, false, [E_WARNING => LogLevel::WARNING, E_DEPRECATED => LogLevel::NOTICE], [E_WARNING => LogLevel::WARNING, E_DEPRECATED => LogLevel::NOTICE], null],
+
+            [false, true, '0', null, null],
+            [false, true, E_ALL, null, E_DEPRECATED | E_USER_DEPRECATED],
+            [false, true, E_ERROR, null, null],
+            [false, true, [], null, null],
+            [false, true, [E_ERROR => LogLevel::ERROR, E_DEPRECATED => LogLevel::DEBUG], null, [E_DEPRECATED => LogLevel::DEBUG]],
+
+            [true, true, '0', null, null],
+            [true, true, E_ALL, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED), E_DEPRECATED | E_USER_DEPRECATED],
+            [true, true, E_ERROR, E_ERROR, null],
+            [true, true, E_USER_DEPRECATED, null, E_USER_DEPRECATED],
+            [true, true, [E_ERROR => LogLevel::ERROR, E_DEPRECATED => LogLevel::DEBUG], [E_ERROR => LogLevel::ERROR], [E_DEPRECATED => LogLevel::DEBUG]],
+            [true, true, [E_ERROR => LogLevel::ALERT], [E_ERROR => LogLevel::ALERT], null],
+            [true, true, [E_USER_DEPRECATED => LogLevel::NOTICE], null, [E_USER_DEPRECATED => LogLevel::NOTICE]],
+        ];
+    }
+
+    /**
+     * @dataProvider provideLevelsAssignedToLoggers
+     *
+     * @param array|string      $levels
+     * @param array|string|null $expectedLoggerLevels
+     * @param array|string|null $expectedDeprecationLoggerLevels
+     */
+    public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
+    {
+        if (!class_exists(ErrorHandler::class)) {
+            $this->markTestSkipped('ErrorHandler component is required to run this test.');
+        }
+
+        $handler = $this->createMock(ErrorHandler::class);
+
+        $expectedCalls = [];
+        $logger = null;
+
+        $deprecationLogger = null;
+        if ($hasDeprecationLogger) {
+            $deprecationLogger = $this->createMock(LoggerInterface::class);
+            if (null !== $expectedDeprecationLoggerLevels) {
+                $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels];
+            }
+        }
+
+        if ($hasLogger) {
+            $logger = $this->createMock(LoggerInterface::class);
+            if (null !== $expectedLoggerLevels) {
+                $expectedCalls[] = [$logger, $expectedLoggerLevels];
+            }
+        }
+
+        $handler
+            ->expects($this->exactly(\count($expectedCalls)))
+            ->method('setDefaultLogger')
+            ->withConsecutive(...$expectedCalls);
+
+        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, null, true, $deprecationLogger);
+        $prevHander = set_exception_handler([$handler, 'handleError']);
+
+        try {
+            $handler
+                ->method('handleError')
+                ->willReturnCallback(function () use ($prevHander) {
+                    $prevHander(...\func_get_args());
+                });
+
+            $sut->configure();
+            set_exception_handler($prevHander);
+        } catch (\Exception $e) {
+            set_exception_handler($prevHander);
+            throw $e;
+        }
     }
 }

@@ -21,12 +21,12 @@ class SubRequestHandlerTest extends TestCase
 {
     private static $globalState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::$globalState = $this->getGlobalState();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Request::setTrustedProxies(self::$globalState[0], self::$globalState[1]);
     }
@@ -143,7 +143,7 @@ class TestSubRequestHandlerKernel implements HttpKernelInterface
         $this->assertCallback = $assertCallback;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
         $assertCallback = $this->assertCallback;
         $assertCallback($request, $type, $catch);

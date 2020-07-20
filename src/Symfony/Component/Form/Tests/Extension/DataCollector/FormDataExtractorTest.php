@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -35,16 +37,16 @@ class FormDataExtractorTest extends TestCase
     private $dataExtractor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataExtractor = new FormDataExtractor();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
@@ -56,7 +58,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->willReturn(new \stdClass());
+            ->willReturn(new HiddenType());
 
         $form = $this->createBuilder('name')
             ->setType($type)
@@ -65,7 +67,7 @@ class FormDataExtractorTest extends TestCase
         $this->assertSame([
             'id' => 'name',
             'name' => 'name',
-            'type_class' => 'stdClass',
+            'type_class' => HiddenType::class,
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [],
@@ -77,7 +79,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->willReturn(new \stdClass());
+            ->willReturn(new HiddenType());
 
         $options = [
             'b' => 'foo',
@@ -95,7 +97,7 @@ class FormDataExtractorTest extends TestCase
         $this->assertSame([
             'id' => 'name',
             'name' => 'name',
-            'type_class' => 'stdClass',
+            'type_class' => HiddenType::class,
             'synchronized' => true,
             'passed_options' => [
                 'a' => 'bar',
@@ -111,7 +113,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->willReturn(new \stdClass());
+            ->willReturn(new HiddenType());
 
         $options = [
             'b' => 'foo',
@@ -126,7 +128,7 @@ class FormDataExtractorTest extends TestCase
         $this->assertSame([
             'id' => 'name',
             'name' => 'name',
-            'type_class' => 'stdClass',
+            'type_class' => HiddenType::class,
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [
@@ -142,7 +144,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->willReturn(new \stdClass());
+            ->willReturn(new HiddenType());
 
         $grandParent = $this->createBuilder('grandParent')
             ->setCompound(true)
@@ -162,7 +164,7 @@ class FormDataExtractorTest extends TestCase
         $this->assertSame([
             'id' => 'grandParent_parent_name',
             'name' => 'name',
-            'type_class' => 'stdClass',
+            'type_class' => HiddenType::class,
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [],

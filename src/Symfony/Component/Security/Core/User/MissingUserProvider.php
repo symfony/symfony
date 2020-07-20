@@ -32,7 +32,7 @@ class MissingUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
         throw new \BadMethodCallException();
     }
@@ -40,7 +40,7 @@ class MissingUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         throw new \BadMethodCallException();
     }
@@ -48,7 +48,7 @@ class MissingUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         throw new \BadMethodCallException();
     }

@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-interface HttpExceptionInterface
+interface HttpExceptionInterface extends \Throwable
 {
     /**
      * Returns the status code.

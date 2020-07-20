@@ -69,7 +69,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
@@ -103,9 +103,10 @@ EOF
         $serviceIdsNb = 0;
         foreach ($serviceIds as $serviceId) {
             $text = [];
+            $resolvedServiceId = $serviceId;
             if (0 !== strpos($serviceId, $previousId)) {
                 $text[] = '';
-                if ('' !== $description = Descriptor::getClassDescription($serviceId, $serviceId)) {
+                if ('' !== $description = Descriptor::getClassDescription($serviceId, $resolvedServiceId)) {
                     if (isset($hasAlias[$serviceId])) {
                         continue;
                     }
@@ -145,6 +146,8 @@ EOF
         }
 
         $io->newLine();
+
+        return 0;
     }
 
     private function getFileLink(string $class): string

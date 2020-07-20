@@ -97,10 +97,7 @@ final class CharacterStream
             }
         }
         if (\is_resource($input)) {
-            $blocks = 512;
-            if (stream_get_meta_data($input)['seekable'] ?? false) {
-                rewind($input);
-            }
+            $blocks = 16372;
             while (false !== $read = fread($input, $blocks)) {
                 $this->write($read);
             }
@@ -114,7 +111,6 @@ final class CharacterStream
         if ($this->currentPos >= $this->charCount) {
             return null;
         }
-        $ret = null;
         $length = ($this->currentPos + $length > $this->charCount) ? $this->charCount - $this->currentPos : $length;
         if ($this->fixedWidth > 0) {
             $len = $length * $this->fixedWidth;
@@ -175,7 +171,7 @@ final class CharacterStream
         $this->dataSize = \strlen($this->data) - \strlen($ignored);
     }
 
-    private function getUtf8CharPositions(string $string, int $startOffset, &$ignoredChars): int
+    private function getUtf8CharPositions(string $string, int $startOffset, string &$ignoredChars): int
     {
         $strlen = \strlen($string);
         $charPos = \count($this->map['p']);

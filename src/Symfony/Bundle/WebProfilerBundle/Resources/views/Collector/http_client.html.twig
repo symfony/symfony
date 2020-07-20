@@ -1,0 +1,131 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.requestCount %}
+        {% set icon %}
+            {{ include('@WebProfiler/Icon/http-client.svg') }}
+            {% set status_color = '' %}
+            <span class="sf-toolbar-value">{{ collector.requestCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Total requests</b>
+                <span>{{ collector.requestCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>HTTP errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.errorCount }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+<span class="label {{ collector.requestCount == 0 ? 'disabled' }}">
+    <span class="icon">{{ include('@WebProfiler/Icon/http-client.svg') }}</span>
+    <strong>HTTP Client</strong>
+    {% if collector.requestCount %}
+        <span class="count">
+            {{ collector.requestCount }}
+        </span>
+    {% endif %}
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>HTTP Client</h2>
+    {% if collector.requestCount == 0 %}
+        <div class="empty">
+            <p>No HTTP requests were made.</p>
+        </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.requestCount }}</span>
+                <span class="label">Total requests</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.errorCount }}</span>
+                <span class="label">HTTP errors</span>
+            </div>
+        </div>
+        <h2>Clients</h2>
+        <div class="sf-tabs">
+            {% for name, client in collector.clients %}
+                <div class="tab {{ client.traces|length == 0 ? 'disabled' }}">
+                    <h3 class="tab-title">{{ name }} <span class="badge">{{ client.traces|length }}</span></h3>
+                    <div class="tab-content">
+                        {% if client.traces|length == 0 %}
+                            <div class="empty">
+                                <p>No requests were made with the "{{ name }}" service.</p>
+                            </div>
+                        {% else %}
+                            <h4>Requests</h4>
+                            {% for trace in client.traces %}
+                                {% set profiler_token = '' %}
+                                {% set profiler_link = '' %}
+                                {% if trace.info.response_headers is defined %}
+                                    {% for header in trace.info.response_headers %}
+                                        {% if header matches '/^x-debug-token: .*$/i' %}
+                                            {% set profiler_token = (header.getValue | slice('x-debug-token: ' | length)) %}
+                                        {% endif %}
+                                        {% if header matches '/^x-debug-token-link: .*$/i' %}
+                                            {% set profiler_link = (header.getValue | slice('x-debug-token-link: ' | length)) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            <span class="label">{{ trace.method }}</span>
+                                        </th>
+                                        <th class="full-width">
+                                            {{ trace.url }}
+                                            {% if trace.options is not empty %}
+                                                {{ profiler_dump(trace.options, maxDepth=1) }}
+                                            {% endif %}
+                                        </th>
+                                        {% if profiler_token and profiler_link %}
+                                            <th>
+                                                Profile
+                                            </th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th>
+                                            {% if trace.http_code >= 500 %}
+                                                {% set responseStatus = 'error' %}
+                                            {% elseif trace.http_code >= 400 %}
+                                                {% set responseStatus = 'warning' %}
+                                            {% else %}
+                                                {% set responseStatus = 'success' %}
+                                            {% endif %}
+                                            <span class="label status-{{ responseStatus }}">
+                                                {{ trace.http_code }}
+                                            </span>
+                                        </th>
+                                        <td>
+                                            {{ profiler_dump(trace.info, maxDepth=1) }}
+                                        </td>
+                                        {% if profiler_token and profiler_link %}
+                                            <td>
+                                                <span><a href="{{ profiler_link }}" target="_blank">{{ profiler_token }}</a></span>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

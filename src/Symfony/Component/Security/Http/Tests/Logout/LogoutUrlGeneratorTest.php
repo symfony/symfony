@@ -29,7 +29,7 @@ class LogoutUrlGeneratorTest extends TestCase
     /** @var LogoutUrlGenerator */
     private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $request = $this->getMockBuilder(Request::class)->getMock();
@@ -46,12 +46,10 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath('secured_area'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No LogoutListener found for firewall key "unregistered_key".
-     */
     public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('No LogoutListener found for firewall key "unregistered_key".');
         $this->generator->registerListener('secured_area', '/logout', null, null, null);
 
         $this->generator->getLogoutPath('unregistered_key');
@@ -65,12 +63,10 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unable to generate a logout url for an anonymous token.
-     */
     public function testGuessFromAnonymousTokenThrowsException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Unable to generate a logout url for an anonymous token.');
         $this->tokenStorage->setToken(new AnonymousToken('default', 'anon.'));
 
         $this->generator->getLogoutPath();
@@ -101,12 +97,10 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unable to find the current firewall LogoutListener, please provide the provider key manually
-     */
     public function testUnableToGuessThrowsException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Unable to find the current firewall LogoutListener, please provide the provider key manually');
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
         $this->generator->getLogoutPath();

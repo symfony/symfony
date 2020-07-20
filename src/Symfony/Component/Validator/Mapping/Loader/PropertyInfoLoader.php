@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -28,6 +29,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 final class PropertyInfoLoader implements LoaderInterface
 {
+    use AutoMappingTrait;
+
     private $listExtractor;
     private $typeExtractor;
     private $accessExtractor;
@@ -47,14 +50,12 @@ final class PropertyInfoLoader implements LoaderInterface
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();
-        if (null !== $this->classValidatorRegexp && !preg_match($this->classValidatorRegexp, $className)) {
-            return false;
-        }
-
         if (!$properties = $this->listExtractor->getProperties($className)) {
             return false;
         }
 
+        $loaded = false;
+        $enabledForClass = $this->isAutoMappingEnabledForClass($metadata, $this->classValidatorRegexp);
         foreach ($properties as $property) {
             if (false === $this->accessExtractor->isWritable($className, $property)) {
                 continue;
@@ -69,11 +70,21 @@ final class PropertyInfoLoader implements LoaderInterface
                 continue;
             }
 
+            $enabledForProperty = $enabledForClass;
             $hasTypeConstraint = false;
             $hasNotNullConstraint = false;
             $hasNotBlankConstraint = false;
             $allConstraint = null;
             foreach ($metadata->getPropertyMetadata($property) as $propertyMetadata) {
+                // Enabling or disabling auto-mapping explicitly always takes precedence
+                if (AutoMappingStrategy::DISABLED === $propertyMetadata->getAutoMappingStrategy()) {
+                    continue 2;
+                }
+
+                if (AutoMappingStrategy::ENABLED === $propertyMetadata->getAutoMappingStrategy()) {
+                    $enabledForProperty = true;
+                }
+
                 foreach ($propertyMetadata->getConstraints() as $constraint) {
                     if ($constraint instanceof Type) {
                         $hasTypeConstraint = true;
@@ -87,6 +98,11 @@ final class PropertyInfoLoader implements LoaderInterface
                 }
             }
 
+            if (!$enabledForProperty) {
+                continue;
+            }
+
+            $loaded = true;
             $builtinTypes = [];
             $nullable = false;
             $scalar = true;
@@ -118,7 +134,7 @@ final class PropertyInfoLoader implements LoaderInterface
             }
         }
 
-        return true;
+        return $loaded;
     }
 
     private function getTypeConstraint(string $builtinType, PropertyInfoType $type): Type

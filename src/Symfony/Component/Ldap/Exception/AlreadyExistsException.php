@@ -16,6 +16,6 @@ namespace Symfony\Component\Ldap\Exception;
  *
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class AlreadyExistsException extends ConnectionException implements ExceptionInterface
+class AlreadyExistsException extends ConnectionException
 {
 }

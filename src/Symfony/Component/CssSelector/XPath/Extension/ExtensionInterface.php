@@ -30,40 +30,38 @@ interface ExtensionInterface
      *
      * @return callable[]
      */
-    public function getNodeTranslators();
+    public function getNodeTranslators(): array;
 
     /**
      * Returns combination translators.
      *
      * @return callable[]
      */
-    public function getCombinationTranslators();
+    public function getCombinationTranslators(): array;
 
     /**
      * Returns function translators.
      *
      * @return callable[]
      */
-    public function getFunctionTranslators();
+    public function getFunctionTranslators(): array;
 
     /**
      * Returns pseudo-class translators.
      *
      * @return callable[]
      */
-    public function getPseudoClassTranslators();
+    public function getPseudoClassTranslators(): array;
 
     /**
      * Returns attribute operation translators.
      *
      * @return callable[]
      */
-    public function getAttributeMatchingTranslators();
+    public function getAttributeMatchingTranslators(): array;
 
     /**
      * Returns extension name.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 }

@@ -18,12 +18,10 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class DefinitionErrorExceptionPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Things went wrong!
-     */
     public function testThrowsException()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Things went wrong!');
         $container = new ContainerBuilder();
         $def = new Definition();
         $def->addError('Things went wrong!');

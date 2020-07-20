@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AuthenticationFailureEvent extends AuthenticationEvent
+final class AuthenticationFailureEvent extends AuthenticationEvent
 {
     private $authenticationException;
 
@@ -30,7 +30,7 @@ class AuthenticationFailureEvent extends AuthenticationEvent
         $this->authenticationException = $ex;
     }
 
-    public function getAuthenticationException()
+    public function getAuthenticationException(): AuthenticationException
     {
         return $this->authenticationException;
     }

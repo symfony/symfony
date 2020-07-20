@@ -45,7 +45,7 @@
     {{ parent() }}
     <style>
         .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
-        .message-item tbody tr td:first-child { width: 115px; }
+        .message-item tbody tr td:first-child { width: 170px; }
 
         .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
         .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none }
@@ -119,8 +119,8 @@
                         <span class="label status-error">exception</span>
                     {% endif %}
                     <a class="toggle-button">
-                        <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
-                        <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
+                        <span class="icon icon-close">{{ include('@WebProfiler/images/icon-minus-square.svg') }}</span>
+                        <span class="icon icon-open">{{ include('@WebProfiler/images/icon-plus-square.svg') }}</span>
                     </a>
                 </th>
             </tr>
@@ -166,7 +166,7 @@
                 <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
             </tr>
             <tr>
-                <td class="text-bold">Envelope stamps</td>
+                <td class="text-bold">Envelope stamps <span class="text-muted">when dispatching</span></td>
                 <td>
                     {% for item in dispatchCall.stamps %}
                         {{ profiler_dump(item) }}
@@ -175,6 +175,18 @@
                     {% endfor %}
                 </td>
             </tr>
+            {% if dispatchCall.stamps_after_dispatch is defined %}
+                <tr>
+                    <td class="text-bold">Envelope stamps <span class="text-muted">after dispatch</span></td>
+                    <td>
+                        {% for item in dispatchCall.stamps_after_dispatch %}
+                            {{ profiler_dump(item) }}
+                        {% else %}
+                            <span class="text-muted">No items</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
             {% if dispatchCall.exception is defined %}
                 <tr>
                     <td class="text-bold">Exception</td>

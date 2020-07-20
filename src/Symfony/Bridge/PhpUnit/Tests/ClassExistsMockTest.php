@@ -16,12 +16,12 @@ use Symfony\Bridge\PhpUnit\ClassExistsMock;
 
 class ClassExistsMockTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ClassExistsMock::register(__CLASS__);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         ClassExistsMock::withMockedClasses([
             ExistingClass::class => false,

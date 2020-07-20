@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Guess\Guess;
@@ -24,22 +27,22 @@ use Symfony\Component\Form\Guess\ValueGuess;
 class FormFactoryTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $guesser1;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $guesser2;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $registry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $builder;
 
@@ -48,7 +51,7 @@ class FormFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
@@ -146,24 +149,6 @@ class FormFactoryTest extends TestCase
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $options));
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
-     */
-    public function testCreateNamedBuilderThrowsUnderstandableException()
-    {
-        $this->factory->createNamedBuilder('name', new \stdClass());
-    }
-
-    /**
-     * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
-     */
-    public function testCreateThrowsUnderstandableException()
-    {
-        $this->factory->create(new \stdClass());
-    }
-
     public function testCreateUsesBlockPrefixIfTypeGivenAsString()
     {
         $options = ['a' => '1', 'b' => '2'];
@@ -196,11 +181,13 @@ class FormFactoryTest extends TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
+        $form = $this->createForm();
+
         $this->builder->expects($this->once())
             ->method('getForm')
-            ->willReturn('FORM');
+            ->willReturn($form);
 
-        $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
+        $this->assertSame($form, $this->factory->create('TYPE', null, $options));
     }
 
     public function testCreateNamed()
@@ -227,11 +214,13 @@ class FormFactoryTest extends TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
+        $form = $this->createForm();
+
         $this->builder->expects($this->once())
             ->method('getForm')
-            ->willReturn('FORM');
+            ->willReturn($form);
 
-        $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
+        $this->assertSame($form, $this->factory->createNamed('name', 'type', null, $options));
     }
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
@@ -245,11 +234,11 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
@@ -277,11 +266,11 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', null, ['attr' => ['maxlength' => 7]])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderCreatesTextFormIfNoGuess()
@@ -296,11 +285,11 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testOptionsCanBeOverridden()
@@ -319,7 +308,7 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['attr' => ['class' => 'foo', 'maxlength' => 11]])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
@@ -328,7 +317,7 @@ class FormFactoryTest extends TestCase
             ['attr' => ['maxlength' => 11]]
         );
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderUsesMaxLengthIfFound()
@@ -354,14 +343,14 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['attr' => ['maxlength' => 20]])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName'
         );
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderUsesMaxLengthAndPattern()
@@ -387,7 +376,7 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['attr' => ['maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce']])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
@@ -396,7 +385,7 @@ class FormFactoryTest extends TestCase
             ['attr' => ['class' => 'tinymce']]
         );
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
@@ -422,14 +411,14 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['required' => false])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName'
         );
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
     }
 
     public function testCreateBuilderUsesPatternIfFound()
@@ -455,14 +444,21 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['attr' => ['pattern' => '[a-zA-Z]']])
-            ->willReturn('builderInstance');
+            ->willReturn($this->builder);
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName'
         );
 
-        $this->assertEquals('builderInstance', $this->builder);
+        $this->assertSame($this->builder, $this->builder);
+    }
+
+    protected function createForm()
+    {
+        $formBuilder = new FormBuilder('', null, new EventDispatcher(), $this->factory);
+
+        return $formBuilder->getForm();
     }
 
     private function getMockFactory(array $methods = [])

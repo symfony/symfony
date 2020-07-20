@@ -20,11 +20,10 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
@@ -39,14 +38,12 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 
     private $eventDispatcher;
     private $messageBus;
-    private $retryStrategy;
     private $logger;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, RetryStrategyInterface $retryStrategy = null, LoggerInterface $logger = null)
+    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
-        $this->retryStrategy = $retryStrategy;
         $this->logger = $logger;
 
         parent::__construct($receiverName, $receiver);
@@ -62,7 +59,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
             ])
-            ->setDescription('Retries one or more messages from the failure transport.')
+            ->setDescription('Retries one or more messages from the failure transport')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
 
@@ -90,6 +87,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $io->comment('Quit this command with CONTROL-C.');
         if (!$output->isVeryVerbose()) {
@@ -110,11 +109,13 @@ EOF
 
             $this->runInteractive($io, $shouldForce);
 
-            return;
+            return 0;
         }
 
         $this->retrySpecificIds($ids, $io, $shouldForce);
         $io->success('All done!');
+
+        return 0;
     }
 
     private function runInteractive(SymfonyStyle $io, bool $shouldForce)
@@ -159,7 +160,9 @@ EOF
 
     private function runWorker(ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce): int
     {
-        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $receiver, $shouldForce) {
+        $count = 0;
+        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $receiver, $shouldForce, &$count) {
+            ++$count;
             $envelope = $messageReceivedEvent->getEnvelope();
 
             $this->displaySingleMessage($envelope, $io);
@@ -178,19 +181,12 @@ EOF
         $worker = new Worker(
             [$this->getReceiverName() => $receiver],
             $this->messageBus,
-            [$this->getReceiverName() => $this->retryStrategy],
             $this->eventDispatcher,
             $this->logger
         );
 
-        $count = 0;
         try {
-            $worker->run([], function (?Envelope $envelope) use ($worker, $io, &$count) {
-                ++$count;
-                if (null === $envelope) {
-                    $worker->stop();
-                }
-            });
+            $worker->run();
         } finally {
             $this->eventDispatcher->removeListener(WorkerMessageReceivedEvent::class, $listener);
         }

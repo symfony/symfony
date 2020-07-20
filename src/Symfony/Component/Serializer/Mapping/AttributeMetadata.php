@@ -50,6 +50,15 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public $serializedName;
 
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isIgnored()} instead.
+     */
+    public $ignore = false;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -58,7 +67,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -66,7 +75,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function addGroup($group)
+    public function addGroup(string $group)
     {
         if (!\in_array($group, $this->groups)) {
             $this->groups[] = $group;
@@ -76,7 +85,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }
@@ -84,7 +93,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setMaxDepth($maxDepth)
+    public function setMaxDepth(?int $maxDepth)
     {
         $this->maxDepth = $maxDepth;
     }
@@ -116,6 +125,22 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
+    public function setIgnore(bool $ignore)
+    {
+        $this->ignore = $ignore;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isIgnored(): bool
+    {
+        return $this->ignore;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
@@ -131,6 +156,10 @@ class AttributeMetadata implements AttributeMetadataInterface
         if (null === $this->serializedName) {
             $this->serializedName = $attributeMetadata->getSerializedName();
         }
+
+        if ($ignore = $attributeMetadata->isIgnored()) {
+            $this->ignore = $ignore;
+        }
     }
 
     /**
@@ -140,6 +169,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName'];
+        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore'];
     }
 }

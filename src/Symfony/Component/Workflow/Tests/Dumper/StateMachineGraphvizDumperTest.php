@@ -13,7 +13,7 @@ class StateMachineGraphvizDumperTest extends TestCase
 
     private $dumper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new StateMachineGraphvizDumper();
     }

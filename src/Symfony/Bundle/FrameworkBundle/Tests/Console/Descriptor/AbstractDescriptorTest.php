@@ -211,6 +211,19 @@ abstract class AbstractDescriptorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider getDeprecationsTestData
+     */
+    public function testGetDeprecations(ContainerBuilder $builder, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $builder, ['deprecations' => true]);
+    }
+
+    public function getDeprecationsTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerDeprecations());
+    }
+
     abstract protected function getDescriptor();
 
     abstract protected function getFormat();
@@ -278,6 +291,27 @@ abstract class AbstractDescriptorTest extends TestCase
 
         $data = [];
         foreach ($objects as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
+                $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+                $data[] = [$object, $description, $options, $file];
+            }
+        }
+
+        return $data;
+    }
+
+    /** @dataProvider getDescribeContainerBuilderWithPriorityTagsTestData */
+    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options): void
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public function getDescribeContainerBuilderWithPriorityTagsTestData(): array
+    {
+        $variations = ['priority_tag' => ['tag' => 'tag1']];
+        $data = [];
+        foreach (ObjectsProvider::getContainerBuildersWithPriorityTags() as $name => $object) {
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);

@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.17",
     "Names": {
         "AED": [
             "AED",
@@ -120,10 +119,6 @@
         "CLP": [
             "CLP",
             "i-Chilean Peso"
-        ],
-        "CNH": [
-            "CNH",
-            "CNH"
         ],
         "CNY": [
             "CN¥",
@@ -590,7 +585,7 @@
             "i-Ugandan Shilling"
         ],
         "USD": [
-            "US$",
+            "$",
             "i-US Dollar"
         ],
         "UYU": [

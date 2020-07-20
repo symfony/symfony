@@ -12,13 +12,18 @@
 namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\EventListener\DefaultLogoutListener;
 use Symfony\Component\Security\Http\HttpUtils;
+
+trigger_deprecation('symfony/security-http', '5.1', 'The "%s" class is deprecated, use "%s" instead.', DefaultLogoutSuccessHandler::class, DefaultLogoutListener::class);
 
 /**
  * Default logout success handler will redirect users to a configured path.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @deprecated since Symfony 5.1
  */
 class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {

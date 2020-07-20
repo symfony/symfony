@@ -32,6 +32,8 @@ abstract class AbstractValidatorTest extends TestCase
 
     const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
 
+    const LAZY_PROPERTY = 'Symfony\Component\Validator\Validator\LazyProperty';
+
     /**
      * @var FakeMetadataFactory
      */
@@ -47,16 +49,17 @@ abstract class AbstractValidatorTest extends TestCase
      */
     public $referenceMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataFactory = new FakeMetadataFactory();
         $this->metadata = new ClassMetadata(self::ENTITY_CLASS);
         $this->referenceMetadata = new ClassMetadata(self::REFERENCE_CLASS);
         $this->metadataFactory->addMetadata($this->metadata);
         $this->metadataFactory->addMetadata($this->referenceMetadata);
+        $this->metadataFactory->addMetadata(new ClassMetadata(self::LAZY_PROPERTY));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->metadataFactory = null;
         $this->metadata = null;
@@ -499,11 +502,9 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
-     */
     public function testFailOnScalarReferences()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\NoSuchMetadataException');
         $entity = new Entity();
         $entity->reference = 'string';
 
@@ -512,7 +513,10 @@ abstract class AbstractValidatorTest extends TestCase
         $this->validate($entity);
     }
 
-    public function testArrayReference()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testArrayReference($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = ['key' => new Reference()];
@@ -530,7 +534,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
 
-        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->$constraintMethod('reference', new Valid());
         $this->referenceMetadata->addConstraint(new Callback([
             'callback' => $callback,
             'groups' => 'Group',
@@ -550,8 +554,10 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    // https://github.com/symfony/symfony/issues/6246
-    public function testRecursiveArrayReference()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testRecursiveArrayReference($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = [2 => ['key' => new Reference()]];
@@ -569,7 +575,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
 
-        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->$constraintMethod('reference', new Valid());
         $this->referenceMetadata->addConstraint(new Callback([
             'callback' => $callback,
             'groups' => 'Group',
@@ -613,7 +619,10 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testArrayTraversalCannotBeDisabled()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testArrayTraversalCannotBeDisabled($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = ['key' => new Reference()];
@@ -622,7 +631,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
 
-        $this->metadata->addPropertyConstraint('reference', new Valid([
+        $this->metadata->$constraintMethod('reference', new Valid([
             'traverse' => false,
         ]));
         $this->referenceMetadata->addConstraint(new Callback($callback));
@@ -633,7 +642,10 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testRecursiveArrayTraversalCannotBeDisabled()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testRecursiveArrayTraversalCannotBeDisabled($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = [2 => ['key' => new Reference()]];
@@ -642,9 +654,10 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
 
-        $this->metadata->addPropertyConstraint('reference', new Valid([
+        $this->metadata->$constraintMethod('reference', new Valid([
             'traverse' => false,
         ]));
+
         $this->referenceMetadata->addConstraint(new Callback($callback));
 
         $violations = $this->validate($entity);
@@ -653,12 +666,15 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testIgnoreScalarsDuringArrayTraversal()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testIgnoreScalarsDuringArrayTraversal($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = ['string', 1234];
 
-        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->$constraintMethod('reference', new Valid());
 
         $violations = $this->validate($entity);
 
@@ -666,12 +682,15 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testIgnoreNullDuringArrayTraversal()
+    /**
+     * @dataProvider getConstraintMethods
+     */
+    public function testIgnoreNullDuringArrayTraversal($constraintMethod)
     {
         $entity = new Entity();
         $entity->reference = [null];
 
-        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->$constraintMethod('reference', new Valid());
 
         $violations = $this->validate($entity);
 
@@ -738,11 +757,9 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
-     */
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\NoSuchMetadataException');
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
@@ -1220,6 +1237,14 @@ abstract class AbstractValidatorTest extends TestCase
         foreach ($assertViolations as $key => $message) {
             $this->assertSame($message, $violations[$key]->getMessage());
         }
+    }
+
+    public function getConstraintMethods()
+    {
+        return [
+            ['addPropertyConstraint'],
+            ['addGetterConstraint'],
+        ];
     }
 
     public function getTestReplaceDefaultGroup()

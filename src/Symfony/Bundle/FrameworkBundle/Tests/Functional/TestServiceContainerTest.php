@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServic
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\UnusedPrivateService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TestServiceContainerTest extends WebTestCase
+class TestServiceContainerTest extends AbstractWebTestCase
 {
     public function testThatPrivateServicesAreUnavailableIfTestConfigIsDisabled()
     {

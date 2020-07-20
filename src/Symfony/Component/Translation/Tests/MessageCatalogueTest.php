@@ -23,17 +23,6 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals('en', $catalogue->getLocale());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing "null" to the first argument of the "Symfony\Component\Translation\MessageCatalogue::__construct" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
-     */
-    public function testGetNullLocale()
-    {
-        $catalogue = new MessageCatalogue(null);
-
-        $this->assertNull($catalogue->getLocale());
-    }
-
     public function testGetDomains()
     {
         $catalogue = new MessageCatalogue('en', ['domain1' => [], 'domain2' => [], 'domain2+intl-icu' => [], 'domain3+intl-icu' => []]);
@@ -65,6 +54,30 @@ class MessageCatalogueTest extends TestCase
             'domain3' => ['biz' => 'biz'],
         ];
         $this->assertEquals($messages, $catalogue->all());
+    }
+
+    public function testAllIntICU()
+    {
+        $messages = [
+            'domain1+intl-icu' => ['foo' => 'bar'],
+            'domain2+intl-icu' => ['bar' => 'foo'],
+            'domain2' => ['biz' => 'biz'],
+        ];
+        $catalogue = new MessageCatalogue('en', $messages);
+
+        // separated domains
+        $this->assertSame(['foo' => 'bar'], $catalogue->all('domain1+intl-icu'));
+        $this->assertSame(['bar' => 'foo'], $catalogue->all('domain2+intl-icu'));
+
+        // merged, intl-icu ignored
+        $this->assertSame(['bar' => 'foo', 'biz' => 'biz'], $catalogue->all('domain2'));
+
+        // intl-icu ignored
+        $messagesExpected = [
+            'domain1' => ['foo' => 'bar'],
+            'domain2' => ['bar' => 'foo', 'biz' => 'biz'],
+        ];
+        $this->assertSame($messagesExpected, $catalogue->all());
     }
 
     public function testHas()
@@ -164,11 +177,9 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals([$r, $r1, $r2], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\LogicException
-     */
     public function testAddFallbackCatalogueWithParentCircularReference()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\LogicException');
         $main = new MessageCatalogue('en_US');
         $fallback = new MessageCatalogue('fr_FR');
 
@@ -176,11 +187,9 @@ class MessageCatalogueTest extends TestCase
         $main->addFallbackCatalogue($fallback);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\LogicException
-     */
     public function testAddFallbackCatalogueWithFallbackCircularReference()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\LogicException');
         $fr = new MessageCatalogue('fr');
         $en = new MessageCatalogue('en');
         $es = new MessageCatalogue('es');
@@ -190,11 +199,9 @@ class MessageCatalogueTest extends TestCase
         $en->addFallbackCatalogue($fr);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\LogicException
-     */
     public function testAddCatalogueWhenLocaleIsNotTheSameAsTheCurrentOne()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\LogicException');
         $catalogue = new MessageCatalogue('en');
         $catalogue->addCatalogue(new MessageCatalogue('fr', []));
     }

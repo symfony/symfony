@@ -21,7 +21,7 @@ class StaticVersionStrategyTest extends TestCase
         $version = 'v1';
         $path = 'test-path';
         $staticVersionStrategy = new StaticVersionStrategy($version);
-        $this->assertEquals($version, $staticVersionStrategy->getVersion($path));
+        $this->assertSame($version, $staticVersionStrategy->getVersion($path));
     }
 
     /**
@@ -31,7 +31,7 @@ class StaticVersionStrategyTest extends TestCase
     {
         $staticVersionStrategy = new StaticVersionStrategy($version, $format);
         $formatted = sprintf($format ?: '%s?%s', $path, $version);
-        $this->assertEquals($formatted, $staticVersionStrategy->applyVersion($path));
+        $this->assertSame($formatted, $staticVersionStrategy->applyVersion($path));
     }
 
     public function getConfigs()

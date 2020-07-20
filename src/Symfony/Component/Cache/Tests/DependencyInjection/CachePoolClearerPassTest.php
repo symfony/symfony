@@ -29,14 +29,17 @@ class CachePoolClearerPassTest extends TestCase
         $container->setParameter('kernel.project_dir', 'foo');
 
         $globalClearer = new Definition(Psr6CacheClearer::class);
+        $globalClearer->setPublic(true);
         $container->setDefinition('cache.global_clearer', $globalClearer);
 
         $publicPool = new Definition();
+        $publicPool->setPublic(true);
         $publicPool->addArgument('namespace');
         $publicPool->addTag('cache.pool', ['clearer' => 'clearer_alias']);
         $container->setDefinition('public.pool', $publicPool);
 
         $publicPool = new Definition();
+        $publicPool->setPublic(true);
         $publicPool->addArgument('namespace');
         $publicPool->addTag('cache.pool', ['clearer' => 'clearer_alias', 'name' => 'pool2']);
         $container->setDefinition('public.pool2', $publicPool);
@@ -48,6 +51,7 @@ class CachePoolClearerPassTest extends TestCase
         $container->setDefinition('private.pool', $privatePool);
 
         $clearer = new Definition();
+        $clearer->setPublic(true);
         $container->setDefinition('clearer', $clearer);
         $container->setAlias('clearer_alias', 'clearer');
 

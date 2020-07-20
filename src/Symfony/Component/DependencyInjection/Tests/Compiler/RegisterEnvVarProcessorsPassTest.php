@@ -60,12 +60,10 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
         $this->assertFalse($container->has('container.env_var_processors_locator'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string".
-     */
     public function testBadProcessor()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string".');
         $container = new ContainerBuilder();
         $container->register('foo', BadProcessor::class)->addTag('container.env_var_processor');
 
@@ -80,7 +78,7 @@ class SimpleProcessor implements EnvVarProcessorInterface
         return $getEnv($name);
     }
 
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return ['foo' => 'string'];
     }
@@ -88,7 +86,7 @@ class SimpleProcessor implements EnvVarProcessorInterface
 
 class BadProcessor extends SimpleProcessor
 {
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return ['foo' => 'string|foo'];
     }

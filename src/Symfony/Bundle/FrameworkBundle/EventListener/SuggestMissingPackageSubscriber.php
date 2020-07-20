@@ -39,8 +39,7 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             '_default' => ['MakerBundle', 'symfony/maker-bundle --dev'],
         ],
         'server' => [
-            'dump' => ['VarDumper Component', 'symfony/var-dumper --dev'],
-            '_default' => ['WebServerBundle', 'symfony/web-server-bundle --dev'],
+            '_default' => ['Debug Bundle', 'symfony/debug-bundle --dev'],
         ],
     ];
 

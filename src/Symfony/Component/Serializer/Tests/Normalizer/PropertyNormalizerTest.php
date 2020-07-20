@@ -25,8 +25,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
@@ -59,7 +61,7 @@ class PropertyNormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->createNormalizer();
     }
@@ -83,11 +85,23 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    /**
+     * @requires PHP 7.4
+     */
+    public function testNormalizeObjectWithUninitializedProperties()
+    {
+        $obj = new Php74Dummy();
+        $this->assertEquals(
+            ['initializedProperty' => 'defaultValue'],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyDummy',
+            PropertyDummy::class,
             'any'
         );
         $this->assertEquals('foo', $obj->foo);
@@ -126,7 +140,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyConstructorDummy',
+            PropertyConstructorDummy::class,
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
@@ -137,7 +151,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => null, 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyConstructorDummy', '
+            PropertyConstructorDummy::class, '
             any'
         );
         $this->assertNull($obj->getFoo());
@@ -299,24 +313,22 @@ class PropertyNormalizerTest extends TestCase
     {
         $this->assertEquals(
             new PropertyDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], __NAMESPACE__.'\PropertyDummy')
+            $this->normalizer->denormalize(['non_existing' => true], PropertyDummy::class)
         );
     }
 
     public function testDenormalizeShouldIgnoreStaticProperty()
     {
-        $obj = $this->normalizer->denormalize(['outOfScope' => true], __NAMESPACE__.'\PropertyDummy');
+        $obj = $this->normalizer->denormalize(['outOfScope' => true], PropertyDummy::class);
 
         $this->assertEquals(new PropertyDummy(), $obj);
         $this->assertEquals('out_of_scope', PropertyDummy::$outOfScope);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage Cannot normalize attribute "bar" because the injected serializer is not a normalizer
-     */
     public function testUnableToNormalizeObjectAttribute()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
         $serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
         $this->normalizer->setSerializer($serializer);
 
@@ -340,6 +352,52 @@ class PropertyNormalizerTest extends TestCase
     public function testInheritedPropertiesSupport()
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
+    }
+
+    public function testMultiDimensionObject()
+    {
+        $normalizer = $this->getDenormalizerForTypeEnforcement();
+        $root = $normalizer->denormalize([
+                'children' => [[
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                ]],
+                'grandChildren' => [[[
+                    ['foo' => 'five', 'bar' => 'six'],
+                    ['foo' => 'seven', 'bar' => 'eight'],
+                ]]],
+                'intMatrix' => [
+                    [0, 1, 2],
+                    [3, 4, 5],
+                ],
+            ],
+            RootDummy::class,
+            'any'
+        );
+        $this->assertEquals(\get_class($root), RootDummy::class);
+
+        // children (two dimension array)
+        $this->assertCount(1, $root->children);
+        $this->assertCount(2, $root->children[0]);
+        $firstChild = $root->children[0][0];
+        $this->assertInstanceOf(Dummy::class, $firstChild);
+        $this->assertSame('one', $firstChild->foo);
+        $this->assertSame('two', $firstChild->bar);
+
+        // grand children (three dimension array)
+        $this->assertCount(1, $root->grandChildren);
+        $this->assertCount(1, $root->grandChildren[0]);
+        $this->assertCount(2, $root->grandChildren[0][0]);
+        $firstGrandChild = $root->grandChildren[0][0][0];
+        $this->assertInstanceOf(Dummy::class, $firstGrandChild);
+        $this->assertSame('five', $firstGrandChild->foo);
+        $this->assertSame('six', $firstGrandChild->bar);
+
+        // int matrix
+        $this->assertSame([
+            [0, 1, 2],
+            [3, 4, 5],
+        ], $root->intMatrix);
     }
 }
 
@@ -405,4 +463,35 @@ class PropertyParentDummy
 
 class PropertyChildDummy extends PropertyParentDummy
 {
+}
+
+class RootDummy
+{
+    public $children;
+    public $grandChildren;
+    public $intMatrix;
+
+    /**
+     * @return Dummy[][]
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    /**
+     * @return Dummy[][][]
+     */
+    public function getGrandChildren()
+    {
+        return $this->grandChildren;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIntMatrix()
+    {
+        return $this->intMatrix;
+    }
 }

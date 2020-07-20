@@ -20,7 +20,7 @@ class JsonDecodeTest extends TestCase
     /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
     private $decode;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decode = new JsonDecode();
     }
@@ -57,10 +57,10 @@ class JsonDecodeTest extends TestCase
 
     /**
      * @dataProvider decodeProviderException
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testDecodeWithException($value)
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $this->decode->decode($value, JsonEncoder::FORMAT);
     }
 

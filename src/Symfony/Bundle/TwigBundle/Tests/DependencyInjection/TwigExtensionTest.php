@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
+use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 
 class TwigExtensionTest extends TestCase
 {
@@ -190,9 +192,9 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path1', 'namespace1'],
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            [__DIR__.'/Fixtures/templates/bundles/AcmeBundle', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', '!Acme'],
             [__DIR__.'/Fixtures/templates'],
         ], $paths);
     }
@@ -248,8 +250,10 @@ class TwigExtensionTest extends TestCase
         $container->setParameter('foo', 'FooClass');
         $container->register('http_kernel', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
+        $container->register('error_renderer.html', HtmlErrorRenderer::class);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
 
         $loader = $container->getDefinition('twig.runtime_loader');
@@ -260,21 +264,20 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 
-    private function createContainer(string $rootDir = __DIR__.'/Fixtures')
+    private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
-            'kernel.root_dir' => $rootDir,
             'kernel.project_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
             'kernel.bundles' => [
-                'TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle',
+                'AcmeBundle' => AcmeBundle::class,
             ],
             'kernel.bundles_metadata' => [
-                'TwigBundle' => [
-                    'namespace' => 'Symfony\\Bundle\\TwigBundle',
-                    'path' => realpath(__DIR__.'/../..'),
+                'AcmeBundle' => [
+                    'namespace' => 'Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle',
+                    'path' => __DIR__.'/AcmeBundle',
                 ],
             ],
         ]));
@@ -286,6 +289,7 @@ class TwigExtensionTest extends TestCase
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
     }
 
@@ -304,7 +308,7 @@ class TwigExtensionTest extends TestCase
                 $loader = new YamlFileLoader($container, $locator);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unsupported format: %s', $format));
+                throw new \InvalidArgumentException(sprintf('Unsupported format: "%s"', $format));
         }
 
         $loader->load($file.'.'.$format);

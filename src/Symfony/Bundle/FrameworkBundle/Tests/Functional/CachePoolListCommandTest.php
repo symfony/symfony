@@ -18,9 +18,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class CachePoolListCommandTest extends WebTestCase
+class CachePoolListCommandTest extends AbstractWebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         static::bootKernel(['test_case' => 'CachePools', 'root_config' => 'config.yml']);
     }
@@ -31,8 +31,8 @@ class CachePoolListCommandTest extends WebTestCase
         $tester->execute([]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:list exits with 0 in case of success');
-        $this->assertContains('cache.app', $tester->getDisplay());
-        $this->assertContains('cache.system', $tester->getDisplay());
+        $this->assertStringContainsString('cache.app', $tester->getDisplay());
+        $this->assertStringContainsString('cache.system', $tester->getDisplay());
     }
 
     public function testEmptyList()

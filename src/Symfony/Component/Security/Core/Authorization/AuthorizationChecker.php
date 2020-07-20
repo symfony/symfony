@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
@@ -52,11 +53,11 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
             }
 
-            return false;
-        }
-
-        if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
-            $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
+            $token = new NullToken();
+        } else {
+            if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
+                $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
+            }
         }
 
         return $this->accessDecisionManager->decide($token, [$attribute], $subject);

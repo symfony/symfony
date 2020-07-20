@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
@@ -77,7 +78,13 @@ class AuthorizationCheckerTest extends TestCase
     {
         $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
 
-        $this->assertFalse($authorizationChecker->isGranted('ROLE_FOO'));
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->isInstanceOf(NullToken::class))
+            ->willReturn(true);
+
+        $this->assertTrue($authorizationChecker->isGranted('ANONYMOUS'));
     }
 
     /**

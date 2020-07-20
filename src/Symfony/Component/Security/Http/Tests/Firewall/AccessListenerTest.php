@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -245,9 +246,15 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')
+            ->with($this->isInstanceOf(NullToken::class))
+            ->willReturn(false);
+
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $accessDecisionManager,
             $accessMap,
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
             false
@@ -268,17 +275,21 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AccessListener::PUBLIC_ACCESS], null])
         ;
 
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')
+            ->with($this->isInstanceOf(NullToken::class), [AccessListener::PUBLIC_ACCESS])
+            ->willReturn(true);
+
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $accessDecisionManager,
             $accessMap,
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
             false
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
@@ -295,17 +306,21 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AccessListener::PUBLIC_ACCESS], null])
         ;
 
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')
+            ->with($this->equalTo($token), [AccessListener::PUBLIC_ACCESS])
+            ->willReturn(true);
+
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $accessDecisionManager,
             $accessMap,
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
             false
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testHandleMWithultipleAttributesShouldBeHandledAsAnd()

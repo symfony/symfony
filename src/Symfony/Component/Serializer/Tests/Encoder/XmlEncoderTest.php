@@ -179,7 +179,7 @@ class XmlEncoderTest extends TestCase
         $array = ['person' => ['@firstname' => 'Peter', '@lastname' => null]];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person firstname="Peter" /></response>'."\n";
+            '<response><person firstname="Peter"/></response>'."\n";
 
         $context = ['remove_empty_attributes' => true];
 
@@ -191,7 +191,7 @@ class XmlEncoderTest extends TestCase
         $array = ['person' => ['@firstname' => 'Peter', '@lastname' => null]];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person firstname="Peter" lastname="" /></response>'."\n";
+            '<response><person firstname="Peter" lastname=""/></response>'."\n";
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
     }

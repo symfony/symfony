@@ -61,6 +61,9 @@ class StoreFactoryTest extends TestCase
         }
         if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
             yield ['redis://localhost', RedisStore::class];
+            yield ['redis://localhost?lazy=1', RedisStore::class];
+            yield ['redis://localhost?redis_cluster=1', RedisStore::class];
+            yield ['redis://localhost?redis_cluster=1&lazy=1', RedisStore::class];
         }
         if (class_exists(\PDO::class)) {
             yield ['sqlite:/tmp/sqlite.db', PdoStore::class];

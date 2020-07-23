@@ -117,13 +117,15 @@ class Connection
                 $clientConfiguration['region'] = $matches[1];
             }
             unset($query['sslmode']);
+        } elseif (self::DEFAULT_OPTIONS['endpoint'] !== $options['endpoint'] ?? self::DEFAULT_OPTIONS['endpoint']) {
+            $clientConfiguration['endpoint'] = $options['endpoint'];
         }
 
         $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
         if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
             $configuration['queue_name'] = $queueName;
         }
-        $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : null;
+        $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));

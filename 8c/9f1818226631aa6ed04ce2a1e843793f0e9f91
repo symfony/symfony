@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-13T09:34:12Z
+
+deps=high/low failures are related apparently, isn't it?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-13T09:47:56Z
+
+I think so. I'll have a look tonight.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-15T18:58:11Z
+
+Apparently, PhpUnitBridge tries to fiddle with a private property `PHPUnit\Util\Test::$annotationCache`.
+
+https://github.com/symfony/symfony/blob/a397c490b018095a6a4bee3b107c80d109293976/src/Symfony/Bridge/PhpUnit/Legacy/CoverageListenerTrait.php#L73
+
+That property has been removed in PHPUnit 8.4 and replaced by a new class `PHPUnit\Util\Annotation\Registry`. I haven't figured out what the purpose of that code is. Maybe @lyrixx can help me out here?

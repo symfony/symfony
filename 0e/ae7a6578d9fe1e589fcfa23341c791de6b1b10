@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-07-16T13:19:07Z
+
+failing Travis test is related to branch 3.4 (when Redis server is not running)
+failing github test is related to  cache
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-23T10:02:42Z
+
+Are the failures related? Can you rebase to retrigger maybe?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-07-23T12:11:51Z
+
+> Are the failures related? Can you rebase to retrigger maybe?
+
+rebased. Faillure are not related.
+
+failure is about test against branch 3.4 without Redis container running nor mechanism to early exit when redis is not runing
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-07-23T17:18:54Z
+
+CI green @nicolas-grekas

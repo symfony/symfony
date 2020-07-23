@@ -33,9 +33,10 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
-        if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
-            $e = error_get_last();
-            self::markTestSkipped($e['message']);
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 

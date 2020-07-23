@@ -23,9 +23,10 @@ class RedisArrayStoreTest extends AbstractRedisStoreTest
         if (!class_exists('RedisArray')) {
             self::markTestSkipped('The RedisArray class is required.');
         }
-        if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
-            $e = error_get_last();
-            self::markTestSkipped($e['message']);
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 

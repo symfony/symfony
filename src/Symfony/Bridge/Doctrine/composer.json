@@ -34,7 +34,7 @@
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "symfony/validator": "^3.2.5|~4.0",
         "symfony/translation": "~2.8|~3.0|~4.0",
-        "doctrine/data-fixtures": "1.0.*",
+        "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "^2.4.5"
     },

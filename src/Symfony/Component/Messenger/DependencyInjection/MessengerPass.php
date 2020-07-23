@@ -339,7 +339,7 @@ class MessengerPass implements CompilerPassInterface
             if ($container->findDefinition($messengerMiddlewareId)->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
                 $childDefinition->setArguments($arguments);
-                $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id, $childDefinition);
+                $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id.'.'.ContainerBuilder::hash($arguments), $childDefinition);
             } elseif ($arguments) {
                 throw new RuntimeException(sprintf('Invalid middleware factory "%s": a middleware factory must be an abstract definition.', $id));
             }

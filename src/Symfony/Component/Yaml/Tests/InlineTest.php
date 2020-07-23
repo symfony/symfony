@@ -73,7 +73,7 @@ class InlineTest extends TestCase
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
+        $this->expectExceptionMessageMatches('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
         Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -675,7 +675,7 @@ class InlineTest extends TestCase
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp($expectedMessage);
+        $this->expectExceptionMessageMatches($expectedMessage);
 
         Inline::parse($data);
     }

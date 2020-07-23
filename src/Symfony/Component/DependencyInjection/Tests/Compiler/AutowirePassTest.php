@@ -434,7 +434,7 @@ class AutowirePassTest extends TestCase
     public function testParentClassNotFoundThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
-        $this->expectExceptionMessageRegExp('{^Cannot autowire service "a": argument "\$r" of method "(Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Compiler\\\\)BadParentTypeHintedArgument::__construct\(\)" has type "\1OptionalServiceClass" but this class is missing a parent class \(Class "?Symfony\\\\Bug\\\\NotExistClass"? not found}');
+        $this->expectExceptionMessageMatches('{^Cannot autowire service "a": argument "\$r" of method "(Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Compiler\\\\)BadParentTypeHintedArgument::__construct\(\)" has type "\1OptionalServiceClass" but this class is missing a parent class \(Class "?Symfony\\\\Bug\\\\NotExistClass"? not found}');
 
         $container = new ContainerBuilder();
 

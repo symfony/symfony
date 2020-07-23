@@ -956,6 +956,7 @@ class FrameworkExtension extends Extension
             // Set the handler class to be null
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+            $container->setAlias('session.handler', 'session.handler.native_file')->setPrivate(true);
         } else {
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 

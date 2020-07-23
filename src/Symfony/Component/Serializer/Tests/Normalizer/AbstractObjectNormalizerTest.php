@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -233,6 +234,43 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
 
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
+    }
+
+    public function testDenormalizeWithNestedDiscriminatorMap()
+    {
+        $classDiscriminatorResolver = new class() implements ClassDiscriminatorResolverInterface {
+            public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
+            {
+                switch ($class) {
+                    case AbstractDummy::class:
+                        return new ClassDiscriminatorMapping('type', [
+                            'foo' => AbstractDummyFirstChild::class,
+                        ]);
+                    case AbstractDummyFirstChild::class:
+                        return new ClassDiscriminatorMapping('nested_type', [
+                            'bar' => AbstractDummySecondChild::class,
+                        ]);
+                    default:
+                        return null;
+                }
+            }
+
+            public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping
+            {
+                return null;
+            }
+
+            public function getTypeForMappedObject($object): ?string
+            {
+                return null;
+            }
+        };
+
+        $normalizer = new AbstractObjectNormalizerDummy(null, null, null, $classDiscriminatorResolver);
+
+        $denormalizedData = $normalizer->denormalize(['type' => 'foo', 'nested_type' => 'bar'], AbstractDummy::class);
+
+        $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
     }
 
     /**

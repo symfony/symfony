@@ -123,8 +123,15 @@ class ContentSecurityPolicyHandler
 
         $headers = $this->getCspHeaders($response);
 
+        $types = [
+          'script-src' => 'csp_script_nonce',
+          'script-src-elem' => 'csp_script_nonce',
+          'style-src' => 'csp_style_nonce',
+          'style-src-elem' => 'csp_style_nonce',
+        ];
+
         foreach ($headers as $header => $directives) {
-            foreach (['script-src' => 'csp_script_nonce', 'script-src-elem' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce', 'style-src-elem' => 'csp_style_nonce'] as $type => $tokenName) {
+            foreach ($types as $type => $tokenName) {
                 if ($this->authorizesInline($directives, $type)) {
                     continue;
                 }

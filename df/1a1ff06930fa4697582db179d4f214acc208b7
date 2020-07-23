@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by evertharmeling at 2020-07-15T13:10:08Z
+
+Do I need to take a look at the failed test?
+
+Looks like the hinted `\Symfony\Component\Mime\Header\HeaderInterface` (in `\Symfony\Component\Mime\Header\Headers`) does not have the `getValue` function.
+
+But in the implementation the `$header` will be of type `\Symfony\Component\Mime\Header\UnstructuredHeader` which does...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-22T10:26:50Z
+
+Yes please, tests should be green (at least the ones related to this change)
+
+---------------------------------------------------------------------------
+
+by evertharmeling at 2020-07-22T12:22:22Z
+
+Test fixed, current fails are not PR related (Redis related)

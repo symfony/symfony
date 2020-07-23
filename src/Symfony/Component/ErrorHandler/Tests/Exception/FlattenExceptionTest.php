@@ -175,9 +175,9 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::createFromThrowable($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
-        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
+        $this->assertEquals('Oh noes!', $flattened->getMessage(), 'The message is copied from the original exception.');
+        $this->assertEquals(42, $flattened->getCode(), 'The code is copied from the original exception.');
+        $this->assertEquals('ParseError', $flattened->getClass(), 'The class is set to the class of the original exception');
     }
 
     /**
@@ -303,7 +303,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['resource', 'stream'], $array[$i++]);
 
         $args = $array[$i++];
-        $this->assertSame($args[0], 'object');
+        $this->assertSame('object', $args[0]);
         $this->assertTrue('Closure' === $args[1] || is_subclass_of($args[1], '\Closure'), 'Expect object class name to be Closure or a subclass of Closure.');
 
         $this->assertSame(['array', [['integer', 1], ['integer', 2]]], $array[$i++]);
@@ -318,8 +318,8 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['float', INF], $array[$i++]);
 
         // assertEquals() does not like NAN values.
-        $this->assertEquals($array[$i][0], 'float');
-        $this->assertNan($array[$i++][1]);
+        $this->assertEquals('float', $array[$i][0]);
+        $this->assertNan($array[$i][1]);
     }
 
     public function testRecursionInArguments()
@@ -358,7 +358,7 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::createFromThrowable($exception);
         $trace = $flattened->getTrace();
 
-        $this->assertSame($trace[1]['args'][0], ['array', ['array', '*SKIPPED over 10000 entries*']]);
+        $this->assertSame(['array', ['array', '*SKIPPED over 10000 entries*']], $trace[1]['args'][0]);
 
         $serializeTrace = serialize($trace);
 

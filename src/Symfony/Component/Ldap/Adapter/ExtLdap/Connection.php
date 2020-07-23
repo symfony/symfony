@@ -25,9 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Connection extends AbstractConnection
 {
-    private const LDAP_INVALID_CREDENTIALS = '0x31';
-    private const LDAP_TIMEOUT = '0x55';
-    private const LDAP_ALREADY_EXISTS = '0x44';
+    private const LDAP_INVALID_CREDENTIALS = 0x31;
+    private const LDAP_TIMEOUT = 0x55;
+    private const LDAP_ALREADY_EXISTS = 0x44;
 
     /** @var bool */
     private $bound = false;

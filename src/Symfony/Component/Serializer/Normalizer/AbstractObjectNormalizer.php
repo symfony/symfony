@@ -223,8 +223,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new RuntimeException(sprintf('The type "%s" has no mapped class for the abstract object "%s".', $type, $class));
             }
 
-            $class = $mappedClass;
-            $reflectionClass = new \ReflectionClass($class);
+            if ($mappedClass !== $class) {
+                return $this->instantiateObject($data, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
+            }
         }
 
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);

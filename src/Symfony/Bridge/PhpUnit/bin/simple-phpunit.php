@@ -93,7 +93,10 @@ $passthruOrFail = function ($command) {
     }
 };
 
-if (PHP_VERSION_ID >= 70200) {
+if (PHP_VERSION_ID >= 80000) {
+    // PHP 8 requires PHPUnit 9.3+
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.3');
+} elseif (PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.3');
 } elseif (PHP_VERSION_ID >= 70100) {
@@ -193,7 +196,11 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         'requires' => ['php' => '*'],
     ];
 
-    if (1 === count($info['versions'])) {
+    $stableVersions = array_filter($info['versions'], function($v) {
+        return !preg_match('/-dev$|^dev-/', $v);
+    });
+
+    if (!$stableVersions) {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress -s dev phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     } else {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");

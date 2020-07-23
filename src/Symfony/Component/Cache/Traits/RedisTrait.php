@@ -173,28 +173,28 @@ trait RedisTrait
             $initializer = function ($redis) use ($connect, $params, $dsn, $auth, $hosts) {
                 try {
                     @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+
+                    set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+                    $isConnected = $redis->isConnected();
+                    restore_error_handler();
+                    if (!$isConnected) {
+                        $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
+                        throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
+                    }
+
+                    if ((null !== $auth && !$redis->auth($auth))
+                        || ($params['dbindex'] && !$redis->select($params['dbindex']))
+                        || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
+                    ) {
+                        $e = preg_replace('/^ERR /', '', $redis->getLastError());
+                        throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
+                    }
+
+                    if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
+                        $redis->setOption(\Redis::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+                    }
                 } catch (\RedisException $e) {
                     throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
-                }
-
-                set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-                $isConnected = $redis->isConnected();
-                restore_error_handler();
-                if (!$isConnected) {
-                    $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
-                }
-
-                if ((null !== $auth && !$redis->auth($auth))
-                    || ($params['dbindex'] && !$redis->select($params['dbindex']))
-                    || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
-                ) {
-                    $e = preg_replace('/^ERR /', '', $redis->getLastError());
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
-                }
-
-                if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
-                    $redis->setOption(\Redis::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
                 }
 
                 return true;

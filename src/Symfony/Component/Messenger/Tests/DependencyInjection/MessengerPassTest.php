@@ -508,21 +508,35 @@ class MessengerPassTest extends TestCase
 
         $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
             ['id' => UselessMiddleware::class],
-            ['id' => 'middleware_with_factory', 'arguments' => ['index_0' => 'foo', 'bar']],
+            ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs1 = ['index_0' => 'foo', 'bar']],
+            ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs2 = ['index_0' => 'baz']],
             ['id' => 'middleware_with_factory_using_default'],
         ]);
 
         (new MessengerPass())->process($container);
         (new ResolveChildDefinitionsPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition($factoryChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory'));
+        $this->assertTrue($container->hasDefinition(
+            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs1)
+        ));
         $this->assertEquals(
             ['foo', 'bar'],
-            $container->getDefinition($factoryChildMiddlewareId)->getArguments(),
+            $container->getDefinition($factoryChildMiddlewareArgs1Id)->getArguments(),
             'parent default argument is overridden, and next ones appended'
         );
 
-        $this->assertTrue($container->hasDefinition($factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'));
+        $this->assertTrue($container->hasDefinition(
+            $factoryChildMiddlewareArgs2Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs2)
+        ));
+        $this->assertEquals(
+            ['baz'],
+            $container->getDefinition($factoryChildMiddlewareArgs2Id)->getArguments(),
+            'parent default argument is overridden, and next ones appended'
+        );
+
+        $this->assertTrue($container->hasDefinition(
+            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default.'.ContainerBuilder::hash([])
+        ));
         $this->assertEquals(
             ['some_default'],
             $container->getDefinition($factoryWithDefaultChildMiddlewareId)->getArguments(),
@@ -531,7 +545,8 @@ class MessengerPassTest extends TestCase
 
         $this->assertEquals([
             new Reference(UselessMiddleware::class),
-            new Reference($factoryChildMiddlewareId),
+            new Reference($factoryChildMiddlewareArgs1Id),
+            new Reference($factoryChildMiddlewareArgs2Id),
             new Reference($factoryWithDefaultChildMiddlewareId),
         ], $container->getDefinition($fooBusId)->getArgument(0)->getValues());
         $this->assertFalse($container->hasParameter($middlewareParameter));

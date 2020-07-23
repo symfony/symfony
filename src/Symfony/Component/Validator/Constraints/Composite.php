@@ -25,8 +25,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * contains the nested constraints.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @internal since Symfony 5.1
  */
 abstract class Composite extends Constraint
 {

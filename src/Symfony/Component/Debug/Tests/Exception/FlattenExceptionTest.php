@@ -174,9 +174,9 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::create($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
-        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
+        $this->assertEquals('Oh noes!', $flattened->getMessage(), 'The message is copied from the original exception.');
+        $this->assertEquals(42, $flattened->getCode(), 'The code is copied from the original exception.');
+        $this->assertEquals('ParseError', $flattened->getClass(), 'The class is set to the class of the original exception');
     }
 
     /**
@@ -300,7 +300,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['float', INF], $array[$i++]);
 
         // assertEquals() does not like NAN values.
-        $this->assertEquals($array[$i][0], 'float');
+        $this->assertEquals('float', $array[$i][0]);
         $this->assertNan($array[$i][1]);
     }
 

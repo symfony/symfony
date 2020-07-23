@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-12T09:37:15Z
+
+/cc @ogizanagi maybe?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-07-15T19:57:38Z
+
+I don't have arguments against.
+[This comment](https://github.com/symfony/symfony/blob/367aa1df6caa2c739a58165ead81e7fe50e6599e/src/Symfony/Component/Validator/Constraints/Composite.php#L23-L25) let me think this was at least considered a valid use-case despite not being the main motivation.
+
+What do you think @xabbuh?
+At least, if we truly want it to be internal, we should remove this comment as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-07-16T06:01:16Z
+
+works for me

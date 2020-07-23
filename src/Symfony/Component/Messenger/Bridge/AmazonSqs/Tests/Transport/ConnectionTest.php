@@ -148,6 +148,16 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithAccountAndEndpointOption()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+
+        $this->assertEquals(
+            new Connection(['account' => 12345], new SqsClient(['endpoint' => 'https://custom-endpoint.tld', 'region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default', ['endpoint' => 'https://custom-endpoint.tld', 'account' => 12345], $httpClient)
+        );
+    }
+
     public function testKeepGettingPendingMessages()
     {
         $client = $this->createMock(SqsClient::class);

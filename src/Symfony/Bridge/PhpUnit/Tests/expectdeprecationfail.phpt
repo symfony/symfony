@@ -2,8 +2,8 @@
 Test ExpectDeprecationTrait failing tests
 --FILE--
 <?php
-$test =  realpath(__DIR__ . '/FailTests/ExpectDeprecationTraitTestFail.php');
-passthru(getenv('SYMFONY_SIMPLE_PHPUNIT_BIN_DIR') . '/simple-phpunit --colors=never ' . $test);
+$test =  realpath(__DIR__.'/FailTests/ExpectDeprecationTraitTestFail.php');
+passthru('php '.getenv('SYMFONY_SIMPLE_PHPUNIT_BIN_DIR').'/simple-phpunit.php --colors=never '.$test);
 ?>
 --EXPECTF--
 PHPUnit %s by Sebastian Bergmann and contributors.

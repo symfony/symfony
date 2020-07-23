@@ -74,3 +74,8 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [23]: https://github.com/symfony/symfony-demo
 [24]: https://symfony.com/coc
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
+
+Donation
+--------
+
+Bitcoin address: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -68,11 +69,10 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 if ($chunk->isFirst()) {
                     $this->assertSame(200, $context->getStatusCode());
                 }
-
-                yield $chunk;
             } catch (TransportExceptionInterface $e) {
                 $context->getResponse()->cancel();
                 $context->replaceRequest('GET', 'http://localhost:8057/');
+                $context->passthru();
             }
         });
 

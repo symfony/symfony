@@ -119,24 +119,24 @@ trait RedisTrait
             $initializer = function ($redis) use ($connect, $params, $dsn, $auth) {
                 try {
                     @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], $params['persistent_id'], $params['retry_interval']);
+
+                    set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+                    $isConnected = $redis->isConnected();
+                    restore_error_handler();
+                    if (!$isConnected) {
+                        $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
+                        throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
+                    }
+
+                    if ((null !== $auth && !$redis->auth($auth))
+                        || ($params['dbindex'] && !$redis->select($params['dbindex']))
+                        || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
+                    ) {
+                        $e = preg_replace('/^ERR /', '', $redis->getLastError());
+                        throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
+                    }
                 } catch (\RedisException $e) {
                     throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e->getMessage());
-                }
-
-                set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-                $isConnected = $redis->isConnected();
-                restore_error_handler();
-                if (!$isConnected) {
-                    $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');
-                }
-
-                if ((null !== $auth && !$redis->auth($auth))
-                    || ($params['dbindex'] && !$redis->select($params['dbindex']))
-                    || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
-                ) {
-                    $e = preg_replace('/^ERR /', '', $redis->getLastError());
-                    throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');
                 }
 
                 return true;

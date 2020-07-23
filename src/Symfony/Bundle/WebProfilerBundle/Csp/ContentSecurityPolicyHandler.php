@@ -128,10 +128,10 @@ class ContentSecurityPolicyHandler
         $headers = $this->getCspHeaders($response);
 
         $types = [
-          'script-src'      => 'csp_script_nonce',
+          'script-src' => 'csp_script_nonce',
           'script-src-elem' => 'csp_script_nonce',
-          'style-src'       => 'csp_style_nonce',
-          'style-src-elem'  => 'csp_style_nonce'
+          'style-src' => 'csp_style_nonce',
+          'style-src-elem' => 'csp_style_nonce',
         ];
 
         foreach ($headers as $header => $directives) {

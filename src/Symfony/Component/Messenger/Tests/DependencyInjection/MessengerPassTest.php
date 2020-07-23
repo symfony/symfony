@@ -517,7 +517,7 @@ class MessengerPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $this->assertTrue($container->hasDefinition(
-            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs1)
+            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory'
         ));
         $this->assertEquals(
             ['foo', 'bar'],
@@ -535,7 +535,7 @@ class MessengerPassTest extends TestCase
         );
 
         $this->assertTrue($container->hasDefinition(
-            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default.'.ContainerBuilder::hash([])
+            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'
         ));
         $this->assertEquals(
             ['some_default'],

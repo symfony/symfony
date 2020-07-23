@@ -463,7 +463,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
-        $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
+        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
     }
 
     public function testRequest()

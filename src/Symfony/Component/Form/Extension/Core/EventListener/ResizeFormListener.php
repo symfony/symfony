@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormInterface;
  * Resize a collection form element based on the data sent from the client.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Patrick Bußmann <patrick.bussmann@bussmann-it.de>
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
@@ -28,21 +29,24 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $options;
     protected $allowAdd;
     protected $allowDelete;
+    protected $indexName;
 
     private $deleteEmpty;
 
     /**
-     * @param bool          $allowAdd    Whether children could be added to the group
-     * @param bool          $allowDelete Whether children could be removed from the group
-     * @param bool|callable $deleteEmpty
+     * @param bool                 $allowAdd    Whether children could be added to the group
+     * @param bool                 $allowDelete Whether children could be removed from the group
+     * @param bool|callable        $deleteEmpty
+     * @param string|callable|null $indexName
      */
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
+    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false, $indexName = null)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
         $this->deleteEmpty = $deleteEmpty;
+        $this->indexName = $indexName;
     }
 
     public static function getSubscribedEvents()
@@ -75,7 +79,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($name, $this->type, array_replace([
+            $form->add($this->getIndexFromValue($value, $name), $this->type, array_replace([
                 'property_path' => '['.$name.']',
             ], $this->options));
         }
@@ -102,9 +106,10 @@ class ResizeFormListener implements EventSubscriberInterface
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
-                if (!$form->has($name)) {
-                    $form->add($name, $this->type, array_replace([
-                        'property_path' => '['.$name.']',
+                $indexedName = $this->getIndexFromValue($value, $name);
+                if (!$form->has($indexedName)) {
+                    $form->add($indexedName, $this->type, array_replace([
+                        'property_path' => '['.$indexedName.']',
                     ], $this->options));
                 }
             }
@@ -150,7 +155,8 @@ class ResizeFormListener implements EventSubscriberInterface
             $toDelete = [];
 
             foreach ($data as $name => $child) {
-                if (!$form->has($name)) {
+                $indexedName = $this->getIndexFromValue($child, $name);
+                if (!$form->has($indexedName)) {
                     $toDelete[] = $name;
                 }
             }
@@ -160,6 +166,27 @@ class ResizeFormListener implements EventSubscriberInterface
             }
         }
 
-        $event->setData($data);
+        if (null !== $this->indexName) {
+            $newData = [];
+            foreach ($form->all() as $item) {
+                $newData[$item->getName()] = $item->getData();
+            }
+            $event->setData($newData);
+        } else {
+            $event->setData($data);
+        }
+    }
+
+    private function getIndexFromValue($value, $defaultValue = null)
+    {
+        if (null === $this->indexName || null === $value) {
+            return $defaultValue;
+        }
+        $indexGetter = 'get'.ucfirst($this->indexName);
+
+        return (\is_callable($this->indexName) ? ($this->indexName)($value, $defaultValue)
+                : (method_exists($value, $indexGetter) ? $value->$indexGetter()
+                    : (\is_array($value) && \array_key_exists($this->indexName, $value)
+                        ? $value[$this->indexName] : null))) ?: $defaultValue;
     }
 }

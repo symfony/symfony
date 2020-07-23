@@ -20,6 +20,7 @@ CHANGELOG
  * Deprecated `Symfony\Component\Form\Extension\Validator\Util\ServerParams` in favor of its parent class `Symfony\Component\Form\Util\ServerParams`
  * Added the `html5` option to the `ColorType` to validate the input
  * Deprecated `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
+ * Added `index_name` for `CollectionType` which allows submitting keys in collections
 
 5.0.0
 -----

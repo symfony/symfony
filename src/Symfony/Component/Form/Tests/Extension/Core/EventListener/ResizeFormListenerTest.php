@@ -16,6 +16,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
@@ -64,6 +66,21 @@ class ResizeFormListenerTest extends TestCase
         $this->assertFalse($this->form->has('0'));
         $this->assertTrue($this->form->has('1'));
         $this->assertTrue($this->form->has('2'));
+    }
+
+    public function testPreSetDataResizesFormWithIndexedName()
+    {
+        $this->form->add($this->getForm('my-id-0'));
+        $this->form->add($this->getForm('my-id-1'));
+
+        $data = ['my-id-2' => 'string', 'my-id-1' => 'string xy'];
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], false, false);
+        $listener->preSetData($event);
+
+        $this->assertFalse($this->form->has('my-id-0'));
+        $this->assertTrue($this->form->has('my-id-1'));
+        $this->assertTrue($this->form->has('my-id-2'));
     }
 
     public function testPreSetDataRequiresArrayOrTraversable()
@@ -187,6 +204,18 @@ class ResizeFormListenerTest extends TestCase
         $this->assertEquals([1 => 'second'], $event->getData());
     }
 
+    public function testOnSubmitNormDataRemovesEntriesMissingInTheFormIfAllowDeleteWithIndexedName()
+    {
+        $this->form->add($this->getForm('my-id-1'));
+
+        $data = ['my-id-0' => 'first', 'my-id-1' => 'second', 'my-id-2' => 'third'];
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener('text', [], false, true);
+        $listener->onSubmit($event);
+
+        $this->assertEquals(['my-id-1' => 'second'], $event->getData());
+    }
+
     public function testOnSubmitNormDataDoesNothingIfNotAllowDelete()
     {
         $this->form->add($this->getForm('1'));
@@ -291,5 +320,98 @@ class ResizeFormListenerTest extends TestCase
         $listener->onSubmit($event);
 
         $this->assertEquals(['0' => ['name' => 'John']], $event->getData());
+    }
+
+    public function testOnSubmitDeleteEmptyCompoundEntriesIfAllowDeleteWithIndexedName()
+    {
+        $this->form->setData(['my-id-1' => ['name' => 'John'], 'my-id-2' => ['name' => 'Jane']]);
+        $form1 = $this->getBuilder('my-id-1')
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+        $form1->add($this->getForm('name'));
+        $form2 = $this->getBuilder('my-id-2')
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+        $form2->add($this->getForm('name'));
+        $this->form->add($form1);
+        $this->form->add($form2);
+
+        $data = ['my-id-1' => ['name' => 'John'], 'my-id-2' => ['name' => '']];
+        foreach ($data as $child => $dat) {
+            $this->form->get($child)->setData($dat);
+        }
+        $event = new FormEvent($this->form, $data);
+        $callback = function ($data) {
+            return '' === $data['name'];
+        };
+        $listener = new ResizeFormListener('text', [], false, true, $callback);
+        $listener->onSubmit($event);
+
+        $this->assertEquals(['my-id-1' => ['name' => 'John']], $event->getData());
+    }
+
+    public function testIndexedNameFeature()
+    {
+        $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'allow_add' => true,
+                'data' => ['foo'],
+                'index_name' => 'id',
+            ])
+            ->getForm()
+        ;
+
+        $this->assertSame(['foo'], $form->get('items')->getData());
+        $form->submit(['items' => ['foo', 'my-id-1' => 'foo', 'my-id-2' => 'bar']]);
+        $this->assertSame(['foo', 'my-id-1' => 'foo', 'my-id-2' => 'bar'], $form->get('items')->getData());
+    }
+
+    public function testIndexedNameFeatureWithAllowDelete()
+    {
+        $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'data' => ['foo'],
+                'index_name' => 'id',
+            ])
+            ->getForm()
+        ;
+
+        $this->assertSame(['foo'], $form->get('items')->getData());
+        $form->submit(['items' => ['my-id-1' => 'foo', 'my-id-2' => 'bar']]);
+        $this->assertSame(['my-id-1' => 'foo', 'my-id-2' => 'bar'], $form->get('items')->getData());
+    }
+
+    public function testIndexedNameFeatureWithSimulatedArray()
+    {
+        $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
+            ->add('items', CollectionType::class, [
+                'entry_type' => FooType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'data' => $data = [
+                    ['id' => 'custom-id-1', 'foo' => 'bar'],
+                    ['id' => 'custom-id-2', 'foo' => 'me'],
+                    ['id' => 'custom-id-3', 'foo' => 'foo'],
+                ],
+                'index_name' => 'id',
+            ])
+            ->getForm()
+        ;
+
+        $this->assertSame($data, $form->get('items')->getData());
+        $form->submit(['items' => [
+            'custom-id-3' => ['foo' => 'foo 2'],
+            'custom-id-1' => ['foo' => 'bar 2'],
+        ]]);
+        $this->assertSame([
+            'custom-id-1' => ['id' => 'custom-id-1', 'foo' => 'bar 2'],
+            'custom-id-3' => ['id' => 'custom-id-3', 'foo' => 'foo 2'],
+        ], $form->get('items')->getData());
     }
 }

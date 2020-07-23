@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\Extension\Validator\Event\PostValidateEvent;
+use Symfony\Component\Form\Extension\Validator\Event\PreValidateEvent;
+use Symfony\Component\Form\Extension\Validator\FormValidationEvents;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -27,6 +31,8 @@ class ValidationListener implements EventSubscriberInterface
 
     private $violationMapper;
 
+    private $eventDispatcher;
+
     /**
      * {@inheritdoc}
      */
@@ -35,10 +41,16 @@ class ValidationListener implements EventSubscriberInterface
         return [FormEvents::POST_SUBMIT => 'validateForm'];
     }
 
-    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
+    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper, ?EventDispatcherInterface $eventDispatcher = null)
     {
         $this->validator = $validator;
         $this->violationMapper = $violationMapper;
+
+        if (!$this->eventDispatcher) {
+            @trigger_error(sprintf('The "$eventDispatcher" argument to the "%s" constructor will be required in Symfony 6.0.', self::class));
+        }
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function validateForm(FormEvent $event)
@@ -46,6 +58,10 @@ class ValidationListener implements EventSubscriberInterface
         $form = $event->getForm();
 
         if ($form->isRoot()) {
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new PreValidateEvent($event->getForm(), $event->getData()), FormValidationEvents::PRE_VALIDATE);
+            }
+
             // Form groups are validated internally (FormValidator). Here we don't set groups as they are retrieved into the validator.
             foreach ($this->validator->validate($form) as $violation) {
                 // Allow the "invalid" constraint to be put onto
@@ -53,6 +69,10 @@ class ValidationListener implements EventSubscriberInterface
                 $allowNonSynchronized = $violation->getConstraint() instanceof Form && Form::NOT_SYNCHRONIZED_ERROR === $violation->getCode();
 
                 $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
+            }
+
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new PostValidateEvent($event->getForm(), $event->getData()), FormValidationEvents::POST_VALIDATE);
             }
         }
     }

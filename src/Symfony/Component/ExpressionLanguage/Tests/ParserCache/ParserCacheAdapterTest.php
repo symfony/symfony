@@ -38,8 +38,8 @@ class ParserCacheAdapterTest extends TestCase
 
         $cacheItem = $parserCacheAdapter->getItem($key);
 
-        $this->assertEquals($cacheItem->get(), $value);
-        $this->assertEquals($cacheItem->isHit(), true);
+        $this->assertEquals($value, $cacheItem->get());
+        $this->assertTrue($cacheItem->isHit());
     }
 
     public function testSave()

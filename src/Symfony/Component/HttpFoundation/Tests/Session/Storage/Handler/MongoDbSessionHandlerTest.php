@@ -102,7 +102,7 @@ class MongoDbSessionHandlerTest extends TestCase
             ->method('findOne')
             ->willReturnCallback(function ($criteria) use ($testTimeout) {
                 $this->assertArrayHasKey($this->options['id_field'], $criteria);
-                $this->assertEquals($criteria[$this->options['id_field']], 'foo');
+                $this->assertEquals('foo', $criteria[$this->options['id_field']]);
 
                 $this->assertArrayHasKey($this->options['expiry_field'], $criteria);
                 $this->assertArrayHasKey('$gte', $criteria[$this->options['expiry_field']]);

@@ -163,7 +163,7 @@ class LdapManagerTest extends LdapTestCase
 
         $result = $this->executeSearchQuery(1);
         $renamedEntry = $result[0];
-        $this->assertEquals($renamedEntry->getAttribute('cn')[0], 'Kevin');
+        $this->assertEquals('Kevin', $renamedEntry->getAttribute('cn')[0]);
 
         $oldRdn = $entry->getAttribute('cn')[0];
         $entryManager->rename($renamedEntry, 'cn='.$oldRdn);

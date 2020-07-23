@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
+use Symfony\Component\Form\Extension\Validator\FormValidationEvents;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -67,19 +68,24 @@ class ValidationListenerTest extends TestCase
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->validator = Validation::createValidator();
-        $this->listener = new ValidationListener($this->validator, new ViolationMapper());
+        $this->listener = new ValidationListener($this->validator, new ViolationMapper(), $this->dispatcher);
         $this->message = 'Message';
         $this->messageTemplate = 'Message template';
         $this->params = ['foo' => 'bar'];
     }
 
-    private function createForm($name = '', $compound = false)
+    private function createForm($name = '', $compound = false, ?object $listener = null)
     {
-        $config = new FormBuilder($name, null, new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
+        $config = new FormBuilder($name, null, $this->dispatcher, (new FormFactoryBuilder())->getFormFactory());
         $config->setCompound($compound);
 
         if ($compound) {
             $config->setDataMapper(new PropertyPathMapper());
+        }
+
+        if ($listener) {
+            $config->addEventListener(FormValidationEvents::PRE_VALIDATE, [$listener, 'preValidate']);
+            $config->addEventListener(FormValidationEvents::POST_VALIDATE, [$listener, 'postValidate']);
         }
 
         return new Form($config);
@@ -133,6 +139,32 @@ class ValidationListenerTest extends TestCase
         $form->submit(null);
 
         $this->listener->validateForm(new FormEvent($form, null));
+
+        $this->assertTrue($form->isValid());
+    }
+
+    public function testEventsAreDispatched()
+    {
+        $data = ['foo' => 'bar'];
+
+        $mock = $this->getMockBuilder('\stdClass')
+            ->setMethods(['preValidate', 'postValidate'])
+            ->getMock();
+        $mock->expects($this->once())
+            ->method('preValidate')
+            ->with($this->callback(function ($event) use ($data) {
+                return $data === $event->getData();
+            }));
+        $mock->expects($this->once())
+            ->method('postValidate')
+            ->with($this->callback(function ($event) use ($data) {
+                return $data === $event->getData();
+            }));
+
+        $form = $this->createForm('', false, $mock);
+        $form->submit($data);
+
+        $this->listener->validateForm(new FormEvent($form, $data));
 
         $this->assertTrue($form->isValid());
     }

@@ -176,7 +176,9 @@ EOF
             $subscribers[] = new StopWorkerOnTimeLimitListener($timeLimit, $this->logger);
         }
 
-        foreach ($subscribers as $subscriber) $this->eventDispatcher->addSubscriber($subscriber);
+        foreach ($subscribers as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
@@ -202,7 +204,9 @@ EOF
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);
 
-        foreach ($subscribers as $subscriber) $this->eventDispatcher->removeSubscriber($subscriber);
+        foreach ($subscribers as $subscriber) {
+            $this->eventDispatcher->removeSubscriber($subscriber);
+        }
 
         return 0;
     }

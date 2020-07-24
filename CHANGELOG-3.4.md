@@ -7,6 +7,34 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.43 (2020-07-24)
+
+ * bug #37635 [Cache] fix catching auth errors (nicolas-grekas)
+ * bug #37572 [FrameworkBundle] set default session.handler alias if handler_id is not provided (Youssef BENHSSAIEN)
+ * bug #37607 Fix checks for phpunit releases on Composer 2 (colinodell)
+ * bug #37562 [Cache] Use the default expiry when saving (not when creating) items (philipp-kolesnikov)
+ * bug #37563 Fix DBAL deprecation (nicolas-grekas)
+ * bug #37521 [Form] Fix ChoiceType translation domain (VincentLanglet)
+ * bug #37520 [Form] silently ignore uninitialized properties when mapping data to forms (ph-fritsche)
+ * bug #37526 [Cache][Config] ensure compatibility with PHP 8 stack traces (xabbuh)
+ * bug #37461 [Process] Fix Permission Denied error when writing sf_proc_00 lock files on Windows (JasonStephensTAMU)
+ * bug #37505 [Form] fix handling null as empty data (xabbuh)
+ * bug #37385 [Console] Fixes question input encoding on Windows (YaFou)
+ * bug #37447 [Validator] fix validating lazy properties that evaluate to null (xabbuh)
+ * bug #37464 [ErrorHandler] fix throwing from __toString() (nicolas-grekas)
+ * bug #37291 [MimeType] Duplicated MimeType due to PHP Bug (juanmrad)
+ * bug #37425 [Form] fix guessing form types for DateTime types (xabbuh)
+ * bug #37392 [Validator] fix handling typed properties as constraint options (xabbuh)
+ * bug #37389 [HttpFondation] Change file extension of "audio/mpeg" from "mpga" to "mp3" (YaFou)
+ * bug #37383 [VarDumper] Support for cURL handler objects (derrabus)
+ * bug #37345 [Form] collect all transformation failures (xabbuh)
+ * bug #37340  Fix support for PHP8 union types (nicolas-grekas)
+ * bug #37275 [DI] tighten detection of local dirs to prevent false positives (nicolas-grekas)
+ * bug #37090 [PhpUnitBridge] Streamline ansi/no-ansi of composer according to phpunit --colors option (kick-the-bucket)
+ * bug #36230 [VarDumper] Fix CliDumper coloration on light arrays (l-vo)
+ * bug #37270 [FrameworkBundle] preserve dots in query-string when redirecting (nicolas-grekas)
+ * bug #37342 [Cache] fix compat with DBAL v3 (nicolas-grekas)
+
 * 3.4.42 (2020-06-12)
 
  * bug #37103 [Form] switch the context when validating nested forms (xabbuh)

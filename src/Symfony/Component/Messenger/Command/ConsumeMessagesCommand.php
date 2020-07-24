@@ -23,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -153,25 +154,29 @@ EOF
         }
 
         $stopsWhen = [];
+        /** @var EventSubscriberInterface[] $subscribers */
+        $subscribers = [];
         if ($limit = $input->getOption('limit')) {
             $stopsWhen[] = "processed {$limit} messages";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
+            $subscribers[] = new StopWorkerOnMessageLimitListener($limit, $this->logger);
         }
 
         if ($failureLimit = $input->getOption('failure-limit')) {
             $stopsWhen[] = "reached {$failureLimit} failed messages";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnFailureLimitListener($failureLimit, $this->logger));
+            $subscribers[] = new StopWorkerOnFailureLimitListener($failureLimit, $this->logger);
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
             $stopsWhen[] = "exceeded {$memoryLimit} of memory";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
+            $subscribers[] = new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger);
         }
 
         if ($timeLimit = $input->getOption('time-limit')) {
             $stopsWhen[] = "been running for {$timeLimit}s";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
+            $subscribers[] = new StopWorkerOnTimeLimitListener($timeLimit, $this->logger);
         }
+
+        foreach ($subscribers as $subscriber) $this->eventDispatcher->addSubscriber($subscriber);
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
@@ -196,6 +201,8 @@ EOF
         $worker->run([
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);
+
+        foreach ($subscribers as $subscriber) $this->eventDispatcher->removeSubscriber($subscriber);
 
         return 0;
     }

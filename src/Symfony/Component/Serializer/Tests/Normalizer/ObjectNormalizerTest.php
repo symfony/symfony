@@ -12,10 +12,12 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Exception\MissingMutatorMethodException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -296,6 +298,16 @@ class ObjectNormalizerTest extends TestCase
             'foo' => 'b',
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],
         ], DummyWithConstructorObjectAndDefaultValue::class, null, $context));
+    }
+
+    public function testAttributesWithoutAccessor()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $obj = new DummyWithoutAccessor();
+
+        $normalizedObj = $normalizer->normalize($obj);
+
+        $this->assertArrayHasKey('email', $normalizedObj);
     }
 
     public function testNormalizeSameObjectWithDifferentAttributes()
@@ -981,5 +993,15 @@ class DummyWithNullableConstructorObject
     public function getInner()
     {
         return $this->inner;
+    }
+}
+
+class DummyWithoutAccessor
+{
+    private $email = 'dummy@example.com';
+
+    public function email(): string
+    {
+        return $this->email;
     }
 }

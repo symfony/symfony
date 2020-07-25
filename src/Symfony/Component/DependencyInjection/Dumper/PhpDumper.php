@@ -877,7 +877,7 @@ EOF;
                 $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
                 $lazyloadInitialization = $definition->isLazy() ? '$lazyLoad = true' : '';
 
-                $c = sprintf("        %s = function (%s) {\n%s        };\n\n        return %1\$s();\n", $factory, $lazyloadInitialization, $c);
+                $c = sprintf("        %s = function (%s) use (\$container) {\n%s        };\n\n        return %1\$s();\n", $factory, $lazyloadInitialization, $c);
             }
 
             $code .= $c;

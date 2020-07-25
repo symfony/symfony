@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added support for properties without mutator method to `ObjectNormalizer`
+
 5.1.0
 -----
 

@@ -41,7 +41,7 @@ class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
         ++$this->failedMessages;
 
         if (null !== $this->logger) {
-            $this->logger->error("Message failed with {error}", ['error' => (string) $event->getThrowable()]);
+            $this->logger->error('Message failed with {error}', ['error' => (string) $event->getThrowable()]);
         }
     }
 

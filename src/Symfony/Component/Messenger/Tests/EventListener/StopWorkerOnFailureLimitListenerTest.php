@@ -84,7 +84,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $event = new WorkerRunningEvent($worker, false);
 
         $failEvent = $this->createFailedEvent();
-        $failEvent->getThrowable()->expects($this->once())->method('__toString')->willReturn("trace");
+        $failEvent->getThrowable()->expects($this->once())->method('__toString')->willReturn('trace');
 
         $failureLimitListener = new StopWorkerOnFailureLimitListener(1, $logger);
         $failureLimitListener->onMessageFailed($failEvent);

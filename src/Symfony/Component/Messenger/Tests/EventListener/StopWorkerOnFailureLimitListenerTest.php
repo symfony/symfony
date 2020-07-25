@@ -70,6 +70,27 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $failureLimitListener->onWorkerRunning($event);
     }
 
+    public function testWorkerLogsErrorWhenLoggerIsGiven(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $logger->expects($this->once())->method('error')
+            ->with(
+                $this->equalTo('Message failed with {error}'),
+                $this->equalTo(['error' => 'trace'])
+            );
+
+        $worker = $this->createMock(Worker::class);
+        $event = new WorkerRunningEvent($worker, false);
+
+        $failEvent = $this->createFailedEvent();
+        $failEvent->getThrowable()->expects($this->once())->method('__toString')->willReturn("trace");
+
+        $failureLimitListener = new StopWorkerOnFailureLimitListener(1, $logger);
+        $failureLimitListener->onMessageFailed($failEvent);
+        $failureLimitListener->onWorkerRunning($event);
+    }
+
     private function createFailedEvent(): WorkerMessageFailedEvent
     {
         $envelope = new Envelope(new DummyMessage('hello'));

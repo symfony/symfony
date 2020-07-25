@@ -39,6 +39,10 @@ class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
         ++$this->failedMessages;
+
+        if (null !== $this->logger) {
+            $this->logger->error("Message failed with {error}", ['error' => (string) $event->getThrowable()]);
+        }
     }
 
     public function onWorkerRunning(WorkerRunningEvent $event): void

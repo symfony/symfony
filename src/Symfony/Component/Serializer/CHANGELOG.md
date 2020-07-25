@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.2.0
------
-
- * added support for properties without mutator method to `ObjectNormalizer`
-
 5.1.0
 -----
 
@@ -13,6 +8,7 @@ CHANGELOG
  * added support for `\stdClass` to `ObjectNormalizer`
  * added the ability to ignore properties using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Ignore`)
  * added an option to serialize constraint violations payloads (e.g. severity)
+ * added support for properties without mutator method to `ObjectNormalizer`
 
 5.0.0
 -----

@@ -48,6 +48,7 @@
         "psr/log-implementation": "To use logging capability in translator"
     },
     "autoload": {
+        "files": [ "Resources/functions/translatable.php" ],
         "psr-4": { "Symfony\\Component\\Translation\\": "" },
         "exclude-from-classmap": [
             "/Tests/"

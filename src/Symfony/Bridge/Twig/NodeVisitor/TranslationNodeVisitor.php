@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
+use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\Node;
 use Twig\NodeVisitor\AbstractNodeVisitor;
 
@@ -68,6 +69,20 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             ];
         } elseif (
             $node instanceof FilterExpression &&
+            'trans' === $node->getNode('filter')->getAttribute('value') &&
+            $node->getNode('node') instanceof FunctionExpression &&
+            't' === $node->getNode('node')->getAttribute('name')
+        ) {
+            $nodeArguments = $node->getNode('node')->getNode('arguments');
+
+            if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
+                $this->messages[] = [
+                    $this->getReadMessageFromArguments($nodeArguments, 0),
+                    $this->getReadDomainFromArguments($nodeArguments, 2),
+                ];
+            }
+        } elseif (
+            $node instanceof FilterExpression &&
             'transchoice' === $node->getNode('filter')->getAttribute('value') &&
             $node->getNode('node') instanceof ConstantExpression
         ) {
@@ -101,6 +116,28 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
     public function getPriority(): int
     {
         return 0;
+    }
+
+    private function getReadMessageFromArguments(Node $arguments, int $index): ?string
+    {
+        if ($arguments->hasNode('message')) {
+            $argument = $arguments->getNode('message');
+        } elseif ($arguments->hasNode($index)) {
+            $argument = $arguments->getNode($index);
+        } else {
+            return null;
+        }
+
+        return $this->getReadMessageFromNode($argument);
+    }
+
+    private function getReadMessageFromNode(Node $node): ?string
+    {
+        if ($node instanceof ConstantExpression) {
+            return $node->getAttribute('value');
+        }
+
+        return null;
     }
 
     private function getReadDomainFromArguments(Node $arguments, int $index): ?string

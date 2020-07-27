@@ -442,6 +442,40 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals(' 8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM')), $this->createOutputInterface(), $question));
     }
 
+    public function testAskMultilineResponseWithEOF()
+    {
+        $essay = <<<'EOD'
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque pretium lectus quis suscipit porttitor. Sed pretium bibendum vestibulum.
+
+Etiam accumsan, justo vitae imperdiet aliquet, neque est sagittis mauris, sed interdum massa leo id leo.
+
+Aliquam rhoncus, libero ac blandit convallis, est sapien hendrerit nulla, vitae aliquet tellus orci a odio. Aliquam gravida ante sit amet massa lacinia, ut condimentum purus venenatis.
+
+Vivamus et erat dictum, euismod neque in, laoreet odio. Aenean vitae tellus at leo vestibulum auctor id eget urna.
+EOD;
+
+        $response = $this->getInputStream($essay);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertEquals($essay, $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithSingleNewline()
+    {
+        $response = $this->getInputStream("\n");
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertEquals('', $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
     /**
      * @dataProvider getAskConfirmationData
      */

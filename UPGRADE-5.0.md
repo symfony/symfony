@@ -681,4 +681,4 @@ WebProfilerBundle
 WebServerBundle
 ---------------
 
- * The bundle has been removed.
+ * The bundle has been deprecated and can be installed separately. You may also use the Symfony Local Web Server instead.

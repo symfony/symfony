@@ -1,5 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% import _self as helper %}
+
 {% block toolbar %}
     {% if collector.requestCount %}
         {% set icon %}
@@ -88,6 +90,7 @@
                                             {% if trace.options is not empty %}
                                                 {{ profiler_dump(trace.options, maxDepth=1) }}
                                             {% endif %}
+                                            <button class="btn btn-sm" data-clipboard-text="{{ helper.render_curl(trace) }}">Copy-as-Curl</button>
                                         </th>
                                         {% if profiler_token and profiler_link %}
                                             <th>
@@ -121,6 +124,8 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                {# tmp: introspect the "trace" #}
+                                {{ dump(trace) }}
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -128,4 +133,19 @@
             {% endfor %}
         {% endif %}
     </div>
+
+    <script type="text/javascript">//<![CDATA[
+
+        document.querySelectorAll('[data-clipboard-text]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                navigator.clipboard.writeText(button.getAttribute('data-clipboard-text'));
+            })
+        });
+
+    //]]></script>
+
 {% endblock %}
+
+{% macro render_curl(trace) %}
+curl "{{ trace.url }}" --compressed -H "Connection: keep-alive" -v
+{% endmacro %}

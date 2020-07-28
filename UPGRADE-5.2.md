@@ -16,6 +16,11 @@ TwigBundle
 
  * Deprecated the public `twig` service to private.
 
+TwigBridge
+----------
+
+ * Changed 2nd argument type of `TranslationExtension::__construct()` to `TranslationNodeVisitor`
+
 Validator
 ---------
 

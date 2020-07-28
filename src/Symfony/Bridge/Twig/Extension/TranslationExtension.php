@@ -18,7 +18,6 @@ use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
-use Twig\NodeVisitor\NodeVisitorInterface;
 use Twig\TwigFilter;
 
 // Help opcache.preload discover always-needed symbols
@@ -34,7 +33,7 @@ final class TranslationExtension extends AbstractExtension
     private $translator;
     private $translationNodeVisitor;
 
-    public function __construct(TranslatorInterface $translator = null, NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator = null, TranslationNodeVisitor $translationNodeVisitor = null)
     {
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;

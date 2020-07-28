@@ -15,7 +15,7 @@
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>HTTP errors</b>
-                <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.errorCount }}</span>
+                <span class="sf-toolbar-status {{ collector.errorCount > 0 ? 'sf-toolbar-status-red' }}">{{ collector.errorCount }}</span>
             </div>
         {% endset %}
 

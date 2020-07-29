@@ -11,22 +11,22 @@
 
 namespace Symfony\Bridge\Monolog\Processor;
 
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Adds the current security token to the log entry.
+ * Adds the original security token to the log entry.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
  */
-class TokenProcessor extends AbstractTokenProcessor
+class SwitchUserTokenProcessor extends AbstractTokenProcessor
 {
     /**
      * {@inheritdoc}
      */
     protected function getKey(): string
     {
-        return 'token';
+        return 'impersonator_token';
     }
 
     /**
@@ -34,6 +34,12 @@ class TokenProcessor extends AbstractTokenProcessor
      */
     protected function getToken(): ?TokenInterface
     {
-        return $this->tokenStorage->getToken();
+        $token = $this->tokenStorage->getToken();
+
+        if ($token instanceof SwitchUserToken) {
+            return $token->getOriginalToken();
+        }
+
+        return null;
     }
 }

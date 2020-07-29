@@ -216,6 +216,19 @@ class RouteTest extends TestCase
 
         $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', null)->setRequirement('bar', '.*'), new Route('/foo/{bar<.*>?}'));
         $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', '<>')->setRequirement('bar', '>'), new Route('/foo/{bar<>>?<>}'));
+
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null), (new Route('/'))->setHost('{bar?}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', 'baz'), (new Route('/'))->setHost('{bar?baz}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', 'baz<buz>'), (new Route('/'))->setHost('{bar?baz<buz>}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null), (new Route('/', ['bar' => 'baz']))->setHost('{bar?}'));
+
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '.*'), (new Route('/'))->setHost('{bar<.*>}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '>'), (new Route('/'))->setHost('{bar<>>}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '.*'), (new Route('/', [], ['bar' => '\d+']))->setHost('{bar<.*>}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '[a-z]{2}'), (new Route('/'))->setHost('{bar<[a-z]{2}>}'));
+
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null)->setRequirement('bar', '.*'), (new Route('/'))->setHost('{bar<.*>?}'));
+        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', '<>')->setRequirement('bar', '>'), (new Route('/'))->setHost('{bar<>>?<>}'));
     }
 
     /**

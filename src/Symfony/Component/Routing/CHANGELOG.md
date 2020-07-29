@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added support for inline definition of requirements and defaults for host
+
 5.1.0
 -----
 

@@ -89,6 +89,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
                     ->setPrivate()
                     ->setMaxAge(0)
                     ->headers->addCacheControlDirective('must-revalidate');
+                $response->headers->addCacheControlDirective('no-store');
             }
         }
 

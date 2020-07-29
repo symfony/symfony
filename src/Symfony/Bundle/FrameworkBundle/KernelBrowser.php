@@ -45,7 +45,7 @@ class KernelBrowser extends HttpKernelBrowser
     /**
      * Returns the container.
      *
-     * @return ContainerInterface|null Returns null when the Kernel has been shutdown or not started yet
+     * @return ContainerInterface
      */
     public function getContainer()
     {

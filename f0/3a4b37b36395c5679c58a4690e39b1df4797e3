@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by guilliamxavier at 2020-07-07T18:17:42Z
+
+/cc @teohhanhui for approval
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-23T10:03:45Z
+
+Closing as staled, we can reopen if the change is confirmed.
+
+---------------------------------------------------------------------------
+
+by guilliamxavier at 2020-07-23T10:51:37Z
+
+/ping @bastnic
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2020-07-23T11:33:24Z
+
+I can confirm I wrote the original class.
+
+Sorry for the lack of response, I have stopped doing Symfony / API Platform, and moved on to Rust.
+
+---------------------------------------------------------------------------
+
+by bastnic at 2020-07-23T12:20:35Z
+
+I can confirm @teohhanhui confirmation ;).

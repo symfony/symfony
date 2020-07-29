@@ -32,8 +32,8 @@ class RedisStore implements PersistingStoreInterface
     private $initialTtl;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|RedisProxy|RedisClusterProxy\Predis\ClientInterface $redisClient
-     * @param float                                                                                $initialTtl  the expiration delay of locks in seconds
+     * @param \Redis|\RedisArray|\RedisCluster|RedisProxy|RedisClusterProxy|\Predis\ClientInterface $redisClient
+     * @param float                                                                                 $initialTtl  the expiration delay of locks in seconds
      */
     public function __construct($redisClient, float $initialTtl = 300.0)
     {

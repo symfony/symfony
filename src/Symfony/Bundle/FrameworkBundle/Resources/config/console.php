@@ -47,6 +47,7 @@ use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
+use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -224,6 +225,12 @@ return static function (ContainerConfigurator $container) {
                 [], // Twig paths
             ])
             ->tag('console.command', ['command' => 'translation:update'])
+
+        ->set('console.command.validator_debug', ValidatorDebugCommand::class)
+            ->args([
+                service('validator'),
+            ])
+            ->tag('console.command', ['command' => 'debug:validator'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->tag('console.command', ['command' => 'workflow:dump'])

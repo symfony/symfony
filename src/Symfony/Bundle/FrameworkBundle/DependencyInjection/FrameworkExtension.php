@@ -1217,6 +1217,8 @@ class FrameworkExtension extends Extension
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)
     {
         if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.validator_debug');
+
             return;
         }
 

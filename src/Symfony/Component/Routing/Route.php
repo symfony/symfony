@@ -130,18 +130,7 @@ class Route implements \Serializable
      */
     public function setPath(string $pattern)
     {
-        if (false !== strpbrk($pattern, '?<')) {
-            $pattern = preg_replace_callback('#\{(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
-                if (isset($m[3][0])) {
-                    $this->setDefault($m[1], '?' !== $m[3] ? substr($m[3], 1) : null);
-                }
-                if (isset($m[2][0])) {
-                    $this->setRequirement($m[1], substr($m[2], 1, -1));
-                }
-
-                return '{'.$m[1].'}';
-            }, $pattern);
-        }
+        $pattern = $this->extractInlineDefaultsAndRequirements($pattern);
 
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
@@ -170,7 +159,7 @@ class Route implements \Serializable
      */
     public function setHost(?string $pattern)
     {
-        $this->host = (string) $pattern;
+        $this->host = $this->extractInlineDefaultsAndRequirements((string) $pattern);
         $this->compiled = null;
 
         return $this;
@@ -542,6 +531,24 @@ class Route implements \Serializable
         $class = $this->getOption('compiler_class');
 
         return $this->compiled = $class::compile($this);
+    }
+
+    private function extractInlineDefaultsAndRequirements(string $pattern): string
+    {
+        if (false === strpbrk($pattern, '?<')) {
+            return $pattern;
+        }
+
+        return preg_replace_callback('#\{(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
+            if (isset($m[3][0])) {
+                $this->setDefault($m[1], '?' !== $m[3] ? substr($m[3], 1) : null);
+            }
+            if (isset($m[2][0])) {
+                $this->setRequirement($m[1], substr($m[2], 1, -1));
+            }
+
+            return '{'.$m[1].'}';
+        }, $pattern);
     }
 
     private function sanitizeRequirement(string $key, string $regex)

@@ -553,12 +553,18 @@ class Route implements \Serializable
 
     private function sanitizeRequirement(string $key, string $regex)
     {
-        if ('' !== $regex && '^' === $regex[0]) {
-            $regex = (string) substr($regex, 1); // returns false for a single character
+        if ('' !== $regex) {
+            if ('^' === $regex[0]) {
+                $regex = substr($regex, 1);
+            } elseif (0 === strpos($regex, '\\A')) {
+                $regex = substr($regex, 2);
+            }
         }
 
         if ('$' === substr($regex, -1)) {
             $regex = substr($regex, 0, -1);
+        } elseif (\strlen($regex) - 2 === strpos($regex, '\\z')) {
+            $regex = substr($regex, 0, -2);
         }
 
         if ('' === $regex) {

@@ -41,6 +41,7 @@
 
         <service id="mailer.logger_message_listener" class="Symfony\Component\Mailer\EventListener\MessageLoggerListener">
             <tag name="kernel.event_subscriber"/>
+            <tag name="kernel.reset" method="reset" />
         </service>
     </services>
 </container>

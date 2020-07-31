@@ -255,6 +255,10 @@ class CliDumper extends AbstractDumper
      */
     public function enterHash(Cursor $cursor, $type, $class, $hasChild)
     {
+        if (null === $this->colors) {
+            $this->colors = $this->supportsColors();
+        }
+
         $this->dumpKey($cursor);
 
         if ($this->collapseNextHash) {
@@ -268,8 +272,7 @@ class CliDumper extends AbstractDumper
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource').($hasChild ? ' {' : ' ');
         } else {
-            $unstyledPrefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? 'array:'.$class : '';
-            $prefix = $this->style('note', $unstyledPrefix).($unstyledPrefix ? ' [' : '[');
+            $prefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? $this->style('note', 'array:'.$class).' [' : '[';
         }
 
         if ($cursor->softRefCount || 0 < $cursor->softRefHandle) {

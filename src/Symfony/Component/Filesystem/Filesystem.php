@@ -23,6 +23,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 class Filesystem
 {
     private static $lastError;
+    private $temporaryFiles;
 
     /**
      * Copies a file.
@@ -693,6 +694,26 @@ class Filesystem
         if (false === @file_put_contents($filename, $content, FILE_APPEND)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
+    }
+
+    /**
+     * Creates a temporary file with support for custom stream wrappers
+     * which will be automatically deleted after the end of the execution.
+     *
+     * @param string $prefix The prefix of the generated temporary filename
+     *                       Note: Windows uses only the first three characters of prefix
+     * @param string $suffix The suffix of the generated temporary filename
+     *
+     * @return string The new temporary filename (with path), or throw an exception on failure
+     */
+    public function tempfile(string $dir, string $prefix, string $suffix = '')
+    {
+        return $this->temporaryFiles[] = $this->tempnam($dir, $prefix, $suffix);
+    }
+
+    public function __destruct()
+    {
+        $this->remove($this->temporaryFiles);
     }
 
     private function toIterable($files): iterable

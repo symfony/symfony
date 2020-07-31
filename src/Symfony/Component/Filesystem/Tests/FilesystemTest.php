@@ -1724,6 +1724,18 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(767, $targetFilePath);
     }
 
+    public function testTempfile()
+    {
+        $dirname = $this->workspace;
+        $filesystem = clone $this->filesystem;
+
+        $filename = $filesystem->tempfile($dirname, 'foo');
+        $this->assertFileExists($filename);
+
+        $filesystem->__destruct();
+        $this->assertFileNotExists($filename);
+    }
+
     /**
      * Normalize the given path (transform each blackslash into a real directory separator).
      */

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -36,12 +37,18 @@ class RouterController
     private $matcher;
     private $routes;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    /**
+     * @var ExpressionFunctionProviderInterface[]
+     */
+    private $expressionLanguageProviders = [];
+
+    public function __construct(Profiler $profiler = null, Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null, iterable $expressionLanguageProviders = [])
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->matcher = $matcher;
         $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
+        $this->expressionLanguageProviders = $expressionLanguageProviders;
     }
 
     /**
@@ -94,6 +101,9 @@ class RouterController
         $context = $this->matcher->getContext();
         $context->setMethod($method);
         $matcher = new TraceableUrlMatcher($this->routes, $context);
+        foreach ($this->expressionLanguageProviders as $provider) {
+            $matcher->addExpressionLanguageProvider($provider);
+        }
 
         return $matcher->getTracesForRequest($traceRequest);
     }

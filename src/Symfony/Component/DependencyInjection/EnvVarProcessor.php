@@ -290,6 +290,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return trim($env);
         }
 
-        throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
+        throw new RuntimeException(sprintf('Unsupported env var prefix "%s" for env name "%s".', $prefix, $name));
     }
 }

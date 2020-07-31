@@ -14,7 +14,7 @@ $ composer require symfony/mailer
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
 
-$transport = Transport::fromDsn('sendgrid://KEY@default');
+$transport = Transport::fromDsn('smtp://localhost');
 $mailer = new Mailer($transport);
 
 $email = (new Email())

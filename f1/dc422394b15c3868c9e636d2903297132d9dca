@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T10:37:12Z
+
+I'm fine with the implementation but I'm not sure I understand the use case (I just re-read the linked issue but that's doesn't help to get when this is useful). Could you please elaborate a bit on this aspect?
+
+(rebase needed btw)
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2020-06-30T16:53:24Z
+
+We have a multi-tenant setup, where each of the tenants have their own URL and those URLs are used internally to identify them. Since we have multiple environments (dev, staging, prod) these URLs change per environment, so we're storing those in parameters and override them in different environments (eg dev.symfony.com and www.symfony.com).
+
+What we want to do is be able to tag certain services, like CRM clients, with the URL of the tenant so that we can use a locator to get the CRM client of the current client, based on the current URL.
+
+For that we need Symfony to be able to process parameters in tag values.
+
+So right now we have a class that takes a ServiceLocator and the ParameterBag as arguments and then does the replacement internally, and that works, but it's rather ugly.
+
+As an aside, we don't use DotEnv, just plain old parameters.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2020-06-30T17:51:52Z
+
+Rebase onto master done @nicolas-grekas

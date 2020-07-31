@@ -128,6 +128,10 @@ class RouteTest extends TestCase
         $route->setRequirement('foo', '\A\d+\z');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes \A and \z from the path');
         $this->assertTrue($route->hasRequirement('foo'));
+
+        $route->setRequirement('bar', '\A\d+\Z');
+        $this->assertEquals('\d+', $route->getRequirement('bar'), '->setRequirement() removes \A and \Z from the path');
+        $this->assertTrue($route->hasRequirement('bar'));
     }
 
     /**
@@ -147,8 +151,10 @@ class RouteTest extends TestCase
            ['^$'],
            ['^'],
            ['$'],
+           ['\A\Z'],
            ['\A\z'],
            ['\A'],
+           ['\Z'],
            ['\z'],
         ];
     }

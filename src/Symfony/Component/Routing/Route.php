@@ -563,7 +563,7 @@ class Route implements \Serializable
 
         if ('$' === substr($regex, -1)) {
             $regex = substr($regex, 0, -1);
-        } elseif (\strlen($regex) - 2 === strpos($regex, '\\z')) {
+        } elseif (\in_array(\strlen($regex) - 2, [strpos($regex, '\\z'), strpos($regex, '\\Z')], true)) {
             $regex = substr($regex, 0, -2);
         }
 

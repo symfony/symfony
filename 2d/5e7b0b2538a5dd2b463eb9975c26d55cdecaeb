@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-09-28T08:50:42Z
+
+Thanks @marie for your first contribution.
+
+This will be not so simple:
+
+1. You can register only one listener by signal. This is a limitation of PHP :/ I don't know what is the best solution to handle this. We can add an abstraction (Listener Registry, something like https://github.com/romainneutron/signal-handler). Or we can do nothing : Symfony will define a listener first. And if in my application I register another listener, then this new listener will be used. But there is a drawback: the original listener from SF will not be called. This could lead to some WTF.
+2. **edit** I missed the fact your already used it ~~You need something to dispatch from PHP core (buffer) to PHP Userland the signal. Since Symfony requires PHP 7.1+ I think our best option is to use https://www.php.net/pcntl_async_signals~~
+3. You hardcode a list a signal, this should be configurable.
+
+---------------------------------------------------------------------------
+
+by marie at 2019-09-29T11:06:47Z
+
+Hello, @lyrixx. Thank you for your code review!
+What do you think about the registry for signals? https://github.com/symfony/symfony/pull/33729/files#diff-a0717f72232896c363603bd89a126da5
+
+---------------------------------------------------------------------------
+
+by dillingham at 2019-11-11T17:58:49Z
+
+Ps thanks @marie for putting time towards this. Much appreciated! 😄
+
+---------------------------------------------------------------------------
+
+by marie at 2019-11-12T08:39:47Z
+
+@dillingham, I'm sorry I don't have time to finish the task now. I'll write in the related issue that it is unassigned.
+
+---------------------------------------------------------------------------
+
+by dillingham at 2019-11-12T17:00:42Z
+
+I understand. Thanks for trying
+
+Seems like a waste to close this when the reviews only seem to be cosmetic
+
+If someone wants to take this over, I'll happily tip via paypal
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-11-12T17:22:04Z
+
+yes it's too bad, could be a great addition for 4.4
+what is missing exaclty?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-12T17:33:03Z
+
+If anyone is interested in pursuing the work, please check it out, squash all commits in one, add yours after, then submit a PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-11-12T17:34:21Z
+
+Please, feel free to take it. if nobody wants to work on it, I may finish it (ping me in 1 month)
+
+@noniagriconomie It will be for SF 5.1 or more :)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-11-12T17:46:05Z
+
+arf yes indeed :)
+
+---------------------------------------------------------------------------
+
+by dillingham at 2019-12-19T13:52:34Z
+
+@lyrixx ping :)
+
+I would of myself but I have no idea how this works haha
+
+---------------------------------------------------------------------------
+
+by dillingham at 2020-01-12T16:28:33Z
+
+Putting $100 bounty on this if anyone can finish it
+
+cc @lyrixx @nicolas-grekas @marie @noniagriconomie
+
+---------------------------------------------------------------------------
+
+by dillingham at 2020-01-26T03:42:48Z
+
+Hey @lyrixx 👋, has Marie satisfied your review / critiques?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-30T12:56:04Z
+
+I'll try to find some time to review / test it ASAP :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-02-08T08:06:56Z
+
+@lyrixx looks like we are just waiting for you :) Just kidding, but I would love to move this one forward.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-29T06:45:04Z
+
+Could be a nice addition for 5.2. @lyrixx Up for another round of reviews?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-29T06:45:27Z
+
+In the meantime, the PR should be rebase onto master (and the target here changed to master).
+
+---------------------------------------------------------------------------
+
+by marie at 2020-06-29T16:12:31Z
+
+Hello! The merge request is in status "needs work", but there are no discussions. What do I need to do to make it accepted? :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-06-30T20:55:21Z
+
+Hello, Sorry for the delay. I did not test it, but If the code in the PR description works as expected, it seems good to me :+1:
+
+But (for another PR) :
+
+* [ ] And easier way to leverage this system in Symfony (framework) should be added (I could take care of this one)
+* [ ] The integration with messenger component should be fixed (maybe this one too)

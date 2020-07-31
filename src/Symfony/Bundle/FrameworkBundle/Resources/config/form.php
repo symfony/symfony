@@ -61,6 +61,7 @@ return static function (ContainerConfigurator $container) {
         ->set('form.factory', FormFactory::class)
             ->public()
             ->args([service('form.registry')])
+            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(FormFactoryInterface::class, 'form.factory')
 
@@ -103,6 +104,7 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->args([service('translator')->ignoreOnInvalid()])
             ->tag('form.type')
+            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->set('form.type.color', ColorType::class)
             ->args([service('translator')->ignoreOnInvalid()])

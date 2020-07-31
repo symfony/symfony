@@ -843,7 +843,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('validation_annotations', ['kernel.charset' => 'UTF-8'], false);
 
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator.alias'));
     }
 
     public function testAnnotations()

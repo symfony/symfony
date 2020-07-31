@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.csrf.token_storage'),
                 service('request_stack')->ignoreOnInvalid(),
             ])
+            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(CsrfTokenManagerInterface::class, 'security.csrf.token_manager')
 

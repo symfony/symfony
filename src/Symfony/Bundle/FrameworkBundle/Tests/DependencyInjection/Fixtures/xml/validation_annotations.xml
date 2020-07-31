@@ -9,4 +9,8 @@
     <framework:config secret="s3cr3t">
         <framework:validation enabled="true" enable-annotations="true" />
     </framework:config>
+
+    <services>
+        <service id="validator.alias" alias="validator" public="true" />
+    </services>
 </container>

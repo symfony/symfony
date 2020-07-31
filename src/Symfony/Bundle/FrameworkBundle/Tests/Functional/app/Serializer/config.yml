@@ -4,3 +4,8 @@ imports:
 framework:
     serializer: { enabled: true }
     property_info: { enabled: true }
+
+services:
+    serializer.alias:
+        alias: serializer
+        public: true

@@ -118,6 +118,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_iterator('kernel.cache_clearer'),
             ])
+            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->set('kernel')
             ->synthetic()
@@ -126,6 +127,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('filesystem', Filesystem::class)
             ->public()
+            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
         ->alias(Filesystem::class, 'filesystem')
 
         ->set('file_locator', FileLocator::class)

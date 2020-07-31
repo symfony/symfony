@@ -3,3 +3,8 @@ framework:
     validation:
         enabled:     true
         enable_annotations: true
+
+services:
+    validator.alias:
+        alias: validator
+        public: true

@@ -6,6 +6,12 @@ DependencyInjection
 
  * Deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
 
+FrameworkBundle
+---------------
+
+ * Deprecated the public `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
+   `cache_clearer`, `filesystem` and `validator` services to private.
+
 Mime
 ----
 

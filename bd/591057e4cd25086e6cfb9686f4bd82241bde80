@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by zlodes at 2020-07-30T15:40:06Z
+
+Travis failed with
+```
+fatal: couldn't find remote ref 4
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-30T15:46:37Z
+
+Note that this could be considered as a new feature. It should target master.

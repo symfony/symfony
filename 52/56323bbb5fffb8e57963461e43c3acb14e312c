@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Alexandre-T at 2020-05-24T08:22:28Z
+
+Thanks for your review, Nicolas!
+
+As source, I verified that I forgot no rules with this chapter on [NouvelObs](https://la-conjugaison.nouvelobs.com/regles/grammaire/le-pluriel-des-noms-121.php) and I used a reversed dictionnary to find all nouns finishing with -al.
+
+* Do you want that I add the link to the source as you do it in EnglishInflector?
+* Should I use solution1 (private singleton) or solution2 (long declaration for static uninflectedWords) [link to review](https://github.com/symfony/symfony/pull/36929#discussion_r429611157)?
+
+I will update my PR as soon as I have your recommendations.
+
+---------------------------------------------------------------------------
+
+by Alexandre-T at 2020-06-27T14:40:25Z
+
+Hi @nicolas-grekas ,
+I fixed what you suggested in your reviews.
+There is always a warning from fabbot.io that detects an error on the word: embarras. This is an invariable french word. I shouldn't replace it with embarrassment.
+The bugs on Travis are due to other commits on master.
+
+---------------------------------------------------------------------------
+
+by Alexandre-T at 2020-06-27T20:23:46Z
+
+Thanks for your review @GromNaN ! It's commited and pushed!

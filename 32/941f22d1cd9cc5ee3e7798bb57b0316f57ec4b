@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-05T17:44:06Z
+
+Can you please update for 5.2?
+5.1 is closed now.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-06-09T09:53:04Z
+
+@nicolas-grekas Should I split this PR service by service to ease the review?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-06-13T22:24:28Z
+
+No need to split IMO. But this should wait on #37186 due to all the conflicts.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T10:32:49Z
+
+Time for rebase :)

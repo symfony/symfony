@@ -4,7 +4,8 @@ CHANGELOG
 5.2.0
 -----
 
- * Added attributes on ``Passport``
+ * Added attributes on `Passport`
+ * Changed `AuthorizationChecker` to call the access decision manager in unauthenticated sessions with a `NullToken`
 
 5.1.0
 -----

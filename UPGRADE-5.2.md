@@ -48,3 +48,9 @@ Validator
     * })
     */
    ```
+
+Security
+--------
+
+ * [BC break] In the experimental authenticator-based system, * `TokenInterface::getUser()`
+   returns `null` in case of unauthenticated session.

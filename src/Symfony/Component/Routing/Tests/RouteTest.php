@@ -122,6 +122,14 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasRequirement('foo'), '->hasRequirement() return true if requirement is set');
     }
 
+    public function testRequirementAlternativeStartAndEndRegexSyntax()
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', '\A\d+\z');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes \A and \z from the path');
+        $this->assertTrue($route->hasRequirement('foo'));
+    }
+
     /**
      * @dataProvider getInvalidRequirements
      */
@@ -139,6 +147,9 @@ class RouteTest extends TestCase
            ['^$'],
            ['^'],
            ['$'],
+           ['\A\z'],
+           ['\A'],
+           ['\z'],
         ];
     }
 

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added support for inline definition of requirements and defaults for host
+ * Added support for `\A` and `\z` as regex start and end for route requirement
 
 5.1.0
 -----

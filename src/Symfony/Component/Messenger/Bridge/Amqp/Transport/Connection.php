@@ -131,6 +131,9 @@ class Connection
      *   * queues[name]: An array of queues, keyed by the name
      *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * binding_arguments: Arguments to be used while binding the queue.
+     *     * bindings[name]: An array of bindings for this queue, keyed by the name
+     *       * key: The binding key (if any) to bind to this queue
+     *       * arguments: An array of arguments to be used while binding the queue.
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
@@ -443,6 +446,12 @@ class Connection
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
+            foreach ($queueConfig['bindings'] ?? [] as $binding) {
+                $this->queue($queueName)->bind($this->exchangeOptions['name'], $binding['key'] ?? null, $binding['arguments'] ?? []);
+            }
+            if (isset($queueConfig['bindings']) && empty($queueConfig['binding_keys'])) {
+                continue;
+            }
             foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
                 $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
             }

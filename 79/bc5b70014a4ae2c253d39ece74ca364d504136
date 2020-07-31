@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-29T13:20:29Z
+
+Not a big fan of adding such an interface TBH. Your implementation extends the core one, right? In which case, type hinting with the class is not an issue.
+
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2020-07-29T13:51:46Z
+
+My implementation does not extend the core one as the core one is declared final. We simply overwrite the TranslationExtension service using the core class and only passing a different NodeVisitor as second argument
+
+As it stands we've already had to copy and modify a few core classes (TransNode for example) to make our implementation work, so to upgrade to symfony 5 we could do the same with TranslationExtension.
+
+I will change the typehint to `TranslationNodeVisitor` and target master.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-30T08:34:52Z
+
+Looks like there is an unrelated commit in the PR. Can you get rid of it?
+
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2020-07-31T05:49:28Z
+
+> Looks like there is an unrelated commit in the PR. Can you get rid of it?
+
+Done @fabpot 👍

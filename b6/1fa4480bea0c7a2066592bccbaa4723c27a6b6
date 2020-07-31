@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by alongosz at 2020-07-27T09:18:40Z
+
+Hi. Our product - eZ Platform - [is affected by that as well](https://travis-ci.org/github/ezsystems/ezpublish-kernel/builds/711385546).
+I've checked this fix with our CI and can confirm it solves the issue. Thanks :)

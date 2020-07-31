@@ -66,7 +66,7 @@ final class ConsoleEvents
     const ALIASES = [
         ConsoleCommandEvent::class => self::COMMAND,
         ConsoleErrorEvent::class => self::ERROR,
-        ConsoleSignalEvent::class => 'console.signal',
+        ConsoleSignalEvent::class => self::SIGNAL,
         ConsoleTerminateEvent::class => self::TERMINATE,
     ];
 }

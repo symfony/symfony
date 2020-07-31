@@ -164,6 +164,16 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
+     * Formats an info message.
+     *
+     * @param string|array $message
+     */
+    public function info($message)
+    {
+        $this->block($message, 'INFO', 'fg=green', ' ', true);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function caution($message)

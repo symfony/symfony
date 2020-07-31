@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2020-04-11T12:32:41Z
+
+Maybe we could also enforce a `NotNull` constraint too based on whether the type is nullable, since `Valid` ignores it by default.

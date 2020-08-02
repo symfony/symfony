@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-31T06:32:07Z
+
+What's the problem keeping it in prod (now that it does not leak memory anymore)?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2020-07-31T11:41:08Z
+
+At first I had a hypothesis that `MessageLoggerListener` was declared in `mailer.php(xml)` by mistake.
+
+If that's not the case, then why it is there when no other service depends on it? Obviously DI cannot automatically remove `mailer.logger_message_listener`, since it is a listener. But in fact it's just collecting information in prod for nothing.
+
+And yes, it's still leaking without calling `$serviceResetter->reset()`! Before installing Symfony Mailer nothing was leaking in my worker in prod. Now I have to add a worker listener to do `$serviceResetter->reset()` just because of the `MessageLoggerListener` which I don't use.
+
+I also found [a comment by](https://github.com/symfony/symfony/pull/32418#issuecomment-509089127) @nicolas-grekas :
+> having a non-leaking core is very important to me
+
+This PR can help to accomplish this goal 😉
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-31T12:29:53Z
+
+Not using something in core does not mean that we should remove it.
+But anyway, I don't have any problem with moving it to debug.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-01T17:43:43Z
+
+(please mind the test failure)

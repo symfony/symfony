@@ -29,6 +29,7 @@ CHANGELOG
     * })
     */
    ```
+ * added the `Isin` constraint and validator
 
 5.1.0
 -----

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by qkdreyer at 2020-07-02T11:19:55Z
+
+Travis failed because of weird `Error: Undefined class constant 'ALIASES'` errors
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-03T12:35:04Z
+
+Can you please add a test case? This will allow spotting a typo ;)
+
+---------------------------------------------------------------------------
+
+by qkdreyer at 2020-07-06T11:26:55Z
+
+Nicely catch @nicolas-grekas

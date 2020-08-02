@@ -24,12 +24,12 @@ final class RedeliveryStamp implements StampInterface
     private $exceptionMessage;
     private $flattenException;
 
-    public function __construct(int $retryCount, string $exceptionMessage = null, FlattenException $flattenException = null)
+    public function __construct(int $retryCount, string $exceptionMessage = null, FlattenException $flattenException = null, \DateTimeImmutable $redeliveredAt = null)
     {
         $this->retryCount = $retryCount;
         $this->exceptionMessage = $exceptionMessage;
         $this->flattenException = $flattenException;
-        $this->redeliveredAt = new \DateTimeImmutable();
+        $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
     }
 
     public static function getRetryCountFromEnvelope(Envelope $envelope): int

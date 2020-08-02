@@ -60,9 +60,9 @@ abstract class Guess
      * If there are multiple guesses with the same, highest confidence, the
      * returned guess is any of them.
      *
-     * @param Guess[] $guesses An array of guesses
+     * @param static[] $guesses An array of guesses
      *
-     * @return self|null
+     * @return static|null
      */
     public static function getBestGuess(array $guesses)
     {

@@ -9,3 +9,4 @@ framework:
             sender: sender@example.org
             recipients:
                 - redirected@example.org
+    profiler: ~

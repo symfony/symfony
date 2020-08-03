@@ -13,10 +13,13 @@ namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
+use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 
 class ConfigurationTest extends TestCase
 {
+    private $files;
+
     public function testItThrowsOnStringishValue()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -244,4 +247,169 @@ class ConfigurationTest extends TestCase
 
         return $groups;
     }
+
+    public function testBaselineGenerationEmptyFile()
+    {
+        $filename = $this->createFile();
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 2,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testBaselineGenerationNoFile()
+    {
+        $filename = $this->createFile();
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 2,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 2,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+
+    }
+
+    public function testExistingBaseline()
+    {
+        $filename = $this->createFile();
+        $baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        file_put_contents($filename, json_encode($baseline));
+
+        $configuration = Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+        $this->assertFalse($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertFalse($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+    }
+
+    public function testExistingBaselineAndGeneration()
+    {
+        $filename = $this->createFile();
+        $baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        file_put_contents($filename, json_encode($baseline));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 3',
+                'count' => 1,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testBaselineArgumentException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('You cannot use the "generateBaseline" configuration option without providing a "baselineFile" configuration option.');
+        Configuration::fromUrlEncodedString('generateBaseline=true');
+    }
+
+    public function testBaselineFileException()
+    {
+        $filename = $this->createFile();
+        unlink($filename);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
+        Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+    }
+
+    public function testBaselineFileWriteError()
+    {
+        $filename = $this->createFile();
+        chmod($filename, 0444);
+        $this->expectError();
+        $this->expectErrorMessageMatches('/failed to open stream: Permission denied/');
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration->writeBaseline();
+    }
+
+    protected function setUp(): void
+    {
+        $this->files = [];
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->files as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+    }
+
+    private function createFile() {
+        $filename = tempnam(sys_get_temp_dir(), 'sf-');
+        $this->files[] = $filename;
+        return $filename;
+    }
+
 }

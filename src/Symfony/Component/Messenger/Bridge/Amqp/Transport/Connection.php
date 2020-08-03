@@ -59,8 +59,7 @@ class Connection
     ];
 
     private const AVAILABLE_QUEUE_OPTIONS = [
-        'binding_keys',
-        'binding_arguments',
+        'bindings',
         'flags',
         'arguments',
     ];
@@ -129,8 +128,8 @@ class Connection
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
      *   * queues[name]: An array of queues, keyed by the name
-     *     * binding_keys: The binding keys (if any) to bind to this queue
-     *     * binding_arguments: Arguments to be used while binding the queue.
+     *     * binding_keys: The binding keys (if any) to bind to this queue (Usage is deprecated. See 'bindings')
+     *     * binding_arguments: Arguments to be used while binding the queue. (Usage is deprecated. See 'bindings')
      *     * bindings[name]: An array of bindings for this queue, keyed by the name
      *       * key: The binding key (if any) to bind to this queue
      *       * arguments: An array of arguments to be used while binding the queue.

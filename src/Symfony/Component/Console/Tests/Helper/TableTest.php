@@ -335,6 +335,45 @@ TABLE
 
 TABLE
             ],
+            'Cell after colspan contains new line break' => [
+                ['Foo', 'Bar', 'Baz'],
+                [
+                    [
+                        new TableCell("foo\nbar", ['colspan' => 2]),
+                        "baz\nqux",
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++-----+-----+-----+
+| Foo | Bar | Baz |
++-----+-----+-----+
+| foo       | baz |
+| bar       | qux |
++-----+-----+-----+
+
+TABLE
+            ],
+            'Cell after colspan contains multiple new lines' => [
+                ['Foo', 'Bar', 'Baz'],
+                [
+                    [
+                        new TableCell("foo\nbar", ['colspan' => 2]),
+                        "baz\nqux\nquux",
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++-----+-----+------+
+| Foo | Bar | Baz  |
++-----+-----+------+
+| foo       | baz  |
+| bar       | qux  |
+|           | quux |
++-----+-----+------+
+
+TABLE
+            ],
             'Cell with rowspan' => [
                 ['ISBN', 'Title', 'Author'],
                 [

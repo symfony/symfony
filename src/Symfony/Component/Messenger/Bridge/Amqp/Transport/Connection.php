@@ -50,6 +50,7 @@ class Connection
         'heartbeat',
         'read_timeout',
         'write_timeout',
+        'confirm_timeout',
         'connect_timeout',
         'cacert',
         'cert',
@@ -128,6 +129,7 @@ class Connection
      *   * read_timeout: Timeout in for income activity. Note: 0 or greater seconds. May be fractional.
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
+     *   * confirm_timeout: Timeout in seconds for confirmation, if none specified transport will not wait for message confirmation. Note: 0 or greater seconds. May be fractional.
      *   * queues[name]: An array of queues, keyed by the name
      *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * binding_arguments: Arguments to be used while binding the queue.
@@ -325,6 +327,10 @@ class Connection
             $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM,
             $attributes
         );
+
+        if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
+            $this->channel()->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);
+        }
     }
 
     private function setupDelay(int $delay, ?string $routingKey)
@@ -477,6 +483,18 @@ class Connection
 
             if (isset($this->connectionOptions['prefetch_count'])) {
                 $this->amqpChannel->setPrefetchCount($this->connectionOptions['prefetch_count']);
+            }
+
+            if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
+                $this->amqpChannel->confirmSelect();
+                $this->amqpChannel->setConfirmCallback(
+                    static function (): bool {
+                        return false;
+                    },
+                    static function (): bool {
+                        return false;
+                    }
+                );
             }
         }
 

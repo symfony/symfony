@@ -625,6 +625,51 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
         $connection->publish('body', ['type' => DummyMessage::class], 0, new AmqpStamp('routing_key', AMQP_IMMEDIATE, ['delivery_mode' => 2]));
     }
+
+    public function testItPublishMessagesWithoutWaitingForConfirmation()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->never())->method('waitForConfirm')->with(0.5);
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testSetChannelToConfirmMessage()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->once())->method('confirmSelect');
+        $amqpChannel->expects($this->once())->method('setConfirmCallback');
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $connection->setup();
+    }
+
+    public function testItCanPublishAndWaitForConfirmation()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->once())->method('waitForConfirm')->with(0.5);
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $connection->publish('body');
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

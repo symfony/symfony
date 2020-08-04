@@ -662,6 +662,20 @@ XML;
         $this->assertEquals($expectedXml, $actualXml);
     }
 
+    public function testEncodeXmlWithDomNodeValue()
+    {
+        $expectedXml = <<<'XML'
+<?xml version="1.0"?>
+<response><foo>bar</foo><bar>foo &amp; bar</bar></response>
+
+XML;
+        $document = new \DOMDocument();
+
+        $actualXml = $this->encoder->encode(['foo' => $document->createTextNode('bar'), 'bar' => $document->createTextNode('foo & bar')], 'xml');
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
     public function testEncodeXmlWithDateTimeObjectValue()
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();

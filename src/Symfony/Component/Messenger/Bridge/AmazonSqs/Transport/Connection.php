@@ -44,6 +44,7 @@ class Connection
         'region' => 'eu-west-1',
         'queue_name' => 'messages',
         'account' => null,
+        'sslmode' => null,
     ];
 
     private $configuration;
@@ -94,6 +95,19 @@ class Connection
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $query);
         }
+
+        // check for extra keys in options
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
+        if (0 < \count($optionsExtraKeys)) {
+            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+        }
+
+        // check for extra keys in options
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
+        if (0 < \count($queryExtraKeys)) {
+            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+        }
+
         $options = $query + $options + self::DEFAULT_OPTIONS;
         $configuration = [
             'buffer_size' => (int) $options['buffer_size'],
@@ -116,7 +130,6 @@ class Connection
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $parsedUrl['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }
-            unset($query['sslmode']);
         } elseif (self::DEFAULT_OPTIONS['endpoint'] !== $options['endpoint'] ?? self::DEFAULT_OPTIONS['endpoint']) {
             $clientConfiguration['endpoint'] = $options['endpoint'];
         }
@@ -126,18 +139,6 @@ class Connection
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
-
-        // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
-        if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
-        }
-
-        // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
-        if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
-        }
 
         return new self($configuration, new SqsClient($clientConfiguration, null, $client));
     }

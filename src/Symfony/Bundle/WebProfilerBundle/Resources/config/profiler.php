@@ -40,6 +40,8 @@ return static function (ContainerConfigurator $container) {
                 service('profiler')->nullOnInvalid(),
                 service('twig'),
                 service('router')->nullOnInvalid(),
+                null,
+                tagged_iterator('routing.expression_language_provider'),
             ])
 
         ->set('web_profiler.controller.exception_panel', ExceptionPanelController::class)

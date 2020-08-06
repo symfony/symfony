@@ -106,6 +106,24 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithSslMode()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'endpoint' => 'http://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://localhost/queue?sslmode=disable', [], $httpClient)
+        );
+    }
+
+    public function testFromDsnWithSslModeOnDefault()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default/queue?sslmode=disable', [], $httpClient)
+        );
+    }
+
     public function testFromDsnWithCustomEndpointAndPort()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
@@ -156,6 +174,30 @@ class ConnectionTest extends TestCase
             new Connection(['account' => 12345], new SqsClient(['endpoint' => 'https://custom-endpoint.tld', 'region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
             Connection::fromDsn('sqs://default', ['endpoint' => 'https://custom-endpoint.tld', 'account' => 12345], $httpClient)
         );
+    }
+
+    public function testFromDsnWithInvalidQueryString()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found in DSN: [foo]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default?foo=foo');
+    }
+
+    public function testFromDsnWithInvalidOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found: [bar]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default', ['bar' => 'bar']);
+    }
+
+    public function testFromDsnWithInvalidQueryStringAndOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found: [bar]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default?foo=foo', ['bar' => 'bar']);
     }
 
     public function testKeepGettingPendingMessages()

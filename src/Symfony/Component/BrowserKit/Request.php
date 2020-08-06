@@ -37,6 +37,11 @@ class Request
     {
         $this->uri = $uri;
         $this->method = $method;
+
+        array_walk_recursive($parameters, static function (&$value) {
+            $value = (string) $value;
+        });
+
         $this->parameters = $parameters;
         $this->files = $files;
         $this->cookies = $cookies;

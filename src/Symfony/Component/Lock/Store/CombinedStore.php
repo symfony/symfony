@@ -67,7 +67,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
                 $store->save($key);
                 ++$successCount;
             } catch (\Exception $e) {
-                $this->logger->warning('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
                 ++$failureCount;
             }
 
@@ -82,7 +82,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+        $this->logger->info('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
 
         // clean up potential locks
         $this->delete($key);
@@ -103,7 +103,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
         foreach ($this->stores as $store) {
             try {
                 if (0.0 >= $adjustedTtl = $expireAt - microtime(true)) {
-                    $this->logger->warning('Stores took to long to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'ttl' => $ttl]);
+                    $this->logger->debug('Stores took to long to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'ttl' => $ttl]);
                     $key->reduceLifetime(0);
                     break;
                 }
@@ -111,7 +111,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
                 $store->putOffExpiration($key, $adjustedTtl);
                 ++$successCount;
             } catch (\Exception $e) {
-                $this->logger->warning('One store failed to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                $this->logger->debug('One store failed to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
                 ++$failureCount;
             }
 
@@ -126,7 +126,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to define the expiration for the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+        $this->logger->notice('Failed to define the expiration for the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
 
         // clean up potential locks
         $this->delete($key);

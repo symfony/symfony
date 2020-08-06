@@ -47,6 +47,7 @@ class GitignoreTest extends TestCase
             [
                 '
                     *
+                    !/bin
                     !/bin/bash
                 ',
                 ['bin/cat', 'abc/bin/cat'],
@@ -99,8 +100,8 @@ class GitignoreTest extends TestCase
             ],
             [
                 'app/cache/',
-                ['app/cache/file.txt', 'app/cache/dir1/dir2/file.txt', 'a/app/cache/file.txt'],
-                [],
+                ['app/cache/file.txt', 'app/cache/dir1/dir2/file.txt'],
+                ['a/app/cache/file.txt'],
             ],
             [
                 '
@@ -132,6 +133,15 @@ class GitignoreTest extends TestCase
                 another_file.txt',
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt', 'another_file.txt'],
                 ['a/app/cache/file.txt', 'IamComment', '#IamComment'],
+            ],
+            [
+                '
+                /app/**
+                !/app/bin
+                !/app/bin/test
+                ',
+                ['app/test/file', 'app/bin/file'],
+                ['app/bin/test'],
             ],
         ];
     }

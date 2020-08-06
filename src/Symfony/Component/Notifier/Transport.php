@@ -21,6 +21,7 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\FailoverTransport;
@@ -50,6 +51,7 @@ class Transport
         FirebaseTransportFactory::class,
         SinchTransportFactory::class,
         FreeMobileTransportFactory::class,
+        ZulipTransportFactory::class,
     ];
 
     private $factories;

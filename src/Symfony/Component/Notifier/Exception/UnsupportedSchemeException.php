@@ -62,6 +62,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sinch\SinchTransportFactory::class,
             'package' => 'symfony/sinch-notifier',
         ],
+        'zulip' => [
+            'class' => Bridge\Zulip\ZulipTransportFactory::class,
+            'package' => 'symfony/zulip-notifier',
+        ],
     ];
 
     /**

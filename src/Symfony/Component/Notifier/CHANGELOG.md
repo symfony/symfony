@@ -4,7 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
- * [BC BREAK] The `TransportInterface::send()` and `AbstractTransport::doSend()` methods changed to return a `SentMessage` instance instead of `void`.
+ * [BC BREAK] The `TransportInterface::send()` and `AbstractTransport::doSend()` methods changed to return a `?SentMessage` instance instead of `void`.
 
 5.1.0
 -----

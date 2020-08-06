@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added a `FrenchInflector` class
+ * added the `slugify()` shortcut method
 
 5.1.0
 -----

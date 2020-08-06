@@ -13,6 +13,7 @@ namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use function Symfony\Component\String\slugify;
 
 class SluggerTest extends TestCase
 {
@@ -25,6 +26,15 @@ class SluggerTest extends TestCase
         $slugger = new AsciiSlugger($locale);
 
         $this->assertSame($expectedSlug, (string) $slugger->slug($string));
+    }
+
+    /**
+     * @requires extension intl
+     * @dataProvider provideSlug
+     */
+    public function testSlugify(string $string, string $locale, string $expectedSlug)
+    {
+        $this->assertSame($expectedSlug, (string) slugify($string, '-', $locale));
     }
 
     public static function provideSlug(): array

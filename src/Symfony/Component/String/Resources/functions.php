@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\String;
 
+use Symfony\Component\String\Slugger\AsciiSlugger;
+
 function u(string $string = ''): UnicodeString
 {
     return new UnicodeString($string);
@@ -27,4 +29,9 @@ function b(string $string = ''): ByteString
 function s(string $string): AbstractString
 {
     return preg_match('//u', $string) ? new UnicodeString($string) : new ByteString($string);
+}
+
+function slugify(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
+{
+    return (new AsciiSlugger())->slug($string, $separator, $locale);
 }

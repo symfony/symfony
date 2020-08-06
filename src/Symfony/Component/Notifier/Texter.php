@@ -48,10 +48,12 @@ final class Texter implements TexterInterface
         return $this->transport->supports($message);
     }
 
-    public function send(MessageInterface $message): SentMessage
+    public function send(MessageInterface $message): ?SentMessage
     {
         if (null === $this->bus) {
-            return $this->transport->send($message);
+            $this->transport->send($message);
+
+            return null;
         }
 
         if (null !== $this->dispatcher) {
@@ -59,5 +61,7 @@ final class Texter implements TexterInterface
         }
 
         $this->bus->dispatch($message);
+
+        return null;
     }
 }

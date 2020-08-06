@@ -25,7 +25,7 @@ interface TransportInterface
     /**
      * @throws TransportExceptionInterface
      */
-    public function send(MessageInterface $message): SentMessage;
+    public function send(MessageInterface $message): ?SentMessage;
 
     public function supports(MessageInterface $message): bool;
 

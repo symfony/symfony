@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-05-04T18:54:35Z
+
+Is `->connect()` blocking until the event source is over ? Or how does this work to keep running while checking for data ?
+
+Both JS and ReactPHP have an event loop running, and the checks in the EventSource are happening in this event loop. But without an event loop, I'm not sure this will be as easy to use.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2020-05-04T20:44:44Z
+
+> Is ->connect() blocking until the event source is over ?
+
+For now it is yes. It just opens an http connection open and uses a stream to get the data. On timeout, it reconnects to that http connection.
+An event loop would definitely be appropriate. Even without I see use cases though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-04T20:49:07Z
+
+I would suggest a radically different approach, based on the same design as HttpClient: a chunk generator.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-05-04T21:46:16Z
+
+You should implement exactly the algorithm described in the WHATWG spec (9.2.4 and 9.2.5): https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-05-04T22:35:55Z
+
+> I would suggest a radically different approach, based on the same design as HttpClient: a chunk generator.
+
+I agree. It could be a class decorating `HttpClient` and will an API like this:
+
+```php
+$response = $client->request('GET', 'https://demo.mercure.rocks/.well-known/mercure?topic=https://example.com');
+
+if (200 !== $response->getStatusCode()) {
+    throw new \Exception('...');
+}
+
+// messages implement Symfony\Contracts\HttpClient\EventInterface
+$fileHandler = fopen('/ubuntu.iso', 'w');
+foreach ($client->messages($response) as $message) {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format
+    // https://github.com/symfony/mercure/blob/master/src/Update.php#L26
+    $message->getData(); // string
+    $message->getType(); // ?string
+    $message->getId(); // ?string
+    $message->getRetry(); // ?string
+
+    // When you're done, close the connection with the server
+    $response->cancel();
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-12T11:31:19Z
+
+What about adding an autowiring alias btw?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2020-06-12T11:54:46Z
+
+> What about adding an autowiring alias btw?
+
+Now I think having an interface would make sense :p. If we do so should we also add a configuration for the reconnectionTime? What about doing so in another PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-12T11:58:53Z
+
+Another PR works. We need to gain some experience to know what's the best way to consume this class.

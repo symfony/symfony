@@ -357,14 +357,15 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->exactly(2))->method('bind')->withConsecutive(
             [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all', 'header-property' => 'change']],
-            [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all', 'header-property' => 'remove']]
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', ['x-match' => 'all', 'header-property' => 'remove']]
         );
 
         $dsn = 'amqp://localhost?exchange[type]=headers'.
             '&queues[queue0][bindings][one][arguments][x-match]=all'.
             '&queues[queue0][bindings][one][arguments][header-property]=change'.
             '&queues[queue0][bindings][two][arguments][x-match]=all'.
-            '&queues[queue0][bindings][two][arguments][header-property]=remove';
+            '&queues[queue0][bindings][two][arguments][header-property]=remove'.
+            '&queues[queue0][bindings][two][key]=binding_key0';
 
         $connection = Connection::fromDsn($dsn, [], $factory);
         $connection->publish('body');

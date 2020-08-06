@@ -37,7 +37,7 @@ final class FreeMobileTransport extends AbstractTransport
     {
         $this->login = $login;
         $this->password = $password;
-        $this->phone = $phone;
+        $this->phone = str_replace('+33', '0', $phone);
 
         parent::__construct($client, $dispatcher);
     }
@@ -49,7 +49,7 @@ final class FreeMobileTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && $this->phone === $message->getPhone();
+        return $message instanceof SmsMessage && $this->phone === str_replace('+33', '0', $message->getPhone());
     }
 
     protected function doSend(MessageInterface $message): SentMessage

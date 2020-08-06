@@ -22,33 +22,37 @@ final class FreeMobileTransportTest extends TestCase
 {
     public function testToStringContainsProperties(): void
     {
-        $transport = $this->initTransport();
+        $transport = $this->getTransport('0611223344');
 
         $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
     }
 
     public function testSupportsMessageInterface(): void
     {
-        $transport = $this->initTransport();
+        $transport = $this->getTransport('0611223344');
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
+        $this->assertTrue($transport->supports(new SmsMessage('+33611223344', 'Hello!')));
         $this->assertFalse($transport->supports(new SmsMessage('0699887766', 'Hello!')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+
+        $transport = $this->getTransport('+33611223344');
+
+        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
+        $this->assertTrue($transport->supports(new SmsMessage('+33611223344', 'Hello!')));
     }
 
     public function testSendNonSmsMessageThrowsException(): void
     {
-        $transport = $this->initTransport();
+        $transport = $this->getTransport('0611223344');
 
         $this->expectException(LogicException::class);
 
         $transport->send(new SmsMessage('0699887766', 'Hello!'));
     }
 
-    private function initTransport(): FreeMobileTransport
+    private function getTransport(string $phone): FreeMobileTransport
     {
-        return (new FreeMobileTransport(
-            'login', 'pass', '0611223344', $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        return (new FreeMobileTransport('login', 'pass', $phone, $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

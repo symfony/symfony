@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-07-31T17:23:58Z
+
+This PR was not getting much attention.
+
+Since the scope was a little too large, I've removed some non-essential features (card DSL, create transform from webhookUrl) in https://github.com/symfony/symfony/pull/36488/commits/1b1946c30a2cc24fa64a486d0614b7793bdcf7e9. I hope It can be accepted with this scope.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-08-06T14:43:36Z
+
+Thanks for the review. Each comment has been treated.

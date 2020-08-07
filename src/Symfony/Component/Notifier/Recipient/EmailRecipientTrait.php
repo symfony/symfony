@@ -12,12 +12,16 @@
 namespace Symfony\Component\Notifier\Recipient;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
-interface SmsRecipientInterface extends RecipientInterface
+trait EmailRecipientTrait
 {
-    public function getPhone(): string;
+    private $email;
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
 }

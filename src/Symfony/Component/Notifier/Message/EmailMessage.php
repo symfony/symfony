@@ -15,9 +15,10 @@ use Symfony\Bridge\Twig\Mime\NotificationEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -35,8 +36,12 @@ final class EmailMessage implements MessageInterface
         $this->envelope = $envelope;
     }
 
-    public static function fromNotification(Notification $notification, Recipient $recipient): self
+    public static function fromNotification(Notification $notification, EmailRecipientInterface $recipient): self
     {
+        if ('' === $recipient->getEmail()) {
+            throw new InvalidArgumentException(sprintf('"%s" needs an email, it cannot be empty.', static::class));
+        }
+
         if (!class_exists(NotificationEmail::class)) {
             $email = (new Email())
                 ->to($recipient->getEmail())

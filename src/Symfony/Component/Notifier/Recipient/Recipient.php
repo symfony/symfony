@@ -11,18 +11,27 @@
 
 namespace Symfony\Component\Notifier\Recipient;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  *
  * @experimental in 5.1
  */
-class Recipient
+class Recipient implements EmailRecipientInterface, SmsRecipientInterface
 {
-    private $email;
+    use EmailRecipientTrait;
+    use SmsRecipientTrait;
 
-    public function __construct(string $email = '')
+    public function __construct(string $email = '', string $phone = '')
     {
+        if ('' === $email && '' === $phone) {
+            throw new InvalidArgumentException(sprintf('"%s" needs an email or a phone but both cannot be empty.', static::class));
+        }
+
         $this->email = $email;
+        $this->phone = $phone;
     }
 
     /**
@@ -35,8 +44,15 @@ class Recipient
         return $this;
     }
 
-    public function getEmail(): string
+    /**
+     * Sets the phone number (no spaces, international code like in +3312345678).
+     *
+     * @return $this
+     */
+    public function phone(string $phone): self
     {
-        return $this->email;
+        $this->phone = $phone;
+
+        return $this;
     }
 }

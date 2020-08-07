@@ -14,7 +14,6 @@ namespace Symfony\Component\Translation\Bridge\Loco;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\Exception\TransportException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Remote\AbstractRemote;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

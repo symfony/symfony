@@ -110,7 +110,7 @@ class TranslationPushCommandTest extends TestCase
                 ->expects($this->any())
                 ->method('read')
                 ->willReturnCallback(
-                    function(array $domains, array $locales) use($remoteMessages) {
+                    function (array $domains, array $locales) use ($remoteMessages) {
                         $translatorBag = new TranslatorBag();
                         foreach ($locales as $locale) {
                             foreach ($domains as $domain) {

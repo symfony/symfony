@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-02-18T20:13:56Z
+
+@OskarStark
+
+> Did you check the current bridge implementations if there are some changes needed?
+
+Yes I checked the bridges too. All should be good there.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-02-28T16:34:57Z
+
+According to @xabbuh comment
+
+> Having hasEmail() and hasPhone() methods does not look right to me. I'd prefer dedicated classes that only implement EmailRecipientInterface and/or SmsRecipientInterface when the required data is actually present.
+
+I gave it a try and introduced `EmailRecipient` and `SmsRecipient` in addition to the `Recipient` class: https://github.com/symfony/symfony/pull/35773/commits/7df6936dfdc4f019477c80d2b86c4202e9d960b1
+
+I also made sure that the different Recipient objects are always in a valid state to be able to remove the check for a non empty email and phone in the `EmailChannel` and `SmsChannel`.
+
+Some tests were added as well: https://github.com/symfony/symfony/pull/35773/commits/f45f2463db09f3599a8e94f60fc1af530bad58b0
+
+I think this solution could be the way to go. WDYT?
+
+P.S.: No idea why the AppVeyor build is failing.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-03-24T15:44:04Z
+
+Hi @fabpot,
+
+can you please have a look on this PR. WDYT?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-04-17T13:25:07Z
+
+@fabpot Thanks for your review. I hope I addressed all of your comments :-) See: https://github.com/symfony/symfony/pull/35773/commits/9368554cfce5e245e913e31b79885c2d16d95834
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-08-07T05:59:09Z
+
+Hi @fabpot thanks for your review :-)
+
+I made the requested changes and rebased the branch on master.  fabbot.io is complaining though, but it looks like a false positive again.

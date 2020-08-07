@@ -33,7 +33,7 @@
     },
     "suggest": {
         "symfony/event-dispatcher": "",
-        "symfony/lock": "",
+        "symfony/lock": "Allow to lock a command",
         "symfony/process": "",
         "psr/log": "For using the console logger"
     },

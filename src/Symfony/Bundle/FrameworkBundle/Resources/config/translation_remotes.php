@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Translation\Bridge\Crowdin\CrowdinRemoteFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoRemoteFactory;
 use Symfony\Component\Translation\Remote\AbstractRemoteFactory;
 
@@ -25,6 +26,13 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
 
         ->set('translation.remote_factory.loco', LocoRemoteFactory::class)
+            ->args([
+                service('translator.data_collector')->nullOnInvalid(),
+            ])
+            ->parent('translation.remote_factory.abstract')
+            ->tag('translation.remote_factory')
+
+        ->set('translation.remote_factory.crowdin', CrowdinRemoteFactory::class)
             ->args([
                 service('translator.data_collector')->nullOnInvalid(),
             ])

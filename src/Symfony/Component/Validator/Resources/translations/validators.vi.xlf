@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Giá trị này không phải là International Securities Identification Number (ISIN).</target>
+                <target>Giá trị này không phải là International Securities Identification Number (ISIN) hợp lệ.</target>
             </trans-unit>
         </body>
     </file>

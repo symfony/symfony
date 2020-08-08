@@ -20,14 +20,14 @@ use function Symfony\Component\String\s;
 final class FunctionsTest extends TestCase
 {
     /**
-     * @dataProvider provideS
+     * @dataProvider provideStrings
      */
     public function testS(AbstractString $expected, string $input)
     {
         $this->assertEquals($expected, s($input));
     }
 
-    public function provideS()
+    public function provideStrings(): array
     {
         return [
             [new UnicodeString('foo'), 'foo'],

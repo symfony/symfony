@@ -160,4 +160,64 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'callable with object' => [[new CallableClass(), 'execute']],
         ];
     }
+
+    public function testExpectsInvalidNonStrictComparison()
+    {
+        $callback = static function($item) {
+            return (int) $item;
+        };
+
+        $this->validator->validate([1, '1', 1.0, '1.0'], new Unique([
+            'message' => 'myMessage',
+            'valueNormalizer' => $callback,
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function testExpectsValidNonStrictComparison()
+    {
+        $callback = static function ($item) {
+            return (int) $item;
+        };
+
+        $this->validator->validate([1, '2', 3, '4.0'], new Unique([
+            'valueNormalizer' => $callback,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testExpectsInvalidCaseInsensitiveComparison()
+    {
+        $callback = static function ($item) {
+            return mb_strtolower($item);
+        };
+
+        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'], new Unique([
+            'message' => 'myMessage',
+            'valueNormalizer' => $callback,
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function testExpectsValidCaseInsensitiveComparison()
+    {
+        $callback = static function ($item) {
+            return mb_strtolower($item);
+        };
+
+        $this->validator->validate(['Hello', 'World'], new Unique([
+            'valueNormalizer' => $callback,
+        ]));
+
+        $this->assertNoViolation();
+    }
 }

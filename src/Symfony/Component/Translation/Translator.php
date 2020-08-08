@@ -199,7 +199,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             return '';
         }
 
-        if (null === $domain) {
+        if(null === $domain){
             $parsed = explode('@', $id);
             $id = $parsed[0];
             $domain = $parsed[1] ?? 'messages';

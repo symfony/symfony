@@ -163,7 +163,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsInvalidNonStrictComparison()
     {
-        $callback = static function($item) {
+        $callback = static function ($item) {
             return (int) $item;
         };
 

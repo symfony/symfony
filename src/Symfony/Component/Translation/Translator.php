@@ -199,9 +199,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             return '';
         }
 
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $parsed = explode('@', $id);
+        $id = $parsed[0];
+        $domain = $parsed[1] ?? $domain ?? 'messages';
 
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();

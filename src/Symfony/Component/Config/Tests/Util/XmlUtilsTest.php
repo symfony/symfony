@@ -81,7 +81,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']);
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertRegExp('/The XML file ".+" is not valid\./', $e->getMessage());
+            $this->assertMatchesRegularExpression('/The XML file ".+" is not valid\./', $e->getMessage());
         }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));

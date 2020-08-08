@@ -177,7 +177,7 @@ class UploadedFileTest extends TestCase
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
 
         $this->assertFileExists($targetPath);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);

@@ -369,6 +369,18 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @dataProvider getTransWithDomainTests
+     */
+    public function testTransWithDomainInId($expected, $id, $translationId, $translation, $parameters, $locale, $domain)
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', [(string) $translationId => $translation], $locale, $domain);
+
+        $this->assertEquals($expected, $translator->trans($id, $parameters, null, $locale));
+    }
+
+    /**
      * @dataProvider getInvalidLocalesTests
      */
     public function testTransInvalidLocale($locale)
@@ -438,9 +450,29 @@ class TranslatorTest extends TestCase
     {
         return [
             ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
+            ['Symfony est super !', 'Symfony is @great!', 'Symfony est super !', [], 'fr', ''],
             ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
             ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
             ['', null, '', [], 'fr', ''],
+        ];
+    }
+
+    public function getTransWithDomainTests()
+    {
+        return [
+            ['Symfony est super !', 'Symfony is great!@messages', 'Symfony is great!', 'Symfony est super !', [], 'fr', 'messages'],
+            ['Symfony est super !', 'Symfony is great!@symfony', 'Symfony is great!', 'Symfony est super !', [], 'fr', 'symfony'],
+            ['Symfony est super !', 'Symfony is great!@', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
+            ['Symfony est super !', 'Symfony is great!@messages', 'Symfony is great!', 'Symfony est super !', [], 'fr', null],
+            ['Symfony est awesome !', 'Symfony is %what%!@messages', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', 'messages'],
+            ['Symfony est awesome !', 'Symfony is %what%!@symfony', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', 'symfony'],
+            ['Symfony est awesome !', 'Symfony is %what%!@', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
+            ['Symfony est awesome !', 'Symfony is %what%!@messages', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', null],
+            ['Symfony est super !', 'Symfony is great!@messages', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', 'messages'],
+            ['Symfony est super !', 'Symfony is great!@symfony', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', 'symfony'],
+            ['Symfony est super !', 'Symfony is great!@', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
+            ['Symfony est super !', 'Symfony is great!@messages', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', null],
+            ['', null, null, '', [], 'fr', ''],
         ];
     }
 

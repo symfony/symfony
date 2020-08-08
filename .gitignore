@@ -7,3 +7,6 @@ composer.phar
 package.tar
 /packages.json
 /.phpunit
+.idea/symfony.iml
+.idea/misc.xml
+.idea/modules.xml

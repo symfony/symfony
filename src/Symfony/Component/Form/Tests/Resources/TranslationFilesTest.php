@@ -23,7 +23,7 @@ class TranslationFilesTest extends TestCase
     {
         $loader = class_exists(Loader::class)
             ? [new Loader(), 'loadFile']
-            : 'PHPUnit\Util\XML::loadfile';
+            : ['PHPUnit\Util\XML', 'loadfile'];
 
         $loader($filePath, false, false, true);
 

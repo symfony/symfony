@@ -1367,8 +1367,8 @@ class ApplicationTest extends TestCase
         $application->setCatchExceptions(false);
         $application->setDispatcher(new EventDispatcher());
 
-        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
-            new \UnknownClass();
+        $application->register('dym')->setCode(function () {
+            throw new \Error('Something went wrong.');
         });
 
         $tester = new ApplicationTester($application);
@@ -1377,7 +1377,7 @@ class ApplicationTest extends TestCase
             $tester->run(['command' => 'dym']);
             $this->fail('->run() should rethrow PHP errors if not handled via ConsoleErrorEvent.');
         } catch (\Error $e) {
-            $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
+            $this->assertSame('Something went wrong.', $e->getMessage());
         }
     }
 
@@ -1702,8 +1702,8 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->setDispatcher(new EventDispatcher());
 
-        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
-            new \UnknownClass();
+        $application->register('dym')->setCode(function () {
+            throw new \Error('Something went wrong.');
         });
 
         $tester = new ApplicationTester($application);
@@ -1712,7 +1712,7 @@ class ApplicationTest extends TestCase
             $tester->run(['command' => 'dym']);
             $this->fail('->run() should rethrow PHP errors if not handled via ConsoleErrorEvent.');
         } catch (\Error $e) {
-            $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
+            $this->assertSame('Something went wrong.', $e->getMessage());
         }
     }
 }

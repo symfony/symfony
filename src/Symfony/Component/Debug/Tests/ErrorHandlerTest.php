@@ -103,10 +103,10 @@ class ErrorHandlerTest extends TestCase
             // if an exception is thrown, the test passed
             if (\PHP_VERSION_ID < 80000) {
                 $this->assertEquals(E_NOTICE, $exception->getSeverity());
-                $this->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+                $this->assertMatchesRegularExpression('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             } else {
                 $this->assertEquals(E_WARNING, $exception->getSeverity());
-                $this->assertRegExp('/^Warning: Undefined variable \$(foo|bar)/', $exception->getMessage());
+                $this->assertMatchesRegularExpression('/^Warning: Undefined variable \$(foo|bar)/', $exception->getMessage());
             }
             $this->assertEquals(__FILE__, $exception->getFile());
 

@@ -27,8 +27,8 @@ class TranslationUpdateCommandTest extends TestCase
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertRegExp('/foo/', $tester->getDisplay());
-        $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpMessagesAndCleanInRootDirectory()
@@ -40,32 +40,32 @@ class TranslationUpdateCommandTest extends TestCase
 
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', '--dump-messages' => true, '--clean' => true]);
-        $this->assertRegExp('/foo/', $tester->getDisplay());
-        $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpTwoMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertRegExp('/foo/', $tester->getDisplay());
-        $this->assertRegExp('/bar/', $tester->getDisplay());
-        $this->assertRegExp('/2 messages were successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/bar/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/2 messages were successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpMessagesForSpecificDomain()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo'], 'mydomain' => ['bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--domain' => 'mydomain']);
-        $this->assertRegExp('/bar/', $tester->getDisplay());
-        $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/bar/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
     public function testWriteMessages()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--force' => true]);
-        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
     public function testWriteMessagesInRootDirectory()
@@ -77,14 +77,14 @@ class TranslationUpdateCommandTest extends TestCase
 
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', '--force' => true]);
-        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
     public function testWriteMessagesForSpecificDomain()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo'], 'mydomain' => ['bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--domain' => 'mydomain']);
-        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
     protected function setUp()

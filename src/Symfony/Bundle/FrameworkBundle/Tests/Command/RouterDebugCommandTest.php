@@ -58,7 +58,7 @@ class RouterDebugCommandTest extends TestCase
 
         $tester->execute([]);
 
-        $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
     }
 
     /**

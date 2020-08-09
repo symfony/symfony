@@ -78,7 +78,7 @@ class KernelTest extends TestCase
         $containerDir = __DIR__.'/Fixtures/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta'));
         $this->assertFileExists($containerDir);
-        $this->assertFileNotExists($containerDir.'.legacy');
+        $this->assertFileDoesNotExist($containerDir.'.legacy');
 
         $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
@@ -86,8 +86,8 @@ class KernelTest extends TestCase
         $this->assertFileExists($containerDir);
         $this->assertFileExists($containerDir.'.legacy');
 
-        $this->assertFileNotExists($legacyContainerDir);
-        $this->assertFileNotExists($legacyContainerDir.'.legacy');
+        $this->assertFileDoesNotExist($legacyContainerDir);
+        $this->assertFileDoesNotExist($legacyContainerDir.'.legacy');
     }
 
     public function testBootInitializesBundlesAndContainer()

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-08-06T10:32:51Z
+
+> Or maybe directly inside the `composer.json`, like an `"eol": "true"` // and `false` by default if not defined
+
+that won't help. You cannot alter the composer.json of a release after it is done (git tags are immutable) so you cannot make that change at the time of the eol.
+Also, the EOL of a release is generally at the time of releasing the next patch release for the same minor. What maintenance process have generally is an EOL date for minor and major versions, not for each package version.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-08-06T10:52:11Z
+
+@stof
+
+I see your point arround the taf and the release
+
+And do you think the:
+
+> Like for example the Security Advisories feature
+
+could help achieve such feature of knowing the EOL of a feature?
+Maybe an internal mapping inside composer land (or community and composer plugin support) ?
+
+---------------------------------------------------------------------------
+
+by domgraziano at 2020-08-06T12:42:22Z
+
+> @stof
+>
+> I see your point arround the taf and the release
+>
+> And do you think the:
+>
+> > Like for example the Security Advisories feature
+>
+> could help achieve such feature of knowing the EOL of a feature?
+> Maybe an internal mapping inside composer land (or community and composer plugin support) ?
+
+Hi, what about a brand new option shipped with the current about command that checks if the current version is EOL, and throws error if it is. I imagine a `php bin/console about --eol_check` that could be easily used by anyone to validate during CI.

@@ -553,6 +553,6 @@ trait PolyfillAssertTrait
      */
     public static function assertDoesNotMatchRegularExpression($pattern, $string, $message = '')
     {
-        static::assertNotRegExp($message, $string, $message);
+        static::assertNotRegExp($pattern, $string, $message);
     }
 }

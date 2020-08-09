@@ -216,6 +216,11 @@ REGEX;
         $inNamespace = false;
         $tokens = token_get_all($source);
 
+        $nsTokens = [T_WHITESPACE => true, T_NS_SEPARATOR => true, T_STRING => true];
+        if (\defined('T_NAME_QUALIFIED')) {
+            $nsTokens[T_NAME_QUALIFIED] = true;
+        }
+
         for ($i = 0; isset($tokens[$i]); ++$i) {
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
@@ -230,7 +235,7 @@ REGEX;
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], [T_WHITESPACE, T_NS_SEPARATOR, T_STRING])) {
+                while (isset($tokens[++$i][1], $nsTokens[$tokens[$i][0]])) {
                     $rawChunk .= $tokens[$i][1];
                 }
                 if ('{' === $tokens[$i]) {

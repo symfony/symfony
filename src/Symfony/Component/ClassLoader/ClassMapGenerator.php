@@ -93,6 +93,11 @@ class ClassMapGenerator
         $contents = file_get_contents($path);
         $tokens = token_get_all($contents);
 
+        $nsTokens = [T_STRING => true, T_NS_SEPARATOR => true];
+        if (\defined('T_NAME_QUALIFIED')) {
+            $nsTokens[T_NAME_QUALIFIED] = true;
+        }
+
         $classes = [];
 
         $namespace = '';
@@ -110,7 +115,7 @@ class ClassMapGenerator
                     $namespace = '';
                     // If there is a namespace, extract it
                     while (isset($tokens[++$i][1])) {
-                        if (\in_array($tokens[$i][0], [T_STRING, T_NS_SEPARATOR])) {
+                        if (isset($nsTokens[$tokens[$i][0]])) {
                             $namespace .= $tokens[$i][1];
                         }
                     }

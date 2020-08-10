@@ -309,6 +309,6 @@ class ResponseHeaderBagTest extends TestCase
 
     private function assertSetCookieHeader(string $expected, ResponseHeaderBag $actual)
     {
-        $this->assertRegExp('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
+        $this->assertMatchesRegularExpression('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
     }
 }

@@ -28,7 +28,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
         $this->assertEquals(TranslationDebugCommand::EXIT_CODE_MISSING, $res);
     }
 
@@ -37,7 +37,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
         $this->assertEquals(TranslationDebugCommand::EXIT_CODE_UNUSED, $res);
     }
 
@@ -46,7 +46,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/fallback/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/fallback/', $tester->getDisplay());
         $this->assertEquals(TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
     }
 
@@ -55,7 +55,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
 
-        $this->assertRegExp('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
         $this->assertEquals(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $res);
     }
 
@@ -65,8 +65,8 @@ class TranslationDebugCommandTest extends TestCase
         $res = $tester->execute(['locale' => 'en']);
         $expectedExitStatus = TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED;
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
         $this->assertEquals($expectedExitStatus, $res);
     }
 
@@ -83,8 +83,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $res = $tester->execute(['locale' => 'en']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
         $this->assertEquals($expectedExitStatus, $res);
     }
 
@@ -103,8 +103,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], $kernel);
         $res = $tester->execute(['locale' => 'en', 'bundle' => $this->translationDir.'/customDir']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
         $this->assertEquals($expectedExitStatus, $res);
     }
 

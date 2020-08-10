@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>Mỗi phần tử trong bộ sưu tập này nên thỏa mãn những ràng buộc của nó.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Giá trị này không phải là mã số chứng khoán quốc tế (ISIN) hợp lệ.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

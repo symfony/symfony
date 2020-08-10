@@ -362,6 +362,22 @@
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
                 <target>Naikalat ang password na ito sa isang data breach at hindi na dapat gamitin. Mangyaring gumamit ng ibang pang password.</target>
             </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Ang halagang ito ay dapat nasa pagitan ng {{ min }} at {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Ang halagang ito ay hindi wastong hostname.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Ang bilang ng mga elemento sa koleksyon na ito ay dapat multiple ng {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Ang halagang ito ay hindi wastong International Securities Identification Number (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
  </xliff>

@@ -127,6 +127,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://symfony.com?'],
             ['http://symfony.com?query=1'],
             ['http://symfony.com/?query=1'],
+            ['http://symfony.com/?query=withslash\\'],
             ['http://symfony.com#'],
             ['http://symfony.com#fragment'],
             ['http://symfony.com/#fragment'],

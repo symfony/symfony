@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-09T16:37:55Z
+
+Can you please target master? That'd be a new feature.
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-09T16:39:51Z
+
+sure!
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-09T18:08:45Z
+
+@nicolas-grekas done, and tests updated
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-10T09:48:47Z
+
+Build fails don't seem related to my changes
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-10T12:52:30Z
+
+@fabpot Updated with suggested changes
+
+---------------------------------------------------------------------------
+
+by stof at 2020-07-10T12:57:54Z
+
+This does not only make the status code of the subrequest available in the exception. It also make it being used as the status code of the master request now (as the thrown exception is an HttpException) when this subrequest does not happen in Twig (I think Twig might be wrapping the HttpException into a Twig RuntimeError exception).
+
+Maybe we should provide an HttpException only as the previous exception here.
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-10T13:16:09Z
+
+The second to last commit has @fabpot suggestion, last commit has @stof suggestion.
+I'll update the test once the chosen option is clear :-)
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-07-15T10:33:36Z
+
+Polite reminder if someone can assess which suggestion to go for please?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-31T07:01:14Z
+
+I'm fine with @stof suggestion. Tests do not pass though.
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2020-08-07T13:33:24Z
+
+PR Updated!
+Failing tests seem to be not related to my PR it's some redis and http envelope errors, any ideas?

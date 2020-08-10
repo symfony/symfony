@@ -23,7 +23,7 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
 
-        $this->assertRegExp('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+        $this->assertMatchesRegularExpression('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
     public function testExecuteListsCommandsWithXmlOption()
@@ -31,7 +31,7 @@ class ListCommandTest extends TestCase
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--format' => 'xml']);
-        $this->assertRegExp('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+        $this->assertMatchesRegularExpression('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
     }
 
     public function testExecuteListsCommandsWithRawOption()

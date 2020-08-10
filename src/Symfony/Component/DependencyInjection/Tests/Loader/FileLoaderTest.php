@@ -207,7 +207,7 @@ class FileLoaderTest extends TestCase
 
         $this->assertTrue($container->has(MissingParent::class));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
             $container->getDefinition(MissingParent::class)->getErrors()[0]
         );

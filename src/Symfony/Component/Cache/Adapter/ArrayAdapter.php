@@ -124,6 +124,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $value = $item["\0*\0value"];
         $expiry = $item["\0*\0expiry"];
 
+        if (0 === $expiry) {
+            $expiry = PHP_INT_MAX;
+        }
+
         if (null !== $expiry && $expiry <= microtime(true)) {
             $this->deleteItem($key);
 

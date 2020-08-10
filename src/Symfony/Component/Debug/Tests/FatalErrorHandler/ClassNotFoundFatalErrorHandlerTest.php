@@ -68,7 +68,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
         }
 
         $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
-        $this->assertSame($translatedMessage, $exception->getMessage());
+        $this->assertMatchesRegularExpression($translatedMessage, $exception->getMessage());
         $this->assertSame($error['type'], $exception->getSeverity());
         $this->assertSame($error['file'], $exception->getFile());
         $this->assertSame($error['line'], $exception->getLine());

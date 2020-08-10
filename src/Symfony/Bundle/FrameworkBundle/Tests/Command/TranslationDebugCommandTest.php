@@ -29,7 +29,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo']);
         $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
     }
 
     public function testDebugUnusedMessages()
@@ -37,7 +37,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
         $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
     }
 
     public function testDebugFallbackMessages()
@@ -45,7 +45,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
         $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
 
-        $this->assertRegExp('/fallback/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/fallback/', $tester->getDisplay());
     }
 
     public function testNoDefinedMessages()
@@ -53,7 +53,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
 
-        $this->assertRegExp('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
     }
 
     public function testDebugDefaultDirectory()
@@ -61,8 +61,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
         $tester->execute(['locale' => 'en']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
     }
 
     /**
@@ -93,8 +93,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['locale' => 'en']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
     }
 
     public function testDebugCustomDirectory()
@@ -110,8 +110,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], $kernel);
         $tester->execute(['locale' => 'en', 'bundle' => $this->translationDir.'/customDir']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
     }
 
     public function testDebugInvalidDirectory()

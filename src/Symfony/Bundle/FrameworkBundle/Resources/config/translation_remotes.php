@@ -21,6 +21,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('http_client')->ignoreOnInvalid(),
                 service('translation.loader.xliff_raw'),
+                service('logger')->nullOnInvalid(),
                 param('kernel.default_locale'),
             ])
             ->abstract()

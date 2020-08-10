@@ -11,20 +11,30 @@
 
 namespace Symfony\Component\Translation\Remote;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\IncompleteDsnException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractRemoteFactory implements RemoteFactoryInterface
 {
+    /** @var HttpClientInterface|null */
     protected $client;
+
+    /** @var LoaderInterface|null */
     protected $loader;
+
+    /** @var LoggerInterface|null */
+    protected $logger;
+
+    /** @var string|null */
     protected $defaultLocale;
 
-    public function __construct(HttpClientInterface $client = null, LoaderInterface $loader = null, string $defaultLocale = null)
+    public function __construct(HttpClientInterface $client = null, LoaderInterface $loader = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->client = $client;
         $this->loader = $loader;
+        $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Bridge\Loco;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\Exception\TransportException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -33,14 +34,23 @@ class LocoRemote extends AbstractRemote
 {
     protected const HOST = 'localise.biz';
 
+    /** @var string */
     private $apiKey;
+
+    /** @var LoaderInterface|null */
     private $loader;
+
+    /** @var LoggerInterface|null */
+    private $logger;
+
+    /** @var string|null */
     private $defaultLocale;
 
-    public function __construct(string $apiKey, HttpClientInterface $client = null, LoaderInterface $loader = null, string $defaultLocale = null)
+    public function __construct(string $apiKey, HttpClientInterface $client = null, LoaderInterface $loader = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->apiKey = $apiKey;
         $this->loader = $loader;
+        $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
 
         parent::__construct($client);
@@ -84,9 +94,7 @@ class LocoRemote extends AbstractRemote
 
         foreach ($locales as $locale) {
             $response = $this->client->request('GET', sprintf('https://%s/api/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locale, $filter), [
-                'headers' => [
-                    'Authorization' => 'Loco '.$this->apiKey,
-                ],
+                'headers' => $this->getDefaultHeaders(),
             ]);
 
             $responseContent = $response->getContent(false);
@@ -110,8 +118,8 @@ class LocoRemote extends AbstractRemote
     {
         $deletedIds = [];
 
-        foreach ($translations->all() as $locale => $messages) {
-            foreach ($messages as $domain => $messages) {
+        foreach ($translations->all() as $locale => $domainMessages) {
+            foreach ($domainMessages as $domain => $messages) {
                 foreach ($messages as $id => $message) {
                     if (\in_array($id, $deletedIds)) {
                         continue;
@@ -125,12 +133,17 @@ class LocoRemote extends AbstractRemote
         }
     }
 
+    protected function getDefaultHeaders(): array
+    {
+        return [
+            'Authorization' => 'Loco '.$this->apiKey,
+        ];
+    }
+
     private function createAsset(string $id): void
     {
         $response = $this->client->request('POST', sprintf('https://%s/api/assets', $this->getEndpoint()), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+            'headers' => $this->getDefaultHeaders(),
             'body' => [
                 'name' => $id,
                 'id' => $id,
@@ -140,7 +153,9 @@ class LocoRemote extends AbstractRemote
         ]);
 
         if (Response::HTTP_CONFLICT === $response->getStatusCode()) {
-            // Translation key already exists in Loco, do nothing
+            $this->logger->warning(sprintf('Translation key (%s) already exists in Loco.', $id), [
+                'id' => $id,
+            ]);
         } elseif (Response::HTTP_CREATED !== $response->getStatusCode()) {
             throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
         }
@@ -149,9 +164,7 @@ class LocoRemote extends AbstractRemote
     private function translateAsset(string $id, string $message, string $locale): void
     {
         $response = $this->client->request('POST', sprintf('https://%s/api/translations/%s/%s', $this->getEndpoint(), $id, $locale), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+            'headers' => $this->getDefaultHeaders(),
             'body' => $message,
         ]);
 
@@ -169,9 +182,7 @@ class LocoRemote extends AbstractRemote
         }
 
         $response = $this->client->request('POST', sprintf('https://%s/api/tags/%s.json', $this->getEndpoint(), $tag), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+            'headers' => $this->getDefaultHeaders(),
             'body' => $idsAsString,
         ]);
 
@@ -182,10 +193,8 @@ class LocoRemote extends AbstractRemote
 
     private function createTag(string $tag): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/api/tags.json', $this->getEndpoint(), $tag), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+        $response = $this->client->request('POST', sprintf('https://%s/api/tags.json', $this->getEndpoint()), [
+            'headers' => $this->getDefaultHeaders(),
             'body' => [
                 'name' => $tag,
             ],
@@ -199,9 +208,7 @@ class LocoRemote extends AbstractRemote
     private function getTags(): array
     {
         $response = $this->client->request('GET', sprintf('https://%s/api/tags.json', $this->getEndpoint()), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+            'headers' => $this->getDefaultHeaders(),
         ]);
 
         $content = $response->getContent(false);
@@ -216,9 +223,7 @@ class LocoRemote extends AbstractRemote
     private function deleteAsset(string $id): void
     {
         $response = $this->client->request('DELETE', sprintf('https://%s/api/assets/%s.json', $this->getEndpoint(), $id), [
-            'headers' => [
-                'Authorization' => 'Loco '.$this->apiKey,
-            ],
+            'headers' => $this->getDefaultHeaders(),
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {

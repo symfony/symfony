@@ -64,4 +64,9 @@ abstract class AbstractRemote implements RemoteInterface
     {
         return static::HOST;
     }
+
+    protected function getDefaultHeaders(): array
+    {
+        return [];
+    }
 }

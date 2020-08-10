@@ -83,14 +83,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         }
 
         $internalErrors = libxml_use_internal_errors(true);
-        $disableEntities = libxml_disable_entity_loader(true);
+        if (LIBXML_VERSION < 20900) {
+            $disableEntities = libxml_disable_entity_loader(true);
+        }
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->loadXML($data, $this->loadOptions);
 
         libxml_use_internal_errors($internalErrors);
-        libxml_disable_entity_loader($disableEntities);
+        if (LIBXML_VERSION < 20900) {
+            libxml_disable_entity_loader($disableEntities);
+        }
 
         if ($error = libxml_get_last_error()) {
             libxml_clear_errors();

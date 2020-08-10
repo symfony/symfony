@@ -1250,7 +1250,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 if ($throwOnAbstract && $definition->isAbstract()) {
                     throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must not be abstract.', $id, $name));
                 }
-                $tags[$id] = $this->parameterBag->resolveValue($definition->getTag($name));
+                $tags[$id] = $definition->getTag($name);
             }
         }
 

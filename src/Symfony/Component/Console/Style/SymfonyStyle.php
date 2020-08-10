@@ -64,7 +64,8 @@ class SymfonyStyle extends OutputStyle
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
         $this->autoPrependBlock();
-        $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, $escape));
+        $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, $escape),
+            self::OUTPUT_NORMAL|($type == 'ERROR' ? self::VERBOSITY_QUIET : 0));
         $this->newLine();
     }
 

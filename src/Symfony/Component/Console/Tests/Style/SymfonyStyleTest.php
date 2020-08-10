@@ -115,4 +115,24 @@ class SymfonyStyleTest extends TestCase
 
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }
+
+    public function testPrintErrorIfWeRunInQuietMode()
+    {
+        $output = $this->getMockBuilder(OutputInterface::class)->getMock();
+        $output
+            ->method('getFormatter')
+            ->willReturn(new OutputFormatter());
+        $output
+            ->expects($this->once())
+            ->method('writeln')
+            ->with(
+                $this->anything(),
+                $this->callback(function($type)
+                {
+                    return (($type & OutputInterface::VERBOSITY_QUIET) == OutputInterface::VERBOSITY_QUIET) ? true:false;
+                }
+            ));
+        $style = new SymfonyStyle($this->getMockBuilder(InputInterface::class)->getMock(), $output);
+        $style->error('test');
+    }
 }

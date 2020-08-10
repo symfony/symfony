@@ -61,16 +61,22 @@ class XliffUtils
     {
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
-        $disableEntities = libxml_disable_entity_loader(false);
+        if (LIBXML_VERSION < 20900) {
+            $disableEntities = libxml_disable_entity_loader(false);
+        }
 
         $isValid = @$dom->schemaValidateSource(self::getSchema($xliffVersion));
         if (!$isValid) {
-            libxml_disable_entity_loader($disableEntities);
+            if (LIBXML_VERSION < 20900) {
+                libxml_disable_entity_loader($disableEntities);
+            }
 
             return self::getXmlErrors($internalErrors);
         }
 
-        libxml_disable_entity_loader($disableEntities);
+        if (LIBXML_VERSION < 20900) {
+            libxml_disable_entity_loader($disableEntities);
+        }
 
         $dom->normalizeDocument();
 

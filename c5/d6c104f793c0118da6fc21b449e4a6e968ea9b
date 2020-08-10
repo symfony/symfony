@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Jontsa at 2020-04-24T09:49:50Z
+
+Infobip recommends API key authentication which is more flexible than using basic auth. https://dev.infobip.com/#section/Authentication
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-04-27T13:50:02Z
+
+I have changed the auth.
+
+Thank you @Jontsa
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2020-04-27T13:55:57Z
+
+I have added tests based on Freemobile too.

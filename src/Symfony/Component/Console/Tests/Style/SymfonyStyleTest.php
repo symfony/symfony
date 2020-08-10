@@ -127,9 +127,8 @@ class SymfonyStyleTest extends TestCase
             ->method('writeln')
             ->with(
                 $this->anything(),
-                $this->callback(function($type)
-                {
-                    return (($type & OutputInterface::VERBOSITY_QUIET) == OutputInterface::VERBOSITY_QUIET) ? true:false;
+                $this->callback(function ($type) {
+                    return (OutputInterface::VERBOSITY_QUIET == ($type & OutputInterface::VERBOSITY_QUIET)) ? true : false;
                 }
             ));
         $style = new SymfonyStyle($this->getMockBuilder(InputInterface::class)->getMock(), $output);

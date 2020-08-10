@@ -282,7 +282,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileDoesNotExist($basePath);
     }
 
     public function testRemoveCleansArrayOfFilesAndDirectories()
@@ -298,8 +298,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        $this->assertFileDoesNotExist($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'file');
     }
 
     public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
@@ -315,8 +315,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        $this->assertFileDoesNotExist($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'file');
     }
 
     public function testRemoveIgnoresNonExistingFiles()
@@ -331,7 +331,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'dir');
     }
 
     public function testRemoveCleansInvalidLinks()
@@ -355,7 +355,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileDoesNotExist($basePath);
     }
 
     public function testFilesExists()
@@ -793,7 +793,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->rename($file, $newPath);
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
         $this->assertFileExists($newPath);
     }
 
@@ -819,7 +819,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->rename($file, $newPath, true);
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
         $this->assertFileExists($newPath);
     }
 
@@ -1345,7 +1345,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertDirectoryExists($targetPath);
         $this->assertFileExists($targetPath.'source');
-        $this->assertFileNotExists($targetPath.'target');
+        $this->assertFileDoesNotExist($targetPath.'target');
     }
 
     public function testMirrorAvoidCopyingTargetDirectoryIfInSourceDirectory()
@@ -1469,7 +1469,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringStartsWith($scheme, $filename);
 
         // The php://temp stream deletes the file after close
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
     }
 
     public function testTempnamWithPharSchemeFails()

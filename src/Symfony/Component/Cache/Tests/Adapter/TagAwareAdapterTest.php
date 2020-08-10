@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
@@ -160,6 +161,25 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter->deleteItem($itemKey); //simulate losing item but keeping tags
 
         $this->assertFalse($anotherPool->hasItem($itemKey));
+    }
+
+    public function testInvalidateTagsWithArrayAdapter()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter());
+
+        $item = $adapter->getItem('foo');
+
+        $this->assertFalse($item->isHit());
+
+        $item->tag('bar');
+        $item->expiresAfter(100);
+        $adapter->save($item);
+
+        $this->assertTrue($adapter->getItem('foo')->isHit());
+
+        $adapter->invalidateTags(['bar']);
+
+        $this->assertFalse($adapter->getItem('foo')->isHit());
     }
 
     public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemAndOnlyHasTags()

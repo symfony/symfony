@@ -50,6 +50,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'infobip' => [
+            'class' => Bridge\Infobip\InfobipTransportFactory::class,
+            'package' => 'symfony/infobip-notifier',
+        ],
         'firebase' => [
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+* added `CompiledClassMetadataFactory` and `ClassMetadataFactoryCompiler` for faster metadata loading.
+
 5.1.0
 -----
 

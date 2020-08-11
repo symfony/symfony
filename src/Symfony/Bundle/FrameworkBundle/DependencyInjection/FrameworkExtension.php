@@ -1990,6 +1990,9 @@ class FrameworkExtension extends Extension
         $container->getDefinition('mailer.transports')->setArgument(0, $transports);
         $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
 
+        $container->removeDefinition('mailer.logger_message_listener');
+        $container->setAlias('mailer.logger_message_listener', (new Alias('mailer.message_logger_listener'))->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "mailer.message_logger_listener" instead.'));
+
         $mailer = $container->getDefinition('mailer.mailer');
         if (false === $messageBus = $config['message_bus']) {
             $mailer->replaceArgument(1, null);

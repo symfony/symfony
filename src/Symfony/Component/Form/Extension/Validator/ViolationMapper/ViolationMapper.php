@@ -241,13 +241,6 @@ class ViolationMapper implements ViolationMapperInterface
                 // Form inherits its parent data
                 // Cut the piece out of the property path and proceed
                 $propertyPathBuilder->remove($i);
-            } elseif (!$scope->getConfig()->getMapped()) {
-                // Form is not mapped
-                // Set the form as new origin and strip everything
-                // we have so far in the path
-                $origin = $scope;
-                $propertyPathBuilder->remove(0, $i + 1);
-                $i = 0;
             } else {
                 /* @var \Symfony\Component\PropertyAccess\PropertyPathInterface $propertyPath */
                 $propertyPath = $scope->getPropertyPath();

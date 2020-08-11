@@ -51,6 +51,8 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
         $code = $this->classMetadataFactoryCompiler->compile($metadatas);
 
         $this->filesystem->dumpFile("{$cacheDir}/serializer.class.metadata.php", $code);
+
+        return [];
     }
 
     /**

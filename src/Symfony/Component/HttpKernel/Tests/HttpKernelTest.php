@@ -314,8 +314,8 @@ class HttpKernelTest extends TestCase
         $request = new Request();
 
         $stack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(['push', 'pop'])->getMock();
-        $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
-        $stack->expects($this->at(1))->method('pop');
+        $stack->expects($this->once())->method('push')->with($this->equalTo($request));
+        $stack->expects($this->once())->method('pop');
 
         $dispatcher = new EventDispatcher();
         $kernel = $this->getHttpKernel($dispatcher, null, $stack);

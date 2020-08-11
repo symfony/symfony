@@ -112,14 +112,12 @@ class ConsoleHandlerTest extends TestCase
     {
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET)
-        ;
-        $output
-            ->expects($this->at(1))
-            ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_DEBUG)
+            ->willReturnOnConsecutiveCalls(
+                OutputInterface::VERBOSITY_QUIET,
+                OutputInterface::VERBOSITY_DEBUG
+            )
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),

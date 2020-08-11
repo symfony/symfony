@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by tyx at 2020-01-19T21:04:54Z
+
+Hello @Nyholm !
+
+Thanks for the reminder.
+
+Glad to see I'm not alone writing this kind of code ;)
+
+I postponed updating this PR for a long time. I will fix that asap.
+
+---------------------------------------------------------------------------
+
+by Devristo at 2020-01-20T11:32:25Z
+
+When dispatching a new command from a command handler it could cause additional nesting of `HandlerFailedException`. For example:
+
+ - HandlerFailedException
+   - HandlerFailedException
+     - MyCustomException
+
+Is this something we would like to consider?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-12T09:00:06Z
+
+A nice little ping again =)
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-12T09:55:33Z
+
+Nice timing @Nyholm ;)
+
+I just updated  and rebased the PR
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-12T11:23:11Z
+
+Thank you for the update.
+
+I think the current code looks good. Im just curious about something. Im not sure we should change anything, but I just want to ask. Is there someway we can stop dealing with arrays?
+
+Maybe Im just interested in the first error. Ie:
+
+```php
+try {
+    $this->bus->dispatch($command);
+} catch (HandlerFailedException $e) {
+    if (null !== $exception = $e->getFirstNestedExceptionOfClass(FooException::class)) {
+        echo $exception->getMessage()
+    } else {
+        throw $e;
+    }
+}
+```
+
+The vast majority of the times, I get an HandlerFailedExcpetion with just a single exception in it. Do we care?
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-05-13T09:20:17Z
+
+Regarding the PR I made a small tweak to ensure returning an array with correct indexes (and update test).
+
+For your point @Nyholm you're totally right. I do the same !
+
+May be we could also add another method to get only the first occurence as sugar ?

@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T11:48:43Z
+
+@fbourigault impressive work you did here! The Blackfire comparisons are incredible (the second one removes hundreds of thousands of function calls!!).
+
+In order to help the Symfony Docs team, we'd need a few more things here:
+
+* The examples you showed, it's all you need to use this in the stand-alone component?
+* When using this inside the Symfony Framework, do you need to enable/change something? Some config option? Some code?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-07T14:19:58Z
+
+@stof here are the benchmark
+- [master vs master+PhpArrayAdapter, 100 iterations with complexity of 1](https://blackfire.io/profiles/compare/c64da9f8-19eb-49dd-8c28-7a249659dcd0/graph)
+- [master vs master+PhpArrayAdapter, 3 iterations with complexity of 60](https://blackfire.io/profiles/compare/2841ce37-8083-4ef2-befa-1e938da7821a/graph)
+- [master vs this PR, 100 iterations with complexity of 1](https://blackfire.io/profiles/compare/4366e148-ab26-4174-8107-98a99c0ccffa/graph)
+- [master vs this PR, 3 iterations with complexity of 60](https://blackfire.io/profiles/compare/eb92528c-fb5e-4c81-94cb-8ac859757b74/graph)
+
+I used the following code to use the `PhpArrayAdapter`:
+```php
+$adapter = new ApcuAdapter('SymfonyMetadata');
+
+$adapter = new PhpArrayAdapter(__DIR__.'/../metadata.cache', $adapter);
+
+$classMetadataFactory = new CacheClassMetadataFactory(
+    new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
+    $adapter
+);
+```
+
+And here is the code for the warmup:
+```php
+$classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+$classMetadatas = [];
+
+foreach([Category::class, Comment::class, Forum::class, Thread::class, User::class] as $class) {
+    $classMetadatas[strtr($class, '\\', '_')] = $classMetadataFactory->getMetadataFor($class);
+}
+
+$adapter = new PhpArrayAdapter(__DIR__.'/../../metadata.cache', new NullAdapter());
+$adapter->warmUp($classMetadatas);
+```
+
+I also switched from `backfire run` to `blackfire/php-sdk` to exclude the warmup from the profile.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-07T14:24:24Z
+
+> The examples you showed, it's all you need to use this in the stand-alone component?
+
+Yes :)
+
+> When using this inside the Symfony Framework, do you need to enable/change something? Some config option? Some code?
+
+This is not yet defined, but it's maybe something to enable. Scanning the whole `src/Entity` directory could be part of the recipe.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-08T23:02:27Z
+
+I fixed all comments.
+
+Now I want to write the `CacheWarmer` and the `FrameworkBundle` integration.
+
+What about having something like:
+```yaml
+framework:
+    serializer:
+        metadata:
+            warmup:
+                - directory: '%kernel.project_dir%/src/Entity'
+                - class: App\Model\MyModelToWarmup
+                - directory: '@SomeBundle/Model'
+```
+
+Third party bundles would be able to add entries to this list by prepending configuration.
+Then the DI extension will build a `Finder` and find classes for `directory` entries.
+Then a class list will be built and used as `CacheWarmer` argument.
+
+I also have a few questions:
+- Where should this `CacheWarmer` live? The `Serializer` component or the `FrameworkBundle`?
+- Do we have some reusable code for scanning directories and finding classes?
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-13T23:06:06Z
+
+Should I add the `symfony/var-exporter` as a requirement or a suggestion?
+
+EDIT: I added it as suggestion.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-01-25T08:37:18Z
+
+I rebased and fixed CS. I think this PR is ready now!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-03T14:15:51Z
+
+Is this still relevant now that many things moved on the topic?
+If yes, can you please rebase?

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T09:14:50Z
+
+@AhmedRaafat14 I've just spent some time with the code and I've changed (again) my mind, sorry about this. Let's keep your first commit and use the output I suggested in https://github.com/symfony/symfony/pull/37676#discussion_r468382538
+
+---------------------------------------------------------------------------
+
+by AhmedRaafat14 at 2020-08-11T09:16:37Z
+
+> @AhmedRaafat14 I've just spent some time with the code and I've changed (again) my mind, sorry about this. Let's keep your first commit and use the output I suggested in [#37676 (comment)](https://github.com/symfony/symfony/pull/37676#discussion_r468382538)
+
+Yes, sure thing thanks for pointing out that.
+Will revert back and apply the format you suggested for the `__string`.
+
+---------------------------------------------------------------------------
+
+by AhmedRaafat14 at 2020-08-11T09:26:02Z
+
+@fabpot Reverted back and will update the docs PR again :)

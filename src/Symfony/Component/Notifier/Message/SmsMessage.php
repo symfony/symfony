@@ -25,6 +25,7 @@ final class SmsMessage implements MessageInterface
     private $transport;
     private $subject;
     private $phone;
+    private $notification;
 
     public function __construct(string $phone, string $subject)
     {
@@ -38,7 +39,15 @@ final class SmsMessage implements MessageInterface
 
     public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self
     {
-        return new self($recipient->getPhone(), $notification->getSubject());
+        $message = new self($recipient->getPhone(), $notification->getSubject());
+        $message->notification = $notification;
+
+        return $message;
+    }
+
+    public function getNotification(): ?Notification
+    {
+        return $this->notification;
     }
 
     /**

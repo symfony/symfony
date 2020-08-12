@@ -1,15 +1,15 @@
 Description:
-  Lists commands
+  Displays help for a command
 
 Usage:
-  list [options] [--] [<namespace>]
+  help [options] [--] [<command_name>]
 
 Arguments:
-  namespace             The namespace name
+  command_name          The command name [default: "help"]
 
 Options:
-      --raw             To output raw command list
       --format=FORMAT   The output format (txt, xml, json, or md) [default: "txt"]
+      --raw             To output raw command help
   -h, --help            Display this help message
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
@@ -19,18 +19,12 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Help:
-  The list command lists all commands:
+  The help command displays help for a given command:
   
-    php app/console list
+    php app/console help list
   
-  You can also display the commands for a specific namespace:
+  You can also output the help in other formats by using the --format option:
   
-    php app/console list test
+    php app/console help --format=xml list
   
-  You can also output the information in other formats by using the --format option:
-  
-    php app/console list --format=xml
-  
-  It's also possible to get raw list of commands (useful for embedding command runner):
-  
-    php app/console list --raw
+  To display the list of available commands, please use the list command.

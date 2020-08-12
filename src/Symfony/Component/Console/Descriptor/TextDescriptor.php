@@ -136,8 +136,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeCommand(Command $command, array $options = [])
     {
-        $command->getSynopsis(true);
-        $command->getSynopsis(false);
         $command->mergeApplicationDefinition(false);
 
         if ($description = $command->getDescription()) {
@@ -154,7 +152,7 @@ class TextDescriptor extends Descriptor
         }
         $this->writeText("\n");
 
-        $definition = $command->getNativeDefinition();
+        $definition = $command->getDefinition();
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");
             $this->describeInputDefinition($definition, $options);

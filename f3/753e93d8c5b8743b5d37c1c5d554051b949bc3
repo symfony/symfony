@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-03-19T11:53:36Z
+
+Also see https://github.com/symfony/symfony/issues/33700
+
+I also noticed that and back then we decided to document this small behavior change.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-19T22:23:41Z
+
+Adding a BC layer on a maintenance branch feels wrong to me, you shouldn't get new deprecation notices in a patch release. The BC break should either be reverted or documented instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-31T19:21:33Z
+
+> The BC break should either be reverted or documented instead
+
+Reverting would mean breaking BC on 5.0 - Documenting is what this PR is about.
+If we missed triggering a deprecation while something has been deprecated, adding this deprecation is a bug fix to me.
+
+Note that I didn't get the patch so I'm just commenting on the process :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-12T07:38:05Z
+
+@l-vo What's the status here?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-08-12T07:45:14Z
+
+@fabpot from my point of view the fix itself is finished, the blocking point is more a discussion between contributors/core members about what should be done here.

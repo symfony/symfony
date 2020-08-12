@@ -63,7 +63,12 @@ class Connection
         $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
-        if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
+        $auth = $connectionCredentials['auth'] ?? null;
+        if ('' === $auth) {
+            $auth = null;
+        }
+ 
+        if (null !== $auth && !$this->connection->auth($auth)) {
             throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 

@@ -155,6 +155,28 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
+    public function testNoAuthWithEmptyPassword()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(0))->method('auth')
+            ->with('')
+            ->willThrowException(new \RuntimeException());
+
+        Connection::fromDsn('redis://@localhost/queue', [], $redis);
+    }
+
+    public function testAuthZeroPassword()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('0')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://0@localhost/queue', [], $redis);
+    }
+
     public function testFailedAuth()
     {
         $this->expectException(\InvalidArgumentException::class);

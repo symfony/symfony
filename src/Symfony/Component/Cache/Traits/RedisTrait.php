@@ -103,6 +103,10 @@ trait RedisTrait
         $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:[^:@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m[2])) {
                 $auth = $m[2];
+
+                if ('' === $auth) {
+                    $auth = null;
+                }
             }
 
             return 'file:'.($m[1] ?? '');

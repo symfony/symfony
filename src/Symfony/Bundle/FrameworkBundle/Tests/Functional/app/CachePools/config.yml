@@ -1,5 +1,5 @@
 imports:
-    - { resource: ../config/default.yml }
+    - { resource: default.yml }
 
 framework:
     cache:
@@ -24,8 +24,3 @@ framework:
             cache.pool7:
                 adapter: cache.pool4
                 public: true
-
-services:
-    cache_clearer.alias:
-        alias: cache_clearer
-        public: true

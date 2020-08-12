@@ -30,6 +30,7 @@ class Question
     private $default;
     private $normalizer;
     private $trimmable = true;
+    private $multiline = false;
 
     /**
      * @param string $question The question to ask to the user
@@ -59,6 +60,26 @@ class Question
     public function getDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * Returns whether the user response accepts newline characters.
+     */
+    public function isMultiline(): bool
+    {
+        return $this->multiline;
+    }
+
+    /**
+     * Sets whether the user response should accept newline characters.
+     *
+     * @return $this
+     */
+    public function setMultiline(bool $multiline): self
+    {
+        $this->multiline = $multiline;
+
+        return $this;
     }
 
     /**

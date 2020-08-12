@@ -211,4 +211,22 @@ EOT
 
         $this->assertStringContainsString($expected, $stream);
     }
+
+    public function testAskMultilineQuestionIncludesHelpText()
+    {
+        $expected = 'Write an essay (press Ctrl+D to continue)';
+
+        if (false !== strpos(PHP_OS, 'WIN')) {
+            $expected = 'Write an essay (press Ctrl+Z then Enter to continue)';
+        }
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $helper = new SymfonyQuestionHelper();
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('\\'));
+        $helper->ask($input, $output = $this->createOutputInterface(), $question);
+
+        $this->assertOutputContains($expected, $output);
+    }
 }

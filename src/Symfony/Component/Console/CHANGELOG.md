@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * Added `SingleCommandApplication::setAutoExit()` to allow testing via `CommandTester`
+ * added support for multiline responses to questions through `Question::setMultiline()`
+   and `Question::isMultiline()`
 
 5.1.0
 -----

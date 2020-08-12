@@ -129,7 +129,7 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = fgets($inputStream, 4096);
+                $ret = $this->readInput($inputStream, $question);
                 if (false === $ret) {
                     throw new MissingInputException('Aborted.');
                 }
@@ -501,5 +501,27 @@ class QuestionHelper extends Helper
         exec('stty 2> /dev/null', $output, $status);
 
         return self::$stdinIsInteractive = 1 !== $status;
+    }
+
+    /**
+     * Reads one or more lines of input and returns what is read.
+     *
+     * @param resource $inputStream The handler resource
+     * @param Question $question    The question being asked
+     *
+     * @return string|bool The input received, false in case input could not be read
+     */
+    private function readInput($inputStream, Question $question)
+    {
+        if (!$question->isMultiline()) {
+            return fgets($inputStream, 4096);
+        }
+
+        $ret = '';
+        while (false !== ($char = fgetc($inputStream))) {
+            $ret .= $char;
+        }
+
+        return $ret;
     }
 }

@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
-use Symfony\Component\Workflow\WorkflowEvents;
 
 class DefinitionBuilderTest extends TestCase
 {
@@ -55,33 +54,5 @@ class DefinitionBuilderTest extends TestCase
         $definition = $builder->build();
 
         $this->assertSame($metadataStore, $definition->getMetadataStore());
-    }
-
-    public function testCheckDefaultDispatchEvents()
-    {
-        $builder = new DefinitionBuilder(['a']);
-        $definition = $builder->build();
-
-        $this->assertSame(WorkflowEvents::getDefaultDispatchedEvents(), $definition->getDispatchedEvents());
-    }
-
-    public function testSetEmptyDispatchEvents()
-    {
-        $builder = new DefinitionBuilder(['a']);
-        $builder->setDispatchEvents([]);
-        $definition = $builder->build();
-
-        $this->assertSame([], $definition->getDispatchedEvents());
-    }
-
-    public function testSetSpecificDispatchEvents()
-    {
-        $events = [WorkflowEvents::ENTERED, WorkflowEvents::COMPLETED];
-
-        $builder = new DefinitionBuilder(['a']);
-        $builder->setDispatchEvents($events);
-        $definition = $builder->build();
-
-        $this->assertSame($events, $definition->getDispatchedEvents());
     }
 }

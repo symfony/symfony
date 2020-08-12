@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 /**
  * FrameworkExtension configuration structure.
@@ -339,7 +340,7 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('support')
                                 ->fixXmlConfig('place')
                                 ->fixXmlConfig('transition')
-                                ->fixXmlConfig('dispatched_event')
+                                ->fixXmlConfig('event_to_dispatch', 'events_to_dispatch')
                                 ->children()
                                     ->arrayNode('audit_trail')
                                         ->canBeEnabled()
@@ -382,21 +383,32 @@ class Configuration implements ConfigurationInterface
                                         ->defaultValue([])
                                         ->prototype('scalar')->end()
                                     ->end()
-                                    ->arrayNode('dispatched_events')
-                                        ->beforeNormalization()
-                                            ->ifString()
-                                            ->then(function ($v) {
-                                                return [$v];
+                                    ->variableNode('events_to_dispatch')
+                                        ->defaultValue(null)
+                                        ->validate()
+                                            ->ifTrue(function ($v) {
+                                                if (null === $v) {
+                                                    return false;
+                                                }
+                                                if (!\is_array($v)) {
+                                                    return true;
+                                                }
+
+                                                foreach ($v as $value) {
+                                                    if (!\is_string($value)) {
+                                                        return true;
+                                                    }
+                                                    if (class_exists(WorkflowEvents::class) && !\in_array($value, WorkflowEvents::ALIASES)) {
+                                                        return true;
+                                                    }
+                                                }
+
+                                                return false;
                                             })
+                                            ->thenInvalid('The value must be "null" or an array of workflow events (like ["workflow.enter"]).')
                                         ->end()
-                                        // We have to specify a default here as when this config option
-                                        // isn't set the default behaviour of `arrayNode()` is to return an empty
-                                        // array which conflicts with our Definition, and we cannot set a default
-                                        // of `null` for arrayNode()'s
-                                        ->defaultValue(['all'])
-                                        ->prototype('scalar')->end()
                                         ->info('Select which Transition events should be dispatched for this Workflow')
-                                        ->example(['leave', 'completed'])
+                                        ->example(['workflow.enter', 'workflow.transition'])
                                     ->end()
                                     ->arrayNode('places')
                                         ->beforeNormalization()
@@ -525,6 +537,18 @@ class Configuration implements ConfigurationInterface
                                         return !$v['supports'] && !isset($v['support_strategy']);
                                     })
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
+                                ->end()
+                                ->beforeNormalization()
+                                        ->always()
+                                        ->then(function ($values) {
+                                            // Special case to deal with XML when the user wants an empty array
+                                            if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
+                                                $values['events_to_dispatch'] = [];
+                                                unset($values['event_to_dispatch']);
+                                            }
+
+                                            return $values;
+                                        })
                                 ->end()
                             ->end()
                         ->end()

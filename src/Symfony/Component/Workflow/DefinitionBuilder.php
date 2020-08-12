@@ -26,7 +26,6 @@ class DefinitionBuilder
     private $transitions = [];
     private $initialPlaces;
     private $metadataStore;
-    private $dispatchEvents = null;
 
     /**
      * @param string[]     $places
@@ -43,7 +42,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore, $this->dispatchEvents);
+        return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);
     }
 
     /**
@@ -57,7 +56,6 @@ class DefinitionBuilder
         $this->transitions = [];
         $this->initialPlaces = null;
         $this->metadataStore = null;
-        $this->dispatchEvents = null;
 
         return $this;
     }
@@ -132,16 +130,6 @@ class DefinitionBuilder
     public function setMetadataStore(MetadataStoreInterface $metadataStore)
     {
         $this->metadataStore = $metadataStore;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setDispatchEvents(array $dispatchEvents)
-    {
-        $this->dispatchEvents = $dispatchEvents;
 
         return $this;
     }

@@ -13,9 +13,9 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'dispatched_events' => [
-                'leave',
-                'completed'
+            'events_to_dispatch' => [
+                'workflow.leave',
+                'workflow.completed',
             ],
             'places' => [
                 'one',

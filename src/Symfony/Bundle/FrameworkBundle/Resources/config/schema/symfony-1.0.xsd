@@ -288,7 +288,7 @@
             <xsd:element name="initial-marking" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="marking-store" type="marking_store" minOccurs="0" maxOccurs="1" />
             <xsd:element name="support" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="dispatched-event" type="dispatched_event" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="event-to-dispatch" type="event_to_dispatch" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="place" type="place" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="transition" type="transition" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="metadata" type="metadata" minOccurs="0" maxOccurs="unbounded" />
@@ -346,16 +346,16 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:simpleType name="dispatched_event">
+    <xsd:simpleType name="event_to_dispatch">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="all" />
-            <xsd:enumeration value="none" />
-            <xsd:enumeration value="leave" />
-            <xsd:enumeration value="transition" />
-            <xsd:enumeration value="enter" />
-            <xsd:enumeration value="entered" />
-            <xsd:enumeration value="completed" />
-            <xsd:enumeration value="announce" />
+            <xsd:enumeration value="" />
+            <xsd:enumeration value="workflow.leave" />
+            <xsd:enumeration value="workflow.leave" />
+            <xsd:enumeration value="workflow.transition" />
+            <xsd:enumeration value="workflow.enter" />
+            <xsd:enumeration value="workflow.entered" />
+            <xsd:enumeration value="workflow.completed" />
+            <xsd:enumeration value="workflow.announce" />
         </xsd:restriction>
     </xsd:simpleType>
 

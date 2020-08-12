@@ -13,6 +13,7 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
+            'events_to_dispatch' => [],
             'places' => [
                 'one',
                 'two',

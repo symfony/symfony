@@ -11,7 +11,7 @@
             <framework:initial-marking>one</framework:initial-marking>
             <framework:marking-store type="method" property="state" />
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:dispatched-event>none</framework:dispatched-event>
+            <framework:event-to-dispatch></framework:event-to-dispatch>
             <framework:place name="one" />
             <framework:place name="two" />
             <framework:place name="three" />

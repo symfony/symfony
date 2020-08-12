@@ -5,7 +5,6 @@ namespace Symfony\Component\Workflow\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Transition;
-use Symfony\Component\Workflow\WorkflowEvents;
 
 class DefinitionTest extends TestCase
 {
@@ -69,31 +68,5 @@ class DefinitionTest extends TestCase
         $places = range('a', 'b');
 
         new Definition($places, [new Transition('name', $places[0], 'c')]);
-    }
-
-    public function testSetDefaultDispatchEvents()
-    {
-        $places = range('a', 'b');
-        $definition = new Definition($places, [], null, null, null);
-
-        $this->assertSame(WorkflowEvents::getDefaultDispatchedEvents(), $definition->getDispatchedEvents());
-    }
-
-    public function testSetEmptyDispatchEvents()
-    {
-        $places = range('a', 'b');
-        $definition = new Definition($places, [], null, null, []);
-
-        $this->assertEmpty($definition->getDispatchedEvents());
-    }
-
-    public function testSetSpecificDispatchEvents()
-    {
-        $events = [WorkflowEvents::ENTERED, WorkflowEvents::COMPLETED];
-
-        $places = range('a', 'b');
-        $definition = new Definition($places, [], null, null, $events);
-
-        $this->assertSame($events, $definition->getDispatchedEvents());
     }
 }

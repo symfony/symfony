@@ -674,16 +674,12 @@ class Table
     {
         $newRow = [];
 
-        $newColumn = null;
         foreach ($row as $column => $cell) {
-            if (null === $newColumn) {
-                $newColumn = $column;
-            }
-            $newRow[$newColumn++] = $cell;
+            $newRow[] = $cell;
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
                 foreach (range($column + 1, $column + $cell->getColspan() - 1) as $position) {
                     // insert empty value at column position
-                    $newRow[$newColumn++] = '';
+                    $newRow[] = '';
                 }
             }
         }

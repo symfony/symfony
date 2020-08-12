@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
@@ -382,11 +383,60 @@ class NativeSessionStorage implements SessionStorageInterface
 
         foreach ($options as $key => $value) {
             if (isset($validOptions[$key])) {
-                if ('cookie_samesite' === $key && \PHP_VERSION_ID < 70300) {
-                    // PHP < 7.3 does not support same_site cookies. We will emulate it in
-                    // the start() method instead.
-                    $this->emulateSameSite = $value;
-                    continue;
+                if ('cookie_samesite' === $key) {
+                    if (Cookie::SAMESITE_NONE === $value) {
+                        // Some browsers are incompatible with SameSite=None, so ignore it
+                        // https://www.chromium.org/updates/same-site/incompatible-clients
+                        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+                        $browserMatch = [];
+                        if (preg_match('#Chrom(e|ium)/(\d+)[\.\d]*#', $userAgent, $browserMatch)) {
+                            // 51 <= Chrome/Chromium <= 66
+                            $version = (int) ($browserMatch[2]);
+                            if (51 <= $version && $version <= 66) {
+                                $value = null;
+                            }
+                        } elseif (preg_match('#\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit/#', $userAgent, $browserMatch)) {
+                            // iOS 12
+                            if (12 === (int) ($browserMatch[1])) {
+                                $value = null;
+                            }
+                        } elseif (preg_match('#\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit/#', $userAgent, $browserMatch)) {
+                            // Embedded browser and Safari on macOS 10.14
+                            if (
+                                (10 === (int) ($browserMatch[1]) && 14 === (int) ($browserMatch[2])) && (
+                                    preg_match('#Version/.* Safari/#', $userAgent) ||
+                                    preg_match('#^Mozilla/[\.\d]+ \(Macintosh;.*Mac OS X [_\d]+\) AppleWebKit/[\.\d]+ \(KHTML, like Gecko\)$#', $userAgent)
+                                )
+                            ) {
+                                $value = null;
+                            }
+                        } elseif (preg_match('#UCBrowser/(\d+)\.(\d+)\.(\d+)[\.\d]*#', $userAgent, $browserMatch)) {
+                            // UCBrowser < 12.13.2
+                            $compareFn = function () {
+                                $versionMajor = (int) ($browserMatch[1]);
+                                $versionMinor = (int) ($browserMatch[2]);
+                                $versionBuild = (int) ($browserMatch[3]);
+                                if (12 !== $versionMajor) {
+                                    return $versionMajor < 12;
+                                }
+                                if (13 !== $versionMinor) {
+                                    return $versionMinor < 13;
+                                }
+
+                                return $versionBuild < 2;
+                            };
+                            if ($compareFn()) {
+                                $value = null;
+                            }
+                        }
+                    }
+
+                    if (\PHP_VERSION_ID < 70300) {
+                        // PHP < 7.3 does not support same_site cookies. We will emulate it in
+                        // the start() method instead.
+                        $this->emulateSameSite = $value;
+                        continue;
+                    }
                 }
                 ini_set('url_rewriter.tags' !== $key ? 'session.'.$key : $key, $value);
             }

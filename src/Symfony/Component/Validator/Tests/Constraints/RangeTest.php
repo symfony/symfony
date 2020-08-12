@@ -52,7 +52,7 @@ class RangeTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/validator 4.4: minMessage and maxMessage are deprecated when min and max options are set together. Use notInRangeMessage instead.
+     * @expectedDeprecation Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.
      * @dataProvider provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet
      */
     public function testDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(array $options, bool $expectedDeprecatedMinMessageSet, bool $expectedDeprecatedMaxMessageSet)

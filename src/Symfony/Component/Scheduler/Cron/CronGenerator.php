@@ -32,7 +32,7 @@ final class CronGenerator
         $this->logger = $logger;
     }
 
-    public function generate(string $filename = 'app', string $path = self::DEFAULT_PATH): void
+    public function generate(string $filename = 'sf_app', string $path = self::DEFAULT_PATH): void
     {
         $file = sprintf('%s/%s', $path, $filename);
 
@@ -45,7 +45,7 @@ final class CronGenerator
         $this->fs->mkdir($file);
     }
 
-    public function write($content, string $filename = 'app', string $path = self::DEFAULT_PATH): void
+    public function write($content, string $filename = 'sf_app', string $path = self::DEFAULT_PATH): void
     {
         $file = sprintf('%s/%s', $path, $filename);
 

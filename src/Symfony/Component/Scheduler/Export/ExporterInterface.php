@@ -19,7 +19,7 @@ use Symfony\Component\Scheduler\Task\TaskListInterface;
  */
 interface ExporterInterface
 {
-    public function exportSingle(TaskInterface $task, string $filePath, string $format): void;
+    public function export(TaskInterface $task, string $filePath, string $format): void;
 
-    public function export(TaskListInterface $taskList, string $filePath, string $format): void;
+    public function exportMultiple(TaskListInterface $taskList, string $filePath, string $format): void;
 }

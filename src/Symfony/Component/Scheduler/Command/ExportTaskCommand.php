@@ -99,7 +99,7 @@ final class ExportTaskCommand extends Command
 
         $exportDirectory = sprintf('%s/%s', $exportDirectory, $filename);
 
-        $this->exporter->export($tasks, $exportDirectory, $format);
+        $this->exporter->exportMultiple($tasks, $exportDirectory, $format);
         $this->io->success(sprintf('[OK] Exported "%d" tasks to "%s"', \count($tasks), sprintf('%s.%s', $exportDirectory, $format)));
 
         return self::SUCCESS;

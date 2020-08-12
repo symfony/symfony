@@ -38,7 +38,7 @@ final class ExporterTest extends TestCase
         $exporter = new Exporter([], $fs, null);
 
         static::expectException(UndefinedFormatterException::class);
-        $exporter->export($taskList, 'json', 'export', '/srv/app/exports');
+        $exporter->exportMultiple($taskList, 'json', 'export', '/srv/app/exports');
     }
 
     public function testExportCannotBeGeneratedOnEmptyTask(): void
@@ -50,7 +50,7 @@ final class ExporterTest extends TestCase
         $exporter = new Exporter([$formatter], $fs, null);
 
         static::expectException(\RuntimeException::class);
-        $exporter->export($taskList, 'json', 'export', '/srv/app/exports');
+        $exporter->exportMultiple($taskList, 'json', 'export', '/srv/app/exports');
     }
 
     public function testExportCannotBeGeneratedOnInvalidFormat(): void
@@ -63,7 +63,7 @@ final class ExporterTest extends TestCase
         $exporter = new Exporter([$formatter], $fs, null);
 
         static::expectException(\InvalidArgumentException::class);
-        $exporter->export($taskList, 'cli', 'export', '/srv/app/exports');
+        $exporter->exportMultiple($taskList, 'cli', 'export', '/srv/app/exports');
     }
 
     public function testExportCannotBeGeneratedOnMissingDirectory(): void
@@ -75,7 +75,7 @@ final class ExporterTest extends TestCase
         $exporter = new Exporter([$formatter], $fs, null);
 
         static::expectException(\RuntimeException::class);
-        $exporter->export($taskList, 'json', 'export');
+        $exporter->exportMultiple($taskList, 'json', 'export');
     }
 
     /**
@@ -93,7 +93,7 @@ final class ExporterTest extends TestCase
 
         $exporter = new Exporter([$formatter], $fs, null);
 
-        $exporter->export($taskList, sprintf('%s/%s', sys_get_temp_dir(), $exportData['filename']), $exportData['format']);
+        $exporter->exportMultiple($taskList, sprintf('%s/%s', sys_get_temp_dir(), $exportData['filename']), $exportData['format']);
         static::assertTrue($fs->exists(sprintf('%s/%s.%s', sys_get_temp_dir(), $exportData['filename'], $exportData['format'])));
     }
 

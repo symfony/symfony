@@ -35,7 +35,7 @@ final class GenerateCronCommand extends Command
     private $generator;
     private $registry;
 
-    protected static $defaultName = 'scheduler:generate';
+    protected static $defaultName = 'scheduler:generate-cron';
 
     public function __construct(CronGenerator $generator, CronRegistry $registry)
     {

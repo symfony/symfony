@@ -38,7 +38,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $command = new GenerateCronCommand($generator, $registry);
 
-        static::assertSame('scheduler:generate', $command->getName());
+        static::assertSame('scheduler:generate-cron', $command->getName());
         static::assertSame('Generate the cron file for each scheduler', $command->getDescription());
         static::assertNotNull($command->getDefinition());
     }

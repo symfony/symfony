@@ -36,7 +36,7 @@ final class Exporter implements ExporterInterface
         $this->logger = $logger;
     }
 
-    public function exportSingle(TaskInterface $task, string $filePath, string $format): void
+    public function export(TaskInterface $task, string $filePath, string $format): void
     {
         if (0 === \count($this->formatters)) {
             throw new UndefinedFormatterException('No formatter found!');
@@ -59,7 +59,7 @@ final class Exporter implements ExporterInterface
         throw new \InvalidArgumentException(sprintf('The following format "%s" cannot be used!', $format));
     }
 
-    public function export(TaskListInterface $taskList, string $filePath, string $format): void
+    public function exportMultiple(TaskListInterface $taskList, string $filePath, string $format): void
     {
         if (0 === \count($this->formatters)) {
             throw new UndefinedFormatterException('No formatter found!');
@@ -70,7 +70,7 @@ final class Exporter implements ExporterInterface
         }
 
         foreach ($taskList as $task) {
-            $this->exportSingle($task, $filePath, $format);
+            $this->export($task, $filePath, $format);
         }
     }
 

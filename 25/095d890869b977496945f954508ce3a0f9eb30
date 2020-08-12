@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-09T11:00:48Z
+
+appveyor is not happy but I believe it has nothing to do with me. Does it ?
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-09T13:53:40Z
+
+> Thanks for your PR but I already rejected in the past
+
+O_O Does it mean you are rejecting this one ?
+
+What I want, is to be able to differentiate transitions that will be done automatically from others that will be done manually.
+If not with the context, how do you suggest to do that ?
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-09T14:14:31Z
+
+> Thanks for your PR but I already rejected in the past
+
+I found an old [PR](https://github.com/symfony/symfony/pull/30902/files) and realized the TransitionEvent knows the context ^^
+
+I'll use this event, then. But I really don't understand why the other events do not deserve to know the context ^^
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-07-09T14:53:46Z
+
+Oups, I write the comment but I forgot to remove it :+1:
+
+I'm against to put the context in the guard event but for other event I guess this is fine :+1:
+
+> O_O Does it mean you are rejecting this one ?
+
+nope, it's OK :+1:
+
+Sorry for my bad comment
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-09T15:11:58Z
+
+> Oups, I write the comment but I forgot to remove it +1
+>
+> I'm against to put the context in the guard event but for other event I guess this is fine +1
+>
+> > O_O Does it mean you are rejecting this one ?
+>
+> nope, it's OK +1
+>
+> Sorry for my bad comment
+
+Great ! So, GuardEvent is not aware of the context anymore. I simplified TransitionEvent. And TransitionEvent is still the only event which can change the context.
+
+---------------------------------------------------------------------------
+
+by epitre at 2020-07-20T09:29:01Z
+
+@lyrixx up !
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-12T13:16:15Z
+
+I'm gonna merge your PR, but I also gonna tweak 2/3 things
+
+Thanks for your work and your patience

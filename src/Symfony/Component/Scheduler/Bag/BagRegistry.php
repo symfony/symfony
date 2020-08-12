@@ -16,11 +16,6 @@ namespace Symfony\Component\Scheduler\Bag;
 use Closure;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Task\TaskInterface;
-use function array_key_exists;
-use function array_filter;
-use function count;
-use function sprintf;
-use function strtr;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -60,7 +55,7 @@ final class BagRegistry implements BagRegistryInterface
 
     public function has(string $name): bool
     {
-        return array_key_exists($name, $this->bags);
+        return \array_key_exists($name, $this->bags);
     }
 
     public function remove(string $name): void
@@ -81,6 +76,6 @@ final class BagRegistry implements BagRegistryInterface
      */
     public function count(): int
     {
-        return count($this->bags);
+        return \count($this->bags);
     }
 }

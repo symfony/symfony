@@ -46,7 +46,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\ExecutionModeOrchestratorInterface;
 use Symfony\Component\Scheduler\Export\ExporterInterface;
-use Symfony\Component\Scheduler\Export\SerializerFormatter;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskExecutionWatcherInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;

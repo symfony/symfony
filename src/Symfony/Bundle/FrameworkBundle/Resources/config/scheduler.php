@@ -11,6 +11,8 @@
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 use Symfony\Component\Mercure\Publisher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Scheduler\Bag\BagRegistry;
@@ -53,10 +55,8 @@ use Symfony\Component\Scheduler\Transport\TransportFactory;
 use Symfony\Component\Scheduler\Worker\Worker as SchedulerWorker;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
-return static function(ContainerConfigurator $container): void {
+return static function (ContainerConfigurator $container): void {
     $container->services()
         ->set('scheduler.cron.registry', CronRegistry::class)
         ->set('scheduler.cron.factory', CronFactory::class)
@@ -129,7 +129,7 @@ return static function(ContainerConfigurator $container): void {
 
         ->set('scheduler.task_factory', TaskFactory::class)
         ->args([
-            tagged_iterator('scheduler.task_factory')
+            tagged_iterator('scheduler.task_factory'),
         ])
         ->alias(TaskFactoryInterface::class, 'scheduler.task_factory')
 
@@ -148,7 +148,7 @@ return static function(ContainerConfigurator $container): void {
 
         ->set('scheduler.http_runner', HttpTaskRunner::class)
         ->args([
-            service('http_client')->nullOnInvalid()
+            service('http_client')->nullOnInvalid(),
         ])
         ->tag('scheduler.runner')
 
@@ -228,7 +228,7 @@ return static function(ContainerConfigurator $container): void {
             tagged_iterator('scheduler.runner'),
             service('scheduler.task_execution.watcher'),
             service('event_dispatcher')->nullOnInvalid(),
-            service('logger')->nullOnInvalid()
+            service('logger')->nullOnInvalid(),
         ])
         ->alias(WorkerInterface::class, 'scheduler.worker')
     ;

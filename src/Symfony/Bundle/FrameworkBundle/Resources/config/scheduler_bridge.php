@@ -10,13 +10,13 @@
  */
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\Scheduler\Bridge\Dkron\Transport\DkronTransportFactory;
 use Symfony\Component\Scheduler\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Scheduler\Bridge\Google\Task\JobFactory;
 use Symfony\Component\Scheduler\Bridge\Google\Transport\GoogleTransportFactory;
 use Symfony\Component\Scheduler\Bridge\Kubernetes\Transport\KubernetesTransportFactory;
 use Symfony\Component\Scheduler\Bridge\Redis\Transport\RedisTransportFactory;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $container): void {
     $container->services()

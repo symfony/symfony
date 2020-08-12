@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-08T15:09:42Z
+
+I'm browsing through all failures on the php 8 run at the moment and see if I can fix or file separate issues for them.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-10T08:39:35Z
+
+Errors related to PHPUnit 9.3:
+- `TestCase::at()` is deprecated. We would need to migrate away from it (the replacement is compatible with older PHPUnit versions, so this can be done separately)
+- the PHPUnit bridge is not compatible, due to trying to use `PHPUnit\TextUI\Exception`
+- `assertDirectoryNotExists` is deprecated in favor of `assertDirectoryDoesNotExist`. the bridge might provide a polyfill for the new method for older PHPUnit versions.
+- `Support for using expectException() with PHPUnit\Framework\Error\Warning is deprecated and will be removed in PHPUnit 10. Use expectWarning() instead.`
+
+Errors related to PHP 8:
+- `doctrine/annotations` is currently broken due to changes in the tokens for namespaces. This is being worked on in Doctrine so this will be solved.
+- `Symfony\Component\Cache\Tests\Adapter\MemcachedAdapterTest` and `Symfony\Component\Cache\Tests\Simple\MemcachedCacheTextModeTest` fail because the exception message for undefined class constants changed.
+- `Symfony\Component\ExpressionLanguage\Tests\Node\GetAttrNodeTest::testEvaluate` fails because of an incompatibility with named arguments (probably using `call_user_fun_array` with an associative array)
+- `Symfony\Component\Filesystem\Tests\FilesystemTest` fails with a TypeError on wrong mode. The tests should probably be skipped.
+- `Symfony\Component\Yaml\Tests\DumperTest::testSpecifications` has a failure
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-10T09:01:11Z
+
+Thanks for the overview. I can look into the individual issues in the upcoming days, but nevertheless I think that we can merge this PR already. It improves the php 8 CI from "completely broken" to "just a little broken". 😃
+
+A few notes:
+
+> `TestCase::at()` is deprecated.
+
+➡️ #37780
+
+> `assertDirectoryNotExists` is deprecated in favor of `assertDirectoryDoesNotExist`. the bridge might provide a polyfill for the new method for older PHPUnit versions.
+
+It does already:
+
+https://github.com/symfony/symfony/blob/b912af92613c3dc256ab5515cca46c9b10223e3a/src/Symfony/Bridge/PhpUnit/Legacy/PolyfillAssertTrait.php#L355-L358
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-10T09:03:40Z
+
+> It does already:
+
+then that's even easier. We can migrate to use the new method everywhere.
+
+But this polyfill is weird. It never calls the parent implementation.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-10T09:08:41Z
+
+> But this polyfill is weird. It never calls the parent implementation.
+
+That's because PhpUnitBridge patches the trait directly into the `TestCase` class.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-10T09:54:32Z
+
+Also related to php 8: We still see the message `Method ReflectionParameter::getClass() is deprecated` frequently. As far as I can tell, we would need to backport #36975 to the 3.4 branch if we wanted to fix them.

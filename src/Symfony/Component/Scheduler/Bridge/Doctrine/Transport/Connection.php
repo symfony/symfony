@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class Connection implements ConnectionInterface
 {
     private const DEFAULT_OPTIONS = [
-        'table_name' => 'scheduler_tasks',
+        'table_name' => 'sf_app_scheduler_tasks',
         'auto_setup' => true,
     ];
 

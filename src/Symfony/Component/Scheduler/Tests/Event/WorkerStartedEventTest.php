@@ -27,6 +27,6 @@ final class WorkerStartedEventTest extends TestCase
         $event = new WorkerStartedEvent($worker);
 
         static::assertSame($worker, $event->getWorker());
-        static::assertFalse($event->isWorkerIdle());
+        static::assertFalse($event->isIdle());
     }
 }

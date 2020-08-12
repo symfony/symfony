@@ -33,7 +33,7 @@ final class Connection implements ConnectionInterface
         'host' => '127.0.0.1',
         'port'    => 6379,
         'timeout' => 30,
-        'dbindex' => 'scheduler_tasks',
+        'dbindex' => 'sf_app_scheduler_tasks',
         'transaction_mode' => 'multi',
     ];
 

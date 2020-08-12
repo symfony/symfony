@@ -36,6 +36,7 @@ use Symfony\Component\Scheduler\Task\TaskList;
 use Symfony\Component\Scheduler\Task\TaskListInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Throwable;
 use function in_array;
 use function sprintf;
 use function usort;
@@ -100,7 +101,7 @@ final class Worker implements WorkerInterface
 
                         return;
                     }
-                } catch (\Throwable $error) {
+                } catch (Throwable $error) {
                     $this->watcher->endWatch($task);
                     $lockedTask->release();
                     $this->failedTasks->add(new FailedTask($task, $error->getMessage()));
@@ -112,29 +113,20 @@ final class Worker implements WorkerInterface
                 }
             }
 
-            throw new UndefinedRunnerException(sprintf('No runner found for the given task "%s"', $task->getName()));
+            throw new UndefinedRunnerException(sprintf('No runner found supporting the given task "%s"', $task->getName()));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stop(): void
     {
         $this->shouldStop = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRunning(): bool
     {
         return $this->running;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFailedTasks(): TaskListInterface
     {
         return $this->failedTasks;

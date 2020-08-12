@@ -43,7 +43,7 @@ final class WorkerTest extends TestCase
         $worker = new Worker([], $watcher, $eventDispatcher, $logger);
 
         static::expectException(UndefinedRunnerException::class);
-        static::expectExceptionMessage('No runner found for the given task "foo"');
+        static::expectExceptionMessage('No runner found supporting the given task "foo"');
         $worker->execute($task);
     }
 
@@ -62,7 +62,7 @@ final class WorkerTest extends TestCase
         $worker = new Worker([$runner], $watcher, $eventDispatcher, $logger);
 
         static::expectException(UndefinedRunnerException::class);
-        static::expectExceptionMessage('No runner found for the given task "foo"');
+        static::expectExceptionMessage('No runner found supporting the given task "foo"');
         $worker->execute($task);
     }
 

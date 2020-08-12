@@ -33,7 +33,7 @@ final class WorkerStartedEvent extends Event
         return $this->worker;
     }
 
-    public function isWorkerIdle(): bool
+    public function isIdle(): bool
     {
         return $this->idle;
     }

@@ -46,10 +46,11 @@ final class Response
         foreach ($this->headers as $name => $value) {
             if (\is_string($value)) {
                 $headers .= sprintf("%s: %s\n", $name, $value);
-            } else {
-                foreach ($value as $headerValue) {
-                    $headers .= sprintf("%s: %s\n", $name, $headerValue);
-                }
+                continue;
+            }
+
+            foreach ($value as $headerValue) {
+                $headers .= sprintf("%s: %s\n", $name, $headerValue);
             }
         }
 

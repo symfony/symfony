@@ -177,14 +177,15 @@ final class CacheItem implements ItemInterface
     {
         if ($logger) {
             $logger->warning($message, $context);
-        } else {
-            $replace = [];
-            foreach ($context as $k => $v) {
-                if (is_scalar($v)) {
-                    $replace['{'.$k.'}'] = $v;
-                }
-            }
-            @trigger_error(strtr($message, $replace), E_USER_WARNING);
+            return;
         }
+        
+        $replace = [];
+        foreach ($context as $k => $v) {
+            if (is_scalar($v)) {
+                $replace['{'.$k.'}'] = $v;
+            }
+        }
+        @trigger_error(strtr($message, $replace), E_USER_WARNING);
     }
 }

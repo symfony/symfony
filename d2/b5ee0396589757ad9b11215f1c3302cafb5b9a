@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-29T14:24:54Z
+
+Thanks for the PR. Is there any prior art on the topic where 3 `ENTER` exits the stream? How discoverable is this? Instead, should we add a line to remind ppl how to exit such questions?
+
+---------------------------------------------------------------------------
+
+by ramsey at 2020-07-29T15:06:05Z
+
+Good questions.
+
+I cannot find any prior art for this pattern. I had thought that [commitizen](http://commitizen.github.io/cz-cli/) prompts the user in this way, but after testing again just now, it continues after a single newline character.
+
+Here is my use-case for this: I am working on a [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) plugin for [CaptainHook](https://github.com/CaptainHookPhp/captainhook). According to the Conventional Commits specification, "a commit body is free-form and MAY consist of any number of newline separated paragraphs." My goal is to prompt the user to enter a longer description (the body), allowing them to enter multiple paragraphs, bullet lists, etc. as part of the body.
+
+Originally, I thought to use 2 newlines (i.e., when a user is finished, they'd hit <kbd>ENTER</kbd> twice to continue to the next prompt), but this prevents the user from being able to create multiple paragraphs (with a single newline between them). The only solution I could think of was to assume two empty newlines meant that the user is ready to continue. This happens when the user hits <kbd>ENTER</kbd> three times in a row.
+
+Another option the user may take is to use <kbd>Ctrl</kbd>+<kbd>D</kbd> (on Unix) or <kbd>Ctrl</kbd>+<kbd>Z</kbd> (on Windows) to send the end-of-transmission control character, which `fgetc()` reads as `EOF`.
+
+I have documented this in https://github.com/symfony/symfony-docs/pull/14002, but I agree that hitting <kbd>ENTER</kbd> 3 times or using <kbd>Ctrl</kbd>+<kbd>D</kbd> or <kbd>Ctrl</kbd>+<kbd>Z</kbd> may not be intuitive or easily discoverable.
+
+I'm open to other ideas for how to handle this.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-07-31T11:03:21Z
+
+@ramsey
+
+> I'm open to other ideas for how to handle this.
+
+The symfony maker bundle, for example, suffix the question with an hint. And I think ppl know/are familiar with this DX.
+
+https://github.com/symfony/maker-bundle/blob/master/src/Maker/MakeEntity.php#L288
+`New property name (press <return> to stop adding fields):`
+
+Maybe it is possible, when the `Question::isMultiline() true` to add such suffix text after the question, prompting the dev with the option(s) to exit. The documentation is a must have, but here it can help also to discover this.
+
+That being said, I got no opinion on the exit keyboard shortcut(s) (as we can not use <kbd>Return</kbd>) :)
+
+---------------------------------------------------------------------------
+
+by ramsey at 2020-07-31T16:39:40Z
+
+The keyboard shortcuts I mentioned work by default (since `fgetc()` interprets them as `EOF`), but they differ depending on the platform. The question here is around the use of hitting <kbd>Enter</kbd>/<kbd>Return</kbd> three times to continue. At this time, I don't have any alternate suggestions for a better DX.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-01T17:51:33Z
+
+What about removing the 3-enter case, and always display the hint about CTRL+D/Z?
+
+---------------------------------------------------------------------------
+
+by ramsey at 2020-08-01T22:52:48Z
+
+I'd be fine with that. Is the hint something that the helper can add by default, or is it something that all implementors need to append to their question text?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-02T05:29:11Z
+
+The helper should add the hint ideally to me.
+
+---------------------------------------------------------------------------
+
+by ramsey at 2020-08-11T21:37:07Z
+
+Updated to include feedback. The build failure does not appear related to this PR; the master branch is also failing.
+
+---------------------------------------------------------------------------
+
+by ramsey at 2020-08-11T21:43:37Z
+
+Here's a simple console script to show this working: https://gist.github.com/ramsey/1b7b19356b7e542d3c885ed4f82e4d82

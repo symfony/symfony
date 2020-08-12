@@ -26,6 +26,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -69,6 +70,9 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     {
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport($user, $badges), $this->firewallName);
+
+        // announce the authenticated token
+        $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token))->getAuthenticatedToken();
 
         // authenticate this in the system
         return $this->handleAuthenticationSuccess($token, $passport, $request, $authenticator);
@@ -167,6 +171,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
             // create the authenticated token
             $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->firewallName);
+
+            // announce the authenticated token
+            $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken))->getAuthenticatedToken();
+
             if (true === $this->eraseCredentials) {
                 $authenticatedToken->eraseCredentials();
             }

@@ -55,6 +55,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -421,6 +422,36 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('workflows_explicitly_enabled_named_workflows');
 
         $this->assertTrue($container->hasDefinition('workflow.workflows.definition'));
+    }
+
+    public function testWorkflowsWithAllDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_all_dispatched_events');
+
+        $workflowDefinition = $container->getDefinition('state_machine.my_workflow.definition');
+        $dispatchedEvents = $workflowDefinition->getArgument(4);
+
+        $this->assertNull($dispatchedEvents);
+    }
+
+    public function testWorkflowsWithNoDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_no_dispatched_events');
+
+        $workflowDefinition = $container->getDefinition('state_machine.my_workflow.definition');
+        $dispatchedEvents = $workflowDefinition->getArgument(4);
+
+        $this->assertSame([], $dispatchedEvents);
+    }
+
+    public function testWorkflowsWithSpecifiedDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_specified_dispatched_events');
+
+        $workflowDefinition = $container->getDefinition('state_machine.my_workflow.definition');
+        $dispatchedEvents = $workflowDefinition->getArgument(4);
+
+        $this->assertSame([WorkflowEvents::LEAVE, WorkflowEvents::COMPLETED], $dispatchedEvents);
     }
 
     public function testEnabledPhpErrorsConfig()

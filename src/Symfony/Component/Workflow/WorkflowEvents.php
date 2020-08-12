@@ -78,4 +78,9 @@ final class WorkflowEvents
     private function __construct()
     {
     }
+
+    public static function getDefaultDispatchedEvents(): array
+    {
+        return [self::LEAVE, self::TRANSITION, self::ENTER, self::ENTERED, self::COMPLETED, self::ANNOUNCE];
+    }
 }

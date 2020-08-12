@@ -742,6 +742,17 @@ class FrameworkExtension extends Extension
             $places = array_column($workflow['places'], 'name');
             $initialMarking = $workflow['initial_marking'] ?? [];
 
+            // Record which events should be dispatched
+            if ($workflow['dispatched_events'] === ['all']) {
+                $dispatchedEvents = null;
+            } elseif ($workflow['dispatched_events'] === ['none']) {
+                $dispatchedEvents = [];
+            } else {
+                $dispatchedEvents = array_map(function (string $event) {
+                    return 'workflow.'.$event;
+                }, $workflow['dispatched_events']);
+            }
+
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
@@ -749,6 +760,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument($metadataStoreDefinition);
+            $definitionDefinition->addArgument($dispatchedEvents);
             $definitionDefinition->addTag('workflow.definition', [
                 'name' => $name,
                 'type' => $type,

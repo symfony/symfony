@@ -29,4 +29,15 @@ final class TaskMessageTest extends TestCase
         static::assertSame($task, $message->getTask());
         static::assertSame('app.messenger', $message->getTask()->getName());
     }
+
+    public function testWorkerTimeoutCanBeSet(): void
+    {
+        $task = $this->createMock(TaskInterface::class);
+        $task->expects(self::once())->method('getName')->willReturn('app.messenger');
+
+        $message = new TaskMessage($task, 2.5);
+        static::assertSame($task, $message->getTask());
+        static::assertSame('app.messenger', $message->getTask()->getName());
+        static::assertSame(2.5, $message->getWorkerTimeout());
+    }
 }

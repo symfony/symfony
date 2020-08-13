@@ -20,13 +20,27 @@ final class TaskMessage
 {
     private $task;
 
-    public function __construct(TaskInterface $task)
+    /**
+     * @var int|float
+     */
+    private $workerTimeout;
+
+    public function __construct(TaskInterface $task, $workerTimeout = 0.5)
     {
         $this->task = $task;
+        $this->workerTimeout = $workerTimeout;
     }
 
     public function getTask(): TaskInterface
     {
         return $this->task;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function getWorkerTimeout()
+    {
+        return $this->workerTimeout;
     }
 }

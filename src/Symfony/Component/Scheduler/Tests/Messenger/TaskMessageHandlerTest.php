@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Messenger;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Messenger\TaskMessage;
 use Symfony\Component\Scheduler\Messenger\TaskMessageHandler;
@@ -28,7 +29,7 @@ final class TaskMessageHandlerTest extends TestCase
         $worker->expects(self::never())->method('execute');
 
         $task = new ShellTask('foo', 'echo Symfony', [
-            'arrival_time' => new \DateTimeImmutable(),
+            'arrival_time' => new DateTimeImmutable(),
             'expression' => '*/45 * * * *',
         ]);
 
@@ -44,7 +45,7 @@ final class TaskMessageHandlerTest extends TestCase
         $worker->expects(self::once())->method('execute');
 
         $task = new ShellTask('foo', 'echo Symfony', [
-            'arrival_time' => new \DateTimeImmutable(),
+            'arrival_time' => new DateTimeImmutable(),
             'expression' => '* * * * *',
         ]);
 

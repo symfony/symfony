@@ -58,7 +58,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([]);
 
         static::assertSame(Command::FAILURE, $tester->getStatusCode());
@@ -81,7 +81,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([
             'schedulers' => ['foo'],
         ]);
@@ -106,7 +106,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([]);
 
         static::assertSame(Command::SUCCESS, $tester->getStatusCode());
@@ -131,7 +131,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([
             '--directory' => '/srv/app',
         ]);
@@ -158,7 +158,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([
             'schedulers' => ['foo'],
         ]);
@@ -185,7 +185,7 @@ final class GenerateCronCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $tester = new CommandTester($application->get('scheduler:generate'));
+        $tester = new CommandTester($application->get('scheduler:generate-cron'));
         $tester->execute([
             'schedulers' => ['foo'],
             '--dry-run' => true,

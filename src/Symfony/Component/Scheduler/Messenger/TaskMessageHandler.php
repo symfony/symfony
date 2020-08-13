@@ -15,6 +15,7 @@ use Cron\CronExpression;
 use Exception;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
+use function sleep;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -40,7 +41,7 @@ final class TaskMessageHandler implements MessageHandlerInterface
         }
 
         while ($this->worker->isRunning()) {
-            sleep(0.5);
+            sleep($message->getWorkerTimeout());
         }
 
         $this->worker->execute($task);

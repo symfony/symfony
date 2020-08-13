@@ -23,6 +23,6 @@ final class TaskUnscheduledEventTest extends TestCase
     {
         $event = new TaskUnscheduledEvent('foo');
 
-        static::assertSame('foo', $event->getTaskName());
+        static::assertSame('foo', $event->getTask());
     }
 }

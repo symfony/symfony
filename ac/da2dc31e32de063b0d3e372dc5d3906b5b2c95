@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by Deamon at 2020-06-12T15:27:50Z
+
+Rebased few minutes ago on master.
+Fixed conflicts and fixed notifier_transport that changed from xml to php.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-10T14:24:27Z
+
+@Deamon Can you submit a PR on symfony/recipes (you can have a look at other notifier bridge recipes to get some inspiration)?
+
+---------------------------------------------------------------------------
+
+by Deamon at 2020-08-10T14:33:11Z
+
+Hello @fabpot, thanks for your comment,
+Here is the pr: https://github.com/symfony/recipes/pull/768
+
+There is also a documentation pr waiting.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-10T15:44:31Z
+
+@Daemon Can you also rebase this PR on current master and take my comment into account? Thank you.
+
+---------------------------------------------------------------------------
+
+by Deamon at 2020-08-12T10:01:52Z
+
+@fabpot, all changes have been pushed
+
+---------------------------------------------------------------------------
+
+by Deamon at 2020-08-12T16:13:34Z
+
+@fabpot your last feedback have been resolved.
+
+the code is teste in v5.1 only, I couldn't get rid of the following error using dev-master branch:
+
+```
+Executing script cache:clear [KO]
+ [KO]
+Script cache:clear returned with error code 1
+!!
+!!  In PhpDumper.php line 1838:
+!!
+!!    Cannot dump definition because of invalid class name ('chatter.transport_factory').
+!!
+!!
+!!
+Script @auto-scripts was called via post-update-cmd
+exit status 1
+```
+
+tried several ways but none worked for me.
+
+and yes, the sentMessage part isn't tested because class doesn't exists in 5.1

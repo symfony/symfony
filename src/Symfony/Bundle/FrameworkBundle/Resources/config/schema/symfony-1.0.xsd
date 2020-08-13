@@ -350,7 +350,6 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="" />
             <xsd:enumeration value="workflow.leave" />
-            <xsd:enumeration value="workflow.leave" />
             <xsd:enumeration value="workflow.transition" />
             <xsd:enumeration value="workflow.enter" />
             <xsd:enumeration value="workflow.entered" />

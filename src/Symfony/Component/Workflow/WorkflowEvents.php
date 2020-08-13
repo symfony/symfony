@@ -31,14 +31,14 @@ final class WorkflowEvents
     const GUARD = 'workflow.guard';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\AnnounceEvent")
+     * @Event("Symfony\Component\Workflow\Event\LeaveEvent")
      */
-    const ANNOUNCE = 'workflow.announce';
+    const LEAVE = 'workflow.leave';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\CompletedEvent")
+     * @Event("Symfony\Component\Workflow\Event\TransitionEvent")
      */
-    const COMPLETED = 'workflow.completed';
+    const TRANSITION = 'workflow.transition';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\EnterEvent")
@@ -51,14 +51,14 @@ final class WorkflowEvents
     const ENTERED = 'workflow.entered';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\LeaveEvent")
+     * @Event("Symfony\Component\Workflow\Event\CompletedEvent")
      */
-    const LEAVE = 'workflow.leave';
+    const COMPLETED = 'workflow.completed';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\TransitionEvent")
+     * @Event("Symfony\Component\Workflow\Event\AnnounceEvent")
      */
-    const TRANSITION = 'workflow.transition';
+    const ANNOUNCE = 'workflow.announce';
 
     /**
      * Event aliases.

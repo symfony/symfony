@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-13T14:01:23Z
+
+@fabpot I addressed your comments. Thanks
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-13T15:28:00Z
+
+Oh, don't merge this PR, there are something wrong: Since we listen some signal, the app never stop :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-13T15:51:36Z
+
+Fixed :)

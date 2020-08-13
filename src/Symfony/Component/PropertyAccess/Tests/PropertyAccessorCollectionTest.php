@@ -130,18 +130,18 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
             ->method('getStructure')
             ->willReturn($structure);
 
-        $structure->expects($this->at(0))
+        $structure->expects($this->once())
             ->method('getAxes')
             ->willReturn($axesBefore);
-        $structure->expects($this->at(1))
+        $structure->expects($this->once())
             ->method('removeAxis')
             ->with('fourth');
-        $structure->expects($this->at(2))
+        $structure->expects($this->exactly(2))
             ->method('addAxis')
-            ->with('first');
-        $structure->expects($this->at(3))
-            ->method('addAxis')
-            ->with('third');
+            ->withConsecutive(
+                ['first'],
+                ['third']
+            );
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }

@@ -57,17 +57,21 @@ class StopwatchExtensionTest extends TestCase
         $events = \is_array($events) ? $events : [$events];
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
 
-        $i = -1;
+        $expectedCalls = 0;
+        $expectedStartCalls = [];
+        $expectedStopCalls = [];
         foreach ($events as $eventName) {
-            $stopwatch->expects($this->at(++$i))
-                ->method('start')
-                ->with($this->equalTo($eventName), 'template')
-            ;
-            $stopwatch->expects($this->at(++$i))
-                ->method('stop')
-                ->with($this->equalTo($eventName))
-            ;
+            ++$expectedCalls;
+            $expectedStartCalls[] = [$this->equalTo($eventName), 'template'];
+            $expectedStopCalls[] = [$this->equalTo($eventName)];
         }
+
+        $startInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
+            ->method('start');
+        \call_user_func_array([$startInvocationMocker, 'withConsecutive'], $expectedStartCalls);
+        $stopInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
+            ->method('stop');
+        \call_user_func_array([$stopInvocationMocker, 'withConsecutive'], $expectedStopCalls);
 
         return $stopwatch;
     }

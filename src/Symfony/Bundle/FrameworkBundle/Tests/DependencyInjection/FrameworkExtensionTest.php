@@ -660,6 +660,16 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
 
+        $this->assertTrue($container->hasDefinition('messenger.transport.beanstalkd'));
+        $transportFactory = $container->getDefinition('messenger.transport.beanstalkd')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.beanstalkd')->getArguments();
+
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertCount(3, $transportArguments);
+        $this->assertSame('beanstalkd://127.0.0.1:11300', $transportArguments[0]);
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.beanstalkd.factory'));
+
         $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
         $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));

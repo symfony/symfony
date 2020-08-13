@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -122,6 +123,8 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('messenger.transport.sqs.factory', AmazonSqsTransportFactory::class)
+
+        ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
         // retry
         ->set('messenger.retry_strategy_locator')

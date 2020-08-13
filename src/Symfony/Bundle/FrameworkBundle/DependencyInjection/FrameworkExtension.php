@@ -772,6 +772,7 @@ class FrameworkExtension extends Extension
                 $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             }
             $workflowDefinition->replaceArgument(3, $name);
+            $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);

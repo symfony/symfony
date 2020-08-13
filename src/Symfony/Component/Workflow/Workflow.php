@@ -34,20 +34,46 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Workflow implements WorkflowInterface
 {
+    public const DISABLE_LEAVE_EVENT = 'workflow_disable_leave_event';
+    public const DISABLE_TRANSITION_EVENT = 'workflow_disable_transition_event';
+    public const DISABLE_ENTER_EVENT = 'workflow_disable_enter_event';
+    public const DISABLE_ENTERED_EVENT = 'workflow_disable_entered_event';
+    public const DISABLE_COMPLETED_EVENT = 'workflow_disable_completed_event';
     public const DISABLE_ANNOUNCE_EVENT = 'workflow_disable_announce_event';
+
     public const DEFAULT_INITIAL_CONTEXT = ['initial' => true];
+
+    private const DISABLE_EVENTS_MAPPING = [
+        WorkflowEvents::LEAVE => self::DISABLE_LEAVE_EVENT,
+        WorkflowEvents::TRANSITION => self::DISABLE_TRANSITION_EVENT,
+        WorkflowEvents::ENTER => self::DISABLE_ENTER_EVENT,
+        WorkflowEvents::ENTERED => self::DISABLE_ENTERED_EVENT,
+        WorkflowEvents::COMPLETED => self::DISABLE_COMPLETED_EVENT,
+        WorkflowEvents::ANNOUNCE => self::DISABLE_ANNOUNCE_EVENT,
+    ];
 
     private $definition;
     private $markingStore;
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed')
+    /**
+     * When `null` fire all events (the default behaviour).
+     * Setting this to an empty array `[]` means no events are dispatched (except the Guard Event).
+     * Passing an array with WorkflowEvents will allow only those events to be dispatched plus
+     * the Guard Event.
+     *
+     * @var array|string[]|null
+     */
+    private $eventsToDispatch = null;
+
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', array $eventsToDispatch = null)
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MethodMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
+        $this->eventsToDispatch = $eventsToDispatch;
     }
 
     /**
@@ -215,9 +241,7 @@ class Workflow implements WorkflowInterface
 
             $this->completed($subject, $transition, $marking, $context);
 
-            if (!($context[self::DISABLE_ANNOUNCE_EVENT] ?? false)) {
-                $this->announce($subject, $transition, $marking, $context);
-            }
+            $this->announce($subject, $transition, $marking, $context);
         }
 
         return $marking;
@@ -334,7 +358,7 @@ class Workflow implements WorkflowInterface
     {
         $places = $transition->getFroms();
 
-        if (null !== $this->dispatcher) {
+        if ($this->shouldDispatchEvent(WorkflowEvents::LEAVE, $context)) {
             $event = new LeaveEvent($subject, $marking, $transition, $this, $context);
 
             $this->dispatcher->dispatch($event, WorkflowEvents::LEAVE);
@@ -352,7 +376,7 @@ class Workflow implements WorkflowInterface
 
     private function transition(object $subject, Transition $transition, Marking $marking, array $context): array
     {
-        if (null === $this->dispatcher) {
+        if (!$this->shouldDispatchEvent(WorkflowEvents::TRANSITION, $context)) {
             return $context;
         }
 
@@ -369,7 +393,7 @@ class Workflow implements WorkflowInterface
     {
         $places = $transition->getTos();
 
-        if (null !== $this->dispatcher) {
+        if ($this->shouldDispatchEvent(WorkflowEvents::ENTER, $context)) {
             $event = new EnterEvent($subject, $marking, $transition, $this, $context);
 
             $this->dispatcher->dispatch($event, WorkflowEvents::ENTER);
@@ -387,7 +411,7 @@ class Workflow implements WorkflowInterface
 
     private function entered(object $subject, ?Transition $transition, Marking $marking, array $context): void
     {
-        if (null === $this->dispatcher) {
+        if (!$this->shouldDispatchEvent(WorkflowEvents::ENTERED, $context)) {
             return;
         }
 
@@ -403,7 +427,7 @@ class Workflow implements WorkflowInterface
 
     private function completed(object $subject, Transition $transition, Marking $marking, array $context): void
     {
-        if (null === $this->dispatcher) {
+        if (!$this->shouldDispatchEvent(WorkflowEvents::COMPLETED, $context)) {
             return;
         }
 
@@ -416,7 +440,7 @@ class Workflow implements WorkflowInterface
 
     private function announce(object $subject, Transition $initialTransition, Marking $marking, array $context): void
     {
-        if (null === $this->dispatcher) {
+        if (!$this->shouldDispatchEvent(WorkflowEvents::ANNOUNCE, $context)) {
             return;
         }
 
@@ -428,5 +452,26 @@ class Workflow implements WorkflowInterface
         foreach ($this->getEnabledTransitions($subject) as $transition) {
             $this->dispatcher->dispatch($event, sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()));
         }
+    }
+
+    private function shouldDispatchEvent(string $eventName, array $context): bool
+    {
+        if (null === $this->dispatcher) {
+            return false;
+        }
+
+        if ($context[self::DISABLE_EVENTS_MAPPING[$eventName]] ?? false) {
+            return false;
+        }
+
+        if (null === $this->eventsToDispatch) {
+            return true;
+        }
+
+        if ([] === $this->eventsToDispatch) {
+            return false;
+        }
+
+        return \in_array($eventName, $this->eventsToDispatch, true);
     }
 }

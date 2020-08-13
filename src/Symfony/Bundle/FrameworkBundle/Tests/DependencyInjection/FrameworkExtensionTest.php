@@ -55,6 +55,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -216,6 +217,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
+        $this->assertNull($container->getDefinition('workflow.article')->getArgument('index_4'), 'Workflows has eventsToDispatch=null');
+
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
@@ -421,6 +424,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('workflows_explicitly_enabled_named_workflows');
 
         $this->assertTrue($container->hasDefinition('workflow.workflows.definition'));
+    }
+
+    public function testWorkflowsWithNoDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_no_events_to_dispatch');
+
+        $eventsToDispatch = $container->getDefinition('state_machine.my_workflow')->getArgument('index_4');
+
+        $this->assertSame([], $eventsToDispatch);
+    }
+
+    public function testWorkflowsWithSpecifiedDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_specified_events_to_dispatch');
+
+        $eventsToDispatch = $container->getDefinition('state_machine.my_workflow')->getArgument('index_4');
+
+        $this->assertSame([WorkflowEvents::LEAVE, WorkflowEvents::COMPLETED], $eventsToDispatch);
     }
 
     public function testEnabledPhpErrorsConfig()

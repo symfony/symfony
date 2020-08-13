@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 
 class DelegatingEngineTest extends TestCase
@@ -108,14 +109,10 @@ class DelegatingEngineTest extends TestCase
 
     private function getContainerMock($services)
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = new ContainerBuilder();
 
-        $i = 0;
         foreach ($services as $id => $service) {
-            $container->expects($this->at($i++))
-                ->method('get')
-                ->with($id)
-                ->willReturn($service);
+            $container->set($id, $service);
         }
 
         return $container;

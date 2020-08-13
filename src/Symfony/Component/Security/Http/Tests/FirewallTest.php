@@ -76,7 +76,7 @@ class FirewallTest extends TestCase
             ->getMock()
         ;
         $event
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('hasResponse')
             ->willReturn(true)
         ;

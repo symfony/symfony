@@ -67,15 +67,10 @@ class LazyChoiceListTest extends TestCase
      */
     public function testGetChoicesUsesLoadedListWhenLoaderDoesNotCacheChoiceListOnFirstCall()
     {
-        $this->loader->expects($this->at(0))
+        $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->willReturn($this->loadedList);
-
-        $this->loader->expects($this->at(1))
-            ->method('loadChoiceList')
-            ->with($this->value)
-            ->willReturn(new ArrayChoiceList(['a', 'b']));
+            ->willReturnOnConsecutiveCalls($this->loadedList, new ArrayChoiceList(['a', 'b']));
 
         // The same list is returned by the lazy choice list
         $this->loadedList->expects($this->exactly(2))

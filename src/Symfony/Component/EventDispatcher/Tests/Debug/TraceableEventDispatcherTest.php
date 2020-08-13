@@ -174,8 +174,12 @@ class TraceableEventDispatcherTest extends TestCase
         $tdispatcher->addListener('foo', $listener1 = function () {});
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->at(0))->method('debug')->with('Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']);
-        $logger->expects($this->at(1))->method('debug')->with('Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']);
+        $logger->expects($this->exactly(2))
+            ->method('debug')
+            ->withConsecutive(
+                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']],
+                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']]
+            );
 
         $tdispatcher->dispatch('foo');
     }
@@ -189,9 +193,13 @@ class TraceableEventDispatcherTest extends TestCase
         $tdispatcher->addListener('foo', $listener1 = function (Event $event) { $event->stopPropagation(); });
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->at(0))->method('debug')->with('Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']);
-        $logger->expects($this->at(1))->method('debug')->with('Listener "{listener}" stopped propagation of the event "{event}".', ['event' => 'foo', 'listener' => 'closure']);
-        $logger->expects($this->at(2))->method('debug')->with('Listener "{listener}" was not called for event "{event}".', ['event' => 'foo', 'listener' => 'closure']);
+        $logger->expects($this->exactly(3))
+            ->method('debug')
+            ->withConsecutive(
+                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']],
+                ['Listener "{listener}" stopped propagation of the event "{event}".', ['event' => 'foo', 'listener' => 'closure']],
+                ['Listener "{listener}" was not called for event "{event}".', ['event' => 'foo', 'listener' => 'closure']]
+            );
 
         $tdispatcher->dispatch('foo');
     }

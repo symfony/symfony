@@ -144,15 +144,13 @@ class FormRegistryTest extends TestCase
         $this->extension1->addType($parentType);
         $this->extension2->addType($type);
 
-        $this->resolvedTypeFactory->expects($this->at(0))
+        $this->resolvedTypeFactory->expects($this->exactly(2))
             ->method('createResolvedType')
-            ->with($parentType)
-            ->willReturn($parentResolvedType);
-
-        $this->resolvedTypeFactory->expects($this->at(1))
-            ->method('createResolvedType')
-            ->with($type, [], $parentResolvedType)
-            ->willReturn($resolvedType);
+            ->withConsecutive(
+                [$parentType],
+                [$type, [], $parentResolvedType]
+            )
+            ->willReturnOnConsecutiveCalls($parentResolvedType, $resolvedType);
 
         $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
     }

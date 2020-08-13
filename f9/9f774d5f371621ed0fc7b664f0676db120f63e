@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-30T15:52:37Z
+
+~Challenge: figure out how to make this work when using a DSN :)~
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T16:45:36Z
+
+@nicolas-grekas what do you mean please ? When not using the default provider ? e.g.:
+```yaml
+mypool:
+    tags: true
+    adapter: cache.adapter.redis
+    provider: redis://myserver:6379
+```
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-04-30T20:50:57Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-05-04T13:55:29Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-16T12:30:52Z
+
+> can you rebase, please ?
+
+Done 🙂
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-06-16T13:18:49Z
+
+I haven't tried it yet but I like it 😃
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-30T13:43:18Z
+
+All threads resolved :)

@@ -12,11 +12,16 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Composite;
+use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class MemberMetadataTest extends TestCase
 {
@@ -41,6 +46,34 @@ class MemberMetadataTest extends TestCase
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new ClassConstraint());
+    }
+
+    public function testAddCompositeConstraintRejectsNestedClassConstraints()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Tests\Fixtures\ClassConstraint" cannot be put on properties or getters.');
+
+        $this->metadata->addConstraint(new PropertyCompositeConstraint([new ClassConstraint()]));
+    }
+
+    public function testAddCompositeConstraintRejectsDeepNestedClassConstraints()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Tests\Fixtures\ClassConstraint" cannot be put on properties or getters.');
+
+        $this->metadata->addConstraint(new Collection(['field1' => new Required([new ClassConstraint()])]));
+    }
+
+    public function testAddCompositeConstraintAcceptsNestedPropertyConstraints()
+    {
+        $this->metadata->addConstraint($constraint = new PropertyCompositeConstraint([new PropertyConstraint()]));
+        $this->assertSame($this->metadata->getConstraints(), [$constraint]);
+    }
+
+    public function testAddCompositeConstraintAcceptsDeepNestedPropertyConstraints()
+    {
+        $this->metadata->addConstraint($constraint = new Collection(['field1' => new Required([new PropertyConstraint()])]));
+        $this->assertSame($this->metadata->getConstraints(), [$constraint]);
     }
 
     public function testSerialize()
@@ -80,5 +113,20 @@ class TestMemberMetadata extends MemberMetadata
 
     protected function newReflectionMember($object)
     {
+    }
+}
+
+class PropertyCompositeConstraint extends Composite
+{
+    public $nested;
+
+    public function getDefaultOption()
+    {
+        return $this->getCompositeOption();
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'nested';
     }
 }

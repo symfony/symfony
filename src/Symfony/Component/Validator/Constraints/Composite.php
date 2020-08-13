@@ -137,6 +137,17 @@ abstract class Composite extends Constraint
     abstract protected function getCompositeOption();
 
     /**
+     * @internal Used by metadata
+     *
+     * @return Constraint[]
+     */
+    public function getNestedContraints()
+    {
+        /* @var Constraint[] $nestedConstraints */
+        return $this->{$this->getCompositeOption()};
+    }
+
+    /**
      * Initializes the nested constraints.
      *
      * This method can be overwritten in subclasses to clean up the nested

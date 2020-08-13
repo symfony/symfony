@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-13T08:01:05Z
+
+@l-vo Tests fail
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-08-13T08:38:02Z
+
+@fabpot my bad, I forgot to add the `symfony/contracts-deprecation` dependency. It's ok now.

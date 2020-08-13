@@ -2076,6 +2076,34 @@ YAML;
         $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
     }
 
+    public function testPhpConstantTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - foo: 'value_0'
+    !php/const 'Symfony\Component\Yaml\Tests\B::BAR': 'value_1'
+map2:
+  - !php/const 'Symfony\Component\Yaml\Tests\B::FOO': 'value_0'
+    bar: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['foo' => 'value_0', 'bar' => 'value_1']],
+            'map2' => [['foo' => 'value_0', 'bar' => 'value_1']],
+        ], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - !!str 0: 'value_0'
+    !!str 1: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['0' => 'value_0', '1' => 'value_1']],
+        ], $this->parser->parse($yaml));
+    }
+
     public function testMergeKeysWhenMappingsAreParsedAsObjects()
     {
         $yaml = <<<YAML
@@ -2338,7 +2366,7 @@ YAML;
 parameters:
     abc
 
-# Comment 
+# Comment
 YAML;
 
         $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));

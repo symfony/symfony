@@ -10,6 +10,7 @@ CHANGELOG
    `kernel.trusted_proxies` and `kernel.trusted_headers` parameters
  * content of request parameter `_password` is now also hidden
    in the request profiler raw content section
+ * Allowed adding attributes on controller arguments that will be passed to argument resolvers.
 
 5.1.0
 -----

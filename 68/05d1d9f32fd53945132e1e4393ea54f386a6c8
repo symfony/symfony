@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-08-08T20:36:24Z
+
+PR rebased with master.
+
+I don't understand why the Travis PHP 7.2 build fails with the message `PHP Fatal error:  Class 'Pheanstalk\Contract\PheanstalkInterface' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/Messenger/Bridge/Beanstalkd/Tests/Transport/ConnectionTest.php on line 42` even though Pheanstalk is required by the package. The 7.3 and 7.4 jobs are passing.
+
+I've been using it for months on production and it is working great.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-08-13T07:19:27Z
+
+@fabpot You mean this failure? https://travis-ci.org/github/symfony/symfony/jobs/717325508
+This happens only on the PHP 7.2 build, but I don't understand why since the Pheanstalk library is required by the bridge.
+On the PHP 7.4 build I can see
+
+```
+cd src/Symfony/Component/Messenger/Bridge/Beanstalkd
+
++'[' -e composer.lock ']'
+
++composer install --no-progress --no-suggest --ansi
+
+Loading composer repositories with package information
+
+Installing dependencies (including require-dev) from lock file
+
+Package operations: 7 installs, 0 updates, 0 removals
+
+  - Installing pda/pheanstalk (v4.0.0): Downloading (100%)
+
+  - Installing psr/log (1.0.0): Loading from cache
+
+  - Installing symfony/messenger (v4.4.0): Loading from cache
+
+  - Installing symfony/inflector (v3.4.0): Loading from cache
+
+  - Installing symfony/property-access (v4.4.0): Loading from cache
+
+  - Installing symfony/polyfill-ctype (v1.8.0): Loading from cache
+
+  - Installing symfony/serializer (v4.4.0): Loading from cache
+
++/home/travis/build/symfony/symfony/phpunit --exclude-group tty,benchmark,intl-data
+```
+
+And all the Beanstalkd bridge tests pass there.
+
+The PHP 7.2 build does not do that, it just runs
+
+```
+/home/travis/build/symfony/symfony/phpunit --exclude-group tty,benchmark,intl-data src/Symfony/Component/Messenger/Bridge/Beanstalkd
+```
+
+I'm not familiar with your Travis CI setup so I'll have to dig a bit deeper into it to check why `composer install` doesn't happen on the 7.2 build (from the look of it it seems like the 7.2 build is triggering some other code path in `.travis.yml`).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-13T07:40:01Z
+
+@X-Coder264 You need to add `"pda/pheanstalk": "^4.0",` in the `require-dev` section of the main/root `composer.json`.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2020-08-13T07:44:58Z
+
+> @X-Coder264 You need to add `"pda/pheanstalk": "^4.0",` in the `require-dev` section of the main/root `composer.json`.
+
+Thanks for the tip - I've added it.

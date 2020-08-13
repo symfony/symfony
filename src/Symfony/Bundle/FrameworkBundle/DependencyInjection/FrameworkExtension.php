@@ -1867,8 +1867,11 @@ class FrameworkExtension extends Extension
         foreach ($config['pools'] as $name => $pool) {
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 
+            $isRedisTagAware = ['cache.adapter.redis_tag_aware'] === $pool['adapters'];
             foreach ($pool['adapters'] as $provider => $adapter) {
-                if ($config['pools'][$adapter]['tags'] ?? false) {
+                if (($config['pools'][$adapter]['adapters'] ?? null) === ['cache.adapter.redis_tag_aware']) {
+                    $isRedisTagAware = true;
+                } elseif ($config['pools'][$adapter]['tags'] ?? false) {
                     $pool['adapters'][$provider] = $adapter = '.'.$adapter.'.inner';
                 }
             }
@@ -1883,7 +1886,10 @@ class FrameworkExtension extends Extension
                 $pool['reset'] = 'reset';
             }
 
-            if ($pool['tags']) {
+            if ($isRedisTagAware) {
+                $tagAwareId = $name;
+                $container->setAlias('.'.$name.'.inner', $name);
+            } elseif ($pool['tags']) {
                 if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
                 }
@@ -1893,22 +1899,20 @@ class FrameworkExtension extends Extension
                     ->setPublic($pool['public'])
                 ;
 
-                $pool['name'] = $name;
+                $pool['name'] = $tagAwareId = $name;
                 $pool['public'] = false;
                 $name = '.'.$name.'.inner';
-
-                if (!\in_array($pool['name'], ['cache.app', 'cache.system'], true)) {
-                    $container->registerAliasForArgument($pool['name'], TagAwareCacheInterface::class);
-                    $container->registerAliasForArgument($name, CacheInterface::class, $pool['name']);
-                    $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name']);
-                }
             } elseif (!\in_array($name, ['cache.app', 'cache.system'], true)) {
-                $container->register('.'.$name.'.taggable', TagAwareAdapter::class)
+                $tagAwareId = '.'.$name.'.taggable';
+                $container->register($tagAwareId, TagAwareAdapter::class)
                     ->addArgument(new Reference($name))
                 ;
-                $container->registerAliasForArgument('.'.$name.'.taggable', TagAwareCacheInterface::class, $name);
-                $container->registerAliasForArgument($name, CacheInterface::class);
-                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            }
+
+            if (!\in_array($name, ['cache.app', 'cache.system'], true)) {
+                $container->registerAliasForArgument($tagAwareId, TagAwareCacheInterface::class, $pool['name'] ?? $name);
+                $container->registerAliasForArgument($name, CacheInterface::class, $pool['name'] ?? $name);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name'] ?? $name);
             }
 
             $definition->setPublic($pool['public']);

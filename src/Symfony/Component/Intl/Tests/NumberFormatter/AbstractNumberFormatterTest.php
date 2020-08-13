@@ -324,7 +324,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        $this->expectException(Warning::class);
+        if (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
@@ -701,7 +705,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        $this->expectException(Warning::class);
+        if (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
@@ -821,7 +829,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
-        $this->expectException(Warning::class);
+        if (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);

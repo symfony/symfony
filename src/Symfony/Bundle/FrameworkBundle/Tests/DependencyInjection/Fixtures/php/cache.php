@@ -32,6 +32,27 @@ $container->loadFromExtension('framework', [
                     'redis://foo' => 'cache.adapter.redis',
                 ],
             ],
+            'cache.redis_tag_aware.foo' => [
+                'adapter' => 'cache.adapter.redis_tag_aware',
+            ],
+            'cache.redis_tag_aware.foo2' => [
+                'tags' => true,
+                'adapter' => 'cache.adapter.redis_tag_aware',
+            ],
+            'cache.redis_tag_aware.bar' => [
+                'adapter' => 'cache.redis_tag_aware.foo',
+            ],
+            'cache.redis_tag_aware.bar2' => [
+                'tags' => true,
+                'adapter' => 'cache.redis_tag_aware.foo',
+            ],
+            'cache.redis_tag_aware.baz' => [
+                'adapter' => 'cache.redis_tag_aware.foo2',
+            ],
+            'cache.redis_tag_aware.baz2' => [
+                'tags' => true,
+                'adapter' => 'cache.redis_tag_aware.foo2',
+            ],
         ],
     ],
 ]);

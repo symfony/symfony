@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
@@ -27,6 +28,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -56,6 +58,8 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -1314,6 +1318,41 @@ abstract class FrameworkExtensionTest extends TestCase
             12,
         ];
         $this->assertEquals($expected, $chain->getArguments());
+    }
+
+    public function testRedisTagAwareAdapter(): void
+    {
+        $container = $this->createContainerFromFile('cache', [], true);
+
+        $aliasesForArguments = [];
+        $argNames = [
+            'cacheRedisTagAwareFoo',
+            'cacheRedisTagAwareFoo2',
+            'cacheRedisTagAwareBar',
+            'cacheRedisTagAwareBar2',
+            'cacheRedisTagAwareBaz',
+            'cacheRedisTagAwareBaz2',
+        ];
+        foreach ($argNames as $argumentName) {
+            $aliasesForArguments[] = sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
+            $aliasesForArguments[] = sprintf('%s $%s', CacheInterface::class, $argumentName);
+            $aliasesForArguments[] = sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
+        }
+
+        foreach ($aliasesForArguments as $aliasForArgumentStr) {
+            $aliasForArgument = $container->getAlias($aliasForArgumentStr);
+            $this->assertNotNull($aliasForArgument, sprintf("No alias found for '%s'", $aliasForArgumentStr));
+
+            $def = $container->getDefinition((string) $aliasForArgument);
+            $this->assertInstanceOf(ChildDefinition::class, $def, sprintf("No definition found for '%s'", $aliasForArgumentStr));
+
+            $defParent = $container->getDefinition($def->getParent());
+            if ($defParent instanceof ChildDefinition) {
+                $defParent = $container->getDefinition($defParent->getParent());
+            }
+
+            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
+        }
     }
 
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()

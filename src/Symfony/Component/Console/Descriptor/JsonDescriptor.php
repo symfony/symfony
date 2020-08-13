@@ -141,7 +141,6 @@ class JsonDescriptor extends Descriptor
 
     private function getCommandData(Command $command): array
     {
-        $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
 
         return [
@@ -149,7 +148,7 @@ class JsonDescriptor extends Descriptor
             'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
             'description' => $command->getDescription(),
             'help' => $command->getProcessedHelp(),
-            'definition' => $this->getInputDefinitionData($command->getNativeDefinition()),
+            'definition' => $this->getInputDefinitionData($command->getDefinition()),
             'hidden' => $command->isHidden(),
         ];
     }

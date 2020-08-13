@@ -1009,6 +1009,12 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'list', '-vvv' => true]);
         $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
+        $tester->run(['command' => 'help', '--help' => true], ['decorated' => false]);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if --help is passed');
+
+        $tester->run(['command' => 'help', '-h' => true], ['decorated' => false]);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if -h is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);

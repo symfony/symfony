@@ -7,6 +7,10 @@ CHANGELOG
  * Added `SingleCommandApplication::setAutoExit()` to allow testing via `CommandTester`
  * added support for multiline responses to questions through `Question::setMultiline()`
    and `Question::isMultiline()`
+ * Added `SignalRegistry` class to stack signals handlers
+ * Added support for signals:
+    * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
+    * Added `SignalableCommandInterface` interface
 
 5.1.0
 -----

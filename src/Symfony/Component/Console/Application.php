@@ -14,6 +14,7 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -79,6 +80,7 @@ class Application implements ResetInterface
     private $singleCommand = false;
     private $initialized;
     private $signalRegistry;
+    private $signalsToDispatchEvent = [];
 
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
@@ -86,6 +88,10 @@ class Application implements ResetInterface
         $this->version = $version;
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
+        $this->signalRegistry = new SignalRegistry();
+        if (\defined('SIGINT')) {
+            $this->signalsToDispatchEvent = [SIGINT, SIGTERM, SIGUSR1, SIGUSR2];
+        }
     }
 
     /**
@@ -101,9 +107,14 @@ class Application implements ResetInterface
         $this->commandLoader = $commandLoader;
     }
 
-    public function setSignalRegistry(SignalRegistry $signalRegistry)
+    public function getSignalRegistry(): SignalRegistry
     {
-        $this->signalRegistry = $signalRegistry;
+        return $this->signalRegistry;
+    }
+
+    public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent)
+    {
+        $this->signalsToDispatchEvent = $signalsToDispatchEvent;
     }
 
     /**
@@ -268,14 +279,20 @@ class Application implements ResetInterface
             $command = $this->find($alternative);
         }
 
-        if ($this->signalRegistry) {
-            foreach ($this->signalRegistry->getHandlingSignals() as $handlingSignal) {
-                $event = new ConsoleSignalEvent($command, $input, $output, $handlingSignal);
-                $onSignalHandler = function () use ($event) {
-                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-                };
+        if ($this->dispatcher) {
+            foreach ($this->signalsToDispatchEvent as $signal) {
+                $event = new ConsoleSignalEvent($command, $input, $output, $signal);
 
-                $this->signalRegistry->register($handlingSignal, $onSignalHandler);
+                $this->signalRegistry->register($signal, function ($signal, $hasNext) use ($event) {
+                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
+
+                    // No more handlers, we try to simulate PHP default behavior
+                    if (!$hasNext) {
+                        if (!\in_array($signal, [SIGUSR1, SIGUSR2], true)) {
+                            exit(0);
+                        }
+                    }
+                });
             }
         }
 
@@ -923,6 +940,12 @@ class Application implements ResetInterface
         foreach ($command->getHelperSet() as $helper) {
             if ($helper instanceof InputAwareInterface) {
                 $helper->setInput($input);
+            }
+        }
+
+        if ($command instanceof SignalableCommandInterface) {
+            foreach ($command->getSubscribedSignals() as $signal) {
+                $this->signalRegistry->register($signal, [$command, 'handleSignal']);
             }
         }
 

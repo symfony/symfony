@@ -232,19 +232,19 @@ class ApplicationTest extends TestCase
     public function testSuggestingPackagesWithExactMatch()
     {
         $result = $this->createEventForSuggestingPackages('server:dump', []);
-        $this->assertRegExp('/You may be looking for a command provided by/', $result);
+        $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     public function testSuggestingPackagesWithPartialMatchAndNoAlternatives()
     {
         $result = $this->createEventForSuggestingPackages('server', []);
-        $this->assertRegExp('/You may be looking for a command provided by/', $result);
+        $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     public function testSuggestingPackagesWithPartialMatchAndAlternatives()
     {
         $result = $this->createEventForSuggestingPackages('server', ['server:run']);
-        $this->assertNotRegExp('/You may be looking for a command provided by/', $result);
+        $this->assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     private function createEventForSuggestingPackages(string $command, array $alternatives = []): string

@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
@@ -51,13 +52,23 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        // Third event is dispatch within main dispatch, but before its handling:
-        $this->expectHandledMessage($handlingMiddleware, 0, $thirdEvent);
-        // Then expect main dispatched message to be handled first:
-        $this->expectHandledMessage($handlingMiddleware, 1, $message);
-        // Then, expect events in new transaction to be handled next, in dispatched order:
-        $this->expectHandledMessage($handlingMiddleware, 2, $firstEvent);
-        $this->expectHandledMessage($handlingMiddleware, 3, $secondEvent);
+        $handlingMiddleware->expects($this->exactly(4))
+            ->method('handle')
+            ->withConsecutive(
+                // Third event is dispatch within main dispatch, but before its handling:
+                [$this->expectHandledMessage($thirdEvent)],
+                // Then expect main dispatched message to be handled first:
+                [$this->expectHandledMessage($message)],
+                // Then, expect events in new transaction to be handled next, in dispatched order:
+                [$this->expectHandledMessage($firstEvent)],
+                [$this->expectHandledMessage($secondEvent)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->willHandleMessage(),
+                $this->willHandleMessage(),
+                $this->willHandleMessage(),
+                $this->willHandleMessage()
+            );
 
         $messageBus->dispatch($message);
     }
@@ -86,12 +97,21 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        // Expect main dispatched message to be handled first:
-        $this->expectHandledMessage($handlingMiddleware, 0, $message);
-        // Then, expect events in new transaction to be handled next, in dispatched order:
-        $this->expectThrowingHandling($handlingMiddleware, 1, $firstEvent, new \RuntimeException('Some exception while handling first event'));
-        // Next event is still handled despite the previous exception:
-        $this->expectHandledMessage($handlingMiddleware, 2, $secondEvent);
+        $handlingMiddleware->expects($this->exactly(3))
+            ->method('handle')
+            ->withConsecutive(
+                // Expect main dispatched message to be handled first:
+                [$this->expectHandledMessage($message)],
+                // Then, expect events in new transaction to be handled next, in dispatched order:
+                [$this->expectHandledMessage($firstEvent)],
+                // Next event is still handled despite the previous exception:
+                [$this->expectHandledMessage($secondEvent)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->willHandleMessage(),
+                $this->throwException(new \RuntimeException('Some exception while handling first event')),
+                $this->willHandleMessage()
+            );
 
         $this->expectException(DelayedMessageHandlingException::class);
         $this->expectExceptionMessage('RuntimeException: Some exception while handling first event');
@@ -132,46 +152,46 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        // Expect main dispatched message to be handled first:
-        $this->expectHandledMessage($handlingMiddleware, 0, $command);
-
-        $this->expectHandledMessage($handlingMiddleware, 1, $eventL1a);
-
         // Handling $eventL1b will dispatch 2 more events
-        $handlingMiddleware->expects($this->at(2))->method('handle')->with($this->callback(function (Envelope $envelope) use ($eventL1b) {
-            return $envelope->getMessage() === $eventL1b;
-        }))->willReturnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b) {
-            $envelope1 = new Envelope($eventL2a, [new DispatchAfterCurrentBusStamp()]);
-            $eventBus->dispatch($envelope1);
-            $eventBus->dispatch(new Envelope($eventL2b, [new DispatchAfterCurrentBusStamp()]));
+        $handlingMiddleware->expects($this->exactly(7))
+            ->method('handle')
+            ->withConsecutive(
+                // Expect main dispatched message to be handled first:
+                [$this->expectHandledMessage($command)],
+                [$this->expectHandledMessage($eventL1a)],
+                [$this->expectHandledMessage($eventL1b)],
+                [$this->expectHandledMessage($eventL1c)],
+                // Handle $eventL2a will dispatch event and throw exception
+                [$this->expectHandledMessage($eventL2a)],
+                // Make sure $eventL2b is handled, since it was dispatched from $eventL1b
+                [$this->expectHandledMessage($eventL2b)],
+                // We dont handle exception L3a since L2a threw an exception.
+                [$this->expectHandledMessage($eventL3b)]
+                // Note: $eventL3a should not be handled.
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->willHandleMessage(),
+                $this->willHandleMessage(),
+                $this->returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b) {
+                    $envelope1 = new Envelope($eventL2a, [new DispatchAfterCurrentBusStamp()]);
+                    $eventBus->dispatch($envelope1);
+                    $eventBus->dispatch(new Envelope($eventL2b, [new DispatchAfterCurrentBusStamp()]));
 
-            return $stack->next()->handle($envelope, $stack);
-        });
+                    return $stack->next()->handle($envelope, $stack);
+                }),
+                $this->willHandleMessage(),
+                $this->returnCallback(function () use ($eventBus, $eventL3a) {
+                    $eventBus->dispatch(new Envelope($eventL3a, [new DispatchAfterCurrentBusStamp()]));
 
-        $this->expectHandledMessage($handlingMiddleware, 3, $eventL1c);
+                    throw new \RuntimeException('Some exception while handling Event level 2a');
+                }),
+                $this->returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL3b) {
+                    $eventBus->dispatch(new Envelope($eventL3b, [new DispatchAfterCurrentBusStamp()]));
 
-        // Handle $eventL2a will dispatch event and throw exception
-        $handlingMiddleware->expects($this->at(4))->method('handle')->with($this->callback(function (Envelope $envelope) use ($eventL2a) {
-            return $envelope->getMessage() === $eventL2a;
-        }))->willReturnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL3a) {
-            $eventBus->dispatch(new Envelope($eventL3a, [new DispatchAfterCurrentBusStamp()]));
-
-            throw new \RuntimeException('Some exception while handling Event level 2a');
-        });
-
-        // Make sure $eventL2b is handled, since it was dispatched from $eventL1b
-        $handlingMiddleware->expects($this->at(5))->method('handle')->with($this->callback(function (Envelope $envelope) use ($eventL2b) {
-            return $envelope->getMessage() === $eventL2b;
-        }))->willReturnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL3b) {
-            $eventBus->dispatch(new Envelope($eventL3b, [new DispatchAfterCurrentBusStamp()]));
-
-            return $stack->next()->handle($envelope, $stack);
-        });
-
-        // We dont handle exception L3a since L2a threw an exception.
-        $this->expectHandledMessage($handlingMiddleware, 6, $eventL3b);
-
-        // Note: $eventL3a should not be handled.
+                    return $stack->next()->handle($envelope, $stack);
+                }),
+                $this->willHandleMessage()
+            );
 
         $this->expectException(DelayedMessageHandlingException::class);
         $this->expectExceptionMessage('RuntimeException: Some exception while handling Event level 2a');
@@ -221,32 +241,32 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $commandHandlingMiddleware,
         ]);
 
-        $this->expectHandledMessage($commandHandlingMiddleware, 0, $message);
-        $this->expectHandledMessage($eventHandlingMiddleware, 0, $event);
+        $commandHandlingMiddleware->expects($this->once())
+            ->method('handle')
+            ->with($this->expectHandledMessage($message))
+            ->willReturnCallback(function ($envelope, StackInterface $stack) {
+                return $stack->next()->handle($envelope, $stack);
+            });
+        $eventHandlingMiddleware->expects($this->once())
+            ->method('handle')
+            ->with($this->expectHandledMessage($event))
+            ->willReturnCallback(function ($envelope, StackInterface $stack) {
+                return $stack->next()->handle($envelope, $stack);
+            });
         $messageBus->dispatch($message);
     }
 
-    /**
-     * @param MiddlewareInterface|MockObject $handlingMiddleware
-     */
-    private function expectHandledMessage(MiddlewareInterface $handlingMiddleware, int $at, $message): void
+    private function expectHandledMessage($message): Callback
     {
-        $handlingMiddleware->expects($this->at($at))->method('handle')->with($this->callback(function (Envelope $envelope) use ($message) {
+        return $this->callback(function (Envelope $envelope) use ($message) {
             return $envelope->getMessage() === $message;
-        }))->willReturnCallback(function ($envelope, StackInterface $stack) {
-            return $stack->next()->handle($envelope, $stack);
         });
     }
 
-    /**
-     * @param MiddlewareInterface|MockObject $handlingMiddleware
-     */
-    private function expectThrowingHandling(MiddlewareInterface $handlingMiddleware, int $at, $message, \Throwable $throwable): void
+    private function willHandleMessage(): ReturnCallback
     {
-        $handlingMiddleware->expects($this->at($at))->method('handle')->with($this->callback(function (Envelope $envelope) use ($message) {
-            return $envelope->getMessage() === $message;
-        }))->willReturnCallback(function () use ($throwable) {
-            throw $throwable;
+        return $this->returnCallback(function ($envelope, StackInterface $stack) {
+            return $stack->next()->handle($envelope, $stack);
         });
     }
 }

@@ -303,7 +303,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null, $passwordEncoder = null)
     {
-        $userProvider = $this->getMockBuilder([UserProviderInterface::class, PasswordUpgraderInterface::class])->getMock();
+        $userProvider = $this->getMockBuilder(PasswordUpgraderProvider::class)->getMock();
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
@@ -328,4 +328,8 @@ class DaoAuthenticationProviderTest extends TestCase
 
         return new DaoAuthenticationProvider($userProvider, $userChecker, 'key', $encoderFactory);
     }
+}
+
+interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
+{
 }

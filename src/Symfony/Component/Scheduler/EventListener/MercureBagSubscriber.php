@@ -17,7 +17,7 @@ use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\Bag\MercureBag;
 use Symfony\Component\Scheduler\Event\TaskExecutedEvent;
 use Symfony\Component\Scheduler\Event\TaskFailedEvent;
-use Symfony\Component\Scheduler\Event\TaskToExecuteEvent;
+use Symfony\Component\Scheduler\Event\TaskExecutingEvent;
 use Symfony\Component\Scheduler\Task\TaskInterface;
 
 /**
@@ -40,13 +40,13 @@ final class MercureBagSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TaskToExecuteEvent::class => 'onTaskToExecute',
+            TaskExecutingEvent::class => 'onTaskToExecute',
             TaskExecutedEvent::class => 'onTaskExecuted',
             TaskFailedEvent::class => 'onTaskFailed',
         ];
     }
 
-    public function onTaskToExecute(TaskToExecuteEvent $event): void
+    public function onTaskToExecute(TaskExecutingEvent $event): void
     {
         $task = $event->getTask();
 

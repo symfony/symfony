@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Scheduler\Worker;
 
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\LockFactory;
@@ -21,7 +22,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Scheduler\Event\TaskExecutedEvent;
 use Symfony\Component\Scheduler\Event\TaskFailedEvent;
-use Symfony\Component\Scheduler\Event\TaskToExecuteEvent;
+use Symfony\Component\Scheduler\Event\TaskExecutingEvent;
 use Symfony\Component\Scheduler\Event\WorkerStartedEvent;
 use Symfony\Component\Scheduler\Event\WorkerStoppedEvent;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
@@ -147,9 +148,9 @@ final class Worker implements WorkerInterface
 
     private function handleTask(RunnerInterface $runner, TaskInterface $task): void
     {
-        $this->dispatch(new TaskToExecuteEvent($task));
+        $this->dispatch(new TaskExecutingEvent($task));
         $output = $runner->run($task);
-        $task->set('last_execution', new \DateTimeImmutable());
+        $task->set('last_execution', new DateTimeImmutable());
         $this->dispatch(new TaskExecutedEvent($task, $output));
     }
 

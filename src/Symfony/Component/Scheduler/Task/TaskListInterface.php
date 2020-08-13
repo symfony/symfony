@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\Scheduler\Task;
 
+use ArrayAccess;
+use Closure;
+use Countable;
+use IteratorAggregate;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-interface TaskListInterface extends \Countable, \ArrayAccess, \IteratorAggregate
+interface TaskListInterface extends Countable, ArrayAccess, IteratorAggregate
 {
     /**
      * Add a new task in the list, by default, the name of the task is used as the key.
@@ -60,11 +65,11 @@ interface TaskListInterface extends \Countable, \ArrayAccess, \IteratorAggregate
     /**
      * Allow to filter the list using a custom filter, the $filter receive the task name and the TaskInterface object (in this order).
      *
-     * @param \Closure $filter
+     * @param Closure $filter
      *
      * @return $this
      */
-    public function filter(\Closure $filter): self;
+    public function filter(Closure $filter): self;
 
     /**
      * Remove the task in the actual list if the name is a valid one.

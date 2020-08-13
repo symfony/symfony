@@ -24,7 +24,7 @@ use Symfony\Component\Scheduler\Task\TaskInterface;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class GetScheduledTaskCommand extends Command
+final class ListScheduledTaskCommand extends Command
 {
     private $schedulerRegistry;
     private $io;

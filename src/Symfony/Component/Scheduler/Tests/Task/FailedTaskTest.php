@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Task;
 
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Task\FailedTask;
 use Symfony\Component\Scheduler\Task\TaskInterface;
@@ -30,6 +31,6 @@ final class FailedTaskTest extends TestCase
         static::assertSame('bar', $failedTask->getName());
         static::assertSame($task, $failedTask->getTask());
         static::assertSame('foo', $failedTask->getReason());
-        static::assertInstanceOf(\DateTimeInterface::class, $failedTask->getTriggerDate());
+        static::assertInstanceOf(DateTimeInterface::class, $failedTask->getFailedAt());
     }
 }

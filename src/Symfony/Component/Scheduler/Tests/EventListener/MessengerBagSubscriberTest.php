@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\Bag\MessengerBag;
 use Symfony\Component\Scheduler\Event\TaskExecutedEvent;
 use Symfony\Component\Scheduler\Event\TaskFailedEvent;
-use Symfony\Component\Scheduler\Event\TaskToExecuteEvent;
+use Symfony\Component\Scheduler\Event\TaskExecutingEvent;
 use Symfony\Component\Scheduler\EventListener\MessengerBagSubscriber;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Task\TaskInterface;
@@ -30,8 +30,8 @@ final class MessengerBagSubscriberTest extends TestCase
 {
     public function testSubscriberListenEvents(): void
     {
-        static::assertArrayHasKey(TaskToExecuteEvent::class, MessengerBagSubscriber::getSubscribedEvents());
-        static::assertArrayHasKey(TaskToExecuteEvent::class, MessengerBagSubscriber::getSubscribedEvents());
+        static::assertArrayHasKey(TaskExecutingEvent::class, MessengerBagSubscriber::getSubscribedEvents());
+        static::assertArrayHasKey(TaskExecutingEvent::class, MessengerBagSubscriber::getSubscribedEvents());
         static::assertArrayHasKey(TaskFailedEvent::class, MessengerBagSubscriber::getSubscribedEvents());
     }
     public function testSubscriberCannotSendMessagesBeforeTaskExecutionWithoutBus(): void
@@ -42,7 +42,7 @@ final class MessengerBagSubscriberTest extends TestCase
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::never())->method('get')->willThrowException(new InvalidArgumentException('The desired bag does not exist.'));
 
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $subscriber = new MessengerBagSubscriber($bagRegistry);
         $subscriber->onTaskToExecute($event);
@@ -87,7 +87,7 @@ final class MessengerBagSubscriberTest extends TestCase
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willThrowException(new InvalidArgumentException('The desired bag does not exist.'));
 
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $subscriber = new MessengerBagSubscriber($bagRegistry, $bus);
 
@@ -145,7 +145,7 @@ final class MessengerBagSubscriberTest extends TestCase
 
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willReturn($bag);
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $subscriber = new MessengerBagSubscriber($bagRegistry, $bus);
         $subscriber->onTaskToExecute($event);
@@ -198,7 +198,7 @@ final class MessengerBagSubscriberTest extends TestCase
 
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willReturn($bag);
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects(self::once())->method('dispatch')->willReturn(new Envelope(new FooMessage()));

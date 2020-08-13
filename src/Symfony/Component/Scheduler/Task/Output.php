@@ -25,7 +25,7 @@ final class Output
     private $task;
     private $type;
 
-    public function __construct(TaskInterface $task, int $exitCode, ?string $output, string $type)
+    public function __construct(TaskInterface $task, int $exitCode, ?string $output = 'undefined', string $type = self::SUCCESS)
     {
         $this->task = $task;
         $this->exitCode = $exitCode;
@@ -33,7 +33,7 @@ final class Output
         $this->type = $type;
     }
 
-    public static function forCli(TaskInterface $task, int $statusCode, ?string $output): self
+    public static function forCli(TaskInterface $task, int $statusCode, ?string $output = 'undefined'): self
     {
         switch ($statusCode) {
             case 1:
@@ -48,17 +48,17 @@ final class Output
         }
     }
 
-    public static function forSuccess(TaskInterface $task, int $statusCode, ?string $output, string $type = self::SUCCESS): self
+    public static function forSuccess(TaskInterface $task, int $statusCode, ?string $output = 'undefined', string $type = self::SUCCESS): self
     {
         return new self($task, $statusCode, $output, $type);
     }
 
-    public static function forError(TaskInterface $task, int $statusCode, ?string $output, string $type = self::ERROR): self
+    public static function forError(TaskInterface $task, int $statusCode, ?string $output = 'undefined', string $type = self::ERROR): self
     {
         return new self($task, $statusCode, $output, $type);
     }
 
-    public static function forScriptTerminated(TaskInterface $task, int $statusCode, ?string $output, string $type = self::TERMINATED): self
+    public static function forScriptTerminated(TaskInterface $task, int $statusCode, ?string $output = 'undefined', string $type = self::TERMINATED): self
     {
         return new self($task, $statusCode, $output, $type);
     }
@@ -76,5 +76,10 @@ final class Output
     public function getTask(): TaskInterface
     {
         return $this->task;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }

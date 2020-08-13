@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Scheduler\Command\GetScheduledTaskCommand;
+use Symfony\Component\Scheduler\Command\ListScheduledTaskCommand;
 use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Scheduler\SchedulerRegistryInterface;
 use Symfony\Component\Scheduler\Task\TaskInterface;
@@ -29,7 +29,7 @@ final class GetScheduledTaskCommentTest extends TestCase
     public function testCommandIsCorrectlyConfigured(): void
     {
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         static::assertSame('scheduler:get-tasks', $command->getName());
         static::assertSame('List the scheduled tasks', $command->getDescription());
@@ -42,7 +42,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -76,7 +76,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -114,7 +114,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -153,7 +153,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -192,7 +192,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -223,7 +223,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -249,7 +249,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);
@@ -275,7 +275,7 @@ final class GetScheduledTaskCommentTest extends TestCase
         $schedulerRegistry = $this->createMock(SchedulerRegistryInterface::class);
         $schedulerRegistry->expects(self::once())->method('get')->with('foo')->willReturn($scheduler);
 
-        $command = new GetScheduledTaskCommand($schedulerRegistry);
+        $command = new ListScheduledTaskCommand($schedulerRegistry);
 
         $application = new Application();
         $application->add($command);

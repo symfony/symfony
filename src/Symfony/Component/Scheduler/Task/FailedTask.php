@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Task;
 
+use DateTimeImmutable;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
@@ -18,13 +20,13 @@ final class FailedTask extends AbstractTask
 {
     private $task;
     private $reason;
-    private $triggerDate;
+    private $failedAt;
 
     public function __construct(TaskInterface $task, string $reason, array $options = [], array $additionalOptions = [])
     {
         $this->task = $task;
         $this->reason = $reason;
-        $this->triggerDate = new \DateTimeImmutable();
+        $this->failedAt = new DateTimeImmutable();
 
         parent::__construct(sprintf('%s.failed', $task->getName()), array_merge($task->getOptions(), $options), $additionalOptions);
     }
@@ -47,8 +49,8 @@ final class FailedTask extends AbstractTask
         return $this->reason;
     }
 
-    public function getTriggerDate(): \DateTimeImmutable
+    public function getFailedAt(): DateTimeImmutable
     {
-        return $this->triggerDate;
+        return $this->failedAt;
     }
 }

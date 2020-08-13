@@ -28,7 +28,7 @@ interface WorkerInterface
      *
      * A worker SHOULD dispatch the following events:
      *  - WorkerStartedEvent: Contain the worker instance BEFORE executing the task.
-     *  - TaskToExecuteEvent: Contain the task to executed BEFORE executing the task.
+     *  - TaskExecutingEvent: Contain the task to executed BEFORE executing the task.
      *  - TaskExecutedEvent: Contain the task to executed AFTER executing the task and its output (if defined).
      *  - WorkerStoppedEvent: Contain the worker instance AFTER executing the task.
      */

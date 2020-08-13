@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Task;
 
+use ArrayIterator;
+
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
@@ -137,7 +139,7 @@ final class TaskList implements TaskListInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->tasks);
     }
@@ -145,9 +147,9 @@ final class TaskList implements TaskListInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->tasks);
+        return new ArrayIterator($this->tasks);
     }
 
     /**

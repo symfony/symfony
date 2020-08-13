@@ -12,6 +12,8 @@
 namespace Symfony\Component\Scheduler\Task;
 
 use Cron\CronExpression;
+use DateInterval;
+use DateTimeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
@@ -71,20 +73,20 @@ abstract class AbstractTask implements TaskInterface
         ]);
 
         $resolver->setAllowedTypes('arguments', ['string[]', 'int[]']);
-        $resolver->setAllowedTypes('arrival_time', [\DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('arrival_time', [DateTimeInterface::class, 'null']);
         $resolver->setAllowedTypes('bags', ['string[]', 'array']);
         $resolver->setAllowedTypes('command', ['string', 'null']);
         $resolver->setAllowedTypes('depends_on', ['string[]', 'array']);
         $resolver->setAllowedTypes('description', ['string', 'null']);
-        $resolver->setAllowedTypes('expression', ['string', \DateTimeInterface::class]);
+        $resolver->setAllowedTypes('expression', ['string', DateTimeInterface::class]);
         $resolver->setAllowedTypes('execution_mode', ['string', 'null']);
         $resolver->setAllowedTypes('isolated', ['bool']);
-        $resolver->setAllowedTypes('last_execution', [\DateTimeInterface::class, 'null']);
-        $resolver->setAllowedTypes('execution_absolute_deadline', [\DateInterval::class, 'null']);
-        $resolver->setAllowedTypes('execution_computation_time', [\DateTimeInterface::class, 'null']);
-        $resolver->setAllowedTypes('execution_relative_deadline', ['int', 'float', 'string', \DateTimeInterface::class, 'null']);
-        $resolver->setAllowedTypes('execution_start_time', ['int', 'float', \DateTimeInterface::class, 'null']);
-        $resolver->setAllowedTypes('execution_ending_date', ['int', 'float', \DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('last_execution', [DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('execution_absolute_deadline', [DateInterval::class, 'null']);
+        $resolver->setAllowedTypes('execution_computation_time', [DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('execution_relative_deadline', ['int', 'float', 'string', DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('execution_start_time', ['int', 'float', DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('execution_ending_date', ['int', 'float', DateTimeInterface::class, 'null']);
         $resolver->setAllowedTypes('max_duration', ['int', 'float', 'null']);
         $resolver->setAllowedTypes('nice', ['int', 'float', 'null']);
         $resolver->setAllowedTypes('output', 'bool');
@@ -146,7 +148,7 @@ abstract class AbstractTask implements TaskInterface
     {
         $expression = $this->options['expression'];
 
-        if ($expression instanceof \DateTimeInterface) {
+        if ($expression instanceof DateTimeInterface) {
             return $expression;
         }
 
@@ -248,16 +250,30 @@ abstract class AbstractTask implements TaskInterface
         ];
     }
 
+    /**
+     * A tag COULD use the following syntaxes:
+     *
+     * - 'app.foo'
+     * - 'app_foo'
+     * - 'app'
+     *
+     * If the 'app.foo' syntax is used, the tags will be exploded and
+     * both 'app' and 'foo' tags will be set.
+     *
+     * @param string $name
+     */
     private function setTag(string $name): void
     {
         $this->set('tags', explode('.', $name));
     }
 
     /**
-     * @param string|\DateTimeInterface $expression
+     * @param string|DateTimeInterface $expression
+     *
+     * @return bool
      */
     private function handleTimeRelativeTasks($expression): bool
     {
-        return (strtotime($expression)) || (CronExpression::isValidExpression($expression)) || ($expression instanceof \DateTimeInterface);
+        return (strtotime($expression)) || (CronExpression::isValidExpression($expression)) || ($expression instanceof DateTimeInterface);
     }
 }

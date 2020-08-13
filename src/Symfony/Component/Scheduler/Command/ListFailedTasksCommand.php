@@ -64,7 +64,7 @@ final class ListFailedTasksCommand extends Command
         }
 
         foreach ($failedTasksList as $task) {
-            $failedTasks[] = [$task->getName(), $task->getReason(), $task->getTriggerDate()->format('m-j-Y H:i:s')];
+            $failedTasks[] = [$task->getName(), $task->getReason(), $task->getFailedAt()->format('m-j-Y H:i:s')];
         }
 
         $table->addRows($failedTasks);

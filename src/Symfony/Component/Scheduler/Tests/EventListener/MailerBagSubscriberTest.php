@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Bag\BagRegistryInterface;
 use Symfony\Component\Scheduler\Bag\MailerBag;
 use Symfony\Component\Scheduler\Event\TaskExecutedEvent;
 use Symfony\Component\Scheduler\Event\TaskFailedEvent;
-use Symfony\Component\Scheduler\Event\TaskToExecuteEvent;
+use Symfony\Component\Scheduler\Event\TaskExecutingEvent;
 use Symfony\Component\Scheduler\EventListener\MailerBagSubscriber;
 use Symfony\Component\Scheduler\EventListener\NotifierBagSubscriber;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
@@ -31,8 +31,8 @@ final class MailerBagSubscriberTest extends TestCase
 {
     public function testSubscriberListenEvents(): void
     {
-        static::assertArrayHasKey(TaskToExecuteEvent::class, NotifierBagSubscriber::getSubscribedEvents());
-        static::assertArrayHasKey(TaskToExecuteEvent::class, NotifierBagSubscriber::getSubscribedEvents());
+        static::assertArrayHasKey(TaskExecutingEvent::class, NotifierBagSubscriber::getSubscribedEvents());
+        static::assertArrayHasKey(TaskExecutingEvent::class, NotifierBagSubscriber::getSubscribedEvents());
         static::assertArrayHasKey(TaskFailedEvent::class, NotifierBagSubscriber::getSubscribedEvents());
     }
 
@@ -44,7 +44,7 @@ final class MailerBagSubscriberTest extends TestCase
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willThrowException(new InvalidArgumentException('The desired bag does not exist.'));
 
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $subscriber = new MailerBagSubscriber($bagRegistry);
 
@@ -93,7 +93,7 @@ final class MailerBagSubscriberTest extends TestCase
 
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willReturn($bag);
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $subscriber = new MailerBagSubscriber($bagRegistry);
         $subscriber->onTaskToExecute($event);
@@ -140,7 +140,7 @@ final class MailerBagSubscriberTest extends TestCase
 
         $bagRegistry = $this->createMock(BagRegistryInterface::class);
         $bagRegistry->expects(self::once())->method('get')->willReturn($bag);
-        $event = new TaskToExecuteEvent($task);
+        $event = new TaskExecutingEvent($task);
 
         $mailer = $this->createMock(MailerInterface::class);
         $mailer->expects(self::once())->method('send');

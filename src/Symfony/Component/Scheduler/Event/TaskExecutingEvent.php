@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
  */
-final class TaskToExecuteEvent extends Event
+final class TaskExecutingEvent extends Event
 {
     private $task;
 

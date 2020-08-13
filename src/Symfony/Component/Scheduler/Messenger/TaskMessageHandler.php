@@ -16,6 +16,7 @@ use Exception;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use function sleep;
+use function usleep;
 
 /**
  * @author Guillaume Loulier <contact@guillaumeloulier.fr>
@@ -41,7 +42,9 @@ final class TaskMessageHandler implements MessageHandlerInterface
         }
 
         while ($this->worker->isRunning()) {
-            sleep($message->getWorkerTimeout());
+            $timeout = $message->getWorkerTimeout();
+
+            is_float($timeout) ? usleep($timeout) : sleep($timeout);
         }
 
         $this->worker->execute($task);

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-05-03T16:16:42Z
+
+I don't think this should be part of the DSN. That's an internal configuration setting, not related to the transport DSN itself.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-05-04T16:24:16Z
+
+Usage of a container parameter instead of a dsn option.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T14:51:12Z
+
+Can't this be solved from the outside, aka by providing a sendmail script wrapper instead?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-30T15:01:38Z
+
+Yes I guess it's possible but only if you have permissions to write your wrapper script on `/usr/local/sendmail`. This PR is mainly (at least in my mind 🙂) for configurations that you can't change (shared hosting...).
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-30T15:02:23Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T15:15:05Z
+
+> This PR is mainly (at least in my mind slightly_smiling_face) for configurations that you can't change (shared hosting...).
+
+do you have this use case personally?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-06-30T15:21:16Z
+
+Yes, on an Ovh shared hosting with ssh (their former "pro" range) :/
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-08-13T12:49:27Z
+
+@fabpot updated, logic for non-windows host a bit modified to reflect the removal of `native+sendmail`
+
+---------------------------------------------------------------------------
+
+by l-vo at 2020-08-13T14:18:17Z
+
+Updated and CHANGELOG modified
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-13T14:24:58Z
+
+@l-vo Great work as always, can you see if you can add some docs about this feature?

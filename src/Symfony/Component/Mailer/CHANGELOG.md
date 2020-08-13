@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `NativeTransportFactory` to configure a transport based on php.ini settings
+
 4.4.0
 -----
 

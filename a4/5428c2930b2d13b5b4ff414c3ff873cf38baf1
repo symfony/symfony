@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-28T17:32:49Z
+
+So.. any thoughts on this? I think this is way more obvious than the current approach.
+
+The list command not giving the application-wide options is a bug.. right? However they were more or less explicitly left out... any opinion on this?
+
+edit: yeah.. after #20090 and rebase 2.7 imo.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T09:50:25Z
+
+Not sure about intentions here. It's done rather explicitly. The global options do work though with `list`.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-11-29T21:14:29Z
+
+Tested the changes on 3.4 and this approach seems to be working properly.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-30T07:43:22Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:18:21Z
+
+@ro0NL I'm digging the old PRs right now and stumbled on this one. I see that you marked it as "Needs work", is it still relevant?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-08-11T10:32:29Z
+
+@fabpot i'd say yes. It boils down to
+
+```
+bin/console list -h
+# does NOT show global options
+
+bin/console about -h
+# does show global options
+
+bin/console help -h
+# does show global options
+# includes an arbitrary "command" argument, e.g.;
+#
+#   Arguments:
+#     command               The command to execute
+#     command_name          The command name [default: "help"]
+```
+
+Not sure why i marked it "needs work" :sweat_smile: i figure to come to some sort of conslusion here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:36:12Z
+
+Ok, can you rebase on current master? I will test it on a real application to see how it behaves.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-08-11T18:30:00Z
+
+@fabpot should be good. ~~Only need to update fixture files still (please do :joy:)~~
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-08-12T12:58:49Z
+
+@fabpot console component passes tests :+1:

@@ -22,7 +22,8 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "~1.0",
         "symfony/polyfill-php80": "^1.15",
-        "symfony/translation-contracts": "^1.1|^2"
+        "symfony/translation-contracts": "^1.1|^2",
+        "symfony/deprecation-contracts": "^2.0"
     },
     "require-dev": {
         "symfony/http-client": "^4.4|^5.0",
@@ -49,6 +50,7 @@
         "symfony/expression-language": "<5.1",
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
+        "symfony/phpunit-bridge": "^5.1",
         "symfony/translation": "<4.4",
         "symfony/yaml": "<4.4"
     },

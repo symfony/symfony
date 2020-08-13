@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -165,9 +166,12 @@ class KernelTest extends TestCase
     public function testShutdownGivesNullContainerToAllBundles()
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')->getMock();
-        $bundle->expects($this->at(3))
+        $bundle->expects($this->exactly(2))
             ->method('setContainer')
-            ->with(null);
+            ->withConsecutive(
+                [$this->isInstanceOf(ContainerInterface::class)],
+                [null]
+            );
 
         $kernel = $this->getKernel(['getBundles']);
         $kernel->expects($this->any())

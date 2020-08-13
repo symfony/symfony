@@ -3,10 +3,13 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Range;
 
 class RangeTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
@@ -52,11 +55,12 @@ class RangeTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.
      * @dataProvider provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet
      */
     public function testDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(array $options, bool $expectedDeprecatedMinMessageSet, bool $expectedDeprecatedMaxMessageSet)
     {
+        $this->expectDeprecation('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+
         $sut = new Range($options);
         $this->assertEquals($expectedDeprecatedMinMessageSet, $sut->deprecatedMinMessageSet);
         $this->assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);

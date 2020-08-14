@@ -159,12 +159,6 @@
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="form-resources">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="resource" type="xsd:string" />
-        </xsd:choice>
-    </xsd:complexType>
-
     <xsd:complexType name="translator">
         <xsd:sequence>
             <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />

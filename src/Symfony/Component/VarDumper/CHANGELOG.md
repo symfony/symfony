@@ -4,6 +4,7 @@ CHANGELOG
 5.2.0
 -----
 
+ * added support for PHPUnit `--colors` option
  * added `VAR_DUMPER_FORMAT=server` env var value support
  * prevent replacing the handler when the `VAR_DUMPER_FORMAT` env var is set
 

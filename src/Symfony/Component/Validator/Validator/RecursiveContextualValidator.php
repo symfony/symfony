@@ -49,6 +49,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private $validatorFactory;
     private $objectInitializers;
 
+    private $validatedConstraintsReferences = [];
+    private $initializedObjectsReferences = [];
+
     /**
      * Creates a validator for the given context.
      *
@@ -443,6 +446,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     {
         $context->setNode($object, $object, $metadata, $propertyPath);
 
+        if (!isset($this->initializedObjectsReferences[$cacheKey])) {
+            $this->initializedObjectsReferences[$cacheKey] = $object;
+        }
+
         if (!$context->isObjectInitialized($cacheKey)) {
             foreach ($this->objectInitializers as $initializer) {
                 $initializer->initialize($object);
@@ -456,9 +463,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // to cascade the "Default" group when traversing the group
             // sequence
             $defaultOverridden = false;
-
-            // Use the object hash for group sequences
-            $groupHash = \is_object($group) ? spl_object_hash($group) : $group;
+            $groupHash = serialize($group);
 
             if ($context->isGroupValidated($cacheKey, $groupHash)) {
                 // Skip this group when validating the properties and when
@@ -803,6 +808,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // that constraints belong to multiple validated groups
             if (null !== $cacheKey) {
                 $constraintHash = spl_object_hash($constraint);
+                if (!isset($this->validatedConstraintsReferences[$constraintHash])) {
+                    $this->validatedConstraintsReferences[$constraintHash] = $constraint;
+                }
+
                 // instanceof Valid: In case of using a Valid constraint with many groups
                 // it makes a reference object get validated by each group
                 if ($constraint instanceof Composite || $constraint instanceof Valid) {

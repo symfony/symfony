@@ -379,6 +379,14 @@ class ConfigurationTest extends TestCase
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
                 'enabled_locales' => [],
+                'pseudo_localization' => [
+                    'enabled' => false,
+                    'accents' => true,
+                    'expansion_factor' => 1.0,
+                    'brackets' => true,
+                    'parse_html' => false,
+                    'localizable_html_attributes' => [],
+                ],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),

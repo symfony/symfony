@@ -133,6 +133,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -1217,6 +1218,19 @@ class FrameworkExtension extends Extension
             );
 
             $translator->replaceArgument(4, $options);
+        }
+
+        if ($config['pseudo_localization']['enabled']) {
+            $options = $config['pseudo_localization'];
+            unset($options['enabled']);
+
+            $container
+                ->register('translator.pseudo', PseudoLocalizationTranslator::class)
+                ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
+                ->setArguments([
+                    new Reference('translator.pseudo.inner'),
+                    $options,
+                ]);
         }
     }
 

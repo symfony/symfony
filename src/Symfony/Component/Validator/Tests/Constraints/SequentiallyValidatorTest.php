@@ -36,15 +36,8 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
 
         $value = 6;
 
-        $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expects($this->any())->method('getViolations')->willReturn($this->context->getViolations());
-        $contextualValidator->expects($this->exactly(2))
-            ->method('validate')
-            ->withConsecutive(
-                [$value, $constraints[0]],
-                [$value, $constraints[1]]
-            )
-            ->willReturn($contextualValidator);
+        $this->expectValidateValue(0, $value, [$constraints[0]]);
+        $this->expectValidateValue(1, $value, [$constraints[1]]);
 
         $this->validator->validate($value, new Sequentially($constraints));
 
@@ -61,24 +54,8 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
 
         $value = 'Foo';
 
-        $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expects($this->any())->method('getViolations')->willReturn($this->context->getViolations());
-        $contextualValidator->expects($this->exactly(2))
-            ->method('validate')
-            ->withConsecutive(
-                [$value, $constraints[0]],
-                [$value, $constraints[1]]
-            )
-            ->will($this->onConsecutiveCalls(
-                // Noop, just return the validator:
-                $this->returnValue($contextualValidator),
-                // Add violation on second call:
-                $this->returnCallback(function () use ($contextualValidator) {
-                    $this->context->getViolations()->add($violation = new ConstraintViolation('regex error', null, [], null, '', null, null, 'regex'));
-
-                    return $contextualValidator;
-                }
-            )));
+        $this->expectValidateValue(0, $value, [$constraints[0]]);
+        $this->expectFailingValueValidation(1, $value, [$constraints[1]], null, new ConstraintViolation('regex error', null, [], null, '', null, null, 'regex'));
 
         $this->validator->validate($value, new Sequentially($constraints));
 

@@ -60,3 +60,6 @@ Security
 
  * [BC break] In the experimental authenticator-based system, * `TokenInterface::getUser()`
    returns `null` in case of unauthenticated session.
+
+ * [BC break] `AccessListener::PUBLIC_ACCESS` has been removed in favor of
+   `AuthenticatedVoter::PUBLIC_ACCESS`.

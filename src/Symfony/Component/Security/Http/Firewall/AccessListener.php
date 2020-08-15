@@ -32,8 +32,6 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
-    const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
-
     private $tokenStorage;
     private $accessDecisionManager;
     private $map;
@@ -57,7 +55,7 @@ class AccessListener extends AbstractListener
         [$attributes] = $this->map->getPatterns($request);
         $request->attributes->set('_access_control_attributes', $attributes);
 
-        return $attributes && ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes && [self::PUBLIC_ACCESS] !== $attributes) ? true : null;
+        return $attributes && ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes && [AuthenticatedVoter::PUBLIC_ACCESS] !== $attributes) ? true : null;
     }
 
     /**

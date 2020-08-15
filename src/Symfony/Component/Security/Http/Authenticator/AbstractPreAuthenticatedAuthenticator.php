@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
@@ -86,10 +87,9 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
 
     public function authenticate(Request $request): PassportInterface
     {
-        $username = $request->attributes->get('_pre_authenticated_username');
-        $user = $this->userProvider->loadUserByUsername($username);
-
-        return new SelfValidatingPassport($user, [new PreAuthenticatedUserBadge()]);
+        return new SelfValidatingPassport(new UserBadge($request->attributes->get('_pre_authenticated_username'), function ($username) {
+            return $this->userProvider->loadUserByUsername($username);
+        }), [new PreAuthenticatedUserBadge()]);
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface

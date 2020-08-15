@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
@@ -69,7 +70,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
         // create an authenticated token for the User
-        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport($user, $badges), $this->firewallName);
+        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport(new UserBadge($user->getUsername(), function () use ($user) { return $user; }), $badges), $this->firewallName);
 
         // announce the authenticated token
         $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token))->getAuthenticatedToken();

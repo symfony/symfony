@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -93,7 +94,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticators[($matchingAuthenticatorIndex + 1) % 2]->expects($this->never())->method('authenticate');
 
-        $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
+        $matchingAuthenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
 
         $listenerCalled = false;
         $this->eventDispatcher->addListener(CheckPassportEvent::class, function (CheckPassportEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
@@ -121,7 +122,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport($this->user, new PasswordCredentials('pass')));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport(new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('pass')));
 
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
@@ -139,7 +140,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
 
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
@@ -160,7 +161,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
 
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
@@ -216,7 +217,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport($this->user));
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);

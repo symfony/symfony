@@ -27,6 +27,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -64,14 +65,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
-        $user = new User('Wouter', null, ['ROLE_USER']);
         // no LdapBadge
-        yield [new TestAuthenticator(), new Passport($user, new PasswordCredentials('s3cret'))];
+        yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'))];
 
         // ldap already resolved
         $badge = new LdapBadge('app.ldap');
         $badge->markResolved();
-        yield [new TestAuthenticator(), new Passport($user, new PasswordCredentials('s3cret'), [$badge])];
+        yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'), [$badge])];
     }
 
     public function testPasswordCredentialsAlreadyResolvedThrowsException()
@@ -81,8 +81,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
         $badge = new PasswordCredentials('s3cret');
         $badge->markResolved();
-        $user = new User('Wouter', null, ['ROLE_USER']);
-        $passport = new Passport($user, $badge, [new LdapBadge('app.ldap')]);
+        $passport = new Passport(new UserBadge('test'), $badge, [new LdapBadge('app.ldap')]);
 
         $listener = $this->createListener();
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
@@ -116,7 +115,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         }
 
         // no password credentials
-        yield [new SelfValidatingPassport(new User('Wouter', null, ['ROLE_USER']), [new LdapBadge('app.ldap')])];
+        yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
 
         // no user passport
         $passport = $this->createMock(PassportInterface::class);
@@ -181,7 +180,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new User('Wouter', null, ['ROLE_USER']), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
+            new Passport(new UserBadge('Wouter', function () { return new User('Wouter', null, ['ROLE_USER']); }), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 

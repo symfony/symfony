@@ -22,6 +22,7 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
@@ -83,6 +84,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
             ->willReturn($user);
 
         $passport = $this->authenticator->authenticate($request);
+        $this->assertEquals($user, $passport->getUser());
         $this->assertTrue($passport->hasBadge(CustomCredentials::class));
 
         $this->guardAuthenticator->expects($this->once())
@@ -110,7 +112,8 @@ class GuardBridgeAuthenticatorTest extends TestCase
             ->with($credentials, $this->userProvider)
             ->willReturn(null);
 
-        $this->authenticator->authenticate($request);
+        $passport = $this->authenticator->authenticate($request);
+        $passport->getUser();
     }
 
     /**
@@ -125,12 +128,6 @@ class GuardBridgeAuthenticatorTest extends TestCase
             ->method('getCredentials')
             ->with($request)
             ->willReturn($credentials);
-
-        $user = new User('test', null, ['ROLE_USER']);
-        $this->guardAuthenticator->expects($this->once())
-            ->method('getUser')
-            ->with($credentials, $this->userProvider)
-            ->willReturn($user);
 
         $this->guardAuthenticator->expects($this->once())
             ->method('supportsRememberMe')
@@ -156,7 +153,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
             ->with($user, 'main')
             ->willReturn($token);
 
-        $this->assertSame($token, $this->authenticator->createAuthenticatedToken(new SelfValidatingPassport($user), 'main'));
+        $this->assertSame($token, $this->authenticator->createAuthenticatedToken(new SelfValidatingPassport(new UserBadge('test', function () use ($user) { return $user; })), 'main'));
     }
 
     public function testHandleSuccess()

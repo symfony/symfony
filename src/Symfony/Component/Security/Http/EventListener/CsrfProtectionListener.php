@@ -57,6 +57,6 @@ class CsrfProtectionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [CheckPassportEvent::class => ['checkPassport', 128]];
+        return [CheckPassportEvent::class => ['checkPassport', 512]];
     }
 }

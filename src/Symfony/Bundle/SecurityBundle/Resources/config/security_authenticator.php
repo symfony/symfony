@@ -23,11 +23,13 @@ use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
+use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
 
 return static function (ContainerConfigurator $container) {
@@ -72,6 +74,18 @@ return static function (ContainerConfigurator $container) {
                service('security.encoder_factory'),
             ])
             ->tag('kernel.event_subscriber')
+
+        ->set('security.listener.user_provider', UserProviderListener::class)
+            ->args([
+                service('security.user_providers'),
+            ])
+            ->tag('kernel.event_listener', ['event' => CheckPassportEvent::class, 'priority' => 1024, 'method' => 'checkPassport'])
+
+        ->set('security.listener.user_provider.abstract', UserProviderListener::class)
+            ->abstract()
+            ->args([
+                abstract_arg('user provider'),
+            ])
 
         ->set('security.listener.password_migrating', PasswordMigratingListener::class)
             ->args([

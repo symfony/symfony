@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -47,7 +48,7 @@ class RememberMeListenerTest extends TestCase
     {
         $this->rememberMeServices->expects($this->never())->method('loginSuccess');
 
-        $event = $this->createLoginSuccessfulEvent('main_firewall', $this->response, new SelfValidatingPassport(new User('wouter', null)));
+        $event = $this->createLoginSuccessfulEvent('main_firewall', $this->response, new SelfValidatingPassport(new UserBadge('wouter', function ($username) { return new User($username, null); })));
         $this->listener->onSuccessfulLogin($event);
     }
 
@@ -78,7 +79,7 @@ class RememberMeListenerTest extends TestCase
     private function createLoginSuccessfulEvent($firewallName, $response, PassportInterface $passport = null)
     {
         if (null === $passport) {
-            $passport = new SelfValidatingPassport(new User('test', null), [new RememberMeBadge()]);
+            $passport = new SelfValidatingPassport(new UserBadge('test', function ($username) { return new User($username, null); }), [new RememberMeBadge()]);
         }
 
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->token, $this->request, $response, $firewallName);

@@ -41,6 +41,7 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Twig\Extension\AbstractExtension;
 
 /**
@@ -342,6 +343,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
+
+            if ($this->authenticatorManagerEnabled) {
+                $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
+                    ->addTag('kernel.event_listener', ['event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
+                    ->replaceArgument(0, new Reference($defaultProvider));
+            }
         } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
         }
@@ -632,7 +639,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $userProvider;
         }
 
-        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey) {
+        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
             return 'security.user_providers';
         }
 

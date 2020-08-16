@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T09:54:13Z
+
+Is it something that needs to be merged in an older branch instead?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-08-11T09:56:33Z
+
+I considered this a new feature. I don't remember your policy for supporting new PHP versions features.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:03:05Z
+
+Right now, we add support for newest PHP versions in the lowest maintained version, that's why I'm asking.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-08-11T10:06:24Z
+
+I need to rebase on 4.4 then, do you agree?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:16:30Z
+
+Yes, please.

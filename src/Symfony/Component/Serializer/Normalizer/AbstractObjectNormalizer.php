@@ -304,7 +304,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
     {
-        if (null === $this->propertyTypeExtractor || null === $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
+        if ((method_exists($parameter, 'isVariadic') && $parameter->isVariadic()) || null === $this->propertyTypeExtractor || null === $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 

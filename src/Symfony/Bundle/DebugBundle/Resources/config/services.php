@@ -100,7 +100,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('var_dumper.server_connection', Connection::class)
             ->args([
-                abstract_arg('server host'),
+                '', // server host
                 [
                     'source' => inline_service(SourceContextProvider::class)->args([
                         param('kernel.charset'),
@@ -114,7 +114,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('var_dumper.dump_server', DumpServer::class)
             ->args([
-                abstract_arg('server host'),
+                '', // server host
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'debug'])

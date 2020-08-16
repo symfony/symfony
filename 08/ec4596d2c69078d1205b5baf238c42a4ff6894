@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-09T11:41:06Z
+
+IIRC it is possible to use the same webhook url to push messages to different channels..
+
+---------------------------------------------------------------------------
+
+by norkunas at 2020-06-09T12:03:22Z
+
+> IIRC it is possible to use the same webhook url to push messages to different channels..
+
+Could you give an example? :slightly_smiling_face:
+In webhook url there is no reference to the recipient, only the generated parts. So when trying to configure `recipient` option via SlackOptions, it overrides the webhook part just with the recipient id.
+So it is as @xavierbriand said, to change the recipient via that method you need to have many webhooks for different channels..
+
+Also from the slack docs:
+> You cannot override the default channel (chosen by the user who installed your app), username, or icon when you're using Incoming Webhooks to post messages. Instead, these values will always inherit from the associated Slack app configuration.
+
+Unless the transport would support posting like this:
+```
+POST https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+Content-type: application/json
+{
+    "text": "Hello, world."
+    "channel": "U12345678"
+}
+```
+
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-09T12:14:49Z
+
+Well I can tell you that in a way it is not accurate.. or that it can be done... for instance check this..
+
+![image](https://user-images.githubusercontent.com/5675248/84146131-d7f71580-aa63-11ea-9cb8-4ddb57de1b9c.png)
+
+I am using a different username (adding always a different UUID) for each one of my errors... although the quote of yours above says that incoming webhook can not change username
+
+not sure if this is dependent of the webhook configuration.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2020-06-09T12:18:16Z
+
+This is the code I use https://github.com/gmponos/monolog-slack/blob/master/src/Formatter/SlackLineFormatter.php
+
+Hope that it's not a bad practice to post another repo here :)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2020-06-09T12:22:20Z
+
+> This is the code I use https://github.com/gmponos/monolog-slack/blob/master/src/Formatter/SlackLineFormatter.php
+>
+> Hope that it's not a bad practice to post another repo here :)
+
+As I see your formatter sets the channel in payload before calling the webhook, but that's what current slack notifier transport does not support :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T09:31:21Z
+
+I won't dig into Slack docs again :) So I'm going to trust the community here. What should we do? Switch back to what I did in 5.0 (which AFAIR is more "powerful" than what we have in 5.1)? Or keep the 5.1 way of doing this? Either way is fine by me. Tell me :)
+
+---------------------------------------------------------------------------
+
+by xavierbriand at 2020-08-12T18:13:35Z
+
+> I won't dig into Slack docs again :) So I'm going to trust the community here. What should we do? Switch back to what I did in 5.0 (which AFAIR is more "powerful" than what we have in 5.1)? Or keep the 5.1 way of doing this? Either way is fine by me. Tell me :)
+
+Sorry Fabien, I meant to deal with that PR, but... life.
+
+IMHO Switching back to 5.0 is the way to go.
+
+---------------------------------------------------------------------------
+
+by xavierbriand at 2020-08-13T19:45:45Z
+
+Rebased + implemented feedback from @norkunas and @stof.

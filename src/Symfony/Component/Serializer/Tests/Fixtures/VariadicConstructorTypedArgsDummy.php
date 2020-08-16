@@ -20,6 +20,7 @@ class VariadicConstructorTypedArgsDummy
         $this->foo = $foo;
     }
 
+    /** @return Dummy[] */
     public function getFoo()
     {
         return $this->foo;

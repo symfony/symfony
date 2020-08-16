@@ -4,6 +4,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -135,19 +137,49 @@ class AbstractNormalizerTest extends TestCase
     }
 
     /**
+     * @dataProvider getNormalizer
+     *
      * @requires PHP 5.6
      */
-    public function testObjectWithVariadicConstructorTypedArguments()
+    public function testObjectWithVariadicConstructorTypedArguments(AbstractNormalizer $normalizer)
     {
-        $normalizer = new PropertyNormalizer();
-        $normalizer->setSerializer(new Serializer([$normalizer]));
-        $data = ['foo' => [['foo' => 'Foo', 'bar' => 'Bar', 'baz' => 'Baz', 'qux' => 'Qux'], ['foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ', 'qux' => 'QUX']]];
-        $dummy = $normalizer->denormalize($data, VariadicConstructorTypedArgsDummy::class);
+        $d1 = new Dummy();
+        $d1->foo = 'Foo';
+        $d1->bar = 'Bar';
+        $d1->baz = 'Baz';
+        $d1->qux = 'Quz';
+        $d2 = new Dummy();
+        $d2->foo = 'FOO';
+        $d2->bar = 'BAR';
+        $d2->baz = 'BAZ';
+        $d2->qux = 'QUZ';
+        $obj = new VariadicConstructorTypedArgsDummy($d1, $d2);
 
+        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
+        $normalizer->setSerializer($serializer);
+        $data = $serializer->serialize($obj, 'json');
+        $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);
         $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
         $this->assertCount(2, $dummy->getFoo());
         foreach ($dummy->getFoo() as $foo) {
             $this->assertInstanceOf(Dummy::class, $foo);
         }
+
+        $dummy = $serializer->deserialize($data, VariadicConstructorTypedArgsDummy::class, 'json');
+        $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
+        $this->assertCount(2, $dummy->getFoo());
+        foreach ($dummy->getFoo() as $foo) {
+            $this->assertInstanceOf(Dummy::class, $foo);
+        }
+    }
+
+    public function getNormalizer()
+    {
+        $extractor = new PhpDocExtractor();
+
+        yield [new PropertyNormalizer()];
+        yield [new PropertyNormalizer(null, null, $extractor)];
+        yield [new ObjectNormalizer()];
+        yield [new ObjectNormalizer(null, null, null, $extractor)];
     }
 }

@@ -11,6 +11,7 @@ CHANGELOG
  * Added support for signals:
     * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
     * Added `SignalableCommandInterface` interface
+ * Added `TableCellStyle` class to customize table cell
 
 5.1.0
 -----

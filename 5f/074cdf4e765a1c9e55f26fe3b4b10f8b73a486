@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-18T18:45:15Z
+
+Can you please rebase now that the priority is fixed?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-07-01T20:04:49Z
+
+@nicolas-grekas LGTM from a lock point of view. I just have concerns about complexity of url generator https://github.com/symfony/symfony/pull/37218#discussion_r442759940 . If you think it's ok you can merge it.

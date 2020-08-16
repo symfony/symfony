@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added attributes on `Passport`
  * Changed `AuthorizationChecker` to call the access decision manager in unauthenticated sessions with a `NullToken`
+ * [BC break] Removed `AccessListener::PUBLIC_ACCESS` in favor of `AuthenticatedVoter::PUBLIC_ACCESS`
 
 5.1.0
 -----

@@ -100,6 +100,7 @@
         <xsd:attribute name="https-port" type="xsd:string" />
         <xsd:attribute name="strict-requirements" type="xsd:string" />
         <xsd:attribute name="utf8" type="xsd:boolean" />
+        <xsd:attribute name="default-uri" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="session">
@@ -162,12 +163,6 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="form-resources">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="resource" type="xsd:string" />
-        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="translator">

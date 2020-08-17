@@ -109,7 +109,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             throw new InvalidArgumentException(sprintf('The "%s" given in the default context is not callable.', self::MAX_DEPTH_HANDLER));
         }
 
-        $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS];
+        $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS]);
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
 
@@ -333,7 +333,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": ', $attribute, $type).$e->getMessage(), $e->getCode(), $e);
+                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
             }
         }
 

@@ -572,6 +572,7 @@
 
     <xsd:complexType name="mailer">
         <xsd:sequence>
+            <xsd:element name="transport" type="mailer_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="envelope" type="mailer_envelope" minOccurs="0" maxOccurs="1" />
             <xsd:element name="header" type="header" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -580,6 +581,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="header" mixed="true">
+    <xsd:complexType name="mailer_transport" mixed="true">
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 

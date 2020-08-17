@@ -35,12 +35,15 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function manyIterables() { }
     public function nullableReturnableTypeNormalization() { }
     public function nonNullableReturnableTypeNormalization() { }
-    public function commonNonObjectReturnedTypeNormalization() { }
     public function bracketsNormalization() { }
     public function booleanNormalization() { }
     public function callableNormalization1() { }
     public function callableNormalization2() { }
     public function otherTypeNormalization() { }
     public function arrayWithLessThanSignNormalization() { }
+    public function this() { }
+    public function mixed() { }
+    public function nullableMixed() { }
+    public function static() { }
     public function outsideMethod() { }
 }

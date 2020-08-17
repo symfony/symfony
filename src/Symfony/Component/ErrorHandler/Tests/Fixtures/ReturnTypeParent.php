@@ -29,7 +29,7 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     abstract public function realReturnTypeIsAlreadyThereWithNull();
 
     /**
-     * @return mixed
+     * @return resource
      */
     public function oneCommonNonObjectReturnedType()
     {
@@ -144,13 +144,6 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     }
 
     /**
-     * @return $this
-     */
-    public function commonNonObjectReturnedTypeNormalization()
-    {
-    }
-
-    /**
      * @return \ArrayIterator[]
      */
     public function bracketsNormalization()
@@ -189,6 +182,34 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
      * @return array<string, int>
      */
     public function arrayWithLessThanSignNormalization()
+    {
+    }
+
+    /**
+     * @return $this
+     */
+    public function this()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function mixed()
+    {
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function nullableMixed()
+    {
+    }
+
+    /**
+     * @return static
+     */
+    public function static()
     {
     }
 

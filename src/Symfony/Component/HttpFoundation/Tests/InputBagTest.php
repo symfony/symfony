@@ -41,7 +41,7 @@ class InputBagTest extends TestCase
             'foo' => ['12', '8'],
         ]);
 
-        $result = $bag->filter('foo', null, \FILTER_VALIDATE_INT, \FILTER_FORCE_ARRAY);
+        $result = $bag->filter('foo', null, FILTER_VALIDATE_INT, FILTER_FORCE_ARRAY);
         $this->assertSame([12, 8], $result);
     }
 
@@ -82,6 +82,6 @@ class InputBagTest extends TestCase
     {
         $bag = new InputBag(['foo' => ['bar', 'baz']]);
         $this->expectDeprecation('Since symfony/http-foundation 5.1: Filtering an array value with "Symfony\Component\HttpFoundation\InputBag::filter()" without passing the FILTER_REQUIRE_ARRAY or FILTER_FORCE_ARRAY flag is deprecated');
-        $bag->filter('foo', \FILTER_VALIDATE_INT);
+        $bag->filter('foo', FILTER_VALIDATE_INT);
     }
 }

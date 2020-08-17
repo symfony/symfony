@@ -30,7 +30,7 @@ class Passport implements UserPassportInterface
 
     /**
      * @param CredentialsInterface $credentials the credentials to check for this authentication, use
-     *                                          SelfValidatingPassport if no credentials should be checked.
+     *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
     public function __construct(UserInterface $user, CredentialsInterface $credentials, array $badges = [])

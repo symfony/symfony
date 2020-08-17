@@ -67,7 +67,7 @@ class Connection
         if ('' === $auth) {
             $auth = null;
         }
- 
+
         if (null !== $auth && !$this->connection->auth($auth)) {
             throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }

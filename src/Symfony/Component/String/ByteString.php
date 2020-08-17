@@ -356,7 +356,7 @@ class ByteString extends AbstractString
     public function slice(int $start = 0, int $length = null): parent
     {
         $str = clone $this;
-        $str->string = (string) substr($this->string, $start, $length ?? \PHP_INT_MAX);
+        $str->string = (string) substr($this->string, $start, $length ?? PHP_INT_MAX);
 
         return $str;
     }
@@ -372,14 +372,14 @@ class ByteString extends AbstractString
     public function splice(string $replacement, int $start = 0, int $length = null): parent
     {
         $str = clone $this;
-        $str->string = substr_replace($this->string, $replacement, $start, $length ?? \PHP_INT_MAX);
+        $str->string = substr_replace($this->string, $replacement, $start, $length ?? PHP_INT_MAX);
 
         return $str;
     }
 
     public function split(string $delimiter, int $limit = null, int $flags = null): array
     {
-        if (1 > $limit = $limit ?? \PHP_INT_MAX) {
+        if (1 > $limit = $limit ?? PHP_INT_MAX) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');
         }
 

@@ -631,6 +631,7 @@ class Inline
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                 }
+                // no break
             case preg_match('/^(?:\+|-)?0o(?P<value>[0-7_]++)$/', $scalar, $matches):
                 $value = str_replace('_', '', $matches['value']);
 

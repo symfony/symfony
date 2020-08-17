@@ -57,7 +57,6 @@ EOT
             );
     }
 
-
     /**
      * {@inheritdoc}
      */

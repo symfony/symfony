@@ -39,6 +39,9 @@ final class Headers
         'return-path' => PathHeader::class,
     ];
 
+    /**
+     * @var HeaderInterface[][]
+     */
     private $headers = [];
     private $lineLength = 76;
 

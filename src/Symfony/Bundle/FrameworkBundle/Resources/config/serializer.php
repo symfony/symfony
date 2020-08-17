@@ -39,9 +39,11 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -74,6 +76,10 @@ return static function (ContainerConfigurator $container) {
         // Normalizer
         ->set('serializer.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
             ->args([[], service('serializer.name_converter.metadata_aware')])
+            ->tag('serializer.normalizer', ['priority' => -915])
+
+        ->set('serializer.normalizer.mime_message', MimeMessageNormalizer::class)
+            ->args([service('serializer.normalizer.property')])
             ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.datetimezone', DateTimeZoneNormalizer::class)
@@ -113,6 +119,18 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -1000])
 
         ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
+
+        ->set('serializer.normalizer.property', PropertyNormalizer::class)
+            ->args([
+                service('serializer.mapping.class_metadata_factory'),
+                service('serializer.name_converter.metadata_aware'),
+                service('property_info')->ignoreOnInvalid(),
+                service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+                null,
+                [],
+            ])
+
+        ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -990])

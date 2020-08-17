@@ -103,8 +103,9 @@ class RoundRobinTransportTest extends TestCase
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(3))->method('send');
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->at(0))->method('send')->will($this->throwException(new TransportException()));
-        $t2->expects($this->at(1))->method('send');
+        $t2->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnOnConsecutiveCalls($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 3);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);

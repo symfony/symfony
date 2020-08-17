@@ -31,7 +31,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         */
 
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertNotRegExp('~[ \t]~', $encoder->encodeString("a \t b"), 'encoded-words in headers cannot contain LWSP as per RFC 2047.');
+        $this->assertDoesNotMatchRegularExpression('~[ \t]~', $encoder->encodeString("a \t b"), 'encoded-words in headers cannot contain LWSP as per RFC 2047.');
     }
 
     public function testSpaceIsRepresentedByUnderscore()

@@ -51,7 +51,7 @@ class FileDumperTest extends TestCase
         $this->assertStringEqualsFile($tempDir.'/d1+intl-icu.en.concrete', 'bar=foo');
         @unlink($tempDir.'/d1+intl-icu.en.concrete');
 
-        $this->assertFileNotExists($tempDir.'/d2.en.concrete');
+        $this->assertFileDoesNotExist($tempDir.'/d2.en.concrete');
         $this->assertStringEqualsFile($tempDir.'/d2+intl-icu.en.concrete', 'bar=foo');
         @unlink($tempDir.'/d2+intl-icu.en.concrete');
     }

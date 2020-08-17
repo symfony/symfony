@@ -78,8 +78,8 @@ class TranslationDebugCommandTest extends TestCase
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
         $tester->execute(['locale' => 'en']);
 
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
     }
 
     public function testDebugDefaultRootDirectory()

@@ -112,9 +112,10 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
-            ->expects($this->at(0))
             ->method('bind')
-            ->with('elsa', 'test1234A$');
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -152,9 +153,10 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
-            ->expects($this->at(0))
             ->method('bind')
-            ->with('elsa', 'test1234A$');
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -195,9 +197,10 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
-            ->expects($this->at(0))
             ->method('bind')
-            ->with('elsa', 'test1234A$');
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
         $ldap
             ->expects($this->once())
             ->method('query')

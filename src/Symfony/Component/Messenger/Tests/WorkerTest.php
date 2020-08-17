@@ -46,13 +46,16 @@ class WorkerTest extends TestCase
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with(
-            new Envelope($apiMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
-        )->willReturnArgument(0);
-
-        $bus->expects($this->at(1))->method('dispatch')->with(
-            new Envelope($ipaMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
-        )->willReturnArgument(0);
+        $bus->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [new Envelope($apiMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])],
+                [new Envelope($ipaMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->returnArgument(0),
+                $this->returnArgument(0)
+            );
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));

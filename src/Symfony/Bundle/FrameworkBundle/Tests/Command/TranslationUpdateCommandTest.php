@@ -36,31 +36,31 @@ class TranslationUpdateCommandTest extends TestCase
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc']);
-        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
-        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpReverseSortedMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'desc']);
-        $this->assertRegExp("/\*test\*foo\*bar/", preg_replace('/\s+/', '', $tester->getDisplay()));
-        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression("/\*test\*foo\*bar/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpSortWithoutValueAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort']);
-        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
-        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
     public function testDumpWrongSortAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test']);
-        $this->assertRegExp('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
     }
 
     public function testDumpMessagesAndCleanInRootDirectory()
@@ -126,7 +126,7 @@ class TranslationUpdateCommandTest extends TestCase
 
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:update', 'locale' => 'en', '--force' => true]);
-        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
     public function testWriteMessagesForSpecificDomain()

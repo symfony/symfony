@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use \RuntimeException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -69,8 +69,8 @@ EOT
         $kernel = $this->getApplication()->getKernel();
 
         if ($input->getOption('eolCheck')) {
-            if(self::isExpired(Kernel::END_OF_MAINTENANCE) && self::isExpired(Kernel::END_OF_LIFE)) {
-                throw new RuntimeException(sprintf('Symfony %s is not maintained anymore, see https://symfony.com/releases to upgrade', Kernel::VERSION));
+            if (self::isExpired(Kernel::END_OF_MAINTENANCE) && self::isExpired(Kernel::END_OF_LIFE)) {
+                throw new RuntimeException(sprintf('Symfony "%s" is not maintained anymore, see https://symfony.com/releases to upgrade.', Kernel::VERSION));
             }
         }
 

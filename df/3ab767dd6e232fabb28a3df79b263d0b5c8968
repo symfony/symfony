@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-16T08:30:44Z
+
+Why not 4.4 since it's a bug fix proposal?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-05-16T10:54:02Z
+
+indeed. fixed
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-05-21T17:58:44Z
+
+Good catch @Tobion
+Added a method to keep the only The first + last X stamps.
+
+Tell me what you think
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-15T12:29:03Z
+
+@Tobion Can you have a look at this one?

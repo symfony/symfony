@@ -79,24 +79,24 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     }
 
     /**
-     * Adds stamps to the envelope by keeping only the First + Last N stamps
+     * Adds stamps to the envelope by keeping only the First + Last N stamps.
      */
     private function withLimitedHistory(Envelope $envelope, StampInterface ...$stamps): Envelope
     {
         foreach ($stamps as $stamp) {
-            $history = $envelope->all(get_class($stamp));
+            $history = $envelope->all(\get_class($stamp));
             if (\count($history) < $this->historySize) {
                 $envelope = $envelope->with($stamp);
                 continue;
             }
 
-            $history = \array_merge(
+            $history = array_merge(
                 [$history[0]],
                 \array_slice($history, -$this->historySize + 2),
                 [$stamp]
             );
 
-            $envelope = $envelope->withoutAll(get_class($stamp))->with(...$history);
+            $envelope = $envelope->withoutAll(\get_class($stamp))->with(...$history);
         }
 
         return $envelope;

@@ -581,6 +581,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="header" mixed="true">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
     <xsd:complexType name="mailer_transport" mixed="true">
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>

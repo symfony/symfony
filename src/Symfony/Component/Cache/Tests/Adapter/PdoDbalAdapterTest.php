@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;

@@ -428,7 +428,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 // handle uninitialized properties in PHP >= 7.4
                 if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
                     $r = new \ReflectionProperty($matches[1], $matches[2]);
-                    $type= ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
+                    $type = ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
                     throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $type), 0, $e);
                 }

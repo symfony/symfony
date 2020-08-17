@@ -452,7 +452,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 switch (true) {
                     case $driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver:
                         throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
-
                     case $driver instanceof \Doctrine\DBAL\Driver\AbstractMySQLDriver:
                         $this->driver = 'mysql';
                         break;

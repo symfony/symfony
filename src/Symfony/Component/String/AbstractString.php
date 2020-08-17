@@ -99,7 +99,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     {
         $str = clone $this;
         $str->string = '';
-        $i = \PHP_INT_MAX;
+        $i = PHP_INT_MAX;
 
         foreach ((array) $needle as $n) {
             $n = (string) $n;
@@ -111,7 +111,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             }
         }
 
-        if (\PHP_INT_MAX === $i) {
+        if (PHP_INT_MAX === $i) {
             return $str;
         }
 
@@ -168,7 +168,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     {
         $str = clone $this;
         $str->string = '';
-        $i = \PHP_INT_MAX;
+        $i = PHP_INT_MAX;
 
         foreach ((array) $needle as $n) {
             $n = (string) $n;
@@ -180,7 +180,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             }
         }
 
-        if (\PHP_INT_MAX === $i) {
+        if (PHP_INT_MAX === $i) {
             return $str;
         }
 
@@ -360,7 +360,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
-        $i = \PHP_INT_MAX;
+        $i = PHP_INT_MAX;
 
         foreach ($needle as $n) {
             $j = $this->indexOf((string) $n, $offset);
@@ -370,7 +370,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             }
         }
 
-        return \PHP_INT_MAX === $i ? null : $i;
+        return PHP_INT_MAX === $i ? null : $i;
     }
 
     /**

@@ -27,8 +27,8 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  */
 class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
 {
-    use LoggerAwareTrait;
     use ExpiringStoreTrait;
+    use LoggerAwareTrait;
 
     /** @var PersistingStoreInterface[] */
     private $stores;

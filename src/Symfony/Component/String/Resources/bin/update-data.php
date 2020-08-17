@@ -17,7 +17,7 @@ set_error_handler(static function (int $type, string $msg, string $file, int $li
     throw new \ErrorException($msg, 0, $type, $file, $line);
 });
 
-set_exception_handler(static function (\Throwable $exception): void {
+set_exception_handler(static function (Throwable $exception): void {
     echo "\n";
 
     $cause = $exception;

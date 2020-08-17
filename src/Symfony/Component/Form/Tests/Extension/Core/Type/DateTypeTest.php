@@ -891,7 +891,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testYearsFor32BitsMachines()
     {
-        if (4 !== PHP_INT_SIZE) {
+        if (4 !== \PHP_INT_SIZE) {
             $this->markTestSkipped('PHP 32 bit is required.');
         }
 

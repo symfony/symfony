@@ -86,7 +86,7 @@ class IntlTestHelper
      */
     public static function require32Bit(TestCase $testCase)
     {
-        if (4 !== PHP_INT_SIZE) {
+        if (4 !== \PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 32 bit is required.');
         }
     }
@@ -96,7 +96,7 @@ class IntlTestHelper
      */
     public static function require64Bit(TestCase $testCase)
     {
-        if (8 !== PHP_INT_SIZE) {
+        if (8 !== \PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 64 bit is required.');
         }
     }

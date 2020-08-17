@@ -69,7 +69,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case self::$useDeprecatedConstants ? Type::BOOLEAN : Types::BOOLEAN:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CheckboxType', [], Guess::HIGH_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE:
+            // no break
             case self::$useDeprecatedConstants ? Type::DATETIMETZ : Types::DATETIMETZ_MUTABLE:
+            // no break
             case 'vardatetime':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', [], Guess::HIGH_CONFIDENCE);
             case 'dateinterval':
@@ -79,10 +81,13 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case self::$useDeprecatedConstants ? Type::TIME : Types::TIME_MUTABLE:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', [], Guess::HIGH_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::DECIMAL : Types::DECIMAL:
+            // no break
             case self::$useDeprecatedConstants ? Type::FLOAT : Types::FLOAT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::INTEGER : Types::INTEGER:
+            // no break
             case self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT:
+            // no break
             case self::$useDeprecatedConstants ? Type::SMALLINT : Types::SMALLINT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\IntegerType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::STRING : Types::STRING:

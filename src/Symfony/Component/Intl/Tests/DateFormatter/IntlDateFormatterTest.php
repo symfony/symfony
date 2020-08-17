@@ -167,7 +167,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testParseThreeDigitsYears()
     {
-        if (PHP_INT_SIZE < 8) {
+        if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Parsing three digits years requires a 64bit PHP.');
         }
 

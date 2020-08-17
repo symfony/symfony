@@ -120,7 +120,6 @@ class VarCloner extends AbstractCloner
                     case \is_int($v):
                     case \is_float($v):
                         continue 2;
-
                     case \is_string($v):
                         if ('' === $v) {
                             continue 2;
@@ -310,7 +309,7 @@ class VarCloner extends AbstractCloner
     private static function initHashMask()
     {
         $obj = (object) [];
-        self::$hashOffset = 16 - PHP_INT_SIZE;
+        self::$hashOffset = 16 - \PHP_INT_SIZE;
         self::$hashMask = -1;
 
         if (\defined('HHVM_VERSION')) {
@@ -331,6 +330,6 @@ class VarCloner extends AbstractCloner
             }
         }
 
-        self::$hashMask ^= hexdec(substr(spl_object_hash($obj), self::$hashOffset, PHP_INT_SIZE));
+        self::$hashMask ^= hexdec(substr(spl_object_hash($obj), self::$hashOffset, \PHP_INT_SIZE));
     }
 }

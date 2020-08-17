@@ -355,6 +355,9 @@ class ProfilerController
         $file = $request->query->get('file');
         $line = $request->query->get('line');
 
+        $flags = PHP_VERSION_ID >= 50400 ? ENT_QUOTES | ENT_SUBSTITUTE : ENT_QUOTES;
+        $file =  nl2br(htmlspecialchars($request->query->get('file'), $flags, 'UTF-8')); 
+
         $filename = $this->baseDir.\DIRECTORY_SEPARATOR.$file;
 
         if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {

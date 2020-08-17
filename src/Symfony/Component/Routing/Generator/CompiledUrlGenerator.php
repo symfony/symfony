@@ -40,7 +40,7 @@ class CompiledUrlGenerator extends UrlGenerator
             $this->defaultLocale ?? null,
         ]);
 
-        while(\count($locales) > 0) {
+        while (\count($locales) > 0) {
             $locale = array_shift($locales);
             do {
                 if (($this->compiledRoutes[$name.'.'.$locale][1]['_canonical_route'] ?? null) === $name) {

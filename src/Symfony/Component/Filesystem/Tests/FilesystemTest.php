@@ -865,7 +865,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFalse(is_link($link));
         $this->assertFalse(is_file($link));
-        $this->assertDirectoryNotExists($link);
+        $this->assertDirectoryDoesNotExist($link);
     }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()

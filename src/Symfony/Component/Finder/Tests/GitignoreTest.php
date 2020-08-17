@@ -23,11 +23,11 @@ class GitignoreTest extends TestCase
         $regex = Gitignore::toRegex($patterns);
 
         foreach ($matchingCases as $matchingCase) {
-            $this->assertRegExp($regex, $matchingCase, sprintf('Failed asserting path [%s] matches gitignore patterns [%s] using regex [%s]', $matchingCase, $patterns, $regex));
+            $this->assertMatchesRegularExpression($regex, $matchingCase, sprintf('Failed asserting path [%s] matches gitignore patterns [%s] using regex [%s]', $matchingCase, $patterns, $regex));
         }
 
         foreach ($nonMatchingCases as $nonMatchingCase) {
-            $this->assertNotRegExp($regex, $nonMatchingCase, sprintf('Failed asserting path [%s] not matching gitignore patterns [%s] using regex [%s]', $nonMatchingCase, $patterns, $regex));
+            $this->assertDoesNotMatchRegularExpression($regex, $nonMatchingCase, sprintf('Failed asserting path [%s] not matching gitignore patterns [%s] using regex [%s]', $nonMatchingCase, $patterns, $regex));
         }
     }
 

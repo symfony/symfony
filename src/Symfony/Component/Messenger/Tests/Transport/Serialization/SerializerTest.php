@@ -87,13 +87,14 @@ class SerializerTest extends TestCase
             ->with($validationStamp = new ValidationStamp(['foo', 'bar']));
 
         $symfonySerializer
-            ->expects($this->at(2))
-            ->method('serialize')->with(
-                $message,
-                'json',
-                [
+            ->expects($this->exactly(3))
+            ->method('serialize')
+            ->withConsecutive(
+                [$this->anything()],
+                [$this->anything()],
+                [$message, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
-                ]
+                ]]
             )
         ;
 
@@ -113,23 +114,18 @@ class SerializerTest extends TestCase
         );
 
         $symfonySerializer
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('deserialize')
-            ->with('[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [])
-            ->willReturn([new SerializerStamp(['groups' => ['foo']])])
-        ;
-
-        $symfonySerializer
-            ->expects($this->at(1))
-            ->method('deserialize')->with(
-                '{}',
-                DummyMessage::class,
-                'json',
-                [
+            ->withConsecutive(
+                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', []],
+                ['{}', DummyMessage::class, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
-                ]
+                ]]
             )
-            ->willReturn(new DummyMessage('test'))
+            ->willReturnOnConsecutiveCalls(
+                [new SerializerStamp(['groups' => ['foo']])],
+                new DummyMessage('test')
+            )
         ;
 
         $serializer->decode([

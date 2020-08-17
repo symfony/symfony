@@ -98,7 +98,7 @@ class FormDataPartTest extends TestCase
             'file' => new DataPart('data.csv', 'data.csv', 'text/csv'),
         ]);
         $headers = $f->getPreparedHeaders()->toArray();
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
             $headers[0]
         );

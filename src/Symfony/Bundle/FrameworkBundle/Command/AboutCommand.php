@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use \RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -46,10 +47,16 @@ be different between web and CLI.
 
 The <info>Environment</info> section displays the current environment variables managed by Symfony Dotenv. It will not
 be shown if no variables were found. The values might be different between web and CLI.
+
+Passing <info>eolCheck</info> as an option you will get an error if the current symfony kernel is End of Maintenance and
+End of Life (can be used in CI as check `php bin/console about --eolCheck`
+
 EOT
-            )
-        ;
+            )->addOption(
+        'eolCheck'
+            );
     }
+
 
     /**
      * {@inheritdoc}
@@ -60,6 +67,12 @@ EOT
 
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
+
+        if ($input->getOption('eolCheck')) {
+            if(self::isExpired(Kernel::END_OF_MAINTENANCE) && self::isExpired(Kernel::END_OF_LIFE)) {
+                throw new RuntimeException(sprintf('Symfony %s is not maintained anymore, see https://symfony.com/releases to upgrade', Kernel::VERSION));
+            }
+        }
 
         $rows = [
             ['<info>Symfony</>'],

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by alanpoulain at 2020-04-04T09:02:54Z
+
+It's only an issue if the default context for the cache key is changed by a child class and if the constructor is called afterwards, doesn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-04-04T19:55:30Z
+
+A test case would be nice if you can.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-04-05T10:31:02Z
+
+@alanpoulain it's even the case if you just pass the keys to exclude as parameter of the constructor.
+@nicolas-grekas test added and exception message fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T09:19:56Z
+
+Is this one still relevant? I see that the original issue has been closed as the problem has been fixed in PHP itself IIUC? /cc @dunglas @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-08-16T13:02:26Z
+
+AFAIK it's still an issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-16T13:31:07Z
+
+@dunglas  Ok, can you rebase so that we can merge?

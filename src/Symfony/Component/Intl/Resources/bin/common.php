@@ -74,7 +74,7 @@ set_error_handler(function ($type, $msg, $file, $line) {
     throw new \ErrorException($msg, 0, $type, $file, $line);
 });
 
-set_exception_handler(function (\Throwable $exception) {
+set_exception_handler(function (Throwable $exception) {
     echo "\n";
 
     $cause = $exception;

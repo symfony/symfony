@@ -59,7 +59,7 @@ class DataPart extends TextPart
         if (false === is_readable($path)) {
             throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
         }
-        
+
         if (false === $handle = @fopen($path, 'r', false)) {
             throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
         }

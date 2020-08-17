@@ -41,8 +41,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
     use FormattableHandlerTrait;
+    use ProcessableHandlerTrait;
 
     private $endpoint;
     private $index;

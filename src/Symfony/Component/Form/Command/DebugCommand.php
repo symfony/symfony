@@ -70,18 +70,18 @@ The <info>%command.name%</info> command displays information about form types.
 
   <info>php %command.full_name%</info>
 
-The command lists all built-in types, services types, type extensions and 
+The command lists all built-in types, services types, type extensions and
 guessers currently available.
 
   <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
   <info>php %command.full_name% ChoiceType</info>
 
-The command lists all defined options that contains the given form type, 
+The command lists all defined options that contains the given form type,
 as well as their parents and type extensions.
 
   <info>php %command.full_name% ChoiceType choice_value</info>
 
-Use the <info>--show-deprecated</info> option to display form types with 
+Use the <info>--show-deprecated</info> option to display form types with
 deprecated options or the deprecated options of the given form type:
 
   <info>php %command.full_name% --show-deprecated</info>

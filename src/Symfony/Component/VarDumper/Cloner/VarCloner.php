@@ -114,7 +114,6 @@ class VarCloner extends AbstractCloner
                     case \is_int($v):
                     case \is_float($v):
                         continue 2;
-
                     case \is_string($v):
                         if ('' === $v) {
                             continue 2;

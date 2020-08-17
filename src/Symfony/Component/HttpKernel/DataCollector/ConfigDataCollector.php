@@ -68,7 +68,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => PHP_VERSION,
-            'php_architecture' => PHP_INT_SIZE * 8,
+            'php_architecture' => \PHP_INT_SIZE * 8,
             'php_intl_locale' => class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a',
             'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => \extension_loaded('xdebug'),

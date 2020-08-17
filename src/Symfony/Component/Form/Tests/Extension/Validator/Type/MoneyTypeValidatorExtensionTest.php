@@ -12,8 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
@@ -22,7 +20,7 @@ class MoneyTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
-    protected function createForm(array $options = array())
+    protected function createForm(array $options = [])
     {
         return $this->factory->create(MoneyType::class, null, $options);
     }
@@ -41,9 +39,9 @@ class MoneyTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
 
-        $form = $this->createForm(array(
+        $form = $this->createForm([
             'legacy_error_messages' => true,
-        ));
+        ]);
 
         $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }

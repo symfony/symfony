@@ -53,9 +53,6 @@ class TableCellStyle
         $this->options = array_merge($this->options, $options);
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;

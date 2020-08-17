@@ -214,7 +214,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $context = stream_context_create($context, ['notification' => $notification]);
 
-        $resolver = static function($multi) use ($context, $options, $url, &$info, $onProgress) {
+        $resolver = static function ($multi) use ($context, $options, $url, &$info, $onProgress) {
             [$host, $port, $url['authority']] = self::dnsResolve($url, $multi, $info, $onProgress);
 
             if (!isset($options['normalized_headers']['host'])) {

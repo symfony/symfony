@@ -19,7 +19,7 @@ use Symfony\Component\Console\SignalRegistry\SignalRegistry;
  */
 class SignalRegistryTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         pcntl_async_signals(false);
         pcntl_signal(SIGUSR1, SIG_DFL);

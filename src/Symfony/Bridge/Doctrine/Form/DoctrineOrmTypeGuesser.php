@@ -60,6 +60,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         switch ($metadata->getTypeOfField($property)) {
             case self::$useDeprecatedConstants ? Type::TARRAY : Types::ARRAY:
+            // no break
             case self::$useDeprecatedConstants ? Type::SIMPLE_ARRAY : Types::SIMPLE_ARRAY:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CollectionType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::BOOLEAN : Types::BOOLEAN:

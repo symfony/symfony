@@ -54,7 +54,7 @@ class Gitignore
             }
 
             $negativesAfter = array_filter(\array_slice($negatives, ++$index));
-            if ($negativesAfter !== []) {
+            if ([] !== $negativesAfter) {
                 $pattern .= sprintf('(?<!%s)', implode('|', $negativesAfter));
             }
 

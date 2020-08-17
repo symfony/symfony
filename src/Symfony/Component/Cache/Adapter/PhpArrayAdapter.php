@@ -30,8 +30,8 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
-    use PhpArrayTrait;
     use ContractsTrait;
+    use PhpArrayTrait;
 
     private $createCacheItem;
 

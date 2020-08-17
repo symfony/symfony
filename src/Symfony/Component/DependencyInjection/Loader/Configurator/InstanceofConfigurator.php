@@ -21,6 +21,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     const FACTORY = 'instanceof';
 
     use Traits\AutowireTrait;
+    use Traits\BindTrait;
     use Traits\CallTrait;
     use Traits\ConfiguratorTrait;
     use Traits\LazyTrait;
@@ -28,7 +29,6 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     use Traits\PublicTrait;
     use Traits\ShareTrait;
     use Traits\TagTrait;
-    use Traits\BindTrait;
 
     private $path;
 

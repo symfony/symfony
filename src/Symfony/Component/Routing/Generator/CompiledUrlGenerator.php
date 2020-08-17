@@ -33,17 +33,25 @@ class CompiledUrlGenerator extends UrlGenerator
 
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
     {
-        $locale = $parameters['_locale']
-            ?? $this->context->getParameter('_locale')
-            ?: $this->defaultLocale;
+        $routeName = null;
+        $locales = array_filter([
+            $parameters['_locale'] ?? null,
+            $this->context->getParameter('_locale') ?? null,
+            $this->defaultLocale ?? null,
+        ]);
 
-        if (null !== $locale) {
+        while(count($locales)>0) {
+            $locale = array_shift($locales);
             do {
                 if (($this->compiledRoutes[$name.'.'.$locale][1]['_canonical_route'] ?? null) === $name) {
-                    $name .= '.'.$locale;
+                    $routeName = $name.'.'.$locale;
                     break;
                 }
             } while (false !== $locale = strstr($locale, '_', true));
+            if ($routeName !== null) {
+                $name = $routeName;
+                break;
+            }
         }
 
         if (!isset($this->compiledRoutes[$name])) {

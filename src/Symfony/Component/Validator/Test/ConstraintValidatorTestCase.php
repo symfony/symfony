@@ -115,7 +115,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $validator->expects($this->any())
             ->method('inContext')
             ->with($context)
-            ->willReturn(new AssertingContextualValidator());
+            ->willReturn($this->createMock(AssertingContextualValidator::class));
 
         return $context;
     }

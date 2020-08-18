@@ -207,30 +207,30 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
+     * Checks if the attribute is granted against the current authentication token and optionally supplied subject.
      *
      * @throws \LogicException
      */
-    protected function isGranted($attributes, $subject = null): bool
+    protected function isGranted($attribute, $subject = null): bool
     {
         if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
         }
 
-        return $this->container->get('security.authorization_checker')->isGranted($attributes, $subject);
+        return $this->container->get('security.authorization_checker')->isGranted($attribute, $subject);
     }
 
     /**
-     * Throws an exception unless the attributes are granted against the current authentication token and optionally
+     * Throws an exception unless the attribute is granted against the current authentication token and optionally
      * supplied subject.
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attributes, $subject = null, string $message = 'Access Denied.'): void
+    protected function denyAccessUnlessGranted($attribute, $subject = null, string $message = 'Access Denied.'): void
     {
-        if (!$this->isGranted($attributes, $subject)) {
+        if (!$this->isGranted($attribute, $subject)) {
             $exception = $this->createAccessDeniedException($message);
-            $exception->setAttributes($attributes);
+            $exception->setAttributes($attribute);
             $exception->setSubject($subject);
 
             throw $exception;

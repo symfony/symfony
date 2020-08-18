@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Kernel;
@@ -39,6 +39,7 @@ class AboutCommand extends Command
     {
         $this
             ->setDescription('Displays information about the current project')
+            ->addOption('is-maintained', null, InputOption::VALUE_NONE, 'Exits if current symfony Kernel is unmaintained (usable with CI tools)')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command displays information about the current Symfony project.
 
@@ -48,12 +49,10 @@ be different between web and CLI.
 The <info>Environment</info> section displays the current environment variables managed by Symfony Dotenv. It will not
 be shown if no variables were found. The values might be different between web and CLI.
 
-Passing <info>eolCheck</info> as an option you will get an error if the current symfony kernel is End of Maintenance and
-End of Life (can be used in CI as check `php bin/console about --eolCheck`
+Passing <info>is-maintained</info> as an option you will get an error if the current symfony kernel is End of Maintenance
+(can be used in CI as check `php bin/console about --is-maintained`
 
 EOT
-            )->addOption(
-        'eolCheck'
             );
     }
 
@@ -67,10 +66,9 @@ EOT
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
-        if ($input->getOption('eolCheck')) {
-            if (self::isExpired(Kernel::END_OF_MAINTENANCE) && self::isExpired(Kernel::END_OF_LIFE)) {
-                throw new RuntimeException(sprintf('Symfony "%s" is not maintained anymore, see https://symfony.com/releases to upgrade.', Kernel::VERSION));
-            }
+        if ($input->getOption('is-maintained') && self::isExpired(Kernel::END_OF_MAINTENANCE)) {
+            $io->error(sprintf('Symfony "%s" is not maintained anymore, see https://symfony.com/releases to upgrade.', Kernel::VERSION));
+            return 1;
         }
 
         $rows = [

@@ -1505,6 +1505,10 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
+        if (!class_exists(Headers::class)) {
+            $container->removeDefinition('serializer.normalizer.mime_message');
+        }
+
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {

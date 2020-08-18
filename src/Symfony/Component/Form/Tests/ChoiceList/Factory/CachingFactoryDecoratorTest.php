@@ -137,14 +137,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $list2 = new ArrayChoiceList([]);
         $closure = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
             ->with($choices, $closure)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices, $closure)
-            ->willReturn($list2);
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, $closure));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure));
@@ -194,14 +190,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $list2 = new ArrayChoiceList([]);
         $filter = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
             ->with($choices, null, $filter)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices, null, $filter)
-            ->willReturn($list2);
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, null, $filter));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, null, $filter));
@@ -232,14 +224,13 @@ class CachingFactoryDecoratorTest extends TestCase
         $closure1 = function () {};
         $closure2 = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
-            ->with($choices, null, $closure1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices, null, $closure2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$choices, null, $closure1],
+                [$choices, null, $closure2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, null, $closure1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, null, $closure2));
@@ -251,16 +242,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $list = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
             ->with($loader)
-            ->willReturn($list)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader)
-            ->willReturn($list2)
-        ;
+            ->willReturnOnConsecutiveCalls($list, $list2);
 
         $this->assertSame($list, $this->factory->createListFromLoader($loader));
         $this->assertSame($list2, $this->factory->createListFromLoader($loader));
@@ -309,16 +294,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $list2 = new ArrayChoiceList([]);
         $closure = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
             ->with($loader, $closure)
-            ->willReturn($list)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader, $closure)
-            ->willReturn($list2)
-        ;
+            ->willReturnOnConsecutiveCalls($list, $list2);
 
         $this->assertSame($list, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), $closure));
         $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), $closure));
@@ -376,16 +355,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $list2 = new ArrayChoiceList([]);
         $closure = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
             ->with($loader, null, $closure)
-            ->willReturn($list)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader, null, $closure)
-            ->willReturn($list2)
-        ;
+            ->willReturnOnConsecutiveCalls($list, $list2);
 
         $this->assertSame($list, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), null, $closure));
         $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), null, $closure));
@@ -425,14 +398,13 @@ class CachingFactoryDecoratorTest extends TestCase
         $closure1 = function () {};
         $closure2 = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
-            ->with($loader, null, $closure1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader, null, $closure2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$loader, null, $closure1],
+                [$loader, null, $closure2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), null, $closure1));
         $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), null, $closure2));
@@ -445,16 +417,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, $preferred)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, $preferred)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, $preferred));
         $this->assertSame($view2, $this->factory->createView($list, $preferred));
@@ -504,16 +470,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, $preferred)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, $preferred)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, $preferred));
         $this->assertSame($view2, $this->factory->createView($list, $preferred));
@@ -563,16 +523,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, null, $labels)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, $labels)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, null, $labels));
         $this->assertSame($view2, $this->factory->createView($list, null, $labels));
@@ -622,16 +576,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, null, null, $index)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, $index)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, null, null, $index));
         $this->assertSame($view2, $this->factory->createView($list, null, null, $index));
@@ -681,16 +629,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, null, null, null, $groupBy)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, $groupBy)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, $groupBy));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, $groupBy));
@@ -740,16 +682,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, null, null, null, null, $attr)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, null, $attr)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr));
@@ -798,16 +734,10 @@ class CachingFactoryDecoratorTest extends TestCase
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
             ->with($list, null, null, null, null, $attr)
-            ->willReturn($view)
-        ;
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, null, $attr)
-            ->willReturn($view2)
-        ;
+            ->willReturnOnConsecutiveCalls($view, $view2);
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr));

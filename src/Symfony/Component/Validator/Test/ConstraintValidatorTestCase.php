@@ -385,6 +385,9 @@ class ConstraintViolationAssertion
     }
 }
 
+/**
+ * @internal
+ */
 class AssertingContextualValidator implements ContextualValidatorInterface
 {
     private $context;

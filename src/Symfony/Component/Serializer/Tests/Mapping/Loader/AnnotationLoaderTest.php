@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -66,6 +67,7 @@ class AnnotationLoaderTest extends TestCase
         $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
+            'third' => AbstractDummyThirdChild::class,
         ]));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));

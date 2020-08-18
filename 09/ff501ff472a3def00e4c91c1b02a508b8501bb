@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-05-24T18:26:32Z
+
+Shouldn't we rather check how the credentials could end up being `null` at all instead?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-24T21:49:08Z
+
+I think I agree with @xabbuh here. I think this should be fixed in `UsernamePasswordFormAuthenticationListener` and a `LogicException` should be thrown instead - this is not a user error (like blank password), but a developer error.
+
+---------------------------------------------------------------------------
+
+by Shine-neko at 2020-05-25T00:38:03Z
+
+> I think I agree with @xabbuh here. I think this should be fixed in `UsernamePasswordFormAuthenticationListener` and a `LogicException` should be thrown instead - this is not a user error (like blank password), but a developer error.
+
+A similar thing ? https://gist.github.com/Shine-neko/76f97ee46950a480074434fa3259f797/revisions
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-05-25T09:32:25Z
+
+Yes, seems good. Although I think the error message can be changed, so we can give the developer guidelines on how to fix it (e.g. adding the expected password parameter named - `$this->options['password_parameter']`).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-23T05:10:13Z
+
+Any news? It looks the gist code is more in line with what we should do.
+
+---------------------------------------------------------------------------
+
+by Shine-neko at 2020-06-26T18:22:15Z
+
+@fabpot  done

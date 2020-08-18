@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2020-08-07T06:41:22Z
+
+I think the right type declaration according to phpstan would be something like this `ArrayIterator<int, FormView>`. Jetbrains IDE is also working on parsing this declaration.
+
+---------------------------------------------------------------------------
+
+by vladyslavstartsev at 2020-08-08T08:56:22Z
+
+@CoalaJoe I've corrected
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2020-08-08T09:00:32Z
+
+Does this declaration work for you? e.g. does not trigger a phpstan warning?
+
+---------------------------------------------------------------------------
+
+by vladyslavstartsev at 2020-08-08T09:01:30Z
+
+@CoalaJoe it does not trigger PHPStan warnings
+
+---------------------------------------------------------------------------
+
+by vladyslavstartsev at 2020-08-08T09:35:27Z
+
+During the discussion in https://github.com/sonata-project/SonataAdminBundle/pull/6258#issuecomment-670849147
+
+We concluded, that `\ArrayIterator<string, FormView>` is the right type

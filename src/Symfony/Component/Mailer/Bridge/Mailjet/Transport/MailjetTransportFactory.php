@@ -25,7 +25,7 @@ class MailjetTransportFactory extends AbstractTransportFactory
         $password = $this->getPassword($dsn);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
 
-        if ('maijlet+api' === $scheme) {
+        if ('mailjet+api' === $scheme) {
             return (new MailjetApiTransport($user, $password, $this->client, $this->dispatcher, $this->logger))->setHost($host);
         }
 

@@ -192,4 +192,34 @@ class SendgridApiTransportTest extends TestCase
         $this->assertArrayHasKey('email', $payload['reply_to']);
         $this->assertSame($replyTo, $payload['reply_to']['email']);
     }
+
+    public function testEnvelopeSenderAndRecipients()
+    {
+        $from = 'from@example.com';
+        $to = 'to@example.com';
+        $envelopeFrom = 'envelopefrom@example.com';
+        $envelopeTo = 'envelopeto@example.com';
+        $email = new Email();
+        $email->from($from)
+            ->to($to)
+            ->cc('cc@example.com')
+            ->bcc('bcc@example.com')
+            ->text('content');
+        $envelope = new Envelope(new Address($envelopeFrom), [new Address($envelopeTo)]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('from', $payload);
+        $this->assertArrayHasKey('email', $payload['from']);
+        $this->assertSame($envelopeFrom, $payload['from']['email']);
+
+        $this->assertArrayHasKey('personalizations', $payload);
+        $this->assertArrayHasKey('to', $payload['personalizations'][0]);
+        $this->assertArrayHasKey('email', $payload['personalizations'][0]['to'][0]);
+        $this->assertCount(1, $payload['personalizations'][0]['to']);
+        $this->assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
+    }
 }

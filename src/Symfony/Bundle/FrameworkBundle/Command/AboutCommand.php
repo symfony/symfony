@@ -68,6 +68,7 @@ EOT
 
         if ($input->getOption('is-maintained') && self::isExpired(Kernel::END_OF_MAINTENANCE)) {
             $io->error(sprintf('Symfony "%s" is not maintained anymore, see https://symfony.com/releases to upgrade.', Kernel::VERSION));
+
             return 1;
         }
 

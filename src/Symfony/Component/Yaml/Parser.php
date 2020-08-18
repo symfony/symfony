@@ -1211,7 +1211,7 @@ class Parser
         }
         $this->openMappingCount = 0;
         $lines = [
-            $this->calculateLineOpenMappings($yaml)
+            $this->calculateLineOpenMappings($yaml),
         ];
         while (!$this->allMappingIsClosed() && $this->moveToNextLine()) {
             $lines[] = $this->calculateLineOpenMappings($this->currentLine);

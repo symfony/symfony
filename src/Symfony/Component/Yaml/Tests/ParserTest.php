@@ -2416,7 +2416,7 @@ YAML;
     }
 
     /**
-     * Test that covers #37788 issue
+     * Test that covers #37788 issue.
      *
      * @dataProvider validMappingSequenceProvider
      */
@@ -2430,12 +2430,12 @@ YAML;
         $expected = [
             'map' => [
                 'key' => 'value',
-                'a' => 'b'
+                'a' => 'b',
             ],
-            'param' => 'some'
+            'param' => 'some',
         ];
 
-        yield "multiline syntax" => [
+        yield 'multiline syntax' => [
             <<<YAML
 map: {
     key: "value",
@@ -2443,22 +2443,22 @@ map: {
 }
 param: "some"
 YAML,
-            $expected
+            $expected,
         ];
-        yield "inline syntax" => [
+        yield 'inline syntax' => [
             <<<YAML
 map: {key: "value", a: "b"}
 param: "some"
 YAML,
-            $expected
+            $expected,
         ];
-        yield "mixed syntax" => [
+        yield 'mixed syntax' => [
             <<<YAML
 map: {key: "value",
 a: "b"}
 param: "some"
 YAML,
-            $expected
+            $expected,
         ];
     }
 }

@@ -2432,32 +2432,27 @@ YAML;
             ],
             'param' => 'some',
         ];
-
-        yield 'multiline syntax' => [
-            <<<YAML
+        $yaml = <<<YAML
 map: {
     key: "value",
     a: "b"
 }
 param: "some"
-YAML,
-            $expected,
-        ];
-        yield 'inline syntax' => [
-            <<<YAML
+YAML;
+        yield 'multiline syntax' => [$yaml, $expected];
+
+        $yaml = <<<YAML
 map: {key: "value", a: "b"}
 param: "some"
-YAML,
-            $expected,
-        ];
-        yield 'mixed syntax' => [
-            <<<YAML
+YAML;
+        yield 'inline syntax' => [$yaml, $expected];
+
+        $yaml = <<<YAML
 map: {key: "value",
 a: "b"}
 param: "some"
-YAML,
-            $expected,
-        ];
+YAML;
+        yield 'mixed syntax' => [$yaml, $expected];
     }
 }
 

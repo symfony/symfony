@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by lwillems at 2020-04-24T07:12:10Z
+
+@tcheymol what about Api transport with mailjet ? i was working on it before i saw your PR so perhaps i can help if you have not done already ?
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-04-24T07:31:29Z
+
+@lwillems Yes, I started working on it, but I needed a first working version quite quick, so, I did not work on the Api part at first
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-06T04:02:25Z
+
+@tcheymol Any plan to add support for the Mailjet API? Perhaps @lwillems can help you finish the PR?
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-08-06T20:06:12Z
+
+@fabpot Yes, that is my plan indeed :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-10T14:25:09Z
+
+@tcheymol Can you submit a PR on symfony/recipes (you can have a look at other notifier bridge recipes to get some inspiration)?
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-08-16T15:41:31Z
+
+@fabpot You are right, I will look at the recipes, I will work on this this week
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-08-18T07:34:14Z
+
+@lwillems I have been working on API integration, if you want to help me with your experience, I would love it
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-08-18T09:03:30Z
+
+> @tcheymol Can you submit a PR on symfony/recipes (you can have a look at other notifier bridge recipes to get some inspiration)?
+
+https://github.com/symfony/recipes/pull/809
+
+By the way, how do you handle Packagist repositories creation ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-18T09:11:08Z
+
+> > @tcheymol Can you submit a PR on symfony/recipes (you can have a look at other notifier bridge recipes to get some inspiration)?
+>
+> [symfony/recipes#809](https://github.com/symfony/recipes/pull/809)
+>
+> By the way, how do you handle Packagist repositories creation ?
+
+Not sure I understand the question, but the code is automatically extracted to its own repository which is then submitted to Packagist.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-18T09:17:36Z
+
+@tcheymol Can you fix the minor issues so that I can merge? Thank you.

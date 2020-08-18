@@ -1060,7 +1060,7 @@ EOF;
     public function testFloatKeys()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Numeric keys are not supported. Quote your evaluable mapping keys instead');
+        $this->expectExceptionMessage('"Numeric" keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 foo:
     1.2: "bar"
@@ -1073,7 +1073,7 @@ EOF;
     public function testBooleanKeys()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
+        $this->expectExceptionMessage('"Non-string" keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 true: foo
 false: bar
@@ -2251,7 +2251,7 @@ EOE;
     public function testDetectCircularReferences($yaml)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Circular reference [foo, bar, foo] detected');
+        $this->expectExceptionMessage('Circular reference [foo, bar, "foo"] detected');
         $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS);
     }
 

@@ -1,5 +1,5 @@
 {
-  "name": "symfony/linkedin-notifier",
+  "name": "symfony/linked-in-notifier",
   "type": "symfony-bridge",
   "description": "Symfony LinkedIn Notifier Bridge",
   "keywords": ["linkedin", "notifier"],

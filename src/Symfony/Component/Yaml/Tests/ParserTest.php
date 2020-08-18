@@ -2414,6 +2414,53 @@ YAML;
             $this->parser->parse($yaml)
         );
     }
+
+    /**
+     * Test that covers #37788 issue
+     *
+     * @dataProvider validMappingSequenceProvider
+     */
+    public function testParametersAfterMappingSequence(string $yaml, array $parsed): void
+    {
+        self::assertSame($parsed, $this->parser->parse($yaml));
+    }
+
+    public function validMappingSequenceProvider(): iterable
+    {
+        $expected = [
+            'map' => [
+                'key' => 'value',
+                'a' => 'b'
+            ],
+            'param' => 'some'
+        ];
+
+        yield "multiline syntax" => [
+            <<<YAML
+map: {
+    key: "value",
+    a: "b"
+}
+param: "some"
+YAML,
+            $expected
+        ];
+        yield "inline syntax" => [
+            <<<YAML
+map: {key: "value", a: "b"}
+param: "some"
+YAML,
+            $expected
+        ];
+        yield "mixed syntax" => [
+            <<<YAML
+map: {key: "value",
+a: "b"}
+param: "some"
+YAML,
+            $expected
+        ];
+    }
 }
 
 class B

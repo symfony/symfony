@@ -36,6 +36,7 @@ class Parser
     private $skippedLineNumbers = [];
     private $locallySkippedLineNumbers = [];
     private $refsBeingParsed = [];
+    private $openMappingCount = 0;
 
     /**
      * Parses a YAML file into a PHP value.
@@ -1208,18 +1209,12 @@ class Parser
         if ('' === $yaml || '{' !== $yaml[0]) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a sequence.', $yaml));
         }
-
-        for ($i = 1; isset($yaml[$i]) && '}' !== $yaml[$i]; ++$i) {
-        }
-
-        if (isset($yaml[$i]) && '}' === $yaml[$i]) {
-            return $yaml;
-        }
-
-        $lines = [$yaml];
-
-        while ($this->moveToNextLine()) {
-            $lines[] = $this->currentLine;
+        $this->openMappingCount = 0;
+        $lines = [
+            $this->calculateLineOpenMappings($yaml)
+        ];
+        while (!$this->allMappingIsClosed() && $this->moveToNextLine()) {
+            $lines[] = $this->calculateLineOpenMappings($this->currentLine);
         }
 
         return implode("\n", $lines);
@@ -1252,5 +1247,24 @@ class Parser
         }
 
         return $value;
+    }
+
+    private function allMappingIsClosed(): bool
+    {
+        return 0 === $this->openMappingCount;
+    }
+
+    private function calculateLineOpenMappings(string $yamlLine): string
+    {
+        for ($i = 0; isset($yamlLine[$i]); ++$i) {
+            if ('{' === $yamlLine[$i]) {
+                ++$this->openMappingCount;
+            }
+            if ('}' === $yamlLine[$i]) {
+                --$this->openMappingCount;
+            }
+        }
+
+        return trim($yamlLine);
     }
 }

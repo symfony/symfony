@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-08-06T14:29:25Z
+
+This is not the right fix for the issue. For instance, `->attributes` is perfectly allowed to hold other types (for instance booleans) and that would be a BC break.
+
+The right fix must be implemented in the conversion layer between BrowserKit and HttpFoundation, for the query and request parameters only.
+
+---------------------------------------------------------------------------
+
+by rgeraads at 2020-08-06T14:49:58Z
+
+Do you mean here? https://github.com/symfony/symfony/blob/786ba109d0a26b8bf7ada4aeb2d639da6599a586/src/Symfony/Component/HttpFoundation/Request.php#L391-L396
+
+I can put the casting right before the switch/case
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-06T14:57:24Z
+
+No. This place is still in the HttpFoundation request object itself (which might add overhead the handling of actual web requests btw).
+
+This should either be done when creating the BrowserKit request (might make sense as other BrowserKit implementations would also not be able to submit non-string values), or when converting from one to the other in https://github.com/symfony/symfony/blob/e1cfbd20feb1fabfa8a691795ee7a8080bced384/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php#L131-L133
+
+---------------------------------------------------------------------------
+
+by rgeraads at 2020-08-06T17:29:38Z
+
+It would make most sense to put it in BrowserKit\Request then.

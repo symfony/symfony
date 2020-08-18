@@ -343,6 +343,9 @@ class ConstraintViolationAssertion
     }
 }
 
+/**
+ * @internal
+ */
 class AssertingContextualValidator implements ContextualValidatorInterface
 {
     private $expectNoValidate = false;

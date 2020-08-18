@@ -72,7 +72,7 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('mailjet+foo', 'mailjet', self::USER, self::PASSWORD),
-            'The "mailjet+foo" scheme is not supported; supported schemes for mailer "mailjet" are: "mailjet", "mailjet+smtp", "mailjet+smtps".',
+            'The "mailjet+foo" scheme is not supported; supported schemes for mailer "mailjet" are: "mailjet", "mailjet+api", "mailjet+smtp", "mailjet+smtps".',
         ];
     }
 

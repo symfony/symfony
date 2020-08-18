@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-28T12:20:55Z
+
+Since this is a new feature, can you please rebase to target master?
+
+---------------------------------------------------------------------------
+
+by szepczynski at 2020-05-28T13:22:36Z
+
+ok, done
+
+I create also a recipe PR here: https://github.com/symfony/recipes/pull/776
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-17T09:47:33Z
+
+You should rebase to get rid of the merge commit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-17T12:58:21Z
+
+Can you also fix issues reported by fabbot (please, ignore the error message suggestion as this is a false positive)?

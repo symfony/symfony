@@ -141,28 +141,19 @@ class MongoDbStore implements BlockingStoreInterface
         if (false === $parsedUrl = parse_url($uri)) {
             throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
-
-        $query = [];
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $query);
-        }
-
-        if (isset($query['collection'])) {
-            $this->options['collection'] = $query['collection'];
-            $queryStringPos = strrpos($uri, $parsedUrl['query']);
-            unset($query['collection']);
-            $prefix = substr($uri, 0, $queryStringPos);
-            $newQuery = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
-            if (empty($newQuery)) {
-                $prefix = rtrim($prefix, '?');
-            }
-            $suffix = substr($uri, $queryStringPos + \strlen($parsedUrl['query']));
-            $uri = $prefix.$newQuery.$suffix;
-        }
-
         $pathDb = ltrim($parsedUrl['path'] ?? '', '/') ?: null;
         if (null !== $pathDb) {
             $this->options['database'] = $pathDb;
+        }
+
+        $matches = [];
+        if (preg_match('/^(.*[\?&])collection=([^&#]*)&?(([^#]*).*)$/', $uri, $matches)) {
+            $prefix = $matches[1];
+            $this->options['collection'] = $matches[2];
+            if (empty($matches[4])) {
+                $prefix = substr($prefix, 0, -1);
+            }
+            $uri = $prefix.$matches[3];
         }
 
         return $uri;

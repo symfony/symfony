@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-03-10T14:58:17Z
+
+According to https://www.w3.org/International/articles/article-text-size.en, the expansion when translating from English to another language tend to be bigger for shorter string than long text. Should we take that into account, or is the single ratio enough ?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-03-10T16:24:12Z
+
+> According to https://www.w3.org/International/articles/article-text-size.en, the expansion when translating from English to another language tend to be bigger for shorter string than long text. Should we take that into account, or is the single ratio enough ?
+
+Let's start simple IMO.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-08-14T09:16:15Z
+
+I just rebased and updated FWB XSD. @javiereguiluz Could you maybe test it and give some feedback? 😄 I'm looking forward to having this in 5.2.

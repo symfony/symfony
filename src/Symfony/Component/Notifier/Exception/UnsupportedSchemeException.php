@@ -74,6 +74,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Zulip\ZulipTransportFactory::class,
             'package' => 'symfony/zulip-notifier',
         ],
+        'smsapi' => [
+            'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
+            'package' => 'symfony/smsapi-notifier',
+        ],
     ];
 
     /**

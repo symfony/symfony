@@ -1,0 +1,37 @@
+{
+    "name": "symfony/smsapi-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony Smsapi Notifier Bridge",
+    "keywords": ["sms", "smsapi", "notifier"],
+    "homepage": "https://mvpdoers.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marcin Szepczynski",
+            "email": "szepczynski@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.3|^5.0",
+        "symfony/notifier": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Smsapi\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

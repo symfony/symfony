@@ -16,8 +16,10 @@ use Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
+use Symfony\Bundle\FrameworkBundle\Command\CachePoolGetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
+use Symfony\Bundle\FrameworkBundle\Command\CachePoolSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
@@ -94,6 +96,12 @@ return static function (ContainerConfigurator $container) {
                 service('cache.global_clearer'),
             ])
             ->tag('console.command', ['command' => 'cache:pool:delete'])
+
+        ->set('console.command.cache_pool_get', CachePoolGetCommand::class)
+            ->tag('console.command', ['command' => 'cache:pool:get'])
+
+        ->set('console.command.cache_pool_set', CachePoolSetCommand::class)
+            ->tag('console.command', ['command' => 'cache:pool:set'])
 
         ->set('console.command.cache_pool_list', CachePoolListCommand::class)
             ->args([

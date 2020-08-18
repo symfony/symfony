@@ -10,6 +10,7 @@ CHANGELOG
    `cache_clearer`, `filesystem` and `validator` services to private.
  * Added `TemplateAwareDataCollectorInterface` and `AbstractDataCollector` to simplify custom data collector creation and leverage autoconfiguration
  * Add `cache.adapter.redis_tag_aware` tag to use `RedisCacheAwareAdapter`
+ * Added `cache:pool:get` and `cache:pool:set` commands to respectively get and set cache pools key value
 
 5.1.0
 -----

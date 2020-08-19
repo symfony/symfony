@@ -9,6 +9,7 @@ CHANGELOG
  * Dispatch an event when the subject enters in the workflow for the very first time
  * Added a default context to the previous event
  * Added support for specifying which events should be dispatched when calling `workflow->apply()`
+ * It is now possible to retrieve a workflow by using a class name
 
 5.1.0
 -----

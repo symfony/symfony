@@ -38,6 +38,15 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
+    /** @var int Allow none of the magic methods */
+    public const DISALLOW_MAGIC_METHODS = ReflectionExtractor::DISALLOW_MAGIC_METHODS;
+    /** @var int Allow magic __get methods */
+    public const MAGIC_GET = ReflectionExtractor::ALLOW_MAGIC_GET;
+    /** @var int Allow magic __set methods */
+    public const MAGIC_SET = ReflectionExtractor::ALLOW_MAGIC_SET;
+    /** @var int Allow magic __call methods */
+    public const MAGIC_CALL = ReflectionExtractor::ALLOW_MAGIC_CALL;
+
     private const VALUE = 0;
     private const REF = 1;
     private const IS_REF_CHAINED = 2;
@@ -45,10 +54,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private const CACHE_PREFIX_WRITE = 'w';
     private const CACHE_PREFIX_PROPERTY_PATH = 'p';
 
-    /**
-     * @var bool
-     */
-    private $magicCall;
+    private $magicMethodsFlags;
     private $ignoreInvalidIndices;
     private $ignoreInvalidProperty;
 
@@ -68,7 +74,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @var PropertyWriteInfoExtractorInterface
      */
     private $writeInfoExtractor;
-
     private $readPropertyCache = [];
     private $writePropertyCache = [];
     private static $resultProto = [self::VALUE => null];
@@ -76,10 +81,20 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
+     *
+     * @param int $magicMethods A bitwise combination of the MAGIC_* constants
+     *                          to specify the allowed magic methods (__get, __set, __call)
+     *                          or self::DISALLOW_MAGIC_METHODS for none
      */
-    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
+    public function __construct(/*int */$magicMethods = self::MAGIC_GET | self::MAGIC_SET, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
-        $this->magicCall = $magicCall;
+        if (\is_bool($magicMethods)) {
+            trigger_deprecation('symfony/property-info', '5.2', 'Passing a boolean to "%s()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).', __METHOD__);
+
+            $magicMethods = ($magicMethods ? self::MAGIC_CALL : 0) | self::MAGIC_GET | self::MAGIC_SET;
+        }
+
+        $this->magicMethodsFlags = $magicMethods;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
         $this->ignoreInvalidProperty = !$throwExceptionOnInvalidPropertyPath;
@@ -472,7 +487,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $accessor = $this->readInfoExtractor->getReadInfo($class, $property, [
             'enable_getter_setter_extraction' => true,
-            'enable_magic_call_extraction' => $this->magicCall,
+            'enable_magic_methods_extraction' => $this->magicMethodsFlags,
             'enable_constructor_extraction' => false,
         ]);
 
@@ -592,7 +607,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $mutator = $this->writeInfoExtractor->getWriteInfo($class, $property, [
             'enable_getter_setter_extraction' => true,
-            'enable_magic_call_extraction' => $this->magicCall,
+            'enable_magic_methods_extraction' => $this->magicMethodsFlags,
             'enable_constructor_extraction' => false,
             'enable_adder_remover_extraction' => $useAdderAndRemover,
         ]);

@@ -86,7 +86,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $def = $container->getDefinition('property_accessor');
-        $this->assertFalse($def->getArgument(0));
+        $this->assertSame(PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_GET, $def->getArgument(0));
         $this->assertFalse($def->getArgument(1));
         $this->assertTrue($def->getArgument(3));
     }
@@ -95,7 +95,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('property_accessor');
         $def = $container->getDefinition('property_accessor');
-        $this->assertTrue($def->getArgument(0));
+        $this->assertSame(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_CALL, $def->getArgument(0));
         $this->assertTrue($def->getArgument(1));
         $this->assertFalse($def->getArgument(3));
     }

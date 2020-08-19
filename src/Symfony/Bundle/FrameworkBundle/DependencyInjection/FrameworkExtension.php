@@ -1429,9 +1429,14 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_access.php');
 
+        $magicMethods = PropertyAccessor::DISALLOW_MAGIC_METHODS;
+        $magicMethods |= $config['magic_call'] ? PropertyAccessor::MAGIC_CALL : 0;
+        $magicMethods |= $config['magic_get'] ? PropertyAccessor::MAGIC_GET : 0;
+        $magicMethods |= $config['magic_set'] ? PropertyAccessor::MAGIC_SET : 0;
+
         $container
             ->getDefinition('property_accessor')
-            ->replaceArgument(0, $config['magic_call'])
+            ->replaceArgument(0, $magicMethods)
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
             ->replaceArgument(4, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))

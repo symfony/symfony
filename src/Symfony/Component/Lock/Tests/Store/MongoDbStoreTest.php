@@ -187,5 +187,12 @@ class MongoDbStoreTest extends AbstractStoreTest
         yield ['mongodb://localhost/?replicaSet=repl', ['database' => 'test', 'collection' => 'lock'], 'mongodb://localhost/?replicaSet=repl'];
         yield ['mongodb://localhost/test?collection=lock&replicaSet=repl', [], 'mongodb://localhost/test?replicaSet=repl'];
         yield ['mongodb://localhost/test?replicaSet=repl', ['collection' => 'lock'], 'mongodb://localhost/test?replicaSet=repl'];
+
+        yield ['mongodb://localhost/test?readPreferenceTags=dc:foo&collection=lock&readPreferenceTags=dc:bar', [], 'mongodb://localhost/test?readPreferenceTags=dc:foo&readPreferenceTags=dc:bar'];
+        yield ['mongodb://localhost?foo_collection=x&collection=lock&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://localhost?collection=lock&foo_collection=x&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://localhost?foo_collection=x&bar_collection=x&collection=lock#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://user:?collection=a@localhost?collection=lock', ['database' => 'test'], 'mongodb://user:?collection=a@localhost'];
+        yield ['mongodb://user:&collection=a@localhost/?collection=lock', ['database' => 'test'], 'mongodb://user:&collection=a@localhost/'];
     }
 }

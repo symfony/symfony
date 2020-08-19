@@ -30,17 +30,13 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
     /**
      * {@inheritdoc}
      */
-    public function supports(WorkflowInterface $workflow, $subject): bool
+    public function supports(WorkflowInterface $workflow, object $subject): bool
     {
-        if (\is_object($subject)) {
-            return $subject instanceof $this->className;
+        if ($subject instanceof \stdClass && property_exists($subject, 'class')) {
+            return $subject->class === $this->className;
         }
 
-        if (\is_string($subject)) {
-            return $subject === $this->className;
-        }
-
-        throw new \InvalidArgumentException(sprintf('"%s" is not a supported type.', \gettype($subject)));
+        return $subject instanceof $this->className;
     }
 
     public function getClassName(): string

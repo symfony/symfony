@@ -51,8 +51,13 @@ class Registry
             }
         }
 
+        if (\is_string($subject)) {
+            $type = $subject;
+        } else {
+            $type = get_debug_type($subject);
+        }
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_debug_type($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', $type));
         }
 
         if (2 <= \count($matched)) {
@@ -60,7 +65,7 @@ class Registry
                 return $workflow->getName();
             }, $matched);
 
-            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), get_debug_type($subject)));
+            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), $type));
         }
 
         return $matched[0];
@@ -85,6 +90,12 @@ class Registry
     {
         if (null !== $workflowName && $workflowName !== $workflow->getName()) {
             return false;
+        }
+
+        if (\is_string($subject)) {
+            $stdClass = new \stdClass();
+            $stdClass->class = $subject;
+            $subject = $stdClass;
         }
 
         return $supportStrategy->supports($workflow, $subject);

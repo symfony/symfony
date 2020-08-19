@@ -14,7 +14,9 @@ class InstanceOfSupportStrategyTest extends TestCase
 
         $this->assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
 
-        $this->assertTrue($strategy->supports($this->createWorkflow(), Subject1::class));
+        $stdClass = new \StdClass();
+        $stdClass->class = Subject1::class;
+        $this->assertTrue($strategy->supports($this->createWorkflow(), $stdClass));
     }
 
     public function testSupportsIfNotClassInstance()
@@ -23,7 +25,9 @@ class InstanceOfSupportStrategyTest extends TestCase
 
         $this->assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
 
-        $this->assertFalse($strategy->supports($this->createWorkflow(), Subject1::class));
+        $stdClass = new \StdClass();
+        $stdClass->class = Subject1::class;
+        $this->assertFalse($strategy->supports($this->createWorkflow(), $stdClass));
     }
 
     private function createWorkflow()

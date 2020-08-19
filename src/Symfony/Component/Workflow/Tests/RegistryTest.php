@@ -109,12 +109,12 @@ class RegistryTest extends TestCase
     {
         $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
-            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                if (\is_object($subject)) {
-                    return $subject instanceof $supportedClassName;
+            ->willReturnCallback(function ($workflow, object $subject) use ($supportedClassName) {
+                if ($subject instanceof \stdClass && property_exists($subject, 'class')) {
+                    return $subject->class === $supportedClassName;
                 }
 
-                return $subject === $supportedClassName;
+                return $subject instanceof $supportedClassName;
             });
 
         return $strategy;

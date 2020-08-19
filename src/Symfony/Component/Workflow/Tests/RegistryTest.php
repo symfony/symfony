@@ -115,7 +115,6 @@ class RegistryTest extends TestCase
                 }
 
                 return $subject === $supportedClassName;
-
             });
 
         return $strategy;

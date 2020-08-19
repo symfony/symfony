@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Workflow\SupportStrategy;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
@@ -36,7 +35,7 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
         if (\is_object($subject)) {
             return $subject instanceof $this->className;
         }
-        
+
         if (\is_string($subject)) {
             return $subject === $this->className;
         }

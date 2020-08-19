@@ -112,9 +112,10 @@ class RegistryTest extends TestCase
             ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 if (\is_object($subject)) {
                     return $subject instanceof $supportedClassName;
-                } else {
-                    return $subject === $supportedClassName;
                 }
+
+                return $subject === $supportedClassName;
+
             });
 
         return $strategy;

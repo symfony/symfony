@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Workflow\SupportStrategy;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
+ * @author Carlos Pereira De Amorim <carlos@shauri.fr>
  * @author Andreas Kleemann <akleemann@inviqa.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
@@ -29,9 +31,15 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
     /**
      * {@inheritdoc}
      */
-    public function supports(WorkflowInterface $workflow, object $subject): bool
+    public function supports(WorkflowInterface $workflow, $subject): bool
     {
-        return $subject instanceof $this->className;
+        if (is_object($subject)) {
+            return $subject instanceof $this->className;
+        } elseif (is_string($subject)) {
+            return $subject === $this->className;
+        } else {
+            throw new Exception(sprintf('%s is not a supported type', gettype($subject)));
+        }
     }
 
     public function getClassName(): string

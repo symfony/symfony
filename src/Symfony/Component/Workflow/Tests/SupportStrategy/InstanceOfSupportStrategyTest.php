@@ -13,6 +13,8 @@ class InstanceOfSupportStrategyTest extends TestCase
         $strategy = new InstanceOfSupportStrategy(Subject1::class);
 
         $this->assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
+
+        $this->assertTrue($strategy->supports($this->createWorkflow(), Subject1::class));
     }
 
     public function testSupportsIfNotClassInstance()
@@ -20,6 +22,8 @@ class InstanceOfSupportStrategyTest extends TestCase
         $strategy = new InstanceOfSupportStrategy(Subject2::class);
 
         $this->assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
+
+        $this->assertFalse($strategy->supports($this->createWorkflow(), Subject1::class));
     }
 
     private function createWorkflow()

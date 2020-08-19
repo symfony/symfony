@@ -15,6 +15,7 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 
 /**
+ * @author Carlos Pereira De Amorim <carlos@shauri.fr>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
@@ -41,7 +42,7 @@ class Registry
     /**
      * @return Workflow
      */
-    public function get(object $subject, string $workflowName = null)
+    public function get($subject, string $workflowName = null)
     {
         $matched = [];
 
@@ -81,7 +82,7 @@ class Registry
         return $matched;
     }
 
-    private function supports(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy, object $subject, ?string $workflowName): bool
+    private function supports(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy, $subject, ?string $workflowName): bool
     {
         if (null !== $workflowName && $workflowName !== $workflow->getName()) {
             return false;

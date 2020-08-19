@@ -53,6 +53,13 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow2', $workflow->getName());
     }
 
+    public function testGetWithSuccessFromClassName()
+    {
+        $workflow = $this->registry->get(Subject1::class);
+        $this->assertInstanceOf(Workflow::class, $workflow);
+        $this->assertSame('workflow1', $workflow->getName());
+
+    }
     public function testGetWithMultipleMatch()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
@@ -103,7 +110,11 @@ class RegistryTest extends TestCase
         $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
             ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                return $subject instanceof $supportedClassName;
+                if (is_object($subject)) {
+                    return $subject instanceof $supportedClassName;
+                } else {
+                    return $subject === $supportedClassName;
+                }
             });
 
         return $strategy;

@@ -35,11 +35,13 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
     {
         if (\is_object($subject)) {
             return $subject instanceof $this->className;
-        } elseif (\is_string($subject)) {
-            return $subject === $this->className;
-        } else {
-            throw new Exception(sprintf('"%s" is not a supported type.', \gettype($subject)));
         }
+        
+        if (\is_string($subject)) {
+            return $subject === $this->className;
+        }
+
+        throw new \InvalidArgumentException(sprintf('"%s" is not a supported type.', \gettype($subject)));
     }
 
     public function getClassName(): string

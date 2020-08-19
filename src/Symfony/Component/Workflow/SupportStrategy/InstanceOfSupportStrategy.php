@@ -38,7 +38,7 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
         } elseif (\is_string($subject)) {
             return $subject === $this->className;
         } else {
-            throw new Exception(sprintf('"%s" is not a supported type', \gettype($subject)));
+            throw new Exception(sprintf('"%s" is not a supported type.', \gettype($subject)));
         }
     }
 

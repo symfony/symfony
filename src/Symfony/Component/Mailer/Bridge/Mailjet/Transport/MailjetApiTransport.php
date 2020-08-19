@@ -85,25 +85,17 @@ class MailjetApiTransport extends AbstractApiTransport
         [$attachments, $inlines, $html] = $this->prepareAttachments($email, $html);
 
         $message = [
-            'From' => [
-                'Email' => $envelope->getSender()->getAddress(),
-                'Name' => $envelope->getSender()->getName(),
-            ],
-            'To' => array_map(function (Address $recipient) {
-                return [
-                    'Email' => $recipient->getAddress(),
-                    'Name' => $recipient->getName(),
-                ];
-            }, $this->getRecipients($email, $envelope)),
+            'From' => $this->formatAddress($envelope->getSender()),
+            'To' => $this->formatAddresses($this->getRecipients($email, $envelope)),
             'Subject' => $email->getSubject(),
             'Attachments' => $attachments,
             'InlinedAttachments' => $inlines,
         ];
         if ($emails = $email->getCc()) {
-            $message['Cc'] = implode(',', $this->stringifyAddresses($emails));
+            $message['Cc'] = $this->formatAddresses($emails);
         }
         if ($emails = $email->getBcc()) {
-            $message['Bcc'] = implode(',', $this->stringifyAddresses($emails));
+            $message['Bcc'] = $this->formatAddresses($emails);
         }
         if ($email->getTextBody()) {
             $message['TextPart'] = $email->getTextBody();
@@ -114,6 +106,19 @@ class MailjetApiTransport extends AbstractApiTransport
 
         return [
             'Messages' => [$message],
+        ];
+    }
+
+    private function formatAddresses(array $addresses): array
+    {
+        return array_map([$this, 'formatAddress'], $addresses);
+    }
+
+    private function formatAddress(Address $address): array
+    {
+        return [
+            'Email' => $address->getAddress(),
+            'Name' => $address->getName(),
         ];
     }
 

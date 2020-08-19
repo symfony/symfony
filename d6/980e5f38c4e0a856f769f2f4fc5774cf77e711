@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-03T14:57:44Z
+
+Rebased to target 5.1
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-17T09:57:19Z
+
+@fabpot No problem, done.
+But I'd friendly ask @dunglas & @joelwurtz review, since the component has changed a lot since 5.1 and now relies on the PropertyInfo component. Thus, this new version of the PR also tweaks the PropertyInfo `ReflectionExtractor`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-19T11:10:19Z
+
+#37857 has been merged up to master, you can rebase now.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-19T13:58:24Z
+
+fabbot failure is unrelated to this PR

@@ -88,7 +88,7 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['message']), $response);
         }
     }
 
@@ -97,7 +97,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('%s/auth/time', $this->getEndpoint());
+        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

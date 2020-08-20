@@ -90,10 +90,16 @@ class SesApiTransport extends AbstractApiTransport
     private function getPayload(Email $email, Envelope $envelope): array
     {
         if ($email->getAttachments()) {
-            return [
+            $payload = [
                 'Action' => 'SendRawEmail',
                 'RawMessage.Data' => base64_encode($email->toString()),
             ];
+
+            if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+                $payload['ConfigurationSetName'] = $header->getBodyAsString();
+            }
+
+            return $payload;
         }
 
         $payload = [
@@ -117,6 +123,9 @@ class SesApiTransport extends AbstractApiTransport
         }
         if ($email->getReplyTo()) {
             $payload['ReplyToAddresses.member'] = $this->stringifyAddresses($email->getReplyTo());
+        }
+        if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $payload['ConfigurationSetName'] = $header->getBodyAsString();
         }
 
         return $payload;

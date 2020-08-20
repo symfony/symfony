@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Message;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -67,7 +68,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
 
     protected function getRequest(SentMessage $message): SendEmailRequest
     {
-        return new SendEmailRequest([
+        $request = [
             'Destination' => new Destination([
                 'ToAddresses' => $this->stringifyAddresses($message->getEnvelope()->getRecipients()),
             ]),
@@ -76,6 +77,13 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
                     'Data' => $message->toString(),
                 ],
             ],
-        ]);
+        ];
+
+        if (($message->getOriginalMessage() instanceof Message)
+            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+        }
+
+        return new SendEmailRequest($request);
     }
 }

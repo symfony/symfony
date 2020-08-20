@@ -3,6 +3,14 @@ Firebase Notifier
 
 Provides Firebase integration for Symfony Notifier.
 
+DSN should be as follow:
+
+```
+firebase://username:password@default
+```
+
+`username` and `password` are your Firebase authentication info.
+
 Resources
 ---------
 

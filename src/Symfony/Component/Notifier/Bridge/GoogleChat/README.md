@@ -3,7 +3,13 @@ Google Chat Notifier
 
 Provides Google Chat integration for Symfony Notifier.
 
-    googlechat://ACCESS_KEY:ACCESS_TOKEN@default/SPACE?threadKey=THREAD_KEY
+DSN should be as follow:
+
+```
+googlechat://ACCESS_KEY:ACCESS_TOKEN@default/SPACE?threadKey=THREAD_KEY
+```
+
+`ACCESS_KEY` and `ACCESS_TOKEN` are your Google Chat authentication info ; `SPACE` is the Google Chat space ; `THREAD_KEY` is the the Google Chat message thread.
 
 Resources
 ---------

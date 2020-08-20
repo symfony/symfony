@@ -88,7 +88,7 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['message']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);
         }
     }
 

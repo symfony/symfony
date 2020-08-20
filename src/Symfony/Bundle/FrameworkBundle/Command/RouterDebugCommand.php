@@ -86,7 +86,7 @@ EOF
         $sortOption = $input->getOption('sort');
         $routes = $this->sortRoutes($this->router->getRouteCollection(), $sortOption);
         if ('priority' !== $sortOption) {
-            $io->caution('The routes list is not sorted in the parsing order.');
+            $io->caution(sprintf('The routes are not sorted in the order they get matched but by %s.', $sortOption));
         }
 
         if ($name) {

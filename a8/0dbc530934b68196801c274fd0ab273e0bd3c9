@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by Chi-teck at 2020-08-19T18:31:35Z
+
+The PR does not combines toggler links into a single button as was suggested in
+https://github.com/symfony/symfony/issues/37739#issuecomment-671898063 because it would require rewriting  a good amount of profiler CSS code which is out of scope of that ticket. Overall I think it makes sense though as the toggler would not loose focus when controlled via keyboard.
+
+For the record, I believe the front-end part of the profiler needs deep refactoring. Using floats with clearfix hack in 2020 seems odd and fallbacks for `classList` and `EventListener` are not really needed nowadays. Dropping support for old IE versions would make CSS/JS part of the profiler a lot simpler and cleaner.

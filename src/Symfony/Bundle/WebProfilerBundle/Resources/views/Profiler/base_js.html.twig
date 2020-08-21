@@ -473,7 +473,11 @@
                                 }
                             };
                         }
-                        addEventListener(document.getElementById('sfToolbarHideButton-' + newToken), 'click', function (event) {
+                        var hideButton = document.getElementById('sfToolbarHideButton-' + newToken);
+                        var hideButtonSvg = hideButton.querySelector('svg');
+                        hideButtonSvg.setAttribute('aria-hidden', 'true');
+                        hideButtonSvg.setAttribute('focusable', 'false');
+                        addEventListener(hideButton, 'click', function (event) {
                             event.preventDefault();
 
                             var p = this.parentNode;
@@ -482,7 +486,11 @@
                             document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
                             setPreference('toolbar/displayState', 'none');
                         });
-                        addEventListener(document.getElementById('sfToolbarMiniToggler-' + newToken), 'click', function (event) {
+                        var showButton = document.getElementById('sfToolbarMiniToggler-' + newToken);
+                        var showButtonSvg = showButton.querySelector('svg');
+                        showButtonSvg.setAttribute('aria-hidden', 'true');
+                        showButtonSvg.setAttribute('focusable', 'false');
+                        addEventListener(showButton, 'click', function (event) {
                             event.preventDefault();
 
                             var elem = this.parentNode;

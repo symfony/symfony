@@ -17,7 +17,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
-use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -29,7 +28,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getResultMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -52,7 +50,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -63,7 +61,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getResultMock(false);
 
         $queryBuilder
@@ -81,7 +78,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertNull($doctrineEnvelope);
     }
@@ -152,11 +149,6 @@ class ConnectionTest extends TestCase
             ->willReturn($expectedResult);
 
         return $stmt;
-    }
-
-    private function getSchemaSynchronizerMock(): SchemaSynchronizer
-    {
-        return $this->createMock(SchemaSynchronizer::class);
     }
 
     /**
@@ -261,7 +253,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $id = 1;
         $stmt = $this->getResultMock([
             'id' => $id,
@@ -285,7 +276,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->find($id);
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -296,7 +287,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $message1 = [
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -332,7 +322,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelopes = $connection->findAll();
 
         $this->assertEquals(1, $doctrineEnvelopes[0]['id']);

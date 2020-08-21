@@ -86,6 +86,9 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
                 'Charset' => $email->getHtmlCharset(),
             ]);
         }
+        if ($emails = $email->getReplyTo()) {
+            $request['ReplyToAddresses'] = $this->stringifyAddresses($emails);
+        }
 
         return new SendEmailRequest($request);
     }

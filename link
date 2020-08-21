@@ -18,19 +18,22 @@ require __DIR__.'/src/Symfony/Component/Filesystem/Filesystem.php';
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Links dependencies to components to a local clone of the main symfony/symfony GitHub repository.
+ * Links dependencies of a project to a local clone of the main symfony/symfony GitHub repository.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 
 $copy = false !== $k = array_search('--copy', $argv, true);
 $copy && array_splice($argv, $k, 1);
+$rollback = false !== $k = array_search('--rollback', $argv, true);
+$rollback && array_splice($argv, $k, 1);
 $pathToProject = $argv[1] ?? getcwd();
 
 if (!is_dir("$pathToProject/vendor/symfony")) {
-    echo 'Link (or copy) dependencies to components to a local clone of the main symfony/symfony GitHub repository.'.PHP_EOL.PHP_EOL;
+    echo 'Links dependencies of a project to a local clone of the main symfony/symfony GitHub repository.'.PHP_EOL.PHP_EOL;
     echo "Usage: $argv[0] /path/to/the/project".PHP_EOL;
     echo '       Use `--copy` to copy dependencies instead of symlink'.PHP_EOL.PHP_EOL;
+    echo '       Use `--rollback` to rollback'.PHP_EOL.PHP_EOL;
     echo "The directory \"$pathToProject\" does not exist or the dependencies are not installed, did you forget to run \"composer install\" in your project?".PHP_EOL;
     exit(1);
 }
@@ -51,12 +54,19 @@ foreach ($directories as $dir) {
 
 foreach (glob("$pathToProject/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
     $package = 'symfony/'.basename($dir);
-    if (!$copy && is_link($dir)) {
-        echo "\"$package\" is already a symlink, skipping.".PHP_EOL;
+
+    if (!isset($sfPackages[$package])) {
         continue;
     }
 
-    if (!isset($sfPackages[$package])) {
+    if ($rollback) {
+        $filesystem->remove($dir);
+        echo "\"$package\" has been rollback from \"$sfPackages[$package]\".".PHP_EOL;
+        continue;
+    }
+
+    if (!$copy && is_link($dir)) {
+        echo "\"$package\" is already a symlink, skipping.".PHP_EOL;
         continue;
     }
 
@@ -75,4 +85,8 @@ foreach (glob("$pathToProject/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as 
 
 foreach (glob("$pathToProject/var/cache/*", GLOB_NOSORT) as $cacheDir) {
     $filesystem->remove($cacheDir);
+}
+
+if ($rollback) {
+    echo PHP_EOL."Rollback done, do not forget to run \"composer install\" in your project \"$pathToProject\".".PHP_EOL;
 }

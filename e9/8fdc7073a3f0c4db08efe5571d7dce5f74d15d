@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-04-22T08:38:38Z
+
+This solution probably makes a lot of sense ... but at first seems confusing:
+
+**Problem**:
+
+* `cache/` is read+write, my server is read only
+
+**Solution**:
+
+* let's make `cache/` read-only
+* let's create a new `tmp/` dir which is read+write
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2020-04-22T16:34:40Z
+
+@javiereguiluz yes, this was brought up in https://github.com/symfony/symfony/issues/23354#issuecomment-617204475 and I think that's a valid alternative: keep cache as-is, introduce a new `build` directory.
+
+I'm waiting for feedback on this new approach, I started looking into it a pull request as well but haven't opened it yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-18T11:56:41Z
+
+This is a good move IMHO.
+
+Reading the related issue, I think we should get the naming right. Keeping the `cache/` directory as is and creating a new one for the "static"/"build" cache seems better to me. Let's name it `build/` for now (I don't have any other name in mind).
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2020-08-19T07:26:31Z
+
+Great! I have updated the PR.
+
+Note that after struggling for a while I did not succeed running the tests locally (`Error : Call to undefined method Symfony\Bundle\FrameworkBundle\Tests\Console\ApplicationTest::assertMatchesRegularExpression()`), so I'm kind of in the blind here. I've pushed what I have done, we'll see on Travis.
+
+Review is welcome!
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-20T13:47:44Z
+
+@mnapoli are you using the `./phpunit` script to run tests ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-08-20T14:00:23Z
+
+This makes a lot of sense to me. And the fact that the new `getBuildDir()` returns `getCacheDir()` means that we're adding this flexibility, but at zero "learning about some new change" cost to existing users that won't care about this.
+
+Very nice!
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2020-08-20T16:40:17Z
+
+@stof thanks for the tip, I didn't. Still, when I use it the tests crash with:
+
+> PHP Fatal error:  Uncaught Error: Call to a member function stop() on null in [...]/src/Symfony/Contracts/HttpClient/Test/TestHttpServer.php:27
+
+Anyway, I don't really want to pollute the discussion with this.

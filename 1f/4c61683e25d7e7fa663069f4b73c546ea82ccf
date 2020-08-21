@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-08-20T19:35:29Z
+
+There is a test failure though:
+
+```
+Testing src/Symfony/Component/Mailer
+
+.......................................................E.......  63 / 237 ( 26%)
+
+............................................................... 126 / 237 ( 53%)
+
+............................................................... 189 / 237 ( 79%)
+
+.SS...........S.........SS......................                237 / 237 (100%)
+
+Time: 1.32 seconds, Memory: 10.00 MB
+
+There was 1 error:
+
+1) Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport\MandrillApiTransportTest::testCustomHeader
+
+Undefined offset: 0
+
+/home/travis/build/symfony/symfony/src/Symfony/Component/Mailer/Bridge/Mailchimp/Tests/Transport/MandrillApiTransportTest.php:68
+```
+
+---------------------------------------------------------------------------
+
+by wulff at 2020-08-20T21:13:07Z
+
+I have updated the relevant test case, but now the Travis test fails on an unrelated test: https://travis-ci.org/github/symfony/symfony/jobs/719745366#L7547.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2020-08-21T05:06:46Z
+
+@wulff can you rebase this to 4.4? There the issue also exists, right?

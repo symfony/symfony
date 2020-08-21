@@ -114,6 +114,7 @@ class DebugExtensionTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
+            'kernel.build_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => true,
             'kernel.project_dir' => __DIR__,

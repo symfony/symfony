@@ -314,7 +314,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function setAnnotatedClassCache(array $annotatedClasses)
     {
-        file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
+        file_put_contents(($this->warmupDir ?: $this->getBuildDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
     }
 
     /**
@@ -331,6 +331,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getCacheDir()
     {
         return $this->getProjectDir().'/var/cache/'.$this->environment;
+    }
+
+    /**
+     * Gets the build directory.
+     */
+    public function getBuildDir(): string
+    {
+        // Returns $this->getCacheDir() for backward compatibility
+        return $this->getCacheDir();
     }
 
     /**
@@ -419,14 +428,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Initializes the service container.
      *
-     * The cached version of the service container is used when fresh, otherwise the
+     * The built version of the service container is used when fresh, otherwise the
      * container is built.
      */
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
-        $cacheDir = $this->warmupDir ?: $this->getCacheDir();
-        $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
+        $buildDir = $this->warmupDir ?: $this->getBuildDir();
+        $cache = new ConfigCache($buildDir.'/'.$class.'.php', $this->debug);
         $cachePath = $cache->getPath();
 
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
@@ -448,7 +457,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
 
         try {
-            is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
+            is_dir($buildDir) ?: mkdir($buildDir, 0777, true);
 
             if ($lock = fopen($cachePath.'.lock', 'w')) {
                 flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
@@ -533,8 +542,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             if ($collectDeprecations) {
                 restore_error_handler();
 
-                file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
-                file_put_contents($cacheDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
+                file_put_contents($buildDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
+                file_put_contents($buildDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
             }
         }
 
@@ -570,7 +579,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $preload = array_merge($preload, (array) $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir')));
         }
 
-        if ($preload && method_exists(Preloader::class, 'append') && file_exists($preloadFile = $cacheDir.'/'.$class.'.preload.php')) {
+        if ($preload && method_exists(Preloader::class, 'append') && file_exists($preloadFile = $buildDir.'/'.$class.'.preload.php')) {
             Preloader::append($preloadFile, $preload);
         }
     }
@@ -597,7 +606,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.debug' => $this->debug,
-            'kernel.cache_dir' => realpath($cacheDir = $this->warmupDir ?: $this->getCacheDir()) ?: $cacheDir,
+            'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
+            'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
             'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata,
@@ -615,7 +625,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function buildContainer()
     {
-        foreach (['cache' => $this->warmupDir ?: $this->getCacheDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
+        foreach (['cache' => $this->getCacheDir(), 'build' => $this->warmupDir ?: $this->getBuildDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                     throw new \RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));

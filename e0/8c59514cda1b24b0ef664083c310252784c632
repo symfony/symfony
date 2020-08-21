@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-21T12:18:56Z
+
+We already allow this in the `require-dev` section of the Messenger component.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-21T12:27:36Z
+
+Are you sure that other components are compatible with Doctrine DBAL 3 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-21T12:56:47Z
+
+I have updated the `composer.json` file of the Doctrine bridge too. The other components (Cache, Lock, and Messenger) already allowed DBAL 3.

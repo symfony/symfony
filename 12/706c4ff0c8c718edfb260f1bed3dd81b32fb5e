@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-21T13:04:30Z
+
+see https://travis-ci.org/github/symfony/symfony/jobs/719172058#L3399
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-21T13:29:56Z
+
+shouldn't we forbid passing an int entirely, as that violates our phpdoc anyway, rather than silently skipping the call ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-21T13:33:53Z
+
+Could be seen as a BC break in 3.4. In more recent versions we already have the `int` type-declaration anway.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-21T13:34:12Z
+
+So I think we do not really need to care about it.

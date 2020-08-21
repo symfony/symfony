@@ -16,9 +16,9 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
-use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
@@ -66,7 +66,7 @@ class Connection implements ResetInterface
     {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
-        $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
+        $this->schemaSynchronizer = $schemaSynchronizer;
         $this->autoSetup = $this->configuration['auto_setup'];
 
         if (null === self::$useDeprecatedConstants) {
@@ -248,7 +248,7 @@ class Connection implements ResetInterface
             $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression(null);
         }
 
-        $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
+        $this->updateSchema();
 
         if ($hasFilterCallback) {
             $this->driverConnection->getConfiguration()->setSchemaAssetsFilter($assetFilter);
@@ -436,6 +436,26 @@ class Connection implements ResetInterface
         $doctrineEnvelope['headers'] = json_decode($doctrineEnvelope['headers'], true);
 
         return $doctrineEnvelope;
+    }
+
+    private function updateSchema(): void
+    {
+        if (null !== $this->schemaSynchronizer) {
+            $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
+
+            return;
+        }
+
+        $comparator = new Comparator();
+        $schemaDiff = $comparator->compare($this->driverConnection->getSchemaManager()->createSchema(), $this->getSchema());
+
+        foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
+            if (method_exists($this->driverConnection, 'executeStatement')) {
+                $this->driverConnection->executeStatement($sql);
+            } else {
+                $this->driverConnection->exec($sql);
+            }
+        }
     }
 }
 class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);

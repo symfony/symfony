@@ -64,8 +64,8 @@ class SerializerTest extends TestCase
         $message = new DummyMessage('Foo');
 
         $serializer = $this->getMockBuilder(SerializerComponent\SerializerInterface::class)->getMock();
-        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar'])->willReturn('Yay');
-        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar'])->willReturn($message);
+        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn('Yay');
+        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn($message);
 
         $encoder = new Serializer($serializer, 'csv', ['foo' => 'bar']);
 
@@ -94,6 +94,7 @@ class SerializerTest extends TestCase
                 [$this->anything()],
                 [$message, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
+                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
                 ]]
             )
         ;
@@ -117,9 +118,10 @@ class SerializerTest extends TestCase
             ->expects($this->exactly(2))
             ->method('deserialize')
             ->withConsecutive(
-                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', []],
+                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [Serializer::MESSENGER_SERIALIZATION_CONTEXT => true]],
                 ['{}', DummyMessage::class, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
+                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
                 ]]
             )
             ->willReturnOnConsecutiveCalls(

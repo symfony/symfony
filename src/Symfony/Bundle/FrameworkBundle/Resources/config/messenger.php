@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -63,6 +64,9 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('format'),
                 abstract_arg('context'),
             ])
+
+        ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -880])
 
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
 

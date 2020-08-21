@@ -65,7 +65,7 @@ class MandrillApiTransportTest extends TestCase
         $this->assertArrayHasKey('message', $payload);
         $this->assertArrayHasKey('headers', $payload['message']);
         $this->assertCount(1, $payload['message']['headers']);
-        $this->assertEquals('foo: bar', $payload['message']['headers'][0]);
+        $this->assertEquals('bar', $payload['message']['headers']['foo']);
     }
 
     public function testSend()

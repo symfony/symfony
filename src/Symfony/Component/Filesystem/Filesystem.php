@@ -199,7 +199,7 @@ class Filesystem
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
         foreach ($this->toIterable($files) as $file) {
-            if (true !== @chmod($file, $mode & ~$umask)) {
+            if ((\PHP_VERSION_ID < 80000 || \is_int($mode)) && true !== @chmod($file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
             }
             if ($recursive && is_dir($file) && !is_link($file)) {

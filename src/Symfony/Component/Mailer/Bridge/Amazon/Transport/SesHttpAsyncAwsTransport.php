@@ -68,7 +68,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
     protected function getRequest(SentMessage $message): SendEmailRequest
     {
         return new SendEmailRequest([
-            'Destination' => $destination = new Destination([
+            'Destination' => new Destination([
                 'ToAddresses' => $this->stringifyAddresses($message->getEnvelope()->getRecipients()),
             ]),
             'Content' => [

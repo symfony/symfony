@@ -105,7 +105,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('%s/auth/time', $this->getEndpoint());
+        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

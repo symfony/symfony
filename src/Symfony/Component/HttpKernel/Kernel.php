@@ -334,7 +334,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     }
 
     /**
-     * Gets the build directory.
+     * {@inheritdoc}
      */
     public function getBuildDir(): string
     {

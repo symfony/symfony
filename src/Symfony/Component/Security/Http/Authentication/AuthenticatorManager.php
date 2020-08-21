@@ -158,6 +158,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
     private function executeAuthenticator(AuthenticatorInterface $authenticator, Request $request): ?Response
     {
+        $passport = null;
+
         try {
             // get the passport from the Authenticator
             $passport = $authenticator->authenticate($request);
@@ -198,7 +200,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             return null;
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
-            $response = $this->handleAuthenticationFailure($e, $request, $authenticator);
+            $response = $this->handleAuthenticationFailure($e, $request, $authenticator, $passport);
             if ($response instanceof Response) {
                 return $response;
             }
@@ -229,7 +231,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     /**
      * Handles an authentication failure and returns the Response for the authenticator.
      */
-    private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator): ?Response
+    private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator, ?PassportInterface $passport): ?Response
     {
         if (null !== $this->logger) {
             $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator)]);
@@ -240,7 +242,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->logger->debug('The "{authenticator}" authenticator set the failure response.', ['authenticator' => \get_class($authenticator)]);
         }
 
-        $this->eventDispatcher->dispatch($loginFailureEvent = new LoginFailureEvent($authenticationException, $authenticator, $request, $response, $this->firewallName));
+        $this->eventDispatcher->dispatch($loginFailureEvent = new LoginFailureEvent($authenticationException, $authenticator, $request, $response, $this->firewallName, $passport));
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();

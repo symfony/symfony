@@ -68,6 +68,7 @@ class SesApiTransportTest extends TestCase
             $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $content['Destination_ToAddresses_member'][0]);
             $this->assertSame('Fabien <fabpot@symfony.com>', $content['Source']);
             $this->assertSame('Hello There!', $content['Message_Body_Text_Data']);
+            $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
 
             $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
   <SendEmailResult>
@@ -87,6 +88,53 @@ class SesApiTransportTest extends TestCase
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
+
+        $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendWithAttachments()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://email.eu-west-1.amazonaws.com:8984/', $url);
+            $this->assertStringContainsStringIgnoringCase('X-Amzn-Authorization: AWS3-HTTPS AWSAccessKeyId=ACCESS_KEY,Algorithm=HmacSHA256,Signature=', $options['headers'][0] ?? $options['request_headers'][0]);
+
+            parse_str($options['body'], $body);
+            $content = base64_decode($body['RawMessage_Data']);
+
+            $this->assertStringContainsString('Hello!', $content);
+            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
+            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('Hello There!', $content);
+            $this->assertStringContainsString(base64_encode('attached data'), $content);
+
+            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+
+            $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
+  <SendRawEmailResult>
+    <MessageId>foobar</MessageId>
+  </SendRawEmailResult>
+</SendEmailResponse>';
+
+            return new MockResponse($xml, [
+                'http_code' => 200,
+            ]);
+        });
+        $transport = new SesApiTransport('ACCESS_KEY', 'SECRET_KEY', null, $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+             ->from(new Address('fabpot@symfony.com', 'Fabien'))
+             ->text('Hello There!')
+             ->attach('attached data');
+
+        $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
 
         $message = $transport->send($mail);
 

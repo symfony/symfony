@@ -89,6 +89,9 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if ($emails = $email->getReplyTo()) {
             $request['ReplyToAddresses'] = $this->stringifyAddresses($emails);
         }
+        if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $request['ConfigurationSetName'] = $header->getBodyAsString();
+        }
 
         return new SendEmailRequest($request);
     }

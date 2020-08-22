@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-21T06:39:32Z
+
+Apparently, this is supported by other transports like SMTP, can you fix all SES transports?.
+
+---------------------------------------------------------------------------
+
+by cvmiert at 2020-08-21T13:56:13Z
+
+> Apparently, this is supported by other transports like SMTP, can you fix all SES transports?.
+
+Sure thing, just pushed the code for that!
+
+Since I don't think these changes break BC, could we consider getting this into the `5.1` branch instead? If so, I'm happy to rebase the PR against that branch.

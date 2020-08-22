@@ -1,14 +1,10 @@
 CHANGELOG
 =========
 
-5.3.0
------
-
-* added support for `X-Forwarded-Prefix` header
-
 5.2.0
 -----
 
+* added support for `X-Forwarded-Prefix` header
  * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
  * added `File::getContent()`
 

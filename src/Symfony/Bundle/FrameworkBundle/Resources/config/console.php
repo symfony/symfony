@@ -39,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Lock\Command\PdoCreateTableCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -286,5 +287,11 @@ return static function (ContainerConfigurator $container) {
                 service('secrets.local_vault'),
             ])
             ->tag('console.command', ['command' => 'secrets:encrypt-from-local'])
+
+        ->set('console.command.pdo_lock_create_table', PdoCreateTableCommand::class)
+            ->args([
+                service('database_connection'),
+            ])
+            ->tag('console.command', ['command' => 'lock:pdo:create-table'])
     ;
 };

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-08-03T18:30:21Z
+
+btw, `HEADER_X_FORWARDED_ALL` should not be updated to whitelist the new traefik-only header, as that would make it trusted by all projects using that constant today while being behind proxies that don't know support that header, which would be a potential security issue for them (the bitmask about which headers are trusted is precisely meant to avoid a security issue).
+
+A new `HEADER_X_FORWARDED_TRAEFIK` constant might be added with the bitmask of headers support by Traefik though for easy config.
+
+---------------------------------------------------------------------------
+
+by jeff1985 at 2020-08-04T10:35:28Z
+
+> btw, `HEADER_X_FORWARDED_ALL` should not be updated to whitelist the new traefik-only header, as that would make it trusted by all projects using that constant today while being behind proxies that don't know support that header, which would be a potential security issue for them (the bitmask about which headers are trusted is precisely meant to avoid a security issue).
+>
+> A new `HEADER_X_FORWARDED_TRAEFIK` constant might be added with the bitmask of headers support by Traefik though for easy config.
+
+Agree! I added the required midifications.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-04T11:13:04Z
+
+`getBasePath` also needs to account for the proxy prefix
+
+---------------------------------------------------------------------------
+
+by jeff1985 at 2020-08-04T11:39:53Z
+
+Hi @stof,
+
+do you have any idea, why the integration tests are failing? The error does not seem to be related to my changes.
+
+---------------------------------------------------------------------------
+
+by jeff1985 at 2020-08-04T11:50:36Z
+
+> `getBasePath` also needs to account for the proxy prefix
+
+Do you have any special condition in mind that we should take care of? I checked the code, and actually `getBasePath` uses `getBaseUrl` internally, so it should work without modifications. I added a check in the tests to make sure it works as expected.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-04T12:25:16Z
+
+hmm, I forgot that `prepareBasePath` uses `getBaseUrl`. So this might be a matter of adding an assertion in the tests to avoid regressions there, but there might indeed not need any change in the code.
+
+---------------------------------------------------------------------------
+
+by jeff1985 at 2020-08-04T12:55:31Z
+
+> hmm, I forgot that `prepareBasePath` uses `getBaseUrl`. So this might be a matter of adding an assertion in the tests to avoid regressions there, but there might indeed not need any change in the code.
+
+Yep, ok. The assertion in tests is already done.
+
+---------------------------------------------------------------------------
+
+by jeff1985 at 2020-08-05T09:32:58Z
+
+Hi @stof
+
+as far as I see all issues are now resolved, right? Are there any todos to get this merged?

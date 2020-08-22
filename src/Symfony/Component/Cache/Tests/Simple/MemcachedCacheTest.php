@@ -81,7 +81,7 @@ class MemcachedCacheTest extends CacheTestCase
             $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
         } else {
             $this->expectException('Error');
-            $this->expectExceptionMessage('Undefined class constant \'Memcached::');
+            $this->expectExceptionMessage('Undefined constant Memcached::');
         }
 
         MemcachedCache::createConnection([], [$name => $value]);

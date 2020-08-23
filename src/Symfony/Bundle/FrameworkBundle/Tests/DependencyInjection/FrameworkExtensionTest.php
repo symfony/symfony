@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Serializer\FormErrorNormalizer;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1148,6 +1149,17 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals(DateTimeNormalizer::class, $definition->getClass());
         $this->assertEquals(-910, $tag[0]['priority']);
+    }
+
+    public function testFormErrorNormalizerRegistred()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('form.serializer.normalizer.form_error');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals(FormErrorNormalizer::class, $definition->getClass());
+        $this->assertEquals(-915, $tag[0]['priority']);
     }
 
     public function testJsonSerializableNormalizerRegistered()

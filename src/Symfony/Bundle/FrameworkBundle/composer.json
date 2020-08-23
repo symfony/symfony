@@ -46,7 +46,7 @@
         "symfony/http-client": "^4.4|^5.0",
         "symfony/lock": "^4.4|^5.0",
         "symfony/mailer": "^5.2",
-        "symfony/messenger": "^4.4|^5.0",
+        "symfony/messenger": "^5.2",
         "symfony/mime": "^4.4|^5.0",
         "symfony/process": "^4.4|^5.0",
         "symfony/security-bundle": "^5.1",

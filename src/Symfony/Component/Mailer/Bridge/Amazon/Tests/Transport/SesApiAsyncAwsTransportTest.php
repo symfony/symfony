@@ -70,6 +70,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
             $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
             $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
+            $this->assertSame('bounces@example.com', $content['FeedbackForwardingEmailAddress']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -86,7 +87,8 @@ class SesApiAsyncAwsTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!')
             ->html('<b>Hello There!</b>')
-            ->replyTo(new Address('replyto-1@example.com'), new Address('replyto-2@example.com'));
+            ->replyTo(new Address('replyto-1@example.com'), new Address('replyto-2@example.com'))
+            ->returnPath(new Address('bounces@example.com'));
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
 

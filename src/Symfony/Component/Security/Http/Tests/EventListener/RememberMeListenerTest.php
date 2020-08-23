@@ -86,6 +86,6 @@ class RememberMeListenerTest extends TestCase
 
     private function createLoginFailureEvent($providerKey)
     {
-        return new LoginFailureEvent(new AuthenticationException(), $this->createMock(AuthenticatorInterface::class), $this->request, null, $providerKey);
+        return new LoginFailureEvent(new AuthenticationException(), $this->createMock(AuthenticatorInterface::class), $this->request, null, $providerKey, null);
     }
 }

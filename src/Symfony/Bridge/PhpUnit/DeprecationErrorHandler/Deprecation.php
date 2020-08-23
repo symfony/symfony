@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 use PHPUnit\Util\Test;
-use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
 
 /**
  * @internal
@@ -61,10 +60,10 @@ class Deprecation
         $line = $trace[$i];
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
-            if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
-                set_error_handler(function () {});
-                $parsedMsg = unserialize($this->message);
-                restore_error_handler();
+            set_error_handler(function () {});
+            $parsedMsg = unserialize($this->message);
+            restore_error_handler();
+            if ($parsedMsg && isset($parsedMsg['deprecation'])) {
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];

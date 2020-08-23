@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by YaFou at 2020-06-25T16:44:50Z
+
+I don't know why the test suite does not pass. Anybody has an answer?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-08-17T16:36:16Z
+
+> Is there any "standards"/prior art for form validation? That would be better than having our own if possible.
+>
+
+After some research, I did not find RFCs or something like that. However this type of normalizer can follow the specification [RFC 7807](https://tools.ietf.org/html/rfc7807) like the `ConstraintViolationListNormalizer`. In my opinion, we shouldn't follow that because forms can't be used in an API. This normalizer can be used in logs for instance. I need some opinions @fabpot
+
+I will work on reviews next week.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-23T16:20:28Z
+
+Let's wait for the tests... I think they will fail as you haven't not changed deps on FramewokrBundle as I mentioned in my previous review.
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-08-23T16:40:34Z
+
+>
+>
+> Let's wait for the tests... I think they will fail as you haven't not changed deps on FramewokrBundle as I mentioned in my previous review.
+
+@fabpot, the tests passes: the Form Component constraint in the Framework Bundle was already at `^5.2`.

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by monteiro at 2020-06-03T16:12:17Z
+
+I still need to test well the priority, because it works on my symfony 5.0 (without it), but I want to try it on Symfony 4.4 to see if I have the same behavior.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2020-06-04T16:13:43Z
+
+I have 2 unit tests failing:
+
+```
+There were 2 errors:
+1) Symfony\Component\Serializer\Tests\Normalizer\FlattenExceptionNormalizerTest::testNormalize with data set "instance from constructor" (Symfony\Component\ErrorHandler\Exception\FlattenException Object (...))
+TypeError: Return value of Symfony\Component\ErrorHandler\Exception\FlattenException::getMessage() must be of the type string, null returned
+/home/travis/build/symfony/symfony/src/Symfony/Component/ErrorHandler/Exception/FlattenException.php:190
+/home/travis/build/symfony/symfony/src/Symfony/Component/Serializer/Normalizer/FlattenExceptionNormalizer.php:37
+/home/travis/build/symfony/symfony/src/Symfony/Component/Serializer/Tests/Normalizer/FlattenExceptionNormalizerTest.php:46
+2) Symfony\Component\Serializer\Tests\Normalizer\FlattenExceptionNormalizerTest::testDenormalizeValidData
+TypeError: Return value of Symfony\Component\ErrorHandler\Exception\FlattenException::getMessage() must be of the type string, null returned
+/home/travis/build/symfony/symfony/src/Symfony/Component/ErrorHandler/Exception/FlattenException.php:190
+/home/travis/build/symfony/symfony/src/Symfony/Component/Serializer/Tests/Normalizer/FlattenExceptionNormalizerTest.php:93
+```
+
+@nicolas-grekas Maybe you can help me with this. I know that on the [FlattenException Unit tests](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/ErrorHandler/Tests/Exception/FlattenExceptionTest.php) you never use the constructor without arguments.
+
+You did the change in the [past](https://github.com/symfony/symfony/commit/810e4a136fd2c6e5f290a17c11d68041d687f3d2) adding typehints to the FlattenException class methods, which makes total sense when you are creating this exception from throwable. But what can we do in this specific case?
+
+Should I still use the empty constructor [here](https://github.com/symfony/symfony/pull/37087/files#diff-9ce3d3e9911b40f7b59360e7ef0ac329R71) or should I use reflection?
+
+If I use it, makes sense to test the empty constructor but since they have different type hints from the getters (Example: message is null in the empty constructor, but getMessage() has a string typehint) the test fails.
+
+Or should I follow the FlattenException unit tests and remove the empty constructor test?
+
+_Note: This does not happen in this specific feature, because the normalizer does not call any getter without a full FlattenException._
+
+---------------------------------------------------------------------------
+
+by monteiro at 2020-08-21T07:00:47Z
+
+@fabpot , after talking with @weaverryan we agreed:
+- Move the FlattenNormalizer to the Messenger component, because it is only used there
+- Added specific context on the Messenger Serializer, so the normalizer knows when it's being used on a Messenger context, in favor of [ProblemNormalizer](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Normalizer/ProblemNormalizer.php#L65), which also normalizes FlattenExceptions, but specific for APIs (not background processes) - That's why the priority is set to be higher than ProblemNormalizer.
+
+Using this strategy:
+- We don't affect the normal behavior of the default Symfony Serializer, because the normalizer is only executed by the Symfony Messenger serializer which sets a specific context.
+- The normalizer will be instantiated if Messenger is installed.
+- We can still normalize FlattenExceptions (without Messenger) because of ProblemNormalizer that already exists today.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-21T16:52:41Z
+
+Tests need to be updated to pass.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2020-08-22T09:18:11Z
+
+@fabpot I have updated the tests but some Travis tests are failing with the error that the FlattenExceptionNormalizer class does not exist (FrameworkBundle is fetching v5.0 in Travis).
+
+I suppose that will only be green when we merge this or am I missing something?

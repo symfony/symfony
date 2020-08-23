@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2020-07-30T12:54:46Z
+
+Here's the related Drupal issue - https://www.drupal.org/project/drupal/issues/3162403 - that fixes this the very ugly way.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-07-30T13:12:19Z
+
+Btw, I suggest you to open an issue (separate from this PR) describing the use cases of Drupal that require you to wrap the symfony deprecation listener. Some of them might be suitable to be integrated in the symfony/phpunit-bridge directly, which would simplify your code in the future (if you don't need to mess with the internals of the bridge implementation anymore).
+
+---------------------------------------------------------------------------
+
+by alexpott at 2020-07-30T13:34:36Z
+
+@stof thanks for the review. How about changing tack? - and try unserialising the message - if that works use the information. That way we're only entering this code path when dealing with a serialized message - and we no longer care so much about the stack trace. See the latest commits for this approach.
+
+I've been meaning to create an issue and PR for the additions Drupal is doing. I did that with the expectedDeprecation work - took a while to land - but now it has that's what's prompted Drupal to move to the SF5 version of the bridge and do less awkward stuff - but now we've run into this.
+
+---------------------------------------------------------------------------
+
+by alexpott at 2020-07-31T10:51:52Z
+
+@stof I created the issue you asked for - https://github.com/symfony/symfony/issues/37715

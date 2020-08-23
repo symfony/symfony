@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-23T09:15:23Z
+
+It could have been, but we started to document DSNs in 5.2, so let's be consistent.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-23T09:42:34Z
+
+Are you sure? I compared all Notifier readme files between `master` and `5.1` and this was the only change.

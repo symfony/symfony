@@ -77,4 +77,34 @@ class ChoiceQuestionTest extends TestCase
 
         $this->assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
     }
+
+    public function testSelectWithNonStringChoices()
+    {
+        $question = new ChoiceQuestion('A question', [
+            $result1 = new StringChoice('foo'),
+            $result2 = new StringChoice('bar'),
+            $result3 = new StringChoice('baz'),
+        ]);
+
+        $this->assertSame($result1, $question->getValidator()('foo'));
+
+        $question->setMultiselect(true);
+
+        $this->assertSame([$result3, $result2], $question->getValidator()('baz, bar'));
+    }
+}
+
+class StringChoice
+{
+    private $string;
+
+    public function __construct(string $string)
+    {
+        $this->string = $string;
+    }
+
+    public function __toString()
+    {
+        return $this->string;
+    }
 }

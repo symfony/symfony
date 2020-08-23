@@ -69,6 +69,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $this->assertSame('Hello There!', $content['Content']['Simple']['Body']['Text']['Data']);
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
             $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
+            $this->assertSame('bounces@example.com', $content['FeedbackForwardingEmailAddress']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -85,7 +86,8 @@ class SesApiAsyncAwsTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!')
             ->html('<b>Hello There!</b>')
-            ->replyTo(new Address('replyto-1@example.com'), new Address('replyto-2@example.com'));
+            ->replyTo(new Address('replyto-1@example.com'), new Address('replyto-2@example.com'))
+            ->returnPath(new Address('bounces@example.com'));
 
         $message = $transport->send($mail);
 

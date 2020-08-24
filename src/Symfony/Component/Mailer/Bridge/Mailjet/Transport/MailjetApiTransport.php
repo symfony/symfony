@@ -26,6 +26,15 @@ class MailjetApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.mailjet.com';
     private const API_VERSION = '3.1';
+    private const FORBIDDEN_HEADERS = [
+        'Date', 'X-CSA-Complaints', 'Message-Id', 'X-Mailjet-Campaign', 'X-MJ-StatisticsContactsListID',
+        'DomainKey-Status', 'Received-SPF', 'Authentication-Results', 'Received', 'X-Mailjet-Prio',
+        'From', 'Sender', 'Subject', 'To', 'Cc', 'Bcc', 'Return-Path', 'Delivered-To', 'DKIM-Signature',
+        'X-Feedback-Id', 'X-Mailjet-Segmentation', 'List-Id', 'X-MJ-MID', 'X-MJ-ErrorMessage',
+        'X-MJ-TemplateErrorDeliver', 'X-MJ-TemplateErrorReporting', 'X-MJ-TemplateLanguage',
+        'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-CustomID', 'X-MJ-EventPayload', 'X-MJ-Vars',
+        'X-Mailjet-TrackOpen', 'X-Mailjet-TrackClick', 'X-MJ-TemplateID', 'X-MJ-WorkflowID',
+    ];
 
     private $privateKey;
     private $publicKey;
@@ -102,6 +111,14 @@ class MailjetApiTransport extends AbstractApiTransport
         }
         if ($html) {
             $message['HTMLPart'] = $html;
+        }
+
+        foreach ($email->getHeaders()->all() as $header) {
+            if (\in_array($header->getName(), self::FORBIDDEN_HEADERS, true)) {
+                continue;
+            }
+
+            $message['Headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return [

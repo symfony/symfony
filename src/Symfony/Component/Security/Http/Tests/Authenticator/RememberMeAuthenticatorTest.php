@@ -12,14 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
-use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class RememberMeAuthenticatorTest extends TestCase
@@ -37,8 +35,6 @@ class RememberMeAuthenticatorTest extends TestCase
             'name' => '_remember_me_cookie',
         ]);
         $this->request = new Request();
-        $this->request->cookies->set('_remember_me_cookie', $val = $this->generateCookieValue());
-        $this->request->attributes->set(AbstractRememberMeServices::COOKIE_ATTR_NAME, new Cookie('_remember_me_cookie', $val));
     }
 
     public function testSupportsTokenStorageWithToken()
@@ -48,39 +44,34 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->assertFalse($this->authenticator->supports($this->request));
     }
 
-    public function testSupportsRequestWithoutAttribute()
+    /**
+     * @dataProvider provideSupportsData
+     */
+    public function testSupports($autoLoginResult, $support)
     {
-        $this->request->attributes->remove(AbstractRememberMeServices::COOKIE_ATTR_NAME);
+        $this->rememberMeServices->expects($this->once())->method('autoLogin')->with($this->request)->willReturn($autoLoginResult);
 
-        $this->assertNull($this->authenticator->supports($this->request));
+        $this->assertSame($support, $this->authenticator->supports($this->request));
     }
 
-    public function testSupportsRequestWithoutCookie()
+    public function provideSupportsData()
     {
-        $this->request->cookies->remove('_remember_me_cookie');
-
-        $this->assertFalse($this->authenticator->supports($this->request));
-    }
-
-    public function testSupports()
-    {
-        $this->assertNull($this->authenticator->supports($this->request));
+        yield [null, false];
+        yield [$this->createMock(TokenInterface::class), null];
     }
 
     public function testAuthenticate()
     {
-        $this->rememberMeServices->expects($this->once())
-            ->method('autoLogin')
-            ->with($this->request)
-            ->willReturn(new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));
-
+        $this->request->attributes->set('_remember_me_token', new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));
         $passport = $this->authenticator->authenticate($this->request);
 
         $this->assertSame($user, $passport->getUser());
     }
 
-    private function generateCookieValue()
+    public function testAuthenticateWithoutToken()
     {
-        return base64_encode(implode(AbstractRememberMeServices::COOKIE_DELIMITER, ['part1', 'part2']));
+        $this->expectException(\LogicException::class);
+
+        $this->authenticator->authenticate($this->request);
     }
 }

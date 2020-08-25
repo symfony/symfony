@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added support of `json` key in parameters of `KernelBrowser::request()`
+   to encode an array to JSON
+
 4.3.0
 -----
 

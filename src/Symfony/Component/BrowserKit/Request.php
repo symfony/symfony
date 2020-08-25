@@ -38,6 +38,10 @@ class Request
         $this->uri = $uri;
         $this->method = $method;
 
+        if (null === $content && isset($parameters['json'])) {
+            $content = json_encode($parameters['json']);
+        }
+
         array_walk_recursive($parameters, static function (&$value) {
             $value = (string) $value;
         });

@@ -71,4 +71,13 @@ class RequestTest extends TestCase
         $request = new Request('http://www.example.com/', 'get', $parameters);
         $this->assertSame($expected, $request->getParameters());
     }
+
+    public function testJsonParametersContent()
+    {
+        $request = new Request('http://www.example.com/', 'get', ['json' => ['foo' => 'bar']]);
+        $this->assertSame('{"foo":"bar"}', $request->getContent());
+
+        $request = new Request('http://www.example.com/', 'get', ['json' => ['foo' => 'bar']], [], [], [], 'baz');
+        $this->assertSame('baz', $request->getContent());
+    }
 }

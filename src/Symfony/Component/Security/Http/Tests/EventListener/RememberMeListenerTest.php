@@ -75,17 +75,17 @@ class RememberMeListenerTest extends TestCase
         $this->listener->onFailedLogin($event);
     }
 
-    private function createLoginSuccessfulEvent($providerKey, $response, PassportInterface $passport = null)
+    private function createLoginSuccessfulEvent($firewallName, $response, PassportInterface $passport = null)
     {
         if (null === $passport) {
             $passport = new SelfValidatingPassport(new User('test', null), [new RememberMeBadge()]);
         }
 
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->token, $this->request, $response, $providerKey);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->token, $this->request, $response, $firewallName);
     }
 
-    private function createLoginFailureEvent($providerKey)
+    private function createLoginFailureEvent($firewallName)
     {
-        return new LoginFailureEvent(new AuthenticationException(), $this->createMock(AuthenticatorInterface::class), $this->request, null, $providerKey, null);
+        return new LoginFailureEvent(new AuthenticationException(), $this->createMock(AuthenticatorInterface::class), $this->request, null, $firewallName, null);
     }
 }

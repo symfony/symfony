@@ -83,7 +83,7 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
+            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getFirewallName() && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }
@@ -128,7 +128,7 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
     private function clearToken(AuthenticationException $exception)
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {

@@ -69,6 +69,6 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof RememberMeToken && $token->getProviderKey() === $this->providerKey;
+        return $token instanceof RememberMeToken && $token->getFirewallName() === $this->providerKey;
     }
 }

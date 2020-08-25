@@ -41,20 +41,20 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         'httponly' => true,
         'samesite' => null,
     ];
-    private $providerKey;
+    private $firewallName;
     private $secret;
     private $userProviders;
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(iterable $userProviders, string $secret, string $providerKey, array $options = [], LoggerInterface $logger = null)
+    public function __construct(iterable $userProviders, string $secret, string $firewallName, array $options = [], LoggerInterface $logger = null)
     {
         if (empty($secret)) {
             throw new \InvalidArgumentException('$secret must not be empty.');
         }
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $firewallName) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
         if (!\is_array($userProviders) && !$userProviders instanceof \Countable) {
             $userProviders = iterator_to_array($userProviders, false);
@@ -65,7 +65,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
         $this->userProviders = $userProviders;
         $this->secret = $secret;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
         $this->options = array_merge($this->options, $options);
         $this->logger = $logger;
     }
@@ -123,7 +123,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
                 $this->logger->info('Remember-me cookie accepted.');
             }
 
-            return new RememberMeToken($user, $this->providerKey, $this->secret);
+            return new RememberMeToken($user, $this->firewallName, $this->secret);
         } catch (CookieTheftException $e) {
             $this->loginFail($request, $e);
 

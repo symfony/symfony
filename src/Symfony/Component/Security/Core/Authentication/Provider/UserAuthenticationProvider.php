@@ -103,7 +103,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey();
+        return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getFirewallName();
     }
 
     /**

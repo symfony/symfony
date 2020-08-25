@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
@@ -57,13 +56,12 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
-        if (($cookie = $request->attributes->get(AbstractRememberMeServices::COOKIE_ATTR_NAME)) && null === $cookie->getValue()) {
+        $token = $this->rememberMeServices->autoLogin($request);
+        if (null === $token) {
             return false;
         }
 
-        if (isset($this->options['name']) && !$request->cookies->has($this->options['name'])) {
-            return false;
-        }
+        $request->attributes->set('_remember_me_token', $token);
 
         // the `null` return value indicates that this authenticator supports lazy firewalls
         return null;
@@ -71,7 +69,10 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function authenticate(Request $request): PassportInterface
     {
-        $token = $this->rememberMeServices->autoLogin($request);
+        $token = $request->attributes->get('_remember_me_token');
+        if (null === $token) {
+            throw new \LogicException('No remember me token is set.');
+        }
 
         return new SelfValidatingPassport($token->getUser());
     }

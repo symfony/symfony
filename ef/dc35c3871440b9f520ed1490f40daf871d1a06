@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nrobinaubertin at 2020-08-20T18:10:23Z
+
+I've implemented the change proposed by @stloyd based on the idea of @dunglas, rebased on master and fixed some tests.
+There's still some that fail but I'm not used to symfony internals and I don't immediately see the changes I should make. If someone more knowledgeable can help, I would be thankful.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-23T17:00:52Z
+
+@nrobinaubertin Can you take @ogizanagi suggestion into account and fix the unit tests? Thank you.
+
+---------------------------------------------------------------------------
+
+by nrobinaubertin at 2020-08-24T12:38:31Z
+
+> @nrobinaubertin Can you take @ogizanagi suggestion into account and fix the unit tests? Thank you.
+
+Done. I added two tests but the previous ones were already working.
+The fails of the CI are not related to this PR

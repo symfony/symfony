@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for `name` attribute on `unit` element from xliff2 to be used as a translation key instead of always the `source` element
+ * updated attributes `cacheVary`, `cacheDir` and method `getCatalogueCachePath`  accessibility in Translator to allow functionality extension.
 
 5.0.0
 -----

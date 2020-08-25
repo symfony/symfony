@@ -20,8 +20,8 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
-use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**

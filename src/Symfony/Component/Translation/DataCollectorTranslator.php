@@ -13,13 +13,14 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\LocaleAwareTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface
+class DataCollectorTranslator implements LocaleAwareTranslatorInterface, TranslatorBagInterface, WarmableInterface
 {
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;

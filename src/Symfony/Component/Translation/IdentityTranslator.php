@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Contracts\Translation\LocaleAwareInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class IdentityTranslator implements TranslatorInterface, LocaleAwareInterface
+class IdentityTranslator implements LocaleAwareTranslatorInterface
 {
     use TranslatorTrait;
 }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-08-25T13:21:56Z
+
+PR updated according to previous reviews (thanks!) + improve error handling + added a few tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-25T14:46:39Z
+
+@odolbeau The tests are still broken when low deps are used.
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-08-25T15:13:40Z
+
+@fabpot This fix should do the job: https://github.com/symfony/symfony/pull/36573/commits/a1b612dac6eb63b1192b397169eaca3804d73967

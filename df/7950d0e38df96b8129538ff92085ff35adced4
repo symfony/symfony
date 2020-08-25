@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2020-08-25T18:05:17Z
+
+I have tested #37943 against my [replication steps](https://github.com/symfony/symfony/issues/37534#issuecomment-671906602) in  #37534 and it resulted in a graceful failure as expected. 🎉🎉 Thanks for this @wouterj

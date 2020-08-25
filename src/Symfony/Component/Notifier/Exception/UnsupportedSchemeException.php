@@ -78,6 +78,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
             'package' => 'symfony/smsapi-notifier',
         ],
+        'esendex' => [
+            'class' => Bridge\Esendex\EsendexTransportFactory::class,
+            'package' => 'symfony/esendex-notifier',
+        ],
     ];
 
     /**

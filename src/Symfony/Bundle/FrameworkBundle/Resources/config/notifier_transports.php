@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
@@ -97,6 +98,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.smsapi', SmsapiTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.esendex', EsendexTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

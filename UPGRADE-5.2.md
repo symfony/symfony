@@ -74,3 +74,12 @@ Security
 
  * [BC break] `AccessListener::PUBLIC_ACCESS` has been removed in favor of
    `AuthenticatedVoter::PUBLIC_ACCESS`.
+
+ * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()`
+   in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`,
+   `DefaultAuthenticationSuccessHandler`, the old methods will be removed in 6.0.
+
+ * Deprecated the `AbstractRememberMeServices::$providerKey` property in favor of
+   `AbstractRememberMeServices::$firewallName`, the old property will be removed
+   in 6.0.
+

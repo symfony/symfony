@@ -28,7 +28,7 @@ class SwitchUserTokenTest extends TestCase
         $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
         $this->assertSame('admin', $unserializedToken->getUsername());
         $this->assertSame('bar', $unserializedToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedToken->getProviderKey());
+        $this->assertSame('provider-key', $unserializedToken->getFirewallName());
         $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
 
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
@@ -36,7 +36,7 @@ class SwitchUserTokenTest extends TestCase
         $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
         $this->assertSame('user', $unserializedOriginalToken->getUsername());
         $this->assertSame('foo', $unserializedOriginalToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedOriginalToken->getProviderKey());
+        $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 

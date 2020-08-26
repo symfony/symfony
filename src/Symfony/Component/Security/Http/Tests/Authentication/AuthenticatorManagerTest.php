@@ -239,8 +239,8 @@ class AuthenticatorManagerTest extends TestCase
         return $authenticator;
     }
 
-    private function createManager($authenticators, $providerKey = 'main', $eraseCredentials = true)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true)
     {
-        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $providerKey, null, $eraseCredentials);
+        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials);
     }
 }

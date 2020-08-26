@@ -29,7 +29,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
-            $handler->setProviderKey('admin');
+            $handler->setFirewallName('admin');
         }
         $this->assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, $token)->getTargetUrl());
     }

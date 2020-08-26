@@ -38,7 +38,7 @@ class LoginSuccessEvent extends Event
     private $authenticatedToken;
     private $request;
     private $response;
-    private $providerKey;
+    private $firewallName;
 
     public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)
     {
@@ -47,7 +47,7 @@ class LoginSuccessEvent extends Event
         $this->authenticatedToken = $authenticatedToken;
         $this->request = $request;
         $this->response = $response;
-        $this->providerKey = $firewallName;
+        $this->firewallName = $firewallName;
     }
 
     public function getAuthenticator(): AuthenticatorInterface
@@ -81,7 +81,7 @@ class LoginSuccessEvent extends Event
 
     public function getFirewallName(): string
     {
-        return $this->providerKey;
+        return $this->firewallName;
     }
 
     public function setResponse(?Response $response): void

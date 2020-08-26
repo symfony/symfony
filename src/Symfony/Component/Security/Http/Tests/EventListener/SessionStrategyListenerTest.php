@@ -60,9 +60,9 @@ class SessionStrategyListenerTest extends TestCase
         $listener->onSuccessfulLogin($this->createEvent('api_firewall'));
     }
 
-    private function createEvent($providerKey)
+    private function createEvent($firewallName)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new User('test', null)), $this->token, $this->request, null, $providerKey);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new User('test', null)), $this->token, $this->request, null, $firewallName);
     }
 
     private function configurePreviousSession()

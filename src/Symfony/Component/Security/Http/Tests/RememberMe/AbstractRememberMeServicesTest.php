@@ -89,7 +89,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
         $this->assertSame($user, $returnedToken->getUser());
         $this->assertSame('foosecret', $returnedToken->getSecret());
-        $this->assertSame('fookey', $returnedToken->getProviderKey());
+        $this->assertSame('fookey', $returnedToken->getFirewallName());
     }
 
     /**

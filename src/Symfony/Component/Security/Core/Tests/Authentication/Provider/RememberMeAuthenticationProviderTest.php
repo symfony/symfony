@@ -99,10 +99,10 @@ class RememberMeAuthenticationProviderTest extends TestCase
                 ->willReturn([]);
         }
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['getProviderKey'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
         $token
             ->expects($this->once())
-            ->method('getProviderKey')
+            ->method('getFirewallName')
             ->willReturn('foo');
 
         return $token;

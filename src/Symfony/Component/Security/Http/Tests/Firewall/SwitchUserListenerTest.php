@@ -49,10 +49,10 @@ class SwitchUserListenerTest extends TestCase
         $this->event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $this->request, HttpKernelInterface::MASTER_REQUEST);
     }
 
-    public function testProviderKeyIsRequired()
+    public function testFirewallNameIsRequired()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('$providerKey must not be empty');
+        $this->expectExceptionMessage('$firewallName must not be empty');
         new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
     }
 

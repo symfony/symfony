@@ -117,7 +117,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
     private function clearToken(AuthenticationException $exception): void
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getProviderKey()) {
+        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {

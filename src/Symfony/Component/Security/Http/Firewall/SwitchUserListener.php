@@ -44,7 +44,7 @@ class SwitchUserListener extends AbstractListener
     private $tokenStorage;
     private $provider;
     private $userChecker;
-    private $providerKey;
+    private $firewallName;
     private $accessDecisionManager;
     private $usernameParameter;
     private $role;
@@ -52,16 +52,16 @@ class SwitchUserListener extends AbstractListener
     private $dispatcher;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
     {
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $firewallName) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->tokenStorage = $tokenStorage;
         $this->provider = $provider;
         $this->userChecker = $userChecker;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
@@ -181,7 +181,7 @@ class SwitchUserListener extends AbstractListener
 
         $roles = $user->getRoles();
         $roles[] = 'ROLE_PREVIOUS_ADMIN';
-        $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
+        $token = new SwitchUserToken($user, $user->getPassword(), $this->firewallName, $roles, $token);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);

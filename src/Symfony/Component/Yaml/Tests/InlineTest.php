@@ -570,6 +570,14 @@ class InlineTest extends TestCase
             ['[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', ['foo', '@foo.baz', ['%foo%' => 'foo is %foo%', 'bar' => '%foo%'], true, '@service_container']],
 
             ['{ foo: { bar: { 1: 2, baz: 3 } } }', ['foo' => ['bar' => [1 => 2, 'baz' => 3]]]],
+
+            // numeric strings with trailing whitespaces
+            ["'0123 '", '0123 '],
+            ['"0123\f"', "0123\f"],
+            ['"0123\n"', "0123\n"],
+            ['"0123\r"', "0123\r"],
+            ['"0123\t"', "0123\t"],
+            ['"0123\v"', "0123\v"],
         ];
     }
 

@@ -23,7 +23,7 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function getAllowedAttributes($classOrObject, array $context,  bool $attributesAsString = false)
+    public function getAllowedAttributes($classOrObject, array $context, bool $attributesAsString = false)
     {
         return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
     }

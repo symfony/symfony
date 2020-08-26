@@ -48,7 +48,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         }
 
         if (!\array_key_exists($class, self::$normalizeCache) || !\array_key_exists($propertyName, self::$normalizeCache[$class])) {
-            self::$normalizeCache[$class][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class);
+            self::$normalizeCache[$class][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class, $context);
         }
 
         return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
@@ -71,7 +71,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$denormalizeCache[$cacheKey][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);
     }
 
-    private function getCacheValueForNormalization(string $propertyName, string $class): ?string
+    private function getCacheValueForNormalization(string $propertyName, string $class, array $context = []): ?string
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {
             return null;
@@ -82,7 +82,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return null;
         }
 
-        return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
+        return $attributesMetadata[$propertyName]->getSerializedNameForGroups((array) ($context['groups'] ?? []));
     }
 
     private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
@@ -115,7 +115,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
 
         $cache = [];
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (null === $metadata->getSerializedName()) {
+            if (null === $metadata->getSerializedNameForGroups((array) ($context['groups'] ?? []))) {
                 continue;
             }
 
@@ -127,7 +127,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
                 continue;
             }
 
-            $cache[$metadata->getSerializedName()] = $name;
+            $cache[$metadata->getSerializedNameForGroups($groups)] = $name;
         }
 
         return $cache;

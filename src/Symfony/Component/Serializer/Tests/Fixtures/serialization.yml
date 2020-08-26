@@ -13,9 +13,23 @@
 'Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy':
   attributes:
     foo:
-      serialized_name: 'baz'
+      serialized_names: 'baz'
     bar:
-      serialized_name: 'qux'
+      serialized_names: 'qux'
+'Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy':
+  attributes:
+    foo:
+      serialized_names: 'baz'
+    foos:
+      serialized_names:
+        bazs: ~
+    barWithGroup:
+      serialized_names:
+        bargroups: ['group1']
+    quuxWithGroups:
+      serialized_names:
+        quuxgroups2: ['group1', 'group2']
+        quuxgroups1: ['group1']
 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy':
   discriminator_map:
     type_property: type

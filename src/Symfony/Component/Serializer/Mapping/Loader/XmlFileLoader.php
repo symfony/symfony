@@ -52,28 +52,25 @@ class XmlFileLoader extends FileLoader
             foreach ($xml->attribute as $attribute) {
                 $attributeName = (string) $attribute['name'];
 
-                if (isset($attributesMetadata[$attributeName])) {
-                    $attributeMetadata = $attributesMetadata[$attributeName];
-                } else {
-                    $attributeMetadata = new AttributeMetadata($attributeName);
-                    $classMetadata->addAttributeMetadata($attributeMetadata);
-                }
+                $attributesMetadata[$attributeName] = $attributesMetadata[$attributeName] ?? new AttributeMetadata($attributeName);
 
                 foreach ($attribute->group as $group) {
-                    $attributeMetadata->addGroup((string) $group);
+                    $attributesMetadata[$attributeName]->addGroup((string) $group);
                 }
 
                 if (isset($attribute['max-depth'])) {
-                    $attributeMetadata->setMaxDepth((int) $attribute['max-depth']);
+                    $attributesMetadata[$attributeName]->setMaxDepth((int) $attribute['max-depth']);
                 }
 
                 if (isset($attribute['serialized-name'])) {
-                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
+                    $attributesMetadata[$attributeName]->addSerializedName((string) $attribute['serialized-name'], (array) $attribute->group);
                 }
 
                 if (isset($attribute['ignore'])) {
-                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                    $attributesMetadata[$attributeName]->setIgnore((bool) $attribute['ignore']);
                 }
+
+                $classMetadata->addAttributeMetadata($attributesMetadata[$attributeName]);
             }
 
             if (isset($xml->{'discriminator-map'})) {

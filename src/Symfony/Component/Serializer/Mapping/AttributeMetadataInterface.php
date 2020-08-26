@@ -57,9 +57,24 @@ interface AttributeMetadataInterface
     public function setSerializedName(string $serializedName = null);
 
     /**
+     * Adds the serialization name for this attribute.
+     */
+    public function addSerializedName(string $serializedName, array $groups = []);
+
+    /**
      * Gets the serialization name for this attribute.
      */
     public function getSerializedName(): ?string;
+
+    /**
+     * Gets the serialization names for this attribute.
+     */
+    public function getSerializedNames(): array;
+
+    /**
+     * Gets the serialization name for this attribute.
+     */
+    public function getSerializedNameForGroups(array $groups = []): ?string;
 
     /**
      * Sets if this attribute must be ignored or not.

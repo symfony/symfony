@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
@@ -415,6 +416,42 @@ class ObjectNormalizerTest extends TestCase
                 'symfony' => '@coopTilleuls',
             ],
             $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
+        );
+    }
+
+    public function testGroupsNormalizeWithGroupsNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new SerializedNameWithGroupsDummy();
+        $obj->bar = 'bar';
+        $obj->barWithGroup = 'barWithGroup';
+        $obj->foo = 'foo';
+        $obj->foos = 'foos';
+        $obj->quux = 'quux';
+        $obj->quuxWithGroups = 'quuxWithGroups';
+
+        $this->assertEquals(
+            ['quuxgroups2' => 'quuxWithGroups'],
+            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['group2']])
+        );
+
+        $this->assertEquals(
+            ['qux' => 'bar', 'bargroups' => 'barWithGroup', 'quuxgroups2' => 'quuxWithGroups'],
+            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => 'group1'])
+        );
+
+        $this->assertEquals([
+            'qux' => 'bar',
+            'baz' => 'foo',
+            'quux' => 'quux',
+            'bazs' => 'foos',
+            'bargroups' => 'barWithGroup',
+            'quuxgroups2' => 'quuxWithGroups',
+        ],
+            $this->normalizer->normalize($obj, null)
         );
     }
 

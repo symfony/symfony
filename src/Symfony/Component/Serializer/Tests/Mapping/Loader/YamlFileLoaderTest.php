@@ -89,8 +89,19 @@ class YamlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
-        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        $this->assertEquals(['baz' => []], $attributesMetadata['foo']->getSerializedNames());
+        $this->assertEquals(['qux' => []], $attributesMetadata['bar']->getSerializedNames());
+    }
+
+    public function testSerializedNames()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(['baz' => []], $attributesMetadata['foo']->getSerializedNames());
+        $this->assertEquals(['bargroups' => ['group1']], $attributesMetadata['barWithGroup']->getSerializedNames());
+        $this->assertEquals(['quuxgroups2' => ['group1', 'group2'], 'quuxgroups1' => ['group1']], $attributesMetadata['quuxWithGroups']->getSerializedNames());
     }
 
     public function testLoadDiscriminatorMap()

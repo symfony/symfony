@@ -71,7 +71,7 @@ class AnnotationLoader implements LoaderInterface
                     } elseif ($annotation instanceof MaxDepth) {
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     } elseif ($annotation instanceof SerializedName) {
-                        $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
+                        $attributesMetadata[$property->name]->addSerializedName($annotation->getSerializedName(), $annotation->getGroups());
                     } elseif ($annotation instanceof Ignore) {
                         $attributesMetadata[$property->name]->setIgnore(true);
                     }
@@ -117,8 +117,7 @@ class AnnotationLoader implements LoaderInterface
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('SerializedName on "%s::%s" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
-
-                    $attributeMetadata->setSerializedName($annotation->getSerializedName());
+                    $attributeMetadata->addSerializedName($annotation->getSerializedName(), $annotation->getGroups());
                 } elseif ($annotation instanceof Ignore) {
                     $attributeMetadata->setIgnore(true);
                 }

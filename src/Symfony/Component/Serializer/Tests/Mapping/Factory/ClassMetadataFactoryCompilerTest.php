@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy;
 
 final class ClassMetadataFactoryCompilerTest extends TestCase
 {
@@ -35,25 +36,27 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $dummyMetadata = $classMetatadataFactory->getMetadataFor(Dummy::class);
         $maxDepthDummyMetadata = $classMetatadataFactory->getMetadataFor(MaxDepthDummy::class);
         $serializedNameDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedNameDummy::class);
+        $serializedNameWithGroupsDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedNameWithGroupsDummy::class);
 
         $code = (new ClassMetadataFactoryCompiler())->compile([
             $dummyMetadata,
             $maxDepthDummyMetadata,
             $serializedNameDummyMetadata,
+            $serializedNameWithGroupsDummyMetadata,
         ]);
 
         file_put_contents($this->dumpPath, $code);
         $compiledMetadata = require $this->dumpPath;
 
-        $this->assertCount(3, $compiledMetadata);
+        $this->assertCount(4, $compiledMetadata);
 
         $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'foo' => [[], null, null],
-                'bar' => [[], null, null],
-                'baz' => [[], null, null],
-                'qux' => [[], null, null],
+                'foo' => [[], null, []],
+                'bar' => [[], null, []],
+                'baz' => [[], null, []],
+                'qux' => [[], null, []],
             ],
             null,
         ], $compiledMetadata[Dummy::class]);
@@ -61,22 +64,37 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $this->assertArrayHasKey(MaxDepthDummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'foo' => [[], 2, null],
-                'bar' => [[], 3, null],
-                'child' => [[], null, null],
+                'foo' => [[], 2, []],
+                'bar' => [[], 3, []],
+                'child' => [[], null, []],
             ],
             null,
         ], $compiledMetadata[MaxDepthDummy::class]);
 
         $this->assertArrayHasKey(SerializedNameDummy::class, $compiledMetadata);
+
         $this->assertEquals([
             [
-                'foo' => [[], null, 'baz'],
-                'bar' => [[], null, 'qux'],
-                'quux' => [[], null, null],
-                'child' => [[], null, null],
+                'foo' => [[], null, ['baz' => []]],
+                'bar' => [[], null, ['qux' => []]],
+                'quux' => [[], null, []],
+                'child' => [[], null, []],
             ],
             null,
         ], $compiledMetadata[SerializedNameDummy::class]);
+
+        $this->assertArrayHasKey(SerializedNameWithGroupsDummy::class, $compiledMetadata);
+
+        $this->assertEquals([
+            [
+                'foo' => [[], null, ['baz' => []]],
+                'bar' => [['group1'], null, ['qux' => []]],
+                'quux' => [[], null, []],
+                'foos' => [[], null, ['bazs' => []]],
+                'barWithGroup' => [['group1'], null, ['bargroups' => ['group1']]],
+                'quuxWithGroups' => [['group1', 'group2'], null, ['quuxgroups2' => ['group1', 'group2'], 'quuxgroups1' => ['group1']]],
+            ],
+            null,
+        ], $compiledMetadata[SerializedNameWithGroupsDummy::class]);
     }
 }

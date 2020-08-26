@@ -33,8 +33,9 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
         }
 
         $compiledClassMetadata = require $compiledClassMetadataFile;
+
         if (!\is_array($compiledClassMetadata)) {
-            throw new \RuntimeException(sprintf('Compiled metadata must be of the type array, %s given.', \gettype($compiledClassMetadata)));
+            throw new \RuntimeException(sprintf('Compiled metadata must be of the type array, "%s" given.', \gettype($compiledClassMetadata)));
         }
 
         $this->compiledClassMetadata = $compiledClassMetadata;
@@ -56,7 +57,7 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
             $classMetadata = new ClassMetadata($className);
             foreach ($this->compiledClassMetadata[$className][0] as $name => $compiledAttributesMetadata) {
                 $classMetadata->attributesMetadata[$name] = $attributeMetadata = new AttributeMetadata($name);
-                [$attributeMetadata->groups, $attributeMetadata->maxDepth, $attributeMetadata->serializedName] = $compiledAttributesMetadata;
+                [$attributeMetadata->groups, $attributeMetadata->maxDepth, $attributeMetadata->serializedNames] = $compiledAttributesMetadata;
             }
             $classMetadata->classDiscriminatorMapping = $this->compiledClassMetadata[$className][1]
                 ? new ClassDiscriminatorMapping(...$this->compiledClassMetadata[$className][1])

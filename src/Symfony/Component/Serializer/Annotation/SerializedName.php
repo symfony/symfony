@@ -28,6 +28,8 @@ final class SerializedName
      */
     private $serializedName;
 
+    private $groups = [];
+
     public function __construct(array $data)
     {
         if (!isset($data['value'])) {
@@ -39,10 +41,16 @@ final class SerializedName
         }
 
         $this->serializedName = $data['value'];
+        $this->groups = (array) ($data['groups'] ?? []);
     }
 
     public function getSerializedName(): string
     {
         return $this->serializedName;
+    }
+
+    public function getGroups(): array
+    {
+        return $this->groups;
     }
 }

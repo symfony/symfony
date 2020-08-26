@@ -144,12 +144,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     public function attributeAndContextProvider()
     {
         return [
-            ['buz', 'buz', ['groups' => ['a']]],
             ['buzForExport', 'buz', ['groups' => ['b']]],
-            ['buz', 'buz', ['groups' => 'a']],
-            ['buzForExport', 'buz', ['groups' => 'b']],
-            ['buz', 'buz', ['groups' => ['c']]],
-            ['buz', 'buz', []],
         ];
     }
 

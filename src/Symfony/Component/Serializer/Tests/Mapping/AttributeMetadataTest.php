@@ -57,6 +57,23 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
     }
 
+    public function testAddSerializedName()
+    {
+        $attributeMetadata = new AttributeMetadata('name');
+        $attributeMetadata->addSerializedName('serialized_name', ['group1', 'group2']);
+
+        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedNameForGroups(['group1']));
+        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedNameForGroups(['group2']));
+        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedNameForGroups(['group1', 'group2']));
+        $this->assertNull($attributeMetadata->getSerializedNameForGroups());
+
+        $attributeMetadata->addSerializedName('serialized_name_group_3', ['group3']);
+        $this->assertEquals('serialized_name_group_3', $attributeMetadata->getSerializedNameForGroups(['group3']));
+
+        $attributeMetadata->addSerializedName('serialized_name_no_group');
+        $this->assertEquals('serialized_name_no_group', $attributeMetadata->getSerializedNameForGroups());
+    }
+
     public function testIgnore()
     {
         $attributeMetadata = new AttributeMetadata('ignored');

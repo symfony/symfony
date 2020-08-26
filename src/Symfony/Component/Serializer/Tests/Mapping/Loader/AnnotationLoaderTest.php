@@ -20,8 +20,8 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
-use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -92,8 +92,20 @@ class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
-        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        $this->assertEquals(['baz' => []], $attributesMetadata['foo']->getSerializedNames());
+        $this->assertEquals(['qux' => []], $attributesMetadata['bar']->getSerializedNames());
+    }
+
+    public function testLoadSerializedNames()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(['baz' => []], $attributesMetadata['foo']->getSerializedNames());
+        $this->assertEquals(['qux' => []], $attributesMetadata['bar']->getSerializedNames());
+        $this->assertEquals(['bargroups' => ['group1']], $attributesMetadata['barWithGroup']->getSerializedNames());
+        $this->assertEquals(['quuxgroups2' => ['group1', 'group2'], 'quuxgroups1' => ['group1']], $attributesMetadata['quuxWithGroups']->getSerializedNames());
     }
 
     public function testLoadClassMetadataAndMerge()

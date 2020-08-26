@@ -25,6 +25,24 @@
         <attribute name="bar" serialized-name="qux" />
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\SerializedNameWithGroupsDummy">
+        <attribute name="foo" serialized-name="baz" />
+        <attribute name="foos" serialized-name="bazs" />
+        <attribute name="barWithGroup">
+            <group>group1</group>
+        </attribute>
+        <attribute name="barWithGroup" serialized-name="bargroups">
+            <group>group1</group>
+        </attribute>
+        <attribute name="quuxWithGroups" serialized-name="quuxgroups2">
+            <group>group1</group>
+            <group>group2</group>
+        </attribute>
+        <attribute name="quuxWithGroups" serialized-name="quuxgroups1">
+            <group>group1</group>
+        </attribute>
+    </class>
+
     <class name="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy">
         <discriminator-map type-property="type">
             <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild" />

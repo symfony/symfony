@@ -49,4 +49,11 @@ class SerializedNameTest extends TestCase
         $maxDepth = new SerializedName(['value' => 'foo']);
         $this->assertEquals('foo', $maxDepth->getSerializedName());
     }
+
+    public function testSerializedNameParametersWithGroups()
+    {
+        $maxDepth = new SerializedName(['value' => 'foo', 'groups' => ['group1', 'group2']]);
+        $this->assertEquals('foo', $maxDepth->getSerializedName());
+        $this->assertEquals(['group1', 'group2'], $maxDepth->getGroups());
+    }
 }

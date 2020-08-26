@@ -42,13 +42,11 @@ class AttributeMetadata implements AttributeMetadataInterface
     public $maxDepth;
 
     /**
-     * @var string|null
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedName()} instead.
+     *           {@link getSerializedNames()} instead.
      */
-    public $serializedName;
+    public $serializedNames = [];
 
     /**
      * @var bool
@@ -111,7 +109,15 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function setSerializedName(string $serializedName = null)
     {
-        $this->serializedName = $serializedName;
+        $this->addSerializedName($serializedName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addSerializedName(string $serializedName, array $groups = [])
+    {
+        $this->serializedNames[$serializedName] = $groups;
     }
 
     /**
@@ -119,7 +125,35 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function getSerializedName(): ?string
     {
-        return $this->serializedName;
+        return $this->getSerializedNameForGroups();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSerializedNames(): array
+    {
+        return $this->serializedNames;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSerializedNameForGroups(array $groups = []): ?string
+    {
+        $defaultSerializedName = null;
+
+        foreach ($this->serializedNames as $serializedName => $groupsForSerializedName) {
+            if (!$groupsForSerializedName) {
+                $defaultSerializedName = $serializedName;
+            }
+
+            if (array_intersect($groups, $groupsForSerializedName)) {
+                return $serializedName;
+            }
+        }
+
+        return $defaultSerializedName;
     }
 
     /**
@@ -152,9 +186,9 @@ class AttributeMetadata implements AttributeMetadataInterface
             $this->maxDepth = $attributeMetadata->getMaxDepth();
         }
 
-        // Overwrite only if not defined
-        if (null === $this->serializedName) {
-            $this->serializedName = $attributeMetadata->getSerializedName();
+        // Overwrite only if empty or nullable array
+        if (!$this->serializedNames) {
+            $this->serializedNames = $attributeMetadata->getSerializedNames();
         }
 
         if ($ignore = $attributeMetadata->isIgnored()) {
@@ -169,6 +203,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore'];
+        return ['name', 'groups', 'maxDepth', 'serializedNames', 'ignore'];
     }
 }

@@ -86,12 +86,28 @@ class YamlFileLoader extends FileLoader
                     $attributeMetadata->setMaxDepth($data['max_depth']);
                 }
 
-                if (isset($data['serialized_name'])) {
-                    if (!\is_string($data['serialized_name']) || empty($data['serialized_name'])) {
-                        throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                if (isset($data['serialized_names'])) {
+                    if (!\is_string($data['serialized_names']) && !\is_array($data['serialized_names'])) {
+                        throw new MappingException(sprintf('The "serialized_names" value must be a non-empty string or an array of serialized name/groups in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
-                    $attributeMetadata->setSerializedName($data['serialized_name']);
+                    if (\is_string($data['serialized_names'])) {
+                        if (!$data['serialized_names']) {
+                            throw new MappingException(sprintf('The "serialized_names" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                        $attributeMetadata->addSerializedName($data['serialized_names']);
+                    } elseif (\is_array($data['serialized_names'])) {
+                        if (empty($data['serialized_names'])) {
+                            throw new MappingException(sprintf('The "serialized_names" value must be a non-empty array of serialized name/groups in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                        foreach ($data['serialized_names'] as $serializedName => $groups) {
+                            if (!\is_string($serializedName) || empty($serializedName)) {
+                                throw new MappingException(sprintf('The key for "serialized_names" array must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                            }
+
+                            $attributeMetadata->addSerializedName($serializedName, (array) $groups);
+                        }
+                    }
                 }
 
                 if (isset($data['ignore'])) {

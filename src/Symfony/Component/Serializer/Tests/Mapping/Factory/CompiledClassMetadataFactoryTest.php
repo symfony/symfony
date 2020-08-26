@@ -35,7 +35,7 @@ final class CompiledClassMetadataFactoryTest extends TestCase
     public function testItThrowAnExceptionWhenMetadataIsNotOfTypeArray()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Compiled metadata must be of the type array, object given.');
+        $this->expectExceptionMessage('Compiled metadata must be of the type array, "object" given.');
 
         $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/object-metadata.php', $classMetadataFactory);

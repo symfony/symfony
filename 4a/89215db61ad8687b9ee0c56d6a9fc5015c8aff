@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T09:14:52Z
+
+Is it still WIP? ping @dunglas
+
+---------------------------------------------------------------------------
+
+by karser at 2019-03-04T09:39:35Z
+
+There are still controversial cases, I need more feedback. This [discussion](https://github.com/symfony/symfony/pull/30128#issuecomment-462283494).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-08T07:00:01Z
+
+/cc @joelwurtz
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-08T07:15:56Z
+
+I think it make sense to have something like this, however i'm not sure about the current priority system. To be clear, this is how it should be, but for BC purpose adding a new extractor on top of other would maybe induce a different behavior in existing application.
+
+What would be really nice is to split extraction for __constructor and attributes list, which is something that would be possible with #30818 (by passing a different extractor to the instantiator, and another one for the property list extraction)
+
+For the moment can we add this extractor without adding it to the flow of control (DI) ? So we don't break any behaviour but still allow people to use it ?
+
+WDYT @dunglas ?
+
+---------------------------------------------------------------------------
+
+by karser at 2019-04-08T11:50:40Z
+
+Thank you @joelwurtz for the code review. I applied all the suggestions and removed from FrameworkBundle all the injections so it won't introduce any BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-08T14:15:46Z
+
+@karser I haven't had a look at the code, but can you rebase the PR to get rid of the merge commit (we don't merge PR with merge commits). Also, is it still WIP?
+
+---------------------------------------------------------------------------
+
+by karser at 2019-04-08T16:24:34Z
+
+@fabpot I removed merges, squashed commits and removed WIP status.

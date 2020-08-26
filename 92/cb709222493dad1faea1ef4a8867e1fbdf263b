@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-22T10:51:29Z
+
+/cc @joelwurtz @Korbeil WDYT?
+
+On my side, I'm wondering about the perf impact of the implementation. Isn't this the same as removing the `$object instanceof \stdClass` check?
+
+Please also add tests.
+
+---------------------------------------------------------------------------
+
+by andreyserdjuk at 2020-07-22T13:02:47Z
+
+@nicolas-grekas it will fail when trying to access protected/private property (`$access` is null but we dunno why: it's a dynamic object property or class protected/private inaccessible property). The only reason why \stdClass check was written before - to be 100% sure that class property is dynamic and cannot be private/protected - inaccessible.
+To improve performance I suggest having `PropertyReadInfo` in any case to make a decision looking on `PropertyReadInfo::$visibility`. But it requires some refactoring.
+BTW setValue() has the same logic. So I guess it also should support dynamic value?
+
+---------------------------------------------------------------------------
+
+by andreyserdjuk at 2020-07-23T09:21:59Z
+
+Update: unit-test added. But only PropertyAccessor::getValue() is covered with getting dynamic value. setValue() - I didn't cover and as I see from unit-tests, the dynamic value cannot be set by design - at least setter method should be.
+@dunglas , could you please tell (you created ReflectionExtractor), whether support of dynamic values getting/setting by ref evolutionally (and intentionally) was removed? I just want to be sure not to harm the idea of this tool.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2020-07-29T15:23:55Z
+
+I'm not sure about perf also, it may be slower (but need benchmark for that)
+
+Another possible implementation would be to follow @nicolas-grekas suggestion by only removing the instanceof part and add a try catch when getting the value (to catch error if property is not accessible : protected / private), maybe it would keep perf reasonable and would also allow a better error message (like property exists but is not accessible)
+
+---------------------------------------------------------------------------
+
+by andreyserdjuk at 2020-07-31T21:50:22Z
+
+@nicolas-grekas please review the last approach suggested by @joelwurtz .

@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidMethods;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassDynamicProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
@@ -95,6 +96,29 @@ class PropertyAccessorTest extends TestCase
     public function testGetValue($objectOrArray, $path, $value)
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    /**
+     * Test get dynamic value from object is other than \stdClass instance.
+     */
+    public function testGetDynamicValue()
+    {
+        $value = 'dynamicPropertyValue';
+        $path = 'dynamicProperty';
+        $object = new TestClassDynamicProperty($value);
+
+        $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    /**
+     * Ensure exact exception with message was thrown on access to non-public property.
+     */
+    public function testGetInaccessibleProperty()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectExceptionMessage(sprintf('Can\'t read protected or private property "%s" in class "%s".', 'protectedProperty', TestClass::class));
+
+        $this->propertyAccessor->getValue(new TestClass('Bernhard'), 'protectedProperty');
     }
 
     /**

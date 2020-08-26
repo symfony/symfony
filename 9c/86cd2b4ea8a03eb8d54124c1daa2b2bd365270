@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-25T13:20:46Z
+
+Closing as explained in the issue.
+
+---------------------------------------------------------------------------
+
+by Flinsch at 2020-08-25T13:44:14Z
+
+> Closing as explained in the issue.
+
+Have you even read the issue in full, @fabpot? Sorry, I don't mean to be rude, but I can't understand how you can just close this without even considering.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T12:05:55Z
+
+Reopening
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-26T12:23:04Z
+
+Can you please rebase and target 5.1 also?
+
+---------------------------------------------------------------------------
+
+by Flinsch at 2020-08-26T12:24:40Z
+
+Will do. Thank you for your consideration.
+
+---------------------------------------------------------------------------
+
+by Flinsch at 2020-08-26T13:12:19Z
+
+> Can you please rebase and target 5.1 also?
+
+@nicolas-grekas, the source branch cannot be changed for a pull request. I can rebase 5.0 onto 5.1 but the source branch will still read 5.0 which might lead to confusions. What should I do in your opinion? Should we stick to the name 5.0 for the source branch or should I replace the pull request with a new one having target/base branch and source branch both set to 5.1?
+
+The Symfony guidelines on how to create pull requests say that "bug fixes must be submitted against the lowest maintained branch where they apply (lowest branches are regularly merged to upper ones so they get the fixes too.)" That's why I have chosen 5.0 in the first place. Just as a remark. I'm sorry if that was wrong.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-26T13:24:26Z
+
+You can rebase your branch 5.0 on 5.1 yes, that'd be fine on our side. You could then delete it on your fork, 5.0 is not maintained anymore anyway.
+
+---------------------------------------------------------------------------
+
+by Flinsch at 2020-08-26T14:06:24Z
+
+> Please add a test case.
+
+Done.
+
+fabbot.io still has comlaints about "Common Typos" and "Merge Commits" which don't seem to have any relations to my changes/commits however.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T14:20:18Z
+
+Looks like you forgot to rebase your changes on 5.1 (many unrelated commits). When done, push it again, that should be enough.

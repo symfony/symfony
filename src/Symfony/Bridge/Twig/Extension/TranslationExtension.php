@@ -92,8 +92,12 @@ final class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans(string $message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    public function trans(?string $message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
+        if (null === $message || '' === $message) {
+            return '';
+        }
+
         if (null !== $count) {
             $arguments['%count%'] = $count;
         }

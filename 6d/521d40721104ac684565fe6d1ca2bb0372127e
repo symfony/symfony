@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T10:04:39Z
+
+@wouterj I think you forgot to add notes in the main UPGRADE files for 5.2 and 6.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T10:07:12Z
+
+And you also have some failing tests.

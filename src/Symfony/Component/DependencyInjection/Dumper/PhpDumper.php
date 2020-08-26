@@ -886,6 +886,7 @@ EOF;
         if ($asFile) {
             $code = str_replace('$this', '$container', $code);
             $code = str_replace('function () {', 'function () use ($container) {', $code);
+            $code = str_replace('function ($lazyLoad = true) {', 'function ($lazyLoad = true) use ($container) {', $code);
         }
 
         $code .= "    }\n";

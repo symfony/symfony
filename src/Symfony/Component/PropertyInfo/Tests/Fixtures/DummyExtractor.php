@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
+use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
+class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     /**
      * {@inheritdoc}
@@ -45,6 +46,14 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     public function getTypes($class, $property, array $context = []): ?array
     {
         return [new Type(Type::BUILTIN_TYPE_INT)];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        return [new Type(Type::BUILTIN_TYPE_STRING)];
     }
 
     /**

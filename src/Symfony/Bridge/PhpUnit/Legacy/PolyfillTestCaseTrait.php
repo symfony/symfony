@@ -11,10 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * This trait is @internal.
@@ -117,19 +115,5 @@ trait PolyfillTestCaseTrait
         $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionMessageRegExp');
         $property->setAccessible(true);
         $property->setValue($this, $messageRegExp);
-    }
-
-    /**
-     * Asserts that a string matches a given regular expression.
-     *
-     * @param string $pattern
-     * @param string $string
-     * @param string $message
-     *
-     * @return void
-     */
-    public function assertMatchesRegularExpression($pattern, $string, $message = '')
-    {
-        $this->assertRegExp($pattern, $string, $message);
     }
 }

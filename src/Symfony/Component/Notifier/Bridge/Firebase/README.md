@@ -3,6 +3,18 @@ Firebase Notifier
 
 Provides Firebase integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+FIREBASE_DSN=firebase://USERNAME:PASSWORD@default
+```
+
+where:
+ - `USERNAME` is your Firebase username
+ - `PASSWORD` is your Firebase password
+
 Resources
 ---------
 

@@ -3,6 +3,18 @@ Mattermost Notifier
 
 Provides Mattermost integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+MATTERMOST_DSN=mattermost://ACCESS_TOKEN@default?channel=CHANNEL
+```
+
+where:
+ - `ACCESS_TOKEN` is your Mattermost access token
+ - `CHANNEL` is your Mattermost channel
+
 Resources
 ---------
 

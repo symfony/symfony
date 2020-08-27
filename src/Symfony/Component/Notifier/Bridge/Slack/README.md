@@ -3,6 +3,18 @@ Slack Notifier
 
 Provides Slack integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+SLACK_DSN=slack://ACCESS_TOKEN@default?channel=CHANNEL
+```
+
+where:
+ - `ACCESS_TOKEN` is your Slack access token
+ - `CHANNEL` is the Slack channel
+
 Resources
 ---------
 

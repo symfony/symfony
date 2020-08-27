@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T06:49:47Z
+
+To fix the tests, you should probably bump the min version for `symfony/mime` to `^5.2`.
+`
+
+---------------------------------------------------------------------------
+
+by tcheymol at 2020-08-26T09:02:24Z
+
+@fabpot Do you mean the version in the Mailer component's `composer.json` or inside Mailjet Mailer's `composer.json`, in the Mailer component, the version is already `^5.2`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-26T09:09:42Z
+
+I mean Mailjet Mailer's composer.json

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by kelunik at 2020-07-16T17:30:06Z
+
+`Loop::disable($id)/enable($id)` only works before the request has been sent.
+
+---------------------------------------------------------------------------
+
+by kelunik at 2020-07-28T18:29:56Z
+
+@nicolas-grekas Tests for Amp's implementation pass, but `Native` / `Mock` needs work. Could you have a look at those?

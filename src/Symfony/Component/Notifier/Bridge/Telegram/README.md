@@ -3,6 +3,18 @@ Telegram Notifier
 
 Provides Telegram integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+TELEGRAM_DSN=telegram://TOKEN@default?channel=CHANNEL
+```
+
+where:
+ - `TOKEN` is your Telegram token
+ - `CHANNEL` is the Slack channel
+
 Resources
 ---------
 

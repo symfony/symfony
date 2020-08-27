@@ -81,5 +81,22 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtps', 'example.com', '', '', 465, ['verify_peer' => false]),
             $transport,
         ];
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['verify_peer' => 'false']),
+            $transport,
+        ];
+
+        yield [
+            Dsn::fromString('smtps://:@example.com?verify_peer=0'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+
+        yield [
+            Dsn::fromString('smtps://:@example.com?verify_peer='),
+            $transport,
+        ];
     }
 }

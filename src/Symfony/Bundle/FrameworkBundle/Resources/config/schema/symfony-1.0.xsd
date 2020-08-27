@@ -510,6 +510,7 @@
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="max-host-connections" type="xsd:integer" />
+        <xsd:attribute name="mock-response-factory" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="http_client_default_options" mixed="true">

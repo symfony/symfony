@@ -41,6 +41,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Serializer\FormErrorNormalizer;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1565,6 +1566,21 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
 
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
+    }
+
+    public function testHttpClientMockResponseFactory()
+    {
+        $container = $this->createContainerFromFile('http_client_mock_response_factory');
+
+        $definition = $container->getDefinition('http_client');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(1, $definition->getArguments());
+
+        $argument = $definition->getArgument(0);
+
+        $this->assertInstanceOf(Reference::class, $argument);
+        $this->assertSame('my_response_factory', (string) $argument);
     }
 
     protected function createContainer(array $data = [])

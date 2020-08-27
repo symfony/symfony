@@ -63,6 +63,7 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -2009,6 +2010,12 @@ class FrameworkExtension extends Extension
 
                 $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
             }
+        }
+
+        if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
+            $container->getDefinition($httpClientId)
+                ->setClass(MockHttpClient::class)
+                ->setArguments([new Reference($responseFactoryId)]);
         }
     }
 

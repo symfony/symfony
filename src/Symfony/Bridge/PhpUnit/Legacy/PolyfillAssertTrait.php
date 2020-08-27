@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\Constraint\LogicalNot;
+use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
 
@@ -442,5 +443,25 @@ trait PolyfillAssertTrait
     {
         static::assertFileExists($filename, $message);
         static::assertNotIsWritable($filename, $message);
+    }
+
+    /**
+     * Asserts that a string matches a given regular expression.
+     *
+     * @param string $pattern
+     * @param string $string
+     * @param string $message
+     *
+     * @return void
+     */
+    public function assertMatchesRegularExpression($pattern, $string, $message = '')
+    {
+        static::assertThat(
+            $string,
+            new LogicalNot(
+                new RegularExpression($pattern)
+            ),
+            $message
+        );
     }
 }

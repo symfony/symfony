@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-29T10:12:14Z
+
+Very related to #35651 and #35677
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T12:52:41Z
+
+@nicolas-grekas Can you have a look at this one as it would unblock some other PRs as well?

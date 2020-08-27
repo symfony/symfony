@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fritzmg at 2020-08-27T07:37:04Z
+
+Updated against current master. @fabpot I still think that this should be merged as is, otherwise there would still be no way of customising the command of the `sendmail` transport, regardless of what is configured in the `php.ini`. This PR is independent of the (very useful) feature of #36131.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-08-27T08:19:13Z
+
+`restart_threshold_sleep` is missing in the PR header + the documentation, it is only mentioned in `CHANGELOG.md`
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2020-08-27T08:20:51Z
+
+> `restart_threshold_sleep` is missing in the PR header
+
+Hm, what do you mean by that? It i used in the example.
+
+It is missing from the proposed documentation, that is true.

@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-02-18T21:32:28Z
+
+Very useful feature for distributed systems when you need to limit concurrency. We used [RabbitMQ](https://www.rabbitmq.com/blog/2014/02/19/distributed-semaphores-with-rabbitmq/) to store semaphores.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2020-02-19T18:56:00Z
+
+This is exactly what I need limit outgoing http connections for a given client.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-02-28T10:26:24Z
+
+Great idea! I like it.
+
+Wouldn't it make sens to merge it with Lock Component?
+
+I've also an enhancement on my todo list, about adding Read/WriteLock (wellknown as SharedLock for flock) to the Lock Compoenent (basicaly being able to get N (infinity) locks for reads, but 1 lock for Write). And sounds like something realy close to this new SemaphoreComponent
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-03T16:37:17Z
+
+> Wouldn't it make sens to merge it with Lock Component?
+
+I don't think so. Even if theses 2 components look similar, they are not. They do not share code (except the Key and StoreFactory Classes, but they are different).
+
+Semaphore does not require lock anymore.
+
+Again, Theses  concept are similar, but they are not the same. That's why they have two different name.
+
+PHP, Linux, Go, Rust have different packages for theses 2 purposes. I think we should stay consistant with others big players.
+
+More over it will be:
+
+* better for discoverability
+* easier to maintain (I guess)
+* easier to get more accurate stats utilisation
+
+> What's about High Availability?
+
+I don't see the issue here. Could you be more specific?
+
+---------------------------------------------------------------------------
+
+by bwoebi at 2020-03-05T12:34:15Z
+
+@lyrixx amphp/sync is relying on amp promises. It does not need the loop though...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-19T17:31:04Z
+
+I changed a bit the implementation. Now it's not as in the Book. But since I'm using a lua script, I'm sure there is no race condition possible (I tested it).
+More over, it's not possible to get an "unfair" semaphore.
+
+The system is now simpler and more powerful.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-03-19T23:00:34Z
+
+> Just a question: In Lock Component we provided a "CombinedStore" in order to provide HighAvailability and guarentee reliability even when a Redis Server in unreachable. Doe you think it worth it?
+
+I don't know. ATM we only have Redis so I don't think this is useful. Maybe later ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:41:59Z
+
+@lyrixx @jderusse What's the status here?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-11T10:43:55Z
+
+To me it was ready month ago
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-18T14:14:03Z
+
+@lyrixx Can you have a look at the feedback?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-27T10:14:02Z
+
+@jderusse @fabpot I have addressed your comments. I hope it's Okay now :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-27T10:24:35Z
+
+Note: The CI is broken, I'm trying to fix it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-08-27T12:45:31Z
+
+Semaphore component is now 💚 in the CI

@@ -3,13 +3,19 @@ Mobyt Notifier
 
 Provides [Mobyt](https://www.mobyt.it/en/) integration for Symfony Notifier.
 
-DSN should be as follow:
+DSN example
+-----------
 
 ```
-mobyt://USER_KEY:ACCESS_TOKEN@default?from=FROM
+// .env file
+MOBYT_DSN=mobyt://USER_KEY:ACCESS_TOKEN@default?from=FROM&type_quality=TYPE_QUALITY
 ```
 
-`USER_KEY` and `ACCESS_TOKEN` are given by Mobyt ; `FROM` is the sender name.
+where:
+ - `USER_KEY` is your Mobyt user key
+ - `ACCESS_TOKEN` is your Mobyt access token
+ - `TYPE_QUALITY` is the quality : `N` for high, `L` for medium, `LL` for low (default: `L`)
+ - `FROM` is the sender
 
 Resources
 ---------

@@ -3,13 +3,18 @@ Infobip Notifier
 
 Provides Infobip integration for Symfony Notifier.
 
-DSN should be as follow:
+DSN example
+-----------
 
 ```
-infobip://authtoken@infobiphost?from=0611223344
+// .env file
+INFOBIP_DSN=infobip://AUTH_TOKEN@INFOBIP_HOST?from=FROM
 ```
 
-`authtoken` and `infobiphost` are given by Infobip ; `from` is the sender.
+where:
+ - `AUTH_TOKEN` is your Infobip auth token
+ - `INFOBIP_HOST` is your Infobip host
+ - `FROM` is the sender
 
 Resources
 ---------

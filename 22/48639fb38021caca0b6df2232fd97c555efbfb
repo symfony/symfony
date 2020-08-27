@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-16T14:33:22Z
+
+I like this very much.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-08-17T20:04:42Z
+
+Thank you @fabpot :smiley:
+
+This PR is ready for a review now, I've added some functional tests to make sure things are working.
+
+There are 2 future considerations here:
+
+1. Should we also rely on the `UserProviderListener` in the core authenticators? (removing their `provider` option and dependency on `UserProviderInterface`)?
+2. User providers are also often used to dynamically add the `PasswordUpgradeBadge`. Should we move this logic to the `UserProviderListener` instead? https://github.com/symfony/symfony/blob/c4ff0741166c1b7916e4dc0e9454a8f99137f270/src/Symfony/Component/Security/Http/Authenticator/FormLoginAuthenticator.php#L93-L95
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-18T05:53:25Z
+
+I think you 2 additional changes you mentioned are worth investigating.

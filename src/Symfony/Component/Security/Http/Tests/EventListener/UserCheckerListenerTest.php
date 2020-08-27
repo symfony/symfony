@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -55,7 +56,7 @@ class UserCheckerListenerTest extends TestCase
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
-        $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport($this->user, [new PreAuthenticatedUserBadge()])));
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PreAuthenticatedUserBadge()])));
     }
 
     public function testPostAuthValidCredentials()
@@ -75,7 +76,7 @@ class UserCheckerListenerTest extends TestCase
     private function createCheckPassportEvent($passport = null)
     {
         if (null === $passport) {
-            $passport = new SelfValidatingPassport($this->user);
+            $passport = new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
         }
 
         return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
@@ -84,7 +85,7 @@ class UserCheckerListenerTest extends TestCase
     private function createLoginSuccessEvent($passport = null)
     {
         if (null === $passport) {
-            $passport = new SelfValidatingPassport($this->user);
+            $passport = new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
         }
 
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), new Request(), null, 'main');

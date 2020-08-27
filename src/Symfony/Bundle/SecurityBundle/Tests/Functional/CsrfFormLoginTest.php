@@ -51,10 +51,6 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
-        if ($options['enable_authenticator_manager'] ?? false) {
-            $form['user_login[username]'] = 'johannes';
-            $form['user_login[password]'] = 'test';
-        }
         $form['user_login[_token]'] = '';
         $client->submit($form);
 

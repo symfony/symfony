@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -51,10 +52,10 @@ class PasswordMigratingListenerTest extends TestCase
     public function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [$this->createEvent(new SelfValidatingPassport($this->createMock(UserInterface::class)))];
+        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
 
         // blank password
-        yield [$this->createEvent(new SelfValidatingPassport($this->createMock(UserInterface::class), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
+        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
 
         // no user
         yield [$this->createEvent($this->createMock(PassportInterface::class))];
@@ -76,7 +77,7 @@ class PasswordMigratingListenerTest extends TestCase
             ->with($this->user, 'new-encoded-password')
         ;
 
-        $event = $this->createEvent(new SelfValidatingPassport($this->user, [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
         $this->listener->onLoginSuccess($event);
     }
 

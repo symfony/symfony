@@ -18,6 +18,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
@@ -75,7 +76,7 @@ class CsrfProtectionListenerTest extends TestCase
 
     private function createPassport(?CsrfTokenBadge $badge)
     {
-        $passport = new SelfValidatingPassport(new User('wouter', 'pass'));
+        $passport = new SelfValidatingPassport(new UserBadge('wouter', function ($username) { return new User($username, 'pass'); }));
         if ($badge) {
             $passport->addBadge($badge);
         }

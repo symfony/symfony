@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -53,7 +54,7 @@ class CheckCredentialsListenerTest extends TestCase
         }
 
         $credentials = new PasswordCredentials($password);
-        $this->listener->checkPassport($this->createEvent(new Passport($this->user, $credentials)));
+        $this->listener->checkPassport($this->createEvent(new Passport(new UserBadge('wouter', function () { return $this->user; }), $credentials)));
 
         if (true === $result) {
             $this->assertTrue($credentials->isResolved());
@@ -73,7 +74,7 @@ class CheckCredentialsListenerTest extends TestCase
 
         $this->encoderFactory->expects($this->never())->method('getEncoder');
 
-        $event = $this->createEvent(new Passport($this->user, new PasswordCredentials('')));
+        $event = $this->createEvent(new Passport(new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('')));
         $this->listener->checkPassport($event);
     }
 
@@ -91,7 +92,7 @@ class CheckCredentialsListenerTest extends TestCase
         $credentials = new CustomCredentials(function () use ($result) {
             return $result;
         }, ['password' => 'foo']);
-        $this->listener->checkPassport($this->createEvent(new Passport($this->user, $credentials)));
+        $this->listener->checkPassport($this->createEvent(new Passport(new UserBadge('wouter', function () { return $this->user; }), $credentials)));
 
         if (true === $result) {
             $this->assertTrue($credentials->isResolved());
@@ -108,7 +109,7 @@ class CheckCredentialsListenerTest extends TestCase
     {
         $this->encoderFactory->expects($this->never())->method('getEncoder');
 
-        $event = $this->createEvent(new SelfValidatingPassport($this->user));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
         $this->listener->checkPassport($event);
     }
 

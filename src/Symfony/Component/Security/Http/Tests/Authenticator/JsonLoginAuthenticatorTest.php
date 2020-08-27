@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -72,8 +71,6 @@ class JsonLoginAuthenticatorTest extends TestCase
     {
         $this->setUpAuthenticator();
 
-        $this->userProvider->expects($this->once())->method('loadUserByUsername')->with('dunglas')->willReturn(new User('dunglas', 'pa$$'));
-
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
@@ -85,8 +82,6 @@ class JsonLoginAuthenticatorTest extends TestCase
             'username_path' => 'authentication.username',
             'password_path' => 'authentication.password',
         ]);
-
-        $this->userProvider->expects($this->once())->method('loadUserByUsername')->with('dunglas')->willReturn(new User('dunglas', 'pa$$'));
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"authentication": {"username": "dunglas", "password": "foo"}}');
         $passport = $this->authenticator->authenticate($request);

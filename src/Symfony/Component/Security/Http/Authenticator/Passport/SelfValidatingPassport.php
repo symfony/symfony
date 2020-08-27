@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 /**
  * An implementation used when there are no credentials to be checked (e.g.
@@ -25,11 +26,20 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 class SelfValidatingPassport extends Passport
 {
     /**
+     * @param UserBadge        $userBadge
      * @param BadgeInterface[] $badges
      */
-    public function __construct(UserInterface $user, array $badges = [])
+    public function __construct($userBadge, array $badges = [])
     {
-        $this->user = $user;
+        if ($userBadge instanceof UserInterface) {
+            trigger_deprecation('symfony/security-http', '5.2', 'The 1st argument of "%s" must be an instance of "%s", support for "%s" will be removed in symfony/security-http 5.3.', __CLASS__, UserBadge::class, UserInterface::class);
+
+            $this->user = $userBadge;
+        } elseif ($userBadge instanceof UserBadge) {
+            $this->addBadge($userBadge);
+        } else {
+            throw new \TypeError(sprintf('Argument 1 of "%s" must be an instance of "%s", "%s" given.', __METHOD__, UserBadge::class, get_debug_type($userBadge)));
+        }
 
         foreach ($badges as $badge) {
             $this->addBadge($badge);

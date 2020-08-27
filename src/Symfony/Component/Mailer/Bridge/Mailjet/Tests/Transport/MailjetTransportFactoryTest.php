@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Tests\Transport;
 
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
@@ -26,6 +27,11 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
 
     public function supportsProvider(): iterable
     {
+        yield [
+            new Dsn('mailjet+api', 'default'),
+            true,
+        ];
+
         yield [
             new Dsn('mailjet', 'default'),
             true,
@@ -51,6 +57,16 @@ class MailjetTransportFactoryTest extends TransportFactoryTestCase
     {
         $dispatcher = $this->getDispatcher();
         $logger = $this->getLogger();
+
+        yield [
+            new Dsn('mailjet+api', 'default', self::USER, self::PASSWORD),
+            new MailjetApiTransport(self::USER, self::PASSWORD, $this->getClient(), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('mailjet+api', 'example.com', self::USER, self::PASSWORD),
+            (new MailjetApiTransport(self::USER, self::PASSWORD, $this->getClient(), $dispatcher, $logger))->setHost('example.com'),
+        ];
 
         yield [
             new Dsn('mailjet', 'default', self::USER, self::PASSWORD),

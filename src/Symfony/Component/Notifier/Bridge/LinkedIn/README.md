@@ -11,6 +11,10 @@ DSN example
 LINKEDIN_DSN='linkedin://ACCESS_TOKEN:USER_ID@default'
 ```
 
+where:
+ - `ACCESS_TOKEN` is your LinkedIn access token
+ - `USER_ID` is your LinkedIn user id
+
 Resources
 ---------
 

@@ -66,9 +66,7 @@ class MailjetApiTransportTest extends TestCase
         $this->assertArrayHasKey('From', $message);
         $sender = $message['From'];
         $this->assertArrayHasKey('Email', $sender);
-        $this->assertArrayHasKey('Name', $sender);
         $this->assertEquals('foo@example.com', $sender['Email']);
-        $this->assertEquals('Foo', $sender['Name']);
 
         $this->assertArrayHasKey('To', $message);
         $recipients = $message['To'];

@@ -103,7 +103,8 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "amphp/http-client": "^4.2",
+        "amphp/amp": "^2.5",
+        "amphp/http-client": "^4.2.1",
         "amphp/http-tunnel": "^1.0",
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0",

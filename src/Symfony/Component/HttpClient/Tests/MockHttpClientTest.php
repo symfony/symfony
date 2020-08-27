@@ -199,6 +199,8 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testPause':
+            case 'testPauseReplace':
+            case 'testPauseDuringBody':
                 $this->markTestSkipped("MockHttpClient doesn't support pauses by default");
                 break;
 

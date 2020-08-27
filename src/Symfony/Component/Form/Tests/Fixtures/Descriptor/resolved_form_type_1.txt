@@ -17,7 +17,8 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   group_by                                         by_reference                                          
   multiple                                         data                                                  
   placeholder                                      disabled                                              
-  preferred_choices                                help                                                  
+  preferred_choices                                getter                                                
+                                                   help                                                  
                                                    help_attr                                             
                                                    help_html                                             
                                                    help_translation_parameters                           
@@ -35,6 +36,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    property_path                                         
                                                    required                                              
                                                    row_attr                                              
+                                                   setter                                                
                                                    translation_domain                                    
                                                    upload_max_size_message                               
  --------------------------- -------------------- ------------------------------ ----------------------- 

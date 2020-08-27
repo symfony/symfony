@@ -16,6 +16,28 @@ FrameworkBundle
    used to be added by default to the seed, which is not the case anymore. This allows sharing caches between
    apps or different environments.
 
+Form
+----
+
+ * Deprecated `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
+
+ Before:
+
+ ```php
+ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+
+ $builder->setDataMapper(new PropertyPathMapper());
+ ```
+
+ After:
+
+ ```php
+ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+ use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+
+ $builder->setDataMapper(new DataMapper(new PropertyPathAccessor()));
+ ```
+
 Lock
 ----
 

@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * Added support for using the `{{ label }}` placeholder in constraint messages, which is replaced in the `ViolationMapper` by the corresponding field form label.
+ * Added `DataMapper`, `ChainAccessor`, `PropertyPathAccessor` and `CallbackAccessor` with new callable `getter` and `setter` options for each form type
+ * Deprecated `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`
 
 5.1.0
 -----

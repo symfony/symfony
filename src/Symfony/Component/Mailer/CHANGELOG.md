@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added `NativeTransportFactory` to configure a transport based on php.ini settings
+ * added `local_domain`, `restart_threshold`, `restart_threshold_sleep` and `ping_threshold` options for `smtp`
+ * added `command` option for `sendmail`
 
 4.4.0
 -----

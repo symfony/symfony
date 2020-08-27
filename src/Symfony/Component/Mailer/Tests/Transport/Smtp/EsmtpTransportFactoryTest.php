@@ -81,5 +81,29 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtps', 'example.com', '', '', 465, ['verify_peer' => false]),
             $transport,
         ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+        $transport->setLocalDomain('example.com');
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['local_domain' => 'example.com']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+        $transport->setRestartThreshold(10, 1);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['restart_threshold' => '10', 'restart_threshold_sleep' => '1']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+        $transport->setPingThreshold(10);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['ping_threshold' => '10']),
+            $transport,
+        ];
     }
 }

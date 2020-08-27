@@ -48,6 +48,18 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
             $transport->setPassword($password);
         }
 
+        if (null !== ($localDomain = $dsn->getOption('local_domain'))) {
+            $transport->setLocalDomain($localDomain);
+        }
+
+        if (null !== ($restartThreshold = $dsn->getOption('restart_threshold'))) {
+            $transport->setRestartThreshold((int) $restartThreshold, (int) $dsn->getOption('restart_threshold_sleep', 0));
+        }
+
+        if (null !== ($pingThreshold = $dsn->getOption('ping_threshold'))) {
+            $transport->setPingThreshold((int) $pingThreshold);
+        }
+
         return $transport;
     }
 

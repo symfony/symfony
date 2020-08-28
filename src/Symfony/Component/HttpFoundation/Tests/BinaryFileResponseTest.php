@@ -46,6 +46,17 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
+    public function testConstructWithNonAscii8BitFilename()
+    {
+        touch(sys_get_temp_dir().'/Àáå.html');
+
+        $response = new BinaryFileResponse(sys_get_temp_dir().'/Àáå.html', 200, [], true, 'attachment');
+
+        @unlink(sys_get_temp_dir().'/Àáå.html');
+
+        $this->assertSame('Àáå.html', $response->getFile()->getFilename());
+    }
+
     public function testSetContent()
     {
         $this->expectException('LogicException');

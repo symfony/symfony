@@ -167,7 +167,7 @@ class HeaderUtils
         }
 
         if ('' === $filenameFallback) {
-            $filenameFallback = $filename;
+            $filenameFallback = self::getFilenameFallback($filename);
         }
 
         // filenameFallback is not ASCII.
@@ -191,6 +191,27 @@ class HeaderUtils
         }
 
         return $disposition.'; '.self::toString($params, ';');
+    }
+
+    public static function getFilenameFallback(string $filename): string
+    {
+        if (preg_match('/^[\x20-\x7e]*$/', $filename) && false === strpos($filename, '%')) {
+            return $filename;
+        }
+        $filenameFallback = '';
+        $encoding = mb_detect_encoding($filename, null, true) ?: '8bit';
+
+        for ($i = 0, $filenameLength = mb_strlen($filename, $encoding); $i < $filenameLength; ++$i) {
+            $char = mb_substr($filename, $i, 1, $encoding);
+
+            if ('%' === $char || \ord($char) < 32 || \ord($char) > 126) {
+                $filenameFallback .= '_';
+            } else {
+                $filenameFallback .= $char;
+            }
+        }
+
+        return $filenameFallback;
     }
 
     private static function groupParts(array $matches, string $separators): array

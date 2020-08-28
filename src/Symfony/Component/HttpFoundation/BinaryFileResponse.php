@@ -159,18 +159,8 @@ class BinaryFileResponse extends Response
             $filename = $this->file->getFilename();
         }
 
-        if ('' === $filenameFallback && (!preg_match('/^[\x20-\x7e]*$/', $filename) || false !== strpos($filename, '%'))) {
-            $encoding = mb_detect_encoding($filename, null, true) ?: '8bit';
-
-            for ($i = 0, $filenameLength = mb_strlen($filename, $encoding); $i < $filenameLength; ++$i) {
-                $char = mb_substr($filename, $i, 1, $encoding);
-
-                if ('%' === $char || \ord($char) < 32 || \ord($char) > 126) {
-                    $filenameFallback .= '_';
-                } else {
-                    $filenameFallback .= $char;
-                }
-            }
+        if ('' === $filenameFallback) {
+            $filenameFallback = HeaderUtils::getFilenameFallback($filename);
         }
 
         $dispositionHeader = $this->headers->makeDisposition($disposition, $filename, $filenameFallback);

@@ -122,6 +122,23 @@ class TranslationExtensionTest extends TestCase
             // trans filter with null message
             ['{{ null|trans }}', ''],
             ['{{ foo|trans }}', '', ['foo' => null]],
+
+            // trans object
+            ['{{ t("Hello")|trans }}', 'Hello'],
+            ['{{ t(name)|trans }}', 'Symfony', ['name' => 'Symfony']],
+            ['{{ t(hello)|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{{ t(hello, { \'%name%\': \'Symfony\' })|trans }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{{ t(hello, { \'%name%\': \'Another Name\' })|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ t(hello)|trans(vars) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ t(hello, vars)|trans }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{{ t("Hello")|trans(locale="fr") }}', 'Hello'],
+            ['{{ t("Hello", {}, "messages")|trans(locale="fr") }}', 'Hello'],
+
+            // trans object with count
+            ['{{ t("{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples")|trans(count=count) }}', 'There is 5 apples', ['count' => 5]],
+            ['{{ t(text)|trans(count=5, arguments={\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
+            ['{{ t(text, {\'%name%\': \'Symfony\'})|trans(count=5) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
+            ['{{ t("{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples", {}, "messages")|trans(locale="fr", count=count) }}', 'There is 5 apples', ['count' => 5]],
         ];
     }
 

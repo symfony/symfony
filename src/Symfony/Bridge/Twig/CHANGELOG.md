@@ -5,6 +5,9 @@ CHANGELOG
 -----
 
  * added the `workflow_transition()` function to easily retrieve a specific transition object
+ * added support for translating `Translatable` objects
+ * added the `t()` function to easily create `Translatable` objects
+ * Added support for extracting messages from the `t()` function
 
 5.0.0
 -----

@@ -15,10 +15,12 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Component\Translation\Translatable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(TranslatorInterface::class);
@@ -52,6 +54,16 @@ final class TranslationExtension extends AbstractExtension
         }
 
         return $this->translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('t', [$this, 'createTranslatable']),
+        ];
     }
 
     /**
@@ -91,8 +103,17 @@ final class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans(?string $message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    /**
+     * @param ?string|Translatable $message The message id (may also be an object that can be cast to string)
+     */
+    public function trans($message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
+        if ($message instanceof Translatable) {
+            $arguments += $message->getParameters();
+            $domain = $message->getDomain();
+            $message = $message->getMessage();
+        }
+
         if (null === $message || '' === $message) {
             return '';
         }
@@ -102,5 +123,10 @@ final class TranslationExtension extends AbstractExtension
         }
 
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
+    }
+
+    public function createTranslatable(string $message, array $parameters = [], string $domain = 'messages'): Translatable
+    {
+        return new Translatable($message, $parameters, $domain);
     }
 }

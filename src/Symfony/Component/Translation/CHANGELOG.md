@@ -5,6 +5,9 @@ CHANGELOG
 -----
 
  * added `PseudoLocalizationTranslator`
+ * added `Translatable` objects that represent a message that can be translated
+ * added the `t()` function to easily create `Translatable` objects
+ * Added support for extracting messages from `Translatable` objects
 
 5.1.0
 -----

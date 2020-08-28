@@ -265,8 +265,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame(['start'], $stateMachineDefinition->getArgument(2));
 
-        $metadataStoreDefinition = $stateMachineDefinition->getArgument(3);
-        $this->assertInstanceOf(Definition::class, $metadataStoreDefinition);
+        $metadataStoreReference = $stateMachineDefinition->getArgument(3);
+        $this->assertInstanceOf(Reference::class, $metadataStoreReference);
+        $this->assertSame('state_machine.pull_request.metadata_store', (string) $metadataStoreReference);
+
+        $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
         $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);

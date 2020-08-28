@@ -742,6 +742,7 @@ class FrameworkExtension extends Extension
                 }
             }
             $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
+            $container->setDefinition(sprintf('%s.metadata_store', $workflowId), $metadataStoreDefinition);
 
             // Create places
             $places = array_column($workflow['places'], 'name');
@@ -753,7 +754,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
-            $definitionDefinition->addArgument($metadataStoreDefinition);
+            $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
             $definitionDefinition->addTag('workflow.definition', [
                 'name' => $name,
                 'type' => $type,

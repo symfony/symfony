@@ -78,8 +78,16 @@ class RedisStore implements PersistingStoreInterface
 
         $script = file_get_contents(__DIR__.'/Resources/redis_put_off_expiration.lua');
 
-        if ($this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)])) {
+        $ret = $this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
+
+        // Occurs when redis has been reset
+        if (false === $ret) {
             throw new SemaphoreExpiredException($key, 'the script returns false');
+        }
+
+        // Occurs when redis has added an item in the set
+        if (0 < $ret) {
+            throw new SemaphoreExpiredException($key, 'the script returns a positive number');
         }
     }
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Semaphore\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
+use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 
@@ -28,7 +29,7 @@ abstract class AbstractStoreTest extends TestCase
     {
         $store = $this->getStore();
 
-        $key = new Key('key', 1);
+        $key = new Key(__METHOD__, 1);
 
         $this->assertFalse($store->exists($key));
         $store->save($key, 10);
@@ -41,8 +42,8 @@ abstract class AbstractStoreTest extends TestCase
     {
         $store = $this->getStore();
 
-        $key1 = new Key('key1', 1);
-        $key2 = new Key('key2', 1);
+        $key1 = new Key(__METHOD__.'1', 1);
+        $key2 = new Key(__METHOD__.'2', 1);
 
         $store->save($key1, 10);
         $this->assertTrue($store->exists($key1));
@@ -65,7 +66,7 @@ abstract class AbstractStoreTest extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = 'resource';
+        $resource = __METHOD__;
         $key1 = new Key($resource, 1);
         $key2 = new Key($resource, 1);
 
@@ -100,7 +101,7 @@ abstract class AbstractStoreTest extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = 'resource';
+        $resource = __METHOD__;
         $key1 = new Key($resource, 2);
         $key2 = new Key($resource, 2);
         $key3 = new Key($resource, 2);
@@ -144,7 +145,7 @@ abstract class AbstractStoreTest extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = 'resource';
+        $resource = __METHOD__;
         $key1 = new Key($resource, 4, 2);
         $key2 = new Key($resource, 4, 2);
         $key3 = new Key($resource, 4, 2);
@@ -184,17 +185,40 @@ abstract class AbstractStoreTest extends TestCase
         $store->delete($key3);
     }
 
+    public function testPutOffExpiration()
+    {
+        $store = $this->getStore();
+        $key = new Key(__METHOD__, 4, 2);
+        $store->save($key, 20);
+
+        $store->putOffExpiration($key, 20);
+
+        // just asserts it doesn't throw an exception
+        $this->addToAssertionCount(1);
+    }
+
+    public function testPutOffExpirationWhenSaveHasNotBeenCalled()
+    {
+        // This test simulate the key has expired since it does not exist
+        $store = $this->getStore();
+        $key1 = new Key(__METHOD__, 4, 2);
+
+        $this->expectException(SemaphoreExpiredException::class);
+        $this->expectExceptionMessage('The semaphore "Symfony\Component\Semaphore\Tests\Store\AbstractStoreTest::testPutOffExpirationWhenSaveHasNotBeenCalled" has expired: the script returns a positive number.');
+
+        $store->putOffExpiration($key1, 20);
+    }
+
     public function testSaveTwice()
     {
         $store = $this->getStore();
 
-        $resource = 'resource';
-        $key = new Key($resource, 1);
+        $key = new Key(__METHOD__, 1);
 
         $store->save($key, 10);
         $store->save($key, 10);
 
-        // just asserts it don't throw an exception
+        // just asserts it doesn't throw an exception
         $this->addToAssertionCount(1);
 
         $store->delete($key);

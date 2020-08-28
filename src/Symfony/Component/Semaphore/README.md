@@ -1,6 +1,10 @@
 Semaphore Component
 ===================
 
+The Semaphore Component manages
+[semaphores](https://en.wikipedia.org/wiki/Semaphore_(programming)), a mechanism
+to provide exclusive access to a shared resource.
+
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
 are not covered by Symfony's

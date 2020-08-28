@@ -283,6 +283,16 @@ EOPHP
     chdir($oldPwd);
 }
 
+// Create a symlink with a predictable path pointing to the currently used version.
+// This is useful for static analytics tools such as PHPStan having to load PHPUnit's classes
+// and for other testing libraries such as Behat using PHPUnit's assertions.
+chdir($PHPUNIT_DIR);
+if (file_exists('phpunit')) {
+    @unlink('phpunit');
+}
+@symlink($PHPUNIT_VERSION_DIR, 'phpunit');
+chdir($oldPwd);
+
 if ($PHPUNIT_VERSION < 8.0) {
     $argv = array_filter($argv, function ($v) use (&$argc) {
         if ('--do-not-cache-result' !== $v) {

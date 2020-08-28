@@ -450,10 +450,16 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 throw $e;
             }
-        } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
-            $result[self::VALUE] = $object->$property;
-            if (isset($zval[self::REF])) {
-                $result[self::REF] = &$object->$property;
+        } elseif (property_exists($object, $property)) {
+            try {
+                $result[self::VALUE] = $object->$property;
+                if (isset($zval[self::REF])) {
+                    $result[self::REF] = &$object->$property;
+                }
+            } catch (\Error $e) {
+                if (!$ignoreInvalidProperty) {
+                    throw new NoSuchPropertyException(sprintf('Can\'t read protected or private property "%s" in class "%s".', $property, $class), 0, $e);
+                }
             }
         } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));

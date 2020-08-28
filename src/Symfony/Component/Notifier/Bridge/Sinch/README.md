@@ -3,6 +3,19 @@ Sinch Notifier
 
 Provides Sinch integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+SINCH_DSN=sinch://SERVICE_PLAN_ID:AUTH_TOKEN@default?from=FROM
+```
+
+where:
+ - `SERVICE_PLAN_ID` is your Sinch service plan id
+ - `AUTH_TOKEN` is your Sinch auth token
+ - `FROM` is your sender
+
 Resources
 ---------
 

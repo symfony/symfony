@@ -3,6 +3,18 @@ RocketChat Notifier
 
 Provides RocketChat integration for Symfony Notifier.
 
+DSN example
+-----------
+
+```
+// .env file
+ROCKETCHAT_DSN=rocketchat://ACCESS_TOKEN@default?channel=CHANNEL
+```
+
+where:
+ - `ACCESS_TOKEN` is your RocketChat access token
+ - `CHANNEL` is your RocketChat channel
+
 Resources
 ---------
 

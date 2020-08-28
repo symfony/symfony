@@ -40,7 +40,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {

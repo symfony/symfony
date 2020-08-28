@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class PasswordMigratingListener implements EventSubscriberInterface
 {

@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {

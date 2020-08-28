@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {

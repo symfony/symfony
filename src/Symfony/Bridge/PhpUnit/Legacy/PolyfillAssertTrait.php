@@ -283,6 +283,17 @@ trait PolyfillAssertTrait
      *
      * @return void
      */
+    public static function assertIsNotReadable($filename, $message = '')
+    {
+        static::assertNotIsReadable($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
     public static function assertIsWritable($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
@@ -299,6 +310,17 @@ trait PolyfillAssertTrait
     {
         static::assertInternalType('string', $filename, $message);
         static::assertFalse(is_writable($filename), $message ? $message : "Failed asserting that $filename is not writable.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertIsNotWritable($filename, $message = '')
+    {
+        static::assertNotIsWritable($filename, $message);
     }
 
     /**
@@ -331,6 +353,17 @@ trait PolyfillAssertTrait
      *
      * @return void
      */
+    public static function assertDirectoryDoesNotExist($directory, $message = '')
+    {
+        static::assertDirectoryNotExists($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
     public static function assertDirectoryIsReadable($directory, $message = '')
     {
         static::assertDirectoryExists($directory, $message);
@@ -355,6 +388,17 @@ trait PolyfillAssertTrait
      *
      * @return void
      */
+    public static function assertDirectoryIsNotReadable($directory, $message = '')
+    {
+        static::assertDirectoryNotIsReadable($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
     public static function assertDirectoryIsWritable($directory, $message = '')
     {
         static::assertDirectoryExists($directory, $message);
@@ -371,6 +415,17 @@ trait PolyfillAssertTrait
     {
         static::assertDirectoryExists($directory, $message);
         static::assertNotIsWritable($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryIsNotWritable($directory, $message = '')
+    {
+        static::assertDirectoryNotIsWritable($directory, $message);
     }
 
     /**
@@ -403,6 +458,17 @@ trait PolyfillAssertTrait
      *
      * @return void
      */
+    public static function assertFileDoesNotExist($filename, $message = '')
+    {
+        static::assertFileNotExists($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
     public static function assertFileIsReadable($filename, $message = '')
     {
         static::assertFileExists($filename, $message);
@@ -419,6 +485,17 @@ trait PolyfillAssertTrait
     {
         static::assertFileExists($filename, $message);
         static::assertNotIsReadable($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileIsNotReadable($filename, $message = '')
+    {
+        static::assertFileNotIsReadable($filename, $message);
     }
 
     /**
@@ -446,22 +523,37 @@ trait PolyfillAssertTrait
     }
 
     /**
-     * Asserts that a string matches a given regular expression.
+     * @param string $filename
+     * @param string $message
      *
+     * @return void
+     */
+    public static function assertFileIsNotWritable($filename, $message = '')
+    {
+        static::assertFileNotIsWritable($filename, $message);
+    }
+
+    /**
      * @param string $pattern
      * @param string $string
      * @param string $message
      *
      * @return void
      */
-    public function assertMatchesRegularExpression($pattern, $string, $message = '')
+    public static function assertMatchesRegularExpression($pattern, $string, $message = '')
     {
-        static::assertThat(
-            $string,
-            new LogicalNot(
-                new RegularExpression($pattern)
-            ),
-            $message
-        );
+        static::assertRegExp($pattern, $string, $message);
+    }
+
+    /**
+     * @param string $pattern
+     * @param string $string
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDoesNotMatchRegularExpression($pattern, $string, $message = '')
+    {
+        static::assertNotRegExp($message, $string, $message);
     }
 }

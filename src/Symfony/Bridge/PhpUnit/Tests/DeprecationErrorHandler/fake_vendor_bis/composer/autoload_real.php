@@ -1,6 +1,6 @@
 <?php
 
-class ComposerLoaderFake
+class ComposerLoaderFakeBis
 {
     public function getPrefixes()
     {
@@ -10,8 +10,7 @@ class ComposerLoaderFake
     public function getPrefixesPsr4()
     {
         return [
-            'App\\Services\\' => [__DIR__.'/../../fake_app/'],
-            'acme\\lib\\' => [__DIR__.'/../acme/lib/'],
+            'foo\\lib\\' => [__DIR__.'/../foo/lib/'],
         ];
     }
 
@@ -32,14 +31,14 @@ class ComposerLoaderFake
     }
 }
 
-class ComposerAutoloaderInitFake
+class ComposerAutoloaderInitFakeBis
 {
     private static $loader;
 
     public static function getLoader()
     {
         if (null === self::$loader) {
-            self::$loader = new ComposerLoaderFake();
+            self::$loader = new ComposerLoaderFakeBis();
             spl_autoload_register([self::$loader, 'loadClass']);
         }
 

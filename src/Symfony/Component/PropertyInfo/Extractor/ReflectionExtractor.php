@@ -194,11 +194,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!$reflectionType = $reflectionParameter->getType()) {
             return null;
         }
-        if (!$type = $this->extractFromReflectionType($reflectionType, $reflectionConstructor)) {
+        if (!$types = $this->extractFromReflectionType($reflectionType, $reflectionConstructor->getDeclaringClass())) {
             return null;
         }
 
-        return [$type];
+        return $types;
     }
 
     private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter

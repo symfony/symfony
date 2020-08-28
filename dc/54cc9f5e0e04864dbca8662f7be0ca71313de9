@@ -1,0 +1,157 @@
+---------------------------------------------------------------------------
+
+by linaori at 2020-07-26T21:29:37Z
+
+I like this implementation, primarily because you can add parameters to the message without having to define that elsewhere. Meaning you can return this object rather than having to return and array where the first key is the message, or a custom data container etc.
+
+In the past I've built something similar where a process would create a similar object and then it translate this in another request:
+```twig
+{{ translatableMessage.key | trans(translatableMessage.parameters) }}
+```
+
+I like this idea because you push the dependency of translating to where it belongs; the view. I suspect this would also benefit translations within the form component where you can easily pass parameters if needed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-07-27T07:36:10Z
+
+im wondering what type of objects would be "translatable", esp. in direct relation to a single message.
+
+To me it hints for a value object instead, rather then a contract.
+
+> push the dependency of translating to where it belongs; the view
+
+does this mean only the `trans` view layer should be translatable aware?
+
+---------------------------------------------------------------------------
+
+by linaori at 2020-07-27T07:38:27Z
+
+> To me it hints for a value object instead, rather then a contract.
+
+You'll need the contract to get the message key and parameters, possibly domain and language.
+
+> does this mean only the `trans` view layer should be translatable aware?
+
+This is automatically the case if the translator can deal with it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-07-27T07:48:41Z
+
+i meant interface. `final class Translatable` offers the same feature.
+
+---------------------------------------------------------------------------
+
+by linaori at 2020-07-27T07:51:59Z
+
+Can do that, though I can also see advantages of (serializable) custom objects.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2020-07-27T15:23:06Z
+
+> i meant interface. `final class Translatable` offers the same feature.
+
+I like the idea of putting `final` on the implementation class in the PR. I do think we should still have an interface so we don't have to force a specific implementation, especially with making it final, but maybe I've misunderstood your comment.
+
+One other example I'd like to provide, is at the end, it would be great to be able to use `$this->addFlash('Successfully imported products.');` or `$this->addFlash(__('Successfully imported %count% product(s)', ['%count%' => count($products]));` and inside of the template just being able to translate all flash messages using `{{ message|trans }}`. It would remove complexity and having to really think too much about how the message is going to be used.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-07-27T17:35:09Z
+
+> I do think we should still have an interface so we don't have to force a specific implementation
+
+do you have any other implementation in mind? I dont see polymorphism being a requirement here.
+
+Im not sure i follow your "addFlash" example, but it could account for Translatables as a feature.
+
+Not sure about the `__()` example either, but see https://github.com/symfony/symfony/issues/35418 also. I think a generic `t('id')` funtion for extraction is nice yes, but also `new Translatable('id')` could be marked for extraction.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2020-07-27T17:49:53Z
+
+> do you have any other implementation in mind? I dont see polymorphism being a requirement here.
+
+I don't have any in mind at the moment, but potentially someone else might have a reason for them. We could just add a concrete class only, but though it might be a good to allow flexibility there. Users could also just use their own translator service to get around this limitation as well. Let me know if you want me to remove the interface.
+
+> Im not sure i follow your "addFlash" example, but it could account for Translatables as a feature.
+
+In a basic CRUD setup, typically we'd add a flash message saying what was done and display it as a flash message on the next page. Using a translatable object would be great to avoid having to pass an already translated string and being able to just display on the next page without special handling or having Symfony think we're missing a translation, as we would like to just always translate the message in the view.
+
+> Not sure about the __() example either, but see #35418 also. I think a generic t('id') funtion for extraction is nice yes, but also new Translatable('id') could be marked for extraction.
+
+`__()` is used in Magento [[docs](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/translations/translate_theory.html)] and `_e()` in Wordpress [[docs](https://developer.wordpress.org/reference/functions/_e/)]. I believe these would be similar to `t()` like you mention in https://github.com/symfony/symfony/issues/35418. I think the leading underscore is a convention when creating translatable strings, so potentially `_t()` instead of just the t? Basically it would be a shortcut for `new Translatable()` as you mention.
+
+I'm open to either way of dealing with this. Let me know what direction you'd like this to take.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-07-28T14:03:15Z
+
+> i meant interface. `final class Translatable` offers the same feature.
+
+We have built basically the same feature here: https://github.com/Becklyn/rad/blob/8.x/src/Translation/DeferredTranslation.php
+
+We have some additional functionality, where not all of it makes sense here:
+
+> We have the concept that we either pass a string (not to-be-translated) or a `DeferredTranslation`.
+
+* We have named constructors: `DeferredTranslation::messages($id)`, `DeferredTranslation::backend($id)`, ...
+* We have a static `::translateValue($value)` method, that either translates the `Translatable` or return the already pre-translated string.
+* We have a `::ensureValidValue()` static method, that checks if the value is a either a string, `Translatable` or (optionally) `null` and automatically throws an `UnexpectedTypeException`.
+
+The point is: from our POV the whole "translate this without using the translator" is a core feature and without these additional use cases it is really cumbersome to use.
+But not all of these additional points make sense for Symfony core. So at least don't make the class `final`, so that one can add these features in their own lib / project.
+
+PS: in terms of our `DeferredTranslation`, we have the same feature for `DeferredRoute` (create a URL without needing a dependency on the router, **very** frequently used) as well as `DeferredForm` (preparing and later manipulating the form config for `->createForm(...)` without using any form service, only used in a single special case).
+
+---------------------------------------------------------------------------
+
+by linaori at 2020-07-28T14:20:57Z
+
+> But not all of these additional points make sense for Symfony core. So at least don't make the class final, so that one can add these features in their own lib / project.
+
+I don't see the added benefit of this. There's a _very_ specific dataset you put in the data object. Handling these custom translations are _not_ a part of the data object, nor should they be. If you need to do something custom, you can use composition (if the interface stays).
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-07-28T16:14:03Z
+
+If the interface stays, that would be fine as well.
+
+Yeah, but for example things like merging parameters is (imo) a core feature. So if it's decided that this doesn't make it to the `Translatable` VO, then at least we need the interface. Otherwise I fear that is a super specific use case, that's not flexible enough for a lot of use cases.
+
+There were quite a few of these in the past, so I'm just trying to chime in to avoid that here. Sorry for the noise.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-07-28T17:29:00Z
+
+Merging parameters y/n would be a Translator implementation detail :)
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2020-08-04T14:40:51Z
+
+Hey @ro0NL, can you take another look at this? Once you're happy with where things are at, I think it would make sense to add a shorthand function (currently leaning towards `_t()`) and add some tests.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2020-08-14T14:35:42Z
+
+@ro0NL added extraction as well. Can you re-review? (looks like Github's re-request feature isn't working properly)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-28T08:08:05Z
+
+Can you rebase on current master (to remove the merge commit)?
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2020-08-28T13:26:29Z
+
+@fabpot rebased onto master

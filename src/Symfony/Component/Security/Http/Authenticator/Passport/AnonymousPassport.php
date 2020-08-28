@@ -17,7 +17,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class AnonymousPassport implements PassportInterface
 {

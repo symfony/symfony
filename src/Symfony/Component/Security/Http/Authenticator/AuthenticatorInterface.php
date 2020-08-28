@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 interface AuthenticatorInterface
 {

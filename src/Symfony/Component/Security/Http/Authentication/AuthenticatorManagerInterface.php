@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Firewall\AbstractListener;
  * @author Wouter de Jong <wouter@wouterj.nl>
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
- * @experimental in Symfony 5.1
+ * @experimental in 5.2
  */
 interface AuthenticatorManagerInterface
 {

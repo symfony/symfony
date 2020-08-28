@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 interface UserPassportInterface extends PassportInterface
 {

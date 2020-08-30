@@ -460,6 +460,19 @@ class Connection
 
     public function cleanup(): void
     {
+        static $unlink = true;
+
+        if ($unlink) {
+            try {
+                $this->connection->unlink($this->stream);
+                $this->connection->unlink($this->queue);
+
+                return;
+            } catch (\Throwable $e) {
+                $unlink = false;
+            }
+        }
+
         $this->connection->del($this->stream);
         $this->connection->del($this->queue);
     }

@@ -71,6 +71,10 @@ class MockHttpClient implements HttpClientInterface
         }
         ++$this->requestsCount;
 
+        if (!$response instanceof ResponseInterface) {
+            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', \is_object($response) ? \get_class($response) : \gettype($response)));
+        }
+
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 

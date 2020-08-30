@@ -1991,9 +1991,12 @@ class FrameworkExtension extends Extension
             unset($scopeConfig['scope']);
 
             if (null === $scope) {
+                $baseUri = $scopeConfig['base_uri'];
+                unset($scopeConfig['base_uri']);
+
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference($httpClientId), $scopeConfig['base_uri'], $scopeConfig])
+                    ->setArguments([new Reference($httpClientId), $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {

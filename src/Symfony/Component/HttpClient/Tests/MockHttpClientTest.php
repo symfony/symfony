@@ -22,6 +22,48 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
+    /**
+     * @dataProvider validResponseFactoryProvider
+     */
+    public function testValidResponseFactory($responseFactory)
+    {
+        (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function validResponseFactoryProvider()
+    {
+        return [
+            [static function (): MockResponse { return new MockResponse(); }],
+            [new MockResponse()],
+            [[new MockResponse()]],
+            [new \ArrayIterator([new MockResponse()])],
+            [null],
+            [(static function (): \Generator { yield new MockResponse(); })()],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidResponseFactoryProvider
+     */
+    public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
+    }
+
+    public function invalidResponseFactoryProvider()
+    {
+        return [
+            [static function (): \Generator { yield new MockResponse(); }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "Generator" given.'],
+            [static function (): array { return [new MockResponse()]; }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "array" given.'],
+            [(static function (): \Generator { yield 'ccc'; })(), 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "string" given.'],
+        ];
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];

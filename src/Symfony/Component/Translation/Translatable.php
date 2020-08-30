@@ -13,9 +13,6 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-// Load the global t() function
-require_once __DIR__.'/Resources/functions/translatable.php';
-
 /**
  * @author Nate Wiebe <nate@northern.co>
  */

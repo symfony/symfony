@@ -273,7 +273,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/property-info 5.2: Passing a boolean to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).
+     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
      */
     public function testLegacyGetValueReadsMagicCallIfEnabled()
     {
@@ -392,7 +392,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/property-info 5.2: Passing a boolean to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).
+     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
      */
     public function testLegacySetValueUpdatesMagicCallIfEnabled()
     {
@@ -480,7 +480,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/property-info 5.2: Passing a boolean to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).
+     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
      */
     public function testLegacyIsReadableRecognizesMagicCallIfEnabled()
     {
@@ -552,7 +552,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Since symfony/property-info 5.2: Passing a boolean to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).
+     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
      */
     public function testLegacyIsWritableRecognizesMagicCallIfEnabled()
     {

@@ -89,7 +89,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public function __construct(/*int */$magicMethods = self::MAGIC_GET | self::MAGIC_SET, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
         if (\is_bool($magicMethods)) {
-            trigger_deprecation('symfony/property-info', '5.2', 'Passing a boolean to "%s()" first argument is deprecated since 5.1 and expect a combination of bitwise flags instead (i.e an integer).', __METHOD__);
+            trigger_deprecation('symfony/property-access', '5.2', 'Passing a boolean as the first argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);
 
             $magicMethods = ($magicMethods ? self::MAGIC_CALL : 0) | self::MAGIC_GET | self::MAGIC_SET;
         }

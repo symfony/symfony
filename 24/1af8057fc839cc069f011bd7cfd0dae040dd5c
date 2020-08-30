@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-21T14:57:37Z
+
+The AppVeyor failure doesn't seem to be related to this change, outputting: `Cannot parse message translation: please install the "intl" PHP extension`.
+
+I ran the tests locally and they fail for something unrelated and caching tests. I'm not sure why these last fail, so I'd appreciate some help.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-28T12:09:34Z
+
+> Cannot parse message translation: please install the "intl" PHP extension
+
+this is totally related - and we're apparently missing some tests that should highlight that this changes the default behavior.
+
+This looks like a BC break to me. It also forces installing the intl extension by default.
+Why don't you change the default domain in you case?
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-28T17:03:51Z
+
+> > Cannot parse message translation: please install the "intl" PHP extension
+>
+> this is totally related - and we're apparently missing some tests that should highlight that this changes the default behavior.
+>
+> This looks like a BC break to me. It also forces installing the intl extension by default.
+> Why don't you change the default domain in you case?
+
+Unless I'm misunderstanding something, I did change the default and it doesn't do what I need, since it checks if it contains it with the domain + suffix and then gets it with only the domain, therefore whether I set my domain to have the suffix or not, it doesn't do what I need.
+
+I see the problem of requiring the intl extension, how could I make it be a setting, or something?
+
+https://github.com/symfony/symfony/pull/37371/files#diff-3126bfacb25e1e304b8cc720e8527a19R219
+This line is what I need, essentially, it just seemed to make sense to also change the other part.
+
+Shouldn't it be:
+
+```
+if ($this->hasIntlFormatter && $catalogue->defines($id, $domain))
+```
+i.e., without appending the suffix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-06-30T13:59:13Z
+
+My previous comment was confusing. The existing code reads as:
+`if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {`
+
+This means that the *catalog* needs to be named with the intl+icu suffix.
+Then having the intl extension will use the intl format.
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-30T14:08:39Z
+
+Okay... But I have the intl extension enabled and I can't pass icu strings directly to trans, it seems to only work for id messages which are then defined in a file. Is it that I just need to dump the translations to a file? (since, again, I'm using a different system)
+
+---------------------------------------------------------------------------
+
+by stof at 2020-06-30T15:47:52Z
+
+@someonewithpc they are not forced to come from a file. You could build custom loaders using different sources (core loaders are all about files, indeed).
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-30T16:10:23Z
+
+@stof No, but I don't want a loader, I don't think. Can you check the linked issue above?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-30T16:36:13Z
+
+In this issue, you describe you want to use the Translator component like this:
+
+```php
+$translator->trans('{{count}, plural, =1 {1 apple} other {{count} apples}}', ['{count}' => 2])
+```
+
+This has nothing to do with translation. It's pure message formatting. That's not what the Translation component is created for. Instead, use Intl's [`MessageFormatter`](https://php.net/messageformatter) directly:
+
+```php
+MessageFormatter::formatMessage("en_US", "{{count}, plural, =1 {1 apple} other {{count} apples}}", ['count' => 2]);
+```
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-30T16:44:36Z
+
+@wouterj It has everything to do with translation. I still want it to translate into different languages
+
+Like I mention in the motivation section above, the point is that _m converts from a way that is easy to specify to the ICU format
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-30T16:56:43Z
+
+If you want to translate it, you'll have translation files like:
+
+```yaml
+# translations/messages+intl-icu.en.yaml
+apples_count: {{count}, plural, =1 {1 apple} other {{count} apples}}
+```
+
+And then use it as:
+
+```php
+$translator->trans('apples_count', ['count' => 2], 'messages'); // 3rd argument not needed as "messages" is the default
+```
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-06-30T16:59:38Z
+
+@wouterj That's the point, I don't want to use ids, I want to use it like I showed above.
+
+---------------------------------------------------------------------------
+
+by someonewithpc at 2020-07-18T01:37:41Z
+
+I updated the code and the relevant tests seem to pass. Could this get merged, or should I create a separate function?

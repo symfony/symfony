@@ -1370,7 +1370,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
-            'base_uri' => 'http://example.com',
             'headers' => [
                 'bar' => 'baz',
             ],

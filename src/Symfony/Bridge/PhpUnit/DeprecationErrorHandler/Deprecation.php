@@ -60,7 +60,11 @@ class Deprecation
         $line = $trace[$i];
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
+            var_dump($this->message);
             $parsedMsg = @unserialize($this->message);
+            if (false === $parsedMsg) {
+                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            }
             if ($parsedMsg && isset($parsedMsg['deprecation'])) {
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];

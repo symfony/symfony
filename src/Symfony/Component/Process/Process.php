@@ -1271,7 +1271,9 @@ class Process implements \IteratorAggregate
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        }
 
         $this->enhanceSigchildCompatibility = (bool) $enhance;
 

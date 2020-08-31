@@ -1550,13 +1550,13 @@ EOTXT;
 
         if (false !== $enhance = getenv('ENHANCE_SIGCHLD')) {
             try {
-                $process->setEnhanceSigchildCompatibility(false);
+                $process->setEnhanceSigchildCompatibility(false, false);
                 $process->getExitCode();
                 $this->fail('ENHANCE_SIGCHLD must be used together with a sigchild-enabled PHP.');
             } catch (RuntimeException $e) {
                 $this->assertSame('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.', $e->getMessage());
                 if ($enhance) {
-                    $process->setEnhanceSigchildCompatibility(true);
+                    $process->setEnhanceSigchildCompatibility(true, false);
                 } else {
                     self::$notEnhancedSigchild = true;
                 }

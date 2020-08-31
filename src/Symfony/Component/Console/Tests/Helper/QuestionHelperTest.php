@@ -608,41 +608,6 @@ EOD;
     }
 
     /**
-     * @dataProvider mixedKeysChoiceListAnswerProvider
-     */
-    public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
-    {
-        $possibleChoices = [
-            '0' => 'No environment',
-            '1' => 'My environment 1',
-            'env_2' => 'My environment 2',
-            3 => 'My environment 3',
-        ];
-
-        $dialog = new QuestionHelper();
-        $helperSet = new HelperSet([new FormatterHelper()]);
-        $dialog->setHelperSet($helperSet);
-
-        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
-        $question->setMaxAttempts(1);
-        $answer = $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream($providedAnswer."\n")), $this->createOutputInterface(), $question);
-
-        $this->assertSame($expectedValue, $answer);
-    }
-
-    public function mixedKeysChoiceListAnswerProvider()
-    {
-        return [
-            ['0', '0'],
-            ['No environment', '0'],
-            ['1', '1'],
-            ['env_2', 'env_2'],
-            [3, '3'],
-            ['My environment 1', '1'],
-        ];
-    }
-
-    /**
      * @dataProvider answerProvider
      */
     public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)

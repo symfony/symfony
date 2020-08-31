@@ -52,6 +52,6 @@ class UntilTest extends TestCase
     public function testVersionParameters()
     {
         $since = new Until(['value' => '1.1.2']);
-        $this->assertEquals('1.1.2', $since->getVersion());
+        $this->assertSame('1.1.2', $since->getVersion());
     }
 }

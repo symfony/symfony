@@ -126,9 +126,9 @@ class AnnotationLoaderTest extends TestCase
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
-        $this->assertEquals('1.0.0', $attributesMetadata['foo']->getSince());
-        $this->assertEquals('1.1.2', $attributesMetadata['bar']->getSince());
-        $this->assertEquals('1.1.9', $attributesMetadata['foo']->getUntil());
-        $this->assertEquals('1.3.0', $attributesMetadata['username']->getUntil());
+        $this->assertSame('1.0.0', $attributesMetadata['foo']->getSince());
+        $this->assertSame('1.1.2', $attributesMetadata['bar']->getSince());
+        $this->assertSame('1.1.9', $attributesMetadata['foo']->getUntil());
+        $this->assertSame('1.3.0', $attributesMetadata['username']->getUntil());
     }
 }

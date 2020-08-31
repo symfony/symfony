@@ -52,6 +52,6 @@ class SinceTest extends TestCase
     public function testVersionParameters()
     {
         $since = new Since(['value' => '1.1.2']);
-        $this->assertEquals('1.1.2', $since->getVersion());
+        $this->assertSame('1.1.2', $since->getVersion());
     }
 }

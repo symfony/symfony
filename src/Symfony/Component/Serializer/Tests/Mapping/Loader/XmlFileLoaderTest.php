@@ -111,7 +111,7 @@ class XmlFileLoaderTest extends TestCase
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
-        $this->assertEquals('1.2.0', $attributesMetadata['foo']->getSince());
-        $this->assertEquals('1.9.1', $attributesMetadata['foo']->getUntil());
+        $this->assertSame('1.2.0', $attributesMetadata['foo']->getSince());
+        $this->assertSame('1.9.1', $attributesMetadata['foo']->getUntil());
     }
 }

@@ -216,16 +216,16 @@ class AbstractNormalizerTest extends TestCase
         $result = $this->normalizer->getAllowedAttributes('c', [
             AbstractNormalizer::GROUPS => ['test'], 'version' => '1.8.0',
         ], true);
-        $this->assertEquals(['a', 'b', 'c'], $result);
+        $this->assertSame(['a', 'b', 'c'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [
             AbstractNormalizer::GROUPS => ['test'], 'version' => '1.7.0',
         ], true);
-        $this->assertEquals(['b'], $result);
+        $this->assertSame(['b'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [
             AbstractNormalizer::GROUPS => ['test'], 'version' => '2.3.0',
         ], true);
-        $this->assertEquals(['a'], $result);
+        $this->assertSame(['a'], $result);
     }
 }

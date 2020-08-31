@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Composer\Semver\Comparator;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -459,11 +458,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return true;
         }
 
-        if (null !== $sinceVersion && Comparator::lessThan($context['version'], $sinceVersion)) {
+        if (null !== $sinceVersion && version_compare($context['version'], $sinceVersion, '<')) {
             return false;
         }
 
-        if (null !== $untilVersion && Comparator::greaterThanOrEqualTo($context['version'], $untilVersion)) {
+        if (null !== $untilVersion && version_compare($context['version'], $untilVersion, '>=')) {
             return false;
         }
 

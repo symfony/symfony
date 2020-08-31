@@ -106,6 +106,7 @@ class HeaderUtilsTest extends TestCase
             ['attachment', 'foo "bar".html', '', 'attachment; filename="foo \\"bar\\".html"'],
             ['attachment', 'foo%20bar.html', 'foo bar.html', 'attachment; filename="foo bar.html"; filename*=utf-8\'\'foo%2520bar.html'],
             ['attachment', 'föö.html', 'foo.html', 'attachment; filename=foo.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html'],
+            ['attachment', 'föö.html', '', 'attachment; filename=foo.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html'],
         ];
     }
 
@@ -121,12 +122,10 @@ class HeaderUtilsTest extends TestCase
     public function provideMakeDispositionFail()
     {
         return [
-            ['attachment', 'foo%20bar.html'],
             ['attachment', 'foo/bar.html'],
             ['attachment', '/foo.html'],
             ['attachment', 'foo\bar.html'],
             ['attachment', '\foo.html'],
-            ['attachment', 'föö.html'],
         ];
     }
 }

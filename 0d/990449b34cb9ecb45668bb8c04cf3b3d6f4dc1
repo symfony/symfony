@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by SnakePin at 2020-08-27T16:23:50Z
+
+>
+>
+> Can you add a test case to cover this fix?
+
+I've added some test cases to cover this fix in my latest commit but I've also added a check to avoid disabling the verification for a DSN like this `smtps://:@example.com?verify_peer=` because it could be misleading to disable it when it clearly doesn't have keywords like no, off or false and is just an empty string.

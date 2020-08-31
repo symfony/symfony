@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-31T10:39:37Z
+
+Builds on AppVeyor only fail for `master` for some reason that I do not understand but this logic applies to `3.4` too.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-31T10:43:12Z
+
+ah, looks like the failure was actually caused by #37371 which was merged into `master`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-08-31T11:14:24Z
+
+everything's back to green \o/

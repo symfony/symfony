@@ -452,7 +452,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * @internal
      */
-    protected function attributeAllowedWithVersion(array $context, ?string $sinceVersion, ?string $untilVersion)
+    private function attributeAllowedWithVersion(array $context, ?string $sinceVersion, ?string $untilVersion)
     {
         if (!isset($context['version'])) {
             return true;

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alex-dev at 2020-08-31T14:18:49Z
+
+Note the added method testProxy is not needed but do showcase the bug much better than the full `SimpleCacheTest` with just a `ProxyAdapter` added.

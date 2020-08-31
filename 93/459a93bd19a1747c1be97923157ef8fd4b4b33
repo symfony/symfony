@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by michaelzangerle at 2020-08-28T14:25:35Z
+
+Adjusted test case in the framework bundle to match new cache key escaping. Tests for serializer and framework bundle run through locally and in AppVeyor but fail on Travis for some reason. One error on travis is probably related to the change but I can't reproduce it locally as it should be fixed with the change. The other is a redis error according to the error message. Any advice?

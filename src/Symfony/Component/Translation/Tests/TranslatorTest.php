@@ -373,6 +373,10 @@ class TranslatorTest extends TestCase
      */
     public function testTransICU(...$args)
     {
+        if (!class_exists(\MessageFormatter::class)) {
+            $this->markTestSkipped(sprintf('Skipping test as the required "%s" class does not exist. Consider installing the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.', \MessageFormatter::class));
+        }
+
         $this->testTrans(...$args);
     }
 

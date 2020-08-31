@@ -34,10 +34,8 @@ redis.call("ZADD", timeKey, now + ttlInSecond, identifier)
 redis.call("ZADD", weightKey, weight, identifier)
 
 -- Extend the TTL
-local curentTtl = redis.call("TTL", weightKey)
-if curentTtl < now + ttlInSecond then
-    redis.call("EXPIRE", weightKey, curentTtl + 10)
-    redis.call("EXPIRE", timeKey, curentTtl + 10)
-end
+local maxExpiration = redis.call("ZREVRANGE", timeKey, 0, 0, "WITHSCORES")[2]
+redis.call("EXPIREAT", weightKey, maxExpiration + 10)
+redis.call("EXPIREAT", timeKey, maxExpiration + 10)
 
 return true

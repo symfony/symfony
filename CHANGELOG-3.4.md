@@ -7,6 +7,24 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.44 (2020-08-31)
+
+ * bug #37949 [Yaml] fix more numeric cases changing in PHP 8 (xabbuh)
+ * bug #37921 [Yaml] account for is_numeric() behavior changes in PHP 8 (xabbuh)
+ * bug #37912 [ExpressionLanguage] fix passing arguments to call_user_func_array() on PHP 8 (xabbuh)
+ * bug #37853 [Validator] ensure that the validator is a mock object for backwards-compatibility (xabbuh)
+ * bug #37845 [Serializer] Fix variadic support when using type hints (fabpot)
+ * bug #37725 [Form] Fix Guess phpdoc return type (franmomu)
+ * bug #37771 Use PHPUnit 9.3 on php 8 (derrabus)
+ * bug #35843 [Validator] Add target guards for Composite nested constraints (ogizanagi)
+ * bug #37744 [Yaml] Fix for #36624; Allow PHP constant as first key in block (jnye)
+ * bug #37767 [Form] fix mapping errors from unmapped forms (xabbuh)
+ * bug #37763 Fix deprecated libxml_disable_entity_loader (jderusse)
+ * bug #37774 [Console] Make sure we pass a numeric array of arguments to call_user_func_array() (derrabus)
+ * bug #37701 [Serializer] Fix that it will never reach DOMNode (TNAJanssen)
+ * bug #37671 [Cache] fix saving no-expiry items with ArrayAdapter (philipp-kolesnikov)
+ * bug #37700 [VarDumper] Improve previous fix on light array coloration (l-vo)
+
 * 3.4.43 (2020-07-24)
 
  * bug #37635 [Cache] fix catching auth errors (nicolas-grekas)

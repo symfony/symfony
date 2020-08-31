@@ -101,7 +101,7 @@ class PropertyAccessorBuilder
      */
     public function disableMagicCall()
     {
-        $this->magicMethods ^= PropertyAccessor::MAGIC_CALL;
+        $this->magicMethods &= ~PropertyAccessor::MAGIC_CALL;
 
         return $this;
     }
@@ -111,7 +111,7 @@ class PropertyAccessorBuilder
      */
     public function disableMagicGet(): self
     {
-        $this->magicMethods ^= PropertyAccessor::MAGIC_GET;
+        $this->magicMethods &= ~PropertyAccessor::MAGIC_GET;
 
         return $this;
     }
@@ -121,7 +121,7 @@ class PropertyAccessorBuilder
      */
     public function disableMagicSet(): self
     {
-        $this->magicMethods ^= PropertyAccessor::MAGIC_SET;
+        $this->magicMethods &= ~PropertyAccessor::MAGIC_SET;
 
         return $this;
     }

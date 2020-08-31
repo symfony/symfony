@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T10:57:01Z
+
+Would be worth a test case, can you please add one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-05T16:00:13Z
+
+Friendly ping @LordZardeck
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-05-03T16:22:55Z
+
+I like this.
+Thank you.
+
+Could you add a small test case so this can be merged?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-07-02T20:15:38Z
+
+What is the pull request status? Do you need help?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T07:13:37Z
+
+Anyone willing to take over this PR to finish it? @YaFou perhaps?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-08-11T13:13:26Z
+
+I'm in vacation but I will finish it later @fabpot. Do I need to open a new pull request?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T13:20:10Z
+
+You can push directly on this PR.
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-08-23T17:02:42Z
+
+@fabpot @Nyholm I opened a pull request LordZardeck/symfony#1 to add a test case for this feature.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-23T17:22:31Z
+
+I've tried to understand why we have the `string` cast in the first place. It was added in #14648 as a bug fix. @ogizanagi Can you review and comment on this one as you were the one who wrote the code?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-24T10:30:52Z
+
+I'm fine for removing this cast.
+
+I think the original fix intended to make selecting choices indexed by keys consistent by always returning strings (it never meant to do it for choices sequentially indexed).
+But the true "issue" is an array like `['0' => 'foo', 'foo' => 'bar']` is actually interpreted as `[0 => 'foo', 'foo' => 'bar']` by PHP. Which means you can either get `'0'` or `0` as the value returned by `ask` depending if you used the key or choice value to answer the question (hence the fix suggestion to always return a string).
+
+A proper fix would have been either:
+- to only cast to string for assoc choices
+- or to properly account for the type of the keys (which is probably not possible actually)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-27T14:53:40Z
+
+Thanks @ogizanagi. That's clearer to me now. @LordZardeck I think we need to add some test cases to cover the situation explained by @ogizanagi to be sure we don't break anything.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-27T15:05:28Z
+
+> I think we need to add some test cases to cover the situation explained by @ogizanagi to be sure we don't break anything.
+
+These test cases already exist and [are failing now](https://travis-ci.org/github/symfony/symfony/jobs/620244915#L4266-L4281), in `QuestionHelperTest::testChoiceFromChoicelistWithMixedKeys`.
+
+Fixing the code to only cast in the case of assoc choices should solve everything here (we should not forget to get https://github.com/LordZardeck/symfony/pull/1 merged as well in here)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-30T07:05:30Z
+
+@ogizanagi Would you like to take over?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-30T08:50:34Z
+
+Sure, I'll update the PR this week
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-31T15:11:53Z
+
+@fabpot : Done. But I'm wondering if this should not be merged as a bug fix into 3.4 since the cast was only meant for keys, not for values (int choices values were casted as well). Support for stringable objects just is a consequence of this fix. Let me know, I'll rebase.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-01T11:31:29Z
+
+@xabbuh Still WIP?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-09-01T12:23:20Z
+
+@fabpot There is still a test class in the Validator component that I need to update. But we can already merge here and I can open a new PR once I have found out how to fix that class.

@@ -126,7 +126,12 @@ return static function (ContainerConfigurator $container) {
             ->args([service('request_stack')])
 
         ->set('form.type_extension.form.validator', FormTypeValidatorExtension::class)
-            ->args([service('validator')])
+            ->args([
+                service('validator'),
+                true,
+                service('twig.form.renderer')->ignoreOnInvalid(),
+                service('translator')->ignoreOnInvalid(),
+            ])
             ->tag('form.type_extension', ['extended-type' => FormType::class])
 
         ->set('form.type_extension.repeated.validator', RepeatedTypeValidatorExtension::class)

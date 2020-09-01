@@ -30,6 +30,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     private $connectedIds = [];
     private $notInlinedIds = [];
     private $inlinedIds = [];
+    private $notInlinableIds = [];
     private $graph;
 
     public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
@@ -99,6 +100,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             }
 
             foreach ($remainingInlinedIds as $id) {
+                if (isset($this->notInlinableIds[$id])) {
+                    continue;
+                }
+
                 $definition = $container->getDefinition($id);
 
                 if (!$definition->isShared() && !$definition->isPublic()) {
@@ -108,6 +113,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         } finally {
             $this->container = null;
             $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = [];
+            $this->notInlinableIds = [];
             $this->graph = null;
         }
     }
@@ -138,6 +144,8 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         $definition = $this->container->getDefinition($id);
 
         if (!$this->isInlineableDefinition($id, $definition)) {
+            $this->notInlinableIds[$id] = true;
+
             return $value;
         }
 

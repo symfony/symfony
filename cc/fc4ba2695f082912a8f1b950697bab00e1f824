@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-15T06:52:22Z
+
+There is no support for `label_format` yet. I have no idea about how get `%id%` substitution value in `ViolationMapper`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-17T08:48:35Z
+
+I think this would need some examples - via tests maybe. Reviewing I'm wondering e.g. why doesn't the message go through translation? Why do we use str_replace instead of "label" as a translation variable? Should translating the label be done before or after humanize() by form? etc. All these may become more obvious with examples.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-17T12:21:23Z
+
+> Why doesn't the message go through translation?
+
+Message into violation object already translated.
+
+> Why do we use str_replace instead of "label" as a translation variable?
+
+Since the message has already been translated, it makes no sense to translate it one more time with `{{ label }}` parameter. IMO str_replace is quite enough. (But maybe I'm not taking something into account.)
+
+> Should translating the label be done before or after humanize() by form?
+
+There I've repeated translation logic from `form_div_layout.html.twig` because we want to get the same label as it rendered on form.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-19T08:21:28Z
+
+Maybe placeholder should be `%label%` for consistence with substitutions format in `label_format` widget option?
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-23T17:22:31Z
+
+@nicolas-grekas what can I do to bring the review closer?
+
+---------------------------------------------------------------------------
+
+by YaFou at 2020-08-21T20:36:09Z
+
+Any news on this pull request?
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-08-22T08:34:03Z
+
+@nicolas-grekas @xabbuh PR rebased on master and ready for review.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-27T14:40:13Z
+
+@xabbuh Could you review this PR?

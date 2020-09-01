@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-08-30T07:31:00Z
+
+Firstly, isn't it actually a new feature? Dispatching those events here is a new behavior. Some listeners will be executed while they were not until now.
+
+Secondly, the events are chained dispatched but they don't use / encapsulate the (current) expected data. For example, the view data encapsulated in the `FormEvents::POST_SUBMIT` form event object is not the view data resynchronized from the real (potentially modified by the `FormEvents::SUBMIT` event) norm data. I understand why it can't be done but I definitely think that this new behavior can cause trouble since listeners are going to be called with unexpected data. IMHO, it doesn't worth the risk.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-03T09:59:21Z
+
+Up.
+for master don't you think?

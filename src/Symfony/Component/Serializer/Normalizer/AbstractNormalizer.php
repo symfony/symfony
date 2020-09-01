@@ -454,15 +454,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     private function attributeAllowedWithVersion(array $context, ?string $sinceVersion, ?string $untilVersion)
     {
-        if (!isset($context['version'])) {
+        if (!isset($context['version']) && !isset($this->defaultContext['version'])) {
             return true;
         }
 
-        if (null !== $sinceVersion && version_compare($context['version'], $sinceVersion, '<')) {
+        $version = $context['version'] ?? $this->defaultContext['version'];
+        if (null !== $sinceVersion && version_compare($version, $sinceVersion, '<')) {
             return false;
         }
 
-        if (null !== $untilVersion && version_compare($context['version'], $untilVersion, '>=')) {
+        if (null !== $untilVersion && version_compare($version, $untilVersion, '>=')) {
             return false;
         }
 

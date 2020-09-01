@@ -1108,6 +1108,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertArrayHasKey('circular_reference_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
         $this->assertArrayHasKey('max_depth_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
         $this->assertEquals($container->getDefinition('serializer.normalizer.object')->getArgument(6)['max_depth_handler'], new Reference('my.max.depth.handler'));
+        $this->assertArrayHasKey('version', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
+        $this->assertEquals($container->getDefinition('serializer.normalizer.object')->getArgument(6)['version'], '1.0.0');
     }
 
     public function testRegisterSerializerExtractor()

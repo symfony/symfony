@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -85,6 +86,7 @@ abstract class AbstractConfigurator
             case $value instanceof Definition:
             case $value instanceof Expression:
             case $value instanceof Parameter:
+            case $value instanceof AbstractArgument:
             case $value instanceof Reference:
                 if ($allowServices) {
                     return $value;

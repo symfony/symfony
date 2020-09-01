@@ -29,6 +29,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     private $connectedIds = [];
     private $notInlinedIds = [];
     private $inlinedIds = [];
+    private $notInlinableIds = [];
     private $graph;
 
     public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
@@ -85,6 +86,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
             } while ($this->inlinedIds && $this->analyzingPass);
 
             foreach ($remainingInlinedIds as $id) {
+                if (isset($this->notInlinableIds[$id])) {
+                    continue;
+                }
+
                 $definition = $container->getDefinition($id);
 
                 if (!$definition->isShared() && !$definition->isPublic()) {
@@ -94,6 +99,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
         } finally {
             $this->container = null;
             $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = [];
+            $this->notInlinableIds = [];
             $this->graph = null;
         }
     }
@@ -124,6 +130,8 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
         $definition = $this->container->getDefinition($id);
 
         if (!$this->isInlineableDefinition($id, $definition)) {
+            $this->notInlinableIds[$id] = true;
+
             return $value;
         }
 

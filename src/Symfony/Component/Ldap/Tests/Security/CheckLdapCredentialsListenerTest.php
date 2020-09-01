@@ -151,7 +151,11 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
-        $this->ldap->expects($this->at(0))->method('bind')->with('elsa', 'test1234A$');
+        $this->ldap
+            ->method('bind')
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
         $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
         $this->ldap->expects($this->once())->method('query')->with('{username}', 'wouter_test')->willReturn($query);
 
@@ -169,7 +173,11 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
-        $this->ldap->expects($this->at(0))->method('bind')->with('elsa', 'test1234A$');
+        $this->ldap
+            ->method('bind')
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
         $this->ldap->expects($this->once())->method('query')->willReturn($query);
 
         $listener = $this->createListener();

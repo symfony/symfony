@@ -22,11 +22,14 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
@@ -385,6 +388,41 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(0, $form->get('field1')->getErrors());
         $this->assertFalse($form->get('field2')->isValid());
         $this->assertCount(1, $form->get('field2')->getErrors());
+    }
+
+    public function testDisabledFormIsInvalidIfRootFormValidationFails()
+    {
+        $form = $this->formFactory
+            ->createBuilder(FormType::class, ['field1' => 0], [
+                'constraints' => new Callback(['callback' => static function ($data, ExecutionContextInterface $context) {
+                    if ($data['field1'] < 1) {
+                        $context->addViolation('Invalid');
+                    }
+                }]),
+            ])
+            ->setDisabled(true)
+            ->add('field1')
+            ->getForm();
+
+        $form->submit(null);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors());
+    }
+
+    public function testDisabledFormIsInvalidIfChildrenValidationFails()
+    {
+        $form = $this->formFactory->createBuilder(FormType::class, ['field1' => 0])
+            ->setDisabled(true)
+            ->add('field1', null, ['constraints' => new GreaterThanOrEqual(1)])
+            ->getForm();
+
+        $form->submit(null);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('field1')->getErrors());
     }
 }
 

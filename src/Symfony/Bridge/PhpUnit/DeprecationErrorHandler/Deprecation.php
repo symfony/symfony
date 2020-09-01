@@ -62,7 +62,9 @@ class Deprecation
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
             if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
+                set_error_handler(function () {});
                 $parsedMsg = unserialize($this->message);
+                restore_error_handler();
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];

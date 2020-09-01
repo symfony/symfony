@@ -508,22 +508,24 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         $dispatcher = $this->config->getEventDispatcher();
 
         // Obviously, a disabled form should not change its data upon submission.
-        if ($this->isDisabled() && $this->isRoot()) {
+        if ($this->isDisabled()) {
             $this->submitted = true;
 
-            if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
-                $event = new FormEvent($this, $submittedData);
-                $dispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
-            }
+            if ($this->isRoot()) {
+                if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
+                    $event = new FormEvent($this, $submittedData);
+                    $dispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
+                }
 
-            if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
-                $event = new FormEvent($this, $this->getNormData());
-                $dispatcher->dispatch(FormEvents::SUBMIT, $event);
-            }
+                if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
+                    $event = new FormEvent($this, $this->getNormData());
+                    $dispatcher->dispatch($event, FormEvents::SUBMIT);
+                }
 
-            if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
-                $event = new FormEvent($this, $this->getViewData());
-                $dispatcher->dispatch(FormEvents::POST_SUBMIT, $event);
+                if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
+                    $event = new FormEvent($this, $this->getViewData());
+                    $dispatcher->dispatch($event, FormEvents::POST_SUBMIT);
+                }
             }
 
             return $this;

@@ -92,6 +92,8 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             $transport,
         ];
 
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+
         yield [
             Dsn::fromString('smtps://:@example.com?verify_peer='),
             $transport,

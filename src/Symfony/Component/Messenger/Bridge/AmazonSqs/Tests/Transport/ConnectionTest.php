@@ -198,31 +198,36 @@ class ConnectionTest extends TestCase
             ->method('getQueueUrl')
             ->with(['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123])
             ->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
-        $client->expects($this->at(1))
+        $client->expects($this->exactly(2))
             ->method('receiveMessage')
-            ->with([
-                'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                'MaxNumberOfMessages' => 9,
-                'WaitTimeSeconds' => 20,
-                'MessageAttributeNames' => ['All'],
-                'VisibilityTimeout' => null,
-            ])
-            ->willReturn(ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
-                new Message(['MessageId' => 1, 'Body' => 'this is a test']),
-                new Message(['MessageId' => 2, 'Body' => 'this is a test']),
-                new Message(['MessageId' => 3, 'Body' => 'this is a test']),
-            ]]));
-        $client->expects($this->at(2))
-            ->method('receiveMessage')
-            ->with([
-                'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                'MaxNumberOfMessages' => 9,
-                'WaitTimeSeconds' => 20,
-                'MessageAttributeNames' => ['All'],
-                'VisibilityTimeout' => null,
-            ])
-            ->willReturn(ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
-            ]]));
+            ->withConsecutive(
+                [
+                    [
+                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                        'MaxNumberOfMessages' => 9,
+                        'WaitTimeSeconds' => 20,
+                        'MessageAttributeNames' => ['All'],
+                        'VisibilityTimeout' => null,
+                    ],
+                ],
+                [
+                    [
+                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                        'MaxNumberOfMessages' => 9,
+                        'WaitTimeSeconds' => 20,
+                        'MessageAttributeNames' => ['All'],
+                        'VisibilityTimeout' => null,
+                    ],
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                    new Message(['MessageId' => 1, 'Body' => 'this is a test']),
+                    new Message(['MessageId' => 2, 'Body' => 'this is a test']),
+                    new Message(['MessageId' => 3, 'Body' => 'this is a test']),
+                ]]),
+                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => []])
+            );
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $this->assertNotNull($connection->get());

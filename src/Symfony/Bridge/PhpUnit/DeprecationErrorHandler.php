@@ -49,8 +49,9 @@ class DeprecationErrorHandler
      * Registers and configures the deprecation handler.
      *
      * The mode is a query string with options:
-     *  - "disabled" to disable the deprecation handler
+     *  - "disabled" to enable/disable the deprecation handler
      *  - "verbose" to enable/disable displaying the deprecation report
+     *  - "quiet" to disable displaying the deprecation report only for some groups (i.e. quiet[]=other)
      *  - "max" to configure the number of deprecations to allow before exiting with a non-zero
      *    status code; it's an array with keys "total", "self", "direct" and "indirect"
      *

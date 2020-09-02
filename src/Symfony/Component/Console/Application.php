@@ -494,6 +494,11 @@ class Application implements ResetInterface
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
 
+        // When the command has a different name than the one used at the command loader level
+        if (!isset($this->commands[$name])) {
+            throw new CommandNotFoundException(sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
+        }
+
         $command = $this->commands[$name];
 
         if ($this->wantHelps) {

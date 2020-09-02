@@ -1,0 +1,165 @@
+---------------------------------------------------------------------------
+
+by scheb at 2020-06-19T14:34:36Z
+
+I've added the logout listener to the array of authentication listeners and removed the sorting logic from `Firewall`.
+
+I have a bit of an issue with `CompleteConfigurationTest`. My compiler pass requires `ResolveChildDefinitionsPass` to be executed, but the test has disabled all optimization steps. The tests are failing because some `ChildDefintion`s are missing the `class` attribute, which would normally be set by `ResolveChildDefinitionsPass`. If I add `ResolveChildDefinitionsPass` as a optimization pass, other things are starting to break, because of missing child definitions.
+
+I've tried to resolve the `class` recursively within my compiler pass (basically doing what `ResolveChildDefinitionsPass` would normally do for me) and then the tests go green. So it's an issue with test setup somehow. I don't really understand how to fix this.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-19T14:56:37Z
+
+When I make this change:
+
+```diff
+diff --git a/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/CompleteConfigurationTest.php b/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/CompleteConfigurationTest.php
+index 95e3e6e345..226eb1a440 100644
+--- a/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/CompleteConfigurationTest.php
++++ b/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/CompleteConfigurationTest.php
+@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
+ use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+ use Symfony\Bundle\SecurityBundle\SecurityBundle;
+ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
++use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
+ use Symfony\Component\DependencyInjection\ContainerBuilder;
+ use Symfony\Component\DependencyInjection\Reference;
+ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+@@ -69,10 +70,9 @@ abstract class CompleteConfigurationTest extends TestCase
+         $configs = [];
+         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
+             $contextDef = $container->getDefinition($contextId);
+-            $arguments = $contextDef->getArguments();
+-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
++            $listeners[] = array_map('strval', $contextDef->getArgument(0)->getValues());
+
+-            $configDef = $container->getDefinition((string) $arguments['index_3']);
++            $configDef = $container->getDefinition((string) $contextDef->getArgument(3));
+             $configs[] = array_values($configDef->getArguments());
+         }
+
+@@ -637,6 +637,7 @@ abstract class CompleteConfigurationTest extends TestCase
+
+         $container = new ContainerBuilder();
+         $container->setParameter('kernel.debug', false);
++        $container->register('cache.system', \stdClass::class);
+
+         $security = new SecurityExtension();
+         $container->registerExtension($security);
+@@ -645,7 +646,7 @@ abstract class CompleteConfigurationTest extends TestCase
+         $bundle->build($container); // Attach all default factories
+         $this->getLoader($container)->load($file);
+
+-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
++        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+         $container->getCompilerPassConfig()->setRemovingPasses([]);
+         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+         $container->compile();
+```
+
+There is only one failing test in the `CompleteConfigurationTest`:
+
+```
+1) Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\XmlCompleteConfigurationTest::testFirewalls
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+         1 => 'security.user_checker'
+         2 => '.security.request_matcher.xmi9dcw'
+         3 => false
++        4 => false
++        5 => ''
++        6 => ''
++        7 => ''
++        8 => ''
++        9 => ''
++        10 => Array ()
++        11 => null
+     )
+     1 => Array (...)
+     2 => Array (...)
+     3 => Array (...)
+ )
+
+/home/wouter/symfony/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/CompleteConfigurationTest.php:86
+```
+
+Seems like there are many new empty security listeners.
+
+---------------------------------------------------------------------------
+
+by scheb at 2020-06-19T15:04:08Z
+
+@wouterj Nice, I'll try that and have a look at this failing test.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-19T16:25:13Z
+
+Can you maybe checkout the Travis failures?
+
+1. The first job can be fixed by executing `php src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-tags-whitelist.php` (it'll update the unused tags list)
+2. deps=high seems to indicate there are some issues with the logout listener behaving differently now
+3. deps=low indicates that we have to update the version constraint in SecurityBundle. You can set it to `^5.2` - which will automagically be transformed into the branch of this PR.
+
+---------------------------------------------------------------------------
+
+by scheb at 2020-06-19T18:12:41Z
+
+So I tried to reproduce these failing tests now for an hour or so. I don't get it. I'm unable to reproduce these failures.
+
+And then there's this build on https://github.com/symfony/symfony/pull/37337/commits/1bc5c7b95b904fcf6276c771bdc8c9c0864fbb4f: https://travis-ci.org/github/symfony/symfony/builds/700163046
+
+- PHP7.2 + php_extra=7.4
+- PHP7.4 + deps=low
+
+These fail in `PhpCompleteConfigurationTest` because I have removed the code that adds logout listener to the authentication listeners array, but didn't update the test. So I expected these tests to fail.
+
+But interestingly PHP: 7.3 + deps=high builds fine without any errors. How's that possible? I've deliberately introduced a failing test, but it doesn't fail 🤔
+
+It feels as if the dependencies of this PR (specifically `symfony/security-http`) are not using the *latest* code from this PR but rather some *outdated* version of this PR's codebase.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-06-19T22:30:53Z
+
+Oh, looking at the composer logs I think `deps=high` always installs the master branch and not the PR branch. So that should be green once this PR is merged. I'm not totally sure though.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-08-13T10:16:16Z
+
+Hi @scheb! Is there anything missing from this PR, or can it be marked as ready-to-merge? I think it's a great feature to add to Symfony and feature freeze is only in a few weeks (so it's good to have a clear overview of what PRs can be ready before this deadline).
+
+---------------------------------------------------------------------------
+
+by scheb at 2020-08-13T10:28:45Z
+
+@wouterj Technically it's ready and I'd like to see it in 5.2. It's still a draft, because I need feedback on this issue:
+
+> Hmm, I'm wondering how would you ensure compatibility then? Combining a 5.1 `symfony/security-bundle` with 5.2 `symfony/security` would lead to an odd behavior.
+
+It breaks the logout feature when you have such a combination in your application. And since @chalasr said
+
+> `security-http` should not be aware of `security-bundle`, only `security-bundle` knows about security components and has version constraints for them
+
+I'm not sure how we could solve this.
+
+I tend to say the change to add the `LogoutListener` to the list of authentication listeners shouldn't be part of this PR. I added this part as an optimization, but it's not required to make the PR work. That specific change looks like a BC break to me, since it breaks compatibility among 5.x versions of `symfony/security-bundle` and `symfony/security`. So we're probably better off considering this change (to add the `LogoutListener` to the list of authentication) for Symfony 6.0.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-13T11:03:36Z
+
+What about removing the LogoutListener for now, merge this PR. Then, we create a PR for the LogoutListener and we can discuss the best option for BC. How does that sound?
+
+---------------------------------------------------------------------------
+
+by scheb at 2020-09-02T10:22:23Z
+
+Hello there! I've removed the change regarding the LogoutListener, as Fabien suggested. The failed builds have been unrelated to the changes. So anything stopping up from merging the PR?

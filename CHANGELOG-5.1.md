@@ -7,6 +7,19 @@ in 5.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.1.0...v5.1.1
 
+* 5.1.5 (2020-09-02)
+
+ * security #cve-2020-15094 Remove headers with internal meaning from HttpClient responses (mpdude)
+ * bug #38024 [Console] Fix undefined index for inconsistent command name definition (chalasr)
+ * bug #38023 [DI] fix inlining of non-shared services (nicolas-grekas)
+ * bug #38022 Missed AbstractArgument (a-menshchikov)
+ * bug #38020 [PhpUnitBridge] swallow deprecations (xabbuh)
+ * bug #37961 [Mailer] Fixed 'verify_peer' option in mailer DSN being ignored (SnakePin)
+ * bug #38010 [Cache] Psr16Cache does not handle Proxy cache items (alex-dev)
+ * bug #37937 [Serializer] fixed fix encoding of cache keys with anonymous classes (michaelzangerle)
+ * bug #38002 [Validator] Fix PhpUnitBridge version constraint (derrabus)
+ * bug #38001 Fix symfony/amazon-mailer constraint (Michał Jusięga)
+
 * 5.1.4 (2020-08-31)
 
  * bug #37966 [HttpClient][MockHttpClient][DX] Throw when the response factory callable does not return a valid response (fancyweb)

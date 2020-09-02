@@ -228,7 +228,7 @@ class MainConfiguration implements ConfigurationInterface
                                 foreach ($v as $originalName => $cookieConfig) {
                                     if (false !== strpos($originalName, '-')) {
                                         $normalizedName = str_replace('-', '_', $originalName);
-                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), E_USER_DEPRECATED);
+                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), \E_USER_DEPRECATED);
 
                                         // normalize cookie names manually for BC reasons. Remove it in Symfony 5.0.
                                         $v[$normalizedName] = $cookieConfig;

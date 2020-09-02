@@ -182,7 +182,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function escape(string $string): string
     {
-        return htmlspecialchars($string, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
+        return htmlspecialchars($string, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
     }
 
     private function abbrClass(string $class): string
@@ -341,7 +341,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function include(string $name, array $context = []): string
     {
-        extract($context, EXTR_SKIP);
+        extract($context, \EXTR_SKIP);
         ob_start();
         include __DIR__.'/../Resources/'.$name;
 

@@ -306,7 +306,7 @@ class Configuration implements ConfigurationInterface
                                                 ->validate()
                                                     ->ifTrue(function ($v) { return 'method' !== $v; })
                                                     ->then(function ($v) {
-                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', E_USER_DEPRECATED);
+                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', \E_USER_DEPRECATED);
 
                                                         return $v;
                                                     })
@@ -496,7 +496,7 @@ class Configuration implements ConfigurationInterface
                                         return 'workflow' === $v['type'] && 'single_state' === ($v['marking_store']['type'] ?? false);
                                     })
                                     ->then(function ($v) {
-                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', E_USER_DEPRECATED);
+                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', \E_USER_DEPRECATED);
 
                                         return $v;
                                     })
@@ -812,7 +812,7 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()
                         ->ifTrue(function ($v) { return isset($v['strict_email']); })
                         ->then(function ($v) {
-                            @trigger_error('The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.', E_USER_DEPRECATED);
+                            @trigger_error('The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.', \E_USER_DEPRECATED);
 
                             return $v;
                         })

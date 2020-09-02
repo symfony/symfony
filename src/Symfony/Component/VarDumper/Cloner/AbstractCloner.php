@@ -244,7 +244,7 @@ abstract class AbstractCloner implements ClonerInterface
     public function cloneVar($var, $filter = 0)
     {
         $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) {
-            if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
+            if (\E_RECOVERABLE_ERROR === $type || \E_USER_ERROR === $type) {
                 // Cloner never dies
                 throw new \ErrorException($msg, 0, $type, $file, $line);
             }

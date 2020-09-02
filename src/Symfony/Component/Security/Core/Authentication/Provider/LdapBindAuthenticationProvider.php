@@ -87,7 +87,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
                 if ('' !== $this->searchDn && '' !== $this->searchPassword) {
                     $this->ldap->bind($this->searchDn, $this->searchPassword);
                 } else {
-                    @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw an exception in Symfony 5.0.', E_USER_DEPRECATED);
+                    @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw an exception in Symfony 5.0.', \E_USER_DEPRECATED);
                 }
                 $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_FILTER);
                 $query = str_replace('{username}', $username, $this->queryString);

@@ -235,7 +235,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), \E_USER_DEPRECATED);
             }
 
             try {
@@ -305,7 +305,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $guesses = [];
 
             foreach (array_keys($value) as $subject) {
-                $minScore = INF;
+                $minScore = \INF;
                 foreach ($proposals as $proposal) {
                     $distance = levenshtein($subject, $proposal);
                     if ($distance <= $minScore && $distance < 3) {

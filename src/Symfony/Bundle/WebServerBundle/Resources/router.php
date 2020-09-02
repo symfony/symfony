@@ -26,18 +26,18 @@ if (ini_get('auto_prepend_file') && !in_array(realpath(ini_get('auto_prepend_fil
     require ini_get('auto_prepend_file');
 }
 
-if (is_file($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$_SERVER['SCRIPT_NAME'])) {
+if (is_file($_SERVER['DOCUMENT_ROOT'].\DIRECTORY_SEPARATOR.$_SERVER['SCRIPT_NAME'])) {
     return false;
 }
 
 $script = isset($_ENV['APP_FRONT_CONTROLLER']) ? $_ENV['APP_FRONT_CONTROLLER'] : 'index.php';
 
 $_SERVER = array_merge($_SERVER, $_ENV);
-$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$script;
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].\DIRECTORY_SEPARATOR.$script;
 
 // Since we are rewriting to app_dev.php, adjust SCRIPT_NAME and PHP_SELF accordingly
-$_SERVER['SCRIPT_NAME'] = DIRECTORY_SEPARATOR.$script;
-$_SERVER['PHP_SELF'] = DIRECTORY_SEPARATOR.$script;
+$_SERVER['SCRIPT_NAME'] = \DIRECTORY_SEPARATOR.$script;
+$_SERVER['PHP_SELF'] = \DIRECTORY_SEPARATOR.$script;
 
 require $script;
 

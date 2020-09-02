@@ -46,7 +46,7 @@ abstract class AbstractUriElement
         $this->method = $method ? strtoupper($method) : null;
         $this->currentUri = $currentUri;
 
-        $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), PHP_URL_SCHEME);
+        $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), \PHP_URL_SCHEME);
         $baseUriIsAbsolute = \in_array(strtolower(substr($this->currentUri, 0, 4)), ['http', 'file']);
         if ($elementUriIsRelative && !$baseUriIsAbsolute) {
             throw new \InvalidArgumentException(sprintf('The URL of the element is relative, so you must define its base URI passing an absolute URL to the constructor of the "%s" class ("%s" was passed).', __CLASS__, $this->currentUri));
@@ -83,7 +83,7 @@ abstract class AbstractUriElement
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
+        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -116,7 +116,7 @@ abstract class AbstractUriElement
         }
 
         // relative path
-        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), PHP_URL_PATH);
+        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), \PHP_URL_PATH);
         $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
 
         return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;

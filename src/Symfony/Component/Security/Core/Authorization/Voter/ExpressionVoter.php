@@ -39,15 +39,15 @@ class ExpressionVoter implements VoterInterface
     public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, $authChecker = null, RoleHierarchyInterface $roleHierarchy = null)
     {
         if ($authChecker instanceof RoleHierarchyInterface) {
-            @trigger_error(sprintf('Passing a RoleHierarchyInterface to "%s()" is deprecated since Symfony 4.2. Pass an AuthorizationCheckerInterface instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a RoleHierarchyInterface to "%s()" is deprecated since Symfony 4.2. Pass an AuthorizationCheckerInterface instead.', __METHOD__), \E_USER_DEPRECATED);
             $roleHierarchy = $authChecker;
             $authChecker = null;
 
             if (!method_exists($roleHierarchy, 'getReachableRoleNames')) {
-                @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($this->roleHierarchy)), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($this->roleHierarchy)), \E_USER_DEPRECATED);
             }
         } elseif (null === $authChecker) {
-            @trigger_error(sprintf('Argument 3 passed to "%s()" should be an instance of AuthorizationCheckerInterface, not passing it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Argument 3 passed to "%s()" should be an instance of AuthorizationCheckerInterface, not passing it is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
         } elseif (!$authChecker instanceof AuthorizationCheckerInterface) {
             throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, AuthorizationCheckerInterface::class, \is_object($authChecker) ? \get_class($authChecker) : \gettype($authChecker)));
         }
@@ -63,7 +63,7 @@ class ExpressionVoter implements VoterInterface
      */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, register the provider directly on the injected ExpressionLanguage instance instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, register the provider directly on the injected ExpressionLanguage instance instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->expressionLanguage->registerProvider($provider);
     }
@@ -99,7 +99,7 @@ class ExpressionVoter implements VoterInterface
             $roleNames = $token->getRoleNames();
             $roles = array_map(function (string $role) { return new Role($role, false); }, $roleNames);
         } else {
-            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
 
             $roles = $token->getRoles(false);
             $roleNames = array_map(function (Role $role) { return $role->getRole(); }, $roles);

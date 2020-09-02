@@ -77,7 +77,7 @@ class Range extends Constraint
                 $this->deprecatedMaxMessageSet = isset($options['maxMessage']);
 
                 if ($this->deprecatedMinMessageSet || $this->deprecatedMaxMessageSet) {
-                    @trigger_error('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', E_USER_DEPRECATED);
+                    @trigger_error('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', \E_USER_DEPRECATED);
                 }
             }
         }

@@ -144,7 +144,7 @@ class FilesystemTestCase extends TestCase
         }
 
         // https://bugs.php.net/69473
-        if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === PHP_ZTS) {
+        if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === \PHP_ZTS) {
             $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
         }
     }

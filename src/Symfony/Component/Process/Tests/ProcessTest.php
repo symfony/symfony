@@ -35,7 +35,7 @@ class ProcessTest extends TestCase
         self::$phpBin = getenv('SYMFONY_PROCESS_PHP_TEST_BINARY') ?: ('phpdbg' === \PHP_SAPI ? 'php' : $phpBin->find());
 
         ob_start();
-        phpinfo(INFO_GENERAL);
+        phpinfo(\INFO_GENERAL);
         self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }
 
@@ -68,12 +68,12 @@ class ProcessTest extends TestCase
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is transient on Windows');
         }
-        @trigger_error('Test Error', E_USER_NOTICE);
+        @trigger_error('Test Error', \E_USER_NOTICE);
         $process = $this->getProcessForCode('sleep(3)');
         $process->run();
         $actualError = error_get_last();
         $this->assertEquals('Test Error', $actualError['message']);
-        $this->assertEquals(E_USER_NOTICE, $actualError['type']);
+        $this->assertEquals(\E_USER_NOTICE, $actualError['type']);
     }
 
     public function testNegativeTimeoutFromConstructor()
@@ -196,7 +196,7 @@ class ProcessTest extends TestCase
 
         $process->wait();
 
-        $this->assertSame('foo'.PHP_EOL, $data);
+        $this->assertSame('foo'.\PHP_EOL, $data);
     }
 
     /**
@@ -401,7 +401,7 @@ class ProcessTest extends TestCase
         $p = $this->getProcessForCode('file_put_contents($s = \''.$uri.'\', \'foo\'); flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');');
 
         $h = fopen($lock, 'w');
-        flock($h, LOCK_EX);
+        flock($h, \LOCK_EX);
 
         $p->start();
 
@@ -413,7 +413,7 @@ class ProcessTest extends TestCase
             $this->assertSame($s, $p->$getIncrementalOutput());
             $this->assertSame('', $p->$getIncrementalOutput());
 
-            flock($h, LOCK_UN);
+            flock($h, \LOCK_UN);
         }
 
         fclose($h);
@@ -536,7 +536,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('echo foo');
 
         $this->assertSame($process, $process->mustRun());
-        $this->assertEquals('foo'.PHP_EOL, $process->getOutput());
+        $this->assertEquals('foo'.\PHP_EOL, $process->getOutput());
     }
 
     public function testSuccessfulMustRunHasCorrectExitCode()
@@ -899,7 +899,7 @@ class ProcessTest extends TestCase
         while (false === strpos($process->getOutput(), 'Caught')) {
             usleep(1000);
         }
-        $process->signal(SIGUSR1);
+        $process->signal(\SIGUSR1);
         $process->wait();
 
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
@@ -912,7 +912,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('sleep 4');
         $process->start();
-        $process->signal(SIGKILL);
+        $process->signal(\SIGKILL);
 
         while ($process->isRunning()) {
             usleep(10000);
@@ -1370,7 +1370,7 @@ class ProcessTest extends TestCase
 
         $process->run();
 
-        $this->assertSame('hello'.PHP_EOL, $process->getOutput());
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
         $this->assertSame('', $process->getErrorOutput());
     }
 

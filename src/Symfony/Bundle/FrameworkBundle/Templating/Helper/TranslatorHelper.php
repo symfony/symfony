@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-@trigger_error('The '.TranslatorHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+@trigger_error('The '.TranslatorHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
@@ -62,7 +62,7 @@ class TranslatorHelper extends Helper
      */
     public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), \E_USER_DEPRECATED);
 
         if (null === $this->translator) {
             return $this->doTrans($id, ['%count%' => $number] + $parameters, $domain, $locale);

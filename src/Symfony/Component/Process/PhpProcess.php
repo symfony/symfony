@@ -65,7 +65,7 @@ class PhpProcess extends Process
      */
     public function setPhpBinary($php)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the $php argument of the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the $php argument of the constructor instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->setCommandLine($php);
     }

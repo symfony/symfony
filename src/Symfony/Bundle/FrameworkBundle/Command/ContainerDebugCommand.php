@@ -122,7 +122,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('show-private')) {
-            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
+            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', \E_USER_DEPRECATED);
         }
 
         $io = new SymfonyStyle($input, $output);

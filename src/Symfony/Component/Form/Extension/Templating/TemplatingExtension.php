@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Templating;
 
-@trigger_error('The '.TemplatingExtension::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+@trigger_error('The '.TemplatingExtension::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Component\Form\AbstractExtension;

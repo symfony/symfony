@@ -64,7 +64,7 @@ class PhpFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && 'php' === pathinfo($resource, PATHINFO_EXTENSION)) {
+        if (null === $type && 'php' === pathinfo($resource, \PATHINFO_EXTENSION)) {
             return true;
         }
 

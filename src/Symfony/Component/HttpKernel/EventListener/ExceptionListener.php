@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "ErrorListener" instead.', ExceptionListener::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "ErrorListener" instead.', ExceptionListener::class), \E_USER_DEPRECATED);
 
 /**
  * @deprecated since Symfony 4.4, use ErrorListener instead

@@ -17,7 +17,7 @@ use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PhpFilesTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PhpFilesCache::class, PhpFilesAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PhpFilesCache::class, PhpFilesAdapter::class, CacheInterface::class), \E_USER_DEPRECATED);
 
 /**
  * @deprecated since Symfony 4.3, use PhpFilesAdapter and type-hint for CacheInterface instead.

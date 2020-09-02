@@ -15,7 +15,7 @@ use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Security\LdapUserProvider as BaseLdapUserProvider;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', LdapUserProvider::class, BaseLdapUserProvider::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', LdapUserProvider::class, BaseLdapUserProvider::class), \E_USER_DEPRECATED);
 
 /**
  * LdapUserProvider is a simple user provider on top of ldap.

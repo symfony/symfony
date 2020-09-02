@@ -61,7 +61,7 @@ foreach (array_slice($argv, 1) as $argumentOrOption) {
 
 foreach ($config['original_files'] as $originalFilePath) {
     if (!file_exists($originalFilePath)) {
-        echo sprintf('The following file does not exist. Make sure that you execute this command at the root dir of the Symfony code repository.%s  %s', PHP_EOL, $originalFilePath);
+        echo sprintf('The following file does not exist. Make sure that you execute this command at the root dir of the Symfony code repository.%s  %s', \PHP_EOL, $originalFilePath);
         exit(1);
     }
 }
@@ -89,7 +89,7 @@ function findTranslationFiles($originalFilePath, $localeToAnalyze)
     $originalFileName = basename($originalFilePath);
     $translationFileNamePattern = str_replace('.en.', '.*.', $originalFileName);
 
-    $translationFiles = glob($translationsDir.'/'.$translationFileNamePattern, GLOB_NOSORT);
+    $translationFiles = glob($translationsDir.'/'.$translationFileNamePattern, \GLOB_NOSORT);
     sort($translationFiles);
     foreach ($translationFiles as $filePath) {
         $locale = extractLocaleFromFilePath($filePath);
@@ -127,7 +127,7 @@ function printTranslationStatus($originalFilePath, $translationStatus, $verboseO
 {
     printTitle($originalFilePath);
     printTable($translationStatus, $verboseOutput);
-    echo PHP_EOL.PHP_EOL;
+    echo \PHP_EOL.\PHP_EOL;
 }
 
 function extractLocaleFromFilePath($filePath)
@@ -154,8 +154,8 @@ function extractTranslationKeys($filePath)
 
 function printTitle($title)
 {
-    echo $title.PHP_EOL;
-    echo str_repeat('=', strlen($title)).PHP_EOL.PHP_EOL;
+    echo $title.\PHP_EOL;
+    echo str_repeat('=', strlen($title)).\PHP_EOL.\PHP_EOL;
 }
 
 function printTable($translations, $verboseOutput)
@@ -174,19 +174,19 @@ function printTable($translations, $verboseOutput)
             textColorGreen();
         }
 
-        echo sprintf('| Locale: %-'.$longestLocaleNameLength.'s | Translated: %d/%d', $locale, $translation['translated'], $translation['total']).PHP_EOL;
+        echo sprintf('| Locale: %-'.$longestLocaleNameLength.'s | Translated: %d/%d', $locale, $translation['translated'], $translation['total']).\PHP_EOL;
 
         textColorNormal();
 
         if (true === $verboseOutput && count($translation['missingKeys']) > 0) {
-            echo str_repeat('-', 80).PHP_EOL;
-            echo '| Missing Translations:'.PHP_EOL;
+            echo str_repeat('-', 80).\PHP_EOL;
+            echo '| Missing Translations:'.\PHP_EOL;
 
             foreach ($translation['missingKeys'] as $id => $content) {
-                echo sprintf('|   (id=%s) %s', $id, $content).PHP_EOL;
+                echo sprintf('|   (id=%s) %s', $id, $content).\PHP_EOL;
             }
 
-            echo str_repeat('-', 80).PHP_EOL;
+            echo str_repeat('-', 80).\PHP_EOL;
         }
     }
 }

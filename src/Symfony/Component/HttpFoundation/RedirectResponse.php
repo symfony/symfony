@@ -35,7 +35,7 @@ class RedirectResponse extends Response
     public function __construct(?string $url, int $status = 302, array $headers = [])
     {
         if (null === $url) {
-            @trigger_error(sprintf('Passing a null url when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a null url when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), \E_USER_DEPRECATED);
             $url = '';
         }
 
@@ -47,7 +47,7 @@ class RedirectResponse extends Response
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
 
-        if (301 == $status && !\array_key_exists('cache-control', array_change_key_case($headers, CASE_LOWER))) {
+        if (301 == $status && !\array_key_exists('cache-control', array_change_key_case($headers, \CASE_LOWER))) {
             $this->headers->remove('cache-control');
         }
     }
@@ -105,7 +105,7 @@ class RedirectResponse extends Response
     <body>
         Redirecting to <a href="%1$s">%1$s</a>.
     </body>
-</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
+</html>', htmlspecialchars($url, \ENT_QUOTES, 'UTF-8')));
 
         $this->headers->set('Location', $url);
 

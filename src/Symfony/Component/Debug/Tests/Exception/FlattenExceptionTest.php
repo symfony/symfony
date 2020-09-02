@@ -265,8 +265,8 @@ class FlattenExceptionTest extends TestCase
             0.0,
             '0',
             '',
-            INF,
-            NAN,
+            \INF,
+            \NAN,
         ]);
 
         $flattened = FlattenException::create($exception);
@@ -297,7 +297,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['float', 0.0], $array[$i++]);
         $this->assertSame(['string', '0'], $array[$i++]);
         $this->assertSame(['string', ''], $array[$i++]);
-        $this->assertSame(['float', INF], $array[$i++]);
+        $this->assertSame(['float', \INF], $array[$i++]);
 
         // assertEquals() does not like NAN values.
         $this->assertEquals('float', $array[$i][0]);

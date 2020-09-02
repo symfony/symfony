@@ -55,7 +55,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         }
 
         $this->multi = new NativeClientState();
-        $this->multi->maxHostConnections = 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX;
+        $this->multi->maxHostConnections = 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX;
     }
 
     /**
@@ -116,7 +116,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if ($onProgress = $options['on_progress']) {
             // Memoize the last progress to ease calling the callback periodically when no network transfer happens
             $lastProgress = [0, 0];
-            $maxDuration = 0 < $options['max_duration'] ? $options['max_duration'] : INF;
+            $maxDuration = 0 < $options['max_duration'] ? $options['max_duration'] : \INF;
             $onProgress = static function (...$progress) use ($onProgress, &$lastProgress, &$info, $maxDuration) {
                 if ($info['total_time'] >= $maxDuration) {
                     throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
@@ -148,11 +148,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $notification = static function (int $code, int $severity, ?string $msg, int $msgCode, int $dlNow, int $dlSize) use ($onProgress, &$info) {
             $info['total_time'] = microtime(true) - $info['start_time'];
 
-            if (STREAM_NOTIFY_PROGRESS === $code) {
+            if (\STREAM_NOTIFY_PROGRESS === $code) {
                 $info['starttransfer_time'] = $info['starttransfer_time'] ?: $info['total_time'];
                 $info['size_upload'] += $dlNow ? 0 : $info['size_body'];
                 $info['size_download'] = $dlNow;
-            } elseif (STREAM_NOTIFY_CONNECT === $code) {
+            } elseif (\STREAM_NOTIFY_CONNECT === $code) {
                 $info['connect_time'] = $info['total_time'];
                 $info['debug'] .= $info['request_header'];
                 unset($info['request_header']);
@@ -310,14 +310,14 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
      */
     private static function dnsResolve(array $url, NativeClientState $multi, array &$info, ?\Closure $onProgress): array
     {
-        if ($port = parse_url($url['authority'], PHP_URL_PORT) ?: '') {
+        if ($port = parse_url($url['authority'], \PHP_URL_PORT) ?: '') {
             $info['primary_port'] = $port;
             $port = ':'.$port;
         } else {
             $info['primary_port'] = 'http:' === $url['scheme'] ? 80 : 443;
         }
 
-        $host = parse_url($url['authority'], PHP_URL_HOST);
+        $host = parse_url($url['authority'], \PHP_URL_HOST);
 
         if (null === $ip = $multi->dnsCache[$host] ?? null) {
             $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
@@ -407,7 +407,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             [$host, $port, $url['authority']] = self::dnsResolve($url, $multi, $info, $onProgress);
             stream_context_set_option($context, 'ssl', 'peer_name', $host);
 
-            if (false !== (parse_url($location, PHP_URL_HOST) ?? false)) {
+            if (false !== (parse_url($location, \PHP_URL_HOST) ?? false)) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;

@@ -153,7 +153,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($fully_paged_query->getResources()), 1);
             $this->assertEquals(\count($paged_query->getResources()), 5);
 
-            if (PHP_MAJOR_VERSION > 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2)) {
+            if (\PHP_MAJOR_VERSION > 7 || (\PHP_MAJOR_VERSION == 7 && \PHP_MINOR_VERSION >= 2)) {
                 // This last query is to ensure that we haven't botched the state of our connection
                 // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
                 // bits to work around an implementation flaw, so we simply can't guarantee this to work there.

@@ -80,7 +80,7 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. Use the DebugBundle combined with MonologBridge instead.', E_USER_DEPRECATED);
+        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. Use the DebugBundle combined with MonologBridge instead.', \E_USER_DEPRECATED);
 
         $filter = $input->getOption('filter');
         if ($filter) {

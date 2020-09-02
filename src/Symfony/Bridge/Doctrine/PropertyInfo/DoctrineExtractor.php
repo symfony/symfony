@@ -44,7 +44,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         if ($entityManager instanceof EntityManagerInterface) {
             $this->entityManager = $entityManager;
         } elseif ($entityManager instanceof ClassMetadataFactory) {
-            @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), \E_USER_DEPRECATED);
             $this->classMetadataFactory = $entityManager;
         } else {
             throw new \TypeError(sprintf('$entityManager must be an instance of "%s", "%s" given.', EntityManagerInterface::class, \is_object($entityManager) ? \get_class($entityManager) : \gettype($entityManager)));

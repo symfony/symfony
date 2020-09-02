@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Workflow\SupportStrategy;
 
-@trigger_error(sprintf('"%s" is deprecated since Symfony 4.1. Use "%s" instead.', ClassInstanceSupportStrategy::class, InstanceOfSupportStrategy::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('"%s" is deprecated since Symfony 4.1. Use "%s" instead.', ClassInstanceSupportStrategy::class, InstanceOfSupportStrategy::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\Workflow\Workflow;
 

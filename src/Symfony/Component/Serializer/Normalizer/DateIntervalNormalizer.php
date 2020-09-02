@@ -34,7 +34,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function __construct($defaultContext = [])
     {
         if (!\is_array($defaultContext)) {
-            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), \E_USER_DEPRECATED);
 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
         }

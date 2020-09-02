@@ -329,7 +329,7 @@ class FileProfilerStorageTest extends TestCase
         $h = tmpfile();
 
         fwrite($h, "line1\n\n\nline2\n");
-        fseek($h, 0, SEEK_END);
+        fseek($h, 0, \SEEK_END);
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));

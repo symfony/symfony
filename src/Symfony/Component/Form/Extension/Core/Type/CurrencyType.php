@@ -77,7 +77,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         if (null !== $this->choiceList) {
             return $this->choiceList;
@@ -93,7 +93,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoicesForValues(array $values, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $values = array_filter($values);
@@ -111,7 +111,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadValuesForChoices(array $choices, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $choices = array_filter($choices);

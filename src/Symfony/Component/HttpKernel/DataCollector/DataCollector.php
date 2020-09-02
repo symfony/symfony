@@ -43,9 +43,9 @@ abstract class DataCollector implements DataCollectorInterface
      */
     public function serialize()
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), \E_USER_DEPRECATED);
 
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+        $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
         $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
 
         return $isCalledFromOverridingMethod ? $this->data : serialize($this->data);
@@ -56,7 +56,7 @@ abstract class DataCollector implements DataCollectorInterface
      */
     public function unserialize($data)
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->data = \is_array($data) ? $data : unserialize($data);
     }
@@ -113,7 +113,7 @@ abstract class DataCollector implements DataCollectorInterface
     public function __sleep()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), \E_USER_DEPRECATED);
             $this->data = $this->serialize();
         }
 
@@ -123,7 +123,7 @@ abstract class DataCollector implements DataCollectorInterface
     public function __wakeup()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'unserialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::unserialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Implementing the "%s::unserialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), \E_USER_DEPRECATED);
             $this->unserialize($this->data);
         }
     }

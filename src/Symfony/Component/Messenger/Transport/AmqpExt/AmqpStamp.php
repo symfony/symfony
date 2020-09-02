@@ -23,7 +23,7 @@ final class AmqpStamp implements NonSendableStampInterface
     private $flags;
     private $attributes;
 
-    public function __construct(string $routingKey = null, int $flags = AMQP_NOPARAM, array $attributes = [])
+    public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
     {
         $this->routingKey = $routingKey;
         $this->flags = $flags;
@@ -62,14 +62,14 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
 
-        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? AMQP_NOPARAM, $attr);
+        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
     }
 
     public static function createWithAttributes(array $attributes, self $previousStamp = null): self
     {
         return new self(
             $previousStamp->routingKey ?? null,
-            $previousStamp->flags ?? AMQP_NOPARAM,
+            $previousStamp->flags ?? \AMQP_NOPARAM,
             array_merge($previousStamp->attributes ?? [], $attributes)
         );
     }

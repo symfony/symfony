@@ -25,12 +25,12 @@ try {
     while (false === strpos($process->getOutput(), 'ready')) {
         usleep(1000);
     }
-    $process->signal(SIGSTOP);
+    $process->signal(\SIGSTOP);
     $process->wait();
 
     return $process->getExitCode();
 } catch (ProcessTimedOutException $t) {
-    echo $t->getMessage().PHP_EOL;
+    echo $t->getMessage().\PHP_EOL;
 
     return 1;
 }

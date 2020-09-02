@@ -152,7 +152,7 @@ final class CacheItem implements ItemInterface
      */
     public function getPreviousTags(): array
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->metadata[self::METADATA_TAGS] ?? [];
     }
@@ -195,7 +195,7 @@ final class CacheItem implements ItemInterface
                     $replace['{'.$k.'}'] = $v;
                 }
             }
-            @trigger_error(strtr($message, $replace), E_USER_WARNING);
+            @trigger_error(strtr($message, $replace), \E_USER_WARNING);
         }
     }
 }

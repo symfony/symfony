@@ -106,19 +106,19 @@ class Connection
 
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
-            $autoSetup = filter_var($redisOptions['auto_setup'], FILTER_VALIDATE_BOOLEAN);
+            $autoSetup = filter_var($redisOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['auto_setup']);
         }
 
         $maxEntries = null;
         if (\array_key_exists('stream_max_entries', $redisOptions)) {
-            $maxEntries = filter_var($redisOptions['stream_max_entries'], FILTER_VALIDATE_INT);
+            $maxEntries = filter_var($redisOptions['stream_max_entries'], \FILTER_VALIDATE_INT);
             unset($redisOptions['stream_max_entries']);
         }
 
         $dbIndex = null;
         if (\array_key_exists('dbindex', $redisOptions)) {
-            $dbIndex = filter_var($redisOptions['dbindex'], FILTER_VALIDATE_INT);
+            $dbIndex = filter_var($redisOptions['dbindex'], \FILTER_VALIDATE_INT);
             unset($redisOptions['dbindex']);
         }
 

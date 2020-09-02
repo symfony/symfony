@@ -335,7 +335,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
             $this->markTestSkipped('intl extension is not loaded');
         }
 
-        $this->iniSet('intl.error_level', E_WARNING);
+        $this->iniSet('intl.error_level', \E_WARNING);
 
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer();
@@ -362,7 +362,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         }
 
         $this->iniSet('intl.use_exceptions', 1);
-        $this->iniSet('intl.error_level', E_WARNING);
+        $this->iniSet('intl.error_level', \E_WARNING);
 
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer = new DateTimeToLocalizedStringTransformer();

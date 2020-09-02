@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-@trigger_error('The '.FilesystemLoader::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig notation for templates instead.', E_USER_DEPRECATED);
+@trigger_error('The '.FilesystemLoader::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig notation for templates instead.', \E_USER_DEPRECATED);
 
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;

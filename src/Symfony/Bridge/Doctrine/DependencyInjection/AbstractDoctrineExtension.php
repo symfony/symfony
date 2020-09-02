@@ -253,11 +253,11 @@ abstract class AbstractDoctrineExtension extends Extension
         $configPath = $this->getMappingResourceConfigDirectory();
         $extension = $this->getMappingResourceExtension();
 
-        if (glob($dir.'/'.$configPath.'/*.'.$extension.'.xml', GLOB_NOSORT)) {
+        if (glob($dir.'/'.$configPath.'/*.'.$extension.'.xml', \GLOB_NOSORT)) {
             $driver = 'xml';
-        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.yml', GLOB_NOSORT)) {
+        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.yml', \GLOB_NOSORT)) {
             $driver = 'yml';
-        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.php', GLOB_NOSORT)) {
+        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.php', \GLOB_NOSORT)) {
             $driver = 'php';
         } else {
             // add the closest existing directory as a resource
@@ -435,7 +435,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function getMetadataDriverClass(string $driverType): string
     {
-        @trigger_error(sprintf('Not declaring the "%s" method in class "%s" is deprecated since Symfony 4.4. This method will be abstract in Symfony 5.0.', __METHOD__, static::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Not declaring the "%s" method in class "%s" is deprecated since Symfony 4.4. This method will be abstract in Symfony 5.0.', __METHOD__, static::class), \E_USER_DEPRECATED);
 
         return '%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%');
     }

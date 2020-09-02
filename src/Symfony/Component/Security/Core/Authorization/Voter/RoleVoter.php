@@ -62,7 +62,7 @@ class RoleVoter implements VoterInterface
             return $token->getRoleNames();
         }
 
-        @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
 
         return array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
     }

@@ -132,7 +132,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
-        $expected->addPropertyConstraint('firstName', new Range(['max' => PHP_INT_MAX]));
+        $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
 
         $this->assertEquals($expected, $metadata);
     }

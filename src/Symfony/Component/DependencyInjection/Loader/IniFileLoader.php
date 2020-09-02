@@ -37,7 +37,7 @@ class IniFileLoader extends FileLoader
         }
 
         // real raw parsing
-        $result = parse_ini_file($path, true, INI_SCANNER_RAW);
+        $result = parse_ini_file($path, true, \INI_SCANNER_RAW);
 
         if (isset($result['parameters']) && \is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
@@ -55,7 +55,7 @@ class IniFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && 'ini' === pathinfo($resource, PATHINFO_EXTENSION)) {
+        if (null === $type && 'ini' === pathinfo($resource, \PATHINFO_EXTENSION)) {
             return true;
         }
 

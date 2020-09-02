@@ -42,7 +42,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     public function __construct($resolver, $defaultOptions = [])
     {
         if ($resolver instanceof ControllerNameParser) {
-            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ControllerNameParser::class, __METHOD__, LoaderResolverInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ControllerNameParser::class, __METHOD__, LoaderResolverInterface::class), \E_USER_DEPRECATED);
             $this->parser = $resolver;
             $resolver = $defaultOptions;
             $defaultOptions = 2 < \func_num_args() ? func_get_arg(2) : [];
@@ -105,7 +105,7 @@ class DelegatingLoader extends BaseDelegatingLoader
                 try {
                     $controller = $this->parser->parse($controller, false);
 
-                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1, use "%s" instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1, use "%s" instead.', $deprecatedNotation, $controller), \E_USER_DEPRECATED);
                 } catch (\InvalidArgumentException $e) {
                     // unable to optimize unknown notation
                 }

@@ -42,7 +42,7 @@ class TranslationWriter implements TranslationWriterInterface
      */
     public function disableBackup()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), \E_USER_DEPRECATED);
 
         foreach ($this->dumpers as $dumper) {
             if (method_exists($dumper, 'setBackup')) {

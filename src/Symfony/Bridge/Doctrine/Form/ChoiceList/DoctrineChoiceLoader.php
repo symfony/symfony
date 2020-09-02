@@ -47,7 +47,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         $classMetadata = $manager->getClassMetadata($class);
 
         if ($idReader && !$idReader->isSingleId()) {
-            @trigger_error(sprintf('Passing an instance of "%s" to "%s" with an entity class "%s" that has a composite id is deprecated since Symfony 4.3 and will throw an exception in 5.0.', IdReader::class, __CLASS__, $class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" to "%s" with an entity class "%s" that has a composite id is deprecated since Symfony 4.3 and will throw an exception in 5.0.', IdReader::class, __CLASS__, $class), \E_USER_DEPRECATED);
 
             // In Symfony 5.0
             // throw new \InvalidArgumentException(sprintf('The second argument `$idReader` of "%s" must be null when the query cannot be optimized because of composite id fields.', __METHOD__));
@@ -57,7 +57,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             $idReader = new IdReader($manager, $classMetadata);
 
             if ($idReader->isSingleId()) {
-                @trigger_error(sprintf('Not explicitly passing an instance of "%s" to "%s" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.', IdReader::class, __CLASS__, $class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not explicitly passing an instance of "%s" to "%s" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.', IdReader::class, __CLASS__, $class), \E_USER_DEPRECATED);
             } else {
                 $idReader = null;
             }

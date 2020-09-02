@@ -91,7 +91,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     public function __construct(?string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
     {
         if (null === $locale) {
-            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->setLocale($locale, false);
@@ -139,7 +139,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         }
 
         if (null === $locale) {
-            @trigger_error(sprintf('Passing "null" to the third argument of the "%s" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "null" to the third argument of the "%s" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->assertValidLocale($locale);
@@ -159,7 +159,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     public function setLocale($locale)
     {
         if (null === $locale && (2 > \func_num_args() || func_get_arg(1))) {
-            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->assertValidLocale($locale);
@@ -188,7 +188,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
 
         foreach ($locales as $locale) {
             if (null === $locale) {
-                @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), \E_USER_DEPRECATED);
             }
             $this->assertValidLocale($locale);
         }
@@ -246,7 +246,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), \E_USER_DEPRECATED);
 
         if ('' === $id = (string) $id) {
             return '';

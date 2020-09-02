@@ -62,7 +62,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     protected function findExtension($name)
     {
         $bundles = $this->initializeBundles();
-        $minScore = INF;
+        $minScore = \INF;
 
         foreach ($bundles as $bundle) {
             if ($name === $bundle->getName()) {

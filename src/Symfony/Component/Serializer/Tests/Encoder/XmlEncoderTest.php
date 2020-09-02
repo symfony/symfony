@@ -604,11 +604,11 @@ XML;
 XML;
 
         if ($legacy) {
-            $this->encoder = new XmlEncoder('people', null, [XML_PI_NODE]);
+            $this->encoder = new XmlEncoder('people', null, [\XML_PI_NODE]);
         } else {
             $this->encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'people',
-                XmlEncoder::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+                XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
             ]);
         }
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
@@ -865,11 +865,11 @@ XML;
     private function doTestEncodeWithoutPi(bool $legacy = false)
     {
         if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_PI_NODE]);
+            $encoder = new XmlEncoder('response', null, [], [\XML_PI_NODE]);
         } else {
             $encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
             ]);
         }
 
@@ -891,11 +891,11 @@ XML;
     private function doTestEncodeWithoutComment(bool $legacy = false)
     {
         if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_COMMENT_NODE]);
+            $encoder = new XmlEncoder('response', null, [], [\XML_COMMENT_NODE]);
         } else {
             $encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_COMMENT_NODE],
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_COMMENT_NODE],
             ]);
         }
 

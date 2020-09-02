@@ -63,7 +63,7 @@ class Section
     public function get($id)
     {
         if (null === $id) {
-            @trigger_error(sprintf('Passing "null" as the first argument of the "%s()" method is deprecated since Symfony 4.4, pass a valid child section identifier instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "null" as the first argument of the "%s()" method is deprecated since Symfony 4.4, pass a valid child section identifier instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         foreach ($this->children as $child) {

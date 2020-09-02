@@ -15,7 +15,7 @@ use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionHandler::class, \Symfony\Component\ErrorHandler\ErrorHandler::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionHandler::class, \Symfony\Component\ErrorHandler\ErrorHandler::class), \E_USER_DEPRECATED);
 
 /**
  * ExceptionHandler converts an exception to a Response object.
@@ -398,7 +398,7 @@ EOF;
 
         if (\is_string($fmt)) {
             $i = strpos($f = $fmt, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: \strlen($f);
-            $fmt = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
+            $fmt = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, \PREG_SPLIT_DELIM_CAPTURE);
 
             for ($i = 1; isset($fmt[$i]); ++$i) {
                 if (0 === strpos($path, $k = $fmt[$i++])) {
@@ -451,7 +451,7 @@ EOF;
      */
     private function escapeHtml(string $str): string
     {
-        return htmlspecialchars($str, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
+        return htmlspecialchars($str, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
     }
 
     private function getSymfonyGhostAsSvg(): string

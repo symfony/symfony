@@ -28,7 +28,7 @@ class DebugCommandTest extends TestCase
 {
     protected function setUp(): void
     {
-        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
     }
 
     protected function tearDown(): void

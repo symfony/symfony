@@ -27,7 +27,7 @@ class FileFormField extends FormField
      */
     public function setErrorCode($error)
     {
-        $codes = [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION];
+        $codes = [\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_EXTENSION];
         if (!\in_array($error, $codes)) {
             throw new \InvalidArgumentException(sprintf('The error code "%s" is not valid.', $error));
         }
@@ -53,7 +53,7 @@ class FileFormField extends FormField
     public function setValue($value)
     {
         if (null !== $value && is_readable($value)) {
-            $error = UPLOAD_ERR_OK;
+            $error = \UPLOAD_ERR_OK;
             $size = filesize($value);
             $info = pathinfo($value);
             $name = $info['basename'];
@@ -69,7 +69,7 @@ class FileFormField extends FormField
             copy($value, $tmp);
             $value = $tmp;
         } else {
-            $error = UPLOAD_ERR_NO_FILE;
+            $error = \UPLOAD_ERR_NO_FILE;
             $size = 0;
             $name = '';
             $value = '';

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Mime\FileBinaryMimeTypeGuesser as NewFileBinaryMimeTypeGuesser;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" instead.', FileBinaryMimeTypeGuesser::class, NewFileBinaryMimeTypeGuesser::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" instead.', FileBinaryMimeTypeGuesser::class, NewFileBinaryMimeTypeGuesser::class), \E_USER_DEPRECATED);
 
 /**
  * Guesses the mime type with the binary "file" (only available on *nix).

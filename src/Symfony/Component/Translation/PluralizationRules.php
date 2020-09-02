@@ -33,7 +33,7 @@ class PluralizationRules
     public static function get($number, $locale/*, bool $triggerDeprecation = true*/)
     {
         if (3 > \func_num_args() || func_get_arg(2)) {
-            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), \E_USER_DEPRECATED);
         }
 
         if ('pt_BR' === $locale) {
@@ -202,7 +202,7 @@ class PluralizationRules
      */
     public static function set(callable $rule, $locale)
     {
-        @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), \E_USER_DEPRECATED);
 
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian

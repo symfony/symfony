@@ -38,7 +38,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
             return $dispatcher;
         }
 
-        @trigger_error(sprintf('The signature of the "%s::dispatch()" method should be updated to "dispatch($event, string $eventName = null)", not doing so is deprecated since Symfony 4.3.', $r->class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The signature of the "%s::dispatch()" method should be updated to "dispatch($event, string $eventName = null)", not doing so is deprecated since Symfony 4.3.', $r->class), \E_USER_DEPRECATED);
 
         $self = new self();
         $self->dispatcher = $dispatcher;
@@ -60,7 +60,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
         if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);
         } elseif (\is_string($event) && (null === $eventName || $eventName instanceof ContractsEvent || $eventName instanceof Event)) {
-            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as the first argument is deprecated since Symfony 4.3, pass it as the second argument and provide the event object as the first argument instead.', ContractsEventDispatcherInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as the first argument is deprecated since Symfony 4.3, pass it as the second argument and provide the event object as the first argument instead.', ContractsEventDispatcherInterface::class), \E_USER_DEPRECATED);
             $swap = $event;
             $event = $eventName ?? new Event();
             $eventName = $swap;

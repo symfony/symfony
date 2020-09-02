@@ -54,7 +54,7 @@ class GetResponseForExceptionEvent extends RequestEvent
      */
     public function getException()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "getThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "getThrowable()" instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->exception ?? $this->exception = $this->throwable instanceof \Exception ? $this->throwable : new FatalThrowableError($this->throwable);
     }
@@ -66,7 +66,7 @@ class GetResponseForExceptionEvent extends RequestEvent
      */
     public function setException(\Exception $exception)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "setThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "setThrowable()" instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->throwable = $this->exception = $exception;
     }

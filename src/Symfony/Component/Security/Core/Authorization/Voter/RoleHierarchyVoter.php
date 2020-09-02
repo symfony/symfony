@@ -29,7 +29,7 @@ class RoleHierarchyVoter extends RoleVoter
     public function __construct(RoleHierarchyInterface $roleHierarchy, string $prefix = 'ROLE_')
     {
         if (!method_exists($roleHierarchy, 'getReachableRoleNames')) {
-            @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($roleHierarchy)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($roleHierarchy)), \E_USER_DEPRECATED);
         }
 
         $this->roleHierarchy = $roleHierarchy;
@@ -46,7 +46,7 @@ class RoleHierarchyVoter extends RoleVoter
             if (method_exists($token, 'getRoleNames')) {
                 $roles = $token->getRoleNames();
             } else {
-                @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
 
                 $roles = array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
             }

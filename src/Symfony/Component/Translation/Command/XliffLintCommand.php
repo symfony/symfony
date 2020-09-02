@@ -91,11 +91,11 @@ EOF
 
         // @deprecated to be removed in 5.0
         if (!$filenames) {
-            if (0 !== ftell(STDIN)) {
+            if (0 !== ftell(\STDIN)) {
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            @trigger_error('Piping content from STDIN to the "lint:xliff" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+            @trigger_error('Piping content from STDIN to the "lint:xliff" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', \E_USER_DEPRECATED);
 
             return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
         }
@@ -209,7 +209,7 @@ EOF
             }
         });
 
-        $io->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return min($errors, 1);
     }

@@ -549,7 +549,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             1,
@@ -567,7 +567,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated, use "bar" option instead.',
             ],
             2,
@@ -587,7 +587,7 @@ class OptionsResolverTest extends TestCase
             },
             [],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             1,
@@ -609,7 +609,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => new \stdClass()],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Passing an instance of "stdClass" to option "foo" is deprecated, pass its FQCN instead.',
             ],
             1,
@@ -645,7 +645,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => null], // It triggers a deprecation
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Passing a value different than true or false is deprecated.',
             ],
             1,
@@ -681,7 +681,7 @@ class OptionsResolverTest extends TestCase
             },
             ['widget' => 'single_text', 'date_format' => 2],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Using the "date_format" option when the "widget" option is set to "single_text" is deprecated.',
             ],
             1,
@@ -707,7 +707,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'], // It triggers a deprecation
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             4,

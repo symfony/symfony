@@ -61,7 +61,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         if ($templating instanceof EngineInterface) {
-            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.3; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.3; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), \E_USER_DEPRECATED);
         }
 
         $this->templating = $templating;
@@ -113,7 +113,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (\count($attributes) > 0) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            $flags = \ENT_QUOTES | \ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',

@@ -39,7 +39,7 @@ class BufferedOutput extends Output
         $this->buffer .= $message;
 
         if ($newline) {
-            $this->buffer .= PHP_EOL;
+            $this->buffer .= \PHP_EOL;
         }
     }
 }

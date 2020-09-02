@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundException::class, \Symfony\Component\ErrorHandler\Error\ClassNotFoundError::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundException::class, \Symfony\Component\ErrorHandler\Error\ClassNotFoundError::class), \E_USER_DEPRECATED);
 
 /**
  * Class (or Trait or Interface) Not Found Exception.

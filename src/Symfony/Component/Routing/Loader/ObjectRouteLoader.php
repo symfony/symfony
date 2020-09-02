@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ObjectRouteLoader::class, ObjectLoader::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ObjectRouteLoader::class, ObjectLoader::class), \E_USER_DEPRECATED);
 
 /**
  * A route loader that calls a method on an object to load the routes.

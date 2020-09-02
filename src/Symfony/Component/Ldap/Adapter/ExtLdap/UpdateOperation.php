@@ -20,10 +20,10 @@ class UpdateOperation
     private $attribute;
 
     private $validOperationTypes = [
-        LDAP_MODIFY_BATCH_ADD,
-        LDAP_MODIFY_BATCH_REMOVE,
-        LDAP_MODIFY_BATCH_REMOVE_ALL,
-        LDAP_MODIFY_BATCH_REPLACE,
+        \LDAP_MODIFY_BATCH_ADD,
+        \LDAP_MODIFY_BATCH_REMOVE,
+        \LDAP_MODIFY_BATCH_REMOVE_ALL,
+        \LDAP_MODIFY_BATCH_REPLACE,
     ];
 
     /**
@@ -37,7 +37,7 @@ class UpdateOperation
         if (!\in_array($operationType, $this->validOperationTypes, true)) {
             throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
         }
-        if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
+        if (\LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
             throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', \gettype($values)));
         }
 

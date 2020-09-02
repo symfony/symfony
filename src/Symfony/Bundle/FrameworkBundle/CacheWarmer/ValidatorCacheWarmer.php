@@ -42,7 +42,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
             throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, ValidatorBuilder::class, \is_object($validatorBuilder) ? \get_class($validatorBuilder) : \gettype($validatorBuilder)));
         }
         if (2 < \func_num_args() && func_get_arg(2) instanceof CacheItemPoolInterface) {
-            @trigger_error(sprintf('The CacheItemPoolInterface $fallbackPool argument of "%s()" is deprecated since Symfony 4.2, you should not pass it anymore.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The CacheItemPoolInterface $fallbackPool argument of "%s()" is deprecated since Symfony 4.2, you should not pass it anymore.', __METHOD__), \E_USER_DEPRECATED);
         }
         parent::__construct($phpArrayFile);
         $this->validatorBuilder = $validatorBuilder;

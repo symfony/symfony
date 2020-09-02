@@ -42,7 +42,7 @@ class JsonLoginLdapFactory extends JsonLoginFactory
 
         if (!empty($config['query_string'])) {
             if ('' === $config['search_dn'] || '' === $config['search_password']) {
-                @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw an exception in Symfony 5.0.', E_USER_DEPRECATED);
+                @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw an exception in Symfony 5.0.', \E_USER_DEPRECATED);
             }
             $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }

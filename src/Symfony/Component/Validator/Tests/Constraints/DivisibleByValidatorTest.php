@@ -72,7 +72,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             [1, '1', 2, '2', 'integer'],
             [10, '10', 3, '3', 'integer'],
             [10, '10', 0, '0', 'integer'],
-            [42, '42', INF, 'INF', 'double'],
+            [42, '42', \INF, 'INF', 'double'],
             [4.15, '4.15', 0.1, '0.1', 'double'],
             ['22', '"22"', '10', '"10"', 'string'],
         ];

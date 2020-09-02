@@ -60,7 +60,7 @@ class TraceableMessageBus implements MessageBusInterface
 
     private function getCaller(): array
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8);
+        $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8);
 
         $file = $trace[1]['file'];
         $line = $trace[1]['line'];

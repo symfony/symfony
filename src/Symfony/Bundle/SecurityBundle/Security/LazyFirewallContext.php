@@ -47,7 +47,7 @@ class LazyFirewallContext extends FirewallContext
 
         foreach (parent::getListeners() as $listener) {
             if (!\is_callable($listener)) {
-                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($listener), AbstractListener::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($listener), AbstractListener::class), \E_USER_DEPRECATED);
                 $listeners[] = [$listener, 'handle'];
                 $lazy = false;
             } elseif (!$lazy || !$listener instanceof AbstractListener) {

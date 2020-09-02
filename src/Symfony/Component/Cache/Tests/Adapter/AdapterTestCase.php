@@ -58,7 +58,7 @@ abstract class AdapterTestCase extends CachePoolTest
             $isHit = false;
             $this->assertTrue($item->isHit());
             $this->assertSame($value, $item->get());
-        }, INF));
+        }, \INF));
         $this->assertFalse($isHit);
 
         $this->assertSame($value, $cache->get('bar', new class($value) implements CallbackInterface {

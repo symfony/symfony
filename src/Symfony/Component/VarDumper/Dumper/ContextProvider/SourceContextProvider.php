@@ -40,7 +40,7 @@ final class SourceContextProvider implements ContextProviderInterface
 
     public function getContext(): ?array
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, $this->limit);
+        $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, $this->limit);
 
         $file = $trace[1]['file'];
         $line = $trace[1]['line'];

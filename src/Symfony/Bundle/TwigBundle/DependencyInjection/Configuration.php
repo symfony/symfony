@@ -36,14 +36,14 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('exception_controller')
                     ->defaultValue(static function () {
-                        @trigger_error('The "twig.exception_controller" configuration key has been deprecated in Symfony 4.4, set it to "null" and use "framework.error_controller" configuration key instead.', E_USER_DEPRECATED);
+                        @trigger_error('The "twig.exception_controller" configuration key has been deprecated in Symfony 4.4, set it to "null" and use "framework.error_controller" configuration key instead.', \E_USER_DEPRECATED);
 
                         return 'twig.controller.exception::showAction';
                     })
                     ->validate()
                         ->ifTrue(static function ($v) { return null !== $v; })
                         ->then(static function ($v) {
-                            @trigger_error('The "twig.exception_controller" configuration key has been deprecated in Symfony 4.4, set it to "null" and use "framework.error_controller" configuration key instead.', E_USER_DEPRECATED);
+                            @trigger_error('The "twig.exception_controller" configuration key has been deprecated in Symfony 4.4, set it to "null" and use "framework.error_controller" configuration key instead.', \E_USER_DEPRECATED);
 
                             return $v;
                         })
@@ -144,7 +144,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('strict_variables')
                     ->defaultValue(function () {
-                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
+                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', \E_USER_DEPRECATED);
 
                         return false;
                     })

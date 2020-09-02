@@ -49,7 +49,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
             return;
         }
 
-        @trigger_error(sprintf('Passing a %s without implementing %s is deprecated since Symfony 4.1.', RouterInterface::class, WarmableInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Passing a %s without implementing %s is deprecated since Symfony 4.1.', RouterInterface::class, WarmableInterface::class), \E_USER_DEPRECATED);
     }
 
     /**

@@ -64,7 +64,7 @@ class Route
         }
 
         if (isset($data['utf8'])) {
-            $data['options']['utf8'] = filter_var($data['utf8'], FILTER_VALIDATE_BOOLEAN) ?: false;
+            $data['options']['utf8'] = filter_var($data['utf8'], \FILTER_VALIDATE_BOOLEAN) ?: false;
             unset($data['utf8']);
         }
 

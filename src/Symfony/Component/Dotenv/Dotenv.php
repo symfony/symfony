@@ -45,7 +45,7 @@ final class Dotenv
     public function __construct(bool $usePutenv = true)
     {
         if (!\func_num_args()) {
-            @trigger_error(sprintf('The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->usePutenv = $usePutenv;

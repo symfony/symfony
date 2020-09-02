@@ -50,7 +50,7 @@ class EmailValidator extends ConstraintValidator
     public function __construct($defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
         if (\is_bool($defaultMode)) {
-            @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), \E_USER_DEPRECATED);
 
             $defaultMode = $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE;
         }
@@ -89,7 +89,7 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->strict) {
-            @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), \E_USER_DEPRECATED);
 
             if ($constraint->strict) {
                 $constraint->mode = Email::VALIDATION_MODE_STRICT;

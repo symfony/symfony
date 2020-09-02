@@ -56,10 +56,10 @@ class InlineTest extends TestCase
     {
         return [
             ['!php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT],
-            ['!php/const PHP_INT_MAX', PHP_INT_MAX],
-            ['[!php/const PHP_INT_MAX]', [PHP_INT_MAX]],
-            ['{ foo: !php/const PHP_INT_MAX }', ['foo' => PHP_INT_MAX]],
-            ['{ !php/const PHP_INT_MAX: foo }', [PHP_INT_MAX => 'foo']],
+            ['!php/const PHP_INT_MAX', \PHP_INT_MAX],
+            ['[!php/const PHP_INT_MAX]', [\PHP_INT_MAX]],
+            ['{ foo: !php/const PHP_INT_MAX }', ['foo' => \PHP_INT_MAX]],
+            ['{ !php/const PHP_INT_MAX: foo }', [\PHP_INT_MAX => 'foo']],
             ['!php/const NULL', null],
         ];
     }
@@ -90,21 +90,21 @@ class InlineTest extends TestCase
 
     public function testDumpNumericValueWithLocale()
     {
-        $locale = setlocale(LC_NUMERIC, 0);
+        $locale = setlocale(\LC_NUMERIC, 0);
         if (false === $locale) {
             $this->markTestSkipped('Your platform does not support locales.');
         }
 
         try {
             $requiredLocales = ['fr_FR.UTF-8', 'fr_FR.UTF8', 'fr_FR.utf-8', 'fr_FR.utf8', 'French_France.1252'];
-            if (false === setlocale(LC_NUMERIC, $requiredLocales)) {
+            if (false === setlocale(\LC_NUMERIC, $requiredLocales)) {
                 $this->markTestSkipped('Could not set any of required locales: '.implode(', ', $requiredLocales));
             }
 
             $this->assertEquals('1.2', Inline::dump(1.2));
-            $this->assertStringContainsStringIgnoringCase('fr', setlocale(LC_NUMERIC, 0));
+            $this->assertStringContainsStringIgnoringCase('fr', setlocale(\LC_NUMERIC, 0));
         } finally {
-            setlocale(LC_NUMERIC, $locale);
+            setlocale(\LC_NUMERIC, $locale);
         }
     }
 

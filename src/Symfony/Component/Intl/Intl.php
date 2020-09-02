@@ -123,7 +123,7 @@ final class Intl
      */
     public static function getCurrencyBundle(): CurrencyBundleInterface
     {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Currencies::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Currencies::class), \E_USER_DEPRECATED);
 
         if (null === self::$currencyBundle) {
             self::$currencyBundle = new CurrencyBundle(
@@ -145,7 +145,7 @@ final class Intl
      */
     public static function getLanguageBundle(): LanguageBundleInterface
     {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" or "%s" instead.', __METHOD__, Languages::class, Scripts::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" or "%s" instead.', __METHOD__, Languages::class, Scripts::class), \E_USER_DEPRECATED);
 
         if (null === self::$languageBundle) {
             self::$languageBundle = new LanguageBundle(
@@ -171,7 +171,7 @@ final class Intl
      */
     public static function getLocaleBundle(): LocaleBundleInterface
     {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Locales::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Locales::class), \E_USER_DEPRECATED);
 
         if (null === self::$localeBundle) {
             self::$localeBundle = new LocaleBundle(
@@ -192,7 +192,7 @@ final class Intl
      */
     public static function getRegionBundle(): RegionBundleInterface
     {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Countries::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Countries::class), \E_USER_DEPRECATED);
 
         if (null === self::$regionBundle) {
             self::$regionBundle = new RegionBundle(
@@ -216,7 +216,7 @@ final class Intl
             if (!self::isExtensionLoaded()) {
                 self::$icuVersion = self::getIcuStubVersion();
             } elseif (\defined('INTL_ICU_VERSION')) {
-                self::$icuVersion = INTL_ICU_VERSION;
+                self::$icuVersion = \INTL_ICU_VERSION;
             } else {
                 try {
                     $reflector = new \ReflectionExtension('intl');

@@ -151,12 +151,12 @@ trait ResponseTrait
         }
 
         try {
-            $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
+            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
             throw new JsonException($e->getMessage().sprintf(' for "%s".', $this->getInfo('url')), $e->getCode());
         }
 
-        if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
+        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error()) {
             throw new JsonException(json_last_error_msg().sprintf(' for "%s".', $this->getInfo('url')), json_last_error());
         }
 
@@ -321,7 +321,7 @@ trait ResponseTrait
         while (true) {
             $hasActivity = false;
             $timeoutMax = 0;
-            $timeoutMin = $timeout ?? INF;
+            $timeoutMin = $timeout ?? \INF;
 
             /** @var ClientState $multi */
             foreach ($runningResponses as $i => [$multi]) {
@@ -387,7 +387,7 @@ trait ResponseTrait
                                 $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                             }
 
-                            $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(ZLIB_ENCODING_GZIP) : null;
+                            $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;
 
                             if ($response->shouldBuffer instanceof \Closure) {
                                 try {

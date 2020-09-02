@@ -32,7 +32,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', SimplePreAuthenticationListener::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', SimplePreAuthenticationListener::class), \E_USER_DEPRECATED);
 
 /**
  * SimplePreAuthenticationListener implements simple proxying to an authenticator.

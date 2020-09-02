@@ -48,7 +48,7 @@ abstract class ObjectLoader extends Loader
 
         if (1 === substr_count($resource, ':')) {
             $resource = str_replace(':', '::', $resource);
-            @trigger_error(sprintf('Referencing object route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Referencing object route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), \E_USER_DEPRECATED);
         }
 
         $parts = explode('::', $resource);

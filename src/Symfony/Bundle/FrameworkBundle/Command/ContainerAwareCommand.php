@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" with dependency injection instead.', ContainerAwareCommand::class, Command::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" with dependency injection instead.', ContainerAwareCommand::class, Command::class), \E_USER_DEPRECATED);
 
 /**
  * Command.

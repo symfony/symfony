@@ -61,7 +61,7 @@ class SplFileInfo extends \SplFileInfo
     {
         $filename = $this->getFilename();
 
-        return pathinfo($filename, PATHINFO_FILENAME);
+        return pathinfo($filename, \PATHINFO_FILENAME);
     }
 
     /**

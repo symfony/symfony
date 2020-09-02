@@ -854,7 +854,7 @@ class OptionsResolver implements Options
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {
             if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || $this->calling) && \is_string($this->deprecated[$option])) {
-                @trigger_error(strtr($this->deprecated[$option], ['%name%' => $option]), E_USER_DEPRECATED);
+                @trigger_error(strtr($this->deprecated[$option], ['%name%' => $option]), \E_USER_DEPRECATED);
             }
 
             return $this->resolved[$option];
@@ -1013,7 +1013,7 @@ class OptionsResolver implements Options
             }
 
             if ('' !== $deprecationMessage) {
-                @trigger_error(strtr($deprecationMessage, ['%name%' => $option]), E_USER_DEPRECATED);
+                @trigger_error(strtr($deprecationMessage, ['%name%' => $option]), \E_USER_DEPRECATED);
             }
         }
 

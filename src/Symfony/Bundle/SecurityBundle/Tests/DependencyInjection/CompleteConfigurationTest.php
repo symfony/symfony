@@ -440,7 +440,7 @@ abstract class CompleteConfigurationTest extends TestCase
             ],
             'JMS\FooBundle\Entity\User7' => [
                 'class' => $sodium ? SodiumPasswordEncoder::class : NativePasswordEncoder::class,
-                'arguments' => $sodium ? [256, 1] : [1, 262144, null, PASSWORD_ARGON2I],
+                'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -555,7 +555,7 @@ abstract class CompleteConfigurationTest extends TestCase
             ],
             'JMS\FooBundle\Entity\User7' => [
                 'class' => NativePasswordEncoder::class,
-                'arguments' => [null, null, 15, PASSWORD_BCRYPT],
+                'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }

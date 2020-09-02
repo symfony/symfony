@@ -15,7 +15,7 @@ use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use the "%s" instead.', PreviewErrorController::class, \Symfony\Component\HttpKernel\Controller\ErrorController::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use the "%s" instead.', PreviewErrorController::class, \Symfony\Component\HttpKernel\Controller\ErrorController::class), \E_USER_DEPRECATED);
 
 /**
  * PreviewErrorController can be used to test error pages.

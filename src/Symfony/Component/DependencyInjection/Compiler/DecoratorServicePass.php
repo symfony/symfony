@@ -29,7 +29,7 @@ class DecoratorServicePass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();
-        $order = PHP_INT_MAX;
+        $order = \PHP_INT_MAX;
 
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$decorated = $definition->getDecoratedService()) {

@@ -59,7 +59,7 @@ class Firewall implements EventSubscriberInterface
         $listeners = $this->map->getListeners($event->getRequest());
 
         if (3 !== \count($listeners)) {
-            @trigger_error(sprintf('Not returning an array of 3 elements from %s::getListeners() is deprecated since Symfony 4.2, the 3rd element must be an instance of %s or null.', FirewallMapInterface::class, LogoutListener::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not returning an array of 3 elements from %s::getListeners() is deprecated since Symfony 4.2, the 3rd element must be an instance of %s or null.', FirewallMapInterface::class, LogoutListener::class), \E_USER_DEPRECATED);
             $listeners[2] = null;
         }
 
@@ -139,7 +139,7 @@ class Firewall implements EventSubscriberInterface
             if (\is_callable($listener)) {
                 $listener($event);
             } else {
-                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($listener), AbstractListener::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($listener), AbstractListener::class), \E_USER_DEPRECATED);
                 $listener->handle($event);
             }
 

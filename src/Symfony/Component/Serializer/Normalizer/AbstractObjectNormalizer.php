@@ -306,7 +306,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function setMaxDepthHandler(?callable $handler): void
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->maxDepthHandler = $handler;
     }
@@ -595,7 +595,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if (\func_num_args() >= 3) {
             $format = func_get_arg(2);
         } else {
-            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', static::class, __FUNCTION__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', static::class, __FUNCTION__), \E_USER_DEPRECATED);
             $format = null;
         }
 

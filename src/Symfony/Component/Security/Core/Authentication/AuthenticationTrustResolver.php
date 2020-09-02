@@ -31,11 +31,11 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
         $this->rememberMeClass = $rememberMeClass;
 
         if (null !== $anonymousClass && !is_a($anonymousClass, AnonymousToken::class, true)) {
-            @trigger_error(sprintf('Configuring a custom anonymous token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $anonymousClass, AnonymousToken::class, self::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Configuring a custom anonymous token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $anonymousClass, AnonymousToken::class, self::class), \E_USER_DEPRECATED);
         }
 
         if (null !== $rememberMeClass && !is_a($rememberMeClass, RememberMeToken::class, true)) {
-            @trigger_error(sprintf('Configuring a custom remember me token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $rememberMeClass, RememberMeToken::class, self::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Configuring a custom remember me token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $rememberMeClass, RememberMeToken::class, self::class), \E_USER_DEPRECATED);
         }
     }
 

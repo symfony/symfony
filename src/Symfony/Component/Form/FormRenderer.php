@@ -133,7 +133,7 @@ class FormRenderer implements FormRendererInterface
 
         if ($renderOnlyOnce && $view->isRendered()) {
             // This is not allowed, because it would result in rendering same IDs multiple times, which is not valid.
-            @trigger_error(sprintf('You are calling "form_%s" for field "%s" which has already been rendered before, trying to render fields which were already rendered is deprecated since Symfony 4.2 and will throw an exception in 5.0.', $blockNameSuffix, $view->vars['name']), E_USER_DEPRECATED);
+            @trigger_error(sprintf('You are calling "form_%s" for field "%s" which has already been rendered before, trying to render fields which were already rendered is deprecated since Symfony 4.2 and will throw an exception in 5.0.', $blockNameSuffix, $view->vars['name']), \E_USER_DEPRECATED);
             // throw new BadMethodCallException(sprintf('Field "%s" has already been rendered. Save result of previous  render call to variable and output that instead.', $view->vars['name']));
             return '';
         }
@@ -293,9 +293,9 @@ class FormRenderer implements FormRendererInterface
     public function encodeCurrency(Environment $environment, string $text, string $widget = ''): string
     {
         if ('UTF-8' === $charset = $environment->getCharset()) {
-            $text = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $text = htmlspecialchars($text, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
         } else {
-            $text = htmlentities($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $text = htmlentities($text, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
             $text = iconv('UTF-8', $charset, $text);
             $widget = iconv('UTF-8', $charset, $widget);
         }

@@ -30,7 +30,7 @@ class TemplateController
     public function __construct(Environment $twig = null, EngineInterface $templating = null)
     {
         if (null !== $templating) {
-            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.4; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.4; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), \E_USER_DEPRECATED);
         }
 
         $this->twig = $twig;

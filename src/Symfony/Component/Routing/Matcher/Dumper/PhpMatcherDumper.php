@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "CompiledUrlMatcherDumper" instead.', PhpMatcherDumper::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "CompiledUrlMatcherDumper" instead.', PhpMatcherDumper::class), \E_USER_DEPRECATED);
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.

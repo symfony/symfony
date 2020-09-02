@@ -89,7 +89,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $list = $this->list();
         $list[$name] = null;
         uksort($list, 'strnatcmp');
-        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), \LOCK_EX));
 
         $this->lastMessage = sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
     }
@@ -141,7 +141,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $list = $this->list();
         unset($list[$name]);
-        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), \LOCK_EX));
 
         $this->lastMessage = sprintf('Secret "%s" removed from "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
@@ -205,9 +205,9 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $this->createSecretsDir();
 
-        if (false === file_put_contents($this->pathPrefix.$file.'.php', $data, LOCK_EX)) {
+        if (false === file_put_contents($this->pathPrefix.$file.'.php', $data, \LOCK_EX)) {
             $e = error_get_last();
-            throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? E_USER_WARNING);
+            throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? \E_USER_WARNING);
         }
     }
 

@@ -30,7 +30,7 @@ class Registry
      */
     public function add(Workflow $workflow, $supportStrategy)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), \E_USER_DEPRECATED);
         $this->workflows[] = [$workflow, $supportStrategy];
     }
 

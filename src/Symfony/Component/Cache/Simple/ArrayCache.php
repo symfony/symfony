@@ -20,7 +20,7 @@ use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', ArrayCache::class, ArrayAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', ArrayCache::class, ArrayAdapter::class, CacheInterface::class), \E_USER_DEPRECATED);
 
 /**
  * @deprecated since Symfony 4.3, use ArrayAdapter and type-hint for CacheInterface instead.
@@ -137,7 +137,7 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
         if (false === $ttl = $this->normalizeTtl($ttl)) {
             return $this->deleteMultiple(array_keys($valuesArray));
         }
-        $expiry = 0 < $ttl ? microtime(true) + $ttl : PHP_INT_MAX;
+        $expiry = 0 < $ttl ? microtime(true) + $ttl : \PHP_INT_MAX;
 
         foreach ($valuesArray as $key => $value) {
             if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {

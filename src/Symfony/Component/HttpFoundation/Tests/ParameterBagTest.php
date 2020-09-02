@@ -138,22 +138,22 @@ class ParameterBagTest extends TestCase
 
         $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 
-        $this->assertEquals('0123', $bag->filter('digits', '', FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
+        $this->assertEquals('0123', $bag->filter('digits', '', \FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
 
-        $this->assertEquals('example@example.com', $bag->filter('email', '', FILTER_VALIDATE_EMAIL), '->filter() gets a value of parameter as email');
+        $this->assertEquals('example@example.com', $bag->filter('email', '', \FILTER_VALIDATE_EMAIL), '->filter() gets a value of parameter as email');
 
-        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_PATH_REQUIRED]), '->filter() gets a value of parameter as URL with a path');
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', \FILTER_VALIDATE_URL, ['flags' => \FILTER_FLAG_PATH_REQUIRED]), '->filter() gets a value of parameter as URL with a path');
 
         // This test is repeated for code-coverage
-        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as URL with a path');
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', \FILTER_VALIDATE_URL, \FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as URL with a path');
 
-        $this->assertFalse($bag->filter('dec', '', FILTER_VALIDATE_INT, [
-            'flags' => FILTER_FLAG_ALLOW_HEX,
+        $this->assertFalse($bag->filter('dec', '', \FILTER_VALIDATE_INT, [
+            'flags' => \FILTER_FLAG_ALLOW_HEX,
             'options' => ['min_range' => 1, 'max_range' => 0xff],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
-        $this->assertFalse($bag->filter('hex', '', FILTER_VALIDATE_INT, [
-            'flags' => FILTER_FLAG_ALLOW_HEX,
+        $this->assertFalse($bag->filter('hex', '', \FILTER_VALIDATE_INT, [
+            'flags' => \FILTER_FLAG_ALLOW_HEX,
             'options' => ['min_range' => 1, 'max_range' => 0xff],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 

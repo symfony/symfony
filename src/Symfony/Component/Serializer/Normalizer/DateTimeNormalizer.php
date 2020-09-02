@@ -44,7 +44,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         ];
 
         if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', \E_USER_DEPRECATED);
 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
             $defaultContext[self::TIMEZONE_KEY] = $timezone;

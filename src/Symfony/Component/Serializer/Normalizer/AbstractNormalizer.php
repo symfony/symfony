@@ -196,7 +196,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     public function setCircularReferenceLimit($circularReferenceLimit)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "circular_reference_limit" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "circular_reference_limit" key of the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->defaultContext[self::CIRCULAR_REFERENCE_LIMIT] = $this->circularReferenceLimit = $circularReferenceLimit;
 
@@ -212,7 +212,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     public function setCircularReferenceHandler(callable $circularReferenceHandler)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "circular_reference_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "circular_reference_handler" key of the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER] = $this->circularReferenceHandler = $circularReferenceHandler;
 
@@ -232,7 +232,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     public function setCallbacks(array $callbacks)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "callbacks" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "callbacks" key of the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         foreach ($callbacks as $attribute => $callback) {
             if (!\is_callable($callback)) {
@@ -253,7 +253,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     public function setIgnoredAttributes(array $ignoredAttributes)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "ignored_attributes" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "ignored_attributes" key of the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->defaultContext[self::IGNORED_ATTRIBUTES] = $this->ignoredAttributes = $ignoredAttributes;
 
@@ -317,7 +317,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function handleCircularReference($object/*, string $format = null, array $context = []*/)
     {
         if (\func_num_args() < 2 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = []" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = []" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
         }
         $format = \func_num_args() > 1 ? func_get_arg(1) : null;
         $context = \func_num_args() > 2 ? func_get_arg(2) : [];
@@ -553,7 +553,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function createChildContext(array $parentContext, $attribute/*, ?string $format */): array
     {
         if (\func_num_args() < 3) {
-            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', static::class, __FUNCTION__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', static::class, __FUNCTION__), \E_USER_DEPRECATED);
         }
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

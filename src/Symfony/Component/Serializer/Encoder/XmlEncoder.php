@@ -60,9 +60,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     private $defaultContext = [
         self::AS_COLLECTION => false,
-        self::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE, XML_COMMENT_NODE],
+        self::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE],
         self::ENCODER_IGNORED_NODE_TYPES => [],
-        self::LOAD_OPTIONS => LIBXML_NONET | LIBXML_NOBLANKS,
+        self::LOAD_OPTIONS => \LIBXML_NONET | \LIBXML_NOBLANKS,
         self::REMOVE_EMPTY_TAGS => false,
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CAST_ATTRIBUTES => true,
@@ -78,15 +78,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = [], int $loadOptions = null, array $decoderIgnoredNodeTypes = [XML_PI_NODE, XML_COMMENT_NODE], array $encoderIgnoredNodeTypes = [])
+    public function __construct($defaultContext = [], int $loadOptions = null, array $decoderIgnoredNodeTypes = [\XML_PI_NODE, \XML_COMMENT_NODE], array $encoderIgnoredNodeTypes = [])
     {
         if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', \E_USER_DEPRECATED);
 
             $defaultContext = [
                 self::DECODER_IGNORED_NODE_TYPES => $decoderIgnoredNodeTypes,
                 self::ENCODER_IGNORED_NODE_TYPES => $encoderIgnoredNodeTypes,
-                self::LOAD_OPTIONS => $loadOptions ?? LIBXML_NONET | LIBXML_NOBLANKS,
+                self::LOAD_OPTIONS => $loadOptions ?? \LIBXML_NONET | \LIBXML_NOBLANKS,
                 self::ROOT_NODE_NAME => (string) $defaultContext,
             ];
         }
@@ -100,7 +100,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public function encode($data, $format, array $context = [])
     {
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
-        $ignorePiNode = \in_array(XML_PI_NODE, $encoderIgnoredNodeTypes, true);
+        $ignorePiNode = \in_array(\XML_PI_NODE, $encoderIgnoredNodeTypes, true);
         if ($data instanceof \DOMDocument) {
             return $data->saveXML($ignorePiNode ? $data->documentElement : null);
         }
@@ -132,7 +132,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         $internalErrors = libxml_use_internal_errors(true);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(true);
         }
         libxml_clear_errors();
@@ -141,7 +141,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $dom->loadXML($data, $context[self::LOAD_OPTIONS] ?? $this->defaultContext[self::LOAD_OPTIONS]);
 
         libxml_use_internal_errors($internalErrors);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             libxml_disable_entity_loader($disableEntities);
         }
 
@@ -154,7 +154,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $rootNode = null;
         $decoderIgnoredNodeTypes = $context[self::DECODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::DECODER_IGNORED_NODE_TYPES];
         foreach ($dom->childNodes as $child) {
-            if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
+            if (\XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
             if (!$rootNode && !\in_array($child->nodeType, $decoderIgnoredNodeTypes, true)) {
@@ -220,7 +220,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     public function setRootNodeName($name)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->defaultContext[self::ROOT_NODE_NAME] = $name;
     }
@@ -234,7 +234,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     public function getRootNodeName()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->defaultContext[self::ROOT_NODE_NAME];
     }
@@ -352,7 +352,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                 continue;
             }
 
-            if (false !== $val = filter_var($attr->nodeValue, FILTER_VALIDATE_INT)) {
+            if (false !== $val = filter_var($attr->nodeValue, \FILTER_VALIDATE_INT)) {
                 $data['@'.$attr->nodeName] = $val;
 
                 continue;
@@ -375,7 +375,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [\XML_TEXT_NODE, \XML_CDATA_SECTION_NODE])) {
             return $node->firstChild->nodeValue;
         }
 
@@ -429,7 +429,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif ('#comment' === $key) {
-                    if (!\in_array(XML_COMMENT_NODE, $encoderIgnoredNodeTypes, true)) {
+                    if (!\in_array(\XML_COMMENT_NODE, $encoderIgnoredNodeTypes, true)) {
                         $append = $this->appendComment($parentNode, $data);
                     }
                 } elseif (\is_array($data) && false === is_numeric($key)) {

@@ -105,7 +105,7 @@ class CacheTraitTest extends TestCase
             return 'computed data';
         };
 
-        $cache->get('key', $callback, INF);
+        $cache->get('key', $callback, \INF);
     }
 
     public function testExceptionOnNegativeBeta()

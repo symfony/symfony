@@ -91,7 +91,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     protected function canBeExtracted($file)
     {
-        return $this->isFile($file) && 'twig' === pathinfo($file, PATHINFO_EXTENSION);
+        return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
     /**

@@ -54,7 +54,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function __construct($defaultContext = [], string $enclosure = '"', string $escapeChar = '', string $keySeparator = '.', bool $escapeFormulas = false)
     {
         if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', \E_USER_DEPRECATED);
 
             $defaultContext = [
                 self::DELIMITER_KEY => (string) $defaultContext,
@@ -214,7 +214,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
 
         if (!isset($context['as_collection'])) {
-            @trigger_error('Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.', E_USER_DEPRECATED);
+            @trigger_error('Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.', \E_USER_DEPRECATED);
         }
 
         // If there is only one data line in the document, return it (the line), the result is not considered as a collection

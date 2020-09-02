@@ -34,7 +34,7 @@ final class HttpClient
                 return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
             }
 
-            @trigger_error('Configure the "curl.cainfo", "openssl.cafile" or "openssl.capath" php.ini setting to enable the CurlHttpClient', E_USER_WARNING);
+            @trigger_error('Configure the "curl.cainfo", "openssl.cafile" or "openssl.capath" php.ini setting to enable the CurlHttpClient', \E_USER_WARNING);
         }
 
         return new NativeHttpClient($defaultOptions, $maxHostConnections);

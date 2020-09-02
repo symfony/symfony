@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-@trigger_error('The '.FormHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+@trigger_error('The '.FormHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
@@ -248,9 +248,9 @@ class FormHelper extends Helper
     public function formEncodeCurrency($text, $widget = '')
     {
         if ('UTF-8' === $charset = $this->getCharset()) {
-            $text = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $text = htmlspecialchars($text, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
         } else {
-            $text = htmlentities($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $text = htmlentities($text, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
             $text = iconv('UTF-8', $charset, $text);
             $widget = iconv('UTF-8', $charset, $widget);
         }

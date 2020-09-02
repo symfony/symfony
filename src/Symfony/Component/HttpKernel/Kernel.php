@@ -244,7 +244,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $first = 3 <= \func_num_args() ? func_get_arg(2) : true;
 
             if (4 !== \func_num_args() || func_get_arg(3)) {
-                @trigger_error(sprintf('Passing more than one argument to %s is deprecated since Symfony 4.4 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing more than one argument to %s is deprecated since Symfony 4.4 and will be removed in 5.0.', __METHOD__), \E_USER_DEPRECATED);
             }
         } else {
             $dir = null;
@@ -274,7 +274,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $files[] = $file;
 
             // see https://symfony.com/doc/current/bundles/override.html on how to overwrite parts of a bundle
-            @trigger_error(sprintf('Overwriting the resource "%s" with "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $name, $file), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Overwriting the resource "%s" with "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $name, $file), \E_USER_DEPRECATED);
         }
 
         if (file_exists($file = $bundle->getPath().'/'.$path)) {
@@ -299,7 +299,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getName(/* $triggerDeprecation = true */)
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (null === $this->name) {
@@ -336,7 +336,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getRootDir(/* $triggerDeprecation = true */)
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use getProjectDir() instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use getProjectDir() instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (null === $this->rootDir) {
@@ -380,7 +380,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getContainer()
     {
         if (!$this->container) {
-            @trigger_error('Getting the container from a non-booted kernel is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+            @trigger_error('Getting the container from a non-booted kernel is deprecated since Symfony 4.4.', \E_USER_DEPRECATED);
         }
 
         return $this->container;
@@ -399,7 +399,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getStartTime()
     {
-        return $this->debug && null !== $this->startTime ? $this->startTime : -INF;
+        return $this->debug && null !== $this->startTime ? $this->startTime : -\INF;
     }
 
     /**
@@ -507,7 +507,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $cachePath = $cache->getPath();
 
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-        $errorLevel = error_reporting(E_ALL ^ E_WARNING);
+        $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
 
         try {
             if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
@@ -528,15 +528,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
 
             if ($lock = fopen($cachePath.'.lock', 'w')) {
-                flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
+                flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
 
-                if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
+                if (!flock($lock, $wouldBlock ? \LOCK_SH : \LOCK_EX)) {
                     fclose($lock);
                     $lock = null;
                 } elseif (!\is_object($this->container = include $cachePath)) {
                     $this->container = null;
                 } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
-                    flock($lock, LOCK_UN);
+                    flock($lock, \LOCK_UN);
                     fclose($lock);
                     $this->container->set('kernel', $this);
 
@@ -551,7 +551,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
             $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
-                if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type) {
                     return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
                 }
 
@@ -561,7 +561,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     return null;
                 }
 
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+                $backtrace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 5);
                 // Clean the trace by removing first frames added by the error handler itself.
                 for ($i = 0; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
@@ -606,7 +606,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
         if ($lock) {
-            flock($lock, LOCK_UN);
+            flock($lock, \LOCK_UN);
             fclose($lock);
         }
 
@@ -620,7 +620,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             static $legacyContainers = [];
             $oldContainerDir = \dirname($oldContainer->getFileName());
             $legacyContainers[$oldContainerDir.'.legacy'] = true;
-            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
+            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', \GLOB_NOSORT) as $legacyContainer) {
                 if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
                     (new Filesystem())->remove(substr($legacyContainer, 0, -7));
                 }
@@ -841,14 +841,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (T_START_HEREDOC === $token[0]) {
+            } elseif (\T_START_HEREDOC === $token[0]) {
                 $output .= $rawChunk.$token[1];
                 do {
                     $token = $tokens[++$i];
                     $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
-                } while (T_END_HEREDOC !== $token[0]);
+                } while (\T_END_HEREDOC !== $token[0]);
                 $rawChunk = '';
-            } elseif (T_WHITESPACE === $token[0]) {
+            } elseif (\T_WHITESPACE === $token[0]) {
                 if ($ignoreSpace) {
                     $ignoreSpace = false;
 
@@ -857,13 +857,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
                 // replace multiple new lines with a single newline
                 $rawChunk .= preg_replace(['/\n{2,}/S'], "\n", $token[1]);
-            } elseif (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
+            } elseif (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT])) {
                 $ignoreSpace = true;
             } else {
                 $rawChunk .= $token[1];
 
                 // The PHP-open tag already has a new-line
-                if (T_OPEN_TAG === $token[0]) {
+                if (\T_OPEN_TAG === $token[0]) {
                     $ignoreSpace = true;
                 }
             }
@@ -882,7 +882,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function serialize()
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), \E_USER_DEPRECATED);
 
         return serialize([$this->environment, $this->debug]);
     }
@@ -892,7 +892,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function unserialize($data)
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), \E_USER_DEPRECATED);
         list($environment, $debug) = unserialize($data, ['allowed_classes' => false]);
 
         $this->__construct($environment, $debug);
@@ -904,7 +904,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function __sleep()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), \E_USER_DEPRECATED);
             $this->serialized = $this->serialize();
 
             return ['serialized'];
@@ -916,7 +916,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function __wakeup()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), \E_USER_DEPRECATED);
             $this->unserialize($this->serialized);
             unset($this->serialized);
 

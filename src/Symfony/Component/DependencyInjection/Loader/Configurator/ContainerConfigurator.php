@@ -114,7 +114,7 @@ function iterator(array $values): IteratorArgument
  */
 function tagged(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null): TaggedIteratorArgument
 {
-    @trigger_error(__NAMESPACE__.'\tagged() is deprecated since Symfony 4.4 and will be removed in 5.0, use '.__NAMESPACE__.'\tagged_iterator() instead.', E_USER_DEPRECATED);
+    @trigger_error(__NAMESPACE__.'\tagged() is deprecated since Symfony 4.4 and will be removed in 5.0, use '.__NAMESPACE__.'\tagged_iterator() instead.', \E_USER_DEPRECATED);
 
     return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod);
 }

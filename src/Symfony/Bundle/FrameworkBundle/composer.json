@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "ext-xml": "*",
-        "symfony/cache": "^4.4|^5.0",
+        "symfony/cache": "^5.2",
         "symfony/config": "^5.0",
         "symfony/dependency-injection": "^5.2",
         "symfony/event-dispatcher": "^5.1",

@@ -332,11 +332,12 @@ abstract class AbstractDoctrineExtension extends Extension
         if (!isset($cacheDriver['namespace'])) {
             // generate a unique namespace for the given application
             if ($container->hasParameter('cache.prefix.seed')) {
-                $seed = '.'.$container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
+                $seed = $container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
             } else {
                 $seed = '_'.$container->getParameter('kernel.project_dir');
+                $seed .= '.'.$container->getParameter('kernel.container_class');
             }
-            $seed .= '.'.$container->getParameter('kernel.container_class');
+
             $namespace = 'sf_'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.ContainerBuilder::hash($seed);
 
             $cacheDriver['namespace'] = $namespace;

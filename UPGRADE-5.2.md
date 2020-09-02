@@ -11,6 +11,10 @@ FrameworkBundle
 
  * Deprecated the public `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
    `cache_clearer`, `filesystem` and `validator` services to private.
+ * If you configured the `framework.cache.prefix_seed` option, you might want to add the `%kernel.environment%` to its value to
+   keep cache namespaces separated by environment of the app. The `%kernel.container_class%` (which includes the environment)
+   used to be added by default to the seed, which is not the case anymore. This allows sharing caches between
+   apps or different environments.
 
 Mime
 ----

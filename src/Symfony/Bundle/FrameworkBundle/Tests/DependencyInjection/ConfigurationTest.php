@@ -463,6 +463,7 @@ class ConfigurationTest extends TestCase
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
+                'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [
                 'enabled' => false,

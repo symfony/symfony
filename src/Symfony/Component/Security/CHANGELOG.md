@@ -8,8 +8,9 @@ CHANGELOG
  * Changed `AuthorizationChecker` to call the access decision manager in unauthenticated sessions with a `NullToken`
  * [BC break] Removed `AccessListener::PUBLIC_ACCESS` in favor of `AuthenticatedVoter::PUBLIC_ACCESS`
  * Added `Passport` to `LoginFailureEvent`.
- * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of  `AbstractRememberMeServices::$firewallName`
+ * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
  * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
+ * Added translator to `\Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator` and `\Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener` to translate authentication failure messages
 
 5.1.0
 -----

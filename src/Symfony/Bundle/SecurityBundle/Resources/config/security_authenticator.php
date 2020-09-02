@@ -143,6 +143,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('options'),
                 service('property_accessor')->nullOnInvalid(),
             ])
+            ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
 
         ->set('security.authenticator.remember_me', RememberMeAuthenticator::class)
             ->abstract()

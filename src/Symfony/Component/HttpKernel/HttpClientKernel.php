@@ -58,6 +58,10 @@ final class HttpClientKernel implements HttpKernelInterface
 
         $response = new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
 
+        $response->headers->remove('X-Body-File');
+        $response->headers->remove('X-Body-Eval');
+        $response->headers->remove('X-Content-Digest');
+
         $response->headers = new class($response->headers->all()) extends ResponseHeaderBag {
             protected function computeCacheControlValue(): string
             {

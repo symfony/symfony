@@ -61,7 +61,7 @@ class Deprecation
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
             set_error_handler(function () {});
-            $parsedMsg = unserialize($this->message);
+            $parsedMsg = @unserialize($this->message);
             restore_error_handler();
             if ($parsedMsg && isset($parsedMsg['deprecation'])) {
                 $this->message = $parsedMsg['deprecation'];

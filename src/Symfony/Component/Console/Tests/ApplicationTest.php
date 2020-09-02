@@ -1802,6 +1802,20 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
     }
+
+    public function testCommandNameMismatchWithCommandLoaderKeyThrows()
+    {
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('The "test" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".');
+
+        $app = new Application();
+        $loader = new FactoryCommandLoader([
+            'test' => static function () { return new Command('test-command'); },
+        ]);
+
+        $app->setCommandLoader($loader);
+        $app->get('test');
+    }
 }
 
 class CustomApplication extends Application

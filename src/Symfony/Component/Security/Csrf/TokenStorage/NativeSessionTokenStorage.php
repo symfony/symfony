@@ -112,7 +112,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
 
     private function startSession()
     {
-        if (PHP_SESSION_NONE === session_status()) {
+        if (\PHP_SESSION_NONE === session_status()) {
             session_start();
         }
 

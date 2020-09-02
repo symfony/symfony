@@ -298,7 +298,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $guesses = [];
 
             foreach (array_keys($value) as $subject) {
-                $minScore = INF;
+                $minScore = \INF;
                 foreach ($proposals as $proposal) {
                     $distance = levenshtein($subject, $proposal);
                     if ($distance <= $minScore && $distance < 3) {

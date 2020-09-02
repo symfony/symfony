@@ -35,9 +35,9 @@ class TableCellStyle
     ];
 
     private $alignMap = [
-        'left' => STR_PAD_RIGHT,
-        'center' => STR_PAD_BOTH,
-        'right' => STR_PAD_LEFT,
+        'left' => \STR_PAD_RIGHT,
+        'center' => \STR_PAD_BOTH,
+        'right' => \STR_PAD_LEFT,
     ];
 
     public function __construct(array $options = [])
@@ -70,7 +70,7 @@ class TableCellStyle
             function ($key) {
                 return \in_array($key, $this->tagOptions) && isset($this->options[$key]);
             },
-            ARRAY_FILTER_USE_KEY
+            \ARRAY_FILTER_USE_KEY
         );
     }
 

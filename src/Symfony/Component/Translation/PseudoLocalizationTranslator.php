@@ -145,7 +145,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
                 $parts[] = [false, false, ' '.$attribute->nodeName.'="'];
 
                 $localizableAttribute = \in_array($attribute->nodeName, $this->localizableHTMLAttributes, true);
-                foreach (preg_split('/(&(?:amp|quot|#039|lt|gt);+)/', htmlspecialchars($attribute->nodeValue, ENT_QUOTES, 'UTF-8'), -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $match) {
+                foreach (preg_split('/(&(?:amp|quot|#039|lt|gt);+)/', htmlspecialchars($attribute->nodeValue, \ENT_QUOTES, 'UTF-8'), -1, \PREG_SPLIT_DELIM_CAPTURE) as $i => $match) {
                     if ('' === $match) {
                         continue;
                     }
@@ -285,7 +285,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
 
         $words = [];
         $wordsCount = 0;
-        foreach (preg_split('/ +/', $visibleText, -1, PREG_SPLIT_NO_EMPTY) as $word) {
+        foreach (preg_split('/ +/', $visibleText, -1, \PREG_SPLIT_NO_EMPTY) as $word) {
             $wordLength = $this->strlen($word);
 
             if ($wordLength >= $missingLength) {
@@ -306,7 +306,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
             return;
         }
 
-        arsort($words, SORT_NUMERIC);
+        arsort($words, \SORT_NUMERIC);
 
         $longestWordLength = max(array_keys($words));
 

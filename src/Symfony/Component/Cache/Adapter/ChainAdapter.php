@@ -51,7 +51,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             if (!$adapter instanceof CacheItemPoolInterface) {
                 throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
             }
-            if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $adapter instanceof ApcuAdapter && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
+            if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $adapter instanceof ApcuAdapter && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
                 continue; // skip putting APCu in the chain when the backend is disabled
             }
 
@@ -95,7 +95,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             $adapter = $this->adapters[$i];
             if (isset($this->adapters[++$i])) {
                 $callback = $wrap;
-                $beta = INF === $beta ? INF : 0;
+                $beta = \INF === $beta ? \INF : 0;
             }
             if ($adapter instanceof CacheInterface) {
                 $value = $adapter->get($key, $callback, $beta, $metadata);

@@ -18,7 +18,7 @@ class ProcessIsolationTest extends TestCase
      */
     public function testIsolation()
     {
-        @trigger_error('Test abc', E_USER_DEPRECATED);
+        @trigger_error('Test abc', \E_USER_DEPRECATED);
         $this->addToAssertionCount(1);
     }
 
@@ -27,6 +27,6 @@ class ProcessIsolationTest extends TestCase
         $this->expectException('PHPUnit\Framework\Exception');
         $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');
 
-        trigger_error('Test that PHPUnit\'s error handler fires.', E_USER_WARNING);
+        trigger_error('Test that PHPUnit\'s error handler fires.', \E_USER_WARNING);
     }
 }

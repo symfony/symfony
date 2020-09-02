@@ -100,14 +100,14 @@ class FlattenExceptionNormalizerTest extends TestCase
                         'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123, 'args' => [],
                     ],
                 ],
-                'trace_as_string' => '#0 foo.php(123): foo()'.PHP_EOL.'#1 bar.php(456): bar()',
+                'trace_as_string' => '#0 foo.php(123): foo()'.\PHP_EOL.'#1 bar.php(456): bar()',
             ],
             'trace' => [
                 [
                     'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123, 'args' => [],
                 ],
             ],
-            'trace_as_string' => '#0 foo.php(123): foo()'.PHP_EOL.'#1 bar.php(456): bar()',
+            'trace_as_string' => '#0 foo.php(123): foo()'.\PHP_EOL.'#1 bar.php(456): bar()',
         ];
         $exception = $this->normalizer->denormalize($normalized, FlattenException::class);
 

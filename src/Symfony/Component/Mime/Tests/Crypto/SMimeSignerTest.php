@@ -143,7 +143,7 @@ class SMimeSignerTest extends SMimeTestCase
             $this->samplesDir.'sign.key',
             null,
             $this->samplesDir.'intermediate.crt',
-            PKCS7_DETACHED
+            \PKCS7_DETACHED
         );
         $signedMessage = $signer->sign($message);
 

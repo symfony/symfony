@@ -173,13 +173,13 @@ class Configuration
             'quiet' => [],
         ];
 
-        if ('' === $normalizedConfiguration['disabled'] || filter_var($normalizedConfiguration['disabled'], FILTER_VALIDATE_BOOLEAN)) {
+        if ('' === $normalizedConfiguration['disabled'] || filter_var($normalizedConfiguration['disabled'], \FILTER_VALIDATE_BOOLEAN)) {
             return self::inDisabledMode();
         }
 
         $verboseOutput = [];
         foreach (['unsilenced', 'direct', 'indirect', 'self', 'other'] as $group) {
-            $verboseOutput[$group] = filter_var($normalizedConfiguration['verbose'], FILTER_VALIDATE_BOOLEAN);
+            $verboseOutput[$group] = filter_var($normalizedConfiguration['verbose'], \FILTER_VALIDATE_BOOLEAN);
         }
 
         if (\is_array($normalizedConfiguration['quiet'])) {

@@ -63,7 +63,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     protected function findExtension(string $name)
     {
         $bundles = $this->initializeBundles();
-        $minScore = INF;
+        $minScore = \INF;
 
         $kernel = $this->getApplication()->getKernel();
         if ($kernel instanceof ExtensionInterface && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)) {

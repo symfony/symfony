@@ -217,7 +217,7 @@ class MongoDbStore implements BlockingStoreInterface
             throw new LockAcquiringException('Failed to acquire lock.', 0, $e);
         }
 
-        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->options['gcProbablity'])) {
+        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbablity'])) {
             $this->createTtlIndex();
         }
 

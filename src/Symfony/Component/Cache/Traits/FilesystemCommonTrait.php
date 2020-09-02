@@ -143,7 +143,7 @@ trait FilesystemCommonTrait
                     continue;
                 }
 
-                foreach (@scandir($dir, SCANDIR_SORT_NONE) ?: [] as $file) {
+                foreach (@scandir($dir, \SCANDIR_SORT_NONE) ?: [] as $file) {
                     if ('.' !== $file && '..' !== $file) {
                         yield $dir.\DIRECTORY_SEPARATOR.$file;
                     }

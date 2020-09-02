@@ -49,7 +49,7 @@ class XliffFileLoaderTest extends TestCase
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(true);
         }
 
@@ -57,7 +57,7 @@ class XliffFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.xlf';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             libxml_disable_entity_loader($disableEntities);
         }
 

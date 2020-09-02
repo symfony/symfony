@@ -35,7 +35,7 @@ final class IdnAddressEncoder implements AddressEncoderInterface
             $domain = substr($address, $i + 1);
 
             if (preg_match('/[^\x00-\x7F]/', $domain)) {
-                $address = sprintf('%s@%s', $local, idn_to_ascii($domain, 0, INTL_IDNA_VARIANT_UTS46));
+                $address = sprintf('%s@%s', $local, idn_to_ascii($domain, 0, \INTL_IDNA_VARIANT_UTS46));
             }
         }
 

@@ -113,7 +113,7 @@ class LazyString implements \Stringable, \JsonSerializable
 
             if (\PHP_VERSION_ID < 70400) {
                 // leverage the ErrorHandler component with graceful fallback when it's not available
-                return trigger_error($e, E_USER_ERROR);
+                return trigger_error($e, \E_USER_ERROR);
             }
 
             throw $e;

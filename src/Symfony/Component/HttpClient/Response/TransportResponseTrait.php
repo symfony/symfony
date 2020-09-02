@@ -152,7 +152,7 @@ trait TransportResponseTrait
         while (true) {
             $hasActivity = false;
             $timeoutMax = 0;
-            $timeoutMin = $timeout ?? INF;
+            $timeoutMin = $timeout ?? \INF;
 
             /** @var ClientState $multi */
             foreach ($runningResponses as $i => [$multi]) {
@@ -218,7 +218,7 @@ trait TransportResponseTrait
                                 $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                             }
 
-                            $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(ZLIB_ENCODING_GZIP) : null;
+                            $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;
 
                             if ($response->shouldBuffer instanceof \Closure) {
                                 try {

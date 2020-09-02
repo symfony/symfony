@@ -24,7 +24,7 @@ final class ExpectedDeprecationAnnotationTest extends TestCase
      */
     public function testOne()
     {
-        @trigger_error('foo', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
     }
 
     /**
@@ -37,7 +37,7 @@ final class ExpectedDeprecationAnnotationTest extends TestCase
      */
     public function testMany()
     {
-        @trigger_error('foo', E_USER_DEPRECATED);
-        @trigger_error('bar', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
+        @trigger_error('bar', \E_USER_DEPRECATED);
     }
 }

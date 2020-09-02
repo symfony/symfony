@@ -102,11 +102,11 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');

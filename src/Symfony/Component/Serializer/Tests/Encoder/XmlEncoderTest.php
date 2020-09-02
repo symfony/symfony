@@ -580,7 +580,7 @@ XML;
 
         $this->encoder = new XmlEncoder([
             XmlEncoder::ROOT_NODE_NAME => 'people',
-            XmlEncoder::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+            XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
         ]);
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
         $this->encoder->setSerializer($serializer);
@@ -813,7 +813,7 @@ XML;
     {
         $encoder = new XmlEncoder([
             XmlEncoder::ROOT_NODE_NAME => 'response',
-            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
         ]);
 
         $expected = '<response/>';
@@ -825,7 +825,7 @@ XML;
     {
         $encoder = new XmlEncoder([
             XmlEncoder::ROOT_NODE_NAME => 'response',
-            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_COMMENT_NODE],
+            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_COMMENT_NODE],
         ]);
 
         $expected = <<<'XML'

@@ -59,7 +59,7 @@ class HostnameValidator extends ConstraintValidator
 
     private function isValid(string $domain): bool
     {
-        return false !== filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
+        return false !== filter_var($domain, \FILTER_VALIDATE_DOMAIN, \FILTER_FLAG_HOSTNAME);
     }
 
     private function hasValidTld(string $domain): bool

@@ -92,7 +92,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
             $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $content);
 
-            $steps = preg_split('{\{"id":"\\\/json\\\/(\d)"\}}', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $steps = preg_split('{\{"id":"\\\/json\\\/(\d)"\}}', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
             $steps[7] = $context->getResponse();
             $steps[1] = $context->replaceRequest('GET', 'http://localhost:8057/json/1');
             $steps[3] = $context->replaceRequest('GET', 'http://localhost:8057/json/2');

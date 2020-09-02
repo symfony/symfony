@@ -185,7 +185,7 @@ final class AmpClientState extends ClientState
             }
         }
 
-        $maxHostConnections = 0 < $this->maxHostConnections ? $this->maxHostConnections : PHP_INT_MAX;
+        $maxHostConnections = 0 < $this->maxHostConnections ? $this->maxHostConnections : \PHP_INT_MAX;
         $pool = new DefaultConnectionFactory($connector, $context);
         $pool = ConnectionLimitingPool::byAuthority($maxHostConnections, $pool);
 

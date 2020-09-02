@@ -322,7 +322,7 @@ class Connection
         $exchange->publish(
             $body,
             $routingKey,
-            $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM,
+            $amqpStamp ? $amqpStamp->getFlags() : \AMQP_NOPARAM,
             $attributes
         );
     }
@@ -343,8 +343,8 @@ class Connection
         if (null === $this->amqpDelayExchange) {
             $this->amqpDelayExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpDelayExchange->setName($this->connectionOptions['delay']['exchange_name']);
-            $this->amqpDelayExchange->setType(AMQP_EX_TYPE_DIRECT);
-            $this->amqpDelayExchange->setFlags(AMQP_DURABLE);
+            $this->amqpDelayExchange->setType(\AMQP_EX_TYPE_DIRECT);
+            $this->amqpDelayExchange->setFlags(\AMQP_DURABLE);
         }
 
         return $this->amqpDelayExchange;
@@ -367,7 +367,7 @@ class Connection
             [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         ));
-        $queue->setFlags(AMQP_DURABLE);
+        $queue->setFlags(\AMQP_DURABLE);
         $queue->setArguments([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
@@ -427,7 +427,7 @@ class Connection
         return $this->queue($queueName)->ack($message->getDeliveryTag());
     }
 
-    public function nack(\AMQPEnvelope $message, string $queueName, int $flags = AMQP_NOPARAM): bool
+    public function nack(\AMQPEnvelope $message, string $queueName, int $flags = \AMQP_NOPARAM): bool
     {
         return $this->queue($queueName)->nack($message->getDeliveryTag(), $flags);
     }
@@ -490,7 +490,7 @@ class Connection
 
             $amqpQueue = $this->amqpFactory->createQueue($this->channel());
             $amqpQueue->setName($queueName);
-            $amqpQueue->setFlags($queueConfig['flags'] ?? AMQP_DURABLE);
+            $amqpQueue->setFlags($queueConfig['flags'] ?? \AMQP_DURABLE);
 
             if (isset($queueConfig['arguments'])) {
                 $amqpQueue->setArguments($queueConfig['arguments']);
@@ -507,8 +507,8 @@ class Connection
         if (null === $this->amqpExchange) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
-            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? AMQP_EX_TYPE_FANOUT);
-            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? AMQP_DURABLE);
+            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
+            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 
             if (isset($this->exchangeOptions['arguments'])) {
                 $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);

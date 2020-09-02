@@ -26,7 +26,7 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $current = PHP_BINARY;
+        $current = \PHP_BINARY;
         $args = 'phpdbg' === \PHP_SAPI ? ' -qrr' : '';
 
         $this->assertEquals($current.$args, $f->find(), '::find() returns the executable PHP');
@@ -50,7 +50,7 @@ class PhpExecutableFinderTest extends TestCase
     public function testNotExitsBinaryFile()
     {
         $f = new PhpExecutableFinder();
-        $phpBinaryEnv = PHP_BINARY;
+        $phpBinaryEnv = \PHP_BINARY;
         putenv('PHP_BINARY=/usr/local/php/bin/php-invalid');
 
         $this->assertFalse($f->find(), '::find() returns false because of not exist file');

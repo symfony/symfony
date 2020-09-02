@@ -100,8 +100,8 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser($kernel);
 
         $files = [
-            ['tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => null, 'error' => UPLOAD_ERR_OK],
-            new UploadedFile($source, 'original', 'mime/original', UPLOAD_ERR_OK, true),
+            ['tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => null, 'error' => \UPLOAD_ERR_OK],
+            new UploadedFile($source, 'original', 'mime/original', \UPLOAD_ERR_OK, true),
         ];
 
         $file = null;
@@ -130,7 +130,7 @@ class HttpKernelBrowserTest extends TestCase
         $kernel = new TestHttpKernel();
         $client = new HttpKernelBrowser($kernel);
 
-        $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE];
+        $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => \UPLOAD_ERR_NO_FILE];
 
         $client->request('POST', '/', [], ['foo' => $file]);
 
@@ -149,18 +149,18 @@ class HttpKernelBrowserTest extends TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs([$source, 'original', 'mime/original', UPLOAD_ERR_OK, true])
+            ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
             ->setMethods(['getSize', 'getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */
         $file->expects($this->any())
             ->method('getSize')
-            ->willReturn(INF)
+            ->willReturn(\INF)
         ;
         $file->expects($this->any())
             ->method('getClientSize')
-            ->willReturn(PHP_INT_MAX)
+            ->willReturn(\PHP_INT_MAX)
         ;
 
         $client->request('POST', '/', [], [$file]);
@@ -172,7 +172,7 @@ class HttpKernelBrowserTest extends TestCase
         $file = $files[0];
 
         $this->assertFalse($file->isValid());
-        $this->assertEquals(UPLOAD_ERR_INI_SIZE, $file->getError());
+        $this->assertEquals(\UPLOAD_ERR_INI_SIZE, $file->getError());
         $this->assertEquals('mime/original', $file->getClientMimeType());
         $this->assertEquals('original', $file->getClientOriginalName());
         $this->assertEquals(0, $file->getSize());

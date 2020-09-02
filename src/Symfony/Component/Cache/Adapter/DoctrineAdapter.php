@@ -52,7 +52,7 @@ class DoctrineAdapter extends AbstractAdapter
                     case 'unserialize':
                     case 'apcu_fetch':
                     case 'apc_fetch':
-                        throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                        throw new \ErrorException($e->getMessage(), $e->getCode(), \E_ERROR, $e->getFile(), $e->getLine());
                 }
             }
 

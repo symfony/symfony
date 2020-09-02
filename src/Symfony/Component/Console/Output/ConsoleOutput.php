@@ -131,7 +131,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         $checks = [
             \function_exists('php_uname') ? php_uname('s') : '',
             getenv('OSTYPE'),
-            PHP_OS,
+            \PHP_OS,
         ];
 
         return false !== stripos(implode(';', $checks), 'OS400');

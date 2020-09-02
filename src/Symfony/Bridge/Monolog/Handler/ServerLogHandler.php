@@ -99,7 +99,7 @@ trait ServerLogHandlerTrait
 
         try {
             if (-1 === stream_socket_sendto($this->socket, $recordFormatted)) {
-                stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
+                stream_socket_shutdown($this->socket, \STREAM_SHUT_RDWR);
 
                 // Let's retry: the persistent connection might just be stale
                 if ($this->socket = $this->createSocket()) {
@@ -125,7 +125,7 @@ trait ServerLogHandlerTrait
 
     private function createSocket()
     {
-        $socket = stream_socket_client($this->host, $errno, $errstr, 0, STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT, $this->context);
+        $socket = stream_socket_client($this->host, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT | \STREAM_CLIENT_PERSISTENT, $this->context);
 
         if ($socket) {
             stream_set_blocking($socket, false);

@@ -11,7 +11,7 @@
 
 use Symfony\Component\String\Resources\WcswidthDataGenerator;
 
-error_reporting(E_ALL);
+error_reporting(\E_ALL);
 
 set_error_handler(static function (int $type, string $msg, string $file, int $line): void {
     throw new \ErrorException($msg, 0, $type, $file, $line);

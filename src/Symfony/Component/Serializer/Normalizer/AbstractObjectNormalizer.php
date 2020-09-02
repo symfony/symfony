@@ -414,11 +414,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
                         switch ($data) {
                             case 'NaN':
-                                return NAN;
+                                return \NAN;
                             case 'INF':
-                                return INF;
+                                return \INF;
                             case '-INF':
-                                return -INF;
+                                return -\INF;
                             default:
                                 throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data));
                         }

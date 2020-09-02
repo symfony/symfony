@@ -315,7 +315,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEqualsWithDelta(45E-6, $objectWithBooleanProperties->float3, 1);
         $this->assertNan($objectWithBooleanProperties->floatNaN);
         $this->assertInfinite($objectWithBooleanProperties->floatInf);
-        $this->assertEquals(-INF, $objectWithBooleanProperties->floatNegInf);
+        $this->assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
     }
 
     private function getDenormalizerForObjectWithBasicProperties()

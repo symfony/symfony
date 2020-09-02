@@ -19,10 +19,10 @@
 function handleSignal($signal)
 {
     switch ($signal) {
-        case SIGTERM:
+        case \SIGTERM:
             $name = 'SIGTERM';
             break;
-        case SIGINT:
+        case \SIGINT:
             $name = 'SIGINT';
             break;
         default:
@@ -33,8 +33,8 @@ function handleSignal($signal)
     echo "signal $name\n";
 }
 
-pcntl_signal(SIGTERM, 'handleSignal');
-pcntl_signal(SIGINT, 'handleSignal');
+pcntl_signal(\SIGTERM, 'handleSignal');
+pcntl_signal(\SIGINT, 'handleSignal');
 
 echo 'received ';
 

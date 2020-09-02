@@ -98,7 +98,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         $handle = function () {
             $stream = $this->response instanceof StreamableInterface ? $this->response->toStream(false) : StreamWrapper::createResource($this->response);
 
-            return stream_get_meta_data($stream)['wrapper_data']->stream_cast(STREAM_CAST_FOR_SELECT);
+            return stream_get_meta_data($stream)['wrapper_data']->stream_cast(\STREAM_CAST_FOR_SELECT);
         };
 
         $stream = StreamWrapper::createResource($this);

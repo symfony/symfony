@@ -167,7 +167,7 @@ class YamlFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yaml', 'yml'], true)) {
+        if (null === $type && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yaml', 'yml'], true)) {
             return true;
         }
 

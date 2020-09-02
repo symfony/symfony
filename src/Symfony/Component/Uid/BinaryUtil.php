@@ -120,7 +120,7 @@ class BinaryUtil
             return (hexdec($time) - self::TIME_OFFSET_INT) / 10000000;
         }
 
-        $time = str_pad(hex2bin($time), 8, "\0", STR_PAD_LEFT);
+        $time = str_pad(hex2bin($time), 8, "\0", \STR_PAD_LEFT);
         $time = self::add($time, self::TIME_OFFSET_COM);
         $time[0] = $time[0] & "\x7F";
 

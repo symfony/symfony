@@ -64,7 +64,7 @@ class Connection
                 return true;
             }
             if (!$socketIsFresh) {
-                stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
+                stream_socket_shutdown($this->socket, \STREAM_SHUT_RDWR);
                 fclose($this->socket);
                 $this->socket = $this->createSocket();
             }
@@ -87,7 +87,7 @@ class Connection
     {
         set_error_handler([self::class, 'nullErrorHandler']);
         try {
-            return stream_socket_client($this->host, $errno, $errstr, 3, STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT);
+            return stream_socket_client($this->host, $errno, $errstr, 3, \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT);
         } finally {
             restore_error_handler();
         }

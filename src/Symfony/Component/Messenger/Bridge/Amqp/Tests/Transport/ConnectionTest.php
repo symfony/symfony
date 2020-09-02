@@ -268,7 +268,7 @@ class ConnectionTest extends TestCase
         );
 
         $amqpExchange->expects($this->once())->method('declareExchange');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->once())->method('bind')->with(self::DEFAULT_EXCHANGE_NAME, null);
 
@@ -291,7 +291,7 @@ class ConnectionTest extends TestCase
         $factory->method('createQueue')->will($this->onConsecutiveCalls($amqpQueue0, $amqpQueue1));
 
         $amqpExchange->expects($this->once())->method('declareExchange');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
         $amqpQueue0->expects($this->exactly(2))->method('bind')->withConsecutive(
             [self::DEFAULT_EXCHANGE_NAME, 'binding_key0'],
@@ -328,7 +328,7 @@ class ConnectionTest extends TestCase
         $factory->method('createQueue')->willReturn($amqpQueue);
 
         $amqpExchange->expects($this->once())->method('declareExchange');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->exactly(1))->method('bind')->withConsecutive(
             [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all']]
@@ -441,7 +441,7 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages__5000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__5000', AMQP_NOPARAM, ['headers' => ['x-some-headers' => 'foo'], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__5000', \AMQP_NOPARAM, ['headers' => ['x-some-headers' => 'foo'], 'delivery_mode' => 2, 'timestamp' => time()]);
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
@@ -483,7 +483,7 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages__120000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__120000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__120000', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $connection->publish('{}', [], 120000);
     }
 
@@ -515,10 +515,10 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
 
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => ['Foo' => 'X', 'Bar' => 'Y'], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => ['Foo' => 'X', 'Bar' => 'Y'], 'delivery_mode' => 2, 'timestamp' => time()]);
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
-        $connection->publish('body', ['Foo' => 'X'], 0, new AmqpStamp(null, AMQP_NOPARAM, ['headers' => ['Bar' => 'Y']]));
+        $connection->publish('body', ['Foo' => 'X'], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['Bar' => 'Y']]));
     }
 
     public function testAmqpStampDelireryModeIsUsed()
@@ -530,10 +530,10 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
 
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 1, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 1, 'timestamp' => time()]);
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
-        $connection->publish('body', [], 0, new AmqpStamp(null, AMQP_NOPARAM, ['delivery_mode' => 1]));
+        $connection->publish('body', [], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['delivery_mode' => 1]));
     }
 
     public function testItCanPublishWithTheDefaultRoutingKey()
@@ -602,7 +602,7 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages_routing_key_120000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages_routing_key_120000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages_routing_key_120000', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $connection->publish('{}', [], 120000, new AmqpStamp('routing_key'));
     }
 
@@ -618,12 +618,12 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('publish')->with(
             'body',
             'routing_key',
-            AMQP_IMMEDIATE,
+            \AMQP_IMMEDIATE,
             ['delivery_mode' => 2, 'headers' => ['type' => DummyMessage::class], 'timestamp' => time()]
         );
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
-        $connection->publish('body', ['type' => DummyMessage::class], 0, new AmqpStamp('routing_key', AMQP_IMMEDIATE, ['delivery_mode' => 2]));
+        $connection->publish('body', ['type' => DummyMessage::class], 0, new AmqpStamp('routing_key', \AMQP_IMMEDIATE, ['delivery_mode' => 2]));
     }
 }
 

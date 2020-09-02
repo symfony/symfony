@@ -198,7 +198,7 @@ class CursorTest extends TestCase
     {
         rewind($output->getStream());
 
-        return str_replace(PHP_EOL, "\n", stream_get_contents($output->getStream()));
+        return str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 
     protected function getOutputStream(): StreamOutput

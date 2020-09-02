@@ -100,7 +100,7 @@ class SymfonyQuestionHelper extends QuestionHelper
 
     private function getEofShortcut(): string
     {
-        if (false !== strpos(PHP_OS, 'WIN')) {
+        if (false !== strpos(\PHP_OS, 'WIN')) {
             return '<comment>Ctrl+Z</comment> then <comment>Enter</comment>';
         }
 

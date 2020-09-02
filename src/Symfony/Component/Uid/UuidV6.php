@@ -25,7 +25,7 @@ class UuidV6 extends Uuid
     public function __construct(string $uuid = null)
     {
         if (null === $uuid) {
-            $uuid = uuid_create(UUID_TYPE_TIME);
+            $uuid = uuid_create(\UUID_TYPE_TIME);
             $this->uid = substr($uuid, 15, 3).substr($uuid, 9, 4).$uuid[0].'-'.substr($uuid, 1, 4).'-6'.substr($uuid, 5, 3).substr($uuid, 18);
         } else {
             parent::__construct($uuid);

@@ -51,13 +51,18 @@ class Deprecation
      */
     public function __construct($message, array $trace, $file)
     {
+        if (isset($trace[2]['function']) && 'trigger_deprecation' === $trace[2]['function']) {
+            $file = $trace[2]['file'];
+            array_splice($trace, 1, 1);
+        }
+
         $this->trace = $trace;
         $this->message = $message;
-        $i = \count($trace);
-        while (1 < $i && $this->lineShouldBeSkipped($trace[--$i])) {
+        $i = \count($this->trace);
+        while (1 < $i && $this->lineShouldBeSkipped($this->trace[--$i])) {
             // No-op
         }
-        $line = $trace[$i];
+        $line = $this->trace[$i];
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
             set_error_handler(function () {});

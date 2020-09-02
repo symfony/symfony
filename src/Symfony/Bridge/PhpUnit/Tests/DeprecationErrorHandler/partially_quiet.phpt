@@ -28,7 +28,7 @@ Remaining direct deprecation notices (1)
 
 Remaining indirect deprecation notices (1)
 
-  1x: deprecatedApi is deprecated! You should stop relying on it!
+  1x: Since acme/lib 3.0: deprecatedApi is deprecated, use deprecatedApi_new instead.
     1x in SomeService::deprecatedApi from acme\lib
 
 Legacy deprecation notices (2)

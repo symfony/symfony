@@ -67,7 +67,7 @@ class NativePasswordEncoderTest extends TestCase
 
     public function testConfiguredAlgorithm()
     {
-        $encoder = new NativePasswordEncoder(null, null, null, PASSWORD_BCRYPT);
+        $encoder = new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT);
         $result = $encoder->encodePassword('password', null);
         $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertStringStartsWith('$2', $result);
@@ -84,7 +84,7 @@ class NativePasswordEncoderTest extends TestCase
     public function testCheckPasswordLength()
     {
         $encoder = new NativePasswordEncoder(null, null, 4);
-        $result = password_hash(str_repeat('a', 72), PASSWORD_BCRYPT, ['cost' => 4]);
+        $result = password_hash(str_repeat('a', 72), \PASSWORD_BCRYPT, ['cost' => 4]);
 
         $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));

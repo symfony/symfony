@@ -105,7 +105,7 @@ class Logger extends AbstractLogger
             $message = strtr($message, $replacements);
         }
 
-        $log = sprintf('[%s] %s', $level, $message).PHP_EOL;
+        $log = sprintf('[%s] %s', $level, $message).\PHP_EOL;
         if ($prefixDate) {
             $log = date(\DateTime::RFC3339).' '.$log;
         }

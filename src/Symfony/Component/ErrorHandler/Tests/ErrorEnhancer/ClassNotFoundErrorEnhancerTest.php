@@ -125,7 +125,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
     public function testEnhanceWithFatalError()
     {
         $error = (new ClassNotFoundErrorEnhancer())->enhance(new FatalError('foo', 0, [
-            'type' => E_ERROR,
+            'type' => \E_ERROR,
             'message' => "Class 'FooBarCcc' not found",
             'file' => $expectedFile = realpath(__FILE__),
             'line' => $expectedLine = __LINE__,

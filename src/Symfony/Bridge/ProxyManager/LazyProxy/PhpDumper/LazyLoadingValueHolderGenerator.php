@@ -66,7 +66,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
                 if (null !== $docBlock = $method->getDocBlock()) {
                     $code = substr($code, \strlen($docBlock->generate()));
                 }
-                $refAmp = (strpos($code, '&') ?: PHP_INT_MAX) <= strpos($code, '(') ? '&' : '';
+                $refAmp = (strpos($code, '&') ?: \PHP_INT_MAX) <= strpos($code, '(') ? '&' : '';
                 $body = preg_replace(
                     '/\nreturn (\$this->valueHolder[0-9a-f]++)(->[^;]++);$/',
                     "\nif ($1 === \$returnValue = {$refAmp}$1$2) {\n    \$returnValue = \$this;\n}\n\nreturn \$returnValue;",

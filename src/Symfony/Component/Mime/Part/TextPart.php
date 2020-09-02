@@ -47,7 +47,7 @@ class TextPart extends AbstractPart
         $this->body = $body;
         $this->charset = $charset;
         $this->subtype = $subtype;
-        $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && 0 === fseek($body, 0, SEEK_CUR) : null;
+        $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && 0 === fseek($body, 0, \SEEK_CUR) : null;
 
         if (null === $encoding) {
             $this->encoding = $this->chooseEncoding();

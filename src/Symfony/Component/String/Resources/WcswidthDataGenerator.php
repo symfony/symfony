@@ -46,7 +46,7 @@ final class WcswidthDataGenerator
 
         $version = $matches[1];
 
-        if (!preg_match_all('/^([A-H\d]{4,})(?:\.\.([A-H\d]{4,}))?;[W|F]/m', $content, $matches, PREG_SET_ORDER)) {
+        if (!preg_match_all('/^([A-H\d]{4,})(?:\.\.([A-H\d]{4,}))?;[W|F]/m', $content, $matches, \PREG_SET_ORDER)) {
             throw new RuntimeException('The wide width pattern did not match anything.');
         }
 
@@ -61,7 +61,7 @@ final class WcswidthDataGenerator
 
         $version = $matches[1];
 
-        if (!preg_match_all('/^([A-H\d]{4,})(?:\.\.([A-H\d]{4,}))? *; (?:Me|Mn)/m', $content, $matches, PREG_SET_ORDER)) {
+        if (!preg_match_all('/^([A-H\d]{4,})(?:\.\.([A-H\d]{4,}))? *; (?:Me|Mn)/m', $content, $matches, \PREG_SET_ORDER)) {
             throw new RuntimeException('The zero width pattern did not match anything.');
         }
 

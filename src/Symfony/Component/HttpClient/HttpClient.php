@@ -44,7 +44,7 @@ final class HttpClient
             $curlVersion = $curlVersion ?? curl_version();
 
             // HTTP/2 push crashes before curl 7.61
-            if (0x073d00 > $curlVersion['version_number'] || !(CURL_VERSION_HTTP2 & $curlVersion['features'])) {
+            if (0x073d00 > $curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & $curlVersion['features'])) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
         }
@@ -54,14 +54,14 @@ final class HttpClient
                 return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
             }
 
-            @trigger_error('Configure the "curl.cainfo", "openssl.cafile" or "openssl.capath" php.ini setting to enable the CurlHttpClient', E_USER_WARNING);
+            @trigger_error('Configure the "curl.cainfo", "openssl.cafile" or "openssl.capath" php.ini setting to enable the CurlHttpClient', \E_USER_WARNING);
         }
 
         if ($amp) {
             return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
         }
 
-        @trigger_error((\extension_loaded('curl') ? 'Upgrade' : 'Install').' the curl extension or run "composer require amphp/http-client" to perform async HTTP operations, including full HTTP/2 support', E_USER_NOTICE);
+        @trigger_error((\extension_loaded('curl') ? 'Upgrade' : 'Install').' the curl extension or run "composer require amphp/http-client" to perform async HTTP operations, including full HTTP/2 support', \E_USER_NOTICE);
 
         return new NativeHttpClient($defaultOptions, $maxHostConnections);
     }

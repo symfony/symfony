@@ -73,7 +73,7 @@ final class TransitionBlocker
             return new static($message, self::UNKNOWN);
         }
 
-        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $backtraceFrame + 1)[$backtraceFrame]['class'] ?? null;
+        $caller = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, $backtraceFrame + 1)[$backtraceFrame]['class'] ?? null;
 
         if (null !== $caller) {
             return new static("The transition has been blocked by a guard ($caller).", self::UNKNOWN);

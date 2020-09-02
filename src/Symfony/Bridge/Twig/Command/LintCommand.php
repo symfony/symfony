@@ -101,7 +101,7 @@ EOF
 
         if ($showDeprecations) {
             $prevErrorHandler = set_error_handler(static function ($level, $message, $file, $line) use (&$prevErrorHandler) {
-                if (E_USER_DEPRECATED === $level) {
+                if (\E_USER_DEPRECATED === $level) {
                     $templateLine = 0;
                     if (preg_match('/ at line (\d+)[ .]/', $message, $matches)) {
                         $templateLine = $matches[1];
@@ -214,7 +214,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return min($errors, 1);
     }

@@ -105,7 +105,7 @@ class LazyStringTest extends TestCase
     {
         $this->assertFalse(LazyString::isStringable(null));
         $this->assertFalse(LazyString::isStringable([]));
-        $this->assertFalse(LazyString::isStringable(STDIN));
+        $this->assertFalse(LazyString::isStringable(\STDIN));
         $this->assertFalse(LazyString::isStringable(new \StdClass()));
     }
 }

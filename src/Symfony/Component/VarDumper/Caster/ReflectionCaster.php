@@ -120,7 +120,7 @@ class ReflectionCaster
             'file' => $c->getExecutingFile(),
             'line' => $c->getExecutingLine(),
         ];
-        if ($trace = $c->getTrace(DEBUG_BACKTRACE_IGNORE_ARGS)) {
+        if ($trace = $c->getTrace(\DEBUG_BACKTRACE_IGNORE_ARGS)) {
             $function = new \ReflectionGenerator($c->getExecutingGenerator());
             array_unshift($trace, [
                 'function' => 'yield',

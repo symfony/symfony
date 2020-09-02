@@ -18,13 +18,13 @@ namespace Symfony\Component\Uid;
  */
 class Uuid extends AbstractUid
 {
-    protected const TYPE = UUID_TYPE_DEFAULT;
+    protected const TYPE = \UUID_TYPE_DEFAULT;
 
     public function __construct(string $uuid)
     {
         $type = uuid_type($uuid);
 
-        if (false === $type || UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
+        if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 

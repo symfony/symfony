@@ -86,7 +86,7 @@ final class InputBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function filter(string $key, $default = null, int $filter = FILTER_DEFAULT, $options = [])
+    public function filter(string $key, $default = null, int $filter = \FILTER_DEFAULT, $options = [])
     {
         $value = $this->has($key) ? $this->all()[$key] : $default;
 
@@ -95,11 +95,11 @@ final class InputBag extends ParameterBag
             $options = ['flags' => $options];
         }
 
-        if (\is_array($value) && !(($options['flags'] ?? 0) & (FILTER_REQUIRE_ARRAY | FILTER_FORCE_ARRAY))) {
+        if (\is_array($value) && !(($options['flags'] ?? 0) & (\FILTER_REQUIRE_ARRAY | \FILTER_FORCE_ARRAY))) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Filtering an array value with "%s()" without passing the FILTER_REQUIRE_ARRAY or FILTER_FORCE_ARRAY flag is deprecated', __METHOD__);
 
             if (!isset($options['flags'])) {
-                $options['flags'] = FILTER_REQUIRE_ARRAY;
+                $options['flags'] = \FILTER_REQUIRE_ARRAY;
             }
         }
 

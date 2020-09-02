@@ -111,7 +111,7 @@ final class NativeResponse implements ResponseInterface
         $url = $this->url;
 
         set_error_handler(function ($type, $msg) use (&$url) {
-            if (E_NOTICE !== $type || 'fopen(): Content-type not specified assuming application/x-www-form-urlencoded' !== $msg) {
+            if (\E_NOTICE !== $type || 'fopen(): Content-type not specified assuming application/x-www-form-urlencoded' !== $msg) {
                 throw new TransportException($msg);
             }
 
@@ -168,7 +168,7 @@ final class NativeResponse implements ResponseInterface
         if (isset($this->headers['content-length'])) {
             $this->remaining = (int) $this->headers['content-length'][0];
         } elseif ('chunked' === ($this->headers['transfer-encoding'][0] ?? null)) {
-            stream_filter_append($this->buffer, 'dechunk', STREAM_FILTER_WRITE);
+            stream_filter_append($this->buffer, 'dechunk', \STREAM_FILTER_WRITE);
             $this->remaining = -1;
         } else {
             $this->remaining = -2;

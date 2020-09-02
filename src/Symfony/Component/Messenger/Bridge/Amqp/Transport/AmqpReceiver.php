@@ -120,7 +120,7 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
     private function rejectAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, string $queueName): void
     {
         try {
-            $this->connection->nack($amqpEnvelope, $queueName, AMQP_NOPARAM);
+            $this->connection->nack($amqpEnvelope, $queueName, \AMQP_NOPARAM);
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

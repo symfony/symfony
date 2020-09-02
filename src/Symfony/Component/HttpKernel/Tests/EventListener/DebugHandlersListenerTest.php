@@ -59,8 +59,8 @@ class DebugHandlersListenerTest extends TestCase
 
         $loggers = $eHandler->setLoggers([]);
 
-        $this->assertArrayHasKey(E_DEPRECATED, $loggers);
-        $this->assertSame([$logger, LogLevel::INFO], $loggers[E_DEPRECATED]);
+        $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
+        $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
     }
 
     public function testConfigureForHttpKernelWithNoTerminateWithException()
@@ -156,28 +156,28 @@ class DebugHandlersListenerTest extends TestCase
     {
         return [
             [false, false, '0', null, null],
-            [false, false, E_ALL, null, null],
+            [false, false, \E_ALL, null, null],
             [false, false, [], null, null],
-            [false, false, [E_WARNING => LogLevel::WARNING, E_USER_DEPRECATED => LogLevel::NOTICE], null, null],
+            [false, false, [\E_WARNING => LogLevel::WARNING, \E_USER_DEPRECATED => LogLevel::NOTICE], null, null],
 
-            [true, false, E_ALL, E_ALL, null],
-            [true, false, E_DEPRECATED, E_DEPRECATED, null],
+            [true, false, \E_ALL, \E_ALL, null],
+            [true, false, \E_DEPRECATED, \E_DEPRECATED, null],
             [true, false, [], null, null],
-            [true, false, [E_WARNING => LogLevel::WARNING, E_DEPRECATED => LogLevel::NOTICE], [E_WARNING => LogLevel::WARNING, E_DEPRECATED => LogLevel::NOTICE], null],
+            [true, false, [\E_WARNING => LogLevel::WARNING, \E_DEPRECATED => LogLevel::NOTICE], [\E_WARNING => LogLevel::WARNING, \E_DEPRECATED => LogLevel::NOTICE], null],
 
             [false, true, '0', null, null],
-            [false, true, E_ALL, null, E_DEPRECATED | E_USER_DEPRECATED],
-            [false, true, E_ERROR, null, null],
+            [false, true, \E_ALL, null, \E_DEPRECATED | \E_USER_DEPRECATED],
+            [false, true, \E_ERROR, null, null],
             [false, true, [], null, null],
-            [false, true, [E_ERROR => LogLevel::ERROR, E_DEPRECATED => LogLevel::DEBUG], null, [E_DEPRECATED => LogLevel::DEBUG]],
+            [false, true, [\E_ERROR => LogLevel::ERROR, \E_DEPRECATED => LogLevel::DEBUG], null, [\E_DEPRECATED => LogLevel::DEBUG]],
 
             [true, true, '0', null, null],
-            [true, true, E_ALL, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED), E_DEPRECATED | E_USER_DEPRECATED],
-            [true, true, E_ERROR, E_ERROR, null],
-            [true, true, E_USER_DEPRECATED, null, E_USER_DEPRECATED],
-            [true, true, [E_ERROR => LogLevel::ERROR, E_DEPRECATED => LogLevel::DEBUG], [E_ERROR => LogLevel::ERROR], [E_DEPRECATED => LogLevel::DEBUG]],
-            [true, true, [E_ERROR => LogLevel::ALERT], [E_ERROR => LogLevel::ALERT], null],
-            [true, true, [E_USER_DEPRECATED => LogLevel::NOTICE], null, [E_USER_DEPRECATED => LogLevel::NOTICE]],
+            [true, true, \E_ALL, \E_ALL & ~(\E_DEPRECATED | \E_USER_DEPRECATED), \E_DEPRECATED | \E_USER_DEPRECATED],
+            [true, true, \E_ERROR, \E_ERROR, null],
+            [true, true, \E_USER_DEPRECATED, null, \E_USER_DEPRECATED],
+            [true, true, [\E_ERROR => LogLevel::ERROR, \E_DEPRECATED => LogLevel::DEBUG], [\E_ERROR => LogLevel::ERROR], [\E_DEPRECATED => LogLevel::DEBUG]],
+            [true, true, [\E_ERROR => LogLevel::ALERT], [\E_ERROR => LogLevel::ALERT], null],
+            [true, true, [\E_USER_DEPRECATED => LogLevel::NOTICE], null, [\E_USER_DEPRECATED => LogLevel::NOTICE]],
         ];
     }
 

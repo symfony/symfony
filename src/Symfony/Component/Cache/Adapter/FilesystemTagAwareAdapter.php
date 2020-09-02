@@ -72,7 +72,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                         if (!is_dir($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
                             continue;
                         }
-                        foreach (scandir($d, SCANDIR_SORT_NONE) ?: [] as $link) {
+                        foreach (scandir($d, \SCANDIR_SORT_NONE) ?: [] as $link) {
                             if ('.' !== $link && '..' !== $link && (null !== $renamed || !realpath($d.\DIRECTORY_SEPARATOR.$link))) {
                                 unlink($d.\DIRECTORY_SEPARATOR.$link);
                             }

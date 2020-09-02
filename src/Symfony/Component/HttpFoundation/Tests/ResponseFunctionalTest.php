@@ -49,7 +49,7 @@ class ResponseFunctionalTest extends TestCase
     public function provideCookie()
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
-            yield [pathinfo($file, PATHINFO_FILENAME)];
+            yield [pathinfo($file, \PATHINFO_FILENAME)];
         }
     }
 }

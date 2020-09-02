@@ -119,7 +119,7 @@ class RedirectController
         }
 
         // redirect if the path is a full URL
-        if (parse_url($path, PHP_URL_SCHEME)) {
+        if (parse_url($path, \PHP_URL_SCHEME)) {
             return new RedirectResponse($path, $statusCode);
         }
 

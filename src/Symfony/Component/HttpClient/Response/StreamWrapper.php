@@ -50,7 +50,7 @@ class StreamWrapper
     public static function createResource(ResponseInterface $response, HttpClientInterface $client = null)
     {
         if ($response instanceof TraceableResponse || (\is_callable([$response, 'toStream']) && isset(class_uses($response)[ResponseTrait::class]))) {
-            $stack = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $stack = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
             if ($response !== ($stack[1]['object'] ?? null)) {
                 return $response->toStream(false);
@@ -61,7 +61,7 @@ class StreamWrapper
             throw new \InvalidArgumentException(sprintf('Providing a client to "%s()" is required when the response doesn\'t have any "stream()" method.', __CLASS__));
         }
 
-        if (false === stream_wrapper_register('symfony', __CLASS__, STREAM_IS_URL)) {
+        if (false === stream_wrapper_register('symfony', __CLASS__, \STREAM_IS_URL)) {
             throw new \RuntimeException(error_get_last()['message'] ?? 'Registering the "symfony" stream wrapper failed.');
         }
 
@@ -96,8 +96,8 @@ class StreamWrapper
     public function stream_open(string $path, string $mode, int $options): bool
     {
         if ('r' !== $mode) {
-            if ($options & STREAM_REPORT_ERRORS) {
-                trigger_error(sprintf('Invalid mode "%s": only "r" is supported.', $mode), E_USER_WARNING);
+            if ($options & \STREAM_REPORT_ERRORS) {
+                trigger_error(sprintf('Invalid mode "%s": only "r" is supported.', $mode), \E_USER_WARNING);
             }
 
             return false;
@@ -112,8 +112,8 @@ class StreamWrapper
             return true;
         }
 
-        if ($options & STREAM_REPORT_ERRORS) {
-            trigger_error('Missing options "client" or "response" in "symfony" stream context.', E_USER_WARNING);
+        if ($options & \STREAM_REPORT_ERRORS) {
+            trigger_error('Missing options "client" or "response" in "symfony" stream context.', \E_USER_WARNING);
         }
 
         return false;
@@ -129,7 +129,7 @@ class StreamWrapper
                         $this->response->getStatusCode(); // ignore 3/4/5xx
                     }
                 } catch (ExceptionInterface $e) {
-                    trigger_error($e->getMessage(), E_USER_WARNING);
+                    trigger_error($e->getMessage(), \E_USER_WARNING);
 
                     return false;
                 }
@@ -140,7 +140,7 @@ class StreamWrapper
             }
 
             if ('' !== $data = fread($this->content, $count)) {
-                fseek($this->content, 0, SEEK_END);
+                fseek($this->content, 0, \SEEK_END);
                 $this->offset += \strlen($data);
 
                 return $data;
@@ -182,7 +182,7 @@ class StreamWrapper
                     return $data;
                 }
             } catch (ExceptionInterface $e) {
-                trigger_error($e->getMessage(), E_USER_WARNING);
+                trigger_error($e->getMessage(), \E_USER_WARNING);
 
                 return false;
             }
@@ -193,9 +193,9 @@ class StreamWrapper
 
     public function stream_set_option(int $option, int $arg1, ?int $arg2): bool
     {
-        if (STREAM_OPTION_BLOCKING === $option) {
+        if (\STREAM_OPTION_BLOCKING === $option) {
             $this->blocking = (bool) $arg1;
-        } elseif (STREAM_OPTION_READ_TIMEOUT === $option) {
+        } elseif (\STREAM_OPTION_READ_TIMEOUT === $option) {
             $this->timeout = $arg1 + $arg2 / 1e6;
         } else {
             return false;
@@ -214,19 +214,19 @@ class StreamWrapper
         return $this->eof && !\is_string($this->content);
     }
 
-    public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+    public function stream_seek(int $offset, int $whence = \SEEK_SET): bool
     {
-        if (!\is_resource($this->content) || 0 !== fseek($this->content, 0, SEEK_END)) {
+        if (!\is_resource($this->content) || 0 !== fseek($this->content, 0, \SEEK_END)) {
             return false;
         }
 
         $size = ftell($this->content);
 
-        if (SEEK_CUR === $whence) {
+        if (\SEEK_CUR === $whence) {
             $offset += $this->offset;
         }
 
-        if (SEEK_END === $whence || $size < $offset) {
+        if (\SEEK_END === $whence || $size < $offset) {
             foreach ($this->client->stream([$this->response]) as $chunk) {
                 try {
                     if ($chunk->isFirst()) {
@@ -236,17 +236,17 @@ class StreamWrapper
                     // Chunks are buffered in $this->content already
                     $size += \strlen($chunk->getContent());
 
-                    if (SEEK_END !== $whence && $offset <= $size) {
+                    if (\SEEK_END !== $whence && $offset <= $size) {
                         break;
                     }
                 } catch (ExceptionInterface $e) {
-                    trigger_error($e->getMessage(), E_USER_WARNING);
+                    trigger_error($e->getMessage(), \E_USER_WARNING);
 
                     return false;
                 }
             }
 
-            if (SEEK_END === $whence) {
+            if (\SEEK_END === $whence) {
                 $offset += $size;
             }
         }
@@ -263,7 +263,7 @@ class StreamWrapper
 
     public function stream_cast(int $castAs)
     {
-        if (STREAM_CAST_FOR_SELECT === $castAs) {
+        if (\STREAM_CAST_FOR_SELECT === $castAs) {
             $this->response->getHeaders(false);
 
             return $this->handle ?? false;
@@ -277,7 +277,7 @@ class StreamWrapper
         try {
             $headers = $this->response->getHeaders(false);
         } catch (ExceptionInterface $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            trigger_error($e->getMessage(), \E_USER_WARNING);
             $headers = [];
         }
 

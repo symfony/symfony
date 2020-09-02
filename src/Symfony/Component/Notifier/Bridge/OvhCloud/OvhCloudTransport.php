@@ -76,7 +76,7 @@ final class OvhCloudTransport extends AbstractTransport
         $headers['X-Ovh-Application'] = $this->applicationKey;
         $headers['X-Ovh-Timestamp'] = $now;
 
-        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.json_encode($content, JSON_UNESCAPED_SLASHES).'+'.$now;
+        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.json_encode($content, \JSON_UNESCAPED_SLASHES).'+'.$now;
         $headers['X-Ovh-Consumer'] = $this->consumerKey;
         $headers['X-Ovh-Signature'] = '$1$'.sha1($toSign);
 

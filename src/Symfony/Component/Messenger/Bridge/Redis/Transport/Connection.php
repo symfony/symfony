@@ -112,43 +112,43 @@ class Connection
 
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
-            $autoSetup = filter_var($redisOptions['auto_setup'], FILTER_VALIDATE_BOOLEAN);
+            $autoSetup = filter_var($redisOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['auto_setup']);
         }
 
         $maxEntries = null;
         if (\array_key_exists('stream_max_entries', $redisOptions)) {
-            $maxEntries = filter_var($redisOptions['stream_max_entries'], FILTER_VALIDATE_INT);
+            $maxEntries = filter_var($redisOptions['stream_max_entries'], \FILTER_VALIDATE_INT);
             unset($redisOptions['stream_max_entries']);
         }
 
         $deleteAfterAck = null;
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
-            $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], FILTER_VALIDATE_BOOLEAN);
+            $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
         }
 
         $dbIndex = null;
         if (\array_key_exists('dbindex', $redisOptions)) {
-            $dbIndex = filter_var($redisOptions['dbindex'], FILTER_VALIDATE_INT);
+            $dbIndex = filter_var($redisOptions['dbindex'], \FILTER_VALIDATE_INT);
             unset($redisOptions['dbindex']);
         }
 
         $tls = false;
         if (\array_key_exists('tls', $redisOptions)) {
-            $tls = filter_var($redisOptions['tls'], FILTER_VALIDATE_BOOLEAN);
+            $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['tls']);
         }
 
         $redeliverTimeout = null;
         if (\array_key_exists('redeliver_timeout', $redisOptions)) {
-            $redeliverTimeout = filter_var($redisOptions['redeliver_timeout'], FILTER_VALIDATE_INT);
+            $redeliverTimeout = filter_var($redisOptions['redeliver_timeout'], \FILTER_VALIDATE_INT);
             unset($redisOptions['redeliver_timeout']);
         }
 
         $claimInterval = null;
         if (\array_key_exists('claim_interval', $redisOptions)) {
-            $claimInterval = filter_var($redisOptions['claim_interval'], FILTER_VALIDATE_INT);
+            $claimInterval = filter_var($redisOptions['claim_interval'], \FILTER_VALIDATE_INT);
             unset($redisOptions['claim_interval']);
         }
 

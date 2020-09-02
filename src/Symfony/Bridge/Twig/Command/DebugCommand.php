@@ -262,7 +262,7 @@ EOF
             $data['warnings'] = $this->buildWarningMessages($wrongBundles);
         }
 
-        $data = json_encode($data, JSON_PRETTY_PRINT);
+        $data = json_encode($data, \JSON_PRETTY_PRINT);
         $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
     }
 
@@ -392,7 +392,7 @@ EOF
         $bundleNames = [];
 
         if ($this->twigDefaultPath && $this->projectDir) {
-            $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
+            $folders = glob($this->twigDefaultPath.'/bundles/*', \GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
                 if (0 === strpos($absolutePath, $this->projectDir)) {
@@ -532,7 +532,7 @@ EOF
 
         $threshold = 1e3;
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }
@@ -548,7 +548,7 @@ EOF
 
     private function isAbsolutePath(string $file): bool
     {
-        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || null !== parse_url($file, PHP_URL_SCHEME);
+        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || null !== parse_url($file, \PHP_URL_SCHEME);
     }
 
     /**

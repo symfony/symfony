@@ -377,7 +377,7 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('Long file names are an issue on Windows');
         }
         $basePath = $this->workspace.'\\directory\\';
-        $maxPathLength = PHP_MAXPATHLEN - 2;
+        $maxPathLength = \PHP_MAXPATHLEN - 2;
 
         $oldPath = getcwd();
         mkdir($basePath);

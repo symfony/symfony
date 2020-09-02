@@ -153,7 +153,7 @@ class EncoderFactory implements EncoderFactoryInterface
 
             case 'bcrypt':
                 $config['algorithm'] = 'native';
-                $config['native_algorithm'] = PASSWORD_BCRYPT;
+                $config['native_algorithm'] = \PASSWORD_BCRYPT;
 
                 return $this->getEncoderConfigFromAlgorithm($config);
 
@@ -181,7 +181,7 @@ class EncoderFactory implements EncoderFactoryInterface
                     $config['algorithm'] = 'sodium';
                 } elseif (\defined('PASSWORD_ARGON2I')) {
                     $config['algorithm'] = 'native';
-                    $config['native_algorithm'] = PASSWORD_ARGON2I;
+                    $config['native_algorithm'] = \PASSWORD_ARGON2I;
                 } else {
                     throw new LogicException(sprintf('Algorithm "argon2i" is not available. Either use %s"auto" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? '"argon2id", ' : ''));
                 }
@@ -193,7 +193,7 @@ class EncoderFactory implements EncoderFactoryInterface
                     $config['algorithm'] = 'sodium';
                 } elseif (\defined('PASSWORD_ARGON2ID')) {
                     $config['algorithm'] = 'native';
-                    $config['native_algorithm'] = PASSWORD_ARGON2ID;
+                    $config['native_algorithm'] = \PASSWORD_ARGON2ID;
                 } else {
                     throw new LogicException(sprintf('Algorithm "argon2id" is not available. Either use %s"auto", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? '"argon2i", ' : ''));
                 }

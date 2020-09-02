@@ -21,7 +21,7 @@ class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
 {
     public function onWorkerStarted(WorkerStartedEvent $event): void
     {
-        pcntl_signal(SIGTERM, static function () use ($event) {
+        pcntl_signal(\SIGTERM, static function () use ($event) {
             $event->getWorker()->stop();
         });
     }

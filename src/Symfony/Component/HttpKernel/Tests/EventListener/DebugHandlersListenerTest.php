@@ -60,8 +60,8 @@ class DebugHandlersListenerTest extends TestCase
 
         $loggers = $eHandler->setLoggers([]);
 
-        $this->assertArrayHasKey(E_DEPRECATED, $loggers);
-        $this->assertSame([$logger, LogLevel::INFO], $loggers[E_DEPRECATED]);
+        $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
+        $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
     }
 
     public function testConfigureForHttpKernelWithNoTerminateWithException()

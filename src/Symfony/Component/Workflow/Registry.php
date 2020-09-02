@@ -29,7 +29,7 @@ class Registry
     public function add(Workflow $workflow, $supportStrategy)
     {
         if (!$supportStrategy instanceof SupportStrategyInterface) {
-            @trigger_error('Support of class name string was deprecated after version 3.2 and won\'t work anymore in 4.0.', E_USER_DEPRECATED);
+            @trigger_error('Support of class name string was deprecated after version 3.2 and won\'t work anymore in 4.0.', \E_USER_DEPRECATED);
 
             $supportStrategy = new ClassInstanceSupportStrategy($supportStrategy);
         }

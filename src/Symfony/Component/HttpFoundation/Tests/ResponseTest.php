@@ -253,7 +253,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsValidateable()
     {
-        $response = new Response('', 200, ['Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)]);
+        $response = new Response('', 200, ['Last-Modified' => $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822)]);
         $this->assertTrue($response->isValidateable(), '->isValidateable() returns true if Last-Modified is present');
 
         $response = new Response('', 200, ['ETag' => '"12345"']);
@@ -266,7 +266,7 @@ class ResponseTest extends ResponseTestCase
     public function testGetDate()
     {
         $oneHourAgo = $this->createDateTimeOneHourAgo();
-        $response = new Response('', 200, ['Date' => $oneHourAgo->format(DATE_RFC2822)]);
+        $response = new Response('', 200, ['Date' => $oneHourAgo->format(\DATE_RFC2822)]);
         $date = $response->getDate();
         $this->assertEquals($oneHourAgo->getTimestamp(), $date->getTimestamp(), '->getDate() returns the Date header if present');
 
@@ -274,9 +274,9 @@ class ResponseTest extends ResponseTestCase
         $date = $response->getDate();
         $this->assertEquals(time(), $date->getTimestamp(), '->getDate() returns the current Date if no Date header present');
 
-        $response = new Response('', 200, ['Date' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)]);
+        $response = new Response('', 200, ['Date' => $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822)]);
         $now = $this->createDateTimeNow();
-        $response->headers->set('Date', $now->format(DATE_RFC2822));
+        $response->headers->set('Date', $now->format(\DATE_RFC2822));
         $date = $response->getDate();
         $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the date when the header has been modified');
 
@@ -299,13 +299,13 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
-        $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(DATE_RFC2822));
+        $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(\DATE_RFC2822));
         $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', -1);
-        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(DATE_RFC822));
+        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(\DATE_RFC822));
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
@@ -364,7 +364,7 @@ class ResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Age'), '->expire() does not set the Age when the response is expired');
 
         $response = new Response();
-        $response->headers->set('Expires', date(DATE_RFC2822, time() + 600));
+        $response->headers->set('Expires', date(\DATE_RFC2822, time() + 600));
         $response->expire();
         $this->assertNull($response->headers->get('Expires'), '->expire() removes the Expires header when the response is fresh');
     }
@@ -381,15 +381,15 @@ class ResponseTest extends ResponseTestCase
         $this->assertNull($response->getTtl(), '->getTtl() returns null when no Expires or Cache-Control headers are present');
 
         $response = new Response();
-        $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(DATE_RFC2822));
+        $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(\DATE_RFC2822));
         $this->assertEquals(3600, $response->getTtl(), '->getTtl() uses the Expires header when no max-age is present');
 
         $response = new Response();
-        $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(DATE_RFC2822));
+        $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822));
         $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in past');
 
         $response = new Response();
-        $response->headers->set('Expires', $response->getDate()->format(DATE_RFC2822));
+        $response->headers->set('Expires', $response->getDate()->format(\DATE_RFC2822));
         $response->headers->set('Age', 0);
         $this->assertSame(0, $response->getTtl(), '->getTtl() correctly handles zero');
 

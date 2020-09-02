@@ -141,8 +141,8 @@ class DnsMockTest extends TestCase
 
         $this->assertFalse(DnsMock::dns_get_record('foobar.com'));
         $this->assertSame($records, DnsMock::dns_get_record('example.com'));
-        $this->assertSame($records, DnsMock::dns_get_record('example.com', DNS_ALL));
-        $this->assertSame($records, DnsMock::dns_get_record('example.com', DNS_A | DNS_PTR));
-        $this->assertSame(array($ptr), DnsMock::dns_get_record('example.com', DNS_PTR));
+        $this->assertSame($records, DnsMock::dns_get_record('example.com', \DNS_ALL));
+        $this->assertSame($records, DnsMock::dns_get_record('example.com', \DNS_A | \DNS_PTR));
+        $this->assertSame(array($ptr), DnsMock::dns_get_record('example.com', \DNS_PTR));
     }
 }

@@ -107,7 +107,7 @@ class ProjectLoader1 extends Loader
 
     public function supports($resource, $type = null)
     {
-        return \is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
+        return \is_string($resource) && 'foo' === pathinfo($resource, \PATHINFO_EXTENSION);
     }
 
     public function getType()

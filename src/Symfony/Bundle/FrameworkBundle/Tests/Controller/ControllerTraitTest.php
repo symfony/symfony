@@ -168,7 +168,7 @@ abstract class ControllerTraitTest extends TestCase
         $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(\JSON_FORCE_OBJECT);
         $this->assertEquals('{}', $response->getContent());
     }
 

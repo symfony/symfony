@@ -167,7 +167,7 @@ class Process implements \IteratorAggregate
         $this->pty = false;
         $this->enhanceSigchildCompatibility = '\\' !== \DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
         if (null !== $options) {
-            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since Symfony 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since Symfony 3.3 and will be removed in 4.0.', __CLASS__), \E_USER_DEPRECATED);
             $this->options = array_replace($this->options, $options);
         }
     }
@@ -268,7 +268,7 @@ class Process implements \IteratorAggregate
             if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName() && (2 > $r->getNumberOfParameters() || 'env' !== $r->getParameters()[1]->name)) {
-                    @trigger_error(sprintf('The %s::start() method expects a second "$env" argument since Symfony 3.3. It will be made mandatory in 4.0.', static::class), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The %s::start() method expects a second "$env" argument since Symfony 3.3. It will be made mandatory in 4.0.', static::class), \E_USER_DEPRECATED);
                 }
             }
             $env = null;
@@ -302,7 +302,7 @@ class Process implements \IteratorAggregate
         if (null !== $env && $inheritEnv) {
             $env += $this->getDefaultEnv();
         } elseif (null !== $env) {
-            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
+            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', \E_USER_DEPRECATED);
         } else {
             $env = $this->getDefaultEnv();
         }
@@ -333,7 +333,7 @@ class Process implements \IteratorAggregate
         }
 
         if (!is_dir($this->cwd)) {
-            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since Symfony 3.4 and will be removed in 4.0.', \E_USER_DEPRECATED);
         }
 
         $this->process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
@@ -906,7 +906,7 @@ class Process implements \IteratorAggregate
     {
         $this->lastOutputTime = microtime(true);
 
-        fseek($this->stdout, 0, SEEK_END);
+        fseek($this->stdout, 0, \SEEK_END);
         fwrite($this->stdout, $line);
         fseek($this->stdout, $this->incrementalOutputOffset);
     }
@@ -922,7 +922,7 @@ class Process implements \IteratorAggregate
     {
         $this->lastOutputTime = microtime(true);
 
-        fseek($this->stderr, 0, SEEK_END);
+        fseek($this->stderr, 0, \SEEK_END);
         fwrite($this->stderr, $line);
         fseek($this->stderr, $this->incrementalErrorOutputOffset);
     }
@@ -1185,7 +1185,7 @@ class Process implements \IteratorAggregate
      */
     public function getOptions()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->options;
     }
@@ -1201,7 +1201,7 @@ class Process implements \IteratorAggregate
      */
     public function setOptions(array $options)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->options = $options;
 
@@ -1219,7 +1219,7 @@ class Process implements \IteratorAggregate
      */
     public function getEnhanceWindowsCompatibility()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->enhanceWindowsCompatibility;
     }
@@ -1235,7 +1235,7 @@ class Process implements \IteratorAggregate
      */
     public function setEnhanceWindowsCompatibility($enhance)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->enhanceWindowsCompatibility = (bool) $enhance;
 
@@ -1251,7 +1251,7 @@ class Process implements \IteratorAggregate
      */
     public function getEnhanceSigchildCompatibility()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->enhanceSigchildCompatibility;
     }
@@ -1271,7 +1271,7 @@ class Process implements \IteratorAggregate
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->enhanceSigchildCompatibility = (bool) $enhance;
 
@@ -1288,7 +1288,7 @@ class Process implements \IteratorAggregate
     public function inheritEnvironmentVariables($inheritEnv = true)
     {
         if (!$inheritEnv) {
-            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
+            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', \E_USER_DEPRECATED);
         }
 
         $this->inheritEnv = (bool) $inheritEnv;
@@ -1305,7 +1305,7 @@ class Process implements \IteratorAggregate
      */
     public function areEnvironmentVariablesInherited()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Environment variables will always be inherited.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Environment variables will always be inherited.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->inheritEnv;
     }
@@ -1452,7 +1452,7 @@ class Process implements \IteratorAggregate
         }
 
         ob_start();
-        phpinfo(INFO_GENERAL);
+        phpinfo(\INFO_GENERAL);
 
         return self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }

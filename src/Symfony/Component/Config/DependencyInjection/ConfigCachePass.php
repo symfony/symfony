@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Config\DependencyInjection;
 
-@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use tagged iterator arguments instead.', ConfigCachePass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use tagged iterator arguments instead.', ConfigCachePass::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

@@ -413,7 +413,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             }
 
             if (false === $this->allowEmptyValue) {
-                @trigger_error(sprintf('Using %s::cannotBeEmpty() at path "%s" has no effect, consider requiresAtLeastOneElement() instead. In 4.0 both methods will behave the same.', __CLASS__, $node->getPath()), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using %s::cannotBeEmpty() at path "%s" has no effect, consider requiresAtLeastOneElement() instead. In 4.0 both methods will behave the same.', __CLASS__, $node->getPath()), \E_USER_DEPRECATED);
             }
 
             if (true === $this->atLeastOne) {
@@ -476,7 +476,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         if (false === $this->allowEmptyValue) {
-            @trigger_error(sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s". In 4.0 it will throw an exception.', $path), E_USER_DEPRECATED);
+            @trigger_error(sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s". In 4.0 it will throw an exception.', $path), \E_USER_DEPRECATED);
         }
 
         if (true === $this->atLeastOne) {

@@ -58,7 +58,7 @@ class IniFileLoaderTest extends TestCase
             $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }
 
-        $expected = parse_ini_file(__DIR__.'/../Fixtures/ini/types.ini', true, INI_SCANNER_TYPED);
+        $expected = parse_ini_file(__DIR__.'/../Fixtures/ini/types.ini', true, \INI_SCANNER_TYPED);
         $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
     }
 
@@ -74,7 +74,7 @@ class IniFileLoaderTest extends TestCase
             ['no', false, true],
             ['none', false, true],
             ['null', null, true],
-            ['constant', PHP_VERSION, true],
+            ['constant', \PHP_VERSION, true],
             ['12', 12, true],
             ['12_string', '12', true],
             ['12_quoted_number', 12, false], // INI_SCANNER_RAW removes the double quotes

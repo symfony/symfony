@@ -40,7 +40,7 @@ class DebugCommand extends Command
     public function __construct($twig = null, $projectDir = null)
     {
         if (!$twig instanceof Environment) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), \E_USER_DEPRECATED);
 
             parent::__construct($twig);
 
@@ -55,7 +55,7 @@ class DebugCommand extends Command
 
     public function setTwigEnvironment(Environment $twig)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->twig = $twig;
     }
@@ -65,7 +65,7 @@ class DebugCommand extends Command
      */
     protected function getTwigEnvironment()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->twig;
     }
@@ -107,7 +107,7 @@ EOF
         if (__CLASS__ !== static::class) {
             $r = new \ReflectionMethod($this, 'getTwigEnvironment');
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', static::class.'::getTwigEnvironment'), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', static::class.'::getTwigEnvironment'), \E_USER_DEPRECATED);
 
                 $this->twig = $this->getTwigEnvironment();
             }
@@ -134,7 +134,7 @@ EOF
             }
 
             $data['loader_paths'] = $this->getLoaderPaths();
-            $data = json_encode($data, JSON_PRETTY_PRINT);
+            $data = json_encode($data, \JSON_PRETTY_PRINT);
             $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
 
             return 0;

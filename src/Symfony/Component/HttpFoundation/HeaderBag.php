@@ -224,7 +224,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return $default;
         }
 
-        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
+        if (false === $date = \DateTime::createFromFormat(\DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 
@@ -329,7 +329,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     protected function parseCacheControl($header)
     {
         $cacheControl = [];
-        preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, PREG_SET_ORDER);
+        preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, \PREG_SET_ORDER);
         foreach ($matches as $match) {
             $cacheControl[strtolower($match[1])] = isset($match[3]) ? $match[3] : (isset($match[2]) ? $match[2] : true);
         }

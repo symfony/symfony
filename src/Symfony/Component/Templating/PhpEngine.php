@@ -143,7 +143,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         // the view variable is exposed to the require file below
         $view = $this;
         if ($this->evalTemplate instanceof FileStorage) {
-            extract($this->evalParameters, EXTR_SKIP);
+            extract($this->evalParameters, \EXTR_SKIP);
             $this->evalParameters = null;
 
             ob_start();
@@ -153,7 +153,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
             return ob_get_clean();
         } elseif ($this->evalTemplate instanceof StringStorage) {
-            extract($this->evalParameters, EXTR_SKIP);
+            extract($this->evalParameters, \EXTR_SKIP);
             $this->evalParameters = null;
 
             ob_start();
@@ -417,7 +417,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function initializeEscapers()
     {
-        $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+        $flags = \ENT_QUOTES | \ENT_SUBSTITUTE;
 
         $this->escapers = [
             'html' =>

@@ -76,7 +76,7 @@ class XmlFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && 'xml' === pathinfo($resource, PATHINFO_EXTENSION)) {
+        if (null === $type && 'xml' === pathinfo($resource, \PATHINFO_EXTENSION)) {
             return true;
         }
 
@@ -423,7 +423,7 @@ class XmlFileLoader extends FileLoader
         // anonymous services "in the wild"
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
-                @trigger_error(sprintf('Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %s at line %d.', $file, $node->getLineNo()), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %s at line %d.', $file, $node->getLineNo()), \E_USER_DEPRECATED);
 
                 // give it a unique name
                 $id = sprintf('%d_%s', ++$count, preg_replace('/^.*\\\\/', '', $node->getAttribute('class')).$suffix);
@@ -492,7 +492,7 @@ class XmlFileLoader extends FileLoader
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service" has no or empty "id" attribute in "%s".', $name, $file));
                     }
                     if ($arg->hasAttribute('strict')) {
-                        @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since Symfony 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since Symfony 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), \E_USER_DEPRECATED);
                     }
 
                     $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
@@ -620,7 +620,7 @@ $imports
 EOF
         ;
 
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(false);
             $valid = @$dom->schemaValidateSource($source);
             libxml_disable_entity_loader($disableEntities);
@@ -644,13 +644,13 @@ EOF
     {
         foreach ($alias->attributes as $name => $node) {
             if (!\in_array($name, ['alias', 'id', 'public'])) {
-                @trigger_error(sprintf('Using the attribute "%s" is deprecated for the service "%s" which is defined as an alias in "%s". Allowed attributes for service aliases are "alias", "id" and "public". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $name, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using the attribute "%s" is deprecated for the service "%s" which is defined as an alias in "%s". Allowed attributes for service aliases are "alias", "id" and "public". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $name, $alias->getAttribute('id'), $file), \E_USER_DEPRECATED);
             }
         }
 
         foreach ($alias->childNodes as $child) {
             if ($child instanceof \DOMElement && self::NS === $child->namespaceURI) {
-                @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), \E_USER_DEPRECATED);
             }
         }
     }

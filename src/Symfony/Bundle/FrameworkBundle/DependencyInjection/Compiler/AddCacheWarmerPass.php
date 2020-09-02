@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use tagged iterator arguments instead.', AddCacheWarmerPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use tagged iterator arguments instead.', AddCacheWarmerPass::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;

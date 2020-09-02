@@ -58,7 +58,7 @@ class YamlFileLoader extends FileLoader
         }
 
         $prevErrorHandler = set_error_handler(function ($level, $message, $script, $line) use ($file, &$prevErrorHandler) {
-            $message = E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$file.'"$0', $message) : $message;
+            $message = \E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$file.'"$0', $message) : $message;
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $script, $line) : false;
         });
@@ -102,7 +102,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return \is_string($resource) && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);
+        return \is_string($resource) && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);
     }
 
     /**

@@ -76,7 +76,7 @@ class FileLoaderTest extends TestCase
                 ['foo', 'bar'],
             ],
             'mixedcase' => ['MixedCaseKey' => 'value'],
-            'constant' => PHP_EOL,
+            'constant' => \PHP_EOL,
             'bar' => '%foo%',
             'escape' => '@escapeme',
             'foo_bar' => new Reference('foo_bar'),

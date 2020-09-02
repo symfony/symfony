@@ -90,7 +90,7 @@ class ServiceLocator implements PsrContainerInterface
             return sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
         }
 
-        $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        $class = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 3);
         $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
         $externalId = $this->externalId ?: $class;
 

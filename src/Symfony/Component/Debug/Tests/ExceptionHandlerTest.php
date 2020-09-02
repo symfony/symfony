@@ -150,7 +150,7 @@ class ExceptionHandlerTest extends TestCase
             $this->fail('OutOfMemoryException should bypass the handler');
         });
 
-        $handler->handle(new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__));
+        $handler->handle(new OutOfMemoryException('foo', 0, \E_ERROR, __FILE__, __LINE__));
 
         $this->assertThatTheExceptionWasOutput(ob_get_clean(), OutOfMemoryException::class, 'OutOfMemoryException', 'foo');
     }

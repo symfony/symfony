@@ -121,7 +121,7 @@ class Application
 
         $renderException = function ($e) use ($output) {
             if (!$e instanceof \Exception) {
-                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), \E_ERROR, $e->getFile(), $e->getLine());
             }
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($e, $output->getErrorOutput());
@@ -139,7 +139,7 @@ class Application
         }
 
         if (null !== $this->dispatcher && $this->dispatcher->hasListeners(ConsoleEvents::EXCEPTION)) {
-            @trigger_error(sprintf('The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.'), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.'), \E_USER_DEPRECATED);
         }
 
         $this->configureIO($input, $output);
@@ -784,7 +784,7 @@ class Application
                 $len = 0;
             }
 
-            $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
+            $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : \PHP_INT_MAX;
             // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
             if (\defined('HHVM_VERSION') && $width > 1 << 31) {
                 $width = 1 << 31;
@@ -853,7 +853,7 @@ class Application
      */
     protected function getTerminalWidth()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->terminal->getWidth();
     }
@@ -867,7 +867,7 @@ class Application
      */
     protected function getTerminalHeight()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->terminal->getHeight();
     }
@@ -881,7 +881,7 @@ class Application
      */
     public function getTerminalDimensions()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return [$this->terminal->getWidth(), $this->terminal->getHeight()];
     }
@@ -900,7 +900,7 @@ class Application
      */
     public function setTerminalDimensions($width, $height)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Set the COLUMNS and LINES env vars instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.2 and will be removed in 4.0. Set the COLUMNS and LINES env vars instead.', __METHOD__), \E_USER_DEPRECATED);
 
         putenv('COLUMNS='.$width);
         putenv('LINES='.$height);
@@ -1173,7 +1173,7 @@ class Application
         }
 
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }

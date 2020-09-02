@@ -109,7 +109,7 @@ EOF
     private function validate($content, $flags, $file = null)
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
-            if (E_USER_DEPRECATED === $level) {
+            if (\E_USER_DEPRECATED === $level) {
                 throw new ParseException($message, $this->getParser()->getRealCurrentLineNb() + 1);
             }
 
@@ -174,7 +174,7 @@ EOF
             }
         });
 
-        $io->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return min($errors, 1);
     }
@@ -201,13 +201,13 @@ EOF
      */
     private function getStdin()
     {
-        if (0 !== ftell(STDIN)) {
+        if (0 !== ftell(\STDIN)) {
             return null;
         }
 
         $inputs = '';
-        while (!feof(STDIN)) {
-            $inputs .= fread(STDIN, 1024);
+        while (!feof(\STDIN)) {
+            $inputs .= fread(\STDIN, 1024);
         }
 
         return $inputs;

@@ -45,7 +45,7 @@ class JsonEncodeTest extends TestCase
     {
         return [
             [[], '[]', []],
-            [[], '{}', ['json_encode_options' => JSON_FORCE_OBJECT]],
+            [[], '{}', ['json_encode_options' => \JSON_FORCE_OBJECT]],
         ];
     }
 

@@ -41,7 +41,7 @@ class SymfonyQuestionHelper extends QuestionHelper
             } else {
                 // make required
                 if (!\is_array($value) && !\is_bool($value) && 0 === \strlen($value)) {
-                    @trigger_error('The default question validator is deprecated since Symfony 3.3 and will not be used anymore in version 4.0. Set a custom question validator if needed.', E_USER_DEPRECATED);
+                    @trigger_error('The default question validator is deprecated since Symfony 3.3 and will not be used anymore in version 4.0. Set a custom question validator if needed.', \E_USER_DEPRECATED);
 
                     throw new LogicException('A value is required.');
                 }

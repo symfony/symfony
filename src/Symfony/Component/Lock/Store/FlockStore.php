@@ -95,7 +95,7 @@ class FlockStore implements StoreInterface
 
         // On Windows, even if PHP doc says the contrary, LOCK_NB works, see
         // https://bugs.php.net/54129
-        if (!flock($handle, LOCK_EX | ($blocking ? 0 : LOCK_NB))) {
+        if (!flock($handle, \LOCK_EX | ($blocking ? 0 : \LOCK_NB))) {
             fclose($handle);
             throw new LockConflictedException();
         }
@@ -123,7 +123,7 @@ class FlockStore implements StoreInterface
 
         $handle = $key->getState(__CLASS__);
 
-        flock($handle, LOCK_UN | LOCK_NB);
+        flock($handle, \LOCK_UN | \LOCK_NB);
         fclose($handle);
 
         $key->removeState(__CLASS__);

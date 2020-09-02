@@ -22,7 +22,7 @@ class ApcClassLoaderTest extends TestCase
 {
     protected function setUp()
     {
-        if (!(filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
+        if (!(filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN))) {
             $this->markTestSkipped('The apc extension is not enabled.');
         } else {
             apcu_clear_cache();
@@ -31,7 +31,7 @@ class ApcClassLoaderTest extends TestCase
 
     protected function tearDown()
     {
-        if (filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             apcu_clear_cache();
         }
     }

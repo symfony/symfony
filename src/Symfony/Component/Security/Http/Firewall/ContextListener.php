@@ -196,7 +196,7 @@ class ContextListener implements ListenerInterface
                         continue;
                     }
 
-                    @trigger_error('Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.', E_USER_DEPRECATED);
+                    @trigger_error('Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.', \E_USER_DEPRECATED);
                 }
 
                 $token->setUser($refreshedUser);

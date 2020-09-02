@@ -199,7 +199,7 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $originalDisableEntities = libxml_disable_entity_loader(false);
         }
         $errorReporting = error_reporting(-1);
@@ -221,7 +221,7 @@ class XmlUtilsTest extends TestCase
             error_reporting($errorReporting);
         }
 
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(true);
             libxml_disable_entity_loader($disableEntities);
 

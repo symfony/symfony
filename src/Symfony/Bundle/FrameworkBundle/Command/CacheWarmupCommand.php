@@ -36,7 +36,7 @@ class CacheWarmupCommand extends ContainerAwareCommand
     public function __construct($cacheWarmer = null)
     {
         if (!$cacheWarmer instanceof CacheWarmerAggregate) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), \E_USER_DEPRECATED);
 
             parent::__construct($cacheWarmer);
 

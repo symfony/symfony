@@ -160,7 +160,7 @@ class YamlFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yaml', 'yml'], true)) {
+        if (null === $type && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yaml', 'yml'], true)) {
             return true;
         }
 
@@ -328,7 +328,7 @@ class YamlFileLoader extends FileLoader
     private function parseDefinition($id, $service, $file, array $defaults)
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
-            @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), \E_USER_DEPRECATED);
         }
         if (\is_string($service) && 0 === strpos($service, '@')) {
             $this->container->setAlias($id, $alias = new Alias(substr($service, 1)));
@@ -363,7 +363,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service as $key => $value) {
                 if (!\in_array($key, ['alias', 'public'])) {
-                    @trigger_error(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), \E_USER_DEPRECATED);
                 }
             }
 
@@ -652,7 +652,7 @@ class YamlFileLoader extends FileLoader
         }
 
         $prevErrorHandler = set_error_handler(function ($level, $message, $script, $line) use ($file, &$prevErrorHandler) {
-            $message = E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$file.'"$0', $message) : $message;
+            $message = \E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$file.'"$0', $message) : $message;
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $script, $line) : false;
         });
@@ -787,7 +787,7 @@ class YamlFileLoader extends FileLoader
             }
 
             if ('=' === substr($value, -1)) {
-                @trigger_error(sprintf('The "=" suffix that used to disable strict references in Symfony 2.x is deprecated since Symfony 3.3 and will be unsupported in 4.0. Remove it in "%s".', $value), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "=" suffix that used to disable strict references in Symfony 2.x is deprecated since Symfony 3.3 and will be unsupported in 4.0. Remove it in "%s".', $value), \E_USER_DEPRECATED);
                 $value = substr($value, 0, -1);
             }
 
@@ -840,7 +840,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
                 }
 
-                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', $keywords)), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', $keywords)), \E_USER_DEPRECATED);
             }
         }
     }

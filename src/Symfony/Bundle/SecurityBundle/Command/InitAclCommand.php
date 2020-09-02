@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 
-@trigger_error(sprintf('Class "%s" is deprecated since Symfony 3.4 and will be removed in 4.0. Use Symfony\Bundle\AclBundle\Command\InitAclCommand instead.', InitAclCommand::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('Class "%s" is deprecated since Symfony 3.4 and will be removed in 4.0. Use Symfony\Bundle\AclBundle\Command\InitAclCommand instead.', InitAclCommand::class), \E_USER_DEPRECATED);
 
 /**
  * Installs the tables required by the ACL system.

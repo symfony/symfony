@@ -233,7 +233,7 @@ abstract class AbstractToken implements TokenInterface
     protected function doSerialize($serialized, $isCalledFromOverridingMethod)
     {
         if (null === $isCalledFromOverridingMethod) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
+            $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
             $isCalledFromOverridingMethod = isset($trace[2]['function'], $trace[2]['object']) && 'serialize' === $trace[2]['function'] && $this === $trace[2]['object'];
         }
 

@@ -114,7 +114,7 @@ class ApplicationTester
         $display = stream_get_contents($this->output->getStream());
 
         if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
+            $display = str_replace(\PHP_EOL, "\n", $display);
         }
 
         return $display;
@@ -138,7 +138,7 @@ class ApplicationTester
         $display = stream_get_contents($this->output->getErrorOutput()->getStream());
 
         if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
+            $display = str_replace(\PHP_EOL, "\n", $display);
         }
 
         return $display;

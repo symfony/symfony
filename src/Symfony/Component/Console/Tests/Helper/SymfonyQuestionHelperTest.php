@@ -206,7 +206,7 @@ EOT
         $stream = stream_get_contents($output->getStream());
 
         if ($normalize) {
-            $stream = str_replace(PHP_EOL, "\n", $stream);
+            $stream = str_replace(\PHP_EOL, "\n", $stream);
         }
 
         $this->assertStringContainsString($expected, $stream);

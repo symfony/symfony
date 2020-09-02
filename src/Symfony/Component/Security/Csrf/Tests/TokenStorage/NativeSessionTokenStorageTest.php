@@ -47,11 +47,11 @@ class NativeSessionTokenStorageTest extends TestCase
     {
         session_id('foobar');
 
-        $this->assertSame(PHP_SESSION_NONE, session_status());
+        $this->assertSame(\PHP_SESSION_NONE, session_status());
 
         $this->storage->setToken('token_id', 'TOKEN');
 
-        $this->assertSame(PHP_SESSION_ACTIVE, session_status());
+        $this->assertSame(\PHP_SESSION_ACTIVE, session_status());
         $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
     }
 

@@ -100,8 +100,8 @@ class ClientTest extends TestCase
         $client = new Client($kernel);
 
         $files = [
-            ['tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 1, 'error' => UPLOAD_ERR_OK],
-            new UploadedFile($source, 'original', 'mime/original', 1, UPLOAD_ERR_OK, true),
+            ['tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 1, 'error' => \UPLOAD_ERR_OK],
+            new UploadedFile($source, 'original', 'mime/original', 1, \UPLOAD_ERR_OK, true),
         ];
 
         $file = null;
@@ -131,7 +131,7 @@ class ClientTest extends TestCase
         $kernel = new TestHttpKernel();
         $client = new Client($kernel);
 
-        $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE];
+        $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => \UPLOAD_ERR_NO_FILE];
 
         $client->request('POST', '/', [], ['foo' => $file]);
 
@@ -150,14 +150,14 @@ class ClientTest extends TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs([$source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true])
+            ->setConstructorArgs([$source, 'original', 'mime/original', 123, \UPLOAD_ERR_OK, true])
             ->setMethods(['getSize'])
             ->getMock()
         ;
 
         $file->expects($this->once())
             ->method('getSize')
-            ->willReturn(INF)
+            ->willReturn(\INF)
         ;
 
         $client->request('POST', '/', [], [$file]);
@@ -169,7 +169,7 @@ class ClientTest extends TestCase
         $file = $files[0];
 
         $this->assertFalse($file->isValid());
-        $this->assertEquals(UPLOAD_ERR_INI_SIZE, $file->getError());
+        $this->assertEquals(\UPLOAD_ERR_INI_SIZE, $file->getError());
         $this->assertEquals('mime/original', $file->getClientMimeType());
         $this->assertEquals('original', $file->getClientOriginalName());
         $this->assertEquals(0, $file->getClientSize());

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-@trigger_error('The '.__NAMESPACE__.'\AutowireExceptionPass class is deprecated since Symfony 3.4 and will be removed in 4.0. Use the DefinitionErrorExceptionPass class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\AutowireExceptionPass class is deprecated since Symfony 3.4 and will be removed in 4.0. Use the DefinitionErrorExceptionPass class instead.', \E_USER_DEPRECATED);
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

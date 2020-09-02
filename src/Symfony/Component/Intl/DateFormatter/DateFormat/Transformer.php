@@ -60,6 +60,6 @@ abstract class Transformer
      */
     protected function padLeft($value, $length)
     {
-        return str_pad($value, $length, '0', STR_PAD_LEFT);
+        return str_pad($value, $length, '0', \STR_PAD_LEFT);
     }
 }

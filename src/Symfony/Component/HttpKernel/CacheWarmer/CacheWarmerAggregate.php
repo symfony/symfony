@@ -68,7 +68,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      */
     public function setWarmers(array $warmers)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->warmers = [];
         foreach ($warmers as $warmer) {
@@ -82,7 +82,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     public function add(CacheWarmerInterface $warmer)
     {
         if ($this->triggerDeprecation) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->warmers[] = $warmer;

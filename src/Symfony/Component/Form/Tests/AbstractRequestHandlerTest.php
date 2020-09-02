@@ -371,14 +371,14 @@ abstract class AbstractRequestHandlerTest extends TestCase
     public function uploadFileErrorCodes()
     {
         return [
-            'no error' => [UPLOAD_ERR_OK, null],
-            'upload_max_filesize ini directive' => [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_INI_SIZE],
-            'MAX_FILE_SIZE from form' => [UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_FORM_SIZE],
-            'partially uploaded' => [UPLOAD_ERR_PARTIAL, UPLOAD_ERR_PARTIAL],
-            'no file upload' => [UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_FILE],
-            'missing temporary directory' => [UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_NO_TMP_DIR],
-            'write failure' => [UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_CANT_WRITE],
-            'stopped by extension' => [UPLOAD_ERR_EXTENSION, UPLOAD_ERR_EXTENSION],
+            'no error' => [\UPLOAD_ERR_OK, null],
+            'upload_max_filesize ini directive' => [\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_INI_SIZE],
+            'MAX_FILE_SIZE from form' => [\UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_FORM_SIZE],
+            'partially uploaded' => [\UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_PARTIAL],
+            'no file upload' => [\UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_NO_FILE],
+            'missing temporary directory' => [\UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_NO_TMP_DIR],
+            'write failure' => [\UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_CANT_WRITE],
+            'stopped by extension' => [\UPLOAD_ERR_EXTENSION, \UPLOAD_ERR_EXTENSION],
         ];
     }
 

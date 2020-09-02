@@ -44,7 +44,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     public function __construct($rootNodeName = 'response', $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
-        $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
+        $this->loadOptions = null !== $loadOptions ? $loadOptions : \LIBXML_NONET | \LIBXML_NOBLANKS;
     }
 
     /**
@@ -83,7 +83,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         }
 
         $internalErrors = libxml_use_internal_errors(true);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(true);
         }
         libxml_clear_errors();
@@ -92,7 +92,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $dom->loadXML($data, $this->loadOptions);
 
         libxml_use_internal_errors($internalErrors);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             libxml_disable_entity_loader($disableEntities);
         }
 
@@ -104,10 +104,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $rootNode = null;
         foreach ($dom->childNodes as $child) {
-            if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
+            if (\XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
-            if (!$rootNode && XML_PI_NODE !== $child->nodeType) {
+            if (!$rootNode && \XML_PI_NODE !== $child->nodeType) {
                 $rootNode = $child;
             }
         }
@@ -310,7 +310,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 continue;
             }
 
-            if (false !== $val = filter_var($attr->nodeValue, FILTER_VALIDATE_INT)) {
+            if (false !== $val = filter_var($attr->nodeValue, \FILTER_VALIDATE_INT)) {
                 $data['@'.$attr->nodeName] = $val;
 
                 continue;
@@ -333,14 +333,14 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [\XML_TEXT_NODE, \XML_CDATA_SECTION_NODE])) {
             return $node->firstChild->nodeValue;
         }
 
         $value = [];
 
         foreach ($node->childNodes as $subnode) {
-            if (XML_PI_NODE === $subnode->nodeType) {
+            if (\XML_PI_NODE === $subnode->nodeType) {
                 continue;
             }
 

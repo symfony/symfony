@@ -196,7 +196,7 @@ EOF
 
         $threshold = 1e3;
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }

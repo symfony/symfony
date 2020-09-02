@@ -36,6 +36,6 @@ class PhpFilesCache extends AbstractCache implements PruneableInterface
 
         $e = new \Exception();
         $this->includeHandler = function () use ($e) { throw $e; };
-        $this->zendDetectUnicode = filter_var(ini_get('zend.detect_unicode'), FILTER_VALIDATE_BOOLEAN);
+        $this->zendDetectUnicode = filter_var(ini_get('zend.detect_unicode'), \FILTER_VALIDATE_BOOLEAN);
     }
 }

@@ -195,7 +195,7 @@ class JsonResponseTest extends TestCase
     {
         $response = new JsonResponse();
 
-        $this->assertEquals(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT, $response->getEncodingOptions());
+        $this->assertEquals(\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT, $response->getEncodingOptions());
     }
 
     public function testSetEncodingOptions()
@@ -205,7 +205,7 @@ class JsonResponseTest extends TestCase
 
         $this->assertEquals('[[1,2,3]]', $response->getContent());
 
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(\JSON_FORCE_OBJECT);
 
         $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }

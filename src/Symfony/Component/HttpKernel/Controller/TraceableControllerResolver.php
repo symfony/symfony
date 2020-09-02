@@ -60,7 +60,7 @@ class TraceableControllerResolver implements ControllerResolverInterface, Argume
      */
     public function getArguments(Request $request, $controller)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.1 and will be removed in 4.0. Please use the %s instead.', __METHOD__, TraceableArgumentResolver::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.1 and will be removed in 4.0. Please use the %s instead.', __METHOD__, TraceableArgumentResolver::class), \E_USER_DEPRECATED);
 
         $ret = $this->argumentResolver->getArguments($request, $controller);
 

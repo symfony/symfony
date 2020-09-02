@@ -116,7 +116,7 @@ class YamlFileLoader extends FileLoader
     private function parseFile($path)
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $script, $line) use ($path, &$prevErrorHandler) {
-            $message = E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$path.'"$0', $message) : $message;
+            $message = \E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$path.'"$0', $message) : $message;
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $script, $line) : false;
         });

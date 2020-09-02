@@ -61,7 +61,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        @trigger_error(sprintf('The AbstractFormLoginAuthenticator::onAuthenticationSuccess() implementation was deprecated in Symfony 3.1 and will be removed in Symfony 4.0. You should implement this method yourself in %s and remove getDefaultSuccessRedirectUrl().', static::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The AbstractFormLoginAuthenticator::onAuthenticationSuccess() implementation was deprecated in Symfony 3.1 and will be removed in Symfony 4.0. You should implement this method yourself in %s and remove getDefaultSuccessRedirectUrl().', static::class), \E_USER_DEPRECATED);
 
         if (!method_exists($this, 'getDefaultSuccessRedirectUrl')) {
             throw new \Exception(sprintf('You must implement onAuthenticationSuccess() or getDefaultSuccessRedirectUrl() in "%s".', static::class));

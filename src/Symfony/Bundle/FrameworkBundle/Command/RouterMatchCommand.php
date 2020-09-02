@@ -39,7 +39,7 @@ class RouterMatchCommand extends ContainerAwareCommand
     public function __construct($router = null)
     {
         if (!$router instanceof RouterInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, RouterInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, RouterInterface::class), \E_USER_DEPRECATED);
 
             parent::__construct($router);
 

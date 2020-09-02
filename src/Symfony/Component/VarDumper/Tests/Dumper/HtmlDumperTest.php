@@ -45,8 +45,8 @@ class HtmlDumperTest extends TestCase
         $dumper->dump($data);
         $out = ob_get_clean();
         $out = preg_replace('/[ \t]+$/m', '', $out);
-        $var['file'] = htmlspecialchars($var['file'], ENT_QUOTES, 'UTF-8');
-        $intMax = PHP_INT_MAX;
+        $var['file'] = htmlspecialchars($var['file'], \ENT_QUOTES, 'UTF-8');
+        $intMax = \PHP_INT_MAX;
         preg_match('/sf-dump-\d+/', $out, $dumpId);
         $dumpId = $dumpId[0];
         $res = (int) $var['res'];

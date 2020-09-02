@@ -162,7 +162,7 @@ class HttpUtils
         // fortunately, they all are, so we have to remove entire query string
         $position = strpos($url, '?');
         if (false !== $position) {
-            $fragment = parse_url($url, PHP_URL_FRAGMENT);
+            $fragment = parse_url($url, \PHP_URL_FRAGMENT);
             $url = substr($url, 0, $position);
             // fragment must be preserved
             if ($fragment) {

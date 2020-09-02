@@ -152,7 +152,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return null;
         }
 
-        if (UPLOAD_ERR_OK === $data['error']) {
+        if (\UPLOAD_ERR_OK === $data['error']) {
             return null;
         }
 
@@ -240,7 +240,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         sort($keys);
 
         if (self::$fileKeys === $keys) {
-            if (UPLOAD_ERR_NO_FILE === $data['error']) {
+            if (\UPLOAD_ERR_NO_FILE === $data['error']) {
                 return null;
             }
 

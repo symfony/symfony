@@ -42,7 +42,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
     public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = [])
     {
         if (null === $encoderFactory) {
-            @trigger_error(sprintf('Passing null as the first argument of "%s()" is deprecated since Symfony 3.3 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing null as the first argument of "%s()" is deprecated since Symfony 3.3 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->encoderFactory = $encoderFactory;
@@ -140,7 +140,7 @@ EOF
         if ($input->isInteractive() && !$emptySalt) {
             $emptySalt = true;
 
-            $errorIo->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
+            $errorIo->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.\PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
 
             if ($errorIo->confirm('Confirm salt generation ?')) {
                 $salt = $this->generateSalt();

@@ -22,7 +22,7 @@ class SyntaxError extends \LogicException
         $message .= '.';
 
         if (null !== $subject && null !== $proposals) {
-            $minScore = INF;
+            $minScore = \INF;
             foreach ($proposals as $proposal) {
                 $distance = levenshtein($subject, $proposal);
                 if ($distance < $minScore) {

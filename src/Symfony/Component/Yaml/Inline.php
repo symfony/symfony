@@ -66,7 +66,7 @@ class Inline
     public static function parse($value, $flags = 0, $references = [])
     {
         if (\is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', \E_USER_DEPRECATED);
 
             if ($flags) {
                 $flags = Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE;
@@ -76,14 +76,14 @@ class Inline
         }
 
         if (\func_num_args() >= 3 && !\is_array($references)) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT flag instead.', \E_USER_DEPRECATED);
 
             if ($references) {
                 $flags |= Yaml::PARSE_OBJECT;
             }
 
             if (\func_num_args() >= 4) {
-                @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
+                @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', \E_USER_DEPRECATED);
 
                 if (func_get_arg(3)) {
                     $flags |= Yaml::PARSE_OBJECT_FOR_MAP;
@@ -156,7 +156,7 @@ class Inline
     public static function dump($value, $flags = 0)
     {
         if (\is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', \E_USER_DEPRECATED);
 
             if ($flags) {
                 $flags = Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE;
@@ -166,7 +166,7 @@ class Inline
         }
 
         if (\func_num_args() >= 3) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', \E_USER_DEPRECATED);
 
             if (func_get_arg(2)) {
                 $flags |= Yaml::DUMP_OBJECT;
@@ -211,9 +211,9 @@ class Inline
             case ctype_digit($value):
                 return \is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value) && false === strpos($value, "\f") && false === strpos($value, "\n") && false === strpos($value, "\r") && false === strpos($value, "\t") && false === strpos($value, "\v"):
-                $locale = setlocale(LC_NUMERIC, 0);
+                $locale = setlocale(\LC_NUMERIC, 0);
                 if (false !== $locale) {
-                    setlocale(LC_NUMERIC, 'C');
+                    setlocale(\LC_NUMERIC, 'C');
                 }
                 if (\is_float($value)) {
                     $repr = (string) $value;
@@ -227,7 +227,7 @@ class Inline
                     $repr = \is_string($value) ? "'$value'" : (string) $value;
                 }
                 if (false !== $locale) {
-                    setlocale(LC_NUMERIC, $locale);
+                    setlocale(\LC_NUMERIC, $locale);
                 }
 
                 return $repr;
@@ -340,7 +340,7 @@ class Inline
                 $i += \strlen($output);
 
                 // remove comments
-                if (Parser::preg_match('/[ \t]+#/', $output, $match, PREG_OFFSET_CAPTURE)) {
+                if (Parser::preg_match('/[ \t]+#/', $output, $match, \PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
             } elseif (Parser::preg_match('/^(.'.($legacyOmittedKeySupport ? '+' : '*').'?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
@@ -356,7 +356,7 @@ class Inline
             }
 
             if ($output && '%' === $output[0]) {
-                @trigger_error(self::getDeprecationMessage(sprintf('Not quoting the scalar "%s" starting with the "%%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', $output)), E_USER_DEPRECATED);
+                @trigger_error(self::getDeprecationMessage(sprintf('Not quoting the scalar "%s" starting with the "%%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', $output)), \E_USER_DEPRECATED);
             }
 
             if ($evaluate) {
@@ -519,19 +519,19 @@ class Inline
             }
 
             if (':' === $key) {
-                @trigger_error(self::getDeprecationMessage('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.'), E_USER_DEPRECATED);
+                @trigger_error(self::getDeprecationMessage('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.'), \E_USER_DEPRECATED);
             }
 
             if (!$isKeyQuoted) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !\is_string($evaluatedKey) && !\is_int($evaluatedKey)) {
-                    @trigger_error(self::getDeprecationMessage('Implicit casting of incompatible mapping keys to strings is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.'), E_USER_DEPRECATED);
+                    @trigger_error(self::getDeprecationMessage('Implicit casting of incompatible mapping keys to strings is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.'), \E_USER_DEPRECATED);
                 }
             }
 
             if (':' !== $key && !$isKeyQuoted && (!isset($mapping[$i + 1]) || !\in_array($mapping[$i + 1], [' ', ',', '[', ']', '{', '}'], true))) {
-                @trigger_error(self::getDeprecationMessage('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since Symfony 3.2 and will throw a ParseException in 4.0.'), E_USER_DEPRECATED);
+                @trigger_error(self::getDeprecationMessage('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since Symfony 3.2 and will throw a ParseException in 4.0.'), \E_USER_DEPRECATED);
             }
 
             if ('<<' === $key) {
@@ -565,7 +565,7 @@ class Inline
                                 $output[$key] = $value;
                             }
                         } elseif (isset($output[$key])) {
-                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), \E_USER_DEPRECATED);
                         }
                         break;
                     case '{':
@@ -584,7 +584,7 @@ class Inline
                                 $output[$key] = $value;
                             }
                         } elseif (isset($output[$key])) {
-                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), \E_USER_DEPRECATED);
                         }
                         break;
                     default:
@@ -602,7 +602,7 @@ class Inline
                                 $output[$key] = $value;
                             }
                         } elseif (isset($output[$key])) {
-                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), \E_USER_DEPRECATED);
                         }
                         --$i;
                 }
@@ -662,18 +662,18 @@ class Inline
             case '!' === $scalar[0]:
                 switch (true) {
                     case 0 === strpos($scalar, '!str'):
-                        @trigger_error(self::getDeprecationMessage('Support for the !str tag is deprecated since Symfony 3.4. Use the !!str tag instead.'), E_USER_DEPRECATED);
+                        @trigger_error(self::getDeprecationMessage('Support for the !str tag is deprecated since Symfony 3.4. Use the !!str tag instead.'), \E_USER_DEPRECATED);
 
                         return (string) substr($scalar, 5);
                     case 0 === strpos($scalar, '!!str '):
                         return (string) substr($scalar, 6);
                     case 0 === strpos($scalar, '! '):
-                        @trigger_error(self::getDeprecationMessage('Using the non-specific tag "!" is deprecated since Symfony 3.4 as its behavior will change in 4.0. It will force non-evaluating your values in 4.0. Use plain integers or !!float instead.'), E_USER_DEPRECATED);
+                        @trigger_error(self::getDeprecationMessage('Using the non-specific tag "!" is deprecated since Symfony 3.4 as its behavior will change in 4.0. It will force non-evaluating your values in 4.0. Use plain integers or !!float instead.'), \E_USER_DEPRECATED);
 
                         return (int) self::parseScalar(substr($scalar, 2), $flags);
                     case 0 === strpos($scalar, '!php/object:'):
                         if (self::$objectSupport) {
-                            @trigger_error(self::getDeprecationMessage('The !php/object: tag to indicate dumped PHP objects is deprecated since Symfony 3.4 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.'), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage('The !php/object: tag to indicate dumped PHP objects is deprecated since Symfony 3.4 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.'), \E_USER_DEPRECATED);
 
                             return unserialize(substr($scalar, 12));
                         }
@@ -685,7 +685,7 @@ class Inline
                         return null;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
-                            @trigger_error(self::getDeprecationMessage('The !!php/object: tag to indicate dumped PHP objects is deprecated since Symfony 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.'), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage('The !!php/object: tag to indicate dumped PHP objects is deprecated since Symfony 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.'), \E_USER_DEPRECATED);
 
                             return unserialize(substr($scalar, 13));
                         }
@@ -711,7 +711,7 @@ class Inline
                         return null;
                     case 0 === strpos($scalar, '!php/const:'):
                         if (self::$constantSupport) {
-                            @trigger_error(self::getDeprecationMessage('The !php/const: tag to indicate dumped PHP constants is deprecated since Symfony 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.'), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage('The !php/const: tag to indicate dumped PHP constants is deprecated since Symfony 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.'), \E_USER_DEPRECATED);
 
                             if (\defined($const = substr($scalar, 11))) {
                                 return \constant($const);
@@ -747,7 +747,7 @@ class Inline
                     case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
-                        @trigger_error(self::getDeprecationMessage(sprintf('Using the unquoted scalar value "%s" is deprecated since Symfony 3.3 and will be considered as a tagged value in 4.0. You must quote it.', $scalar)), E_USER_DEPRECATED);
+                        @trigger_error(self::getDeprecationMessage(sprintf('Using the unquoted scalar value "%s" is deprecated since Symfony 3.3 and will be considered as a tagged value in 4.0. You must quote it.', $scalar)), \E_USER_DEPRECATED);
                 }
 
             // Optimize for returning strings.
@@ -787,7 +787,7 @@ class Inline
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9,]*(\.[0-9_]+)?$/', $scalar):
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9_]*(\.[0-9_]+)?$/', $scalar):
                         if (false !== strpos($scalar, ',')) {
-                            @trigger_error(self::getDeprecationMessage('Using the comma as a group separator for floats is deprecated since Symfony 3.2 and will be removed in 4.0.'), E_USER_DEPRECATED);
+                            @trigger_error(self::getDeprecationMessage('Using the comma as a group separator for floats is deprecated since Symfony 3.2 and will be removed in 4.0.'), \E_USER_DEPRECATED);
                         }
 
                         return (float) str_replace([',', '_'], '', $scalar);

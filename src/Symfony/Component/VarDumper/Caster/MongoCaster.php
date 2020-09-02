@@ -13,7 +13,7 @@ namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\VarDumper\Cloner\Stub;
 
-@trigger_error('The '.__NAMESPACE__.'\MongoCaster class is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\MongoCaster class is deprecated since Symfony 3.4 and will be removed in 4.0.', \E_USER_DEPRECATED);
 
 /**
  * Casts classes from the MongoDb extension to array representation.

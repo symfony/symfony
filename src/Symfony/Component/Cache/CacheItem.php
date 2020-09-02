@@ -186,7 +186,7 @@ final class CacheItem implements CacheItemInterface
                     $replace['{'.$k.'}'] = $v;
                 }
             }
-            @trigger_error(strtr($message, $replace), E_USER_WARNING);
+            @trigger_error(strtr($message, $replace), \E_USER_WARNING);
         }
     }
 }

@@ -216,7 +216,7 @@ class ArrayNodeTest extends TestCase
 
         $deprecationTriggered = false;
         $deprecationHandler = function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
-            if (E_USER_DEPRECATED === $level) {
+            if (\E_USER_DEPRECATED === $level) {
                 return $deprecationTriggered = true;
             }
 

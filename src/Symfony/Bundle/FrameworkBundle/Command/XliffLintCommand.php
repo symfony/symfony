@@ -29,7 +29,7 @@ class XliffLintCommand extends BaseLintCommand
     public function __construct($name = null, $directoryIteratorProvider = null, $isReadableProvider = null)
     {
         if (\func_num_args()) {
-            @trigger_error(sprintf('Passing a constructor argument in "%s()" is deprecated since Symfony 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a constructor argument in "%s()" is deprecated since Symfony 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (null === $directoryIteratorProvider) {

@@ -96,7 +96,7 @@ class CommandTester
         $display = stream_get_contents($this->output->getStream());
 
         if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
+            $display = str_replace(\PHP_EOL, "\n", $display);
         }
 
         return $display;
@@ -152,7 +152,7 @@ class CommandTester
         $stream = fopen('php://memory', 'r+', false);
 
         foreach ($inputs as $input) {
-            fwrite($stream, $input.PHP_EOL);
+            fwrite($stream, $input.\PHP_EOL);
         }
 
         rewind($stream);

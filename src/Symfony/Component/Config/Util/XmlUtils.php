@@ -51,15 +51,15 @@ class XmlUtils
         }
 
         $internalErrors = libxml_use_internal_errors(true);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             $disableEntities = libxml_disable_entity_loader(true);
         }
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->loadXML($content, LIBXML_NONET | (\defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
-            if (LIBXML_VERSION < 20900) {
+        if (!$dom->loadXML($content, \LIBXML_NONET | (\defined('LIBXML_COMPACT') ? \LIBXML_COMPACT : 0))) {
+            if (\LIBXML_VERSION < 20900) {
                 libxml_disable_entity_loader($disableEntities);
             }
 
@@ -69,12 +69,12 @@ class XmlUtils
         $dom->normalizeDocument();
 
         libxml_use_internal_errors($internalErrors);
-        if (LIBXML_VERSION < 20900) {
+        if (\LIBXML_VERSION < 20900) {
             libxml_disable_entity_loader($disableEntities);
         }
 
         foreach ($dom->childNodes as $child) {
-            if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
+            if (\XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new XmlParsingException('Document types are not allowed.');
             }
         }
@@ -267,7 +267,7 @@ class XmlUtils
         $errors = [];
         foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
+                \LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),
                 $error->file ?: 'n/a',

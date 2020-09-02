@@ -33,7 +33,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
 
     public function __construct($realmName, $secret, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
-        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since Symfony 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since Symfony 3.4 and will be removed in 4.0.', __CLASS__), \E_USER_DEPRECATED);
 
         $this->realmName = $realmName;
         $this->secret = $secret;

@@ -738,7 +738,7 @@ class Response
             return $this->headers->getDate('Expires');
         } catch (\RuntimeException $e) {
             // according to RFC 2616 invalid date formats (e.g. "0" and "-1") must be treated as in the past
-            return \DateTime::createFromFormat(DATE_RFC2822, 'Sat, 01 Jan 00 00:00:00 +0000');
+            return \DateTime::createFromFormat(\DATE_RFC2822, 'Sat, 01 Jan 00 00:00:00 +0000');
         }
     }
 
@@ -1283,7 +1283,7 @@ class Response
         $status = ob_get_status(true);
         $level = \count($status);
         // PHP_OUTPUT_HANDLER_* are not defined on HHVM 3.3
-        $flags = \defined('PHP_OUTPUT_HANDLER_REMOVABLE') ? PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
+        $flags = \defined('PHP_OUTPUT_HANDLER_REMOVABLE') ? \PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? \PHP_OUTPUT_HANDLER_FLUSHABLE : \PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
 
         while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
             if ($flush) {

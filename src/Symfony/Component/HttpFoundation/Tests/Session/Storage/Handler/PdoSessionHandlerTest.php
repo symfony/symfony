@@ -154,7 +154,7 @@ class PdoSessionHandlerTest extends TestCase
         if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('PHPUnit_MockObject cannot mock the PDOStatement class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
         }
-        if (filter_var(ini_get('session.use_strict_mode'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOLEAN)) {
             $this->markTestSkipped('Strict mode needs no locking for new sessions.');
         }
 

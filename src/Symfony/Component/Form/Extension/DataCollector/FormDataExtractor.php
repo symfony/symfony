@@ -29,7 +29,7 @@ class FormDataExtractor implements FormDataExtractorInterface
     public function __construct(ValueExporter $valueExporter = null, $triggerDeprecationNotice = true)
     {
         if (null !== $valueExporter && $triggerDeprecationNotice) {
-            @trigger_error('Passing a ValueExporter instance to '.__METHOD__.'() is deprecated in version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error('Passing a ValueExporter instance to '.__METHOD__.'() is deprecated in version 3.2 and will be removed in 4.0.', \E_USER_DEPRECATED);
         }
     }
 

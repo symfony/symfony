@@ -71,7 +71,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $this->isCollected = false;
         }
 
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 7);
+        $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 7);
 
         $file = $trace[0]['file'];
         $line = $trace[0]['line'];

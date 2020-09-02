@@ -132,7 +132,7 @@ class GuardAuthenticationListener implements ListenerInterface
                 }
 
                 if ($guardAuthenticator instanceof AbstractGuardAuthenticator) {
-                    @trigger_error(sprintf('Returning null from "%1$s::getCredentials()" is deprecated since Symfony 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%1$s::supports()" instead.', \get_class($guardAuthenticator)), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Returning null from "%1$s::getCredentials()" is deprecated since Symfony 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%1$s::supports()" instead.', \get_class($guardAuthenticator)), \E_USER_DEPRECATED);
 
                     return;
                 }

@@ -41,12 +41,12 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->setPath(\dirname(PHP_BINARY));
+        $this->setPath(\dirname(\PHP_BINARY));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertSamePath(PHP_BINARY, $result);
+        $this->assertSamePath(\PHP_BINARY, $result);
     }
 
     public function testFindWithDefault()
@@ -88,12 +88,12 @@ class ExecutableFinderTest extends TestCase
 
         $this->setPath('');
 
-        $extraDirs = [\dirname(PHP_BINARY)];
+        $extraDirs = [\dirname(\PHP_BINARY)];
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), null, $extraDirs);
 
-        $this->assertSamePath(PHP_BINARY, $result);
+        $this->assertSamePath(\PHP_BINARY, $result);
     }
 
     public function testFindWithOpenBaseDir()
@@ -106,12 +106,12 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->iniSet('open_basedir', \dirname(PHP_BINARY).(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', \dirname(\PHP_BINARY).(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? \PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertSamePath(PHP_BINARY, $result);
+        $this->assertSamePath(\PHP_BINARY, $result);
     }
 
     public function testFindProcessInOpenBasedir()
@@ -124,12 +124,12 @@ class ExecutableFinderTest extends TestCase
         }
 
         $this->setPath('');
-        $this->iniSet('open_basedir', PHP_BINARY.(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', \PHP_BINARY.(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? \PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);
 
-        $this->assertSamePath(PHP_BINARY, $result);
+        $this->assertSamePath(\PHP_BINARY, $result);
     }
 
     public function testFindBatchExecutableOnWindows()
@@ -170,6 +170,6 @@ class ExecutableFinderTest extends TestCase
 
     private function getPhpBinaryName()
     {
-        return basename(PHP_BINARY, '\\' === \DIRECTORY_SEPARATOR ? '.exe' : '');
+        return basename(\PHP_BINARY, '\\' === \DIRECTORY_SEPARATOR ? '.exe' : '');
     }
 }

@@ -55,7 +55,7 @@ class AbstractSessionHandlerTest extends TestCase
     public function provideSession()
     {
         foreach (glob(__DIR__.'/Fixtures/*.php') as $file) {
-            yield [pathinfo($file, PATHINFO_FILENAME)];
+            yield [pathinfo($file, \PATHINFO_FILENAME)];
         }
     }
 }

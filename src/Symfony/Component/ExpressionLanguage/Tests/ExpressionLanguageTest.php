@@ -104,7 +104,7 @@ class ExpressionLanguageTest extends TestCase
     public function testConstantFunction()
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        $this->assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));

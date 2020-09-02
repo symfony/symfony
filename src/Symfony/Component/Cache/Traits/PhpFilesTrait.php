@@ -30,7 +30,7 @@ trait PhpFilesTrait
 
     public static function isSupported()
     {
-        return \function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN);
+        return \function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -40,7 +40,7 @@ trait PhpFilesTrait
     {
         $time = time();
         $pruned = true;
-        $allowCompile = 'cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN);
+        $allowCompile = 'cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOLEAN);
 
         set_error_handler($this->includeHandler);
         try {
@@ -118,8 +118,8 @@ trait PhpFilesTrait
     protected function doSave(array $values, $lifetime)
     {
         $ok = true;
-        $data = [$lifetime ? time() + $lifetime : PHP_INT_MAX, ''];
-        $allowCompile = 'cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN);
+        $data = [$lifetime ? time() + $lifetime : \PHP_INT_MAX, ''];
+        $allowCompile = 'cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOLEAN);
 
         foreach ($values as $key => $value) {
             if (null === $value || \is_object($value)) {

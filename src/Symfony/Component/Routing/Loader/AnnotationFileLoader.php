@@ -77,7 +77,7 @@ class AnnotationFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
+        return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
     }
 
     /**
@@ -93,11 +93,11 @@ class AnnotationFileLoader extends FileLoader
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
 
-        if (1 === \count($tokens) && T_INLINE_HTML === $tokens[0][0]) {
+        if (1 === \count($tokens) && \T_INLINE_HTML === $tokens[0][0]) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
         }
 
-        $nsTokens = [T_NS_SEPARATOR => true, T_STRING => true];
+        $nsTokens = [\T_NS_SEPARATOR => true, \T_STRING => true];
         if (\defined('T_NAME_QUALIFIED')) {
             $nsTokens[T_NAME_QUALIFIED] = true;
         }
@@ -109,7 +109,7 @@ class AnnotationFileLoader extends FileLoader
                 continue;
             }
 
-            if (true === $class && T_STRING === $token[0]) {
+            if (true === $class && \T_STRING === $token[0]) {
                 return $namespace.'\\'.$token[1];
             }
 
@@ -121,7 +121,7 @@ class AnnotationFileLoader extends FileLoader
                 $token = $tokens[$i];
             }
 
-            if (T_CLASS === $token[0]) {
+            if (\T_CLASS === $token[0]) {
                 // Skip usage of ::class constant and anonymous classes
                 $skipClassToken = false;
                 for ($j = $i - 1; $j > 0; --$j) {
@@ -129,10 +129,10 @@ class AnnotationFileLoader extends FileLoader
                         break;
                     }
 
-                    if (T_DOUBLE_COLON === $tokens[$j][0] || T_NEW === $tokens[$j][0]) {
+                    if (\T_DOUBLE_COLON === $tokens[$j][0] || \T_NEW === $tokens[$j][0]) {
                         $skipClassToken = true;
                         break;
-                    } elseif (!\in_array($tokens[$j][0], [T_WHITESPACE, T_DOC_COMMENT, T_COMMENT])) {
+                    } elseif (!\in_array($tokens[$j][0], [\T_WHITESPACE, \T_DOC_COMMENT, \T_COMMENT])) {
                         break;
                     }
                 }
@@ -142,7 +142,7 @@ class AnnotationFileLoader extends FileLoader
                 }
             }
 
-            if (T_NAMESPACE === $token[0]) {
+            if (\T_NAMESPACE === $token[0]) {
                 $namespace = true;
             }
         }

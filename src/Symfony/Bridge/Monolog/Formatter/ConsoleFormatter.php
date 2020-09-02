@@ -57,7 +57,7 @@ class ConsoleFormatter implements FormatterInterface
     {
         // BC Layer
         if (!\is_array($options)) {
-            @trigger_error(sprintf('The constructor arguments $format, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra of "%s" are deprecated since Symfony 3.3 and will be removed in 4.0. Use $options instead.', self::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The constructor arguments $format, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra of "%s" are deprecated since Symfony 3.3 and will be removed in 4.0. Use $options instead.', self::class), \E_USER_DEPRECATED);
             $args = \func_get_args();
             $options = [];
             if (isset($args[0])) {

@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'fopen_flags' => false,
         'protected_to_private' => false,
+        'native_constant_invocation' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

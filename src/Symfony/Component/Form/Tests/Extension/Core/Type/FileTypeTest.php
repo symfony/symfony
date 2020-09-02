@@ -205,7 +205,7 @@ class FileTypeTest extends BaseTypeTest
             ->getForm();
         $form->submit(new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'foo', null, null, $errorCode, true));
 
-        if (UPLOAD_ERR_OK === $errorCode) {
+        if (\UPLOAD_ERR_OK === $errorCode) {
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
@@ -230,7 +230,7 @@ class FileTypeTest extends BaseTypeTest
             'size' => 100,
         ]);
 
-        if (UPLOAD_ERR_OK === $errorCode) {
+        if (\UPLOAD_ERR_OK === $errorCode) {
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
@@ -254,7 +254,7 @@ class FileTypeTest extends BaseTypeTest
             new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'bar', null, null, $errorCode, true),
         ]);
 
-        if (UPLOAD_ERR_OK === $errorCode) {
+        if (\UPLOAD_ERR_OK === $errorCode) {
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
@@ -292,7 +292,7 @@ class FileTypeTest extends BaseTypeTest
             ],
         ]);
 
-        if (UPLOAD_ERR_OK === $errorCode) {
+        if (\UPLOAD_ERR_OK === $errorCode) {
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
@@ -305,14 +305,14 @@ class FileTypeTest extends BaseTypeTest
     public function uploadFileErrorCodes()
     {
         return [
-            'no error' => [UPLOAD_ERR_OK, null],
-            'upload_max_filesize ini directive' => [UPLOAD_ERR_INI_SIZE, 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.'],
-            'MAX_FILE_SIZE from form' => [UPLOAD_ERR_FORM_SIZE, 'The file is too large.'],
-            'partially uploaded' => [UPLOAD_ERR_PARTIAL, 'The file could not be uploaded.'],
-            'no file upload' => [UPLOAD_ERR_NO_FILE, 'The file could not be uploaded.'],
-            'missing temporary directory' => [UPLOAD_ERR_NO_TMP_DIR, 'The file could not be uploaded.'],
-            'write failure' => [UPLOAD_ERR_CANT_WRITE, 'The file could not be uploaded.'],
-            'stopped by extension' => [UPLOAD_ERR_EXTENSION, 'The file could not be uploaded.'],
+            'no error' => [\UPLOAD_ERR_OK, null],
+            'upload_max_filesize ini directive' => [\UPLOAD_ERR_INI_SIZE, 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.'],
+            'MAX_FILE_SIZE from form' => [\UPLOAD_ERR_FORM_SIZE, 'The file is too large.'],
+            'partially uploaded' => [\UPLOAD_ERR_PARTIAL, 'The file could not be uploaded.'],
+            'no file upload' => [\UPLOAD_ERR_NO_FILE, 'The file could not be uploaded.'],
+            'missing temporary directory' => [\UPLOAD_ERR_NO_TMP_DIR, 'The file could not be uploaded.'],
+            'write failure' => [\UPLOAD_ERR_CANT_WRITE, 'The file could not be uploaded.'],
+            'stopped by extension' => [\UPLOAD_ERR_EXTENSION, 'The file could not be uploaded.'],
         ];
     }
 

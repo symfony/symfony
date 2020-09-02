@@ -814,7 +814,7 @@ class Definition
      */
     public function setAutowiringTypes(array $types)
     {
-        @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
+        @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', \E_USER_DEPRECATED);
 
         $this->autowiringTypes = [];
 
@@ -861,7 +861,7 @@ class Definition
     public function getAutowiringTypes(/*$triggerDeprecation = true*/)
     {
         if (1 > \func_num_args() || func_get_arg(0)) {
-            @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
+            @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', \E_USER_DEPRECATED);
         }
 
         return array_keys($this->autowiringTypes);
@@ -878,7 +878,7 @@ class Definition
      */
     public function addAutowiringType($type)
     {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), \E_USER_DEPRECATED);
 
         $this->autowiringTypes[$type] = true;
 
@@ -896,7 +896,7 @@ class Definition
      */
     public function removeAutowiringType($type)
     {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), \E_USER_DEPRECATED);
 
         unset($this->autowiringTypes[$type]);
 
@@ -914,7 +914,7 @@ class Definition
      */
     public function hasAutowiringType($type)
     {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), \E_USER_DEPRECATED);
 
         return isset($this->autowiringTypes[$type]);
     }

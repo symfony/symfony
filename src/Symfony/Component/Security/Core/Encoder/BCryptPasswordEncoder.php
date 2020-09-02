@@ -71,7 +71,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
             // Ignore $salt, the auto-generated one is always the best
         }
 
-        return password_hash($raw, PASSWORD_BCRYPT, $options);
+        return password_hash($raw, \PASSWORD_BCRYPT, $options);
     }
 
     /**

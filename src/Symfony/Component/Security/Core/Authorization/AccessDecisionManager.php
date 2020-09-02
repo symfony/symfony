@@ -62,7 +62,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function setVoters(array $voters)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->voters = $voters;
     }
@@ -191,7 +191,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         if (method_exists($voter, 'vote')) {
-            @trigger_error(sprintf('Calling vote() on an voter without %1$s is deprecated as of 3.4 and will be removed in 4.0. Implement the %1$s on your voter.', VoterInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Calling vote() on an voter without %1$s is deprecated as of 3.4 and will be removed in 4.0. Implement the %1$s on your voter.', VoterInterface::class), \E_USER_DEPRECATED);
 
             // making the assumption that the signature matches
             return $voter->vote($token, $subject, $attributes);

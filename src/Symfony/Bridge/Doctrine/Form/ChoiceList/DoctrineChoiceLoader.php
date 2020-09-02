@@ -52,7 +52,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     {
         // BC to be removed and replace with type hints in 4.0
         if ($manager instanceof ChoiceListFactoryInterface) {
-            @trigger_error(sprintf('Passing a ChoiceListFactoryInterface to %s is deprecated since Symfony 3.1 and will no longer be supported in 4.0. You should either call "%s::loadChoiceList" or override it to return a ChoiceListInterface.', __CLASS__, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a ChoiceListFactoryInterface to %s is deprecated since Symfony 3.1 and will no longer be supported in 4.0. You should either call "%s::loadChoiceList" or override it to return a ChoiceListInterface.', __CLASS__, __CLASS__), \E_USER_DEPRECATED);
 
             // Provide a BC layer since $factory has changed
             // form first to last argument as of 3.1

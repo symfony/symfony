@@ -40,12 +40,12 @@ class PhpExecutableFinder
 
         // HHVM support
         if (\defined('HHVM_VERSION')) {
-            return (getenv('PHP_BINARY') ?: PHP_BINARY).$args;
+            return (getenv('PHP_BINARY') ?: \PHP_BINARY).$args;
         }
 
         // PHP_BINARY return the current sapi executable
-        if (PHP_BINARY && \in_array(\PHP_SAPI, ['cli', 'cli-server', 'phpdbg'], true)) {
-            return PHP_BINARY.$args;
+        if (\PHP_BINARY && \in_array(\PHP_SAPI, ['cli', 'cli-server', 'phpdbg'], true)) {
+            return \PHP_BINARY.$args;
         }
 
         if ($php = getenv('PHP_PATH')) {
@@ -62,11 +62,11 @@ class PhpExecutableFinder
             }
         }
 
-        if (@is_executable($php = PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        if (@is_executable($php = \PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
             return $php;
         }
 
-        $dirs = [PHP_BINDIR];
+        $dirs = [\PHP_BINDIR];
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dirs[] = 'C:\xampp\php\\';
         }

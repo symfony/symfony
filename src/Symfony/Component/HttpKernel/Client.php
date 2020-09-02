@@ -170,7 +170,7 @@ EOF;
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
                         0,
-                        UPLOAD_ERR_INI_SIZE,
+                        \UPLOAD_ERR_INI_SIZE,
                         true
                     );
                 } else {

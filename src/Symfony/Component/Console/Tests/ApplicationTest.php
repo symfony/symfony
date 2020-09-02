@@ -79,7 +79,7 @@ class ApplicationTest extends TestCase
 
     protected function normalizeLineBreaks($text)
     {
-        return str_replace(PHP_EOL, "\n", $text);
+        return str_replace(\PHP_EOL, "\n", $text);
     }
 
     /**
@@ -902,10 +902,10 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo:bar', '--no-interaction' => true], ['decorated' => false]);
-        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if --no-interaction is passed');
+        $this->assertSame('called'.\PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if --no-interaction is passed');
 
         $tester->run(['command' => 'foo:bar', '-n' => true], ['decorated' => false]);
-        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+        $this->assertSame('called'.\PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
     public function testRunWithGlobalOptionAndNoCommand()
@@ -1202,7 +1202,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
-        $this->assertEquals('before.foo.after.'.PHP_EOL, $tester->getDisplay());
+        $this->assertEquals('before.foo.after.'.\PHP_EOL, $tester->getDisplay());
     }
 
     public function testRunWithExceptionAndDispatcher()
@@ -1546,7 +1546,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run([], ['interactive' => false]);
-        $this->assertEquals('called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals('called'.\PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
 
         $application = new CustomDefaultCommandApplication();
         $application->setAutoExit(false);
@@ -1554,7 +1554,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run([], ['interactive' => false]);
 
-        $this->assertEquals('called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals('called'.\PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
     public function testSetRunCustomDefaultCommandWithOption()
@@ -1569,7 +1569,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['--fooopt' => 'opt'], ['interactive' => false]);
 
-        $this->assertEquals('called'.PHP_EOL.'opt'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals('called'.\PHP_EOL.'opt'.\PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
     public function testSetRunCustomSingleCommand()

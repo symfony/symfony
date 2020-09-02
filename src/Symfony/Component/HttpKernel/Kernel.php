@@ -232,7 +232,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (!$first && !$noDeprecation) {
-            @trigger_error(sprintf('Passing "false" as the second argument to "%s()" is deprecated as of 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "false" as the second argument to "%s()" is deprecated as of 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (!isset($this->bundleMap[$name])) {
@@ -397,7 +397,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
         if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', \E_USER_DEPRECATED);
         }
 
         $this->loadClassCache = [$name, $extension];
@@ -411,7 +411,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function setClassCache(array $classes)
     {
         if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', \E_USER_DEPRECATED);
         }
 
         file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
@@ -430,7 +430,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getStartTime()
     {
-        return $this->debug && null !== $this->startTime ? $this->startTime : -INF;
+        return $this->debug && null !== $this->startTime ? $this->startTime : -\INF;
     }
 
     /**
@@ -463,7 +463,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected function doLoadClassCache($name, $extension)
     {
         if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error(__METHOD__.'() is deprecated since Symfony 3.3, to be removed in 4.0.', \E_USER_DEPRECATED);
         }
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
 
@@ -498,7 +498,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $this->bundles[$name] = $bundle;
 
             if ($parentName = $bundle->getParent()) {
-                @trigger_error('Bundle inheritance is deprecated as of 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+                @trigger_error('Bundle inheritance is deprecated as of 3.4 and will be removed in 4.0.', \E_USER_DEPRECATED);
 
                 if (isset($directChildren[$parentName])) {
                     throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
@@ -583,7 +583,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $oldContainer = null;
         if ($fresh = $cache->isFresh()) {
             // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-            $errorLevel = error_reporting(E_ALL ^ E_WARNING);
+            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             $fresh = $oldContainer = false;
             try {
                 if (file_exists($cache->getPath()) && \is_object($this->container = include $cache->getPath())) {
@@ -605,7 +605,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
             $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
-                if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type) {
                     return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
                 }
 
@@ -615,7 +615,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     return null;
                 }
 
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                $backtrace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                 // Clean the trace by removing first frames added by the error handler itself.
                 for ($i = 0; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
@@ -651,7 +651,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (null === $oldContainer && file_exists($cache->getPath())) {
-            $errorLevel = error_reporting(E_ALL ^ E_WARNING);
+            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             try {
                 $oldContainer = include $cache->getPath();
             } catch (\Throwable $e) {
@@ -673,7 +673,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             static $legacyContainers = [];
             $oldContainerDir = \dirname($oldContainer->getFileName());
             $legacyContainers[$oldContainerDir.'.legacy'] = true;
-            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', GLOB_NOSORT) as $legacyContainer) {
+            foreach (glob(\dirname($oldContainerDir).\DIRECTORY_SEPARATOR.'*.legacy', \GLOB_NOSORT) as $legacyContainer) {
                 if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
                     (new Filesystem())->remove(substr($legacyContainer, 0, -7));
                 }
@@ -736,13 +736,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected function getEnvParameters()
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The "%s()" method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $parameters = [];
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, 'SYMFONY__')) {
-                @trigger_error(sprintf('The support of special environment variables that start with SYMFONY__ (such as "%s") is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax instead to get the value of environment variables in configuration files.', $key), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The support of special environment variables that start with SYMFONY__ (such as "%s") is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax instead to get the value of environment variables in configuration files.', $key), \E_USER_DEPRECATED);
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }
@@ -921,14 +921,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (T_START_HEREDOC === $token[0]) {
+            } elseif (\T_START_HEREDOC === $token[0]) {
                 $output .= $rawChunk.$token[1];
                 do {
                     $token = $tokens[++$i];
                     $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
-                } while (T_END_HEREDOC !== $token[0]);
+                } while (\T_END_HEREDOC !== $token[0]);
                 $rawChunk = '';
-            } elseif (T_WHITESPACE === $token[0]) {
+            } elseif (\T_WHITESPACE === $token[0]) {
                 if ($ignoreSpace) {
                     $ignoreSpace = false;
 
@@ -937,13 +937,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
                 // replace multiple new lines with a single newline
                 $rawChunk .= preg_replace(['/\n{2,}/S'], "\n", $token[1]);
-            } elseif (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
+            } elseif (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT])) {
                 $ignoreSpace = true;
             } else {
                 $rawChunk .= $token[1];
 
                 // The PHP-open tag already has a new-line
-                if (T_OPEN_TAG === $token[0]) {
+                if (\T_OPEN_TAG === $token[0]) {
                     $ignoreSpace = true;
                 }
             }

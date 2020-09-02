@@ -100,7 +100,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         }
 
         if (0 !== strpos($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/') && (\defined('GLOB_BRACE') || false === strpos($this->pattern, '{'))) {
-            $paths = glob($this->prefix.$this->pattern, GLOB_NOSORT | (\defined('GLOB_BRACE') ? GLOB_BRACE : 0));
+            $paths = glob($this->prefix.$this->pattern, \GLOB_NOSORT | (\defined('GLOB_BRACE') ? \GLOB_BRACE : 0));
             sort($paths);
             foreach ($paths as $path) {
                 if ($this->recursive && is_dir($path)) {

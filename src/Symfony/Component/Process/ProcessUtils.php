@@ -40,7 +40,7 @@ class ProcessUtils
      */
     public static function escapeArgument($argument)
     {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use a command line array or give env vars to the Process::start/run() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.'() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use a command line array or give env vars to the Process::start/run() method instead.', \E_USER_DEPRECATED);
 
         //Fix for PHP bug #43784 escapeshellarg removes % from given string
         //Fix for PHP bug #49446 escapeshellarg doesn't work on Windows
@@ -53,7 +53,7 @@ class ProcessUtils
 
             $escapedArgument = '';
             $quote = false;
-            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            foreach (preg_split('/(")/', $argument, -1, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE) as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
                 } elseif (self::isSurroundedBy($part, '%')) {

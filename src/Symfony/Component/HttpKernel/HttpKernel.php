@@ -51,7 +51,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->argumentResolver = $argumentResolver;
 
         if (null === $this->argumentResolver) {
-            @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), \E_USER_DEPRECATED);
             // fallback in case of deprecations
             $this->argumentResolver = $resolver;
         }
@@ -239,7 +239,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // the developer asked for a specific status code
         if ($response->headers->has('X-Status-Code')) {
-            @trigger_error(sprintf('Using the X-Status-Code header is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::allowCustomResponseCode() instead.', GetResponseForExceptionEvent::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the X-Status-Code header is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::allowCustomResponseCode() instead.', GetResponseForExceptionEvent::class), \E_USER_DEPRECATED);
 
             $response->setStatusCode($response->headers->get('X-Status-Code'));
 

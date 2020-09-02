@@ -102,7 +102,7 @@ class QuestionHelper extends Helper
      */
     public function setInputStream($stream)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), \E_USER_DEPRECATED);
 
         if (!\is_resource($stream)) {
             throw new InvalidArgumentException('Input stream must be a valid resource.');
@@ -122,7 +122,7 @@ class QuestionHelper extends Helper
     public function getInputStream()
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), \E_USER_DEPRECATED);
         }
 
         return $this->inputStream;
@@ -155,7 +155,7 @@ class QuestionHelper extends Helper
     {
         $this->writePrompt($output, $question);
 
-        $inputStream = $this->inputStream ?: STDIN;
+        $inputStream = $this->inputStream ?: \STDIN;
         $autocomplete = $question->getAutocompleterValues();
 
         if (\function_exists('sapi_windows_cp_set')) {

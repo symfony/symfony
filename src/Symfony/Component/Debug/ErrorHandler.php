@@ -49,39 +49,39 @@ use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 class ErrorHandler
 {
     private $levels = [
-        E_DEPRECATED => 'Deprecated',
-        E_USER_DEPRECATED => 'User Deprecated',
-        E_NOTICE => 'Notice',
-        E_USER_NOTICE => 'User Notice',
-        E_STRICT => 'Runtime Notice',
-        E_WARNING => 'Warning',
-        E_USER_WARNING => 'User Warning',
-        E_COMPILE_WARNING => 'Compile Warning',
-        E_CORE_WARNING => 'Core Warning',
-        E_USER_ERROR => 'User Error',
-        E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
-        E_COMPILE_ERROR => 'Compile Error',
-        E_PARSE => 'Parse Error',
-        E_ERROR => 'Error',
-        E_CORE_ERROR => 'Core Error',
+        \E_DEPRECATED => 'Deprecated',
+        \E_USER_DEPRECATED => 'User Deprecated',
+        \E_NOTICE => 'Notice',
+        \E_USER_NOTICE => 'User Notice',
+        \E_STRICT => 'Runtime Notice',
+        \E_WARNING => 'Warning',
+        \E_USER_WARNING => 'User Warning',
+        \E_COMPILE_WARNING => 'Compile Warning',
+        \E_CORE_WARNING => 'Core Warning',
+        \E_USER_ERROR => 'User Error',
+        \E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
+        \E_COMPILE_ERROR => 'Compile Error',
+        \E_PARSE => 'Parse Error',
+        \E_ERROR => 'Error',
+        \E_CORE_ERROR => 'Core Error',
     ];
 
     private $loggers = [
-        E_DEPRECATED => [null, LogLevel::INFO],
-        E_USER_DEPRECATED => [null, LogLevel::INFO],
-        E_NOTICE => [null, LogLevel::WARNING],
-        E_USER_NOTICE => [null, LogLevel::WARNING],
-        E_STRICT => [null, LogLevel::WARNING],
-        E_WARNING => [null, LogLevel::WARNING],
-        E_USER_WARNING => [null, LogLevel::WARNING],
-        E_COMPILE_WARNING => [null, LogLevel::WARNING],
-        E_CORE_WARNING => [null, LogLevel::WARNING],
-        E_USER_ERROR => [null, LogLevel::CRITICAL],
-        E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
-        E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
-        E_PARSE => [null, LogLevel::CRITICAL],
-        E_ERROR => [null, LogLevel::CRITICAL],
-        E_CORE_ERROR => [null, LogLevel::CRITICAL],
+        \E_DEPRECATED => [null, LogLevel::INFO],
+        \E_USER_DEPRECATED => [null, LogLevel::INFO],
+        \E_NOTICE => [null, LogLevel::WARNING],
+        \E_USER_NOTICE => [null, LogLevel::WARNING],
+        \E_STRICT => [null, LogLevel::WARNING],
+        \E_WARNING => [null, LogLevel::WARNING],
+        \E_USER_WARNING => [null, LogLevel::WARNING],
+        \E_COMPILE_WARNING => [null, LogLevel::WARNING],
+        \E_CORE_WARNING => [null, LogLevel::WARNING],
+        \E_USER_ERROR => [null, LogLevel::CRITICAL],
+        \E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
+        \E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
+        \E_PARSE => [null, LogLevel::CRITICAL],
+        \E_ERROR => [null, LogLevel::CRITICAL],
+        \E_CORE_ERROR => [null, LogLevel::CRITICAL],
     ];
 
     private $thrownErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
@@ -154,7 +154,7 @@ class ErrorHandler
             $handler->setExceptionHandler($prev);
         }
 
-        $handler->throwAt(E_ALL & $handler->thrownErrors, true);
+        $handler->throwAt(\E_ALL & $handler->thrownErrors, true);
 
         return $handler;
     }
@@ -176,7 +176,7 @@ class ErrorHandler
      * @param array|int       $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param bool            $replace Whether to replace or not any existing logger
      */
-    public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, $replace = false)
+    public function setDefaultLogger(LoggerInterface $logger, $levels = \E_ALL, $replace = false)
     {
         $loggers = [];
 
@@ -188,7 +188,7 @@ class ErrorHandler
             }
         } else {
             if (null === $levels) {
-                $levels = E_ALL;
+                $levels = \E_ALL;
             }
             foreach ($this->loggers as $type => $log) {
                 if (($type & $levels) && (empty($log[0]) || $replace || $log[0] === $this->bootstrappingLogger)) {
@@ -242,7 +242,7 @@ class ErrorHandler
 
         if ($flush) {
             foreach ($this->bootstrappingLogger->cleanLogs() as $log) {
-                $type = $log[2]['exception'] instanceof \ErrorException ? $log[2]['exception']->getSeverity() : E_ERROR;
+                $type = $log[2]['exception'] instanceof \ErrorException ? $log[2]['exception']->getSeverity() : \E_ERROR;
                 if (!isset($flush[$type])) {
                     $this->bootstrappingLogger->log($log[0], $log[1], $log[2]);
                 } elseif ($this->loggers[$type][0]) {
@@ -280,7 +280,7 @@ class ErrorHandler
     public function throwAt($levels, $replace = false)
     {
         $prev = $this->thrownErrors;
-        $this->thrownErrors = ($levels | E_RECOVERABLE_ERROR | E_USER_ERROR) & ~E_USER_DEPRECATED & ~E_DEPRECATED;
+        $this->thrownErrors = ($levels | \E_RECOVERABLE_ERROR | \E_USER_ERROR) & ~\E_USER_DEPRECATED & ~\E_DEPRECATED;
         if (!$replace) {
             $this->thrownErrors |= $prev;
         }
@@ -382,15 +382,15 @@ class ErrorHandler
      */
     public function handleError($type, $message, $file, $line)
     {
-        if (\PHP_VERSION_ID >= 70300 && E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
-            $type = E_DEPRECATED;
+        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
+            $type = \E_DEPRECATED;
         }
 
         // Level is the current error reporting level to manage silent error.
         $level = error_reporting();
         $silenced = 0 === ($level & $type);
         // Strong errors are not authorized to be silenced.
-        $level |= E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED;
+        $level |= \E_RECOVERABLE_ERROR | \E_USER_ERROR | \E_DEPRECATED | \E_USER_DEPRECATED;
         $log = $this->loggedErrors & $type;
         $throw = $this->thrownErrors & $type & $level;
         $type &= $level | $this->screamedErrors;
@@ -414,7 +414,7 @@ class ErrorHandler
             $context = $e;
         }
 
-        if (null !== $backtrace && $type & E_ERROR) {
+        if (null !== $backtrace && $type & \E_ERROR) {
             // E_ERROR fatal errors are triggered on HHVM when
             // hhvm.error_handling.call_user_handler_on_fatals=1
             // which is the way to get their backtrace.
@@ -430,7 +430,7 @@ class ErrorHandler
             self::$toStringException = null;
         } elseif (!$throw && !($type & $level)) {
             if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {
-                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3), $type, $file, $line, false) : [];
+                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 3), $type, $file, $line, false) : [];
                 $errorAsException = new SilencedErrorContext($type, $file, $line, $lightTrace);
             } elseif (isset(self::$silencedErrorCache[$id][$message])) {
                 $lightTrace = null;
@@ -469,7 +469,7 @@ class ErrorHandler
         }
 
         if ($throw) {
-            if (\PHP_VERSION_ID < 70400 && E_USER_ERROR & $type) {
+            if (\PHP_VERSION_ID < 70400 && \E_USER_ERROR & $type) {
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['function'], $backtrace[$i]['type'], $backtrace[$i - 1]['function'])
                         && '__toString' === $backtrace[$i]['function']
@@ -558,7 +558,7 @@ class ErrorHandler
         if (!$exception instanceof \Exception) {
             $exception = new FatalThrowableError($exception);
         }
-        $type = $exception instanceof FatalErrorException ? $exception->getSeverity() : E_ERROR;
+        $type = $exception instanceof FatalErrorException ? $exception->getSeverity() : \E_ERROR;
         $handlerException = null;
 
         if (($this->loggedErrors & $type) || $exception instanceof FatalThrowableError) {
@@ -674,7 +674,7 @@ class ErrorHandler
             // Handled below
         }
 
-        if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
+        if ($error && $error['type'] &= \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR) {
             // Let's not throw anymore but keep logging
             $handler->throwAt(0, true);
             $trace = isset($error['backtrace']) ? $error['backtrace'] : null;
@@ -716,9 +716,9 @@ class ErrorHandler
      */
     public static function stackErrors()
     {
-        @trigger_error('Support for stacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+        @trigger_error('Support for stacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', \E_USER_DEPRECATED);
 
-        self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+        self::$stackedErrorLevels[] = error_reporting(error_reporting() | \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR);
     }
 
     /**
@@ -728,13 +728,13 @@ class ErrorHandler
      */
     public static function unstackErrors()
     {
-        @trigger_error('Support for unstacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+        @trigger_error('Support for unstacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', \E_USER_DEPRECATED);
 
         $level = array_pop(self::$stackedErrorLevels);
 
         if (null !== $level) {
             $errorReportingLevel = error_reporting($level);
-            if ($errorReportingLevel !== ($level | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
+            if ($errorReportingLevel !== ($level | \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR)) {
                 // If the user changed the error level, do not overwrite it
                 error_reporting($errorReportingLevel);
             }

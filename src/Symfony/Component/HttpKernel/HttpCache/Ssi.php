@@ -65,13 +65,13 @@ class Ssi extends AbstractSurrogate
         // we don't use a proper XML parser here as we can have SSI tags in a plain text response
         $content = $response->getContent();
 
-        $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
         $chunks[0] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[0]);
 
         $i = 1;
         while (isset($chunks[$i])) {
             $options = [];
-            preg_match_all('/(virtual)="([^"]*?)"/', $chunks[$i], $matches, PREG_SET_ORDER);
+            preg_match_all('/(virtual)="([^"]*?)"/', $chunks[$i], $matches, \PREG_SET_ORDER);
             foreach ($matches as $set) {
                 $options[$set[1]] = $set[2];
             }

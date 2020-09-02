@@ -116,7 +116,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         if (null !== $logger) {
             $fs->setLogger($logger);
         }
-        if (!self::$apcuSupported || (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
+        if (!self::$apcuSupported || (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN))) {
             return $fs;
         }
 

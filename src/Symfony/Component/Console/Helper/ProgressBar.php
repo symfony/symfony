@@ -475,7 +475,7 @@ final class ProgressBar
                 $message = "\x0D\x1B[2K$message";
             }
         } elseif ($this->step > 0) {
-            $message = PHP_EOL.$message;
+            $message = \PHP_EOL.$message;
         }
 
         $this->firstRun = false;
@@ -544,7 +544,7 @@ final class ProgressBar
                 return Helper::formatMemory(memory_get_usage(true));
             },
             'current' => function (self $bar) {
-                return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
+                return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT);
             },
             'max' => function (self $bar) {
                 return $bar->getMaxSteps();

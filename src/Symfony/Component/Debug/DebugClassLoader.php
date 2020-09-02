@@ -56,7 +56,7 @@ class DebugClassLoader
             } elseif (substr($test, -\strlen($file)) === $file) {
                 // filesystem is case insensitive and realpath() normalizes the case of characters
                 self::$caseCheck = 1;
-            } elseif (false !== stripos(PHP_OS, 'darwin')) {
+            } elseif (false !== stripos(\PHP_OS, 'darwin')) {
                 // on MacOSX, HFS+ is case insensitive but realpath() doesn't normalize the case of characters
                 self::$caseCheck = 2;
             } else {
@@ -141,7 +141,7 @@ class DebugClassLoader
      */
     public function loadClass($class)
     {
-        $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+        $e = error_reporting(error_reporting() | \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR);
 
         try {
             if ($this->isFinder && !isset($this->loaded[$class])) {
@@ -197,7 +197,7 @@ class DebugClassLoader
             }
 
             foreach ($deprecations as $message) {
-                @trigger_error($message, E_USER_DEPRECATED);
+                @trigger_error($message, \E_USER_DEPRECATED);
             }
         }
 

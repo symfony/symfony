@@ -377,7 +377,7 @@ EOF;
 
         if (\is_string($fmt)) {
             $i = strpos($f = $fmt, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: \strlen($f);
-            $fmt = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
+            $fmt = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, \PREG_SPLIT_DELIM_CAPTURE);
 
             for ($i = 1; isset($fmt[$i]); ++$i) {
                 if (0 === strpos($path, $k = $fmt[$i++])) {
@@ -434,7 +434,7 @@ EOF;
      */
     private function escapeHtml($str)
     {
-        return htmlspecialchars($str, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
+        return htmlspecialchars($str, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
     }
 
     private function getSymfonyGhostAsSvg()

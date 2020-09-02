@@ -383,7 +383,7 @@ class SecurityExtension extends Extension
             }
 
             if (!$logoutOnUserChange = $firewall['logout_on_user_change']) {
-                @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), \E_USER_DEPRECATED);
             }
 
             if (isset($this->logoutOnUserChangeByContextKey[$contextKey]) && $this->logoutOnUserChangeByContextKey[$contextKey][1] !== $logoutOnUserChange) {
@@ -733,7 +733,7 @@ class SecurityExtension extends Extension
 
         // in 4.0, ignore the `switch_user.stateless` key if $stateless is `true`
         if ($stateless && false === $config['stateless']) {
-            @trigger_error(sprintf('Firewall "%s" is configured as "stateless" but the "switch_user.stateless" key is set to false. Both should have the same value, the firewall\'s "stateless" value will be used as default value for the "switch_user.stateless" key in 4.0.', $id), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Firewall "%s" is configured as "stateless" but the "switch_user.stateless" key is set to false. Both should have the same value, the firewall\'s "stateless" value will be used as default value for the "switch_user.stateless" key in 4.0.', $id), \E_USER_DEPRECATED);
         }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
@@ -837,7 +837,7 @@ class SecurityExtension extends Extension
      */
     private function getFirstProvider($firewallName, $listenerName, array $providerIds)
     {
-        @trigger_error(sprintf('Listener "%s" on firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since Symfony 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $listenerName, $firewallName, $first = array_keys($providerIds)[0]), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Listener "%s" on firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since Symfony 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $listenerName, $firewallName, $first = array_keys($providerIds)[0]), \E_USER_DEPRECATED);
 
         return $providerIds[$first];
     }

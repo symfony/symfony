@@ -46,7 +46,7 @@ class CacheClearCommand extends ContainerAwareCommand
     public function __construct($cacheClearer = null, Filesystem $filesystem = null)
     {
         if (!$cacheClearer instanceof CacheClearerInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, CacheClearerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, CacheClearerInterface::class), \E_USER_DEPRECATED);
 
             parent::__construct($cacheClearer);
 
@@ -133,7 +133,7 @@ EOF
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             if ($this->warning) {
-                @trigger_error($this->warning, E_USER_DEPRECATED);
+                @trigger_error($this->warning, \E_USER_DEPRECATED);
                 $io->warning($this->warning);
                 $this->warning = null;
             }

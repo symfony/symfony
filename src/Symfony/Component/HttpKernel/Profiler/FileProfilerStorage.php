@@ -58,7 +58,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         $file = fopen($file, 'r');
-        fseek($file, 0, SEEK_END);
+        fseek($file, 0, \SEEK_END);
 
         $result = [];
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
@@ -251,7 +251,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
             $position += $upTo;
             $line = substr($buffer, $upTo + 1).$line;
-            fseek($file, max(0, $position), SEEK_SET);
+            fseek($file, max(0, $position), \SEEK_SET);
 
             if ('' !== $line) {
                 break;

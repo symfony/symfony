@@ -610,7 +610,7 @@ class FrameworkExtension extends Extension
         foreach ($config['workflows'] as $name => $workflow) {
             if (!\array_key_exists('type', $workflow)) {
                 $workflow['type'] = 'workflow';
-                @trigger_error(sprintf('The "type" option of the "framework.workflows.%s" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.', $name), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "type" option of the "framework.workflows.%s" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.', $name), \E_USER_DEPRECATED);
             }
             $type = $workflow['type'];
             $workflowId = sprintf('%s.%s', $type, $name);

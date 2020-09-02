@@ -235,7 +235,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), \E_USER_DEPRECATED);
             }
 
             try {

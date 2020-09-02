@@ -104,7 +104,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         if (!$needsUtf8 && $useUtf8 && preg_match('/[\x80-\xFF]/', $pattern)) {
             $needsUtf8 = true;
-            @trigger_error(sprintf('Using UTF-8 route patterns without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for pattern "%s".', $pattern), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using UTF-8 route patterns without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for pattern "%s".', $pattern), \E_USER_DEPRECATED);
         }
         if (!$useUtf8 && $needsUtf8) {
             throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
@@ -112,7 +112,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('#\{\w+\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
         foreach ($matches as $match) {
             $varName = substr($match[0][0], 1, -1);
             // get all static text preceding the current variable
@@ -177,7 +177,7 @@ class RouteCompiler implements RouteCompilerInterface
                     $useUtf8 = false;
                 } elseif (!$needsUtf8 && preg_match('/[\x80-\xFF]|(?<!\\\\)\\\\(?:\\\\\\\\)*+(?-i:X|[pP][\{CLMNPSZ]|x\{[A-Fa-f0-9]{3})/', $regexp)) {
                     $needsUtf8 = true;
-                    @trigger_error(sprintf('Using UTF-8 route requirements without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for variable "%s" in pattern "%s".', $varName, $pattern), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Using UTF-8 route requirements without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for variable "%s" in pattern "%s".', $varName, $pattern), \E_USER_DEPRECATED);
                 }
                 if (!$useUtf8 && $needsUtf8) {
                     throw new \LogicException(sprintf('Cannot mix UTF-8 requirement with non-UTF-8 charset for variable "%s" in pattern "%s".', $varName, $pattern));
@@ -193,7 +193,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         // find the first optional token
-        $firstOptional = PHP_INT_MAX;
+        $firstOptional = \PHP_INT_MAX;
         if (!$isHost) {
             for ($i = \count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];

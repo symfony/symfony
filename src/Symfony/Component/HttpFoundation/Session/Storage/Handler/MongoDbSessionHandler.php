@@ -70,7 +70,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     public function __construct($mongo, array $options)
     {
         if ($mongo instanceof \MongoClient || $mongo instanceof \Mongo) {
-            @trigger_error(sprintf('Using %s with the legacy mongo extension is deprecated as of 3.4 and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using %s with the legacy mongo extension is deprecated as of 3.4 and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.', __CLASS__), \E_USER_DEPRECATED);
         }
 
         if (!($mongo instanceof \MongoDB\Client || $mongo instanceof \MongoClient || $mongo instanceof \Mongo)) {

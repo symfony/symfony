@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Process;
 
-@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use the Process class instead.', ProcessBuilder::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Use the Process class instead.', ProcessBuilder::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;

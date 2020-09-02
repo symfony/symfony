@@ -28,7 +28,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     public function __construct(EventDispatcherInterface $dispatcher = null)
     {
         if ($dispatcher instanceof TraceableEventDispatcherInterface && !method_exists($dispatcher, 'reset')) {
-            @trigger_error(sprintf('Implementing "%s" without the "reset()" method is deprecated since Symfony 3.4 and will be unsupported in 4.0 for class "%s".', TraceableEventDispatcherInterface::class, \get_class($dispatcher)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Implementing "%s" without the "reset()" method is deprecated since Symfony 3.4 and will be unsupported in 4.0 for class "%s".', TraceableEventDispatcherInterface::class, \get_class($dispatcher)), \E_USER_DEPRECATED);
         }
         $this->dispatcher = $dispatcher;
     }

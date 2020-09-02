@@ -12,7 +12,7 @@
 namespace Symfony\Component\ClassLoader;
 
 if (\PHP_VERSION_ID >= 70000) {
-    @trigger_error('The '.__NAMESPACE__.'\ClassCollectionLoader class is deprecated since Symfony 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+    @trigger_error('The '.__NAMESPACE__.'\ClassCollectionLoader class is deprecated since Symfony 3.3 and will be removed in 4.0.', \E_USER_DEPRECATED);
 }
 
 /**
@@ -216,7 +216,7 @@ REGEX;
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        $nsTokens = [T_WHITESPACE => true, T_NS_SEPARATOR => true, T_STRING => true];
+        $nsTokens = [\T_WHITESPACE => true, \T_NS_SEPARATOR => true, \T_STRING => true];
         if (\defined('T_NAME_QUALIFIED')) {
             $nsTokens[T_NAME_QUALIFIED] = true;
         }
@@ -225,10 +225,10 @@ REGEX;
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
+            } elseif (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT])) {
                 // strip comments
                 continue;
-            } elseif (T_NAMESPACE === $token[0]) {
+            } elseif (\T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
                     $rawChunk .= "}\n";
                 }
@@ -245,15 +245,15 @@ REGEX;
                     $rawChunk = rtrim($rawChunk)."\n{";
                     $inNamespace = true;
                 }
-            } elseif (T_START_HEREDOC === $token[0]) {
+            } elseif (\T_START_HEREDOC === $token[0]) {
                 $output .= self::compressCode($rawChunk).$token[1];
                 do {
                     $token = $tokens[++$i];
                     $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
-                } while (T_END_HEREDOC !== $token[0]);
+                } while (\T_END_HEREDOC !== $token[0]);
                 $output .= "\n";
                 $rawChunk = '';
-            } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
+            } elseif (\T_CONSTANT_ENCAPSED_STRING === $token[0]) {
                 $output .= self::compressCode($rawChunk).$token[1];
                 $rawChunk = '';
             } else {

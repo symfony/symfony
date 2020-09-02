@@ -55,7 +55,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     public function __construct($writer = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultLocale = null, $defaultTransPath = null, $defaultViewsPath = null)
     {
         if (!$writer instanceof TranslationWriterInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, TranslationWriterInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, TranslationWriterInterface::class), \E_USER_DEPRECATED);
 
             parent::__construct($writer);
 
@@ -209,7 +209,7 @@ EOF
         $prefix = $input->getOption('prefix');
         // @deprecated since version 3.4, to be removed in 4.0 along with the --no-prefix option
         if ($input->getOption('no-prefix')) {
-            @trigger_error('The "--no-prefix" option is deprecated since Symfony 3.4 and will be removed in 4.0. Use the "--prefix" option with an empty string as value instead.', E_USER_DEPRECATED);
+            @trigger_error('The "--no-prefix" option is deprecated since Symfony 3.4 and will be removed in 4.0. Use the "--prefix" option with an empty string as value instead.', \E_USER_DEPRECATED);
             $prefix = '';
         }
         $this->extractor->setPrefix($prefix);

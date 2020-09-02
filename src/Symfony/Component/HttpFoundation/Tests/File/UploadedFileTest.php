@@ -41,7 +41,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             null,
             filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK
         );
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
@@ -58,7 +58,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             null,
             filesize(__DIR__.'/Fixtures/.unknownextension'),
-            UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK
         );
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
@@ -113,7 +113,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
+        $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
     }
 
     public function testGetClientOriginalName()
@@ -150,7 +150,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             'image/gif',
             filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK
         );
 
         $file->move(__DIR__.'/Fixtures/directory');
@@ -170,7 +170,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             'image/gif',
             filesize($path),
-            UPLOAD_ERR_OK,
+            \UPLOAD_ERR_OK,
             true
         );
 
@@ -235,7 +235,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             null,
             filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK,
+            \UPLOAD_ERR_OK,
             true
         );
 
@@ -261,11 +261,11 @@ class UploadedFileTest extends TestCase
     public function uploadedFileErrorProvider()
     {
         return [
-            [UPLOAD_ERR_INI_SIZE],
-            [UPLOAD_ERR_FORM_SIZE],
-            [UPLOAD_ERR_PARTIAL],
-            [UPLOAD_ERR_NO_TMP_DIR],
-            [UPLOAD_ERR_EXTENSION],
+            [\UPLOAD_ERR_INI_SIZE],
+            [\UPLOAD_ERR_FORM_SIZE],
+            [\UPLOAD_ERR_PARTIAL],
+            [\UPLOAD_ERR_NO_TMP_DIR],
+            [\UPLOAD_ERR_EXTENSION],
         ];
     }
 
@@ -276,7 +276,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             null,
             filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK
         );
 
         $this->assertFalse($file->isValid());
@@ -290,9 +290,9 @@ class UploadedFileTest extends TestCase
         $this->assertGreaterThan(0, $size);
 
         if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
-            $this->assertSame(PHP_INT_MAX, $size);
+            $this->assertSame(\PHP_INT_MAX, $size);
         } else {
-            $this->assertLessThan(PHP_INT_MAX, $size);
+            $this->assertLessThan(\PHP_INT_MAX, $size);
         }
     }
 }

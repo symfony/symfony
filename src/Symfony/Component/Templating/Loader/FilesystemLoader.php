@@ -106,7 +106,7 @@ class FilesystemLoader extends Loader
                 && ':' == $file[1]
                 && ('\\' == $file[2] || '/' == $file[2])
             )
-            || null !== parse_url($file, PHP_URL_SCHEME)
+            || null !== parse_url($file, \PHP_URL_SCHEME)
         ) {
             return true;
         }

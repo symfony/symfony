@@ -31,16 +31,16 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertTrue($c->isDebug());
         $this->assertSame('config', $c->getName());
         $this->assertSame('testkernel', $c->getAppName());
-        $this->assertMatchesRegularExpression('~^'.preg_quote($c->getPhpVersion(), '~').'~', PHP_VERSION);
-        $this->assertMatchesRegularExpression('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', PHP_VERSION);
+        $this->assertMatchesRegularExpression('~^'.preg_quote($c->getPhpVersion(), '~').'~', \PHP_VERSION);
+        $this->assertMatchesRegularExpression('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', \PHP_VERSION);
         $this->assertSame(\PHP_INT_SIZE * 8, $c->getPhpArchitecture());
         $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
-        $this->assertSame(\extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
+        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
     }
 }
 

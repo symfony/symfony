@@ -51,7 +51,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 if ($options['choices']) {
-                    @trigger_error(sprintf('Using the "choices" option in %s has been deprecated since Symfony 3.3 and will be ignored in 4.0. Override the "choice_loader" option instead or set it to null.', __CLASS__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Using the "choices" option in %s has been deprecated since Symfony 3.3 and will be ignored in 4.0. Override the "choice_loader" option instead or set it to null.', __CLASS__), \E_USER_DEPRECATED);
 
                     return null;
                 }
@@ -95,7 +95,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         if (null !== $this->choiceList) {
             return $this->choiceList;
@@ -111,7 +111,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoicesForValues(array $values, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $values = array_filter($values);
@@ -134,7 +134,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadValuesForChoices(array $choices, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $choices = array_filter($choices);

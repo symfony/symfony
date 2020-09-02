@@ -50,7 +50,7 @@ trait ManagerRegistryTrait
      */
     public function setContainer(SymfonyContainerInterface $container = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Inject a PSR-11 container using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Inject a PSR-11 container using the constructor instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->container = $container;
     }
@@ -74,7 +74,7 @@ trait ManagerRegistryTrait
         $manager = $this->container->get($name);
 
         if (!$manager instanceof LazyLoadingInterface) {
-            @trigger_error(sprintf('Resetting a non-lazy manager service is deprecated since Symfony 3.2 and will throw an exception in version 4.0. Set the "%s" service as lazy and require "symfony/proxy-manager-bridge" in your composer.json file instead.', $name), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Resetting a non-lazy manager service is deprecated since Symfony 3.2 and will throw an exception in version 4.0. Set the "%s" service as lazy and require "symfony/proxy-manager-bridge" in your composer.json file instead.', $name), \E_USER_DEPRECATED);
 
             $this->container->set($name, null);
 

@@ -46,7 +46,7 @@ class CliDumperTest extends TestCase
         $dumper->dump($data);
         $out = ob_get_clean();
         $out = preg_replace('/[ \t]+$/m', '', $out);
-        $intMax = PHP_INT_MAX;
+        $intMax = \PHP_INT_MAX;
         $res = (int) $var['res'];
 
         $r = \defined('HHVM_VERSION') ? '' : '#%d';

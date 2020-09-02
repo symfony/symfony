@@ -121,7 +121,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
                 }
             }
         }
-        $expiry = 0 < $ttl ? time() + $ttl : PHP_INT_MAX;
+        $expiry = 0 < $ttl ? time() + $ttl : \PHP_INT_MAX;
 
         foreach ($valuesArray as $key => $value) {
             $this->values[$key] = $value;

@@ -99,7 +99,7 @@ class Configuration implements ConfigurationInterface
                                     }
                                 }
 
-                                return !filter_var($v, FILTER_VALIDATE_IP);
+                                return !filter_var($v, \FILTER_VALIDATE_IP);
                             })
                             ->thenInvalid('Invalid proxy IP "%s"')
                         ->end()

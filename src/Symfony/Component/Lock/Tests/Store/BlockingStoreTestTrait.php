@@ -55,11 +55,11 @@ trait BlockingStoreTestTrait
         $parentPID = posix_getpid();
 
         // Block SIGHUP signal
-        pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
+        pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
 
         if ($childPID = pcntl_fork()) {
             // Wait the start of the child
-            pcntl_sigwaitinfo([SIGHUP], $info);
+            pcntl_sigwaitinfo([\SIGHUP], $info);
 
             try {
                 // This call should failed given the lock should already by acquired by the child
@@ -69,7 +69,7 @@ trait BlockingStoreTestTrait
             }
 
             // send the ready signal to the child
-            posix_kill($childPID, SIGHUP);
+            posix_kill($childPID, \SIGHUP);
 
             // This call should be blocked by the child #1
             $store->waitAndSave($key);
@@ -81,14 +81,14 @@ trait BlockingStoreTestTrait
             $this->assertSame(0, pcntl_wexitstatus($status1), 'The child process couldn\'t lock the resource');
         } else {
             // Block SIGHUP signal
-            pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
+            pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
             try {
                 $store->save($key);
                 // send the ready signal to the parent
-                posix_kill($parentPID, SIGHUP);
+                posix_kill($parentPID, \SIGHUP);
 
                 // Wait for the parent to be ready
-                pcntl_sigwaitinfo([SIGHUP], $info);
+                pcntl_sigwaitinfo([\SIGHUP], $info);
 
                 // Wait ClockDelay to let parent assert to finish
                 usleep($clockDelay);

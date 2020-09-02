@@ -81,7 +81,7 @@ abstract class AbstractUriElement
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
+        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -114,7 +114,7 @@ abstract class AbstractUriElement
         }
 
         // relative path
-        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), PHP_URL_PATH);
+        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), \PHP_URL_PATH);
         $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
 
         return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;

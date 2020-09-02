@@ -71,6 +71,28 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($form->isValid());
     }
 
+    public function testUnderlyingObjectCannotChangeOnSubmitIfDisabledForm()
+    {
+        $person = new \stdClass();
+        $person->name = 'John Doe';
+
+        $form = $this->getBuilder('person', null, \stdClass::class)
+            ->setData($person)
+            ->setDisabled(true)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->addEventListener(FormEvents::SUBMIT, static function (FormEvent $event) {
+                $event->getData()->name = 'Jane';
+            })
+            ->add($this->getBuilder('name'))
+            ->getForm();
+
+        $form->submit(['name' => 'Jacques Doe']);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame('John Doe', $person->name);
+    }
+
     public function testDisabledChildFormCannotChangeOnSubmit()
     {
         $form = $this->getBuilder('person')

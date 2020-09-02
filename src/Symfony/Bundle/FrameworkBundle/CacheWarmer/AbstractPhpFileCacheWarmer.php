@@ -19,9 +19,6 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-/**
- * @internal
- */
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
     private $phpArrayFile;

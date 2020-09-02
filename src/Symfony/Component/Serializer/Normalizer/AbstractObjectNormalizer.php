@@ -384,14 +384,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // In XML and CSV all basic datatypes are represented as strings, it is e.g. not possible to determine,
             // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
             // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
-            //
-            // This is special to xml and csv format
-            if (
-                \is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)
-            ) {
-                if (
-                    '' === $data && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)
-                ) {
+            if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+                if ('' === $data && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
                     return null;
                 }
 
@@ -407,10 +401,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         }
                         break;
                     case Type::BUILTIN_TYPE_INT:
-                        if (
-                            ctype_digit($data) ||
-                            '-' === $data[0] && ctype_digit(substr($data, 1))
-                        ) {
+                        if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
                             $data = (int) $data;
                         } else {
                             throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data));

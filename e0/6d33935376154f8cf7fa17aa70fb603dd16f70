@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2020-02-27T17:10:18Z
+
+Will update the recipe as pointed out in https://github.com/symfony/symfony/pull/35723#issuecomment-590422930 when merged.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-03-02T15:22:54Z
+
+tests should pass when merged
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-01T11:54:00Z
+
+@Tobion @nicolas-grekas Can we finish this PR? Thank you.

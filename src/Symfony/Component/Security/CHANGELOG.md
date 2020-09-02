@@ -9,6 +9,7 @@ CHANGELOG
  * [BC break] Removed `AccessListener::PUBLIC_ACCESS` in favor of `AuthenticatedVoter::PUBLIC_ACCESS`
  * Added `Passport` to `LoginFailureEvent`.
  * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of  `AbstractRememberMeServices::$firewallName`
+ * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
 
 5.1.0
 -----

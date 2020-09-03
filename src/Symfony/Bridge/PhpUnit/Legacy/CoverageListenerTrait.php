@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use PHPUnit\Util\Annotation\Registry;
 
 /**
  * PHP 5.3 compatible trait-like shared implementation.
@@ -70,9 +71,6 @@ class CoverageListenerTrait
             $testClass = \PHPUnit_Util_Test::class;
         }
 
-        $r = new \ReflectionProperty($testClass, 'annotationCache');
-        $r->setAccessible(true);
-
         $covers = $sutFqcn;
         if (!\is_array($sutFqcn)) {
             $covers = array($sutFqcn);
@@ -82,6 +80,20 @@ class CoverageListenerTrait
             }
         }
 
+        if (class_exists(Registry::class)) {
+            $this->addCoversForDocBlockInsideRegistry($test, $covers);
+
+            return;
+        }
+
+        $this->addCoversForClassToAnnotationCache($testClass, $test, $covers);
+    }
+
+    private function addCoversForClassToAnnotationCache($testClass, $test, $covers)
+    {
+        $r = new \ReflectionProperty($testClass, 'annotationCache');
+        $r->setAccessible(true);
+
         $cache = $r->getValue();
         $cache = array_replace_recursive($cache, array(
             \get_class($test) => array(
@@ -89,6 +101,18 @@ class CoverageListenerTrait
             ),
         ));
         $r->setValue($testClass, $cache);
+    }
+
+    private function addCoversForDocBlockInsideRegistry($test, $covers)
+    {
+        $docBlock = Registry::getInstance()->forClassName(\get_class($test));
+
+        $symbolAnnotations = new \ReflectionProperty($docBlock, 'symbolAnnotations');
+        $symbolAnnotations->setAccessible(true);
+
+        $symbolAnnotations->setValue($docBlock, array_replace($docBlock->symbolAnnotations(), array(
+            'covers' => $covers,
+        )));
     }
 
     private function findSutFqcn($test)

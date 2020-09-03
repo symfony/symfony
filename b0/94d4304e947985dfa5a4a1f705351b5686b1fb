@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by malteschlueter at 2020-09-02T15:04:23Z
+
+> Thanks for working on this one. It's definitely a feature (so targetting master is a good idea).
+
+My pleasure.
+
+> I don't think we have to add this to the `UsernamePasswordJsonAuthenticationListener` (those are part of a system that will be removed in Symfony 6). If you can, I think it's also a good idea to add a test for this new feature.
+
+I will add a test. Takes some time^^
+
+---------------------------------------------------------------------------
+
+by malteschlueter at 2020-09-02T15:37:01Z
+
+During writing the test i saw some other error messages like "_Invalid username._" [(JsonLoginAuthenticator.php#L167)](https://github.com/symfony/symfony/blob/485e59f43946935c8f07d7aeccbd43e703937b9d/src/Symfony/Component/Security/Http/Authenticator/JsonLoginAuthenticator.php#L167).
+Am i blind or is there no translation for it?
+
+What do you think about the other error messages. Should they also translated see "[Invalid JSON.](https://github.com/symfony/symfony/blob/485e59f43946935c8f07d7aeccbd43e703937b9d/src/Symfony/Component/Security/Http/Authenticator/JsonLoginAuthenticator.php#L155)" or "[The key "username" must be provided.](https://github.com/symfony/symfony/blob/485e59f43946935c8f07d7aeccbd43e703937b9d/src/Symfony/Component/Security/Http/Authenticator/JsonLoginAuthenticator.php#L163)"
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-02T15:59:54Z
+
+i figure we can re-use a bunch of translations from the validator domain.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-02T16:02:19Z
+
+no wait, i dont think http exceptions need to be translated at all. Usually they are caught by an ExceptionListener exposing the http status text in prod (while preserving the original message in dev).
+
+In this case im fine with only translating the responses generated here :+1:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-02T16:07:29Z
+
+Please note that the `$message` constructor is a non-user safe string and the `messageKey` is almost always [hardcoded in the exception class](https://github.com/symfony/symfony/blob/485e59f43946935c8f07d7aeccbd43e703937b9d/src/Symfony/Component/Security/Core/Exception/BadCredentialsException.php#L25-L28). And this message key does exists: https://github.com/symfony/symfony/blob/485e59f43946935c8f07d7aeccbd43e703937b9d/src/Symfony/Component/Security/Core/Resources/translations/security.en.xlf#L17-L20
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-09-03T07:32:48Z
+
+@malteschlueter looks like the PR already needs a rebase 🙈

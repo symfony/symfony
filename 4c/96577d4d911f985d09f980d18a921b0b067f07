@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-03T09:37:16Z
+
+Tests for the low requirements must be fixed.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-03T09:39:46Z
+
+Oh sorry, missed that test failure. For your information, this means that you should add a dev dependency on `symfony/translation` in the Http and Core security `composer.json` files.
+
+---------------------------------------------------------------------------
+
+by malteschlueter at 2020-09-03T11:36:31Z
+
+> Oh sorry, missed that test failure. For your information, this means that you should add a dev dependency on `symfony/translation` in the Http and Core security `composer.json` files.
+
+Thanks for the tip @wouterj.
+
+I understand why to add it to the Http Security but why should i added it also to Core Security? I didn't changed anything in this "area".
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-03T11:49:06Z
+
+> I understand why to add it to the Http Security but why should i added it also to Core Security? I didn't changed anything in this "area".
+
+My mistake (in my mind, all authentication listeners lived in Core, but most of them actually live in Http).
+
+:+1: the remaining test failure is not caused by this PR

@@ -189,6 +189,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher')->nullOnInvalid(),
                 service('property_accessor')->nullOnInvalid(),
             ])
+            ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'security'])
 
         ->set('security.authentication.listener.remote_user', RemoteUserAuthenticationListener::class)

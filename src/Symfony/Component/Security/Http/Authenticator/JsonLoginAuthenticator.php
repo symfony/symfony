@@ -35,6 +35,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides a stateless implementation of an authentication via
@@ -54,6 +55,11 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     private $propertyAccessor;
     private $successHandler;
     private $failureHandler;
+
+    /**
+     * @var TranslatorInterface|null
+     */
+    private $translator;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, ?AuthenticationSuccessHandlerInterface $successHandler = null, ?AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], ?PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -120,7 +126,13 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         if (null === $this->failureHandler) {
-            return new JsonResponse(['error' => $exception->getMessageKey()], JsonResponse::HTTP_UNAUTHORIZED);
+            $errorMessage = $exception->getMessageKey();
+
+            if (null !== $this->translator) {
+                $errorMessage = $this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'security');
+            }
+
+            return new JsonResponse(['error' => $errorMessage], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
@@ -129,6 +141,11 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     public function isInteractive(): bool
     {
         return true;
+    }
+
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     private function getCredentials(Request $request)

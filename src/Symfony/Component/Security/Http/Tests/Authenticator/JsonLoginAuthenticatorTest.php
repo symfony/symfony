@@ -14,12 +14,15 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
@@ -121,6 +124,27 @@ class JsonLoginAuthenticatorTest extends TestCase
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));
         yield [$request, 'Invalid username.', BadCredentialsException::class];
+    }
+
+    public function testAuthenticationFailureWithoutTranslator()
+    {
+        $this->setUpAuthenticator();
+
+        $response = $this->authenticator->onAuthenticationFailure(new Request(), new AuthenticationException());
+        $this->assertSame(['error' => 'An authentication exception occurred.'], json_decode($response->getContent(), true));
+    }
+
+    public function testAuthenticationFailureWithTranslator()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['An authentication exception occurred.' => 'foo'], 'en', 'security');
+
+        $this->setUpAuthenticator();
+        $this->authenticator->setTranslator($translator);
+
+        $response = $this->authenticator->onAuthenticationFailure(new Request(), new AuthenticationException());
+        $this->assertSame(['error' => 'foo'], json_decode($response->getContent(), true));
     }
 
     private function setUpAuthenticator(array $options = [])

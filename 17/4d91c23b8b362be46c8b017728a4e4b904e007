@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-07-27T13:22:22Z
+
+Rather than adding a required dependency on `symfony/uid` in `symfony/doctrine-bridge` (which would then bring this package to everyone using the Doctrine Bridge for another reason), I think we should create a dedicated bridge package between `doctrine/dbal` and `symfony/uid` (and *then*, it becomes possible to have a smart default registering the type based on the fact that the package is installed, as there would be no reason to install that bridge without configuring it).
+
+My own opinion (note that this has not been discussed yet with the other members of the core team to take a decision) is that we should not use `symfony/doctrine-bridge` to host more integrations. Making a bridge between all Symfony components and all Doctrine packages at once makes it harder to handle dependencies and makes it impossible to have smart defaults.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-29T14:29:18Z
+
+Thanks for the PR. I didn't think about @stof's proposal but that shouldn't prevent moving forward on the rest. Can you please remove the declare statements (we don't use strict mode) and apply the fabbot patch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-01T18:09:51Z
+
+> I think we should create a dedicated bridge package between doctrine/dbal and symfony/uid (and then, it becomes possible to have a smart default registering the type based on the fact that the package is installed, as there would be no reason to install that bridge without configuring it).
+
+Why can't we have a smart default without a dedicated bridge? Can't DoctrineBundle register the types when detecting that Uid is installed?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-03T12:15:47Z
+
+hmm, for this particular case, we could indeed define a smart default based on 2 packages. But this does not remove the more complex management of dependencies (as we have to manage them through conflict rules rather than requirements).
+And I think registering custom types adds some code running during the booting phase and/or the first instantiation of the connection service. So registering unused types might no be a good idea. Just having the uid component installed does not mean you want to use the new DBAL types for them. If they were in a dedicated package, that would be a much stronger signal (why installing a package providing the uid-based DBAL types if you don't want to register them ?)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-08-13T08:41:05Z
+
+This does not solve any of @stof 's concerns, but [we already have components](https://github.com/symfony/symfony/search?l=JSON&q=%22doctrine%2Fdbal%22) with their own bridges to Doctrine shipped within it.
+But if we mean to ask the user to require another dep for such a simple need, I'd rather go with @stof 's suggestion which indeed conveys more than the doctrine bridge itself.
+
+One solution for now may be to ship this bridge into the component itself and split it later into a dedicated package if we want it to happen, as we did for Messenger transports?
+
+---------------------------------------------------------------------------
+
+by gennadigennadigennadi at 2020-08-15T17:29:26Z
+
+Todo:
+- [x] Register Types if Uid Component is installed
+- [x] Update Changelog
+
+---------------------------------------------------------------------------
+
+by gennadigennadigennadi at 2020-08-16T17:53:14Z
+
+I have added a CompilerPass to register the Types if no uuid or ulid is already registered. An alternative is to register them directly inside of the [DoctrineExtension ](https://github.com/doctrine/DoctrineBundle/blob/1.12.x/DependencyInjection/DoctrineExtension.php#L112).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-22T06:42:52Z
+
+@gennadigennadigennadi Can you finish the items on your todolist and move the PR to a non-draft status?
+
+---------------------------------------------------------------------------
+
+by gennadigennadigennadi at 2020-09-02T18:20:53Z
+
+> Did you think about the DoctrineBundle's side?
+> What about opening a PR on it to integrate this work?
+
+That's exactly what I was about to do as soon this PR gets accepted, but I can open a PR sooner if you like.

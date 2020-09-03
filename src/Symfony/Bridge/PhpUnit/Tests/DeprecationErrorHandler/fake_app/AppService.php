@@ -37,5 +37,14 @@ final class AppService
         $service = new SomeService();
         $service->indirectDeprecatedApi($useContracts);
     }
+
+    public function directDeprecations()
+    {
+        $service1 = new SomeService();
+        $service1->deprecatedApi();
+
+        $service2 = new SomeOtherService();
+        $service2->deprecatedApi();
+    }
 }
 

@@ -1329,16 +1329,20 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame(ChainAdapter::class, $chain->getClass());
 
+        $this->assertCount(2, $chain->getArguments());
+        $this->assertCount(3, $chain->getArguments()[0]);
+
+        $expectedSeed = $chain->getArgument(0)[1]->getArgument(0);
         $expected = [
             [
                 (new ChildDefinition('cache.adapter.array'))
                     ->replaceArgument(0, 12),
                 (new ChildDefinition('cache.adapter.filesystem'))
-                    ->replaceArgument(0, 'UKoP1K+Hox')
+                    ->replaceArgument(0, $expectedSeed)
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
                     ->replaceArgument(0, new Reference('.cache_connection.kYdiLgf'))
-                    ->replaceArgument(1, 'UKoP1K+Hox')
+                    ->replaceArgument(1, $expectedSeed)
                     ->replaceArgument(2, 12),
             ],
             12,

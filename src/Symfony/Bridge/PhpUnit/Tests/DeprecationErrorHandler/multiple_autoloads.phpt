@@ -38,7 +38,7 @@ require __DIR__.'/fake_vendor_bis/autoload.php';
 --EXPECTF--
 Remaining direct deprecation notices (2)
 
-  1x: deprecatedApi is deprecated! You should stop relying on it!
+  1x: Since acme/lib 3.0: deprecatedApi is deprecated, use deprecatedApi_new instead.
     1x in AppService::directDeprecations from App\Services
 
   1x: deprecatedApi from foo is deprecated! You should stop relying on it!

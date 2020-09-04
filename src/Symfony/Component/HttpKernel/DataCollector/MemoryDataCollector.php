@@ -92,7 +92,8 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * @return int|float
+     * @return int|float The configured memory limit can exceed the range that can be 
+     *                   representedby an integer.
      */
     private function convertToBytes(string $memoryLimit)
     {

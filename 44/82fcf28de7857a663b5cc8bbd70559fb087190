@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by ndench at 2020-09-03T00:59:03Z
+
+Travis is failing on FrameworkBundle tests, it appears to be unrelated to this PR as the same test failures are present in a number of other open PRs. If my PR has somehow affected these tests I'm happy to fix them if someone can point in the right direction.
+
+<details><summary>Test failures</summary>
+
+```
+There were 3 failures:
+
+1) Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\PhpFrameworkExtensionTest::testCachePoolServices
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+             'bindings' => Array ()
+             'errors' => Array ()
+             'arguments' => Array (
+-                'index_0' => 'xctxZ1lyiH'
++                'index_0' => 'UKoP1K+Hox'
+                 'index_1' => 12
+             )
+             'innerServiceId' => null
+@@ @@
+             'errors' => Array ()
+             'arguments' => Array (
+                 'index_0' => Symfony\Component\DependencyInjection\Reference Object (...)
+-                'index_1' => 'xctxZ1lyiH'
++                'index_1' => 'UKoP1K+Hox'
+                 'index_2' => 12
+             )
+             'innerServiceId' => null
+
+/home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php:1476
+
+2) Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\XmlFrameworkExtensionTest::testCachePoolServices
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+             'bindings' => Array ()
+             'errors' => Array ()
+             'arguments' => Array (
+-                'index_0' => 'xctxZ1lyiH'
++                'index_0' => 'UKoP1K+Hox'
+                 'index_1' => 12
+             )
+             'innerServiceId' => null
+@@ @@
+             'errors' => Array ()
+             'arguments' => Array (
+                 'index_0' => Symfony\Component\DependencyInjection\Reference Object (...)
+-                'index_1' => 'xctxZ1lyiH'
++                'index_1' => 'UKoP1K+Hox'
+                 'index_2' => 12
+             )
+             'innerServiceId' => null
+
+/home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php:1476
+
+3) Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\YamlFrameworkExtensionTest::testCachePoolServices
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+             'bindings' => Array ()
+             'errors' => Array ()
+             'arguments' => Array (
+-                'index_0' => 'xctxZ1lyiH'
++                'index_0' => 'UKoP1K+Hox'
+                 'index_1' => 12
+             )
+             'innerServiceId' => null
+@@ @@
+             'errors' => Array ()
+             'arguments' => Array (
+                 'index_0' => Symfony\Component\DependencyInjection\Reference Object (...)
+-                'index_1' => 'xctxZ1lyiH'
++                'index_1' => 'UKoP1K+Hox'
+                 'index_2' => 12
+             )
+             'innerServiceId' => null
+
+/home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php:1476
+
+FAILURES!
+Tests: 873, Assertions: 2537, Failures: 3, Skipped: 5.
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-03T06:27:42Z
+
+/cc @ogizanagi

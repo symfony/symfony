@@ -16,18 +16,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransform
 
 class StringToFloatTransformerTest extends TestCase
 {
-    private $transformer;
-
-    protected function setUp(): void
-    {
-        $this->transformer = new StringToFloatTransformer();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->transformer = null;
-    }
-
     public function provideTransformations(): array
     {
         return [

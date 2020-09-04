@@ -33,6 +33,7 @@ class Connection
         'consumer' => 'consumer',
         'auto_setup' => true,
         'delete_after_ack' => false,
+        'delete_after_reject' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
         'tls' => false,
@@ -51,6 +52,7 @@ class Connection
     private $nextClaim = 0;
     private $claimInterval;
     private $deleteAfterAck;
+    private $deleteAfterReject;
     private $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
@@ -89,6 +91,7 @@ class Connection
         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
         $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
         $this->deleteAfterAck = $configuration['delete_after_ack'] ?? self::DEFAULT_OPTIONS['delete_after_ack'];
+        $this->deleteAfterReject = $configuration['delete_after_reject'] ?? self::DEFAULT_OPTIONS['delete_after_reject'];
         $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
@@ -128,6 +131,12 @@ class Connection
             unset($redisOptions['delete_after_ack']);
         }
 
+        $deleteAfterReject = null;
+        if (\array_key_exists('delete_after_reject', $redisOptions)) {
+            $deleteAfterReject = filter_var($redisOptions['delete_after_reject'], \FILTER_VALIDATE_BOOLEAN);
+            unset($redisOptions['delete_after_reject']);
+        }
+
         $dbIndex = null;
         if (\array_key_exists('dbindex', $redisOptions)) {
             $dbIndex = filter_var($redisOptions['dbindex'], \FILTER_VALIDATE_INT);
@@ -159,6 +168,7 @@ class Connection
             'auto_setup' => $autoSetup,
             'stream_max_entries' => $maxEntries,
             'delete_after_ack' => $deleteAfterAck,
+            'delete_after_reject' => $deleteAfterReject,
             'dbindex' => $dbIndex,
             'redeliver_timeout' => $redeliverTimeout,
             'claim_interval' => $claimInterval,
@@ -348,7 +358,9 @@ class Connection
     {
         try {
             $deleted = $this->connection->xack($this->stream, $this->group, [$id]);
-            $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
+            if ($this->deleteAfterReject) {
+                $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
+            }
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -426,7 +438,7 @@ class Connection
             $this->connection->clearLastError();
         }
 
-        if ($this->deleteAfterAck) {
+        if ($this->deleteAfterAck || $this->deleteAfterReject) {
             $groups = $this->connection->xinfo('GROUPS', $this->stream);
             if (
                 // support for Redis extension version 5+
@@ -434,7 +446,7 @@ class Connection
                 // support for Redis extension version 4.x
                 || (\is_string($groups) && substr_count($groups, '"name"'))
             ) {
-                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
+                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
             }
         }
 

@@ -170,6 +170,20 @@ EOF
             }
         }
 
+        $kernelDir = \dirname((new \ReflectionObject($kernel))->getFileName());
+        $preloadFile = $fs->makePathRelative(\dirname($containerFile, 2), $kernelDir);
+        $preloadFile .= substr_replace(basename($containerFile), '.preload', -4, 0);
+        $preloadFile = var_export('/'.$preloadFile, true);
+        @file_put_contents($kernelDir.'/preload.php', <<<EOPHP
+<?php
+
+if (file_exists(__DIR__.$preloadFile)) {
+    require __DIR__.$preloadFile;
+}
+
+EOPHP
+        );
+
         if ($output->isVerbose()) {
             $io->comment('Finished');
         }

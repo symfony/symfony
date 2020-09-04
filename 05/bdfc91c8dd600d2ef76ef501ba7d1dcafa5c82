@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-08T09:51:19Z
+
+Then there is going to be zero different between calling reject() and calling ack(). This looks suspicious to me.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2020-05-20T12:25:04Z
+
+Maybe that introducing a new `delete_after_reject` option would make more sense. As a reminder, this option is here to cover memory usage (https://github.com/symfony/symfony/commit/7c416a7173e73156588e13cc0d22da989f54ea23) although #36619 is an issue where rejected (not acknowledged) messages would not be available to other consumers. Acknowledged messages would could still be deleted to spare memory even though rejected ones could persist.
+
+---------------------------------------------------------------------------
+
+by Steveb-p at 2020-05-21T08:26:11Z
+
+> Then there is going to be zero different between calling reject() and calling ack(). This looks suspicious to me.
+
+Whoops, missed the comment.
+
+Pretty much yes, rejection and acknowledgement becomes undistinguishable. From my point of view, acknowledgement means "Yup, I've seen this message and I've handled it". Whether it was rejected or handled ok is not possible to pass to Redis as there is no `XREJ`ect command anyway.
+
+This is similar to how Kafka handles messages, which is what Redis streams are based on conceptually. It is simply a structured log that you go through, acknowledging messages as they come (meaning, "I've read it").
+
+https://redis.io/topics/streams-intro
+> Consumer groups were initially introduced by the popular messaging system called Kafka (TM). Redis reimplements a similar idea in completely different terms, but the goal is the same: to allow a group of clients to cooperate consuming a different portion of the same stream of messages.
+
+As you can see in the original, `XACK` was sent to Redis just before `XDEL` anyway. Deleting the message causes other consumer groups to be unable to handle that message, despite potentially being able to.
+In my case, other consumer group is simply another application. Errors during deserialization caused Worker to reject the message and delete, even though another app was perfectly able to work with it.
+
+> As a reminder, this option is here to cover memory usage
+
+(`delete_after_ack`) I would like to add some sort of warning/note to documentation of this feature (probably in another PR?). I can see where it comes from, but it's "only" reasonable to delete messages if only one consumer group is assumed (that is, Messenger component is treated as internal application queue, not as a method of different application parts / applications to speak to one another).
+In cases where another consumer group shows up, it breaks consumer group functionality in Redis.
+
+---------------------------------------------------------------------------
+
+by Steveb-p at 2020-05-26T23:46:28Z
+
+@sroze could you give your opinion on this if you have some spare time? I'd like to adjust the PR to match.
+
+Does this need some tests to be added, or will it be good as-is, even with new configuration property `delete_after_reject`?
+
+EDIT: Also, what `delete_after_reject` default value should be? From my point of view it should maybe follow the `delete_after_ack` property if it is set, and be `false` otherwise?
+I think that this would prevent messages from being deleted (which is what surprised me in the original issue) while keeping the intent of managing redis's memory in `delete_after_ack` = `true` case.
+
+EDIT2: I rebased the PR to the current ~~`master`~~ `5.1` branch. And I've put a lot of people on reviever list by doing so... Sorry :disappointed: :cry:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-06-22T12:15:14Z
+
+Looks good to me, but I'm not sure this qualifies as a bugfix given it introduces a new option (and thus requires code changes).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-06-22T12:16:39Z
+
+I agree with @chalasr, this should target 5.2 (aka master).
+
+---------------------------------------------------------------------------
+
+by Steveb-p at 2020-06-22T17:07:40Z
+
+@fabpot @chalasr I'll rebase and adjust the PR accordingly.
+
+Hopefully I won't pull half of the community into it this time :see_no_evil:

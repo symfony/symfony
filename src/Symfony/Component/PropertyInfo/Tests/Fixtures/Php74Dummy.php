@@ -18,4 +18,14 @@ class Php74Dummy
 {
     public Dummy $dummy;
     private ?bool $nullableBoolProp;
+    /** @var string[] */
+    private array $stringCollection;
+
+    public function addStringCollection(string $string): void
+    {
+    }
+
+    public function removeStringCollection(string $string): void
+    {
+    }
 }

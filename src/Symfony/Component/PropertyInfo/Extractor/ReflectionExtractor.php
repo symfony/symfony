@@ -139,18 +139,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes($class, $property, array $context = []): ?array
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            try {
-                $reflectionProperty = new \ReflectionProperty($class, $property);
-                $type = $reflectionProperty->getType();
-                if (null !== $type) {
-                    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass());
-                }
-            } catch (\ReflectionException $e) {
-                // noop
-            }
-        }
-
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
@@ -168,6 +156,18 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
             return $fromDefaultValue;
+        }
+
+        if (\PHP_VERSION_ID >= 70400) {
+            try {
+                $reflectionProperty = new \ReflectionProperty($class, $property);
+                $type = $reflectionProperty->getType();
+                if (null !== $type) {
+                    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass());
+                }
+            } catch (\ReflectionException $e) {
+                // noop
+            }
         }
 
         return null;

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by sanmai at 2020-09-04T07:21:56Z
+
+I think I addressed all comments. How should I test this change?
+
+I see [there's a test](https://github.com/symfony/symfony/blob/29feb0091152fc84f14ff1bf8372c5646f74ae6d/src/Symfony/Bridge/PhpUnit/Tests/CoverageListenerTest.php#L7), but it assumes a currently used version of PHPUnit. Should this be enough?

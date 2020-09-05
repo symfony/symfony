@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by loic425 at 2020-09-04T07:24:33Z
+
+> You need to fix tests with low deps. In the FrameworkBundle composer.json file, you need to require symfony/validator ^5.2.
+
+@fabpot It seems to be not enough.
+https://travis-ci.org/github/symfony/symfony/jobs/724055904#L6907

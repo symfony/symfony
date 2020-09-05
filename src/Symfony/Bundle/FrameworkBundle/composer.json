@@ -29,8 +29,7 @@
         "symfony/polyfill-php80": "^1.15",
         "symfony/filesystem": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
-        "symfony/routing": "^5.1",
-        "symfony/validator": "^5.2"
+        "symfony/routing": "^5.1"
     },
     "require-dev": {
         "doctrine/annotations": "~1.7",
@@ -58,6 +57,7 @@
         "symfony/string": "^5.0",
         "symfony/translation": "^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
+        "symfony/validator": "^5.2",
         "symfony/workflow": "^5.2",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
@@ -88,7 +88,7 @@
         "symfony/translation": "<5.0",
         "symfony/twig-bridge": "<4.4",
         "symfony/twig-bundle": "<4.4",
-        "symfony/validator": "<4.4",
+        "symfony/validator": "<5.2",
         "symfony/web-profiler-bundle": "<4.4",
         "symfony/workflow": "<5.2"
     },

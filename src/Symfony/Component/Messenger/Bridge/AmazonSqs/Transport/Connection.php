@@ -318,6 +318,7 @@ class Connection
         if (self::isFifoQueue($this->configuration['queue_name'])) {
             $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
             $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1(json_encode(['body' => $body, 'headers' => $headers]));
+            unset($parameters['DelaySeconds']);
         }
 
         $this->client->sendMessage($parameters);

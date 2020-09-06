@@ -48,6 +48,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -159,6 +160,13 @@ return static function (ContainerConfigurator $container) {
                 service('security.role_hierarchy')->nullOnInvalid(),
             ])
             ->tag('security.voter', ['priority' => 245])
+
+        ->set('security.impersonate_url_generator', ImpersonateUrlGenerator::class)
+        ->args([
+            service('request_stack'),
+            service('security.firewall.map'),
+            service('security.token_storage'),
+        ])
 
         // Firewall related services
         ->set('security.firewall', FirewallListener::class)

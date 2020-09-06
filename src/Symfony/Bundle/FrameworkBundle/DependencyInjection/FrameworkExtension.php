@@ -171,6 +171,7 @@ class FrameworkExtension extends Extension
     private $messengerConfigEnabled = false;
     private $mailerConfigEnabled = false;
     private $httpClientConfigEnabled = false;
+    private $notifierConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -372,7 +373,7 @@ class FrameworkExtension extends Extension
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['notifier'])) {
+        if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
@@ -635,6 +636,10 @@ class FrameworkExtension extends Extension
 
         if ($this->httpClientConfigEnabled) {
             $loader->load('http_client_debug.php');
+        }
+
+        if ($this->notifierConfigEnabled) {
+            $loader->load('notifier_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);

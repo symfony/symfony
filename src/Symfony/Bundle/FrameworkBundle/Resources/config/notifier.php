@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Channel\EmailChannel;
 use Symfony\Component\Notifier\Channel\SmsChannel;
 use Symfony\Component\Notifier\Chatter;
 use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 use Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -101,5 +102,8 @@ return static function (ContainerConfigurator $container) {
         ->set('texter.messenger.sms_handler', MessageHandler::class)
             ->args([service('texter.transports')])
             ->tag('messenger.message_handler', ['handles' => SmsMessage::class])
+
+        ->set('notifier.logger_notification_listener', NotificationLoggerListener::class)
+            ->tag('kernel.event_subscriber')
     ;
 };

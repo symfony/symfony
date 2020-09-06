@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * Turns a ResponseInterface to a string and vice-versa. Generated string should me modifiable easily.
+ * Turns a ResponseInterface to a string and vice-versa. Generated string should be modifiable easily.
  *
  * @author Gary PEGEOT <gary.pegeot@allopneus.com>
  */

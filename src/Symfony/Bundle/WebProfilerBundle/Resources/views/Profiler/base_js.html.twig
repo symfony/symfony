@@ -422,7 +422,7 @@
                 newToken = (newToken || token);
                 this.load(
                     'sfwdt' + token,
-                    '{{ url("_wdt", { "token": "xxxxxx" })|escape('js') }}'.replace(/xxxxxx/, newToken),
+                    '{{ url("_wdt", { "token": "xxxxxx" }, true)|escape('js') }}'.replace(/xxxxxx/, newToken),
                     function(xhr, el) {
 
                         /* Evaluate in global scope scripts embedded inside the toolbar */

@@ -1898,6 +1898,30 @@ YAML
                 [new TaggedValue('foo', 'bar')],
                 '[ !foo bar ]',
             ],
+            'with-comments' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz
+    #bar
+  ]]
+YAML
+            ],
+            'with-comments-trailing-comma' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz,
+    #bar
+  ]]
+YAML
+            ],
         ];
     }
 

@@ -382,10 +382,12 @@ class ProfilerControllerTest extends WebTestCase
             ->with($profile->getToken())
             ->willReturn($profile);
 
+        $collectorsNames = array_keys($profile->getCollectors());
+
         $profiler
             ->expects($this->atLeastOnce())
             ->method('has')
-            ->with($this->logicalXor($collectorsNames = array_keys($profile->getCollectors())))
+            ->with($this->logicalXor(...$collectorsNames))
             ->willReturn(true);
 
         $expectedTemplate = 'expected_template.html.twig';

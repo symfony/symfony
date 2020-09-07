@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger as Logger;
+use Symfony\Component\Filesystem\Tests\FilesystemTestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ResponseRecorder;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RecordReplayCallback;
 use Symfony\Component\HttpClient\Response\ResponseSerializer;
 
-class RecordReplayCallbackTest extends TestCase
+class RecordReplayCallbackTest extends FilesystemTestCase
 {
     /**
      * @var Logger
@@ -38,7 +38,8 @@ class RecordReplayCallbackTest extends TestCase
 
     protected function setUp(): void
     {
-        $recorder = new ResponseRecorder(sys_get_temp_dir(), new ResponseSerializer());
+        parent::setUp();
+        $recorder = new ResponseRecorder($this->workspace, new ResponseSerializer(), $this->filesystem);
 
         $this->logger = new Logger();
         $this->callback = new RecordReplayCallback($recorder);
@@ -46,7 +47,7 @@ class RecordReplayCallbackTest extends TestCase
         $this->client = new MockHttpClient($this->callback);
     }
 
-    public function testReplayOrRecord(): void
+    public function testReplayOrRecord()
     {
         $response = $this->client->request('GET', 'http://localhost:8057');
         $response->getHeaders(false);
@@ -61,7 +62,7 @@ class RecordReplayCallbackTest extends TestCase
         $this->assertTrue($this->logger->hasDebugThatContains('Response replayed'), 'Response should be replayed');
     }
 
-    public function testReplayThrowWhenNoRecordIsFound(): void
+    public function testReplayThrowWhenNoRecordIsFound()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to replay response for GET request to "http://localhost:8057/" endpoint.');

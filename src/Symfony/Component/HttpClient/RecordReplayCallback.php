@@ -36,19 +36,10 @@ class RecordReplayCallback implements LoggerAwareInterface
     public const MODE_REPLAY = 'replay';
     public const MODE_REPLAY_OR_RECORD = 'replay_or_record';
 
-    /**
-     * @var string
-     */
     private $mode;
 
-    /**
-     * @var HttpClientInterface
-     */
     private $client;
 
-    /**
-     * @var ResponseRecorder
-     */
     private $recorder;
 
     public function __construct(ResponseRecorder $recorder, string $mode = 'replay_or_record', HttpClientInterface $client = null)

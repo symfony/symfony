@@ -183,7 +183,7 @@ before_install:
               tfold ext.redis tpecl redis-5.2.2 redis.so $INI "no"
           fi
 
-          tfold ext.igbinary tpecl igbinary-3.1.2 igbinary.so $INI
+          tfold ext.igbinary tpecl igbinary-3.1.5 igbinary.so $INI
       done
     - |
       # List all php extensions with versions

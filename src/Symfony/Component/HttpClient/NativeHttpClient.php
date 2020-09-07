@@ -214,7 +214,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'disable_compression' => true,
             ], static function ($v) { return null !== $v; }),
             'socket' => [
-                'bindto' => $options['bindto'],
+                'bindto' => $options['bindto'] ?: '0:0',
                 'tcp_nodelay' => true,
             ],
         ];

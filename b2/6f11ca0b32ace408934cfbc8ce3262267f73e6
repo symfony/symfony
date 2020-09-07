@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-08T13:45:05Z
+
+The PR has been updated to match the new attribute syntax and is now compatible with php 8.0.0-beta1.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-03T09:13:42Z
+
+The PR has once again been updated because of a syntax change: https://github.com/php/php-src/commit/8b37c1e993f17345312a76a239b77ae137d3f8e8
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-07T09:05:35Z
+
+The failure on travis can be skipped by listing the fixture file in `.github/patch-types.php` maybe?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-07T11:35:24Z
+
+I've added the file there. 👍

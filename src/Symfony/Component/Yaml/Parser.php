@@ -1253,7 +1253,13 @@ class Parser
             for ($i = 1; isset($this->currentLine[$i]) && ']' !== $this->currentLine[$i]; ++$i) {
             }
 
-            $value .= trim($this->currentLine);
+            $trimmedValue = trim($this->currentLine);
+
+            if ('' !== $trimmedValue && '#' === $trimmedValue[0]) {
+                continue;
+            }
+
+            $value .= $trimmedValue;
 
             if (isset($this->currentLine[$i]) && ']' === $this->currentLine[$i]) {
                 break;

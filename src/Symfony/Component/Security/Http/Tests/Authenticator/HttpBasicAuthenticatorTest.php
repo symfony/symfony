@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
 
 class HttpBasicAuthenticatorTest extends TestCase
 {
@@ -77,7 +77,7 @@ class HttpBasicAuthenticatorTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $this->userProvider = $this->createMock([UserProviderInterface::class, PasswordUpgraderInterface::class]);
+        $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
         $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
         $authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
 

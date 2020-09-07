@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Looks for definitions with autowiring enabled and registers their corresponding "@required" methods as setters.
@@ -49,6 +50,14 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
             }
 
             while (true) {
+                if (\PHP_VERSION_ID >= 80000 && $r->getAttributes(Required::class)) {
+                    if ($this->isWither($r, $r->getDocComment() ?: '')) {
+                        $withers[] = [$r->name, [], true];
+                    } else {
+                        $value->addMethodCall($r->name, []);
+                    }
+                    break;
+                }
                 if (false !== $doc = $r->getDocComment()) {
                     if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
                         if ($this->isWither($reflectionMethod, $doc)) {

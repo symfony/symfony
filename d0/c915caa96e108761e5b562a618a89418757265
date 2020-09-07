@@ -1,0 +1,148 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-01T18:50:44Z
+
+Right now, you can mix&match attributes and annotations. It would have the same effect as if you specified multiple annotations. This was the easiest way to implement it, but this behavior is certainly debatable.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-07-01T19:00:06Z
+
+i think it's fair to assume both definitions remain equivalent. Then it works on all SF versions, loading either one or another.
+
+> I was wondering if we can make use of attributes as a replacement for Doctrine Annotations
+
+raising the bigger question, is there any reason not to? Should we deprecate annotation support once we support php:^8?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-07-02T08:00:15Z
+
+Please note that the attribute syntax has just changed from `<< ... >>` to `@@...`  See https://wiki.php.net/rfc/shorter_attribute_syntax
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-02T10:33:21Z
+
+@javiereguiluz This has not been merged yet, has it?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-07-02T10:39:39Z
+
+Not merged yet ... but approved, so it will be merged "soon" (I was notified about this by this nice @beberlei service: https://php-rfc-watch.beberlei.de/)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-02T11:07:15Z
+
+All right. If I changed the PR now, Travis won't be able to run my tests anymore. I don't expect the reflection API to be affected by the change, so all I will need to do is adjust the test fixtures and the attribute class itself to the new syntax. I'll do this as soon as Travis' nightly build supports it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-03T20:38:29Z
+
+Pending PR for the syntax change: php/php-src#5796
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-07T07:32:47Z
+
+I've pushed an update to this PR the other day.
+
+* The PR is now incompatible with 8.0.0alpha1 and requires the changes of php/php-src#5751 to run.
+    * `PhpAttribute` has been renamed to `Attribute`
+    * The allowed targets of the `Route` attribute have been set to class and method (just like the annotation).
+    * Now, we need to explicitly allow the attribute to be applied multiple times to the same structure, so I did just that.
+* I've duplicated all test fixtures of `AnnotationClassLoaderTest` and rewrote the annotations to attributes. So we're running the same test suite for annotations and attributes now.
+
+Some tests mocked Doctrine's annotation reader. I rewrote those test to use an actual annotation reader instead. It might be a good idea to backport that change, in order to ease the maintenance.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-07T12:43:02Z
+
+I might need some help with getting Travis green: https://travis-ci.org/github/symfony/symfony/jobs/705695329
+
+On the php 7.4 run, it looks like some piece of code is trying to parse my new attribute (which only works on php 8). Anything I can do to prevent that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-07T12:50:32Z
+
+patch `.github/patch-types.php`?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-07T15:37:55Z
+
+> patch `.github/patch-types.php`?
+
+That did not help, apparently. 🙁
+
+---------------------------------------------------------------------------
+
+by moliata at 2020-07-09T16:52:08Z
+
+@javiereguiluz Just to chime in, `@@` is still in "unknown status" given that it raises ambiguity in the PHP parser. Thus, whether the new syntax will be used depends on the [namespaced names as tokens RFC](https://wiki.php.net/rfc/namespaced_names_as_token).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-09T17:58:38Z
+
+PHP attributes are basically a moving target at the moment. Just look at the changes between the alpha1 and alpha2 releases. And because I need a working testsuite, I won't anticipate any syntax changes until they actually hit the php 8 nightly build on travis.
+
+Nevertheless, I think working with attributes at this early stage can be very helpful:
+
+* We can find out if attributes are helpful and how we can make use of them in Symfony.
+* We can give early feedback to the php dev team, which in turn might help them to fine-tune the feature before the final release.
+
+Since Symfony 5.2 will stabilize together with php 8, I'm marking this PR as ready now. The current implementation of the PR works find with the alpha2 of php 8. If the PR gets merged, I'll monitor the php 8 build on Travis and adjust the implementation if necessary.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-07-09T18:42:15Z
+
+I've pushed a small update. The `Route` attribute class can be used as a Doctrine-style annotation now. This should make the transition from annotations to attributes even smoother, because we can now convert the annotations one by one without importing both classes: Just use the attribute class. And one fine day, when Symfony drops php 7 support (😱) we could even merge the two classes.
+
+I originally wanted to use the same class for annotations and attributes. The only thing that prevented me from doing so is that I have to configure the attribute class itself by attaching an attribute to it. And I cannot do this without breaking php 7 compatibility. This is why I've created the attribute as a subclass of the annotation class.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-08T17:58:53Z
+
+Hello again. I've updated the PR in order to make it compatible with php 8.0.0-beta1. The attribute syntax has changed from `<<Route>>` to `@@Route` as @javiereguiluz has already anticipated.
+
+Moreover, php now supports named arguments which is a perfect match for attributes! I've updated the constructor so we don't have to work with those bulky arrays anymore. The syntax of the attribute is now almost the same as for doctrine annotations.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-08-08T18:07:55Z
+
+@derrabus it looks like `@@...` syntax could be dropped before the final release of PHP 8. The syntax is still being debated and the new candidates are `#[...]` and `@[...]` See https://externals.io/message/111312
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-08T18:13:29Z
+
+@javiereguiluz Yes, I'm aware. I'll keep the PR updated.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-08-08T18:38:09Z
+
+I've cherry-picked #37771 into this PR in order to have the new tests executed on php 8. Please note that Doctrine annotations are currently broken due to doctrine/annotations#339.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-03T08:36:03Z
+
+Another syntax change has hit the php master branch: https://github.com/php/php-src/commit/8b37c1e993f17345312a76a239b77ae137d3f8e8
+
+Let's hope it's the final one. 🤞
+
+Because with the new `#[…]` syntax attributes can be written in a way so that they are treated as a comment by php 7, there is no need for a dedicated attribute class anymore. This is why I've merged my attribute class with the annotation class.
+
+Travis' nightly php 8 build is a bit behind and still expects the `@@` syntax, so tests are failing currently. I'll trigger a new build in a couple of days when Travis has caught up.
+
+Fabbot is red because it tries to "fix" the attribute from `#` to `//`. This is probably something we should report to the PHP CS Fixer project, I guess.

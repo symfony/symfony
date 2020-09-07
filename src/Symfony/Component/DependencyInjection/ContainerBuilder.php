@@ -1173,7 +1173,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } else {
             $r = new \ReflectionClass($class = $parameterBag->resolveValue($definition->getClass()));
 
-            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs(array_values($arguments));
             // don't trigger deprecations for internal uses
             // @deprecated since version 3.3, to be removed in 4.0 along with the deprecated class
             $deprecationAllowlist = ['event_dispatcher' => ContainerAwareEventDispatcher::class];

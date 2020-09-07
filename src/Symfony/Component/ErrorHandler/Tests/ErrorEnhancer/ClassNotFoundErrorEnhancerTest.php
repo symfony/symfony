@@ -82,12 +82,28 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
 
         return [
             [
+                'Class "WhizBangFactory" not found',
+                "Attempted to load class \"WhizBangFactory\" from the global namespace.\nDid you forget a \"use\" statement?",
+            ],
+            [
                 'Class \'WhizBangFactory\' not found',
                 "Attempted to load class \"WhizBangFactory\" from the global namespace.\nDid you forget a \"use\" statement?",
             ],
             [
+                'Class "Foo\\Bar\\WhizBangFactory" not found',
+                "Attempted to load class \"WhizBangFactory\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
                 'Class \'Foo\\Bar\\WhizBangFactory\' not found',
                 "Attempted to load class \"WhizBangFactory\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
+                'Interface "Foo\\Bar\\WhizBangInterface" not found',
+                "Attempted to load interface \"WhizBangInterface\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
+                'Trait "Foo\\Bar\\WhizBangTrait" not found',
+                "Attempted to load trait \"WhizBangTrait\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
             ],
             [
                 'Class \'UndefinedFunctionError\' not found',

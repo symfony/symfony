@@ -12,10 +12,10 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Psr\SimpleCache\CacheInterface;
-use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\ChainCache;
 use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Tests\Fixtures\PrunableCache;
 
 /**
  * @group time-sensitive
@@ -65,7 +65,7 @@ class ChainCacheTest extends CacheTestCase
 
     private function getPruneableMock(): CacheInterface
     {
-        $pruneable = $this->createMock([CacheInterface::class, PruneableInterface::class]);
+        $pruneable = $this->createMock(PrunableCache::class);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -77,7 +77,7 @@ class ChainCacheTest extends CacheTestCase
 
     private function getFailingPruneableMock(): CacheInterface
     {
-        $pruneable = $this->createMock([CacheInterface::class, PruneableInterface::class]);
+        $pruneable = $this->createMock(PrunableCache::class);
 
         $pruneable
             ->expects($this->atLeastOnce())

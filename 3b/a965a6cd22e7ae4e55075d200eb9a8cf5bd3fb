@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-07-30T16:04:48Z
+
+Hello,
+
+Thanks for your  first contribution.
+
+I like a lot your idea 👍🏼  Thanks.
+
+I have a question about the implementation : Why did you choose the create two Processor instead of doing all the work in the existing processor?
+
+---------------------------------------------------------------------------
+
+by IgorTimoshenko at 2020-07-31T12:55:35Z
+
+@lyrixx,
+
+I have added the second processor in order to separate processing of tokens. In my opinion, tokens should be processed by their own processors. Moreover, some projects may not use user impersonation feature, and an abstract processor provides the ability to easily implement your own processor

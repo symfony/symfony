@@ -17,7 +17,6 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ResponseRecorder;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -86,9 +85,13 @@ class RecordReplayCallback implements LoggerAwareInterface
             $parts[] = substr(hash_final($ctx), 0, 6);
         }
 
-        $key = (new AsciiSlugger())->slug(implode('-', $parts))->toString();
+        $key = strtr(implode('-', $parts), ':/\\', '-');
 
-        $this->log('Calculated key "{key}" for {method} request to "{url}".', compact('key', 'method', 'url'));
+        $this->log('Calculated key "{key}" for {method} request to "{url}".', [
+            'key' => $key,
+            'method' => $method,
+            'url' => $url,
+        ]);
 
         if (static::MODE_RECORD === $this->mode) {
             return $this->recordResponse($key, $method, $url, $options);

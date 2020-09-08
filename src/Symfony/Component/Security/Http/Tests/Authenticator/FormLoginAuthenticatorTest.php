@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -25,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
 
 class FormLoginAuthenticatorTest extends TestCase
 {
@@ -148,7 +148,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
         $request->setSession($this->createSession());
 
-        $this->userProvider = $this->createMock([UserProviderInterface::class, PasswordUpgraderInterface::class]);
+        $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
         $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
 
         $this->setUpAuthenticator();

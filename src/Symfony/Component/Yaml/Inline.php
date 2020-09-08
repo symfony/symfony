@@ -650,20 +650,20 @@ class Inline
 
                 switch (true) {
                     case ctype_digit($scalar):
-                        if ('0' === $scalar[0] && '0' !== $scalar) {
+                        if (preg_match('/^0[0-7]+$/', $scalar)) {
                             trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
 
-                            return octdec(preg_replace('/[^0-7]/', '', $scalar));
+                            return octdec($scalar);
                         }
 
                         $cast = (int) $scalar;
 
                         return ($scalar === (string) $cast) ? $cast : $scalar;
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
-                        if ('0' === $scalar[1] && '-0' !== $scalar) {
+                        if (preg_match('/^-0[0-7]+$/', $scalar)) {
                             trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
 
-                            return -octdec(preg_replace('/[^0-7]/', '', substr($scalar, 1)));
+                            return -octdec(substr($scalar, 1));
                         }
 
                         $cast = (int) $scalar;

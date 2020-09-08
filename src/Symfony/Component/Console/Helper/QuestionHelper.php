@@ -160,7 +160,7 @@ class QuestionHelper extends Helper
 
         if (\function_exists('sapi_windows_cp_set')) {
             // Codepage used by cmd.exe on Windows to allow special characters (éàüñ).
-            sapi_windows_cp_set(1252);
+            @sapi_windows_cp_set(1252);
         }
 
         if (null === $autocomplete || !self::$stty || !Terminal::hasSttyAvailable()) {

@@ -801,7 +801,7 @@ class Request
     {
         $ip = $this->server->get('REMOTE_ADDR');
 
-        if (!$this->isFromTrustedProxy()) {
+        if (!$this->isFromTrustedProxy() || $this->server->has('PLATFORM_PROJECT_ENTROPY')) {
             return [$ip];
         }
 

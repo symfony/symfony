@@ -382,11 +382,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
         yield [1.123, '1.1', 1, 1];
         yield [1.123, '1.12', 2, 2];
         yield [1.123, '1.123', -1, 0];
-
-        if (\PHP_VERSION_ID < 80000) {
-            // This dataset will produce a TypeError on php 8.
-            yield [1.123, '1', 'abc', 0];
-        }
     }
 
     /**
@@ -417,11 +412,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
         yield [1000, '1,000', 1, 1];
         yield [1000, '1,000', 2, 1];
         yield [1000, '1,000', -1, 1];
-
-        if (\PHP_VERSION_ID < 80000) {
-            // This dataset will produce a TypeError on php 8.
-            yield [1000, '1000', 'abc', 0];
-        }
     }
 
     /**

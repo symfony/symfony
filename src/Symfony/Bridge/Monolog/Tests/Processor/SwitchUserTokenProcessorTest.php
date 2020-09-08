@@ -35,9 +35,13 @@ class SwitchUserTokenProcessorTest extends TestCase
         $record = ['extra' => []];
         $record = $processor($record);
 
-        $this->assertArrayHasKey('original_token', $record['extra']);
-        $this->assertEquals($originalToken->getUsername(), $record['extra']['original_token']['username']);
-        $this->assertEquals($originalToken->isAuthenticated(), $record['extra']['original_token']['authenticated']);
-        $this->assertEquals(['ROLE_SUPER_ADMIN'], $record['extra']['original_token']['roles']);
+        $expected = [
+            'impersonator_token' => [
+                'username' => 'original_user',
+                'authenticated' => true,
+                'roles' => ['ROLE_SUPER_ADMIN'],
+            ],
+        ];
+        $this->assertSame($expected, $record['extra']);
     }
 }

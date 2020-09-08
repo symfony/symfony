@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by sanmai at 2020-09-07T15:19:49Z
+
+@derrabus if you have a second to have a look
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-07T15:40:34Z
+
+Can you provide an example of a test that would fail without your changes?
+
+---------------------------------------------------------------------------
+
+by sanmai at 2020-09-07T15:53:31Z
+
+Sure, [this is how it looks](https://github.com/infection/infection/runs/1082085875?check_suite_focus=true#step:6:163).
+
+This `FileNotFound` extends `RuntimeException`, so both will be inside `$covers` array.
+
+---------------------------------------------------------------------------
+
+by sanmai at 2020-09-07T22:53:54Z
+
+A relevant commit: https://github.com/sebastianbergmann/phpunit/commit/e06850c12b93d55271966b423519972a5ec6df45
+
+A test for `InvalidCodeUnitException` being thrown in these cases: https://github.com/sebastianbergmann/code-unit/blob/60c6fb972b3262e423be3000e7b8c67cbc477580/tests/unit/ClassMethodUnitTest.php#L49-L54

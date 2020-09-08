@@ -71,6 +71,7 @@ class Process implements \IteratorAggregate
     private $incrementalErrorOutputOffset = 0;
     private $tty = false;
     private $pty;
+    private $options = ['suppress_errors' => true, 'bypass_shell' => true];
 
     private $useFileHandles = false;
     /** @var PipesInterface */
@@ -196,7 +197,11 @@ class Process implements \IteratorAggregate
 
     public function __destruct()
     {
-        $this->stop(0);
+        if ($this->options['create_new_console'] ?? false) {
+            $this->processPipes->close();
+        } else {
+            $this->stop(0);
+        }
     }
 
     public function __clone()
@@ -303,10 +308,7 @@ class Process implements \IteratorAggregate
             $commandline = $this->replacePlaceholders($commandline, $env);
         }
 
-        $options = ['suppress_errors' => true];
-
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
         } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
@@ -332,7 +334,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException(sprintf('The provided cwd "%s" does not exist.', $this->cwd));
         }
 
-        $this->process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $options);
+        $this->process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
         if (!\is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -1218,6 +1220,32 @@ class Process implements \IteratorAggregate
         }
 
         return $this->starttime;
+    }
+
+    /**
+     * Defines options to pass to the underlying proc_open().
+     *
+     * @see https://php.net/proc_open for the options supported by PHP.
+     *
+     * Enabling the "create_new_console" option allows a subprocess to continue
+     * to run after the main process exited, on both Windows and *nix
+     */
+    public function setOptions(array $options)
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Setting options while the process is running is not possible.');
+        }
+
+        $defaultOptions = $this->options;
+        $existingOptions = ['blocking_pipes', 'create_process_group', 'create_new_console'];
+
+        foreach ($options as $key => $value) {
+            if (!\in_array($key, $existingOptions)) {
+                $this->options = $defaultOptions;
+                throw new LogicException(sprintf('Invalid option "%s" passed to "%s()". Supported options are "%s".', $key, __METHOD__, implode('", "', $existingOptions)));
+            }
+            $this->options[$key] = $value;
+        }
     }
 
     /**

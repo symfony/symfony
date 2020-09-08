@@ -558,6 +558,10 @@ class ErrorHandlerTest extends TestCase
      */
     public function testHandleFatalErrorOnHHVM()
     {
+        if (!\defined('HHVM_VERSION')) {
+            $this->markTestSkipped('This test requires HHVM.');
+        }
+
         try {
             $handler = ErrorHandler::register();
 

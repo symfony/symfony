@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-07T20:47:20Z
+
+Do you have an exemple of that on php 8? Worth a test case?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-07T20:53:00Z
+
+We have a failing test already, see https://travis-ci.org/github/symfony/symfony/jobs/724971294, line 5020.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-07T21:03:45Z
+
+I'd prefer being very specific about the reason of the exception. Maybe using getFilename()?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-07T21:09:37Z
+
+Sounds like a good idea. I've added a check.

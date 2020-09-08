@@ -196,6 +196,8 @@ before_install:
           ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
       fi
 
+    - if [[ $PHP = nightly ]]; then composer self-update --snapshot; fi
+
 install:
     - |
       # Install the phpunit-bridge from a PR if required

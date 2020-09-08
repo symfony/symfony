@@ -791,12 +791,12 @@ class InlineTest extends TestCase
 
     public function testParsePositiveOctalNumberContainingInvalidDigits()
     {
-        self::assertSame(342391, Inline::parse('0123456789'));
+        self::assertSame('0123456789', Inline::parse('0123456789'));
     }
 
     public function testParseNegativeOctalNumberContainingInvalidDigits()
     {
-        self::assertSame(-342391, Inline::parse('-0123456789'));
+        self::assertSame('-0123456789', Inline::parse('-0123456789'));
     }
 
     /**

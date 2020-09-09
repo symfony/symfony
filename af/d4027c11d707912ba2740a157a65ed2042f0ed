@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by lstrojny at 2020-09-08T15:27:01Z
+
+> Thanks for the PR.
+> I understand that rawurlencode increases the length of keys, but encoding them is nonetheless required since memcached doesn't allow spaces in them, while we do.
+> This breaks it currently, isn't it?
+
+Great point, indeed, spaces would now break. So what I did now is adding a custom encoding function that replaces memcached reserved characters with Symfony reserved characters but keep the length of the key.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-08T20:59:16Z
+
+LGTM but there are some failures to investigate in Github Actions.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2020-09-09T08:05:14Z
+
+@nicolas-grekas tests pass now, fixed further encoding issue. I accidentally force-pushed over your changes but restored the variable rename. I've seen that you removed the rawurlencode() for the namespace and I expanded the testcase to demonstrate why I think it’s needed. Can you elaborate on why you think it’s not needed?

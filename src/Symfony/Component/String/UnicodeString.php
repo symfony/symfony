@@ -143,6 +143,10 @@ class UnicodeString extends AbstractUnicodeString
             return null;
         }
 
+        if ($this->length() <= $offset) {
+            return null;
+        }
+
         $i = $this->ignoreCase ? grapheme_stripos($this->string, $needle, $offset) : grapheme_strpos($this->string, $needle, $offset);
 
         return false === $i ? null : $i;
@@ -235,7 +239,7 @@ class UnicodeString extends AbstractUnicodeString
             $result = '';
             $indexOf = $this->ignoreCase ? 'grapheme_stripos' : 'grapheme_strpos';
 
-            while (false !== $i = $indexOf($tail, $from)) {
+            while ('' !== $tail && false !== $i = $indexOf($tail, $from)) {
                 $slice = grapheme_substr($tail, 0, $i);
                 $result .= $slice.$to;
                 $tail = substr($tail, \strlen($slice) + \strlen($from));
@@ -262,6 +266,10 @@ class UnicodeString extends AbstractUnicodeString
 
     public function slice(int $start = 0, int $length = null): AbstractString
     {
+        if ($this->length() <= $start) {
+            return new self();
+        }
+
         $str = clone $this;
         $str->string = (string) grapheme_substr($this->string, $start, $length ?? \PHP_INT_MAX);
 

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by digilist at 2020-07-11T14:40:13Z
+
+I just noticed that the build is failing for older PHP versions, please let me check first.
+
+Update: Fixed it. It was because older versions of the phpdocumenter reflection package did not allow/parse spaces in `array<string, string>` The appveyor and travis builds are still red, but those builds are failing because of unrelated tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-07-12T09:36:39Z
+
+We would consider this as a new feature indeed. Can you rebase and target master please?
+
+---------------------------------------------------------------------------
+
+by MaSpeng at 2020-08-20T16:12:53Z
+
+How is the status of this merge request, I stumbled over this issue by myself right now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-07T14:20:31Z
+
+/cc @dunglas could you maybe have a look?

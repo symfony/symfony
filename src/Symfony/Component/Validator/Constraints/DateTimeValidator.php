@@ -53,6 +53,12 @@ class DateTimeValidator extends DateValidator
             return;
         }
 
+        if ('+' === substr($constraint->format, -1)) {
+            $errors['warnings'] = array_filter($errors['warnings'], function ($warning) {
+                return 'Trailing data' !== $warning;
+            });
+        }
+
         foreach ($errors['warnings'] as $warning) {
             if ('The parsed date was invalid' === $warning) {
                 $this->context->buildViolation($constraint->message)

@@ -84,9 +84,6 @@ EOTXT
 
     public function testFromCallableClosureCaster()
     {
-        if (\defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped('Not for HHVM.');
-        }
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
             (new \ReflectionMethod(__CLASS__, 'stub'))->getClosure(),

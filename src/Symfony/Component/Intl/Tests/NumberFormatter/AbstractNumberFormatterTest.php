@@ -324,7 +324,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        if (method_exists($this, 'expectWarning')) {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
             $this->expectWarning();
         } else {
             $this->expectException(Warning::class);
@@ -338,6 +340,10 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrencyReturn($formatter, $value)
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        }
+
         $this->assertFalse(@$formatter->format($value, NumberFormatter::TYPE_CURRENCY));
     }
 
@@ -699,7 +705,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        if (method_exists($this, 'expectWarning')) {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
             $this->expectWarning();
         } else {
             $this->expectException(Warning::class);
@@ -823,7 +831,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
-        if (method_exists($this, 'expectWarning')) {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
             $this->expectWarning();
         } else {
             $this->expectException(Warning::class);

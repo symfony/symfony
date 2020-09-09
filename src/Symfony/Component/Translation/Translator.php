@@ -171,7 +171,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function getLocale()
     {
-        return $this->locale;
+        return $this->locale ?? \Locale::getDefault();
     }
 
     /**

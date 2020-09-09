@@ -19,6 +19,19 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
+    private $defaultLocale;
+
+    protected function setUp(): void
+    {
+        $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
+    }
+
     /**
      * @dataProvider getInvalidLocalesTests
      */
@@ -45,7 +58,7 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator(null);
 
-        $this->assertNull($translator->getLocale());
+        $this->assertSame('en', $translator->getLocale());
     }
 
     public function testSetGetLocale()
@@ -87,7 +100,7 @@ class TranslatorTest extends TestCase
         $translator = new Translator('en');
         $translator->setLocale(null);
 
-        $this->assertNull($translator->getLocale());
+        $this->assertSame('en', $translator->getLocale());
     }
 
     public function testGetCatalogue()

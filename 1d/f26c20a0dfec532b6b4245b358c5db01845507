@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-09T05:02:00Z
+
+Can you remove the test instead? We don't support HHVM anymore, so evrything related to HHVM can be removed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-09T05:11:35Z
+
+3.4 still contains a lot of HHVM specific code, let's merged as is in 3.4.

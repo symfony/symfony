@@ -194,10 +194,6 @@ class NativeSessionStorageTest extends TestCase
 
     public function testSessionOptions()
     {
-        if (\defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM is not handled in this test case.');
-        }
-
         $options = [
             'url_rewriter.tags' => 'a=href',
             'cache_expire' => '200',

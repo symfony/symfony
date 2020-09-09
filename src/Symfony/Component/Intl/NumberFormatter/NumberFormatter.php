@@ -357,6 +357,10 @@ abstract class NumberFormatter
 
         // The original NumberFormatter does not support this format type
         if (self::TYPE_CURRENCY === $type) {
+            if (\PHP_VERSION_ID >= 80000) {
+                throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%s given).', $type));
+            }
+
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
@@ -513,6 +517,10 @@ abstract class NumberFormatter
         $type = (int) $type;
 
         if (self::TYPE_DEFAULT === $type || self::TYPE_CURRENCY === $type) {
+            if (\PHP_VERSION_ID >= 80000) {
+                throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%d given).', $type));
+            }
+
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;

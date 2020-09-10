@@ -27,7 +27,7 @@ final class Preloader
 
         foreach ($list as $item) {
             if (0 === strpos($item, $cacheDir)) {
-                file_put_contents($file, sprintf("require_once __DIR__.%s;\n", var_export(substr($item, \strlen($cacheDir)), true)), \FILE_APPEND);
+                file_put_contents($file, sprintf("require_once __DIR__.%s;\n", var_export(strtr(substr($item, \strlen($cacheDir)), \DIRECTORY_SEPARATOR, '/'), true)), \FILE_APPEND);
                 continue;
             }
 

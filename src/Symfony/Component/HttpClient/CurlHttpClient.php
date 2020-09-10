@@ -562,6 +562,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_PROTOCOLS,
             \CURLOPT_REDIR_PROTOCOLS,
             \CURLOPT_COOKIEFILE,
+            \CURLOPT_HTTP09_ALLOWED,
             \CURLINFO_REDIRECT_COUNT,
         ];
 

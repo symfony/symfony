@@ -13,6 +13,7 @@ CHANGELOG
  * added `framework.http_client.retry_failing` configuration tree
  * added `assertCheckboxChecked()` and `assertCheckboxNotChecked()` in `WebTestCase`
  * added `assertFormValue()` and `assertNoFormValue()` in `WebTestCase`
+ * Added `createNamedFormBuilder` method to `AbstractController`
 
 5.1.0
 -----

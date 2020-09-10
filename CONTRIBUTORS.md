@@ -2696,3 +2696,4 @@ Symfony is the result of the work of many people who made the code better
  - Vladislav Vlastovskiy (vlastv)
  - RENAUDIN Xavier (xorrox)
  - Yannick Vanhaeren (yvh)
+ - Kilian Riou (redheness)

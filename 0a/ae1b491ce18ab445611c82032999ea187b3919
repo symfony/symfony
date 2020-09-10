@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-08-30T09:01:16Z
+
+Thank you for the PR.
+
+Im hesitant. I do like the fact that this will make testing of my command handlers simpler because the command handler dispatches events with the `DispatchAfterCurrentBusStamp`. Now I don't need to invoke a dummy command bus that invoke my handlers, I can invoke my command handlers directly.
+
+However, when running production code (non-test), I don't see any scenario where you would like to add a DispatchAfter**CurrentBus**Stamp when you are not on a "current bus". So I dont think this change make any sense.
+
+With that said tough... If the stamp was named something differently. Like (not a suggestion) `DispatchMessageInTheirOwnSeparateBusTransaction`, then yes. I guess this would make perfect sense. =)
+
+It also seams like @ostrolucky and @jkobus are dispatching these events from non-message handlers. That is something I would never do =). But I guess they have their reasons why it makes sense for them. So Im not sure I would fight them on a principle...
+
+----------
+
+This answer was very undeceive. Sorry about that..
+
+- I do like the implementation.
+- I don't like the reason why we need this
+- I do like that this makes things easier for developers (myself included)
+- I maybe just feel that merging this will result to a weird name of the stamp, but I don't suggest changing it.
+
+I can really go either way with this PR. @weaverryan what are your thoughts?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-10T17:12:21Z
+
+Based on @Nyholm's comment, I'm merging it. Maybe another PR could change the name.

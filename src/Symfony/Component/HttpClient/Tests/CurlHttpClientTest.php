@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -41,5 +42,50 @@ class CurlHttpClientTest extends HttpClientTestCase
         }
 
         parent::testTimeoutIsNotAFatalError();
+    }
+
+    public function testOverridingRefererUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_REFERER" with "extra.curl", use option "headers" instead.');
+
+        $httpClient->request('GET', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_REFERER => 'Banana',
+                ],
+            ],
+        ]);
+    }
+
+    public function testOverridingHttpMethodUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The HTTP method cannot be overridden using "extra.curl".');
+
+        $httpClient->request('POST', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_HTTPGET => true,
+                ],
+            ],
+        ]);
+    }
+
+    public function testOverridingInternalAttributesUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_PRIVATE" with "extra.curl".');
+
+        $httpClient->request('POST', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_PRIVATE => 'overriden private',
+                ],
+            ],
+        ]);
     }
 }

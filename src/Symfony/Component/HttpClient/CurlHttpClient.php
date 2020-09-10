@@ -40,6 +40,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private $defaultOptions = self::OPTIONS_DEFAULTS + [
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
                              //   password as the second one; or string like username:password - enabling NTLM auth
+        'extra' => [
+            'curl' => [],    // A list of extra curl options indexed by their corresponding CURLOPT_*
+        ],
     ];
 
     /**
@@ -274,6 +277,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_TIMEOUT_MS] = 1000 * $options['max_duration'];
         }
 
+        if (!empty($options['extra']['curl']) && \is_array($options['extra']['curl'])) {
+            $this->validateExtraCurlOptions($options['extra']['curl']);
+            $curlopts += $options['extra']['curl'];
+        }
+
         if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
             unset($this->multi->pushedResponses[$url]);
 
@@ -297,11 +305,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         foreach ($curlopts as $opt => $value) {
             if (null !== $value && !curl_setopt($ch, $opt, $value) && \CURLOPT_CERTINFO !== $opt) {
-                $constants = array_filter(get_defined_constants(), static function ($v, $k) use ($opt) {
-                    return $v === $opt && 'C' === $k[0] && (0 === strpos($k, 'CURLOPT_') || 0 === strpos($k, 'CURLINFO_'));
-                }, \ARRAY_FILTER_USE_BOTH);
-
-                throw new TransportException(sprintf('Curl option "%s" is not supported.', key($constants) ?? $opt));
+                $constantName = $this->findConstantName($opt);
+                throw new TransportException(sprintf('Curl option "%s" is not supported.', $constantName ?? $opt));
             }
         }
 
@@ -486,5 +491,102 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
             return implode('', self::resolveUrl($location, $url));
         };
+    }
+
+    private function findConstantName($opt): ?string
+    {
+        $constants = array_filter(get_defined_constants(), static function ($v, $k) use ($opt) {
+            return $v === $opt && 'C' === $k[0] && (0 === strpos($k, 'CURLOPT_') || 0 === strpos($k, 'CURLINFO_'));
+        }, \ARRAY_FILTER_USE_BOTH);
+
+        return key($constants);
+    }
+
+    /**
+     * Prevents overriding options that are set internally throughout the request.
+     */
+    private function validateExtraCurlOptions(array $options): void
+    {
+        $curloptsToConfig = [
+            //options used in CurlHttpClient
+            \CURLOPT_HTTPAUTH => 'auth_ntlm',
+            \CURLOPT_USERPWD => 'auth_ntlm',
+            \CURLOPT_RESOLVE => 'resolve',
+            \CURLOPT_NOSIGNAL => 'timeout',
+            \CURLOPT_HTTPHEADER => 'headers',
+            \CURLOPT_INFILE => 'body',
+            \CURLOPT_READFUNCTION => 'body',
+            \CURLOPT_INFILESIZE => 'body',
+            \CURLOPT_POSTFIELDS => 'body',
+            \CURLOPT_UPLOAD => 'body',
+            \CURLOPT_PINNEDPUBLICKEY => 'peer_fingerprint',
+            \CURLOPT_UNIX_SOCKET_PATH => 'bindto',
+            \CURLOPT_INTERFACE => 'bindto',
+            \CURLOPT_TIMEOUT_MS => 'max_duration',
+            \CURLOPT_TIMEOUT => 'max_duration',
+            \CURLOPT_MAXREDIRS => 'max_redirects',
+            \CURLOPT_PROXY => 'proxy',
+            \CURLOPT_NOPROXY => 'no_proxy',
+            \CURLOPT_SSL_VERIFYPEER => 'verify_peer',
+            \CURLOPT_SSL_VERIFYHOST => 'verify_host',
+            \CURLOPT_CAINFO => 'cafile',
+            \CURLOPT_CAPATH => 'capath',
+            \CURLOPT_SSL_CIPHER_LIST => 'ciphers',
+            \CURLOPT_SSLCERT => 'local_cert',
+            \CURLOPT_SSLKEY => 'local_pk',
+            \CURLOPT_KEYPASSWD => 'passphrase',
+            \CURLOPT_CERTINFO => 'capture_peer_cert_chain',
+            \CURLOPT_USERAGENT => 'normalized_headers',
+            \CURLOPT_REFERER => 'headers',
+            //options used in CurlResponse
+            \CURLOPT_NOPROGRESS => 'on_progress',
+            \CURLOPT_PROGRESSFUNCTION => 'on_progress',
+        ];
+
+        $curloptsToCheck = [
+            \CURLOPT_PRIVATE,
+            \CURLOPT_HEADERFUNCTION,
+            \CURLOPT_WRITEFUNCTION,
+            \CURLOPT_VERBOSE,
+            \CURLOPT_STDERR,
+            \CURLOPT_RETURNTRANSFER,
+            \CURLOPT_URL,
+            \CURLOPT_FOLLOWLOCATION,
+            \CURLOPT_HEADER,
+            \CURLOPT_CONNECTTIMEOUT,
+            \CURLOPT_CONNECTTIMEOUT_MS,
+            \CURLOPT_HEADEROPT,
+            \CURLOPT_HTTP_VERSION,
+            \CURLOPT_PORT,
+            \CURLOPT_DNS_USE_GLOBAL_CACHE,
+            \CURLOPT_PROTOCOLS,
+            \CURLOPT_REDIR_PROTOCOLS,
+            \CURLOPT_COOKIEFILE,
+            \CURLINFO_REDIRECT_COUNT,
+        ];
+
+        $methodOpts = [
+            \CURLOPT_POST,
+            \CURLOPT_PUT,
+            \CURLOPT_CUSTOMREQUEST,
+            \CURLOPT_HTTPGET,
+            \CURLOPT_NOBODY,
+        ];
+
+        foreach ($options as $opt => $optValue) {
+            if (isset($curloptsToConfig[$opt])) {
+                $constName = $this->findConstantName($opt) ?? $opt;
+                throw new InvalidArgumentException(sprintf('Cannot set "%s" with "extra.curl", use option "%s" instead.', $constName, $curloptsToConfig[$opt]));
+            }
+
+            if (\in_array($opt, $methodOpts)) {
+                throw new InvalidArgumentException('The HTTP method cannot be overridden using "extra.curl".');
+            }
+
+            if (\in_array($opt, $curloptsToCheck)) {
+                $constName = $this->findConstantName($opt) ?? $opt;
+                throw new InvalidArgumentException(sprintf('Cannot set "%s" with "extra.curl".', $constName));
+            }
+        }
     }
 }

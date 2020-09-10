@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 use MongoDB\Client;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MongoDbStore;
@@ -79,17 +78,6 @@ class MongoDbStoreTest extends AbstractStoreTest
             $indexes[] = $index->getName();
         }
         $this->assertContains('expires_at_1', $indexes);
-    }
-
-    public function testNonBlocking()
-    {
-        $this->expectException(NotSupportedException::class);
-
-        $store = $this->getStore();
-
-        $key = new Key(uniqid(__METHOD__, true));
-
-        $store->waitAndSave($key);
     }
 
     /**

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * Added `FlattenExceptionNormalizer` to give more information about the exception on Messenger background processes. The `FlattenExceptionNormalizer` has a higher priority than `ProblemNormalizer` and it is only used when the Messenger serialization context is set.
+* Added factory methods to `DelayStamp`.
 
 5.1.0
 -----

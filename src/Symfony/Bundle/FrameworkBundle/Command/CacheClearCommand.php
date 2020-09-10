@@ -199,7 +199,7 @@ EOF
         $preloadFile = $fs->makePathRelative(\dirname($containerFile, 2), $kernelDir);
         $preloadFile .= substr_replace(basename($containerFile), '.preload', -4, 0);
         $preloadFile = var_export('/'.$preloadFile, true);
-        @file_put_contents($kernelDir.'/preload.php', <<<EOPHP
+        @file_put_contents($kernelDir.'/.preload.php', <<<EOPHP
 <?php
 
 if (file_exists(__DIR__.$preloadFile)) {

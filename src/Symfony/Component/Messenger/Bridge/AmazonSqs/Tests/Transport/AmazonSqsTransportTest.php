@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -48,6 +49,13 @@ class AmazonSqsTransportTest extends TestCase
 
         $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testTransportIsAMessageCountAware()
+    {
+        $transport = $this->getTransport();
+
+        $this->assertInstanceOf(MessageCountAwareInterface::class, $transport);
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)

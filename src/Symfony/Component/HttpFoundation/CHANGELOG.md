@@ -4,9 +4,10 @@ CHANGELOG
 5.2.0
 -----
 
-* added support for `X-Forwarded-Prefix` header
+ * added support for `X-Forwarded-Prefix` header
  * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
  * added `File::getContent()`
+ * added ability to use comma separated ip addresses for `RequestMatcher::matchIps()`
 
 5.1.0
 -----

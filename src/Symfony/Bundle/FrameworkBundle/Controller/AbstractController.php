@@ -334,6 +334,14 @@ abstract class AbstractController implements ServiceSubscriberInterface
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }
+    
+    /**
+     * Creates and returns a named form builder instance.
+     */
+    protected function createNamedFormBuilder(string $name, $data = null, array $options = []): FormBuilderInterface
+    {
+        return $this->container->get('form.factory')->createNamedBuilder($name, FormType::class, $data, $options);
+    }
 
     /**
      * Shortcut to return the Doctrine Registry service.

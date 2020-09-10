@@ -123,6 +123,19 @@ final class CurlResponse implements ResponseInterface
         }
 
         curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id): int {
+            if ('H' === (curl_getinfo($ch, \CURLINFO_PRIVATE)[0] ?? null)) {
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = new TransportException(sprintf('Unsupported protocol for "%s"', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+
+                return 0;
+            }
+
+            curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id): int {
+                $multi->handlesActivity[$id][] = $data;
+
+                return \strlen($data);
+            });
+
             $multi->handlesActivity[$id][] = $data;
 
             return \strlen($data);

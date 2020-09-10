@@ -180,6 +180,35 @@ class MailgunApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
+    public function testSendThrowsForErrorResponseWithContentTypeTextHtml()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages', $url);
+            $this->assertStringContainsStringIgnoringCase('Authorization: Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
+
+            // NOTE: Mailgun API does this even if "Accept" request header value is "application/json".
+            return new MockResponse('Forbidden', [
+                'http_code' => 401,
+                'response_headers' => [
+                    'content-type' => 'text/html',
+                ],
+            ]);
+        });
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us', $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: Forbidden (code 401).');
+        $transport->send($mail);
+    }
+
     public function testTagAndMetadataHeaders()
     {
         $json = json_encode(['foo' => 'bar']);

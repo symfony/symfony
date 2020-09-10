@@ -233,7 +233,7 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot']), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
     }
@@ -260,7 +260,7 @@ class PhpDumperTest extends TestCase
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\', '/Fixtures/includes/', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories.txt', $dump);
     }
@@ -286,7 +286,7 @@ class PhpDumperTest extends TestCase
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\', '/Fixtures/includes/', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
     }
@@ -304,7 +304,7 @@ class PhpDumperTest extends TestCase
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo_lazy.php', '/Fixtures/includes/foo_lazy.php', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt', $dump);
     }
@@ -980,7 +980,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace('\\\\Dumper', '/Dumper', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php'])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php'])));
     }
 
     public function testExpressionReferencingPrivateService()
@@ -1143,7 +1143,7 @@ class PhpDumperTest extends TestCase
 
         $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace("'\\\\includes\\\\HotPath\\\\", "'/includes/HotPath/", $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_inline_requires.php', $dump);

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-10T09:11:09Z
+
+Worth a note in the UPGRADE file + CHANGELOG of the component, isn't it?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-10T09:33:29Z
+
+Entry in changelog and upgrade added.

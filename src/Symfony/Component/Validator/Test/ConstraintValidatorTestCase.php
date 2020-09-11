@@ -499,11 +499,11 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function getViolations()
     {
-        return $this->context->getViolations();
     }
 
     public function doGetViolations()
     {
+        return $this->context->getViolations();
     }
 
     public function expectNoValidate()

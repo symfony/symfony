@@ -38,6 +38,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -108,6 +109,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => 1000])
 
         ->set('serializer.normalizer.uid', UidNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -915])
+
+        ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.object', ObjectNormalizer::class)

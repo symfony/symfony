@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Serializer;
+namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Serializer\FormErrorNormalizer;
+use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 
 class FormErrorNormalizerTest extends TestCase
 {

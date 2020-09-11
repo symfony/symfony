@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -19,20 +19,11 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class MemcachedAdapter extends AbstractAdapter
+trait MemcachedTrait
 {
-    /**
-     * We are replacing characters that are illegal in Memcached keys with reserved characters from
-     * {@see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
-This conversation was marked as resolved by lstrojny
-     * Note: don’t use {@see \Symfony\Component\Cache\Adapter\AbstractAdapter::NS_SEPARATOR}.
-     */
-    private const RESERVED_MEMCACHED = " \n\r\t\v\f\0";
-    private const RESERVED_PSR6 = '@()\{}/';
-
-    protected $maxIdLength = 250;
-
     private static $defaultClientOptions = [
         'persistent_id' => null,
         'username' => null,
@@ -40,21 +31,24 @@ This conversation was marked as resolved by lstrojny
         \Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP,
     ];
 
+    /**
+     * We are replacing characters that are illegal in Memcached keys with reserved characters from
+     * {@see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
+     * Note: don’t use {@see \Symfony\Component\Cache\Adapter\AbstractAdapter::NS_SEPARATOR}.
+     */
+    private static $RESERVED_MEMCACHED = " \n\r\t\v\f\0";
+    private static $RESERVED_PSR6 = '@()\{}/';
+
     private $marshaller;
     private $client;
     private $lazyClient;
 
-    /**
-     * Using a MemcachedAdapter with a TagAwareAdapter for storing tags is discouraged.
-     * Using a RedisAdapter is recommended instead. If you cannot do otherwise, be aware that:
-     * - the Memcached::OPT_BINARY_PROTOCOL must be enabled
-     *   (that's the default when using MemcachedAdapter::createConnection());
-     * - tags eviction by Memcached's LRU algorithm will break by-tags invalidation;
-     *   your Memcached memory should be large enough to never trigger LRU.
-     *
-     * Using a MemcachedAdapter as a pure items store is fine.
-     */
-    public function __construct(\Memcached $client, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public static function isSupported()
+    {
+        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
+    }
+
+    private function init(\Memcached $client, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required.');
@@ -75,11 +69,6 @@ This conversation was marked as resolved by lstrojny
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
-    public static function isSupported()
-    {
-        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
-    }
-
     /**
      * Creates a Memcached instance.
      *
@@ -90,7 +79,6 @@ This conversation was marked as resolved by lstrojny
      * - [['localhost', 11211, 33]]
      *
      * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
-     * @param array                   $options An array of options
      *
      * @return \Memcached
      *
@@ -101,7 +89,7 @@ This conversation was marked as resolved by lstrojny
         if (\is_string($servers)) {
             $servers = [$servers];
         } elseif (!\is_array($servers)) {
-            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', get_debug_type($servers)));
+            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', \gettype($servers)));
         }
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required.');
@@ -285,7 +273,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave($id)
     {
         return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
@@ -300,6 +288,7 @@ This conversation was marked as resolved by lstrojny
         foreach ($this->checkResultCode($this->getClient()->deleteMulti($encodedIds)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;
+                break;
             }
         }
 
@@ -309,7 +298,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doClear(string $namespace)
+    protected function doClear($namespace)
     {
         return '' === $namespace && $this->getClient()->flush();
     }
@@ -344,11 +333,11 @@ This conversation was marked as resolved by lstrojny
 
     private static function encodeKey(string $key): string
     {
-        return strtr($key, self::RESERVED_MEMCACHED, self::RESERVED_PSR6);
+        return strtr($key, self::$RESERVED_MEMCACHED, self::$RESERVED_PSR6);
     }
 
     private static function decodeKey(string $key): string
     {
-        return strtr($key, self::RESERVED_PSR6, self::RESERVED_MEMCACHED);
+        return strtr($key, self::$RESERVED_PSR6, self::$RESERVED_MEMCACHED);
     }
 }

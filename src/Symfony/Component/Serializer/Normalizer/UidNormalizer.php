@@ -24,10 +24,6 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function normalize($object, string $format = null, array $context = [])
     {
-        if (!$object instanceof AbstractUid) {
-            throw new InvalidArgumentException('The object must be an instance of "Symfony\Component\Uid\AbstractUid".');
-        }
-
         return (string) $object;
     }
 
@@ -45,12 +41,10 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
-            $uid = Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
+            return Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
             throw new NotNormalizableValueException(sprintf('The data is not a valid "%s" string representation.', $type));
         }
-
-        return $uid;
     }
 
     /**

@@ -143,11 +143,11 @@ class UnicodeString extends AbstractUnicodeString
             return null;
         }
 
-        if ($this->length() <= $offset) {
+        try {
+            $i = $this->ignoreCase ? grapheme_stripos($this->string, $needle, $offset) : grapheme_strpos($this->string, $needle, $offset);
+        } catch (\ValueError $e) {
             return null;
         }
-
-        $i = $this->ignoreCase ? grapheme_stripos($this->string, $needle, $offset) : grapheme_strpos($this->string, $needle, $offset);
 
         return false === $i ? null : $i;
     }
@@ -266,12 +266,12 @@ class UnicodeString extends AbstractUnicodeString
 
     public function slice(int $start = 0, int $length = null): AbstractString
     {
-        if ($this->length() <= $start) {
-            return new self();
-        }
-
         $str = clone $this;
-        $str->string = (string) grapheme_substr($this->string, $start, $length ?? \PHP_INT_MAX);
+        try {
+            $str->string = (string) grapheme_substr($this->string, $start, $length ?? \PHP_INT_MAX);
+        } catch (\ValueError $e) {
+            $str->string = '';
+        }
 
         return $str;
     }

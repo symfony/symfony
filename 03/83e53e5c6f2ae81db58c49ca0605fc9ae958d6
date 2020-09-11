@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-09-10T19:40:50Z
+
+what about other client implementations ?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-10T19:41:23Z
+
+and this seems to break the http push tests and many tests on Travis
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-11T06:27:28Z
+
+> what about other client implementations ?
+
+they already fail properly, only curl knows about HTTP/0.9
+
+> and this seems to break the http push tests and many tests on Travis
+
+fixed hopefuly

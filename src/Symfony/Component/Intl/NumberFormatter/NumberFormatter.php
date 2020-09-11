@@ -691,7 +691,7 @@ abstract class NumberFormatter
 
         // Swiss rounding
         if (0 < $roundingIncrement && 0 < $fractionDigits) {
-            $roundingFactor = $roundingIncrement / pow(10, $fractionDigits);
+            $roundingFactor = $roundingIncrement / 10 ** $fractionDigits;
             $value = round($value / $roundingFactor) * $roundingFactor;
         }
 
@@ -713,7 +713,7 @@ abstract class NumberFormatter
         if (isset(self::$phpRoundingMap[$roundingModeAttribute])) {
             $value = round($value, $precision, self::$phpRoundingMap[$roundingModeAttribute]);
         } elseif (isset(self::$customRoundingList[$roundingModeAttribute])) {
-            $roundingCoef = pow(10, $precision);
+            $roundingCoef = 10 ** $precision;
             $value *= $roundingCoef;
             $value = (float) (string) $value;
 

@@ -24,6 +24,29 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $cache->save($item);
 
         $this->assertSame('bar', $cache->getItem('foo')->get());
+
+        $cache->invalidateTags(['tag2']);
+
+        $this->assertFalse($cache->getItem('foo')->isHit());
+    }
+
+    public function testIntegrationUsingProxiedAdapterForTagsPool()
+    {
+        $arrayAdapter = new ArrayAdapter();
+        $cache = new TagAwareAdapter($arrayAdapter, new ProxyAdapter($arrayAdapter));
+
+        $item = $cache->getItem('foo');
+        $item->expiresAfter(600);
+        $item->tag(['baz']);
+        $item->set('bar');
+        $cache->save($item);
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+        $this->assertTrue($cache->getItem('foo')->isHit());
+
+        $cache->invalidateTags(['baz']);
+
+        $this->assertFalse($cache->getItem('foo')->isHit());
     }
 
     public function dataProvider(): array

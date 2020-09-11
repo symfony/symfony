@@ -62,12 +62,6 @@ class UidNormalizerTest extends TestCase
         }
     }
 
-    public function testNormalizeForNonUid()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->normalizer->normalize(new \stdClass());
-    }
-
     /**
      * @dataProvider dataProvider
      */

@@ -74,7 +74,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
-        $delay = $this->delayMilliseconds * pow($this->multiplier, $retries);
+        $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;

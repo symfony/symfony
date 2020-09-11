@@ -37,7 +37,6 @@
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/security-csrf": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0"
     },

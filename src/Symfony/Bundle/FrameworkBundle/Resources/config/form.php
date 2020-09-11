@@ -34,7 +34,6 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
-use Symfony\Component\Form\Serializer\FormErrorNormalizer;
 use Symfony\Component\Form\Util\ServerParams;
 
 return static function (ContainerConfigurator $container) {
@@ -146,8 +145,5 @@ return static function (ContainerConfigurator $container) {
                 param('validator.translation_domain'),
             ])
             ->tag('form.type_extension')
-
-        ->set('form.serializer.normalizer.form_error', FormErrorNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
     ;
 };

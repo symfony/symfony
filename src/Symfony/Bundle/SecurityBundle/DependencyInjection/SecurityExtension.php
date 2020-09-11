@@ -588,7 +588,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        if (false === $hasListeners) {
+        if (false === $hasListeners && !$this->authenticatorManagerEnabled) {
             throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 

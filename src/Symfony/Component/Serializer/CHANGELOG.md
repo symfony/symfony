@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * added `CompiledClassMetadataFactory` and `ClassMetadataFactoryCompiler` for faster metadata loading.
+* added `UidNormalizer`
 
 5.1.0
 -----

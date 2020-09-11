@@ -44,6 +44,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -105,6 +106,9 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)
             ->args([service('serializer.property_accessor')])
             ->tag('serializer.normalizer', ['priority' => 1000])
+
+        ->set('serializer.normalizer.uid', UidNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.object', ObjectNormalizer::class)
             ->args([

@@ -7,6 +7,7 @@ CHANGELOG
  * Added `FirewallListenerFactoryInterface`, which can be implemented by security factories to add firewall listeners
  * Added `SortFirewallListenersPass` to make the execution order of firewall listeners configurable by
    leveraging `Symfony\Component\Security\Http\Firewall\FirewallListenerInterface`
+ * Added ability to use comma separated ip address list for `security.access_control`
 
 5.1.0
 -----

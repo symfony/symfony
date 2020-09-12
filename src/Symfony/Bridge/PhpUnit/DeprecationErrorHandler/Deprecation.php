@@ -143,6 +143,10 @@ class Deprecation
     public function isLegacy()
     {
         $class = $this->originatingClass();
+        if ((new \ReflectionClass($class))->isInternal()) {
+            return false;
+        }
+
         $method = $this->originatingMethod();
 
         return 0 === strpos($method, 'testLegacy')

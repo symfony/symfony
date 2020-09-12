@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-08-06T09:18:57Z
+
+> Do stores deal properly with an upgrade scenario, where the store might contain existing locks created using the old format for the state ?
+
+Good point. For sure, they have to.
+But I don't know how to add test to assert it.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-08-06T13:41:46Z
+
+> Good point. For sure, they have to.
+
+I know they *have to*. The question is whether they actually *do*.
+
+To test this, we would need to write some lock in the old format in Redis (or whatever storage) and then try to acquire the same lock with the new code and ensure it does not break but properly detects a conflict.
+
+For a local test, what you can do is creating 2 projects: one using symfony/lock 5.1 to acquire the lock and hold it, and another one using your new code and trying to acquire a (conflicting) lock (should be tested with both `acquire()` and `acquireRead()`. This might be easier than filling the storage by hand.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-08-06T15:40:03Z
+
+I tested compatibility locally with 2 clients (with different versions) at the same time and it worked in both way.
+(tested Flock and Redis)
+
+I also added a integration test that reuse the old code to assert it for Redis.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-19T12:36:41Z
+
+@jderusse Just for my information, the next step here is to implement the feature in other stores?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-08-19T12:41:52Z
+
+> @jderusse Just for my information, the next step here is to implement the feature in other stores?
+
+That was my first idea. But it's more complicated than I thought, and PR might be harder to review. I suggest:
+- decide if we like the idea/rfc and merge this PR first (with 2 stores implemented)
+- create 1 PR dedicated per store latter (5.2 if possible)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-19T17:21:31Z
+
+Having this feature available for some stores only is fine by me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-02T14:25:38Z
+
+@jderusse Having additionnal stores in other PRs is a good idea. Can you finish this one without other stores?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-02T15:43:25Z
+
+PR is ready for review, with the current 2 stores (flock, redis)

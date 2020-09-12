@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use DateTimeImmutable;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -30,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -640,6 +643,154 @@ class SerializerTest extends TestCase
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
     }
+
+    /**
+     * @dataProvider provideDenormalizationSuccessResultCases
+     */
+    public function testDenormalizationSuccessResult(string $type, $normalizedData, $expectedValue)
+    {
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $json = json_encode($normalizedData);
+
+        $result = $serializer->deserialize($json, $type, 'json', [
+            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertTrue($result->isSucessful());
+        self::assertEquals($expectedValue, $result->getDenormalizedValue());
+    }
+
+    public function provideDenormalizationSuccessResultCases()
+    {
+        $dto = new Dto();
+        $dto->int = 1;
+        $dto->date = new DateTimeImmutable('2020-01-01');
+        $dto->nested = new NestedDto();
+        $dto->nested->string = 'string';
+
+        yield [
+            Dto::class,
+            [
+                'int' => 1,
+                'date' => '2020-01-01',
+                'nested' => [
+                    'string' => 'string',
+                ],
+            ],
+            $dto,
+        ];
+
+        yield [
+            'bool',
+            true,
+            true,
+        ];
+    }
+
+    /**
+     * @dataProvider provideDenormalizationFailureResultCases
+     */
+    public function testDenormalizationFailureResult(string $type, $normalizedData, array $expectedErrors)
+    {
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $json = json_encode($normalizedData);
+
+        $result = $serializer->deserialize($json, $type, 'json', [
+            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertFalse($result->isSucessful());
+        self::assertSame($expectedErrors, $result->getInvariantViolationMessages());
+    }
+
+    public function provideDenormalizationFailureResultCases()
+    {
+        yield [
+            Dto::class,
+            [
+                'int' => 'not-an-integer',
+                'date' => 'not-a-date',
+                'nested' => [
+                    'string' => [],
+                ],
+            ],
+            [
+                'int' => ['The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Dto" must be one of "int" ("string" given).'],
+                'date' => ['DateTimeImmutable::__construct(): Failed to parse time string (not-a-date) at position 0 (n): The timezone could not be found in the database'],
+                'nested.string' => ['The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\NestedDto" must be one of "string" ("array" given).'],
+            ],
+        ];
+
+        yield [
+            'bool',
+            'not-a-boolean',
+            [
+                '' => ['Data expected to be of type "bool" ("string" given).'],
+            ],
+        ];
+    }
+
+    public function testDenormalizationFailureResultWithUnwrapping()
+    {
+        $serializer = new Serializer(
+            [
+                new UnwrappingDenormalizer(new PropertyAccessor()),
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $json = json_encode([
+            'wrapped' => [
+                'data' => [
+                    'int' => 'not-an-integer',
+                    'date' => 'not-a-date',
+                    'nested' => [
+                        'string' => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $result = $serializer->deserialize($json, Dto::class, 'json', [
+            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+            UnwrappingDenormalizer::UNWRAP_PATH => '[wrapped][data]',
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertFalse($result->isSucessful());
+        self::assertSame([
+            'wrapped.data.int' => ['The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Dto" must be one of "int" ("string" given).'],
+            'wrapped.data.date' => ['DateTimeImmutable::__construct(): Failed to parse time string (not-a-date) at position 0 (n): The timezone could not be found in the database'],
+            'wrapped.data.nested.string' => ['The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\NestedDto" must be one of "string" ("array" given).'],
+        ], $result->getInvariantViolationMessages());
+    }
 }
 
 class Model
@@ -712,4 +863,30 @@ interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAware
 
 interface DenormalizerAwareDenormalizer extends DenormalizerInterface, DenormalizerAwareInterface
 {
+}
+
+class Dto
+{
+    /**
+     * @var int
+     */
+    public $int;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    public $date;
+
+    /**
+     * @var NestedDto
+     */
+    public $nested;
+}
+
+class NestedDto
+{
+    /**
+     * @var string
+     */
+    public $string;
 }

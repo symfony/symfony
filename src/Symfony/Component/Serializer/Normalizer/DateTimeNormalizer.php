@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.
@@ -81,6 +83,27 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * @return \DateTimeInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            $result = $this->doDenormalize($data, $type, $context);
+        } catch (NotNormalizableValueException $exception) {
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                $violation = new InvariantViolation($data, $exception->getMessage(), $exception);
+
+                return DenormalizationResult::failure(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+
+        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            return DenormalizationResult::success($result);
+        }
+
+        return $result;
+    }
+
+    private function doDenormalize($data, string $type, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);

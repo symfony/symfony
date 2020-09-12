@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -80,13 +81,37 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     {
         if (Headers::class === $type) {
             $ret = [];
+            $invariantViolations = [];
             foreach ($data as $headers) {
                 foreach ($headers as $header) {
-                    $ret[] = $this->serializer->denormalize($header, $this->headerClassMap[strtolower($header['name'])] ?? UnstructuredHeader::class, $format, $context);
+                    $name = $header['name'];
+                    $result = $this->serializer->denormalize($header, $this->headerClassMap[strtolower($name)] ?? UnstructuredHeader::class, $format, $context);
+
+                    if ($result instanceof DenormalizationResult) {
+                        if (!$result->isSucessful()) {
+                            $invariantViolations += $result->getInvariantViolations();
+
+                            continue;
+                        }
+
+                        $result = $result->getDenormalizedValue();
+                    }
+
+                    $ret[] = $result;
                 }
             }
 
-            return new Headers(...$ret);
+            if ([] !== $invariantViolations) {
+                return DenormalizationResult::failure($invariantViolations);
+            }
+
+            $headers = new Headers(...$ret);
+
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                return DenormalizationResult::success($headers);
+            }
+
+            return $headers;
         }
 
         if (AbstractPart::class === $type) {

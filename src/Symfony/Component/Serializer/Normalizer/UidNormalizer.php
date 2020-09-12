@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -70,10 +72,24 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
-            return Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
+            $result = Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
-            throw new NotNormalizableValueException(sprintf('The data is not a valid "%s" string representation.', $type));
+            $message = sprintf('The data is not a valid "%s" string representation.', $type);
+
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                $violation = new InvariantViolation($data, $message, $exception);
+
+                return DenormalizationResult::failure(['' => [$violation]]);
+            }
+
+            throw new NotNormalizableValueException($message);
         }
+
+        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            return DenormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

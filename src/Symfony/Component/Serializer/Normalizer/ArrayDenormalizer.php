@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -34,7 +36,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []): array
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (null === $this->denormalizer) {
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
@@ -48,13 +50,44 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 
         $type = substr($type, 0, -2);
 
+        $invariantViolations = [];
+        $collectInvariantViolations = $context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false;
+
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
             if (null !== $builtinType && !('is_'.$builtinType)($key)) {
-                throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key)));
+                $message = sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key));
+
+                if ($collectInvariantViolations) {
+                    $invariantViolations[$key][] = new InvariantViolation($value, $message);
+
+                    continue;
+                }
+
+                throw new NotNormalizableValueException($message);
             }
 
-            $data[$key] = $this->denormalizer->denormalize($value, $type, $format, $context);
+            $denormalizedValue = $this->denormalizer->denormalize($value, $type, $format, $context);
+
+            if ($denormalizedValue instanceof DenormalizationResult) {
+                if (!$denormalizedValue->isSucessful()) {
+                    $invariantViolations += $denormalizedValue->getInvariantViolationsNestedIn($key);
+
+                    continue;
+                }
+
+                $denormalizedValue = $denormalizedValue->getDenormalizedValue();
+            }
+
+            $data[$key] = $denormalizedValue;
+        }
+
+        if ([] !== $invariantViolations) {
+            return DenormalizationResult::failure($invariantViolations);
+        }
+
+        if ($collectInvariantViolations) {
+            return DenormalizationResult::success($data);
         }
 
         return $data;

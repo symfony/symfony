@@ -194,7 +194,19 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         // Check for a denormalizer first, e.g. the data is wrapped
         if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
-                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)));
+                $message = sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data));
+
+                if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                    $violation = new InvariantViolation($data, $message);
+
+                    return DenormalizationResult::failure(['' => [$violation]]);
+                }
+
+                throw new NotNormalizableValueException($message);
+            }
+
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                return DenormalizationResult::success($data);
             }
 
             return $data;

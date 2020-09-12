@@ -13,7 +13,9 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -167,6 +169,34 @@ class DataUriNormalizerTest extends TestCase
             ['data:a!b#c&d-e^f_g+h.i/a!b#c&d-e^f_g+h.i;base64,foobar'],
             ['data:text/plain;charset=utf-8;base64,SGVsbG8gV29ybGQh'],
         ];
+    }
+
+    /**
+     * @dataProvider validUriProvider
+     */
+    public function testItDenormalizesAndReturnsSuccessResult($uri): void
+    {
+        $result = $this->normalizer->denormalize($uri, \SplFileObject::class, null, [
+            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertTrue($result->isSucessful());
+        self::assertInstanceOf(\SplFileObject::class, $result->getDenormalizedValue());
+    }
+
+    public function testItDenormalizesAndReturnsFailureResult(): void
+    {
+        $result = $this->normalizer->denormalize('not-a-uri', \SplFileObject::class, null, [
+            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertFalse($result->isSucessful());
+        self::assertSame(
+            ['' => ['The provided "data:" URI is not valid.']],
+            $result->getInvariantViolationMessages()
+        );
     }
 
     private function getContent(\SplFileObject $file)

@@ -24,8 +24,14 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 interface DenormalizerInterface
 {
+    const COLLECT_INVARIANT_VIOLATIONS = 'collect_invariant_violations';
+
     /**
      * Denormalizes data back into an object of the given class.
+     *
+     * When context option `collect_invariant_violations` is enabled, the
+     * denormalizer must always return an instance of
+     * {@see \Symfony\Component\Serializer\DenormalizationResult}.
      *
      * @param mixed  $data    Data to restore
      * @param string $type    The expected class to instantiate

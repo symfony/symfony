@@ -3,7 +3,9 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
@@ -167,5 +169,52 @@ class UidNormalizerTest extends TestCase
         $this->normalizer->normalize(new Ulid(), null, [
             'uid_normalization_format' => 'ccc',
         ]);
+    }
+
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testItDenormalizesAndReturnsSuccessResult(string $uuidString, string $class): void
+    {
+        $result = $this->normalizer->denormalize($uuidString, $class, null, [
+            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertTrue($result->isSucessful());
+        self::assertEquals(
+            Ulid::class === $class ? new Ulid($uuidString) : Uuid::fromString($uuidString),
+            $result->getDenormalizedValue()
+        );
+    }
+
+    /**
+     * @dataProvider failureDataProvider
+     */
+    public function testItDenormalizesAndReturnsFailureResult(string $class): void
+    {
+        $result = $this->normalizer->denormalize('not-an-uuid', $class, null, [
+            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertFalse($result->isSucessful());
+        self::assertSame(
+            ['' => [sprintf('The data is not a valid "%s" string representation.', $class)]],
+            $result->getInvariantViolationMessages()
+        );
+    }
+
+    public function failureDataProvider(): iterable
+    {
+        return [
+            [UuidV1::class],
+            [UuidV3::class],
+            [UuidV4::class],
+            [UuidV5::class],
+            [UuidV6::class],
+            [AbstractUid::class],
+            [Ulid::class],
+        ];
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -22,6 +23,7 @@ use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -311,6 +313,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
+        $invariantViolations = [];
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
@@ -332,11 +336,36 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
+
+            if ($value instanceof DenormalizationResult) {
+                if (!$value->isSucessful()) {
+                    $invariantViolations += $value->getInvariantViolationsNestedIn($attribute);
+
+                    continue;
+                }
+
+                $value = $value->getDenormalizedValue();
+            }
+
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
                 throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
             }
+        }
+
+        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            if (!empty($extraAttributes)) {
+                $message = (new ExtraAttributesException($extraAttributes))->getMessage();
+
+                $invariantViolations[''][] = new InvariantViolation($data, $message);
+            }
+
+            if ([] !== $invariantViolations) {
+                return DenormalizationResult::failure($invariantViolations);
+            }
+
+            return DenormalizationResult::success($object);
         }
 
         if (!empty($extraAttributes)) {
@@ -364,13 +393,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
         if (null === $types = $this->getTypes($currentClass, $attribute)) {
-            return $data;
+            return $this->denormalizationSuccess($data, $context);
         }
 
         $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
-                return null;
+                return $this->denormalizationSuccess(null, $context);
             }
 
             $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
@@ -386,7 +415,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
             if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
                 if ('' === $data && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
-                    return null;
+                    return $this->denormalizationSuccess(null, $context);
                 }
 
                 switch ($type->getBuiltinType()) {
@@ -397,30 +426,36 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         } elseif ('true' === $data || '1' === $data) {
                             $data = true;
                         } else {
-                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data));
+                            $message = sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data);
+
+                            return $this->denormalizationFailure($data, $message, $context);
                         }
                         break;
                     case Type::BUILTIN_TYPE_INT:
                         if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
                             $data = (int) $data;
                         } else {
-                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data));
+                            $message = sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data);
+
+                            return $this->denormalizationFailure($data, $message, $context);
                         }
                         break;
                     case Type::BUILTIN_TYPE_FLOAT:
                         if (is_numeric($data)) {
-                            return (float) $data;
+                            return $this->denormalizationSuccess((float) $data, $context);
                         }
 
                         switch ($data) {
                             case 'NaN':
-                                return \NAN;
+                                return $this->denormalizationSuccess(\NAN, $context);
                             case 'INF':
-                                return \INF;
+                                return $this->denormalizationSuccess(\INF, $context);
                             case '-INF':
-                                return -\INF;
+                                return $this->denormalizationSuccess(-\INF, $context);
                             default:
-                                throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data));
+                                $message = sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data);
+
+                                return $this->denormalizationFailure($data, $message, $context);
                         }
 
                         break;
@@ -479,19 +514,41 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
             // a float is expected.
             if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && false !== strpos($format, JsonEncoder::FORMAT)) {
-                return (float) $data;
+                return $this->denormalizationSuccess((float) $data, $context);
             }
 
             if (('is_'.$builtinType)($data)) {
-                return $data;
+                return $this->denormalizationSuccess($data, $context);
             }
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {
-            return $data;
+            return $this->denormalizationSuccess($data, $context);
         }
 
-        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data)));
+        $message = sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data));
+
+        return $this->denormalizationFailure($data, $message, $context);
+    }
+
+    private function denormalizationSuccess($denormalizedValue, array $context)
+    {
+        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            return DenormalizationResult::success($denormalizedValue);
+        }
+
+        return $denormalizedValue;
+    }
+
+    private function denormalizationFailure($normalizedValue, string $message, array $context)
+    {
+        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            $violation = new InvariantViolation($normalizedValue, $message);
+
+            return DenormalizationResult::failure(['' => [$violation]]);
+        }
+
+        throw new NotNormalizableValueException($message);
     }
 
     /**

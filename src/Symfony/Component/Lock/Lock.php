@@ -26,7 +26,7 @@ use Symfony\Component\Lock\Exception\NotSupportedException;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-final class Lock implements LockInterface, LoggerAwareInterface
+final class Lock implements SharedLockInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -75,6 +75,53 @@ final class Lock implements LockInterface, LoggerAwareInterface
                 $this->store->waitAndSave($this->key);
             } else {
                 $this->store->save($this->key);
+            }
+
+            $this->dirty = true;
+            $this->logger->debug('Successfully acquired the "{resource}" lock.', ['resource' => $this->key]);
+
+            if ($this->ttl) {
+                $this->refresh();
+            }
+
+            if ($this->key->isExpired()) {
+                try {
+                    $this->release();
+                } catch (\Exception $e) {
+                    // swallow exception to not hide the original issue
+                }
+                throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $this->key));
+            }
+
+            return true;
+        } catch (LockConflictedException $e) {
+            $this->dirty = false;
+            $this->logger->info('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', ['resource' => $this->key]);
+
+            if ($blocking) {
+                throw $e;
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            $this->logger->notice('Failed to acquire the "{resource}" lock.', ['resource' => $this->key, 'exception' => $e]);
+            throw new LockAcquiringException(sprintf('Failed to acquire the "%s" lock.', $this->key), 0, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function acquireRead(bool $blocking = false): bool
+    {
+        try {
+            if (!$this->store instanceof SharedLockStoreInterface) {
+                throw new NotSupportedException(sprintf('The store "%s" does not support shared locks.', get_debug_type($this->store)));
+            }
+            if ($blocking) {
+                $this->store->waitAndSaveRead($this->key);
+            } else {
+                $this->store->saveRead($this->key);
             }
 
             $this->dirty = true;

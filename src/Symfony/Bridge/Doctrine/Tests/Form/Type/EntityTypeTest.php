@@ -138,6 +138,39 @@ class EntityTypeTest extends BaseTypeTest
         ]);
     }
 
+    /**
+     * @dataProvider choiceTranslationDomainProvider
+     */
+    public function testChoiceTranslationDomainIsDisabledByDefault($expanded)
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+
+        $this->persist([$entity1]);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'choices' => [
+                $entity1,
+            ],
+            'class' => SingleIntIdEntity::class,
+            'em' => 'default',
+            'expanded' => $expanded,
+        ]);
+
+        if ($expanded) {
+            $this->assertFalse($field->get('1')->getConfig()->getOption('translation_domain'));
+        } else {
+            $this->assertFalse($field->getConfig()->getOption('choice_translation_domain'));
+        }
+    }
+
+    public function choiceTranslationDomainProvider()
+    {
+        return [
+            [false],
+            [true],
+        ];
+    }
+
     public function testSetDataToUninitializedEntityWithNonRequired()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');

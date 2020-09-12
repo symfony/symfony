@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -211,6 +212,12 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 null, // use igbinary_serialize() when available
             ])
+
+        ->set('cache.early_expiration_handler', EarlyExpirationHandler::class)
+            ->args([
+                service('reverse_container'),
+            ])
+            ->tag('messenger.message_handler')
 
         ->set('cache.default_clearer', Psr6CacheClearer::class)
             ->args([

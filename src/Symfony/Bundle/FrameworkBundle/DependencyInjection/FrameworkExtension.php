@@ -147,6 +147,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -436,6 +437,8 @@ class FrameworkExtension extends Extension
             ->addTag('container.env_var_loader');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
+        $container->registerForAutoconfiguration(CallbackInterface::class)
+            ->addTag('container.reversible');
         $container->registerForAutoconfiguration(ServiceLocator::class)
             ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)

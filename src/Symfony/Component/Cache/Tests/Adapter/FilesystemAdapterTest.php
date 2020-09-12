@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -26,29 +27,7 @@ class FilesystemAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        self::rmdir(sys_get_temp_dir().'/symfony-cache');
-    }
-
-    public static function rmdir(string $dir)
-    {
-        if (!file_exists($dir)) {
-            return;
-        }
-        if (!$dir || 0 !== strpos(\dirname($dir), sys_get_temp_dir())) {
-            throw new \Exception(__METHOD__."() operates only on subdirs of system's temp dir");
-        }
-        $children = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($children as $child) {
-            if ($child->isDir()) {
-                rmdir($child);
-            } else {
-                unlink($child);
-            }
-        }
-        rmdir($dir);
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool

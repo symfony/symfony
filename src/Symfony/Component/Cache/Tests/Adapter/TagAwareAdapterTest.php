@@ -20,6 +20,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -35,7 +36,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     /**

@@ -1,0 +1,159 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
+
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
+
+/**
+ * @internal
+ * @experimental in 5.2
+ */
+class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+{
+    public function addConfiguration(NodeDefinition $node)
+    {
+        /** @var NodeBuilder $builder */
+        $builder = $node->children();
+
+        $builder
+            ->scalarNode('check_route')
+                ->isRequired()
+                ->info('Route that will validate the login link - e.g. app_login_link_verify')
+            ->end()
+            ->arrayNode('signature_properties')
+                ->prototype('scalar')->end()
+                ->requiresAtLeastOneElement()
+                ->info('An array of properties on your User that are used to sign the link. If any of these change, all existing links will become invalid')
+                ->example(['email', 'password'])
+            ->end()
+            ->integerNode('lifetime')
+                ->defaultValue(600)
+                ->info('The lifetime of the login link in seconds')
+            ->end()
+            ->integerNode('max_uses')
+                ->defaultNull()
+                ->info('Max number of times a login link can be used - null means unlimited within lifetime.')
+            ->end()
+            ->scalarNode('used_link_cache')
+                ->info('Cache service id used to expired links of max_uses is set')
+            ->end()
+            ->scalarNode('success_handler')
+                ->info(sprintf('A service id that implements %s', AuthenticationSuccessHandlerInterface::class))
+            ->end()
+            ->scalarNode('failure_handler')
+                ->info(sprintf('A service id that implements %s', AuthenticationFailureHandlerInterface::class))
+            ->end()
+            ->scalarNode('provider')
+                ->info('the user provider to load users from.')
+            ->end()
+        ;
+
+        foreach (array_merge($this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
+            if (\is_bool($default)) {
+                $builder->booleanNode($name)->defaultValue($default);
+            } else {
+                $builder->scalarNode($name)->defaultValue($default);
+            }
+        }
+    }
+
+    public function getKey()
+    {
+        return 'login-link';
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    {
+        if (!class_exists(LoginLinkHandler::class)) {
+            throw new \LogicException('Login login link requires symfony/security-http:^5.2.');
+        }
+
+        if (!$container->hasDefinition('security.authenticator.login_link')) {
+            $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/../../Resources/config'));
+            $loader->load('security_authenticator_login_link.php');
+        }
+
+        if (null !== $config['max_uses'] && !isset($config['used_link_cache'])) {
+            $config['used_link_cache'] = 'security.authenticator.cache.expired_links';
+        }
+
+        $expiredStorageId = null;
+        if (isset($config['used_link_cache'])) {
+            $expiredStorageId = 'security.authenticator.expired_login_link_storage.'.$firewallName;
+            $container
+                ->setDefinition($expiredStorageId, new ChildDefinition('security.authenticator.expired_login_link_storage'))
+                ->replaceArgument(0, new Reference($config['used_link_cache']))
+                ->replaceArgument(1, $config['lifetime']);
+        }
+
+        $linkerId = 'security.authenticator.login_link_handler.'.$firewallName;
+        $linkerOptions = [
+            'route_name' => $config['check_route'],
+            'lifetime' => $config['lifetime'],
+            'max_uses' => $config['max_uses'] ?? null,
+        ];
+        $container
+            ->setDefinition($linkerId, new ChildDefinition('security.authenticator.abstract_login_link_handler'))
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(3, $config['signature_properties'])
+            ->replaceArgument(5, $linkerOptions)
+            ->replaceArgument(6, $expiredStorageId ? new Reference($expiredStorageId) : null)
+            ->addTag('security.authenticator.login_linker', ['firewall' => $firewallName])
+        ;
+
+        $authenticatorId = 'security.authenticator.login_link.'.$firewallName;
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.login_link'))
+            ->replaceArgument(0, new Reference($linkerId))
+            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
+            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
+            ->replaceArgument(4, [
+                'check_route' => $config['check_route'],
+            ]);
+
+        return $authenticatorId;
+    }
+
+    public function getPosition()
+    {
+        return 'form';
+    }
+
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    {
+        throw new \Exception('The old authentication system is not supported with login_link.');
+    }
+
+    protected function getListenerId()
+    {
+        throw new \Exception('The old authentication system is not supported with login_link.');
+    }
+
+    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
+    {
+        throw new \Exception('The old authentication system is not supported with login_link.');
+    }
+
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    {
+        throw new \Exception('The old authentication system is not supported with login_link.');
+    }
+}

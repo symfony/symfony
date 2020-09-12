@@ -38,7 +38,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
         foreach ($reflection->getParameters() as $param) {
             $attribute = null;
-            if (method_exists($param, 'getAttributes')) {
+            if (\PHP_VERSION_ID >= 80000) {
                 $reflectionAttributes = $param->getAttributes(ArgumentInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
 
                 if (\count($reflectionAttributes) > 1) {

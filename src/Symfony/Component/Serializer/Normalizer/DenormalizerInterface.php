@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 interface DenormalizerInterface
 {
+    const COLLECT_INVARIANT_VIOLATIONS = 'collect_invariant_violations';
+
     /**
      * Denormalizes data back into an object of the given class.
      *

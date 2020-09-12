@@ -8,6 +8,7 @@ CHANGELOG
  * added `UidNormalizer`
  * added `FormErrorNormalizer`
  * added `MimeMessageNormalizer`
+ * added `DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS` context option to collect denormalization errors instead of throwing immediately
 
 5.1.0
 -----

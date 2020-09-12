@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -48,7 +49,13 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
             $data = $this->propertyAccessor->getValue($data, $propertyPath);
         }
 
-        return $this->serializer->denormalize($data, $class, $format, $context);
+        try {
+            return $this->serializer->denormalize($data, $class, $format, $context);
+        } catch (InvariantViolationException $exception) {
+            $propertyPath = str_replace('][', '.', substr($propertyPath, 1, -1));
+
+            throw new InvariantViolationException($exception->getViolationsNestedIn($propertyPath));
+        }
     }
 
     /**

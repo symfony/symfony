@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -30,6 +31,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -633,6 +635,92 @@ class SerializerTest extends TestCase
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
     }
+
+    public function testCollectDenormalizationErrors()
+    {
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $json = json_encode([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'baz' => [
+                'foo' => 'foo',
+                'bar' => 'bar',
+            ],
+        ]);
+
+        $exception = null;
+
+        try {
+            $serializer->deserialize($json, Dto::class, 'json', [
+                Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+            ]);
+        } catch (InvariantViolationException $exception) {
+        }
+
+        self::assertNotNull($exception);
+        self::assertSame([
+            'foo' => ['This value is not a valid date.'],
+            'bar' => ['This value is not a valid date.'],
+            'baz.foo' => ['This value is not a valid date.'],
+            'baz.bar' => ['This value is not a valid date.'],
+        ], $exception->getViolationMessages());
+    }
+
+    public function testCollectDenormalizationErrorsWithUnwrapping()
+    {
+        $serializer = new Serializer(
+            [
+                new UnwrappingDenormalizer(new PropertyAccessor()),
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        $json = json_encode([
+            'wrapped' => [
+                'data' => [
+                    'foo' => 'foo',
+                    'bar' => 'bar',
+                    'baz' => [
+                        'foo' => 'foo',
+                        'bar' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+
+        $exception = null;
+
+        try {
+            $serializer->deserialize($json, Dto::class, 'json', [
+                Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+                UnwrappingDenormalizer::UNWRAP_PATH => '[wrapped][data]',
+            ]);
+        } catch (InvariantViolationException $exception) {
+        }
+
+        self::assertNotNull($exception);
+        self::assertSame([
+            'wrapped.data.foo' => ['This value is not a valid date.'],
+            'wrapped.data.bar' => ['This value is not a valid date.'],
+            'wrapped.data.baz.foo' => ['This value is not a valid date.'],
+            'wrapped.data.baz.bar' => ['This value is not a valid date.'],
+        ], $exception->getViolationMessages());
+    }
 }
 
 class Model
@@ -705,4 +793,22 @@ interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAware
 
 interface DenormalizerAwareDenormalizer extends DenormalizerInterface, DenormalizerAwareInterface
 {
+}
+
+class Dto
+{
+    /**
+     * @var \DateTimeImmutable
+     */
+    public $foo;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    public $bar;
+
+    /**
+     * @var Dto
+     */
+    public $baz;
 }

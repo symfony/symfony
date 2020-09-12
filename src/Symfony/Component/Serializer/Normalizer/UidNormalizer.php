@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -42,6 +44,12 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         try {
             return Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                $violation = new InvariantViolation($data, sprintf('This value is not a valid %s URI.', substr(strrchr($type, '\\'), 1)), $exception);
+
+                throw new InvariantViolationException(['' => [$violation]]);
+            }
+
             throw new NotNormalizableValueException(sprintf('The data is not a valid "%s" string representation.', $type));
         }
     }

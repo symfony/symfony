@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -51,13 +52,23 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
         $serializer = $this->serializer;
         $type = substr($type, 0, -2);
 
+        $invariantViolations = [];
+
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
-            if (null !== $builtinType && !('is_'.$builtinType)($key)) {
-                throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key)));
-            }
+            try {
+                if (null !== $builtinType && !('is_'.$builtinType)($key)) {
+                    throw new NotNormalizableValueException($key, $value, sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key)));
+                }
 
-            $data[$key] = $serializer->denormalize($value, $type, $format, $context);
+                $data[$key] = $serializer->denormalize($value, $type, $format, $context);
+            } catch (InvariantViolationException $exception) {
+                $invariantViolations += $exception->getViolationsNestedIn($key);
+            }
+        }
+
+        if ([] !== $invariantViolations) {
+            throw new InvariantViolationException($invariantViolations);
         }
 
         return $data;

@@ -17,6 +17,8 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
+use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -55,9 +57,19 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     public function normalize($object, ?string $format = null, array $context = [])
     {
         if ($object instanceof Headers) {
+            $invariantViolations = [];
+
             $ret = [];
             foreach ($this->headersProperty->getValue($object) as $name => $header) {
-                $ret[$name] = $this->serializer->normalize($header, $format, $context);
+                try {
+                    $ret[$name] = $this->serializer->normalize($header, $format, $context);
+                } catch (InvariantViolationException $exception) {
+                    $invariantViolations[''][] = new InvariantViolation($header, "Header {$name} is invalid.", $exception);
+                }
+            }
+
+            if ([] !== $invariantViolations) {
+                throw new InvariantViolationException($invariantViolations);
             }
 
             return $ret;

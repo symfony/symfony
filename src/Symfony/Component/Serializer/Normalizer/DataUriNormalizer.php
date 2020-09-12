@@ -15,7 +15,9 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 
 /**
  * Normalizes an {@see \SplFileInfo} object to a data URI.
@@ -90,6 +92,21 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      * @throws NotNormalizableValueException
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            return $this->doDenormalize($data, $type);
+        } catch (NotNormalizableValueException $exception) {
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                $violation = new InvariantViolation($data, 'This value is not a valid data URI.', $exception);
+
+                throw new InvariantViolationException(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function doDenormalize($data, string $type)
     {
         if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw new NotNormalizableValueException('The provided "data:" URI is not valid.');

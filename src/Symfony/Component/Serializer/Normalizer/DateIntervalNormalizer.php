@@ -12,7 +12,9 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\InvariantViolation;
 
 /**
  * Normalizes an instance of {@see \DateInterval} to an interval string.
@@ -70,6 +72,21 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws UnexpectedValueException
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            return $this->doDenormalize($data, $context);
+        } catch (\Throwable $exception) {
+            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                $violation = new InvariantViolation($data, 'This value is not a valid date interval.', $exception);
+
+                throw new InvariantViolationException(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function doDenormalize($data, array $context = [])
     {
         if (!\is_string($data)) {
             throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', get_debug_type($data)));

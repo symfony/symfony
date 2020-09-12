@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
+use Symfony\Component\Serializer\Exception\InvariantViolationException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -311,6 +312,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
+        $invariantViolations = [];
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
@@ -331,12 +334,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
             try {
-                $this->setAttributeValue($object, $attribute, $value, $format, $context);
-            } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
+                $denormalizedValue = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
+                try {
+                    $this->setAttributeValue($object, $attribute, $denormalizedValue, $format, $context);
+                } catch (InvalidArgumentException $e) {
+                    throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
+                }
+            } catch (InvariantViolationException $exception) {
+                $invariantViolations += $exception->getViolationsNestedIn($attribute);
             }
+        }
+
+        if ([] !== $invariantViolations) {
+            throw new InvariantViolationException($invariantViolations);
         }
 
         if (!empty($extraAttributes)) {

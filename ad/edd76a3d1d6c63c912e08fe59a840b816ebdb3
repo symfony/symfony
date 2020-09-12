@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-15T08:15:38Z
+
+@Nyholm thanks for having a look :)
+
+To test this, you need to configure a pool with the `messenger_bus` option set, and have the consumer run:
+
+```yaml
+framework:
+    cache:
+        pools:
+            test.cache:
+                messenger_bus: message_bus
+    messenger:
+        transports:
+            amqp: '%env(MESSENGER_TRANSPORT_DSN)%'
+        routing:
+            'Symfony\Component\Cache\Messenger\Message': amqp
+```
+
+BTW, this shows another area where Messenger needs to improve: how should a bundle provide configuration for this Message-to-transport mapping out of the box? ping @sroze @ogizanagi @weaverryan.
+
+Then e.g. in a controller:
+```php
+    /**
+     * @Route("/test", name="test")
+     */
+    public function index(CacheInterface $testCache)
+    {
+        $value = $testCache->get('foo', [$this, 'compute']);
+
+        return $this->render('test/index.html.twig', [
+            'value' => $value,
+        ]);
+    }
+
+    public function compute(ItemInterface $item)
+    {
+        $item->expiresAfter(5);
+        sleep(1);
+
+        return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+    }
+```
+
+Runnig the dev weberver: `symfony serve`
+Running the worker: `bin/console messenger:consume -vvv`
+*etc.*
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-15T14:41:59Z
+
+See https://github.com/nicolas-grekas/cache-bus for a running example.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-19T06:57:34Z
+
+Looks like a great idea 😍
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T15:27:05Z
+
+What's the status of this PR? I feel everyone concerned is at the EU hackathon, could be a great opportunity to merge :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-04-05T06:45:44Z
+
+Can you rebase and perhaps answers the few questions?
+
+---------------------------------------------------------------------------
+
+by Plopix at 2020-05-08T16:19:29Z
+
+I would love to see this merged/updated to be merged! I think that is a great addition for performances
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-06T06:45:21Z
+
+@nicolas-grekas What do you want to do with this PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-07T16:00:32Z
+
+I'm adding tests, that should be ok in a few hours.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-08T20:20:51Z
+
+I rebased the PR and added unit tests. It works \o/
+
+I also verified on [the demo app I built last year](https://github.com/nicolas-grekas/cache-bus), all works as expected :tada:
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by bastnic at 2020-09-09T07:36:33Z
+
+Stunning idea!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-11T07:51:26Z
+
+@nicolas-grekas Can you fix the tests?

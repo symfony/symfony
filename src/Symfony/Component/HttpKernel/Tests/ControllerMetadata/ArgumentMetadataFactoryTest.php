@@ -15,6 +15,9 @@ use Fake\ImportedAndFake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Exception\InvalidMetadataException;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
@@ -115,6 +118,28 @@ class ArgumentMetadataFactoryTest extends TestCase
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
             new ArgumentMetadata('last', 'string', false, true, '', false),
         ], $arguments);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributeSignature()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
+
+        $this->assertEquals([
+            new ArgumentMetadata('baz', 'string', false, false, null, false, new Foo('bar')),
+        ], $arguments);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributeSignatureError()
+    {
+        $this->expectException(InvalidMetadataException::class);
+
+        $this->factory->createArgumentMetadata([new AttributeController(), 'invalidAction']);
     }
 
     private function signature1(self $foo, array $bar, callable $baz)

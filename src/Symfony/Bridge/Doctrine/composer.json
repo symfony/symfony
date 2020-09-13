@@ -25,7 +25,7 @@
         "doctrine/annotations": "~1.7",
         "symfony/stopwatch": "~2.8|~3.0|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/form": "^3.3.10|~4.0",
+        "symfony/form": "^3.4.43|~4.4.11",
         "symfony/http-kernel": "~2.8|~3.0|~4.0",
         "symfony/property-access": "~2.8|~3.0|~4.0",
         "symfony/property-info": "~2.8|3.0|~4.0",

@@ -29,7 +29,7 @@ class AmqpTransportFactory implements TransportFactoryInterface
 
     public function supports(string $dsn, array $options): bool
     {
-        return 0 === strpos($dsn, 'amqp://');
+        return 0 === strpos($dsn, 'amqp://') || 0 === strpos($dsn, 'amqps://');
     }
 }
 class_alias(AmqpTransportFactory::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class);

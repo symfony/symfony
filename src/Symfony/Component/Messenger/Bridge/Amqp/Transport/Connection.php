@@ -167,20 +167,22 @@ class Connection
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if ('amqp://' !== $dsn) {
+            if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
                 throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
             }
 
             $parsedUrl = [];
         }
 
+        $useAmqps = 0 === strpos($dsn, 'amqps://');
         $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
         $exchangeName = $pathParts[1] ?? 'messages';
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+        $port = $useAmqps ? 5671 : 5672;
 
         $amqpOptions = array_replace_recursive([
             'host' => $parsedUrl['host'] ?? 'localhost',
-            'port' => $parsedUrl['port'] ?? 5672,
+            'port' => $parsedUrl['port'] ?? $port,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
             'exchange' => [
                 'name' => $exchangeName,
@@ -215,6 +217,10 @@ class Connection
 
             return $queueOptions;
         }, $queuesOptions);
+
+        if ($useAmqps && !self::hasCaCertConfigured($amqpOptions)) {
+            throw new InvalidArgumentException('No CA certificate has been provided. Set "amqp.cacert" in your php.ini or pass the "cacert" parameter in the DSN to use SSL. Alternatively, you can use amqp:// to use without SSL.');
+        }
 
         return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
     }
@@ -258,6 +264,11 @@ class Connection
         }
 
         return $arguments;
+    }
+
+    private static function hasCaCertConfigured(array $amqpOptions): bool
+    {
+        return (isset($amqpOptions['cacert']) && '' !== $amqpOptions['cacert']) || '' !== ini_get('amqp.cacert');
     }
 
     /**

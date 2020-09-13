@@ -322,7 +322,7 @@ install:
                   # add return types before running the test suite
                   rm src/Symfony/Contracts -Rf && mv vendor/symfony/contracts src/Symfony/Contracts
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
-                  sed -i 's/"\*\*\/Tests\/"//' composer.json
+                  sed -i 's/"\*\*\/Tests\/"/"src\/Symfony\/Component\/HttpKernel\/Tests\/Fixtures\/Controller\/AttributeController.php"/' composer.json
                   composer install --optimize-autoloader
                   SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php
                   SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php # ensure the script is idempotent

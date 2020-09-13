@@ -24,11 +24,11 @@ final class DiscordTransportFactoryTest extends TestCase
         $factory = new DiscordTransportFactory();
 
         $host = 'testHost';
-        $channel = 'testChannel';
+        $webhookId = 'testChannel';
 
-        $transport = $factory->create(Dsn::fromString(sprintf('discord://%s@%s/?channel=%s', 'token', $host, $channel)));
+        $transport = $factory->create(Dsn::fromString(sprintf('discord://%s@%s/?webhook_id=%s', 'token', $host, $webhookId)));
 
-        $this->assertSame(sprintf('discord://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame(sprintf('discord://%s?webhook_id=%s', $host, $webhookId), (string) $transport);
     }
 
     public function testCreateWithNoTokenThrowsMalformed(): void
@@ -36,15 +36,15 @@ final class DiscordTransportFactoryTest extends TestCase
         $factory = new DiscordTransportFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('discord://%s/?channel=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString(sprintf('discord://%s/?webhook_id=%s', 'testHost', 'testChannel')));
     }
 
     public function testSupportsDiscordScheme(): void
     {
         $factory = new DiscordTransportFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('discord://host/?channel=testChannel')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('discord://host/?webhook_id=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?webhook_id=testChannel')));
     }
 
     public function testNonDiscordSchemeThrows(): void
@@ -52,6 +52,6 @@ final class DiscordTransportFactoryTest extends TestCase
         $factory = new DiscordTransportFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://token@host/?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://token@host/?webhook_id=testChannel'));
     }
 }

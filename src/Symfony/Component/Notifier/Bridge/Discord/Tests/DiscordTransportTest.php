@@ -25,12 +25,12 @@ final class DiscordTransportTest extends TestCase
 {
     public function testToStringContainsProperties(): void
     {
-        $channel = 'testChannel';
+        $webhookId = 'testChannel';
 
-        $transport = new DiscordTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
+        $transport = new DiscordTransport('testToken', $webhookId, $this->createMock(HttpClientInterface::class));
         $transport->setHost('testHost');
 
-        $this->assertSame(sprintf('discord://%s?channel=%s', 'testHost', $channel), (string) $transport);
+        $this->assertSame(sprintf('discord://%s?webhook_id=%s', 'testHost', $webhookId), (string) $transport);
     }
 
     public function testSupportsChatMessage(): void

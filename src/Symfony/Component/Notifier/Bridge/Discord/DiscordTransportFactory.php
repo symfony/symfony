@@ -30,12 +30,12 @@ final class DiscordTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
         $token = $this->getUser($dsn);
-        $channel = $dsn->getOption('channel');
+        $webhookId = $dsn->getOption('webhook_id');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
         if ('discord' === $scheme) {
-            return (new DiscordTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new DiscordTransport($token, $webhookId, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'discord', $this->getSupportedSchemes());

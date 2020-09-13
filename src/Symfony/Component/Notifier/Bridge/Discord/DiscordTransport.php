@@ -32,12 +32,12 @@ final class DiscordTransport extends AbstractTransport
     protected const HOST = 'discord.com';
 
     private $token;
-    private $chatChannel;
+    private $webhookId;
 
-    public function __construct(string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $webhookId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
-        $this->chatChannel = $channel;
+        $this->webhookId = $webhookId;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -45,7 +45,7 @@ final class DiscordTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('discord://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return sprintf('discord://%s?webhook_id=%s', $this->getEndpoint(), $this->webhookId);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,8 +62,17 @@ final class DiscordTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
 
-        $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->token, $this->chatChannel);
-        $options['content'] = $message->getSubject();
+        $messageOptions = $message->getOptions();
+        $options = $messageOptions ? $messageOptions->toArray() : [];
+
+        $content = $message->getSubject();
+
+        if (\strlen($content) > 2000) {
+            throw new LogicException(sprintf('The subject length of "%s" transport must be less than 2000 characters.', __CLASS__, ChatMessage::class, get_debug_type($message)));
+        }
+
+        $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);
+        $options['content'] = $content;
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);
@@ -71,7 +80,29 @@ final class DiscordTransport extends AbstractTransport
         if (204 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%s).', $result['message'], $result['code']), $response);
+            if (401 === $response->getStatusCode()) {
+                $originalContent = $message->getSubject();
+                $errorMessage = $result['message'];
+                $errorCode = $result['code'];
+                throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%d: "%s").', $originalContent, $errorCode, $errorMessage), $response);
+            }
+
+            if (400 === $response->getStatusCode()) {
+                $originalContent = $message->getSubject();
+
+                $errorMessage = '';
+                foreach ($result as $fieldName => $message) {
+                    $message = \is_array($message) ? implode(' ', $message) : $message;
+                    $errorMessage .= $fieldName.': '.$message.' ';
+                }
+
+                $errorMessage = trim($errorMessage);
+                throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%s).', $originalContent, $errorMessage), $response);
+            }
+
+            throw new TransportException(sprintf('Unable to post the Discord message: "%s" (Status Code: %d).', $message->getSubject(), $response->getStatusCode()), $response);
         }
+
+        return new SentMessage($message, (string) $this);
     }
 }

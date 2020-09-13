@@ -8,7 +8,7 @@ DSN example
 
 ```
 // .env file
-DISCORD_DSN=discord://TOKEN@default?channel=ID
+DISCORD_DSN=discord://TOKEN@default?webhook_id=ID
 ```
 
 where:

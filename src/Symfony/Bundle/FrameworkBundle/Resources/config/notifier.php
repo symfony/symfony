@@ -73,7 +73,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(ChatterInterface::class, 'chatter')
 
         ->set('chatter.transports', Transports::class)
-            ->factory(['chatter.transport_factory', 'fromStrings'])
+            ->factory([service('chatter.transport_factory'), 'fromStrings'])
             ->args([[]])
 
         ->set('chatter.transport_factory', Transport::class)
@@ -93,7 +93,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(TexterInterface::class, 'texter')
 
         ->set('texter.transports', Transports::class)
-            ->factory(['texter.transport_factory', 'fromStrings'])
+            ->factory([service('texter.transport_factory'), 'fromStrings'])
             ->args([[]])
 
         ->set('texter.transport_factory', Transport::class)

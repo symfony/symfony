@@ -529,7 +529,7 @@ class AbstractControllerTest extends TestCase
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
-    
+
     public function testCreateNamedFormBuilder()
     {
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilderInterface')->getMock();
@@ -542,7 +542,7 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
-        
+
         $this->assertEquals($formBuilder, $controller->createNamedFormBuilder('foo', 'bar'));
     }
 

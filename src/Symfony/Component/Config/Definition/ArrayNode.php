@@ -213,7 +213,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         foreach ($this->children as $name => $child) {
             if (!\array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
-                    $ex = new InvalidConfigurationException(sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath()));
+                    $message = sprintf('The child config "%s" under "%s" must be configured.', $name, $this->getPath());
+                    if ($child->getInfo()) {
+                        $message .= sprintf("\n\n Description: %s", $child->getInfo());
+                    }
+                    $ex = new InvalidConfigurationException($message);
                     $ex->setPath($this->getPath());
 
                     throw $ex;

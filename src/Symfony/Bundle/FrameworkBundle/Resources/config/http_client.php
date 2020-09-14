@@ -17,6 +17,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Psr18Client;
+use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
+use Symfony\Component\HttpClient\Retry\HttpStatusCodeDecider;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -47,6 +49,20 @@ return static function (ContainerConfigurator $container) {
                 service('http_client'),
                 service(ResponseFactoryInterface::class)->ignoreOnInvalid(),
                 service(StreamFactoryInterface::class)->ignoreOnInvalid(),
+            ])
+
+        // retry
+        ->set('http_client.retry.abstract_exponential_backoff', ExponentialBackOff::class)
+            ->abstract()
+            ->args([
+                abstract_arg('delay ms'),
+                abstract_arg('multiplier'),
+                abstract_arg('max delay ms'),
+            ])
+        ->set('http_client.retry.abstract_httpstatuscode_decider', HttpStatusCodeDecider::class)
+            ->abstract()
+            ->args([
+                abstract_arg('http codes'),
             ])
     ;
 };

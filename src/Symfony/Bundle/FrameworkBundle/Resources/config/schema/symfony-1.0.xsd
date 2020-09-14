@@ -519,6 +519,7 @@
             <xsd:element name="resolve" type="http_resolve" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="max-redirects" type="xsd:integer" />
         <xsd:attribute name="http-version" type="xsd:string" />
@@ -535,7 +536,6 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
-
     </xsd:complexType>
 
     <xsd:complexType name="http_client_scope_options" mixed="true">
@@ -544,6 +544,7 @@
             <xsd:element name="resolve" type="http_resolve" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="scope" type="xsd:string" />
@@ -572,6 +573,20 @@
             <xsd:element name="sha1" type="xsd:string" minOccurs="0" />
             <xsd:element name="md5" type="xsd:string" minOccurs="0" />
         </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="http_client_retry_failed">
+        <xsd:sequence>
+            <xsd:element name="http-code" type="xsd:integer" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="backoff-service" type="xsd:string" />
+        <xsd:attribute name="decider-service" type="xsd:string" />
+        <xsd:attribute name="max-retries" type="xsd:integer" />
+        <xsd:attribute name="delay" type="xsd:integer" />
+        <xsd:attribute name="multiplier" type="xsd:float" />
+        <xsd:attribute name="max-delay" type="xsd:float" />
+        <xsd:attribute name="response_header" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="http_query" mixed="true">

@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Retry;
+namespace Symfony\Component\HttpClient\Retry;
 
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
-use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * A retry strategy with a constant or exponential retry delay.
+ * A retry backOff with a constant or exponential retry delay.
  *
  * For example, if $delayMilliseconds=10000 & $multiplier=1 (default),
  * each retry will wait exactly 10 seconds.
@@ -27,26 +26,21 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  *      * Retry 3: 40 second delay (20000 * 2 = 40000)
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @final
+ * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class MultiplierRetryStrategy implements RetryStrategyInterface
+final class ExponentialBackOff implements RetryBackOffInterface
 {
-    private $maxRetries;
     private $delayMilliseconds;
     private $multiplier;
     private $maxDelayMilliseconds;
 
     /**
-     * @param int   $maxRetries           The maximum number of times to retry
      * @param int   $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
      * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
      * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
      */
-    public function __construct(int $maxRetries = 3, int $delayMilliseconds = 1000, float $multiplier = 1, int $maxDelayMilliseconds = 0)
+    public function __construct(int $delayMilliseconds = 1000, float $multiplier = 2, int $maxDelayMilliseconds = 0)
     {
-        $this->maxRetries = $maxRetries;
-
         if ($delayMilliseconds < 0) {
             throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
@@ -63,24 +57,9 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
     }
 
-    /**
-     * @param \Throwable|null $throwable The cause of the failed handling
-     */
-    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
+    public function getDelay(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, ResponseInterface $partialResponse, \Throwable $throwable = null): int
     {
-        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
-
-        return $retries < $this->maxRetries;
-    }
-
-    /**
-     * @param \Throwable|null $throwable The cause of the failed handling
-     */
-    public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int
-    {
-        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
-
-        $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
+        $delay = $this->delayMilliseconds * $this->multiplier ** $retryCount;
 
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;

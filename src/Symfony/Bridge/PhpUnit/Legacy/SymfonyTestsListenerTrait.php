@@ -49,8 +49,8 @@ class SymfonyTestsListenerTrait
             \PHPUnit_Util_Blacklist::$blacklistedClassNames[__CLASS__] = 2;
         } elseif (method_exists('PHPUnit\Util\Blacklist', 'addDirectory')) {
             eval(" // PHP 5.3 compat
-            (new BlackList())->getBlacklistedDirectories();
-            Blacklist::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
+            (new \PHPUnit\Util\Blacklist())->getBlacklistedDirectories();
+            \PHPUnit\Util\Blacklist::addDirectory(\dirname(__FILE__, 2));
             ");
         } else {
             Blacklist::$blacklistedClassNames[__CLASS__] = 2;

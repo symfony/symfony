@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-07T22:07:21Z
+
+Regarding the CI failure: The PhpDoc-Parser of PHPUnit 9.3 breaks when being called on a internal class. I'll look into this. Either we work around this problem in PhpUnitBridge or I submit a fix to PHPUnit.
+
+---------------------------------------------------------------------------
+
+by sanmai at 2020-09-08T01:34:08Z
+
+#38094 might be related.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-08T06:38:11Z
+
+PHPUnit won't ship a fix (see sebastianbergmann/phpunit#4448), so I'm going for the workaround now.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-14T07:09:51Z
+
+We're green! 🎉

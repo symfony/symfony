@@ -477,7 +477,7 @@ class Connection
                 $credentials['password'] = '********';
                 unset($credentials['delay']);
 
-                throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s).', json_encode($credentials)), 0, $e);
+                throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s).', json_encode($credentials, \JSON_UNESCAPED_SLASHES)), 0, $e);
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
 

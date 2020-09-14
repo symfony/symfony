@@ -38,7 +38,7 @@ class CacheClearCommandTest extends TestCase
     protected function tearDown(): void
     {
         $this->fs->remove($this->kernel->getProjectDir());
-        $this->fs->remove(__DIR__.'/Fixture/preload.php');
+        $this->fs->remove(__DIR__.'/Fixture/.preload.php');
     }
 
     public function testCacheIsFreshAfterCacheClearedWithWarmup()

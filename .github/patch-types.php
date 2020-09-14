@@ -29,6 +29,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/WitherStaticReturnType.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
+        case false !== strpos($file, '/src/Symfony/Component/HttpKernel/Tests/Fixtures/Controller/AttributeController.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Dummy.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/ParentDummy.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Php80Dummy.php'):

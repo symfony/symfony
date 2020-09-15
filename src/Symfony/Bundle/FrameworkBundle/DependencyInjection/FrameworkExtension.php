@@ -93,6 +93,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer as MessagerSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -1791,9 +1792,15 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.beanstalkd.factory');
             $container->removeAlias(SerializerInterface::class);
         } else {
+            $context = $config['serializer']['symfony_serializer']['context'];
+            if (isset($context['type_resolver']) && $context['type_resolver']) {
+                $context[MessagerSerializer::TYPE_RESOLVER] = new Reference($context['type_resolver']);
+                unset($context['type_resolver']);
+            }
+
             $container->getDefinition('messenger.transport.symfony_serializer')
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])
-                ->replaceArgument(2, $config['serializer']['symfony_serializer']['context']);
+                ->replaceArgument(2, $context);
             $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);
         }
 

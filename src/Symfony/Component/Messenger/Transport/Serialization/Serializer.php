@@ -17,10 +17,15 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\DecodedAwareTypeResolverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\HeaderTypeResolver;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\TypeResolverInterface;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
@@ -31,6 +36,8 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
 class Serializer implements SerializerInterface
 {
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';
+    public const TYPE_RESOLVER = 'messenger_type_resolver';
+
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
     private $serializer;
@@ -62,12 +69,12 @@ class Serializer implements SerializerInterface
      */
     public function decode(array $encodedEnvelope): Envelope
     {
-        if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers".');
-        }
-
-        if (empty($encodedEnvelope['headers']['type'])) {
-            throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
+        $headersRequired = !isset($this->context[self::TYPE_RESOLVER]) || $this->context[self::TYPE_RESOLVER] instanceof HeaderTypeResolver;
+        if (empty($encodedEnvelope['body']) || ($headersRequired && empty($encodedEnvelope['headers']))) {
+            $message = $headersRequired ?
+                'Encoded envelope should have at least a "body" and some "headers".' :
+                'Encoded envelope should have at least a "body".';
+            throw new MessageDecodingFailedException($message);
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
@@ -79,12 +86,36 @@ class Serializer implements SerializerInterface
         }
 
         try {
-            $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
+            $message = $this->deserialize($encodedEnvelope, $context);
         } catch (ExceptionInterface $e) {
             throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         return new Envelope($message, $stamps);
+    }
+
+    private function deserialize(array $encodedEnvelope, array $context)
+    {
+        $resolver = $context[self::TYPE_RESOLVER] ?? new HeaderTypeResolver();
+
+        if ($resolver instanceof TypeResolverInterface) {
+            $type = $resolver->resolve($encodedEnvelope);
+
+            return $this->serializer->deserialize($encodedEnvelope['body'], $type, $this->format, $context);
+        }
+
+        if ($resolver instanceof DecodedAwareTypeResolverInterface) {
+            if (!$this->serializer instanceof DecoderInterface || !$this->serializer instanceof DenormalizerInterface) {
+                throw new MessageDecodingFailedException(sprintf('A serializer implementing "%s" and "%s" is needed to use "%s".', DecoderInterface::class, DenormalizerInterface::class, \get_class($resolver)));
+            }
+
+            $decodedBody = $this->serializer->decode($encodedEnvelope['body'], $this->format, $context);
+            $type = $resolver->resolve($encodedEnvelope, $decodedBody);
+
+            return $this->serializer->denormalize($decodedBody, $type, $this->format, $context);
+        }
+
+        throw new MessageDecodingFailedException(sprintf(sprintf('"%s" must be an instance of "%s" or "%s", "%s" given.', self::TYPE_RESOLVER, TypeResolverInterface::class, DecodedAwareTypeResolverInterface::class, \is_object($resolver) ? \get_class($resolver) : \gettype($resolver))));
     }
 
     /**
@@ -111,7 +142,7 @@ class Serializer implements SerializerInterface
     private function decodeStamps(array $encodedEnvelope): array
     {
         $stamps = [];
-        foreach ($encodedEnvelope['headers'] as $name => $value) {
+        foreach ($encodedEnvelope['headers'] ?? [] as $name => $value) {
             if (0 !== strpos($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
             }

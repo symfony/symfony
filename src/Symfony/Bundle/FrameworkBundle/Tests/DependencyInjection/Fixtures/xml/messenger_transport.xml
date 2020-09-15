@@ -12,6 +12,7 @@
                 <framework:symfony-serializer format="csv">
                     <framework:context>
                         <framework:enable_max_depth>true</framework:enable_max_depth>
+                        <framework:type_resolver>App\Serializer\TypeResolver</framework:type_resolver>
                     </framework:context>
                 </framework:symfony-serializer>
             </framework:serializer>

@@ -7,7 +7,10 @@ $container->loadFromExtension('framework', [
             'default_serializer' => 'messenger.transport.symfony_serializer',
             'symfony_serializer' => [
                 'format' => 'csv',
-                'context' => ['enable_max_depth' => true],
+                'context' => [
+                    'enable_max_depth' => true,
+                    'type_resolver' => 'App\Serializer\TypeResolver',
+                ],
             ],
         ],
         'transports' => [

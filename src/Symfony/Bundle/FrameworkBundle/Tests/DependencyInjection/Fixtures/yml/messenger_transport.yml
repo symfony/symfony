@@ -7,5 +7,6 @@ framework:
                 format: csv
                 context:
                     enable_max_depth: true
+                    type_resolver: 'App\Serializer\TypeResolver'
         transports:
             default: 'amqp://localhost/%2f/messages'

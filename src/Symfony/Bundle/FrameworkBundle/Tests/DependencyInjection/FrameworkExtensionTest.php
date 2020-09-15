@@ -727,7 +727,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
-        $this->assertSame(['enable_max_depth' => true], $serializerTransportDefinition->getArgument(2));
+        $this->assertEquals([
+            'enable_max_depth' => true,
+            'messenger_type_resolver' => new Reference('App\Serializer\TypeResolver'),
+        ], $serializerTransportDefinition->getArgument(2));
     }
 
     public function testMessengerWithMultipleBuses()

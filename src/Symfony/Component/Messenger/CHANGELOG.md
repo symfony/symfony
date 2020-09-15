@@ -10,6 +10,7 @@ CHANGELOG
 * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
 * Added `WorkerMessageRetriedEvent`
 * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
+* Added `TypeResolverInterface` and `DecodedAwareTypeResolverInterface` to allow to consume messages from a non-Symfony application.
 
 5.1.0
 -----

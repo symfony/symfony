@@ -19,6 +19,9 @@ use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\DecodedAwareTypeResolverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\HeaderTypeResolver;
+use Symfony\Component\Messenger\Transport\Serialization\TypeResolver\TypeResolverInterface;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
@@ -231,6 +234,175 @@ class SerializerTest extends TestCase
                 'X-Message-Stamp-'.SerializerStamp::class => '[{}]',
             ],
         ]);
+    }
+
+    public function provideDecodingWithTypeResolver(): \Generator
+    {
+        $expectedInstance = new class('hello') {
+            private $message;
+
+            public function __construct(string $message)
+            {
+                $this->message = $message;
+            }
+        };
+
+        $customTypeResolver = new class($expectedInstance) implements TypeResolverInterface {
+            private $expectedInstance;
+
+            public function __construct($expectedInstance)
+            {
+                $this->expectedInstance = $expectedInstance;
+            }
+
+            public function resolve(array $encodedEnvelope): string
+            {
+                if (('my-type-that-is-not-a-class' === $encodedEnvelope['headers']['type'] ?? null)
+                    && 'my-app' === $encodedEnvelope['headers']['origin'] ?? null) {
+                    return \get_class($this->expectedInstance);
+                }
+
+                throw new \Exception('Can\'t resolve type');
+            }
+        };
+
+        $decodedAwareTypeResolver = new class($expectedInstance) implements DecodedAwareTypeResolverInterface {
+            private $expectedInstance;
+
+            public function __construct($expectedInstance)
+            {
+                $this->expectedInstance = $expectedInstance;
+            }
+
+            public function resolve(array $encodedEnvelope, array $body): string
+            {
+                if (\array_key_exists('message', $body)) {
+                    return \get_class($this->expectedInstance);
+                }
+
+                throw new \Exception('Can\'t resolve type');
+            }
+        };
+
+        yield 'implicit_header_type_resolver' => [[], [
+            'headers' => ['type' => \get_class($expectedInstance)],
+            'body' => '{"message":"hello"}',
+        ], $expectedInstance, false];
+
+        yield 'header_type_resolver_default_field' => [[Serializer::TYPE_RESOLVER => new HeaderTypeResolver()], [
+            'headers' => ['type' => \get_class($expectedInstance)],
+            'body' => '{"message":"hello"}',
+        ], $expectedInstance, false];
+
+        yield 'header_type_resolver_other_field' => [[Serializer::TYPE_RESOLVER => new HeaderTypeResolver('class')], [
+            'headers' => ['class' => \get_class($expectedInstance)],
+            'body' => '{"message":"hello"}',
+        ], $expectedInstance, false];
+
+        yield 'custom_type_resolver' => [[Serializer::TYPE_RESOLVER => $customTypeResolver], [
+            'headers' => ['type' => 'my-type-that-is-not-a-class', 'origin' => 'my-app'],
+            'body' => '{"message":"hello"}',
+        ], $expectedInstance, false];
+
+        yield 'decoded_aware_type_resolver' => [[Serializer::TYPE_RESOLVER => $decodedAwareTypeResolver], [
+            'body' => '{"message":"hello"}',
+        ], $expectedInstance, true];
+    }
+
+    /**
+     * @dataProvider provideDecodingWithTypeResolver
+     */
+    public function testDecodingWithTypeResolver(array $serializerContext, array $encodedEnvelope, object $expectedInstance, bool $useFullSerializer)
+    {
+        $interfaces = SerializerComponentInterface::class;
+
+        if ($useFullSerializer) {
+            $interfaces = [
+                $interfaces,
+                SerializerComponent\Encoder\DecoderInterface::class,
+                SerializerComponent\Normalizer\DenormalizerInterface::class,
+            ];
+        }
+
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock($interfaces),
+            'json',
+            $serializerContext
+        );
+
+        $symfonySerializer
+            ->method('deserialize')
+            ->with('{"message":"hello"}', \get_class($expectedInstance), 'json', $serializerContext + [
+                Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
+            ])
+            ->willReturn($expectedInstance);
+
+        if ($useFullSerializer) {
+            $symfonySerializer
+                ->method('decode')
+                ->with('{"message":"hello"}', 'json', $serializerContext + [
+                        Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
+                    ])
+                ->willReturn(['message' => 'hello']);
+
+            $symfonySerializer
+                ->method('denormalize')
+                ->with(['message' => 'hello'], \get_class($expectedInstance), 'json', $serializerContext + [
+                        Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
+                    ])
+                ->willReturn($expectedInstance);
+        }
+
+        $envelope = $serializer->decode($encodedEnvelope);
+        $message = $envelope->getMessage();
+
+        $this->assertSame($expectedInstance, $message);
+    }
+
+    public function testUsingDecodedAwareTypeResolverWithoutSuitableSerializerShouldThrowException()
+    {
+        $decodedAwareTypeResolver = new class() implements DecodedAwareTypeResolverInterface {
+            public function resolve(array $encodedEnvelope, array $body): string
+            {
+                throw new \Exception('Not implemented');
+            }
+        };
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'A serializer implementing "%s" and "%s" is needed to use "%s".',
+            SerializerComponent\Encoder\DecoderInterface::class,
+            SerializerComponent\Normalizer\DenormalizerInterface::class,
+            \get_class($decodedAwareTypeResolver)
+        ));
+
+        $serializer = new Serializer(
+            $this->createMock(SerializerComponentInterface::class),
+            'json',
+            [Serializer::TYPE_RESOLVER => $decodedAwareTypeResolver]
+        );
+
+        $serializer->decode(['body' => '{"foo": "bar"}']);
+    }
+
+    public function testImproperTypeResolverShouldThrowException()
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(sprintf(
+            '"%s" must be an instance of "%s" or "%s", "%s" given.',
+            Serializer::TYPE_RESOLVER,
+            TypeResolverInterface::class,
+            DecodedAwareTypeResolverInterface::class,
+            \stdClass::class
+        ));
+
+        $serializer = new Serializer(
+            $this->createMock(SerializerComponentInterface::class),
+            'json',
+            [Serializer::TYPE_RESOLVER => new \stdClass()]
+        );
+
+        $serializer->decode(['body' => '{"foo": "bar"}']);
     }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface

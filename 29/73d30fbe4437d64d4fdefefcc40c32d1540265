@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by t-richard at 2020-09-14T21:28:20Z
+
+Changed from a logged warning to an exception and adapted tests.

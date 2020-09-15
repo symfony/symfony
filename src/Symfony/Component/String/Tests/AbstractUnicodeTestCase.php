@@ -20,6 +20,16 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         $this->assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
     }
 
+    public function testAsciiClosureRule()
+    {
+        $rule = function ($c) {
+            return str_replace('ö', 'OE', $c);
+        };
+
+        $s = static::createFromString('Dieser Wert sollte größer oder gleich');
+        $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
+    }
+
     public function provideCreateFromCodePoint(): array
     {
         return [

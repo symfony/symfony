@@ -55,7 +55,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var array
      */
-    private $isOptional = [];
+    private $isNullSafe = [];
 
     /**
      * String representation of the path.
@@ -80,7 +80,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->elements = $propertyPath->elements;
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
-            $this->isOptional = $propertyPath->isOptional;
+            $this->isNullSafe = $propertyPath->isNullSafe;
             $this->pathAsString = $propertyPath->pathAsString;
 
             return;
@@ -111,10 +111,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             // Mark as optional when last character is "?".
             if ('?' === substr($element, -1, 1)) {
-                $this->isOptional[] = true;
+                $this->isNullSafe[] = true;
                 $element = substr($element, 0, -1);
             } else {
-                $this->isOptional[] = false;
+                $this->isNullSafe[] = false;
             }
             $this->elements[] = $element;
 
@@ -161,7 +161,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
         array_pop($parent->elements);
         array_pop($parent->isIndex);
-        array_pop($parent->isOptional);
+        array_pop($parent->isNullSafe);
 
         return $parent;
     }
@@ -223,12 +223,12 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isOptional(int $index)
+    public function isNullSafe(int $index)
     {
-        if (!isset($this->isOptional[$index])) {
+        if (!isset($this->isNullSafe[$index])) {
             throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
         }
 
-        return $this->isOptional[$index];
+        return $this->isNullSafe[$index];
     }
 }

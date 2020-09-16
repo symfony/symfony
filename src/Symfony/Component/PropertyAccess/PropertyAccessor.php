@@ -279,7 +279,12 @@ class PropertyAccessor implements PropertyAccessorInterface
         for ($i = 0; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
-            $isOptional = $propertyPath->isOptional($i);
+
+            $isNullSafe = false;
+            if (method_exists($propertyPath, 'isNullSafe')) {
+                // To be removed in symfony 6 once we are sure isNullSafe is always implemented.
+                $isNullSafe = $propertyPath->isNullSafe($i);
+            }
 
             if ($isIndex) {
                 // Create missing nested arrays on demand
@@ -310,11 +315,11 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 $zval = $this->readIndex($zval, $property);
             } else {
-                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty, $isOptional);
+                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty, $isNullSafe);
             }
 
             // the final value of the path must not be validated
-            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE]) && !$isOptional) {
+            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE]) && !$isNullSafe) {
                 throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
             }
 
@@ -368,22 +373,21 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */
-    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false, $isOptional = false): array
+    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false, $isNullSafe = false): array
     {
         $result = self::$resultProto;
 
         if (!\is_object($zval[self::VALUE])) {
-            if (!$isOptional) {
+            if (!$isNullSafe) {
                 throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
-            } else {
-                $result[self::VALUE] = null;
-
-                return $result;
             }
+
+            $result[self::VALUE] = null;
+            return $result;
         }
 
         $object = $zval[self::VALUE];
-        $access = $this->getReadAccessInfo(\get_class($object), $property, $isOptional);
+        $access = $this->getReadAccessInfo(\get_class($object), $property, $isNullSafe);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
             $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
@@ -407,7 +411,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             // we call the getter and hope the __call do the job
             $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
-        } elseif ($isOptional) {
+        } elseif ($isNullSafe) {
             $result[self::VALUE] = null;
         } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
@@ -424,7 +428,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Guesses how to read the property value.
      */
-    private function getReadAccessInfo(string $class, string $property, $isOptional): array
+    private function getReadAccessInfo(string $class, string $property, $isNullSafe): array
     {
         $key = str_replace('\\', '.', $class).'..'.$property;
 
@@ -477,7 +481,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // we call the getter and hope the __call do the job
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
             $access[self::ACCESS_NAME] = $getter;
-        } elseif ($isOptional) {
+        } elseif ($isNullSafe) {
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
         } else {
             $methods = [$getter, $getsetter, $isser, $hasser, '__get'];

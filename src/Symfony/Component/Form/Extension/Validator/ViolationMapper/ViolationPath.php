@@ -196,9 +196,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isOptional(int $index)
+    public function isNullSafe(int $index)
     {
-        // Nothing is optional
         return false;
     }
 

@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-07-10T06:10:55Z
+
+Thanks for working on this. I agree that having such a component in core would be wonderful.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-07-10T08:26:46Z
+
+>     * Rate limiting outgoing API calls (e.g. HttpClient), to prevent hitting upstream API limits.
+
+Based on the naming of https://schneems.com/2020/06/25/rate-limiting-rate-throttling-and-how-they-work-together/, what HttpClient would need is a rate throttling implementation, not a rate limiting one (which does not exactly work the same).
+Heroku published a blog post recently about their rate throttling algorithm in their SDK btw: https://blog.heroku.com/rate-throttle-api-client
+
+Are you sure that the same component can be used for both ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-07-10T09:50:42Z
+
+> Are you sure that the same component can be used for both ?
+
+Yes, I think so, that's where the two different methods come into play. The example shown in the PR description is a throttling example (it throttles the number of time echo's we are creating).
+
+An example of a rate limiter can be:
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$request = new \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+
+$factory = new \Symfony\Component\RateLimiter\LimiterFactory();
+$limiter = $factory->createLimiter(10, \Symfony\Component\RateLimiter\Rate::perSecond(1), $request->getClientIp());
+
+if (!$limiter->consume()) {
+    (new \Symfony\Component\HttpFoundation\Response(null, 429))->send();
+}
+
+// ...
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2020-07-10T10:10:53Z
+
+@wouterj but for an HttpClient, the proper implementation of rate throttling is to adapt to the rate limits of the target API, not to implement rate limits on its own (as it might not be the only client involved to consume the rate limits) That's why I'm doubting that the same component would be used for that.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-07-10T11:28:56Z
+
+Ah, I've now read the Heroku article you posted and I see what you mean. I still think this component works for both throttling and limiting, but API call throttling might need a different approach indeed. For the focus of this PR, let's remove the API throttling usecase from this PR and keep the API throttling discussions in #37471.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-07-16T12:06:42Z
+
+Heh, interesting timing! I'm just finalizing a *generic* throttling library of my own: https://github.com/zenstruck/governator
+
+It is basically a port of the throttling system from Laravel (core) and uses the *fixed window* strategy. I used the lock component for inspiration on configuring the *stores*.
+
+This certainly looks more robust and would love to see rate limiting in Symfony core!
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-07-21T15:42:40Z
+
+This PR now includes integration into the FrameworkBundle using a `LimiterFactory` (this copies the approach of the Lock component), see updated example in the PR description.
+
+I've come to the conclusion that a generic limiter component must at least provide 2 different limiter algorithms. I propose the following 2 algorithms:
+
+* **Token bucket** (originally in this PR), allows limiting bursts and rates: "After 5 failed attempts, you can only try once every 15 minutes."
+* **Sliding window**, common in API limiting: "You can make a maximum of 50 requests per hour"
+
+Other possible algorithms are: leaky bucket (more like a queue) or fixed window (implemented by Laravel). See https://medium.com/figma-design/an-alternative-approach-to-rate-limiting-f8a06cf7c94c and https://blog.cloudflare.com/counting-things-a-lot-of-different-things/ on reasons to use sliding window instead of the fixed window implemented in Laravel.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-07T07:51:45Z
+
+So I've been coming back to this PR locally a couple of times and I'm a bit stuck.
+
+The component as-is provides a working Token Bucket limiter implementation. This works great for something like login throttling, but might not be the best limiter algorithm for API limits (sliding window/fixed window is a better choice). However, I can't find a way to add the same "reservation" support to these window algorithms. Where I need help: **Should we provide one limiter interface for different algorithms, or should we create 2 separate interfaces?**
+
+Also, using the cache component for storage is nice, but directly implementing e.g. Redis can improve performance significantly I think (as you can use REdis commands directly, instead of a "fetching -> php code -> storing" loop). I think that's out of the initial scope of this PR, but something to be taken into account.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-07T07:54:53Z
+
+I don't see any problem in providing 2 interfaces.
+Regarding Redis, we can probably improve performance in another PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-09-13T12:14:52Z
+
+Regarding web API limits, isn't it better to handle them at the edge of the network? Most web servers (NGINX, Apache) and proxies such as Cloudflare support fixing rate limits. Enforcing the limits at this level prevent to start a PHP process for nothing.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-15T19:43:35Z
+
+This PR is now ready in my opinion. I've moved the security integration using login throttling to another PR: https://github.com/symfony/symfony/pull/38204 (to not block this PR too much)
+
+I've also implement a simpler to implement variable Fixed Window strategy, rather than the Sliding Window. Laravel also only has fixed window strategies. This means one could have a burst of hits at the end of one window, and at the start of the next. As shown in this image (source: https://medium.com/figma-design/an-alternative-approach-to-rate-limiting-f8a06cf7c94c):
+
+![image](https://miro.medium.com/max/749/1*OtN-jP5mZko-OUsKzN28Gg.png)
+
+However, I've also introduced a Compound limiter. Using multiple fixed window limiters, you can somewhat flatten out the bursts as well.
+
+(Fabbot failure appears to be unrelated)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-15T19:48:49Z
+
+> Regarding web API limits, isn't it better to handle them at the edge of the network? Most web servers (NGINX, Apache) and proxies such as Cloudflare support fixing rate limits. Enforcing the limits at this level prevent to start a PHP process for nothing.
+
+Yes, I agree - that is for larger apps. In the documentation of this component, we have to be carefull to place this component in the world of rate limiting on other elements of the network. E.g. I can imagine quite some apps build with Symfony that aren't run behind Cloudflare or on a cloud hosting. Those might just use this for API limits, as long as they are aware of the disadvantage (still having to boot the Symfony kernel).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-16T10:00:39Z
+
+Alright, I've updated the PR conform your comments (I think I agree that application wide limiters are probably quite rare).

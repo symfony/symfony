@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -107,7 +107,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $parent = $this->getBuilder('parent')
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $options = [
             'validation_groups' => ['group1', 'group2'],
@@ -130,7 +130,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $options = ['validation_groups' => ['group1', 'group2']];
         $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
@@ -169,7 +169,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $options = [
             'validation_groups' => ['group1', 'group2'],
@@ -196,7 +196,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
 
         $form->setData($object);
@@ -243,7 +243,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         ];
         $form = $this->getBuilder('name', null, $formOptions)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $childOptions = ['constraints' => [new NotBlank()]];
         $child = $this->getCompoundForm(new \stdClass(), $childOptions);
@@ -470,7 +470,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $parent = $this->getBuilder('parent')
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form = $this->getForm('name', '\stdClass', [
             'validation_groups' => 'form_group',
@@ -497,7 +497,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $parent = $this->getBuilder('parent')
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form = $this->getCompoundForm($object, [
             'validation_groups' => 'form_group',
@@ -525,7 +525,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $parentOptions = ['validation_groups' => 'group'];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
         $form = $this->getCompoundForm($object, $formOptions);
@@ -546,7 +546,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $parentOptions = ['validation_groups' => [$this, 'getValidationGroups']];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
         $form = $this->getCompoundForm($object, $formOptions);
@@ -571,7 +571,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         ];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
         $form = $this->getCompoundForm($object, $formOptions);
@@ -618,7 +618,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $form = $this->getBuilder('parent', null, ['extra_fields_message' => 'Extra!|Extras!'])
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->add($this->getBuilder('child'))
             ->getForm();
 
@@ -643,7 +643,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $form = $this->getBuilder('parent', null, ['extra_fields_message' => 'Extra!|Extras!!'])
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->add($this->getBuilder('child'))
             ->getForm();
 
@@ -669,7 +669,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this
             ->getBuilder('parent', null, ['allow_extra_fields' => true])
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->add($this->getBuilder('child'))
             ->getForm();
 
@@ -698,7 +698,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this
             ->getBuilder('form', null, ['constraints' => [new NotBlank(['groups' => ['foo']])]])
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form->submit([
             'extra_data' => 'foo',
@@ -739,7 +739,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return $this->getBuilder('name', \is_object($data) ? \get_class($data) : null, $options)
             ->setData($data)
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
     }
 

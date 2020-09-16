@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -82,7 +82,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
-        $config->setDataMapper(new PropertyPathMapper());
+        $config->setDataMapper(new DataMapper());
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
@@ -1643,7 +1643,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData(false);
         $config->setPropertyPath('name');
         $config->setCompound(true);
-        $config->setDataMapper(new PropertyPathMapper());
+        $config->setDataMapper(new DataMapper());
 
         $child = new Form($config);
         $parent->add($child);
@@ -1681,7 +1681,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData(false);
         $config->setPropertyPath('custom');
         $config->setCompound(true);
-        $config->setDataMapper(new PropertyPathMapper());
+        $config->setDataMapper(new DataMapper());
 
         $child = new Form($config);
         $parent->add($child);
@@ -1719,7 +1719,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData(false);
         $config->setPropertyPath('custom-id');
         $config->setCompound(true);
-        $config->setDataMapper(new PropertyPathMapper());
+        $config->setDataMapper(new DataMapper());
 
         $child = new Form($config);
         $parent->add($child);

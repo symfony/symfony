@@ -18,10 +18,14 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+trigger_deprecation('symfony/form', '5.2', 'The "%s" class is deprecated. Use "%s" instead.', PropertyPathMapper::class, DataMapper::class);
+
 /**
  * Maps arrays/objects to/from forms using property paths.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since symfony/form 5.2. Use {@see DataMapper} instead.
  */
 class PropertyPathMapper implements DataMapperInterface
 {

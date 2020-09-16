@@ -17,6 +17,7 @@
             "disabled",
             "empty_data",
             "error_bubbling",
+            "getter",
             "help",
             "help_attr",
             "help_html",
@@ -36,6 +37,7 @@
             "property_path",
             "required",
             "row_attr",
+            "setter",
             "translation_domain",
             "trim",
             "upload_max_size_message"

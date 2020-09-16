@@ -48,6 +48,7 @@ Form
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.
  * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
  * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been removed, use `\NumberFormatter::ROUND_*` instead.
+ * Removed `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
 
 FrameworkBundle
 ---------------

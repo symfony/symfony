@@ -137,15 +137,15 @@ abstract class AbstractUnicodeString extends AbstractString
                 }
             } elseif (!\function_exists('iconv')) {
                 $s = preg_replace('/[^\x00-\x7F]/u', '?', $s);
-            } elseif (\ICONV_IMPL === 'glibc') {
-                $s = iconv('UTF-8', 'ASCII//TRANSLIT', $s);
             } else {
                 $s = @preg_replace_callback('/[^\x00-\x7F]/u', static function ($c) {
-                    if ('' === $c = (string) iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $c[0])) {
+                    $c = (string) iconv('UTF-8', 'ASCII//TRANSLIT', $c[0]);
+
+                    if ('' === $c && '' === iconv('UTF-8', 'ASCII//TRANSLIT', '²')) {
                         throw new \LogicException(sprintf('"%s" requires a translit-able iconv implementation, try installing "gnu-libiconv" if you\'re using Alpine Linux.', static::class));
                     }
 
-                    return 1 < \strlen($c) ? ltrim($c, '\'`"^~') : (\strlen($c) ? $c : '?');
+                    return 1 < \strlen($c) ? ltrim($c, '\'`"^~') : ('' !== $c ? $c : '?');
                 }, $s);
             }
         }

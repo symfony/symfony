@@ -16,6 +16,11 @@ FrameworkBundle
    used to be added by default to the seed, which is not the case anymore. This allows sharing caches between
    apps or different environments.
 
+Lock
+----
+
+ * `MongoDbStore` does not implement `BlockingStoreInterface` anymore, typehint against `PersistingStoreInterface` instead.
+
 Mime
 ----
 

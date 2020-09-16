@@ -38,7 +38,8 @@ class MailjetApiTransportTest extends TestCase
     public function testPayloadFormat()
     {
         $email = (new Email())
-            ->subject('Sending email to mailjet API');
+            ->subject('Sending email to mailjet API')
+            ->replyTo(new Address('qux@example.com', 'Qux'));
         $email->getHeaders()
             ->addTextHeader('X-authorized-header', 'authorized')
             ->addTextHeader('X-MJ-TemplateLanguage', 'forbidden'); // This header is forbidden
@@ -76,5 +77,31 @@ class MailjetApiTransportTest extends TestCase
         $this->assertEquals('', $recipients[0]['Name']); // For Recipients, even if the name is filled, it is empty
         $this->assertEquals('baz@example.com', $recipients[1]['Email']);
         $this->assertEquals('', $recipients[1]['Name']);
+
+        $this->assertArrayHasKey('ReplyTo', $message);
+        $replyTo = $message['ReplyTo'];
+        $this->assertIsArray($replyTo);
+        $this->assertEquals('qux@example.com', $replyTo['Email']);
+        $this->assertEquals('Qux', $replyTo['Name']);
+    }
+
+    public function testReplyTo()
+    {
+        $from = 'foo@example.com';
+        $to = 'bar@example.com';
+        $email = new Email();
+        $email
+            ->from($from)
+            ->to($to)
+            ->replyTo(new Address('qux@example.com', 'Qux'), new Address('quux@example.com', 'Quux'));
+        $envelope = new Envelope(new Address($from), [new Address($to)]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+
+        $this->expectExceptionMessage('Mailjet\'s API only supports one Reply-To email, 2 given.');
+
+        $method->invoke($transport, $email, $envelope);
     }
 }

@@ -44,12 +44,13 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null !== $envelope->last(DispatchAfterCurrentBusStamp::class)) {
-            if (!$this->isRootDispatchCallRunning) {
-                throw new \LogicException(sprintf('You can only use a "%s" stamp in the context of a message handler.', DispatchAfterCurrentBusStamp::class));
-            }
-            $this->queue[] = new QueuedEnvelope($envelope, $stack);
+            if ($this->isRootDispatchCallRunning) {
+                $this->queue[] = new QueuedEnvelope($envelope, $stack);
 
-            return $envelope;
+                return $envelope;
+            }
+
+            $envelope = $envelope->withoutAll(DispatchAfterCurrentBusStamp::class);
         }
 
         if ($this->isRootDispatchCallRunning) {

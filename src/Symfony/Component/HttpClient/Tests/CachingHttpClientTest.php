@@ -89,7 +89,7 @@ class CachingHttpClientTest extends TestCase
             'test', [
             'response_headers' => [
                 'X-Content-Digest' => 'some-hash',
-            ]
+            ],
         ]));
         $headers = $response->getHeaders();
 
@@ -100,7 +100,7 @@ class CachingHttpClientTest extends TestCase
     {
         $mockClient = new MockHttpClient($mockResponse);
 
-        $store = new Store(sys_get_temp_dir() . '/sf_http_cache');
+        $store = new Store(sys_get_temp_dir().'/sf_http_cache');
         $client = new CachingHttpClient($mockClient, $store);
 
         $response = $client->request('GET', 'http://test');

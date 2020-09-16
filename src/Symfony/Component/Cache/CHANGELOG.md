@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added integration with Messenger to allow computing cached values in a worker
+
 5.1.0
 -----
 

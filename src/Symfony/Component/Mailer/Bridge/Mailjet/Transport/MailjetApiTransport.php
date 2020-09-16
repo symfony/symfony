@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -29,7 +30,7 @@ class MailjetApiTransport extends AbstractApiTransport
     private const FORBIDDEN_HEADERS = [
         'Date', 'X-CSA-Complaints', 'Message-Id', 'X-Mailjet-Campaign', 'X-MJ-StatisticsContactsListID',
         'DomainKey-Status', 'Received-SPF', 'Authentication-Results', 'Received', 'X-Mailjet-Prio',
-        'From', 'Sender', 'Subject', 'To', 'Cc', 'Bcc', 'Return-Path', 'Delivered-To', 'DKIM-Signature',
+        'From', 'Sender', 'Subject', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path', 'Delivered-To', 'DKIM-Signature',
         'X-Feedback-Id', 'X-Mailjet-Segmentation', 'List-Id', 'X-MJ-MID', 'X-MJ-ErrorMessage',
         'X-MJ-TemplateErrorDeliver', 'X-MJ-TemplateErrorReporting', 'X-MJ-TemplateLanguage',
         'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-CustomID', 'X-MJ-EventPayload', 'X-MJ-Vars',
@@ -105,6 +106,12 @@ class MailjetApiTransport extends AbstractApiTransport
         }
         if ($emails = $email->getBcc()) {
             $message['Bcc'] = $this->formatAddresses($emails);
+        }
+        if ($emails = $email->getReplyTo()) {
+            if (1 < $length = \count($emails)) {
+                throw new TransportException(sprintf('Mailjet\'s API only supports one Reply-To email, %d given.', $length));
+            }
+            $message['ReplyTo'] = $this->formatAddress($emails[0]);
         }
         if ($email->getTextBody()) {
             $message['TextPart'] = $email->getTextBody();

@@ -9,11 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Serializer;
+namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalizes invalid Form instances.

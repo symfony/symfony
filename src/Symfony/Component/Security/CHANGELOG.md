@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
  * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
  * Added translator to `\Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator` and `\Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener` to translate authentication failure messages
+ * Added a CurrentUser attribute to force the UserValueResolver to resolve an argument to the current user.
 
 5.1.0
 -----

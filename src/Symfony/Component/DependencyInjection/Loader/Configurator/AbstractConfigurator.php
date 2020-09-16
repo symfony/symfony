@@ -24,7 +24,7 @@ abstract class AbstractConfigurator
     const FACTORY = 'unknown';
 
     /**
-     * @var callable(mixed $value, bool $allowService)|null
+     * @var callable(mixed, bool $allowService)|null
      */
     public static $valuePreProcessor;
 

@@ -21,6 +21,8 @@ use Symfony\Component\Lock\Store\RedisStore;
  */
 class RedisStoreTest extends AbstractRedisStoreTest
 {
+    use SharedLockStoreTestTrait;
+
     public static function setUpBeforeClass(): void
     {
         try {

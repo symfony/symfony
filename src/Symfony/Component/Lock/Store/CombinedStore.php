@@ -16,8 +16,10 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
@@ -25,8 +27,9 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
+class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
 {
+    use BlockingSharedLockStoreTrait;
     use ExpiringStoreTrait;
     use LoggerAwareTrait;
 
@@ -34,6 +37,8 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
     private $stores;
     /** @var StrategyInterface */
     private $strategy;
+    /** @var SharedLockStoreInterface[] */
+    private $sharedLockStores;
 
     /**
      * @param PersistingStoreInterface[] $stores The list of synchronized stores
@@ -65,6 +70,53 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
         foreach ($this->stores as $store) {
             try {
                 $store->save($key);
+                ++$successCount;
+            } catch (\Exception $e) {
+                $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                ++$failureCount;
+            }
+
+            if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
+                break;
+            }
+        }
+
+        $this->checkNotExpired($key);
+
+        if ($this->strategy->isMet($successCount, $storesCount)) {
+            return;
+        }
+
+        $this->logger->info('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+
+        // clean up potential locks
+        $this->delete($key);
+
+        throw new LockConflictedException();
+    }
+
+    public function saveRead(Key $key)
+    {
+        if (null === $this->sharedLockStores) {
+            $this->sharedLockStores = [];
+            foreach ($this->stores as $store) {
+                if ($store instanceof SharedLockStoreInterface) {
+                    $this->sharedLockStores[] = $store;
+                }
+            }
+        }
+
+        $successCount = 0;
+        $storesCount = \count($this->stores);
+        $failureCount = $storesCount - \count($this->sharedLockStores);
+
+        if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
+            throw new NotSupportedException(sprintf('The store "%s" does not contains enough compatible store to met the requirements.', get_debug_type($this)));
+        }
+
+        foreach ($this->sharedLockStores as $store) {
+            try {
+                $store->saveRead($key);
                 ++$successCount;
             } catch (\Exception $e) {
                 $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);

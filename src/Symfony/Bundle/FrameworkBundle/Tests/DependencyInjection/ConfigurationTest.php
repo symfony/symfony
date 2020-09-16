@@ -531,6 +531,10 @@ class ConfigurationTest extends TestCase
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
             ],
+            'rate_limiter' => [
+                'enabled' => false,
+                'limiters' => [],
+            ],
         ];
     }
 }

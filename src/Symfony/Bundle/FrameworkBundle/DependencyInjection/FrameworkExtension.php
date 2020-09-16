@@ -123,6 +123,9 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
+use Symfony\Component\RateLimiter\Limiter;
+use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
@@ -173,6 +176,7 @@ class FrameworkExtension extends Extension
     private $mailerConfigEnabled = false;
     private $httpClientConfigEnabled = false;
     private $notifierConfigEnabled = false;
+    private $lockConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -405,8 +409,16 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['lock'])) {
+        if ($this->lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['rate_limiter'])) {
+            if (!interface_exists(LimiterInterface::class)) {
+                throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
+            }
+
+            $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -2167,6 +2179,48 @@ class FrameworkExtension extends Extension
                 $container->setDefinition($id, new Definition(Recipient::class, [$recipient['email'], $recipient['phone']]));
                 $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
             }
+        }
+    }
+
+    private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        if (!$this->lockConfigEnabled) {
+            throw new LogicException('Rate limiter support cannot be enabled without enabling the Lock component.');
+        }
+
+        $loader->load('rate_limiter.php');
+
+        $locks = [];
+        $storages = [];
+        foreach ($config['limiters'] as $name => $limiterConfig) {
+            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
+
+            if (!isset($locks[$limiterConfig['lock']])) {
+                $locks[$limiterConfig['lock']] = new Reference($limiterConfig['lock']);
+            }
+            $limiter->addArgument($locks[$limiterConfig['lock']]);
+            unset($limiterConfig['lock']);
+
+            if (!isset($storages[$limiterConfig['storage']])) {
+                $storageId = $limiterConfig['storage'];
+                // cache pools are configured by the FrameworkBundle, so they
+                // exists in the scoped ContainerBuilder provided to this method
+                if ($container->has($storageId)) {
+                    if ($container->findDefinition($storageId)->hasTag('cache.pool')) {
+                        $container->register('limiter.storage.'.$storageId, CacheStorage::class)->addArgument(new Reference($storageId));
+                        $storageId = 'limiter.storage.'.$storageId;
+                    }
+                }
+
+                $storages[$limiterConfig['storage']] = new Reference($storageId);
+            }
+            $limiter->replaceArgument(1, $storages[$limiterConfig['storage']]);
+            unset($limiterConfig['storage']);
+
+            $limiterConfig['id'] = $name;
+            $limiter->replaceArgument(0, $limiterConfig);
+
+            $container->registerAliasForArgument($limiterId, Limiter::class, $name.'.limiter');
         }
     }
 

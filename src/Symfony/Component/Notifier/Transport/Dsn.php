@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class Dsn
 {
@@ -26,8 +26,10 @@ final class Dsn
     private $password;
     private $port;
     private $options;
+    private $path;
+    private $dsn;
 
-    public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [])
+    public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)
     {
         $this->scheme = $scheme;
         $this->host = $host;
@@ -35,6 +37,7 @@ final class Dsn
         $this->password = $password;
         $this->port = $port;
         $this->options = $options;
+        $this->path = $path;
     }
 
     public static function fromString(string $dsn): self
@@ -54,9 +57,13 @@ final class Dsn
         $user = isset($parsedDsn['user']) ? urldecode($parsedDsn['user']) : null;
         $password = isset($parsedDsn['pass']) ? urldecode($parsedDsn['pass']) : null;
         $port = $parsedDsn['port'] ?? null;
+        $path = $parsedDsn['path'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query);
+        $dsnObject = new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query, $path);
+        $dsnObject->dsn = $dsn;
+
+        return $dsnObject;
     }
 
     public function getScheme(): string
@@ -87,5 +94,15 @@ final class Dsn
     public function getOption(string $key, $default = null)
     {
         return $this->options[$key] ?? $default;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function getOriginalDsn(): string
+    {
+        return $this->dsn;
     }
 }

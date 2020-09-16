@@ -11,25 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
-use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory as BridgeRedisTransportFactory;
 
-/**
- * @author Alexander Schranz <alexander@suluio>
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-class RedisTransportFactory implements TransportFactoryInterface
-{
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisTransportFactory::class, BridgeRedisTransportFactory::class);
+
+class_exists(BridgeRedisTransportFactory::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/redis-messenger instead.
+     */
+    class RedisTransportFactory
     {
-        unset($options['transport_name']);
-
-        return new RedisTransport(Connection::fromDsn($dsn, $options), $serializer);
-    }
-
-    public function supports(string $dsn, array $options): bool
-    {
-        return 0 === strpos($dsn, 'redis://');
     }
 }

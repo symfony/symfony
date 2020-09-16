@@ -21,12 +21,12 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->previousLocale = setlocale(LC_ALL, '0');
+        $this->previousLocale = setlocale(\LC_ALL, '0');
     }
 
     protected function tearDown(): void
     {
-        setlocale(LC_ALL, $this->previousLocale);
+        setlocale(\LC_ALL, $this->previousLocale);
     }
 
     public function testTransform()
@@ -96,7 +96,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
     public function testFloatToIntConversionMismatchOnTransform()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null, null, MoneyToLocalizedStringTransformer::ROUND_DOWN, 100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_DOWN, 100);
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 
@@ -106,7 +106,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     public function testValidNumericValuesWithNonDotDecimalPointCharacter()
     {
         // calling setlocale() here is important as it changes the representation of floats when being cast to strings
-        setlocale(LC_ALL, 'de_AT.UTF-8');
+        setlocale(\LC_ALL, 'de_AT.UTF-8');
 
         $transformer = new MoneyToLocalizedStringTransformer(4, null, null, 100);
         IntlTestHelper::requireFullIntl($this, false);

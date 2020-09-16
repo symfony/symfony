@@ -120,7 +120,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderHelp(FormView $view)
     {
-        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', \get_class($this)));
+        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
     }
 
     abstract protected function renderErrors(FormView $view);
@@ -1923,7 +1923,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
@@ -1939,7 +1939,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
@@ -1954,7 +1954,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]

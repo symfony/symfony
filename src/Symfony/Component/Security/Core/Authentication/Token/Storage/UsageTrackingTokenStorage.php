@@ -52,6 +52,11 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
     public function setToken(TokenInterface $token = null): void
     {
         $this->storage->setToken($token);
+
+        if ($token && $this->enableUsageTracking) {
+            // increments the internal session usage index
+            $this->sessionLocator->get('session')->getMetadataBag();
+        }
     }
 
     public function enableUsageTracking(): void

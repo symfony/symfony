@@ -13,12 +13,19 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class TraceableHttpClientTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        TestHttpServer::start();
+    }
+
     public function testItTracesRequest()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
@@ -36,10 +43,10 @@ class TraceableHttpClientTest extends TestCase
                     return true;
                 })
             )
-            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse()))
+            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
         ;
         $sut = new TraceableHttpClient($httpClient);
-        $sut->request('GET', '/foo/bar', ['options1' => 'foo']);
+        $sut->request('GET', '/foo/bar', ['options1' => 'foo'])->getContent();
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
         $actualTracedRequest = $tracedRequests[0];
         $this->assertEquals([
@@ -47,6 +54,7 @@ class TraceableHttpClientTest extends TestCase
             'url' => '/foo/bar',
             'options' => ['options1' => 'foo'],
             'info' => [],
+            'content' => 'hello',
         ], $actualTracedRequest);
     }
 
@@ -78,5 +86,18 @@ class TraceableHttpClientTest extends TestCase
         $sut->request('GET', 'https://example.com/foo/bar');
         $sut->reset();
         $this->assertCount(0, $sut->getTracedRequests());
+    }
+
+    public function testStream()
+    {
+        $sut = new TraceableHttpClient(new NativeHttpClient());
+        $response = $sut->request('GET', 'http://localhost:8057/chunked');
+        $chunks = [];
+        foreach ($sut->stream($response) as $r => $chunk) {
+            $chunks[] = $chunk->getContent();
+        }
+        $this->assertSame($response, $r);
+        $this->assertGreaterThan(1, \count($chunks));
+        $this->assertSame('Symfony is awesome!', implode('', $chunks));
     }
 }

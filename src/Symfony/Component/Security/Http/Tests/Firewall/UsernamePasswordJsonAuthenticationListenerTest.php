@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,7 +38,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      */
     private $listener;
 
-    private function createListener(array $options = [], $success = true, $matchCheckPath = true)
+    private function createListener(array $options = [], $success = true, $matchCheckPath = true, $withMockedHandler = true)
     {
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $httpUtils = $this->getMockBuilder(HttpUtils::class)->getMock();
@@ -55,10 +57,15 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
             $authenticationManager->method('authenticate')->willThrowException(new AuthenticationException());
         }
 
-        $authenticationSuccessHandler = $this->getMockBuilder(AuthenticationSuccessHandlerInterface::class)->getMock();
-        $authenticationSuccessHandler->method('onAuthenticationSuccess')->willReturn(new Response('ok'));
-        $authenticationFailureHandler = $this->getMockBuilder(AuthenticationFailureHandlerInterface::class)->getMock();
-        $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
+        $authenticationSuccessHandler = null;
+        $authenticationFailureHandler = null;
+
+        if ($withMockedHandler) {
+            $authenticationSuccessHandler = $this->getMockBuilder(AuthenticationSuccessHandlerInterface::class)->getMock();
+            $authenticationSuccessHandler->method('onAuthenticationSuccess')->willReturn(new Response('ok'));
+            $authenticationFailureHandler = $this->getMockBuilder(AuthenticationFailureHandlerInterface::class)->getMock();
+            $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
+        }
 
         $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, $httpUtils, 'providerKey', $authenticationSuccessHandler, $authenticationFailureHandler, $options);
     }
@@ -86,12 +93,28 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testHandleFailure()
     {
-        $this->createListener([], false);
+        $this->createListener([], false, true, false);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
         $event = new RequestEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         ($this->listener)($event);
-        $this->assertEquals('ko', $event->getResponse()->getContent());
+        $this->assertSame(['error' => 'An authentication exception occurred.'], json_decode($event->getResponse()->getContent(), true));
+    }
+
+    public function testTranslatedHandleFailure()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['An authentication exception occurred.' => 'foo'], 'en', 'security');
+
+        $this->createListener([], false, true, false);
+        $this->listener->setTranslator($translator);
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
+        $event = new RequestEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+
+        ($this->listener)($event);
+        $this->assertSame(['error' => 'foo'], json_decode($event->getResponse()->getContent(), true));
     }
 
     public function testUsePath()

@@ -35,7 +35,7 @@ class JsonBundleWriter implements BundleWriterInterface
             }
         });
 
-        $contents = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)."\n";
+        $contents = json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE)."\n";
 
         file_put_contents($path.'/'.$locale.'.json', $contents);
     }

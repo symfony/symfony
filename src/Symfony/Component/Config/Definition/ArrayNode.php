@@ -207,7 +207,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function finalizeValue($value)
     {
         if (false === $value) {
-            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
         }
 
         foreach ($this->children as $name => $child) {
@@ -227,7 +227,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+                $deprecation = $child->getDeprecation($name, $this->getPath());
+                trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
             }
 
             try {
@@ -250,7 +251,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function validateType($value)
     {
         if (!\is_array($value) && (!$this->allowFalse || false !== $value)) {
-            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected array, but got %s', $this->getPath(), \gettype($value)));
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "array", but got "%s"', $this->getPath(), get_debug_type($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }
@@ -297,7 +298,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $guesses = [];
 
             foreach (array_keys($value) as $subject) {
-                $minScore = INF;
+                $minScore = \INF;
                 foreach ($proposals as $proposal) {
                     $distance = levenshtein($subject, $proposal);
                     if ($distance <= $minScore && $distance < 3) {

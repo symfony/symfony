@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * AnnotationClassLoader loads routing information from a PHP class and its methods.
  *
- * You need to define an implementation for the getRouteDefaults() method. Most of the
+ * You need to define an implementation for the configureRoute() method. Most of the
  * time, this method should define some PHP callable to be called for the route
  * (a controller in MVC speak).
  *
@@ -52,7 +52,23 @@ use Symfony\Component\Routing\RouteCollection;
  *         }
  *     }
  *
+ * On PHP 8, the annotation class can be used as an attribute as well:
+ *     #[Route('/Blog')]
+ *     class Blog
+ *     {
+ *         #[Route('/', name: 'blog_index')]
+ *         public function index()
+ *         {
+ *         }
+ *         #[Route('/{id}', name: 'blog_post', requirements: ["id" => '\d+'])]
+ *         public function show()
+ *         {
+ *         }
+ *     }
+
+ *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
@@ -61,14 +77,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * @var string
      */
-    protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
+    protected $routeAnnotationClass = RouteAnnotation::class;
 
     /**
      * @var int
      */
     protected $defaultRouteIndex = 0;
 
-    public function __construct(Reader $reader)
+    public function __construct(Reader $reader = null)
     {
         $this->reader = $reader;
     }
@@ -108,19 +124,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
-            foreach ($this->reader->getMethodAnnotations($method) as $annot) {
-                if ($annot instanceof $this->routeAnnotationClass) {
-                    $this->addRoute($collection, $annot, $globals, $class, $method);
-                }
+            foreach ($this->getAnnotations($method) as $annot) {
+                $this->addRoute($collection, $annot, $globals, $class, $method);
             }
         }
 
         if (0 === $collection->count() && $class->hasMethod('__invoke')) {
             $globals = $this->resetGlobals();
-            foreach ($this->reader->getClassAnnotations($class) as $annot) {
-                if ($annot instanceof $this->routeAnnotationClass) {
-                    $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
-                }
+            foreach ($this->getAnnotations($class) as $annot) {
+                $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
             }
         }
 
@@ -130,7 +142,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * @param RouteAnnotation $annot or an object that exposes a similar interface
      */
-    protected function addRoute(RouteCollection $collection, $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
+    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
     {
         $name = $annot->getName();
         if (null === $name) {
@@ -157,10 +169,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $host = $globals['host'];
         }
 
-        $condition = $annot->getCondition();
-        if (null === $condition) {
-            $condition = $globals['condition'];
-        }
+        $condition = $annot->getCondition() ?? $globals['condition'];
+        $priority = $annot->getPriority() ?? $globals['priority'];
 
         $path = $annot->getLocalizedPaths() ?: $annot->getPath();
         $prefix = $globals['localized_paths'] ?: $globals['path'];
@@ -207,10 +217,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->configureRoute($route, $class, $method, $annot);
             if (0 !== $locale) {
                 $route->setDefault('_locale', $locale);
+                $route->setRequirement('_locale', preg_quote($locale));
                 $route->setDefault('_canonical_route', $name);
-                $collection->add($name.'.'.$locale, $route);
+                $collection->add($name.'.'.$locale, $route, $priority);
             } else {
-                $collection->add($name, $route);
+                $collection->add($name, $route, $priority);
             }
         }
     }
@@ -258,7 +269,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
     {
         $globals = $this->resetGlobals();
 
-        if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
+        $annot = null;
+        if (\PHP_VERSION_ID >= 80000 && ($attribute = $class->getAttributes($this->routeAnnotationClass)[0] ?? null)) {
+            $annot = $attribute->newInstance();
+        }
+        if (!$annot && $this->reader) {
+            $annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass);
+        }
+
+        if ($annot) {
             if (null !== $annot->getName()) {
                 $globals['name'] = $annot->getName();
             }
@@ -297,6 +316,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['condition'] = $annot->getCondition();
             }
 
+            $globals['priority'] = $annot->getPriority() ?? 0;
+
             foreach ($globals['requirements'] as $placeholder => $requirement) {
                 if (\is_int($placeholder)) {
                     throw new \InvalidArgumentException(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" in "%s"?', $placeholder, $requirement, $class->getName()));
@@ -320,6 +341,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'host' => '',
             'condition' => '',
             'name' => '',
+            'priority' => 0,
         ];
     }
 
@@ -328,5 +350,33 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
     }
 
-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);
+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
+
+    /**
+     * @param \ReflectionClass|\ReflectionMethod $reflection
+     *
+     * @return iterable|RouteAnnotation[]
+     */
+    private function getAnnotations(object $reflection): iterable
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            foreach ($reflection->getAttributes($this->routeAnnotationClass) as $attribute) {
+                yield $attribute->newInstance();
+            }
+        }
+
+        if (!$this->reader) {
+            return;
+        }
+
+        $anntotations = $reflection instanceof \ReflectionClass
+            ? $this->reader->getClassAnnotations($reflection)
+            : $this->reader->getMethodAnnotations($reflection);
+
+        foreach ($anntotations as $annotation) {
+            if ($annotation instanceof $this->routeAnnotationClass) {
+                yield $annotation;
+            }
+        }
+    }
 }

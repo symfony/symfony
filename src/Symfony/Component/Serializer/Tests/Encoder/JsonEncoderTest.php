@@ -48,7 +48,7 @@ class JsonEncoderTest extends TestCase
 
     public function testOptions()
     {
-        $context = ['json_encode_options' => JSON_NUMERIC_CHECK];
+        $context = ['json_encode_options' => \JSON_NUMERIC_CHECK];
 
         $arr = [];
         $arr['foo'] = '3';
@@ -78,7 +78,7 @@ class JsonEncoderTest extends TestCase
 
     public function testEncodeNotUtf8WithPartialOnError()
     {
-        $context = ['json_encode_options' => JSON_PARTIAL_OUTPUT_ON_ERROR];
+        $context = ['json_encode_options' => \JSON_PARTIAL_OUTPUT_ON_ERROR];
 
         $arr = [
             'utf8' => 'Hello World!',
@@ -88,16 +88,16 @@ class JsonEncoderTest extends TestCase
         $result = $this->encoder->encode($arr, 'json', $context);
         $jsonLastError = json_last_error();
 
-        $this->assertSame(JSON_ERROR_UTF8, $jsonLastError);
+        $this->assertSame(\JSON_ERROR_UTF8, $jsonLastError);
         $this->assertEquals('{"utf8":"Hello World!","notUtf8":null}', $result);
 
-        $this->assertEquals('0', $this->serializer->serialize(NAN, 'json', $context));
+        $this->assertEquals('0', $this->serializer->serialize(\NAN, 'json', $context));
     }
 
     public function testDecodeFalseString()
     {
         $result = $this->encoder->decode('false', 'json');
-        $this->assertSame(JSON_ERROR_NONE, json_last_error());
+        $this->assertSame(\JSON_ERROR_NONE, json_last_error());
         $this->assertFalse($result);
     }
 

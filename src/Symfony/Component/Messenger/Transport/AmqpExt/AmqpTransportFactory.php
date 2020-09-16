@@ -11,24 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
-use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory as BridgeAmqpTransportFactory;
 
-/**
- * @author Samuel Roze <samuel.roze@gmail.com>
- */
-class AmqpTransportFactory implements TransportFactoryInterface
-{
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpTransportFactory::class, BridgeAmqpTransportFactory::class);
+
+class_exists(BridgeAmqpTransportFactory::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/amqp-messenger instead.
+     */
+    class AmqpTransportFactory
     {
-        unset($options['transport_name']);
-
-        return new AmqpTransport(Connection::fromDsn($dsn, $options), $serializer);
-    }
-
-    public function supports(string $dsn, array $options): bool
-    {
-        return 0 === strpos($dsn, 'amqp://');
     }
 }

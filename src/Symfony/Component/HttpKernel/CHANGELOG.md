@@ -1,12 +1,35 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added session usage
+ * made the public `http_cache` service handle requests when available
+ * allowed enabling trusted hosts and proxies using new `kernel.trusted_hosts`,
+   `kernel.trusted_proxies` and `kernel.trusted_headers` parameters
+ * content of request parameter `_password` is now also hidden
+   in the request profiler raw content section
+ * Allowed adding attributes on controller arguments that will be passed to argument resolvers.
+
+5.1.0
+-----
+
+ * allowed to use a specific logger channel for deprecations
+ * made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+;
+   not returning an array is deprecated
+ * made kernels implementing `WarmableInterface` be part of the cache warmup stage
+ * deprecated support for `service:action` syntax to reference controllers, use `serviceOrFqcn::method` instead
+ * allowed using public aliases to reference controllers
+ * added session usage reporting when the `_stateless` attribute of the request is set to `true`
+ * added `AbstractSessionListener::onSessionUsage()` to report when the session is used while a request is stateless
+
 5.0.0
 -----
 
  * removed support for getting the container from a non-booted kernel
- * removed the first and second constructor argument of `ConfigDataCollector` 
- * removed `ConfigDataCollector::getApplicationName()` 
+ * removed the first and second constructor argument of `ConfigDataCollector`
+ * removed `ConfigDataCollector::getApplicationName()`
  * removed `ConfigDataCollector::getApplicationVersion()`
  * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
  * removed `TranslatorListener` in favor of `LocaleAwareListener`
@@ -18,7 +41,7 @@ CHANGELOG
  * removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
  * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * removed `PostResponseEvent`, use `TerminateEvent` instead
- * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
+ * removed `SaveSessionListener` in favor of `AbstractSessionListener`
  * removed `Client`, use `HttpKernelBrowser` instead
  * added method `getProjectDir()` to `KernelInterface`
  * removed methods `serialize` and `unserialize` from `DataCollector`, store the serialized state in the data property instead

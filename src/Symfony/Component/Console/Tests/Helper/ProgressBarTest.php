@@ -336,9 +336,9 @@ class ProgressBarTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            '  0/50 [>---------------------------]   0%'.PHP_EOL.
-            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.PHP_EOL.
-            "\x1b[1A\x1b[0J".'  2/50 [=>--------------------------]   4%'.PHP_EOL,
+            '  0/50 [>---------------------------]   0%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'  2/50 [=>--------------------------]   4%'.\PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -362,12 +362,12 @@ class ProgressBarTest extends TestCase
         rewind($stream->getStream());
 
         $this->assertEquals(
-            '  0/50 [>---------------------------]   0%'.PHP_EOL.
-            '  0/50 [>---------------------------]   0%'.PHP_EOL.
-            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.PHP_EOL.
-            "\x1b[2A\x1b[0J".'  1/50 [>---------------------------]   2%'.PHP_EOL.
-            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.PHP_EOL.
-            '  1/50 [>---------------------------]   2%'.PHP_EOL,
+            '  0/50 [>---------------------------]   0%'.\PHP_EOL.
+            '  0/50 [>---------------------------]   0%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
+            "\x1b[2A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
+            '  1/50 [>---------------------------]   2%'.\PHP_EOL,
             stream_get_contents($stream->getStream())
         );
     }
@@ -393,12 +393,12 @@ class ProgressBarTest extends TestCase
 
         rewind($stream->getStream());
 
-        $this->assertEquals('  0/50 [>---------------------------]   0%'.PHP_EOL.
-            ' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.PHP_EOL.
-            "\x1b[4A\x1b[0J".' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.PHP_EOL.
-            "\x1b[3A\x1b[0J".'  1/50 [>---------------------------]   2%'.PHP_EOL.
-            ' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.PHP_EOL.
-            "\x1b[3A\x1b[0J".' 1/50 [>]   2% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.PHP_EOL,
+        $this->assertEquals('  0/50 [>---------------------------]   0%'.\PHP_EOL.
+            ' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL.
+            "\x1b[4A\x1b[0J".' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL.
+            "\x1b[3A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
+            ' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL.
+            "\x1b[3A\x1b[0J".' 1/50 [>]   2% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL,
             stream_get_contents($stream->getStream())
         );
     }
@@ -555,16 +555,16 @@ class ProgressBarTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            '   0/200 [>---------------------------]   0%'.PHP_EOL.
-            '  20/200 [==>-------------------------]  10%'.PHP_EOL.
-            '  40/200 [=====>----------------------]  20%'.PHP_EOL.
-            '  60/200 [========>-------------------]  30%'.PHP_EOL.
-            '  80/200 [===========>----------------]  40%'.PHP_EOL.
-            ' 100/200 [==============>-------------]  50%'.PHP_EOL.
-            ' 120/200 [================>-----------]  60%'.PHP_EOL.
-            ' 140/200 [===================>--------]  70%'.PHP_EOL.
-            ' 160/200 [======================>-----]  80%'.PHP_EOL.
-            ' 180/200 [=========================>--]  90%'.PHP_EOL.
+            '   0/200 [>---------------------------]   0%'.\PHP_EOL.
+            '  20/200 [==>-------------------------]  10%'.\PHP_EOL.
+            '  40/200 [=====>----------------------]  20%'.\PHP_EOL.
+            '  60/200 [========>-------------------]  30%'.\PHP_EOL.
+            '  80/200 [===========>----------------]  40%'.\PHP_EOL.
+            ' 100/200 [==============>-------------]  50%'.\PHP_EOL.
+            ' 120/200 [================>-----------]  60%'.\PHP_EOL.
+            ' 140/200 [===================>--------]  70%'.\PHP_EOL.
+            ' 160/200 [======================>-----]  80%'.\PHP_EOL.
+            ' 180/200 [=========================>--]  90%'.\PHP_EOL.
             ' 200/200 [============================] 100%',
             stream_get_contents($output->getStream())
         );
@@ -581,8 +581,8 @@ class ProgressBarTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            '  0/50 [>---------------------------]   0%'.PHP_EOL.
-            ' 25/50 [==============>-------------]  50%'.PHP_EOL.
+            '  0/50 [>---------------------------]   0%'.\PHP_EOL.
+            ' 25/50 [==============>-------------]  50%'.\PHP_EOL.
             ' 50/50 [============================] 100%',
             stream_get_contents($output->getStream())
         );
@@ -596,7 +596,7 @@ class ProgressBarTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            '    0 [>---------------------------]'.PHP_EOL.
+            '    0 [>---------------------------]'.\PHP_EOL.
             '    1 [->--------------------------]',
             stream_get_contents($output->getStream())
         );
@@ -759,7 +759,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x0D\x1B[2K\x1B[1A\x1B[2K".
+            "\x1B[1A\x1B[1G\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
@@ -915,7 +915,7 @@ class ProgressBarTest extends TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D\x1B[2K".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
+        return ($count ? sprintf("\x1B[%dA\x1B[1G\x1b[2K", $count) : "\x1B[1G\x1B[2K").$expected;
     }
 
     public function testBarWidthWithMultilineFormat()

@@ -35,6 +35,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     private $resources = [];
 
+    /**
+     * @var int[]
+     */
+    private $priorities = [];
+
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
@@ -53,7 +58,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->routes);
+        return new \ArrayIterator($this->all());
     }
 
     /**
@@ -66,11 +71,22 @@ class RouteCollection implements \IteratorAggregate, \Countable
         return \count($this->routes);
     }
 
-    public function add(string $name, Route $route)
+    /**
+     * @param int $priority
+     */
+    public function add(string $name, Route $route/*, int $priority = 0*/)
     {
-        unset($this->routes[$name]);
+        if (\func_num_args() < 3 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            trigger_deprecation('symfony/routing', '5.1', 'The "%s()" method will have a new "int $priority = 0" argument in version 6.0, not defining it is deprecated.', __METHOD__);
+        }
+
+        unset($this->routes[$name], $this->priorities[$name]);
 
         $this->routes[$name] = $route;
+
+        if ($priority = 3 <= \func_num_args() ? func_get_arg(2) : 0) {
+            $this->priorities[$name] = $priority;
+        }
     }
 
     /**
@@ -80,6 +96,14 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function all()
     {
+        if ($this->priorities) {
+            $priorities = $this->priorities;
+            $keysOrder = array_flip(array_keys($this->routes));
+            uksort($this->routes, static function ($n1, $n2) use ($priorities, $keysOrder) {
+                return (($priorities[$n2] ?? 0) <=> ($priorities[$n1] ?? 0)) ?: ($keysOrder[$n1] <=> $keysOrder[$n2]);
+            });
+        }
+
         return $this->routes;
     }
 
@@ -101,7 +125,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function remove($name)
     {
         foreach ((array) $name as $n) {
-            unset($this->routes[$n]);
+            unset($this->routes[$n], $this->priorities[$n]);
         }
     }
 
@@ -114,8 +138,12 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
         foreach ($collection->all() as $name => $route) {
-            unset($this->routes[$name]);
+            unset($this->routes[$name], $this->priorities[$name]);
             $this->routes[$name] = $route;
+
+            if (isset($collection->priorities[$name])) {
+                $this->priorities[$name] = $collection->priorities[$name];
+            }
         }
 
         foreach ($collection->getResources() as $resource) {
@@ -147,15 +175,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function addNamePrefix(string $prefix)
     {
         $prefixedRoutes = [];
+        $prefixedPriorities = [];
 
         foreach ($this->routes as $name => $route) {
             $prefixedRoutes[$prefix.$name] = $route;
-            if (null !== $name = $route->getDefault('_canonical_route')) {
-                $route->setDefault('_canonical_route', $prefix.$name);
+            if (null !== $canonicalName = $route->getDefault('_canonical_route')) {
+                $route->setDefault('_canonical_route', $prefix.$canonicalName);
+            }
+            if (isset($this->priorities[$name])) {
+                $prefixedPriorities[$prefix.$name] = $this->priorities[$name];
             }
         }
 
         $this->routes = $prefixedRoutes;
+        $this->priorities = $prefixedPriorities;
     }
 
     /**

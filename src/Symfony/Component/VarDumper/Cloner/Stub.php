@@ -48,7 +48,7 @@ class Stub
     {
         $properties = [];
 
-        if (!isset(self::$defaultProperties[$c = \get_class($this)])) {
+        if (!isset(self::$defaultProperties[$c = static::class])) {
             self::$defaultProperties[$c] = get_class_vars($c);
 
             foreach ((new \ReflectionClass($c))->getStaticProperties() as $k => $v) {

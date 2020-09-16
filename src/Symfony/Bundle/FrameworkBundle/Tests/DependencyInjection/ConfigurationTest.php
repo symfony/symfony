@@ -30,10 +30,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
-        $this->assertEquals(
-            array_merge(['secret' => 's3cr3t', 'trusted_hosts' => []], self::getBundleDefaultConfig()),
-            $config
-        );
+        $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
     public function getTestValidSessionName()
@@ -314,12 +311,40 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testItErrorsWhenDefaultBusDoesNotExist()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
+
+        $processor->processConfiguration($configuration, [
+            [
+                'messenger' => [
+                    'default_bus' => 'foo',
+                    'buses' => [
+                        'bar' => null,
+                        'baz' => null,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'secret' => 's3cr3t',
+            'trusted_hosts' => [],
+            'trusted_headers' => [
+                'x-forwarded-all',
+                '!x-forwarded-host',
+                '!x-forwarded-prefix',
+            ],
             'csrf_protection' => [
                 'enabled' => false,
             ],
@@ -329,6 +354,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
+                'legacy_error_messages' => true,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],
@@ -352,6 +378,15 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
+                'enabled_locales' => [],
+                'pseudo_localization' => [
+                    'enabled' => false,
+                    'accents' => true,
+                    'expansion_factor' => 1.0,
+                    'brackets' => true,
+                    'parse_html' => false,
+                    'localizable_html_attributes' => [],
+                ],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -380,6 +415,8 @@ class ConfigurationTest extends TestCase
             ],
             'property_access' => [
                 'magic_call' => false,
+                'magic_get' => true,
+                'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],
@@ -388,10 +425,11 @@ class ConfigurationTest extends TestCase
             ],
             'router' => [
                 'enabled' => false,
+                'default_uri' => null,
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => false,
+                'utf8' => null,
             ],
             'session' => [
                 'enabled' => false,
@@ -425,6 +463,7 @@ class ConfigurationTest extends TestCase
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
+                'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [
                 'enabled' => false,
@@ -469,6 +508,8 @@ class ConfigurationTest extends TestCase
                 'dsn' => null,
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+                'message_bus' => null,
+                'headers' => [],
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
@@ -482,8 +523,13 @@ class ConfigurationTest extends TestCase
             'secrets' => [
                 'enabled' => true,
                 'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
-                'local_dotenv_file' => '%kernel.project_dir%/.env.local',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
                 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
+            ],
+            'http_cache' => [
+                'enabled' => false,
+                'debug' => '%kernel.debug%',
+                'private_headers' => [],
             ],
         ];
     }

@@ -1,9 +1,9 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kaukasisch-Albanisch",
         "Arab": "Arabisch",
+        "Aran": "Nastaliq",
         "Armn": "Armenisch",
         "Avst": "Avestisch",
         "Bali": "Balinesisch",
@@ -42,6 +42,7 @@
         "Grek": "Griechisch",
         "Gujr": "Gujarati",
         "Guru": "Gurmukhi",
+        "Hanb": "Han mit Bopomofo",
         "Hang": "Hangul",
         "Hani": "Chinesisch",
         "Hano": "Hanunoo",
@@ -114,6 +115,7 @@
         "Phnx": "Phönizisch",
         "Plrd": "Pollard Phonetisch",
         "Prti": "Parthisch",
+        "Qaag": "Zawgyi",
         "Rjng": "Rejang",
         "Roro": "Rongorongo",
         "Runr": "Runenschrift",

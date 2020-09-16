@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 class UserValueResolverTest extends TestCase
@@ -63,6 +64,20 @@ class UserValueResolverTest extends TestCase
 
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
+
+        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
+        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+    }
+
+    public function testResolveWithAttribute()
+    {
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $token = new UsernamePasswordToken($user, 'password', 'provider');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, new CurrentUser());
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));

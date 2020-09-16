@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Validator;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 
 /**

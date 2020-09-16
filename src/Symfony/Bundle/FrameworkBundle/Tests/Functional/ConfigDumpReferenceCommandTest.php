@@ -30,6 +30,14 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $this->application->doRun(new ArrayInput([]), new NullOutput());
     }
 
+    public function testDumpKernelExtension()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'foo']);
+        $this->assertStringContainsString('foo:', $tester->getDisplay());
+        $this->assertStringContainsString('    bar', $tester->getDisplay());
+    }
+
     public function testDumpBundleName()
     {
         $tester = $this->createCommandTester();

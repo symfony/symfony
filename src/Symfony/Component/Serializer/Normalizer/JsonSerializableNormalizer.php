@@ -35,7 +35,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
         }
 
         if (!$this->serializer instanceof NormalizerInterface) {
-            throw new LogicException('Cannot normalize object because injected serializer is not a normalizer');
+            throw new LogicException('Cannot normalize object because injected serializer is not a normalizer.');
         }
 
         return $this->serializer->normalize($object->jsonSerialize(), $format, $context);
@@ -70,6 +70,6 @@ class JsonSerializableNormalizer extends AbstractNormalizer
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 }

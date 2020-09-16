@@ -20,6 +20,16 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         $this->assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
     }
 
+    public function testAsciiClosureRule()
+    {
+        $rule = function ($c) {
+            return str_replace('ö', 'OE', $c);
+        };
+
+        $s = static::createFromString('Dieser Wert sollte größer oder gleich');
+        $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
+    }
+
     public function provideCreateFromCodePoint(): array
     {
         return [
@@ -565,6 +575,18 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
                 ['äußerst', 'äußerst', 7, '+'],
                 ['+äußerst', 'äußerst', 8, '+'],
                 ['äöä.', '.', 4, 'äö'],
+            ]
+        );
+    }
+
+    public static function provideReverse()
+    {
+        return array_merge(
+            parent::provideReverse(),
+            [
+                ['äuß⭐erst', 'tsre⭐ßuä'],
+                ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
+                ['नमस्ते', 'तेस्मन'],
             ]
         );
     }

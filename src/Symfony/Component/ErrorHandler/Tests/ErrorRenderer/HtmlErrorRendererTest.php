@@ -13,7 +13,6 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class HtmlErrorRendererTest extends TestCase
 {

@@ -11,14 +11,15 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var ChoiceListFactoryInterface|MockObject
      */
@@ -75,8 +78,8 @@ class DoctrineChoiceLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
-        $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')->getMock();
-        $this->repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')->getMock();
+        $this->om = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $this->repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $this->class = 'stdClass';
         $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
             ->disableOriginalConstructor()
@@ -100,6 +103,10 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->method('getClassMetadata')
             ->with($this->class)
             ->willReturn(new ClassMetadata($this->class));
+        $this->repository->expects($this->any())
+            ->method('findAll')
+            ->willReturn([$this->obj1, $this->obj2, $this->obj3])
+        ;
     }
 
     public function testLoadChoiceList()
@@ -186,8 +193,12 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadValuesForChoices([]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
+        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -205,7 +216,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
     }
 
-    public function testLoadValuesForChoicesLoadsIfSingleIntIdAndValueGiven()
+    public function testLoadValuesForChoicesDoesNotLoadIfSingleIntIdAndValueGiven()
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -216,7 +227,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->repository->expects($this->once())
+        $this->repository->expects($this->never())
             ->method('findAll')
             ->willReturn($choices);
 
@@ -254,8 +265,7 @@ class DoctrineChoiceLoaderTest extends TestCase
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
-            $this->class,
-            $this->idReader
+            $this->class
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -285,8 +295,12 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadChoicesForValues([]));
     }
 
-    public function testLoadChoicesForValuesLoadsOnlyChoicesIfSingleIntId()
+    /**
+     * @group legacy
+     */
+    public function legacyTestLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
+        $this->expectDeprecation('Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.');
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -318,6 +332,42 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
             $loader->loadChoicesForValues([4 => '3', 7 => '2']
+        ));
+    }
+
+    public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
+    {
+        $loader = new DoctrineChoiceLoader(
+            $this->om,
+            $this->class,
+            $this->idReader,
+            $this->objectLoader
+        );
+
+        $choices = [$this->obj2, $this->obj3];
+
+        $this->idReader->expects($this->any())
+            ->method('getIdField')
+            ->willReturn('idField');
+
+        $this->repository->expects($this->never())
+            ->method('findAll');
+
+        $this->objectLoader->expects($this->once())
+            ->method('getEntitiesByIds')
+            ->with('idField', [4 => '3', 7 => '2'])
+            ->willReturn($choices);
+
+        $this->idReader->expects($this->any())
+            ->method('getIdValue')
+            ->willReturnMap([
+                [$this->obj2, '2'],
+                [$this->obj3, '3'],
+            ]);
+
+        $this->assertSame(
+            [4 => $this->obj3, 7 => $this->obj2],
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']
         ));
     }
 

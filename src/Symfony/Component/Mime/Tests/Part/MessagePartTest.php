@@ -22,7 +22,7 @@ class MessagePartTest extends TestCase
 {
     public function testConstructor()
     {
-        $p = new MessagePart((new Email())->from('fabien@symfony.com')->text('content'));
+        $p = new MessagePart((new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content'));
         $this->assertStringContainsString('content', $p->getBody());
         $this->assertStringContainsString('content', $p->bodyToString());
         $this->assertStringContainsString('content', implode('', iterator_to_array($p->bodyToIterable())));

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/config": "^4.4|^5.0",
         "symfony/twig-bridge": "^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
@@ -27,7 +27,7 @@
     "require-dev": {
         "symfony/asset": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/dependency-injection": "^5.2",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
@@ -40,7 +40,7 @@
         "doctrine/cache": "~1.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<4.4",
+        "symfony/dependency-injection": "<5.2",
         "symfony/framework-bundle": "<5.0",
         "symfony/translation": "<5.0"
     },
@@ -53,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

@@ -48,7 +48,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class AbstractAuthenticationListener
+abstract class AbstractAuthenticationListener extends AbstractListener
 {
     protected $options;
     protected $logger;
@@ -103,18 +103,22 @@ abstract class AbstractAuthenticationListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return $this->requiresAuthentication($request);
+    }
+
+    /**
      * Handles form based authentication.
      *
      * @throws \RuntimeException
      * @throws SessionUnavailableException
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
-
-        if (!$this->requiresAuthentication($request)) {
-            return;
-        }
 
         if (!$request->hasSession()) {
             throw new \RuntimeException('This authentication method requires a session.');
@@ -171,11 +175,11 @@ abstract class AbstractAuthenticationListener
     private function onFailure(Request $request, AuthenticationException $failed): Response
     {
         if (null !== $this->logger) {
-            $this->logger->error('Authentication request failed.', ['exception' => $failed]);
+            $this->logger->info('Authentication request failed.', ['exception' => $failed]);
         }
 
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
         }
 

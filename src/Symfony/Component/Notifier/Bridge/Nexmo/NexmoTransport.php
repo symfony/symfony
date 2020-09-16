@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Nexmo;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -22,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class NexmoTransport extends AbstractTransport
 {
@@ -51,10 +52,10 @@ final class NexmoTransport extends AbstractTransport
         return $message instanceof SmsMessage;
     }
 
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [
@@ -69,9 +70,16 @@ final class NexmoTransport extends AbstractTransport
 
         $result = $response->toArray(false);
         foreach ($result['messages'] as $msg) {
-            if ($msg['status'] ?? 0 > 0) {
-                throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $msg['error-text'], $msg['status']), $response);
+            if ($msg['status'] ?? false) {
+                throw new TransportException('Unable to send the SMS: '.$msg['error-text'].sprintf(' (code %s).', $msg['status']), $response);
             }
         }
+
+        $success = $response->toArray(false);
+
+        $message = new SentMessage($message, (string) $this);
+        $message->setMessageId($success['messages'][0]['message-id']);
+
+        return $message;
     }
 }

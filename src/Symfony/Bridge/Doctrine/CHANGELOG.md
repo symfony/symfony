@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added support for symfony/uid as `UlidType`, `UuidType`, `UlidBinaryType` and `UuidBinaryType` as Doctrine types
+ * added `UlidGenerator`, `UUidV1Generator`, `UuidV4Generator` and `UuidV6Generator`
+
 5.0.0
 -----
 
@@ -12,8 +18,9 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] using null as `$classValidatorRegexp` value in `DoctrineLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
  * added `DoctrineClearEntityManagerWorkerSubscriber`
- * deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`
+ * deprecated `RegistryInterface`, use `Doctrine\Persistence\ManagerRegistry`
  * added support for invokable event listeners
  * added `getMetadataDriverClass` method to deprecate class parameters in service configuration files
 

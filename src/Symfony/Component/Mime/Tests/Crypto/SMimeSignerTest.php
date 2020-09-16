@@ -99,6 +99,7 @@ class SMimeSignerTest extends SMimeTestCase
     {
         $message = (new Email())
             ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->to('fabien@symfony.com')
             ->addBcc('fabien@symfony.com', 's.stok@rollerscapes.net')
             ->subject('I am your sign of fear')
             ->from('noreply@example.com')
@@ -115,8 +116,9 @@ class SMimeSignerTest extends SMimeTestCase
         $message = new Email((new Headers())
             ->addDateHeader('Date', new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->addMailboxListHeader('From', ['fabien@symfony.com'])
+            ->addMailboxListHeader('To', ['fabien@symfony.com'])
         );
-        $message->html($content = 'html content <img src="cid:test.gif">');
+        $message->html('html content <img src="cid:test.gif">');
         $message->text('text content');
         $message->attach(fopen(__DIR__.'/../Fixtures/mimetypes/test', 'r'));
         $message->attach(fopen(__DIR__.'/../Fixtures/mimetypes/test.gif', 'r'), 'test.gif');
@@ -141,7 +143,7 @@ class SMimeSignerTest extends SMimeTestCase
             $this->samplesDir.'sign.key',
             null,
             $this->samplesDir.'intermediate.crt',
-            PKCS7_DETACHED
+            \PKCS7_DETACHED
         );
         $signedMessage = $signer->sign($message);
 

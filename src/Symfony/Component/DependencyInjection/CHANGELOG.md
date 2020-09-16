@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `param()` and `abstract_arg()` in the PHP-DSL
+ * deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+
+5.1.0
+-----
+
+ * deprecated `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * allow decorators to reference their decorated service using the special `.inner` id
+ * added support to autowire public typed properties in php 7.4
+ * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
+ * added possibility to define abstract service arguments
+ * allowed mixing "parent" and instanceof-conditionals/defaults/bindings
+ * updated the signature of method `Definition::setDeprecated()` to `Definition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `Alias::setDeprecated()` to `Alias::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `DeprecateTrait::deprecate()` to `DeprecateTrait::deprecation(string $package, string $version, string $message)`
+ * deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
+   configure them explicitly instead
+ * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
+ * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
+ * allowed loading and dumping tags with an attribute named "name"
+ * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * deprecated PHP-DSL's `inline()` function, use `service()` instead
+ * added support of PHP8 static return type for withers
+ * added `AliasDeprecatedPublicServicesPass` to deprecate public services to private
+
 5.0.0
 -----
 

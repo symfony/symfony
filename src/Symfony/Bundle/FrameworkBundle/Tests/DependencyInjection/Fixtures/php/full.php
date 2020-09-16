@@ -8,6 +8,7 @@ $container->loadFromExtension('framework', [
         'csrf_protection' => [
             'field_name' => '_csrf',
         ],
+        'legacy_error_messages' => false,
     ],
     'http_method_override' => false,
     'esi' => [
@@ -23,6 +24,7 @@ $container->loadFromExtension('framework', [
     'router' => [
         'resource' => '%kernel.project_dir%/config/routing.xml',
         'type' => 'xml',
+        'utf8' => true,
     ],
     'session' => [
         'storage_id' => 'session.storage.native',
@@ -49,6 +51,7 @@ $container->loadFromExtension('framework', [
         'fallback' => 'fr',
         'paths' => ['%kernel.project_dir%/Fixtures/translations'],
         'cache_dir' => '%kernel.cache_dir%/translations',
+        'enabled_locales' => ['fr', 'en']
     ],
     'validation' => [
         'enabled' => true,

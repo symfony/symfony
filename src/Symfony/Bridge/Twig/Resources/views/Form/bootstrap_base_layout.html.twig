@@ -187,7 +187,7 @@
 {# Rows #}
 
 {% block button_row -%}
-    <div class="form-group">
+    <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_widget(form) -}}
     </div>
 {%- endblock button_row %}

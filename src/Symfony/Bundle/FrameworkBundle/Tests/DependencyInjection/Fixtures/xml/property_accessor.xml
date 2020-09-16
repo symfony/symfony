@@ -7,6 +7,6 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:property-access magic-call="true" throw-exception-on-invalid-index="true" throw-exception-on-invalid-property-path="false"/>
+        <framework:property-access magic-call="true" magic-get="true" magic-set="false" throw-exception-on-invalid-index="true" throw-exception-on-invalid-property-path="false"/>
     </framework:config>
 </container>

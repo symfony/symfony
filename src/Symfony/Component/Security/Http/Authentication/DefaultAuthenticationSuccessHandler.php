@@ -30,7 +30,9 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     protected $httpUtils;
     protected $options;
+    /** @deprecated since 5.2, use $firewallName instead */
     protected $providerKey;
+    protected $firewallName;
     protected $defaultOptions = [
         'always_use_default_target_path' => false,
         'default_target_path' => '/',
@@ -75,15 +77,43 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * Get the provider key.
      *
      * @return string
+     *
+     * @deprecated since 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {
-        return $this->providerKey;
+        if (1 !== \func_num_args() || true !== func_get_arg(0)) {
+            trigger_deprecation('symfony/security-core', '5.2', 'Method "%s()" is deprecated, use "getFirewallName()" instead.', __METHOD__);
+        }
+
+        if ($this->providerKey !== $this->firewallName) {
+            trigger_deprecation('symfony/security-core', '5.2', 'The "%1$s::$providerKey" property is deprecated, use "%1$s::$firewallName" instead.', __CLASS__);
+
+            return $this->providerKey;
+        }
+
+        return $this->firewallName;
     }
 
     public function setProviderKey(string $providerKey)
     {
+        if (2 !== \func_num_args() || true !== func_get_arg(1)) {
+            trigger_deprecation('symfony/security-http', '5.2', 'Method "%s" is deprecated, use "setFirewallName()" instead.', __METHOD__);
+        }
+
         $this->providerKey = $providerKey;
+    }
+
+    public function getFirewallName(): ?string
+    {
+        return $this->getProviderKey(true);
+    }
+
+    public function setFirewallName(string $firewallName): void
+    {
+        $this->setProviderKey($firewallName, true);
+
+        $this->firewallName = $firewallName;
     }
 
     /**
@@ -101,8 +131,9 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        if (null !== $this->providerKey && $targetUrl = $this->getTargetPath($request->getSession(), $this->providerKey)) {
-            $this->removeTargetPath($request->getSession(), $this->providerKey);
+        $firewallName = $this->getFirewallName();
+        if (null !== $firewallName && $targetUrl = $this->getTargetPath($request->getSession(), $firewallName)) {
+            $this->removeTargetPath($request->getSession(), $firewallName);
 
             return $targetUrl;
         }

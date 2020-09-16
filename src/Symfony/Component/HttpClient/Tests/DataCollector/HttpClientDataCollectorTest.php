@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\HttpClient\Tests\DataCollector;
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -19,9 +21,13 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class HttpClientDataCollectorTest extends TestCase
 {
-    public function testItCollectsRequestCount()
+    public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
+    }
+
+    public function testItCollectsRequestCount()
+    {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
@@ -50,7 +56,6 @@ class HttpClientDataCollectorTest extends TestCase
 
     public function testItCollectsErrorCount()
     {
-        TestHttpServer::start();
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
@@ -80,7 +85,6 @@ class HttpClientDataCollectorTest extends TestCase
 
     public function testItCollectsErrorCountByClient()
     {
-        TestHttpServer::start();
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
@@ -113,7 +117,6 @@ class HttpClientDataCollectorTest extends TestCase
 
     public function testItCollectsTracesByClient()
     {
-        TestHttpServer::start();
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
@@ -146,7 +149,6 @@ class HttpClientDataCollectorTest extends TestCase
 
     public function testItIsEmptyAfterReset()
     {
-        TestHttpServer::start();
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
@@ -170,7 +172,7 @@ class HttpClientDataCollectorTest extends TestCase
 
         foreach ($tracedRequests as $request) {
             $response = $httpClient->request($request['method'], $request['url'], $request['options'] ?? []);
-            $response->getContent(false); // To avoid exception in ResponseTrait::doDestruct
+            $response->getContent(false); // disables exceptions from destructors
         }
 
         return $httpClient;

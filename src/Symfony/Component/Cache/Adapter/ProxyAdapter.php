@@ -25,14 +25,15 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
-    use ProxyTrait;
     use ContractsTrait;
+    use ProxyTrait;
 
     private $namespace;
     private $namespaceLen;
     private $createCacheItem;
     private $setInnerItem;
     private $poolHash;
+    private $defaultLifetime;
 
     public function __construct(CacheItemPoolInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
@@ -40,8 +41,9 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $this->poolHash = $poolHash = spl_object_hash($pool);
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace);
         $this->namespaceLen = \strlen($namespace);
+        $this->defaultLifetime = $defaultLifetime;
         $this->createCacheItem = \Closure::bind(
-            static function ($key, $innerItem) use ($defaultLifetime, $poolHash) {
+            static function ($key, $innerItem) use ($poolHash) {
                 $item = new CacheItem();
                 $item->key = $key;
 
@@ -52,7 +54,6 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $item->value = $v = $innerItem->get();
                 $item->isHit = $innerItem->isHit();
                 $item->innerItem = $innerItem;
-                $item->defaultLifetime = $defaultLifetime;
                 $item->poolHash = $poolHash;
 
                 // Detect wrapped values that encode for their expiry and creation duration
@@ -87,7 +88,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                     $item["\0*\0value"] = ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
                 }
                 $innerItem->set($item["\0*\0value"]);
-                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', $item["\0*\0expiry"])) : null);
+                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', 0 === $item["\0*\0expiry"] ? \PHP_INT_MAX : $item["\0*\0expiry"])) : null);
             },
             null,
             CacheItem::class
@@ -223,8 +224,8 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             return false;
         }
         $item = (array) $item;
-        if (null === $item["\0*\0expiry"] && 0 < $item["\0*\0defaultLifetime"]) {
-            $item["\0*\0expiry"] = microtime(true) + $item["\0*\0defaultLifetime"];
+        if (null === $item["\0*\0expiry"] && 0 < $this->defaultLifetime) {
+            $item["\0*\0expiry"] = microtime(true) + $this->defaultLifetime;
         }
 
         if ($item["\0*\0poolHash"] === $this->poolHash && $item["\0*\0innerItem"]) {

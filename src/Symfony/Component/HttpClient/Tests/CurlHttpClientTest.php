@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use Psr\Log\AbstractLogger;
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -22,48 +22,70 @@ class CurlHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
-        return new CurlHttpClient();
+        if (false !== strpos($testCase, 'Push')) {
+            if (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) {
+                $this->markTestSkipped('PHP 7.3.0 to 7.3.3 don\'t support HTTP/2 PUSH');
+            }
+
+            if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073d00 > ($v = curl_version())['version_number'] || !(\CURL_VERSION_HTTP2 & $v['features'])) {
+                $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
+            }
+        }
+
+        return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false]);
     }
 
-    /**
-     * @requires PHP 7.2.17
-     */
-    public function testHttp2Push()
+    public function testTimeoutIsNotAFatalError()
     {
-        if (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) {
-            $this->markTestSkipped('PHP 7.3.0 to 7.3.3 don\'t support HTTP/2 PUSH');
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
         }
 
-        if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073d00 > ($v = curl_version())['version_number'] || !(CURL_VERSION_HTTP2 & $v['features'])) {
-            $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
-        }
+        parent::testTimeoutIsNotAFatalError();
+    }
 
-        $logger = new class() extends AbstractLogger {
-            public $logs = [];
+    public function testOverridingRefererUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_REFERER" with "extra.curl", use option "headers" instead.');
 
-            public function log($level, $message, array $context = []): void
-            {
-                $this->logs[] = $message;
-            }
-        };
+        $httpClient->request('GET', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_REFERER => 'Banana',
+                ],
+            ],
+        ]);
+    }
 
-        $client = new CurlHttpClient([], 6, 2);
-        $client->setLogger($logger);
+    public function testOverridingHttpMethodUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The HTTP method cannot be overridden using "extra.curl".');
 
-        $index = $client->request('GET', 'https://http2.akamai.com/');
-        $index->getContent();
+        $httpClient->request('POST', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_HTTPGET => true,
+                ],
+            ],
+        ]);
+    }
 
-        $css = $client->request('GET', 'https://http2.akamai.com/resources/push.css');
+    public function testOverridingInternalAttributesUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_PRIVATE" with "extra.curl".');
 
-        $css->getHeaders();
-
-        $expected = [
-            'Request: "GET https://http2.akamai.com/"',
-            'Queueing pushed response: "https://http2.akamai.com/resources/push.css"',
-            'Response: "200 https://http2.akamai.com/"',
-            'Accepting pushed response: "GET https://http2.akamai.com/resources/push.css"',
-            'Response: "200 https://http2.akamai.com/resources/push.css"',
-        ];
-        $this->assertSame($expected, $logger->logs);
+        $httpClient->request('POST', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_PRIVATE => 'overriden private',
+                ],
+            ],
+        ]);
     }
 }

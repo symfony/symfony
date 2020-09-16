@@ -12,11 +12,13 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
@@ -38,7 +40,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class MessengerPassTest extends TestCase
@@ -156,7 +157,7 @@ class MessengerPassTest extends TestCase
     public function testProcessTagWithUnknownBus()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler": bus "unknown_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: command_bus).');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler": bus "unknown_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: "command_bus").');
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
 
         $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', ['bus' => 'unknown_bus']);
@@ -223,6 +224,34 @@ class MessengerPassTest extends TestCase
         $secondHandlerReference = $secondHandlerDescriptorDefinition->getArgument(0);
         $secondHandlerDefinition = $container->getDefinition($secondHandlerReference);
         $this->assertSame(PrioritizedHandler::class, $secondHandlerDefinition->getClass());
+    }
+
+    public function testRegisterAbstractHandler()
+    {
+        $container = $this->getContainerBuilder($messageBusId = 'message_bus');
+        $container->register($messageBusId, MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
+
+        $container
+            ->register(DummyHandler::class, DummyHandler::class)
+            ->setAbstract(true);
+
+        $container
+            ->setDefinition($abstractDirectChildId = 'direct_child', new ChildDefinition(DummyHandler::class))
+            ->setAbstract(true);
+
+        $container
+            ->setDefinition($abstractHandlerId = 'child', new ChildDefinition($abstractDirectChildId))
+            ->addTag('messenger.message_handler');
+
+        (new MessengerPass())->process($container);
+
+        $messageHandlerMapping = $container->getDefinition($messageBusId.'.messenger.handlers_locator')->getArgument(0);
+        $this->assertHandlerDescriptor(
+            $container,
+            $messageHandlerMapping,
+            DummyMessage::class,
+            [$abstractHandlerId]
+        );
     }
 
     public function testThrowsExceptionIfTheHandlerClassDoesNotExist()
@@ -508,21 +537,35 @@ class MessengerPassTest extends TestCase
 
         $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
             ['id' => UselessMiddleware::class],
-            ['id' => 'middleware_with_factory', 'arguments' => ['index_0' => 'foo', 'bar']],
+            ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs1 = ['index_0' => 'foo', 'bar']],
+            ['id' => 'middleware_with_factory', 'arguments' => $factoryChildMiddlewareArgs2 = ['index_0' => 'baz']],
             ['id' => 'middleware_with_factory_using_default'],
         ]);
 
         (new MessengerPass())->process($container);
         (new ResolveChildDefinitionsPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition($factoryChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory'));
+        $this->assertTrue($container->hasDefinition(
+            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory'
+        ));
         $this->assertEquals(
             ['foo', 'bar'],
-            $container->getDefinition($factoryChildMiddlewareId)->getArguments(),
+            $container->getDefinition($factoryChildMiddlewareArgs1Id)->getArguments(),
             'parent default argument is overridden, and next ones appended'
         );
 
-        $this->assertTrue($container->hasDefinition($factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'));
+        $this->assertTrue($container->hasDefinition(
+            $factoryChildMiddlewareArgs2Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs2)
+        ));
+        $this->assertEquals(
+            ['baz'],
+            $container->getDefinition($factoryChildMiddlewareArgs2Id)->getArguments(),
+            'parent default argument is overridden, and next ones appended'
+        );
+
+        $this->assertTrue($container->hasDefinition(
+            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'
+        ));
         $this->assertEquals(
             ['some_default'],
             $container->getDefinition($factoryWithDefaultChildMiddlewareId)->getArguments(),
@@ -531,7 +574,8 @@ class MessengerPassTest extends TestCase
 
         $this->assertEquals([
             new Reference(UselessMiddleware::class),
-            new Reference($factoryChildMiddlewareId),
+            new Reference($factoryChildMiddlewareArgs1Id),
+            new Reference($factoryChildMiddlewareArgs2Id),
             new Reference($factoryWithDefaultChildMiddlewareId),
         ], $container->getDefinition($fooBusId)->getArgument(0)->getValues());
         $this->assertFalse($container->hasParameter($middlewareParameter));

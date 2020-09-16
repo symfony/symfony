@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
+use Symfony\Component\Mime\Address;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -24,6 +25,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MandrillHttpTransport extends AbstractHttpTransport
 {
+    use MandrillHeadersTrait;
+
     private const HOST = 'mandrillapp.com';
     private $key;
 
@@ -45,8 +48,11 @@ class MandrillHttpTransport extends AbstractHttpTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send-raw.json', [
             'json' => [
                 'key' => $this->key,
-                'to' => $this->stringifyAddresses($envelope->getRecipients()),
-                'from_email' => $envelope->getSender()->toString(),
+                'to' => array_map(function (Address $recipient): string {
+                    return $recipient->getAddress();
+                }, $envelope->getRecipients()),
+                'from_email' => $envelope->getSender()->getAddress(),
+                'from_name' => $envelope->getSender()->getName(),
                 'raw_message' => $message->toString(),
             ],
         ]);
@@ -54,13 +60,13 @@ class MandrillHttpTransport extends AbstractHttpTransport
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('error' === ($result['status'] ?? false)) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']), $response);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $result['code']), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email (code %d).', $result['code']), $response);
         }
 
-        $message->setMessageId($result['_id']);
+        $message->setMessageId($result[0]['_id']);
 
         return $response;
     }

@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -65,6 +67,7 @@ class AnnotationLoaderTest extends TestCase
         $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
+            'third' => AbstractDummyThirdChild::class,
         ]));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
@@ -104,5 +107,15 @@ class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true), $classMetadata);
+    }
+
+    public function testLoadIgnore()
+    {
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
+        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 }

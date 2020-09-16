@@ -78,7 +78,7 @@ class UnstructuredHeaderTest extends TestCase
 
         $nonAsciiChar = pack('C', 0x8F);
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
-        $this->assertRegExp('~^[^:\x00-\x20\x80-\xFF]+: [^\x80-\xFF\r\n]+$~s', $header->toString());
+        $this->assertMatchesRegularExpression('~^[^:\x00-\x20\x80-\xFF]+: [^\x80-\xFF\r\n]+$~s', $header->toString());
     }
 
     public function testEncodedWordsFollowGeneralStructure()
@@ -91,7 +91,7 @@ class UnstructuredHeaderTest extends TestCase
 
         $nonAsciiChar = pack('C', 0x8F);
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
-        $this->assertRegExp('~^X-Test: \=?.*?\?.*?\?.*?\?=$~s', $header->toString());
+        $this->assertMatchesRegularExpression('~^X-Test: \=?.*?\?.*?\?.*?\?=$~s', $header->toString());
     }
 
     public function testEncodedWordIncludesCharsetAndEncodingMethodAndText()

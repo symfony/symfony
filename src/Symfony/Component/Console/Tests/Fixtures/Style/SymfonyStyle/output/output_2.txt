@@ -9,5 +9,7 @@
 
  ! [NOTE] Note                                                                                                          
 
+ [INFO] Info                                                                                                            
+
 X [CUSTOM] Custom block                                                                                                 
 

@@ -33,6 +33,12 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         static::deleteTmpDir();
     }
 
+    public function provideSecuritySystems()
+    {
+        yield [['enable_authenticator_manager' => true]];
+        yield [['enable_authenticator_manager' => false]];
+    }
+
     protected static function deleteTmpDir()
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
@@ -61,14 +67,15 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         return new $class(
             static::getVarDir(),
             $options['test_case'],
-            isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : strtolower(static::getVarDir().$options['test_case']),
-            isset($options['debug']) ? $options['debug'] : false
+            $options['root_config'] ?? 'config.yml',
+            $options['environment'] ?? strtolower(static::getVarDir().$options['test_case']),
+            $options['debug'] ?? false,
+            $options['enable_authenticator_manager'] ?? false
         );
     }
 
     protected static function getVarDir()
     {
-        return 'SB'.substr(strrchr(\get_called_class(), '\\'), 1);
+        return 'SB'.substr(strrchr(static::class, '\\'), 1);
     }
 }

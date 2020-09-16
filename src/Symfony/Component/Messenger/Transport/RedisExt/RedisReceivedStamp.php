@@ -11,22 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp as BridgeRedisReceivedStamp;
 
-/**
- * @author Alexander Schranz <alexander@sulu.io>
- */
-class RedisReceivedStamp implements NonSendableStampInterface
-{
-    private $id;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated,use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisReceivedStamp::class, BridgeRedisReceivedStamp::class);
 
-    public function __construct(string $id)
+class_exists(BridgeRedisReceivedStamp::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/redis-messenger instead.
+     */
+    class RedisReceivedStamp
     {
-        $this->id = $id;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
     }
 }

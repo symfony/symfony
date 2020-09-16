@@ -44,6 +44,4 @@ services:
     alias_for_foo: '@foo'
     another_alias_for_foo:
         alias: foo
-        public: false
-    another_third_alias_for_foo:
-        alias: foo
+        public: true

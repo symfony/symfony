@@ -366,6 +366,26 @@
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Dieser Wert sollte zwischen {{ min }} und {{ max }} sein.</target>
             </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Dieser Wert ist kein gültiger Hostname.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Die Anzahl an Elementen in dieser Sammlung sollte ein Vielfaches von {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Dieser Wert sollte eine der folgenden Bedingungen erfüllen:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Jedes Element dieser Sammlung sollte seine eigene Menge an Bedingungen erfüllen.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Dieser Wert ist keine gültige Internationale Wertpapierkennnummer (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

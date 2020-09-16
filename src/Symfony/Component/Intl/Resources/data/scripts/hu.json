@@ -1,7 +1,7 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "Arab",
+        "Aran": "Nasztalik",
         "Armi": "Birodalmi arámi",
         "Armn": "Örmény",
         "Avst": "Avesztán",
@@ -36,7 +36,7 @@
         "Grek": "Görög",
         "Gujr": "Gudzsaráti",
         "Guru": "Gurmuki",
-        "Hanb": "Hanb",
+        "Hanb": "Han bopomofóval",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hano": "Hanunoo",
@@ -93,6 +93,7 @@
         "Phnx": "Főniciai",
         "Plrd": "Pollard fonetikus",
         "Prti": "Feliratos parthian",
+        "Qaag": "Zawgyi",
         "Rjng": "Redzsang",
         "Roro": "Rongorongo",
         "Runr": "Runikus",

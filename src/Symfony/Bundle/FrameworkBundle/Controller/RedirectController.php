@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,17 @@ class RedirectController
         $attributes = [];
         if (false === $ignoreAttributes || \is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
-            $attributes = $keepQueryParams ? array_merge($request->query->all(), $attributes) : $attributes;
+
+            if ($keepQueryParams) {
+                if ($query = $request->server->get('QUERY_STRING')) {
+                    $query = HeaderUtils::parseQuery($query);
+                } else {
+                    $query = $request->query->all();
+                }
+
+                $attributes = array_merge($query, $attributes);
+            }
+
             unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod'], $attributes['keepQueryParams']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
@@ -109,7 +120,7 @@ class RedirectController
         }
 
         // redirect if the path is a full URL
-        if (parse_url($path, PHP_URL_SCHEME)) {
+        if (parse_url($path, \PHP_URL_SCHEME)) {
             return new RedirectResponse($path, $statusCode);
         }
 
@@ -117,8 +128,7 @@ class RedirectController
             $scheme = $request->getScheme();
         }
 
-        $qs = $request->getQueryString();
-        if ($qs) {
+        if ($qs = $request->server->get('QUERY_STRING') ?: $request->getQueryString()) {
             if (false === strpos($path, '?')) {
                 $qs = '?'.$qs;
             } else {

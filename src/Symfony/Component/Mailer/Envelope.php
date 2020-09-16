@@ -44,9 +44,17 @@ class Envelope
 
     public function setSender(Address $sender): void
     {
-        $this->sender = new Address($sender->getAddress());
+        // to ensure deliverability of bounce emails independent of UTF-8 capabilities of SMTP servers
+        if (!preg_match('/^[^@\x80-\xFF]++@/', $sender->getAddress())) {
+            throw new InvalidArgumentException(sprintf('Invalid sender "%s": non-ASCII characters not supported in local-part of email.', $sender->getAddress()));
+        }
+        $this->sender = $sender;
     }
 
+    /**
+     * @return Address Returns a "mailbox" as specified by RFC 2822
+     *                 Must be converted to an "addr-spec" when used as a "MAIL FROM" value in SMTP (use getAddress())
+     */
     public function getSender(): Address
     {
         return $this->sender;
@@ -64,7 +72,7 @@ class Envelope
         $this->recipients = [];
         foreach ($recipients as $recipient) {
             if (!$recipient instanceof Address) {
-                throw new InvalidArgumentException(sprintf('A recipient must be an instance of "%s" (got "%s").', Address::class, \is_object($recipient) ? \get_class($recipient) : \gettype($recipient)));
+                throw new InvalidArgumentException(sprintf('A recipient must be an instance of "%s" (got "%s").', Address::class, get_debug_type($recipient)));
             }
             $this->recipients[] = new Address($recipient->getAddress());
         }

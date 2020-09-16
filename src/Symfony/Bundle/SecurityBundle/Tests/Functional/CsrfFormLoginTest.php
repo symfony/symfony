@@ -14,11 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class CsrfFormLoginTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginAndLogoutWithCsrfTokens($config)
+    public function testFormLoginAndLogoutWithCsrfTokens($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -44,11 +44,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithInvalidCsrfToken($config)
+    public function testFormLoginWithInvalidCsrfToken($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[_token]'] = '';
@@ -61,11 +61,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -81,11 +81,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin($options)
     {
-        $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $client->request('GET', '/protected-resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -101,11 +101,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
-    public function getConfigs()
+    public function provideClientOptions()
     {
-        return [
-            ['config.yml'],
-            ['routes_as_path.yml'],
-        ];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
     }
 }

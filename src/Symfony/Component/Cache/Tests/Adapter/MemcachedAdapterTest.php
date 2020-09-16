@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
+/**
+ * @group integration
+ */
 class MemcachedAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
@@ -39,11 +42,11 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null, string $namespace = null): CacheItemPoolInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
-        return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new MemcachedAdapter($client, $namespace ?? str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
     public function testOptions()
@@ -68,8 +71,14 @@ class MemcachedAdapterTest extends AdapterTestCase
      */
     public function testBadOptions($name, $value)
     {
-        $this->expectException('ErrorException');
-        $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        if (\PHP_VERSION_ID < 80000) {
+            $this->expectException('ErrorException');
+            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        } else {
+            $this->expectException('Error');
+            $this->expectExceptionMessage('Undefined constant Memcached::');
+        }
+
         MemcachedAdapter::createConnection([], [$name => $value]);
     }
 
@@ -137,7 +146,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'localhost',
             11222,
         ];
-        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -154,7 +163,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             '/var/local/run/memcached.socket',
             0,
         ];
-        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',
@@ -238,5 +247,37 @@ class MemcachedAdapterTest extends AdapterTestCase
             ],
         ];
         $this->assertSame($expected, $client->getServerList());
+    }
+
+    public function testKeyEncoding()
+    {
+        $reservedMemcachedCharacters = " \n\r\t\v\f\0";
+
+        $namespace = $reservedMemcachedCharacters.random_int(0, \PHP_INT_MAX);
+        $pool = $this->createCachePool(0, null, $namespace);
+
+        /**
+         * Choose a key that is below {@see \Symfony\Component\Cache\Adapter\MemcachedAdapter::$maxIdLength} so that
+         * {@see \Symfony\Component\Cache\Traits\AbstractTrait::getId()} does not shorten the key but choose special
+         * characters that would be encoded and therefore increase the key length over the Memcached limit.
+         */
+        // 250 is Memcached’s max key length, 7 bytes for prefix seed
+        $key = str_repeat('%', 250 - 7 - \strlen($reservedMemcachedCharacters) - \strlen($namespace)).$reservedMemcachedCharacters;
+
+        self::assertFalse($pool->hasItem($key));
+
+        $item = $pool->getItem($key);
+        self::assertFalse($item->isHit());
+        self::assertSame($key, $item->getKey());
+
+        self::assertTrue($pool->save($item->set('foobar')));
+
+        self::assertTrue($pool->hasItem($key));
+        $item = $pool->getItem($key);
+        self::assertTrue($item->isHit());
+        self::assertSame($key, $item->getKey());
+
+        self::assertTrue($pool->deleteItem($key));
+        self::assertFalse($pool->hasItem($key));
     }
 }

@@ -38,7 +38,7 @@ class DotenvVaultTest extends TestCase
         $vault->seal('foo', $plain);
 
         unset($_SERVER['foo'], $_ENV['foo']);
-        (new Dotenv(false))->load($this->envFile);
+        (new Dotenv())->load($this->envFile);
 
         $decrypted = $vault->reveal('foo');
         $this->assertSame($plain, $decrypted);
@@ -50,7 +50,7 @@ class DotenvVaultTest extends TestCase
         $this->assertFalse($vault->remove('foo'));
 
         unset($_SERVER['foo'], $_ENV['foo']);
-        (new Dotenv(false))->load($this->envFile);
+        (new Dotenv())->load($this->envFile);
 
         $this->assertArrayNotHasKey('foo', $vault->list());
     }

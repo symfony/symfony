@@ -32,7 +32,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
      */
     public function testHandleWhenUsernameLength($username, $ok)
     {
-        $request = Request::create('/login_check', 'POST', ['_username' => $username]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 'symfony']);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
 
         $httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
@@ -110,7 +110,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function testHandleNonStringUsernameWithInt($postOnly)
     {
         $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
-        $this->expectExceptionMessage('The key "_username" must be a string, "integer" given.');
+        $this->expectExceptionMessage('The key "_username" must be a string, "int" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -133,7 +133,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function testHandleNonStringUsernameWithObject($postOnly)
     {
         $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
-        $this->expectExceptionMessage('The key "_username" must be a string, "object" given.');
+        $this->expectExceptionMessage('The key "_username" must be a string, "stdClass" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -161,7 +161,31 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ->method('__toString')
             ->willReturn('someUsername');
 
-        $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass]);
+        $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass, '_password' => 'symfony']);
+        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $listener = new UsernamePasswordFormAuthenticationListener(
+            new TokenStorage(),
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
+            $httpUtils = new HttpUtils(),
+            'foo',
+            new DefaultAuthenticationSuccessHandler($httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            ['require_previous_session' => false, 'post_only' => $postOnly]
+        );
+        $event = new RequestEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener($event);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleWhenPasswordAreNull($postOnly)
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The key "_password" cannot be null; check that the password field name of the form matches.');
+
+        $request = Request::create('/login_check', 'POST', ['_username' => 'symfony', 'password' => 'symfony']);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),

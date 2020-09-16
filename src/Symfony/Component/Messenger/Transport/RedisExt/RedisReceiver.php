@@ -11,78 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\LogicException;
-use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver as BridgeRedisReceiver;
 
-/**
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-class RedisReceiver implements ReceiverInterface
-{
-    private $connection;
-    private $serializer;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisReceiver::class, BridgeRedisReceiver::class);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer ?? new PhpSerializer();
-    }
+class_exists(BridgeRedisReceiver::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/redis-messenger instead.
      */
-    public function get(): iterable
+    class RedisReceiver
     {
-        $redisEnvelope = $this->connection->get();
-
-        if (null === $redisEnvelope) {
-            return [];
-        }
-
-        try {
-            $envelope = $this->serializer->decode([
-                'body' => $redisEnvelope['body'],
-                'headers' => $redisEnvelope['headers'],
-            ]);
-        } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($redisEnvelope['id']);
-
-            throw $exception;
-        }
-
-        return [$envelope->with(new RedisReceivedStamp($redisEnvelope['id']))];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(Envelope $envelope): void
-    {
-        $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reject(Envelope $envelope): void
-    {
-        $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
-    }
-
-    private function findRedisReceivedStamp(Envelope $envelope): RedisReceivedStamp
-    {
-        /** @var RedisReceivedStamp|null $redisReceivedStamp */
-        $redisReceivedStamp = $envelope->last(RedisReceivedStamp::class);
-
-        if (null === $redisReceivedStamp) {
-            throw new LogicException('No RedisReceivedStamp found on the Envelope.');
-        }
-
-        return $redisReceivedStamp;
     }
 }

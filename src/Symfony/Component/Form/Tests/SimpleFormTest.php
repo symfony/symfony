@@ -118,13 +118,26 @@ class SimpleFormTest extends AbstractFormTest
     // https://github.com/symfony/symfony/commit/d4f4038f6daf7cf88ca7c7ab089473cce5ebf7d8#commitcomment-1632879
     public function testDataIsInitializedFromSubmit()
     {
+        $preSetData = false;
+        $preSubmit = false;
+
         $mock = $this->getMockBuilder('\stdClass')
             ->setMethods(['preSetData', 'preSubmit'])
             ->getMock();
-        $mock->expects($this->at(0))
-            ->method('preSetData');
-        $mock->expects($this->at(1))
-            ->method('preSubmit');
+        $mock->expects($this->once())
+            ->method('preSetData')
+            ->with($this->callback(function () use (&$preSetData, $preSubmit) {
+                $preSetData = true;
+
+                return false === $preSubmit;
+            }));
+        $mock->expects($this->once())
+            ->method('preSubmit')
+            ->with($this->callback(function () use ($preSetData, &$preSubmit) {
+                $preSubmit = true;
+
+                return false === $preSetData;
+            }));
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
         $config->addEventListener(FormEvents::PRE_SET_DATA, [$mock, 'preSetData']);
@@ -1095,6 +1108,21 @@ class SimpleFormTest extends AbstractFormTest
         $form = new Form($config);
 
         $form->setData('foo');
+    }
+
+    public function testIsEmptyCallback()
+    {
+        $config = new FormConfigBuilder('foo', null, $this->dispatcher);
+
+        $config->setIsEmptyCallback(function ($modelData): bool { return 'ccc' === $modelData; });
+        $form = new Form($config);
+        $form->setData('ccc');
+        $this->assertTrue($form->isEmpty());
+
+        $config->setIsEmptyCallback(function (): bool { return false; });
+        $form = new Form($config);
+        $form->setData(null);
+        $this->assertFalse($form->isEmpty());
     }
 
     protected function createForm(): FormInterface

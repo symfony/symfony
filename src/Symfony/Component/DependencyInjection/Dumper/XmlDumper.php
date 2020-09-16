@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -107,8 +108,8 @@ class XmlDumper extends Dumper
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');
         }
-        if (!$definition->isPrivate()) {
-            $service->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
+        if ($definition->isPublic()) {
+            $service->setAttribute('public', 'true');
         }
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
@@ -136,7 +137,11 @@ class XmlDumper extends Dumper
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
                 $tag = $this->document->createElement('tag');
-                $tag->setAttribute('name', $name);
+                if (!\array_key_exists('name', $attributes)) {
+                    $tag->setAttribute('name', $name);
+                } else {
+                    $tag->appendChild($this->document->createTextNode($name));
+                }
                 foreach ($attributes as $key => $value) {
                     $tag->setAttribute($key, $value);
                 }
@@ -178,8 +183,11 @@ class XmlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecation('%service_id%')['message']));
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }
@@ -219,13 +227,16 @@ class XmlDumper extends Dumper
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
         $service->setAttribute('alias', $id);
-        if (!$id->isPrivate()) {
-            $service->setAttribute('public', $id->isPublic() ? 'true' : 'false');
+        if ($id->isPublic()) {
+            $service->setAttribute('public', 'true');
         }
 
         if ($id->isDeprecated()) {
+            $deprecation = $id->getDeprecation('%alias_id%');
             $deprecated = $this->document->createElement('deprecated');
-            $deprecated->appendChild($this->document->createTextNode($id->getDeprecationMessage('%alias_id%')));
+            $deprecated->appendChild($this->document->createTextNode($deprecation['message']));
+            $deprecated->setAttribute('package', $deprecation['package']);
+            $deprecated->setAttribute('version', $deprecation['version']);
 
             $service->appendChild($deprecated);
         }
@@ -312,10 +323,19 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
+            } elseif ($value instanceof AbstractArgument) {
+                $element->setAttribute('type', 'abstract');
+                $text = $this->document->createTextNode(self::phpToXml($value->getText()));
+                $element->appendChild($text);
             } else {
                 if (\in_array($value, ['null', 'true', 'false'], true)) {
                     $element->setAttribute('type', 'string');
                 }
+
+                if (\is_string($value) && (is_numeric($value) || preg_match('/^0b[01]*$/', $value) || preg_match('/^0x[0-9a-f]++$/i', $value))) {
+                    $element->setAttribute('type', 'string');
+                }
+
                 $text = $this->document->createTextNode(self::phpToXml($value));
                 $element->appendChild($text);
             }

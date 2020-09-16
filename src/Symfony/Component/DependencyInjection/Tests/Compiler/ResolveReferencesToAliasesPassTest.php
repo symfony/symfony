@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -83,16 +86,16 @@ class ResolveReferencesToAliasesPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.
      */
     public function testDeprecationNoticeWhenReferencedByAlias()
     {
+        $this->expectDeprecation('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
 
         $alias = new Alias('deprecated_foo_alias');
@@ -103,16 +106,16 @@ class ResolveReferencesToAliasesPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.
      */
     public function testDeprecationNoticeWhenReferencedByDefinition()
     {
+        $this->expectDeprecation('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('foo_aliased', $aliasDeprecated);
 
         $container

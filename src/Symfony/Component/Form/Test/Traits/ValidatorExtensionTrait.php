@@ -27,11 +27,11 @@ trait ValidatorExtensionTrait
     protected function getValidatorExtension(): ValidatorExtension
     {
         if (!interface_exists(ValidatorInterface::class)) {
-            throw new \Exception('In order to use the "ValidatorExtensionTrait", the symfony/validator component must be installed');
+            throw new \Exception('In order to use the "ValidatorExtensionTrait", the symfony/validator component must be installed.');
         }
 
         if (!$this instanceof TypeTestCase) {
-            throw new \Exception(sprintf('The trait "ValidatorExtensionTrait" can only be added to a class that extends %s', TypeTestCase::class));
+            throw new \Exception(sprintf('The trait "ValidatorExtensionTrait" can only be added to a class that extends "%s".', TypeTestCase::class));
         }
 
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
@@ -39,6 +39,6 @@ trait ValidatorExtensionTrait
         $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
         $this->validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
-        return new ValidatorExtension($this->validator);
+        return new ValidatorExtension($this->validator, false);
     }
 }

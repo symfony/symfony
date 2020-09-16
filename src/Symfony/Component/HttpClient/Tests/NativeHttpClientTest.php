@@ -25,4 +25,14 @@ class NativeHttpClientTest extends HttpClientTestCase
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
     }
+
+    public function testHttp2PushVulcain()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
+    }
+
+    public function testHttp2PushVulcainWithUnusedResponse()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
+    }
 }

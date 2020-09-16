@@ -13,17 +13,11 @@ namespace Symfony\Component\Notifier\Recipient;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
-interface SmsRecipientInterface
+interface SmsRecipientInterface extends RecipientInterface
 {
-    /**
-     * Sets the phone number (no spaces, international code like in +3312345678).
-     *
-     * @return $this
-     */
-    public function phone(string $phone): self;
-
     public function getPhone(): string;
 }

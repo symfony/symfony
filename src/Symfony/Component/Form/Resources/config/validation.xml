@@ -6,8 +6,8 @@
 
   <class name="Symfony\Component\Form\Form">
     <constraint name="Symfony\Component\Form\Extension\Validator\Constraints\Form" />
-    <property name="children">
-        <constraint name="Valid" />
-    </property>
+    <constraint name="Symfony\Component\Validator\Constraints\Traverse">
+      <option name="traverse">false</option>
+    </constraint>
   </class>
 </constraint-mapping>

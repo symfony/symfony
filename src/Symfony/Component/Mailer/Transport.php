@@ -16,12 +16,14 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
@@ -45,13 +47,14 @@ class Transport
         MailgunTransportFactory::class,
         PostmarkTransportFactory::class,
         SendgridTransportFactory::class,
+        MailjetTransportFactory::class,
     ];
 
     private $factories;
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {
-        $factory = new self(self::getDefaultFactories($dispatcher, $client, $logger));
+        $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
 
         return $factory->fromString($dsn);
     }
@@ -85,7 +88,7 @@ class Transport
     {
         list($transport, $offset) = $this->parseDsn($dsn);
         if ($offset !== \strlen($dsn)) {
-            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: %s.', substr($dsn, $offset)));
+            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: "%s".', substr($dsn, $offset)));
         }
 
         return $transport;
@@ -149,7 +152,7 @@ class Transport
         throw new UnsupportedSchemeException($dsn);
     }
 
-    private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
+    public static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
     {
         foreach (self::FACTORY_CLASSES as $factoryClass) {
             if (class_exists($factoryClass)) {
@@ -162,5 +165,7 @@ class Transport
         yield new SendmailTransportFactory($dispatcher, $client, $logger);
 
         yield new EsmtpTransportFactory($dispatcher, $client, $logger);
+
+        yield new NativeTransportFactory($dispatcher, $client, $logger);
     }
 }

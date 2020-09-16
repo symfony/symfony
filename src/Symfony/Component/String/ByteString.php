@@ -22,25 +22,67 @@ use Symfony\Component\String\Exception\RuntimeException;
  * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
- *
- * @experimental in 5.0
  */
 class ByteString extends AbstractString
 {
+    private const ALPHABET_ALPHANUMERIC = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
     public function __construct(string $string = '')
     {
         $this->string = $string;
     }
 
-    public static function fromRandom(int $length = 16): self
+    /*
+     * The following method was derived from code of the Hack Standard Library (v4.40 - 2020-05-03)
+     *
+     * https://github.com/hhvm/hsl/blob/80a42c02f036f72a42f0415e80d6b847f4bf62d5/src/random/private.php#L16
+     *
+     * Code subject to the MIT license (https://github.com/hhvm/hsl/blob/master/LICENSE).
+     *
+     * Copyright (c) 2004-2020, Facebook, Inc. (https://www.facebook.com/)
+     */
+
+    public static function fromRandom(int $length = 16, string $alphabet = null): self
     {
-        $string = '';
+        if ($length <= 0) {
+            throw new InvalidArgumentException(sprintf('A strictly positive length is expected, "%d" given.', $length));
+        }
 
-        do {
-            $string .= str_replace(['/', '+', '='], '', base64_encode(random_bytes($length)));
-        } while (\strlen($string) < $length);
+        $alphabet = $alphabet ?? self::ALPHABET_ALPHANUMERIC;
+        $alphabetSize = \strlen($alphabet);
+        $bits = (int) ceil(log($alphabetSize, 2.0));
+        if ($bits <= 0 || $bits > 56) {
+            throw new InvalidArgumentException('The length of the alphabet must in the [2^1, 2^56] range.');
+        }
 
-        return new static(substr($string, 0, $length));
+        $ret = '';
+        while ($length > 0) {
+            $urandomLength = (int) ceil(2 * $length * $bits / 8.0);
+            $data = random_bytes($urandomLength);
+            $unpackedData = 0;
+            $unpackedBits = 0;
+            for ($i = 0; $i < $urandomLength && $length > 0; ++$i) {
+                // Unpack 8 bits
+                $unpackedData = ($unpackedData << 8) | \ord($data[$i]);
+                $unpackedBits += 8;
+
+                // While we have enough bits to select a character from the alphabet, keep
+                // consuming the random data
+                for (; $unpackedBits >= $bits && $length > 0; $unpackedBits -= $bits) {
+                    $index = ($unpackedData & ((1 << $bits) - 1));
+                    $unpackedData >>= $bits;
+                    // Unfortunately, the alphabet size is not necessarily a power of two.
+                    // Worst case, it is 2^k + 1, which means we need (k+1) bits and we
+                    // have around a 50% chance of missing as k gets larger
+                    if ($index < $alphabetSize) {
+                        $ret .= $alphabet[$index];
+                        --$length;
+                    }
+                }
+            }
+        }
+
+        return new static($ret);
     }
 
     public function bytesAt(int $offset): array
@@ -202,7 +244,7 @@ class ByteString extends AbstractString
         set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
 
         try {
-            if (false === $match($regexp, $this->string, $matches, $flags | PREG_UNMATCHED_AS_NULL, $offset)) {
+            if (false === $match($regexp, $this->string, $matches, $flags | \PREG_UNMATCHED_AS_NULL, $offset)) {
                 $lastError = preg_last_error();
 
                 foreach (get_defined_constants(true)['pcre'] as $k => $v) {
@@ -223,7 +265,7 @@ class ByteString extends AbstractString
     public function padBoth(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_BOTH);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_BOTH);
 
         return $str;
     }
@@ -231,7 +273,7 @@ class ByteString extends AbstractString
     public function padEnd(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_RIGHT);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_RIGHT);
 
         return $str;
     }
@@ -239,7 +281,7 @@ class ByteString extends AbstractString
     public function padStart(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_LEFT);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_LEFT);
 
         return $str;
     }
@@ -271,7 +313,7 @@ class ByteString extends AbstractString
 
         if (\is_array($to)) {
             if (!\is_callable($to)) {
-                throw new \TypeError(sprintf('Argument 2 passed to %s::replaceMatches() must be callable, array given.', \get_class($this)));
+                throw new \TypeError(sprintf('Argument 2 passed to "%s::replaceMatches()" must be callable, array given.', static::class));
             }
 
             $replace = 'preg_replace_callback';
@@ -299,6 +341,14 @@ class ByteString extends AbstractString
 
         $str = clone $this;
         $str->string = $string;
+
+        return $str;
+    }
+
+    public function reverse(): parent
+    {
+        $str = clone $this;
+        $str->string = strrev($str->string);
 
         return $str;
     }
@@ -449,29 +499,8 @@ class ByteString extends AbstractString
 
     public function width(bool $ignoreAnsiDecoration = true): int
     {
-        $width = 0;
-        $s = str_replace(["\x00", "\x05", "\x07"], '', $this->string);
+        $string = preg_match('//u', $this->string) ? $this->string : preg_replace('/[\x80-\xFF]/', '?', $this->string);
 
-        if (false !== strpos($s, "\r")) {
-            $s = str_replace(["\r\n", "\r"], "\n", $s);
-        }
-
-        foreach (explode("\n", $s) as $s) {
-            if ($ignoreAnsiDecoration) {
-                $s = preg_replace('/\x1B(?:
-                    \[ [\x30-\x3F]*+ [\x20-\x2F]*+ [0x40-\x7E]
-                    | [P\]X^_] .*? \x1B\\\\
-                    | [\x41-\x7E]
-                )/x', '', $s);
-            }
-
-            $w = substr_count($s, "\xAD") - substr_count($s, "\x08");
-
-            if ($width < $w += \strlen($s)) {
-                $width = $w;
-            }
-        }
-
-        return $width;
+        return (new CodePointString($string))->width($ignoreAnsiDecoration);
     }
 }

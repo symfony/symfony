@@ -1,7 +1,6 @@
 {
-    "Version": "36",
     "Names": {
-        "Arab": "Arab",
+        "Arab": "hija’iyah",
         "Armn": "Armenia",
         "Beng": "Bangla",
         "Bopo": "Bopomofo",
@@ -34,6 +33,7 @@
         "Orya": "Odia",
         "Sinh": "Sinhala",
         "Taml": "Tamil",
+        "Telu": "Telugu",
         "Thaa": "Thaana",
         "Thai": "Thailand",
         "Tibt": "Tibetan",

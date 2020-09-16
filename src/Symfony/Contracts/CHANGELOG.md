@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+2.1.3
+-----
+
+ * fixed compat with PHP 8
+
+2.1.0
+-----
+
+ * added "symfony/deprecation-contracts"
+
+2.0.1
+-----
+
+ * added `/json` endpoints to the test mock HTTP server
+
+2.0.0
+-----
+
+ * bumped minimum PHP version to 7.2 and added explicit type hints
+ * made "psr/event-dispatcher" a required dependency of "symfony/event-dispatcher-contracts"
+ * made "symfony/http-client-contracts" not experimental anymore
+
+1.1.9
+-----
+
+ * fixed compat with PHP 8
+
 1.1.0
 -----
 

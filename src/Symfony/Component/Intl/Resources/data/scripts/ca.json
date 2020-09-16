@@ -1,11 +1,11 @@
 {
-    "Version": "36",
     "Names": {
         "Adlm": "adlam",
         "Afak": "afaka",
         "Aghb": "albanès caucàsic",
         "Ahom": "ahom",
         "Arab": "àrab",
+        "Aran": "nastaliq",
         "Armi": "arameu imperial",
         "Armn": "armeni",
         "Avst": "avèstic",
@@ -124,6 +124,7 @@
         "Phnx": "fenici",
         "Plrd": "pollard miao",
         "Prti": "parthià inscripcional",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongo-rongo",
         "Runr": "rúnic",

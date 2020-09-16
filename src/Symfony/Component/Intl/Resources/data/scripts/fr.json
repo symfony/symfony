@@ -1,7 +1,7 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "arabe",
+        "Aran": "nastaliq",
         "Armi": "araméen impérial",
         "Armn": "arménien",
         "Avst": "avestique",
@@ -97,6 +97,7 @@
         "Phnx": "phénicien",
         "Plrd": "phonétique de Pollard",
         "Prti": "parthe des inscriptions",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongorongo",
         "Runr": "runique",

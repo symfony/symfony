@@ -23,8 +23,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "symfony/polyfill-ctype": "~1.8"
+        "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
+        "symfony/string": "^5.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Inflector\\": "" },
@@ -35,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

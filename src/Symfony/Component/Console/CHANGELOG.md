@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added `SingleCommandApplication::setAutoExit()` to allow testing via `CommandTester`
+ * added support for multiline responses to questions through `Question::setMultiline()`
+   and `Question::isMultiline()`
+ * Added `SignalRegistry` class to stack signals handlers
+ * Added support for signals:
+    * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
+    * Added `SignalableCommandInterface` interface
+ * Added `TableCellStyle` class to customize table cell
+
+5.1.0
+-----
+
+ * `Command::setHidden()` is final since Symfony 5.1
+ * Add `SingleCommandApplication`
+ * Add `Cursor` class
+
 5.0.0
 -----
 

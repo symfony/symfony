@@ -12,15 +12,15 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -41,15 +41,14 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
     private $idReaders = [];
 
     /**
-     * @var DoctrineChoiceLoader[]
+     * @var EntityLoaderInterface[]
      */
-    private $choiceLoaders = [];
+    private $entityLoaders = [];
 
     /**
      * Creates the label for a choice.
      *
      * For backwards compatibility, objects are cast to strings by default.
-     *
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
@@ -83,13 +82,16 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
      *
+     * @param object $queryBuilder A query builder, type declaration is not present here as there
+     *                             is no common base class for the different implementations
+     *
      * @return array|null Array with important QueryBuilder parts or null if
      *                    they can't be determined
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
+    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
     {
         return null;
     }
@@ -114,44 +116,26 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-                $hash = null;
-                $qbParts = null;
+                // If there is no QueryBuilder we can safely cache
+                $vary = [$options['em'], $options['class']];
 
-                // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
                 // also if concrete Type can return important QueryBuilder parts to generate
-                // hash key we go for it as well
-                if (!$options['query_builder'] || null !== $qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder'])) {
-                    $hash = CachingFactoryDecorator::generateHash([
-                        $options['em'],
-                        $options['class'],
-                        $qbParts,
-                    ]);
-
-                    if (isset($this->choiceLoaders[$hash])) {
-                        return $this->choiceLoaders[$hash];
-                    }
+                // hash key we go for it as well, otherwise fallback on the instance
+                if ($options['query_builder']) {
+                    $vary[] = $this->getQueryBuilderPartsForCachingHash($options['query_builder']) ?? $options['query_builder'];
                 }
 
-                if (null !== $options['query_builder']) {
-                    $entityLoader = $this->getLoader($options['em'], $options['query_builder'], $options['class']);
-                } else {
-                    $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
-                    $entityLoader = $this->getLoader($options['em'], $queryBuilder, $options['class']);
-                }
-
-                $doctrineChoiceLoader = new DoctrineChoiceLoader(
+                return ChoiceList::loader($this, new DoctrineChoiceLoader(
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
-                    $entityLoader,
-                    false
-                );
-
-                if (null !== $hash) {
-                    $this->choiceLoaders[$hash] = $doctrineChoiceLoader;
-                }
-
-                return $doctrineChoiceLoader;
+                    $this->getCachedEntityLoader(
+                        $options['em'],
+                        $options['query_builder'] ?? $options['em']->getRepository($options['class'])->createQueryBuilder('e'),
+                        $options['class'],
+                        $vary
+                    )
+                ), $vary);
             }
 
             return null;
@@ -162,7 +146,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
             // field name. We can only use numeric IDs as names, as we cannot
             // guarantee that a non-numeric ID contains a valid form name
             if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isIntId()) {
-                return [__CLASS__, 'createChoiceName'];
+                return ChoiceList::fieldName($this, [__CLASS__, 'createChoiceName']);
             }
 
             // Otherwise, an incrementing integer is used as name automatically
@@ -176,7 +160,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $choiceValue = function (Options $options) {
             // If the entity has a single-column ID, use that ID as value
             if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isSingleId()) {
-                return [$options['id_reader'], 'getIdValue'];
+                return ChoiceList::value($this, [$options['id_reader'], 'getIdValue'], $options['id_reader']);
             }
 
             // Otherwise, an incrementing integer is used as value automatically
@@ -184,7 +168,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         };
 
         $emNormalizer = function (Options $options, $em) {
-            /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 if ($em instanceof ObjectManager) {
                     return $em;
@@ -215,27 +198,13 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         // Set the "id_reader" option via the normalizer. This option is not
         // supposed to be set by the user.
         $idReaderNormalizer = function (Options $options) {
-            $hash = CachingFactoryDecorator::generateHash([
-                $options['em'],
-                $options['class'],
-            ]);
-
             // The ID reader is a utility that is needed to read the object IDs
             // when generating the field values. The callback generating the
             // field values has no access to the object manager or the class
             // of the field, so we store that information in the reader.
             // The reader is cached so that two choice lists for the same class
             // (and hence with the same reader) can successfully be cached.
-            if (!isset($this->idReaders[$hash])) {
-                $classMetadata = $options['em']->getClassMetadata($options['class']);
-                $this->idReaders[$hash] = new IdReader($options['em'], $classMetadata);
-            }
-
-            if ($this->idReaders[$hash]->isSingleId()) {
-                return $this->idReaders[$hash];
-            }
-
-            return null;
+            return $this->getCachedIdReader($options['em'], $options['class']);
         };
 
         $resolver->setDefaults([
@@ -243,7 +212,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
             'query_builder' => null,
             'choices' => null,
             'choice_loader' => $choiceLoader,
-            'choice_label' => [__CLASS__, 'createChoiceLabel'],
+            'choice_label' => ChoiceList::label($this, [__CLASS__, 'createChoiceLabel']),
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal
@@ -256,15 +225,17 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
-        $resolver->setAllowedTypes('em', ['null', 'string', 'Doctrine\Common\Persistence\ObjectManager']);
+        $resolver->setAllowedTypes('em', ['null', 'string', ObjectManager::class]);
     }
 
     /**
      * Return the default loader object.
      *
+     * @param mixed $queryBuilder
+     *
      * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, QueryBuilder $queryBuilder, string $class);
+    abstract public function getLoader(ObjectManager $manager, $queryBuilder, string $class);
 
     public function getParent()
     {
@@ -273,6 +244,29 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
 
     public function reset()
     {
-        $this->choiceLoaders = [];
+        $this->entityLoaders = [];
+    }
+
+    private function getCachedIdReader(ObjectManager $manager, string $class): ?IdReader
+    {
+        $hash = CachingFactoryDecorator::generateHash([$manager, $class]);
+
+        if (isset($this->idReaders[$hash])) {
+            return $this->idReaders[$hash];
+        }
+
+        $idReader = new IdReader($manager, $manager->getClassMetadata($class));
+
+        // don't cache the instance for composite ids that cannot be optimized
+        return $this->idReaders[$hash] = $idReader->isSingleId() ? $idReader : null;
+    }
+
+    private function getCachedEntityLoader(ObjectManager $manager, $queryBuilder, string $class, array $vary): EntityLoaderInterface
+    {
+        $hash = CachingFactoryDecorator::generateHash($vary);
+
+        return $this->entityLoaders[$hash] ?? ($this->entityLoaders[$hash] = $this->getLoader($manager, $queryBuilder, $class));
     }
 }
+
+interface_exists(ObjectManager::class);

@@ -23,7 +23,7 @@ class CommandForV5 extends \PHPUnit_TextUI_Command
      */
     protected function createRunner()
     {
-        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : array();
+        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : [];
 
         $registeredLocally = false;
 

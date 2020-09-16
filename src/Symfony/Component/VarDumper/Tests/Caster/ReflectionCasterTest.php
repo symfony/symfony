@@ -49,8 +49,8 @@ ReflectionClass {
 %A]
   methods: array:%d [
 %A
-    "export" => ReflectionMethod {
-      +name: "export"
+    "__construct" => ReflectionMethod {
+      +name: "__construct"
       +class: "ReflectionClass"
 %A    parameters: {
         $%s: ReflectionParameter {
@@ -84,9 +84,6 @@ EOTXT
 
     public function testFromCallableClosureCaster()
     {
-        if (\defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped('Not for HHVM.');
-        }
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
             (new \ReflectionMethod(__CLASS__, 'stub'))->getClosure(),
@@ -120,7 +117,7 @@ EOTXT
 
     public function testReflectionParameter()
     {
-        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
+        $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

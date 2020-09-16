@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -38,6 +38,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -78,7 +79,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', \get_class($this)));
+            throw new ServiceNotFoundException('parameter_bag.', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
         }
 
         return $this->container->get('parameter_bag')->get($name);
@@ -196,7 +197,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException
      */
-    protected function addFlash(string $type, string $message): void
+    protected function addFlash(string $type, $message): void
     {
         if (!$this->container->has('session')) {
             throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');
@@ -206,30 +207,30 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
+     * Checks if the attribute is granted against the current authentication token and optionally supplied subject.
      *
      * @throws \LogicException
      */
-    protected function isGranted($attributes, $subject = null): bool
+    protected function isGranted($attribute, $subject = null): bool
     {
         if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
         }
 
-        return $this->container->get('security.authorization_checker')->isGranted($attributes, $subject);
+        return $this->container->get('security.authorization_checker')->isGranted($attribute, $subject);
     }
 
     /**
-     * Throws an exception unless the attributes are granted against the current authentication token and optionally
+     * Throws an exception unless the attribute is granted against the current authentication token and optionally
      * supplied subject.
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attributes, $subject = null, string $message = 'Access Denied.'): void
+    protected function denyAccessUnlessGranted($attribute, $subject = null, string $message = 'Access Denied.'): void
     {
-        if (!$this->isGranted($attributes, $subject)) {
+        if (!$this->isGranted($attribute, $subject)) {
             $exception = $this->createAccessDeniedException($message);
-            $exception->setAttributes($attributes);
+            $exception->setAttributes($attribute);
             $exception->setSubject($subject);
 
             throw $exception;
@@ -351,7 +352,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return mixed
+     * @return UserInterface|object|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *

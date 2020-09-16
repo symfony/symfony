@@ -12,8 +12,8 @@
 namespace Symfony\Component\ErrorHandler\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Tests\Fixtures\StringErrorCodeException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -161,9 +161,9 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::createFromThrowable($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
-        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
+        $this->assertEquals('Oh noes!', $flattened->getMessage(), 'The message is copied from the original exception.');
+        $this->assertEquals(42, $flattened->getCode(), 'The code is copied from the original exception.');
+        $this->assertEquals('ParseError', $flattened->getClass(), 'The class is set to the class of the original exception');
     }
 
     /**
@@ -182,6 +182,15 @@ class FlattenExceptionTest extends TestCase
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getFile(), $flattened->getFile());
+    }
+
+    /**
+     * @dataProvider stringAndIntDataProvider
+     */
+    public function testCode(\Throwable $exception)
+    {
+        $flattened = FlattenException::createFromThrowable($exception);
+        $this->assertSame($exception->getCode(), $flattened->getCode());
     }
 
     /**
@@ -225,8 +234,20 @@ class FlattenExceptionTest extends TestCase
         ];
     }
 
+    public function stringAndIntDataProvider(): array
+    {
+        return [
+            [new \Exception('test1', 123)],
+            [new StringErrorCodeException('test2', '42S02')],
+        ];
+    }
+
     public function testArguments()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $dh = opendir(__DIR__);
         $fh = tmpfile();
 
@@ -248,8 +269,8 @@ class FlattenExceptionTest extends TestCase
             0.0,
             '0',
             '',
-            INF,
-            NAN,
+            \INF,
+            \NAN,
         ]);
 
         $flattened = FlattenException::createFromThrowable($exception);
@@ -268,7 +289,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['resource', 'stream'], $array[$i++]);
 
         $args = $array[$i++];
-        $this->assertSame($args[0], 'object');
+        $this->assertSame('object', $args[0]);
         $this->assertTrue('Closure' === $args[1] || is_subclass_of($args[1], '\Closure'), 'Expect object class name to be Closure or a subclass of Closure.');
 
         $this->assertSame(['array', [['integer', 1], ['integer', 2]]], $array[$i++]);
@@ -280,15 +301,19 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(['float', 0.0], $array[$i++]);
         $this->assertSame(['string', '0'], $array[$i++]);
         $this->assertSame(['string', ''], $array[$i++]);
-        $this->assertSame(['float', INF], $array[$i++]);
+        $this->assertSame(['float', \INF], $array[$i++]);
 
         // assertEquals() does not like NAN values.
-        $this->assertEquals($array[$i][0], 'float');
+        $this->assertEquals('float', $array[$i][0]);
         $this->assertNan($array[$i][1]);
     }
 
     public function testRecursionInArguments()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $a = null;
         $a = ['foo', [2, &$a]];
         $exception = $this->createException($a);
@@ -300,6 +325,10 @@ class FlattenExceptionTest extends TestCase
 
     public function testTooBigArray()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $a = [];
         for ($i = 0; $i < 20; ++$i) {
             for ($j = 0; $j < 50; ++$j) {
@@ -315,7 +344,7 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::createFromThrowable($exception);
         $trace = $flattened->getTrace();
 
-        $this->assertSame($trace[1]['args'][0], ['array', ['array', '*SKIPPED over 10000 entries*']]);
+        $this->assertSame(['array', ['array', '*SKIPPED over 10000 entries*']], $trace[1]['args'][0]);
 
         $serializeTrace = serialize($trace);
 
@@ -329,6 +358,11 @@ class FlattenExceptionTest extends TestCase
         });
 
         $this->assertSame('RuntimeException@anonymous', $flattened->getClass());
+
+        $flattened->setClass(\get_class(new class('Oops') extends NotFoundHttpException {
+        }));
+
+        $this->assertSame('Symfony\Component\HttpKernel\Exception\NotFoundHttpException@anonymous', $flattened->getClass());
 
         $flattened = FlattenException::createFromThrowable(new \Exception(sprintf('Class "%s" blah.', \get_class(new class() extends \RuntimeException {
         }))));

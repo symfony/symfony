@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deprecations remainingCount="5">
+  <deprecation count="3">
+    <message>Some deprecation message.</message>
+    <file>/path/to/some/file.php</file>
+    <line>39</line>
+  </deprecation>
+  <deprecation count="2">
+    <message>An other deprecation message.</message>
+    <file>/path/to/an/other/file.php</file>
+    <line>25</line>
+  </deprecation>
+</deprecations>

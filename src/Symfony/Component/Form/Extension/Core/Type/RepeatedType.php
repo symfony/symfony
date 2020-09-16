@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
@@ -31,13 +32,16 @@ class RepeatedType extends AbstractType
             $options['options']['error_bubbling'] = $options['error_bubbling'];
         }
 
+        // children fields must always be mapped
+        $defaultOptions = ['mapped' => true];
+
         $builder
             ->addViewTransformer(new ValueToDuplicatesTransformer([
                 $options['first_name'],
                 $options['second_name'],
             ]))
-            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
-            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
+            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options'], $defaultOptions))
+            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options'], $defaultOptions))
         ;
     }
 
@@ -47,13 +51,18 @@ class RepeatedType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'type' => __NAMESPACE__.'\TextType',
+            'type' => TextType::class,
             'options' => [],
             'first_options' => [],
             'second_options' => [],
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'The values do not match.';
+            },
         ]);
 
         $resolver->setAllowedTypes('options', 'array');

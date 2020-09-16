@@ -14,8 +14,10 @@ namespace Symfony\Component\Lock\Tests\Store;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
@@ -27,6 +29,7 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 class CombinedStoreTest extends AbstractStoreTest
 {
     use ExpiringStoreTestTrait;
+    use SharedLockStoreTestTrait;
 
     /**
      * {@inheritdoc}
@@ -350,5 +353,31 @@ class CombinedStoreTest extends AbstractStoreTest
             ->with($key);
 
         $this->store->delete($key);
+    }
+
+    public function testSaveReadWithIncompatibleStores()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $badStore = $this->createMock(PersistingStoreInterface::class);
+
+        $store = new CombinedStore([$badStore], new UnanimousStrategy());
+        $this->expectException(NotSupportedException::class);
+
+        $store->saveRead($key);
+    }
+
+    public function testSaveReadWithCompatibleStore()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $goodStore = $this->createMock(SharedLockStoreInterface::class);
+        $goodStore->expects($this->once())
+            ->method('saveRead')
+            ->with($key);
+
+        $store = new CombinedStore([$goodStore], new UnanimousStrategy());
+
+        $store->saveRead($key);
     }
 }

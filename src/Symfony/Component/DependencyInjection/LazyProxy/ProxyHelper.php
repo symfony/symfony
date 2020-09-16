@@ -31,26 +31,36 @@ class ProxyHelper
         if (!$type) {
             return null;
         }
-        if (!\is_string($type)) {
-            $name = $type->getName();
+
+        $types = [];
+
+        foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $type) {
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
             if ($type->isBuiltin()) {
-                return $noBuiltin ? null : $name;
+                if (!$noBuiltin) {
+                    $types[] = $name;
+                }
+                continue;
+            }
+
+            $lcName = strtolower($name);
+            $prefix = $noBuiltin ? '' : '\\';
+
+            if ('self' !== $lcName && 'parent' !== $lcName) {
+                $types[] = '' !== $prefix ? $prefix.$name : $name;
+                continue;
+            }
+            if (!$r instanceof \ReflectionMethod) {
+                continue;
+            }
+            if ('self' === $lcName) {
+                $types[] = $prefix.$r->getDeclaringClass()->name;
+            } else {
+                $types[] = ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix.$parent->name : null;
             }
         }
-        $lcName = strtolower($name);
-        $prefix = $noBuiltin ? '' : '\\';
 
-        if ('self' !== $lcName && 'parent' !== $lcName) {
-            return $prefix.$name;
-        }
-        if (!$r instanceof \ReflectionMethod) {
-            return null;
-        }
-        if ('self' === $lcName) {
-            return $prefix.$r->getDeclaringClass()->name;
-        }
-
-        return ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix.$parent->name : null;
+        return $types ? implode('|', $types) : null;
     }
 }

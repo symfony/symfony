@@ -26,9 +26,12 @@ class CachePoolsTest extends AbstractWebTestCase
 
     /**
      * @requires extension redis
+     * @group integration
      */
     public function testRedisCachePools()
     {
+        $this->skipIfRedisUnavailable();
+
         try {
             $this->doTestCachePools(['root_config' => 'redis_config.yml', 'environment' => 'redis_cache'], RedisAdapter::class);
         } catch (\PHPUnit\Framework\Error\Warning $e) {
@@ -42,7 +45,7 @@ class CachePoolsTest extends AbstractWebTestCase
             }
             $this->markTestSkipped($e->getMessage());
         } catch (InvalidArgumentException $e) {
-            if (0 !== strpos($e->getMessage(), 'Redis connection failed')) {
+            if (0 !== strpos($e->getMessage(), 'Redis connection ')) {
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
@@ -51,9 +54,12 @@ class CachePoolsTest extends AbstractWebTestCase
 
     /**
      * @requires extension redis
+     * @group integration
      */
     public function testRedisCustomCachePools()
     {
+        $this->skipIfRedisUnavailable();
+
         try {
             $this->doTestCachePools(['root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'], RedisAdapter::class);
         } catch (\PHPUnit\Framework\Error\Warning $e) {
@@ -90,7 +96,7 @@ class CachePoolsTest extends AbstractWebTestCase
         $pool2 = $container->get('cache.pool2');
         $pool2->save($item);
 
-        $container->get('cache_clearer')->clear($container->getParameter('kernel.cache_dir'));
+        $container->get('cache_clearer.alias')->clear($container->getParameter('kernel.cache_dir'));
         $item = $pool1->getItem($key);
         $this->assertFalse($item->isHit());
 
@@ -120,5 +126,14 @@ class CachePoolsTest extends AbstractWebTestCase
     protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'CachePools'] + $options);
+    }
+
+    private function skipIfRedisUnavailable()
+    {
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 }

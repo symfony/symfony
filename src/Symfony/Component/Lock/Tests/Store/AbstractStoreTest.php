@@ -109,4 +109,20 @@ abstract class AbstractStoreTest extends TestCase
 
         $store->delete($key);
     }
+
+    public function testDeleteIsolated()
+    {
+        $store = $this->getStore();
+
+        $key1 = new Key(uniqid(__METHOD__, true));
+        $key2 = new Key(uniqid(__METHOD__, true));
+
+        $store->save($key1);
+        $this->assertTrue($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+
+        $store->delete($key2);
+        $this->assertTrue($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+    }
 }

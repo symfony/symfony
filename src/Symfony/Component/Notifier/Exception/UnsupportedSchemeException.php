@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class UnsupportedSchemeException extends LogicException
 {
@@ -30,16 +30,63 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Telegram\TelegramTransportFactory::class,
             'package' => 'symfony/telegram-notifier',
         ],
+        'mattermost' => [
+            'class' => Bridge\Mattermost\MattermostTransportFactory::class,
+            'package' => 'symfony/mattermost-notifier',
+        ],
+        'googlechat' => [
+            'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
+            'package' => 'symfony/googlechat-notifier',
+        ],
         'nexmo' => [
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',
+        ],
+        'rocketchat' => [
+            'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
+            'package' => 'rocketchat-notifier',
         ],
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'infobip' => [
+            'class' => Bridge\Infobip\InfobipTransportFactory::class,
+            'package' => 'symfony/infobip-notifier',
+        ],
+        'firebase' => [
+            'class' => Bridge\Firebase\FirebaseTransportFactory::class,
+            'package' => 'symfony/firebase-notifier',
+        ],
+        'free-mobile' => [
+            'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
+            'package' => 'symfony/free-mobile-notifier',
+        ],
+        'ovhcloud' => [
+            'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
+            'package' => 'symfony/ovhcloud-notifier',
+        ],
+        'sinch' => [
+            'class' => Bridge\Sinch\SinchTransportFactory::class,
+            'package' => 'symfony/sinch-notifier',
+        ],
+        'zulip' => [
+            'class' => Bridge\Zulip\ZulipTransportFactory::class,
+            'package' => 'symfony/zulip-notifier',
+        ],
+        'smsapi' => [
+            'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
+            'package' => 'symfony/smsapi-notifier',
+        ],
+        'esendex' => [
+            'class' => Bridge\Esendex\EsendexTransportFactory::class,
+            'package' => 'symfony/esendex-notifier',
+        ],
     ];
 
+    /**
+     * @param string[] $supported
+     */
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])
     {
         $provider = $dsn->getScheme();

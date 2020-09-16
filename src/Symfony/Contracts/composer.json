@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "^1.0"
@@ -26,6 +26,7 @@
     },
     "replace": {
         "symfony/cache-contracts": "self.version",
+        "symfony/deprecation-contracts": "self.version",
         "symfony/event-dispatcher-contracts": "self.version",
         "symfony/http-client-contracts": "self.version",
         "symfony/service-contracts": "self.version",
@@ -40,6 +41,7 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },
+        "files": [ "Deprecation/function.php" ],
         "exclude-from-classmap": [
             "**/Tests/"
         ]
@@ -47,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

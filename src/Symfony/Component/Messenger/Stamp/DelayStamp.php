@@ -30,4 +30,19 @@ final class DelayStamp implements StampInterface
     {
         return $this->delay;
     }
+
+    public static function delayForSeconds(int $seconds): self
+    {
+        return new self($seconds * 1000);
+    }
+
+    public static function delayForMinutes(int $minutes): self
+    {
+        return self::delayForSeconds($minutes * 60);
+    }
+
+    public static function delayForHours(int $hours): self
+    {
+        return self::delayForMinutes($hours * 60);
+    }
 }

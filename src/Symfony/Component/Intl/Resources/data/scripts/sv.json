@@ -1,11 +1,11 @@
 {
-    "Version": "36",
     "Names": {
         "Adlm": "adlamiska",
         "Afak": "afakiska",
         "Aghb": "kaukasiska albanska",
         "Ahom": "ahom",
         "Arab": "arabiska",
+        "Aran": "nastaliq",
         "Armi": "imperisk arameiska",
         "Armn": "armeniska",
         "Avst": "avestiska",
@@ -134,6 +134,7 @@
         "Phnx": "feniciska",
         "Plrd": "pollardtecken",
         "Prti": "tidig parthianska",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Rohg": "hanifiska",
         "Roro": "rongo-rongo",

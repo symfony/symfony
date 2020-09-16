@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -29,7 +30,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @internal
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TelegramTransport extends AbstractTransport
 {
@@ -38,10 +39,10 @@ final class TelegramTransport extends AbstractTransport
     private $token;
     private $chatChannel;
 
-    public function __construct(string $token, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
-        $this->chatChannel = $chatChannel;
+        $this->chatChannel = $channel;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -60,10 +61,14 @@ final class TelegramTransport extends AbstractTransport
     /**
      * @see https://core.telegram.org/bots/api
      */
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+        }
+
+        if ($message->getOptions() && !$message->getOptions() instanceof TelegramOptions) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, TelegramOptions::class));
         }
 
         $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);
@@ -71,8 +76,12 @@ final class TelegramTransport extends AbstractTransport
         if (!isset($options['chat_id'])) {
             $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
         }
+
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+        }
+
         $options['text'] = $message->getSubject();
-        $options['parse_mode'] = 'Markdown';
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);
@@ -80,7 +89,14 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Telegram message: %s (%s).', $result['description'], $result['error_code']), $response);
+            throw new TransportException('Unable to post the Telegram message: '.$result['description'].sprintf(' (code %s).', $result['error_code']), $response);
         }
+
+        $success = $response->toArray(false);
+
+        $message = new SentMessage($message, (string) $this);
+        $message->setMessageId($success['result']['message_id']);
+
+        return $message;
     }
 }

@@ -1,0 +1,35 @@
+{
+    "name": "symfony/beanstalkd-messenger",
+    "type": "symfony-bridge",
+    "description": "Symfony Beanstalkd Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Antonio Pauletich",
+            "email": "antonio.pauletich95@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "pda/pheanstalk": "^4.0",
+        "symfony/messenger": "^4.4|^5.0"
+    },
+    "require-dev": {
+        "symfony/property-access": "^4.4|^5.0",
+        "symfony/serializer": "^4.4|^5.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Beanstalkd\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

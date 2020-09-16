@@ -1,8 +1,6 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "Arabesch",
-        "Armi": "Armi",
         "Armn": "Armenesch",
         "Avst": "Avestesch",
         "Bali": "Balinesesch",
@@ -16,7 +14,6 @@
         "Buhd": "Buhid",
         "Cans": "UCAS",
         "Cari": "Karesch",
-        "Cham": "Cham",
         "Cher": "Cherokee",
         "Cirt": "Cirth",
         "Copt": "Koptesch",

@@ -105,21 +105,36 @@ class FilesystemTestCase extends TestCase
         );
     }
 
-    protected function getFileOwner($filepath)
+    protected function getFileOwnerId($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
         $infos = stat($filepath);
 
-        return ($datas = posix_getpwuid($infos['uid'])) ? $datas['name'] : null;
+        return $infos['uid'];
+    }
+
+    protected function getFileOwner($filepath)
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+    }
+
+    protected function getFileGroupId($filepath)
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $infos = stat($filepath);
+
+        return $infos['gid'];
     }
 
     protected function getFileGroup($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        $infos = stat($filepath);
-        if ($datas = posix_getgrgid($infos['gid'])) {
+        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
             return $datas['name'];
         }
 
@@ -144,7 +159,7 @@ class FilesystemTestCase extends TestCase
         }
 
         // https://bugs.php.net/69473
-        if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === PHP_ZTS) {
+        if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === \PHP_ZTS) {
             $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
         }
     }

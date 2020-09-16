@@ -13,7 +13,6 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Serializer;

@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractor;
+namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
+use phpDocumentor\Reflection\DocBlock\StandardTagFactory;
+use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
 use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -44,6 +46,26 @@ class PhpDocExtractorTest extends TestCase
     public function testParamTagTypeIsOmitted()
     {
         $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
+    }
+
+    public function invalidTypesProvider()
+    {
+        return [
+            'pub' => ['pub', null, null],
+            'stat' => ['stat', null, null],
+            'foo' => ['foo', $this->isPhpDocumentorV5() ? 'Foo.' : null, null],
+            'bar' => ['bar', $this->isPhpDocumentorV5() ? 'Bar.' : null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidTypesProvider
+     */
+    public function testInvalid($property, $shortDescription, $longDescription)
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
     }
 
     /**
@@ -94,7 +116,7 @@ class PhpDocExtractorTest extends TestCase
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
-            ['emptyVar', null, null, null],
+            ['emptyVar', null, $this->isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
         ];
     }
 
@@ -124,6 +146,39 @@ class PhpDocExtractorTest extends TestCase
                     true,
                     new Type(Type::BUILTIN_TYPE_INT),
                     new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))
+                )],
+                null,
+                null,
+            ],
+            [
+                'arrayWithKeys',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(Type::BUILTIN_TYPE_STRING)
+                )],
+                null,
+                null,
+            ],
+            [
+                'arrayWithKeysAndComplexValue',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(
+                        Type::BUILTIN_TYPE_ARRAY,
+                        true,
+                        null,
+                        true,
+                        new Type(Type::BUILTIN_TYPE_INT),
+                        new Type(Type::BUILTIN_TYPE_STRING, true)
+                    )
                 )],
                 null,
                 null,
@@ -249,6 +304,35 @@ class PhpDocExtractorTest extends TestCase
     public function testDocBlockFallback($property, $types)
     {
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
+    }
+
+    protected function isPhpDocumentorV5()
+    {
+        if (class_exists(InvalidTag::class)) {
+            return true;
+        }
+
+        return (new \ReflectionMethod(StandardTagFactory::class, 'create'))
+            ->hasReturnType();
+    }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractConstructorTypes($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function constructorTypesProvider()
+    {
+        return [
+            ['date', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['dateObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeInterface')]],
+            ['dateTime', null],
+            ['ddd', null],
+        ];
     }
 }
 

@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -40,7 +41,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalize()
     {
         $normalizer = new AbstractObjectNormalizerDummy();
-        $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'], __NAMESPACE__.'\Dummy');
+        $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'], Dummy::class);
 
         $this->assertSame('foo', $normalizedData->foo);
         $this->assertNull($normalizedData->bar);
@@ -50,12 +51,12 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testInstantiateObjectDenormalizer()
     {
         $data = ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'];
-        $class = __NAMESPACE__.'\Dummy';
+        $class = Dummy::class;
         $context = [];
 
         $normalizer = new AbstractObjectNormalizerDummy();
 
-        $this->assertInstanceOf(__NAMESPACE__.'\Dummy', $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
+        $this->assertInstanceOf(Dummy::class, $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
     }
 
     public function testDenormalizeWithExtraAttributes()
@@ -66,7 +67,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
             ['fooFoo' => 'foo', 'fooBar' => 'bar'],
-            __NAMESPACE__.'\Dummy',
+            Dummy::class,
             'any',
             ['allow_extra_attributes' => false]
         );
@@ -174,6 +175,14 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $stringCollection->children[1]);
     }
 
+    public function testDenormalizeNotSerializableObjectToPopulate()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $normalizedData = $normalizer->denormalize(['foo' => 'foo'], Dummy::class, null, [AbstractObjectNormalizer::OBJECT_TO_POPULATE => new NotSerializable()]);
+
+        $this->assertSame('foo', $normalizedData->foo);
+    }
+
     private function getDenormalizerForStringCollection()
     {
         $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
@@ -225,6 +234,116 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
 
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
+    }
+
+    public function testDenormalizeWithNestedDiscriminatorMap()
+    {
+        $classDiscriminatorResolver = new class() implements ClassDiscriminatorResolverInterface {
+            public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
+            {
+                switch ($class) {
+                    case AbstractDummy::class:
+                        return new ClassDiscriminatorMapping('type', [
+                            'foo' => AbstractDummyFirstChild::class,
+                        ]);
+                    case AbstractDummyFirstChild::class:
+                        return new ClassDiscriminatorMapping('nested_type', [
+                            'bar' => AbstractDummySecondChild::class,
+                        ]);
+                    default:
+                        return null;
+                }
+            }
+
+            public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping
+            {
+                return null;
+            }
+
+            public function getTypeForMappedObject($object): ?string
+            {
+                return null;
+            }
+        };
+
+        $normalizer = new AbstractObjectNormalizerDummy(null, null, null, $classDiscriminatorResolver);
+
+        $denormalizedData = $normalizer->denormalize(['type' => 'foo', 'nested_type' => 'bar'], AbstractDummy::class);
+
+        $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
+    }
+
+    public function testDenormalizeBasicTypePropertiesFromXml()
+    {
+        $denormalizer = $this->getDenormalizerForObjectWithBasicProperties();
+
+        // bool
+        $objectWithBooleanProperties = $denormalizer->denormalize(
+            [
+                'boolTrue1' => 'true',
+                'boolFalse1' => 'false',
+                'boolTrue2' => '1',
+                'boolFalse2' => '0',
+                'int1' => '4711',
+                'int2' => '-4711',
+                'float1' => '123.456',
+                'float2' => '-1.2344e56',
+                'float3' => '45E-6',
+                'floatNaN' => 'NaN',
+                'floatInf' => 'INF',
+                'floatNegInf' => '-INF',
+            ],
+            ObjectWithBasicProperties::class,
+            'xml'
+        );
+
+        $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
+
+        // Bool Properties
+        $this->assertTrue($objectWithBooleanProperties->boolTrue1);
+        $this->assertFalse($objectWithBooleanProperties->boolFalse1);
+        $this->assertTrue($objectWithBooleanProperties->boolTrue2);
+        $this->assertFalse($objectWithBooleanProperties->boolFalse2);
+
+        // Integer Properties
+        $this->assertEquals(4711, $objectWithBooleanProperties->int1);
+        $this->assertEquals(-4711, $objectWithBooleanProperties->int2);
+
+        // Float Properties
+        $this->assertEqualsWithDelta(123.456, $objectWithBooleanProperties->float1, 0.01);
+        $this->assertEqualsWithDelta(-1.2344e56, $objectWithBooleanProperties->float2, 1);
+        $this->assertEqualsWithDelta(45E-6, $objectWithBooleanProperties->float3, 1);
+        $this->assertNan($objectWithBooleanProperties->floatNaN);
+        $this->assertInfinite($objectWithBooleanProperties->floatInf);
+        $this->assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
+    }
+
+    private function getDenormalizerForObjectWithBasicProperties()
+    {
+        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor->method('getTypes')
+            ->will($this->onConsecutiveCalls(
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('int')],
+                [new Type('int')],
+                [new Type('float')],
+                [new Type('float')],
+                [new Type('float')],
+                [new Type('float')],
+                [new Type('float')],
+                [new Type('float')]
+            ));
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
     }
 
     /**
@@ -311,6 +430,45 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
     {
         $object->$attribute = $value;
     }
+}
+
+class ObjectWithBasicProperties
+{
+    /** @var bool */
+    public $boolTrue1;
+
+    /** @var bool */
+    public $boolFalse1;
+
+    /** @var bool */
+    public $boolTrue2;
+
+    /** @var bool */
+    public $boolFalse2;
+
+    /** @var int */
+    public $int1;
+
+    /** @var int */
+    public $int2;
+
+    /** @var float */
+    public $float1;
+
+    /** @var float */
+    public $float2;
+
+    /** @var float */
+    public $float3;
+
+    /** @var float */
+    public $floatNaN;
+
+    /** @var float */
+    public $floatInf;
+
+    /** @var float */
+    public $floatNegInf;
 }
 
 class StringCollection
@@ -440,5 +598,17 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
+    }
+}
+
+class NotSerializable
+{
+    public function __sleep()
+    {
+        if (class_exists(\Error::class)) {
+            throw new \Error('not serializable');
+        }
+
+        throw new \Exception('not serializable');
     }
 }

@@ -14,9 +14,13 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfTokenClearingLogoutHandlerPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\CustomAuthenticatorFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
@@ -34,10 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
@@ -63,20 +63,24 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
         $extension->addSecurityListenerFactory(new AnonymousFactory());
+        $extension->addSecurityListenerFactory(new CustomAuthenticatorFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new RegisterCsrfTokenClearingLogoutHandlerPass());
+        $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
+        $container->addCompilerPass(new RegisterLdapLocatorPass());
+        // must be registered after RegisterListenersPass (in the FrameworkBundle)
+        $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
+        // execute after ResolveChildDefinitionsPass optimization pass, to ensure class names are set
+        $container->addCompilerPass(new SortFirewallListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
-        $container->addCompilerPass(new AddEventAliasesPass([
-            AuthenticationSuccessEvent::class => AuthenticationEvents::AUTHENTICATION_SUCCESS,
-            AuthenticationFailureEvent::class => AuthenticationEvents::AUTHENTICATION_FAILURE,
-            InteractiveLoginEvent::class => SecurityEvents::INTERACTIVE_LOGIN,
-            SwitchUserEvent::class => SecurityEvents::SWITCH_USER,
-        ]));
+        $container->addCompilerPass(new AddEventAliasesPass(array_merge(
+            AuthenticationEvents::ALIASES,
+            SecurityEvents::ALIASES
+        )));
     }
 }

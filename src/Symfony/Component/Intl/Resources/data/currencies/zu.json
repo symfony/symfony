@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "AED": [
             "AED",
@@ -120,10 +119,6 @@
         "CLP": [
             "CLP",
             "i-Chilean Peso"
-        ],
-        "CNH": [
-            "CNH",
-            "CNH"
         ],
         "CNY": [
             "CN¥",

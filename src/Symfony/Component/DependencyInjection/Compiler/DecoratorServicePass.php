@@ -24,12 +24,19 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Diego Saint Esteben <diego@saintesteben.me>
  */
-class DecoratorServicePass implements CompilerPassInterface
+class DecoratorServicePass extends AbstractRecursivePass
 {
+    private $innerId = '.inner';
+
+    public function __construct(?string $innerId = '.inner')
+    {
+        $this->innerId = $innerId;
+    }
+
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();
-        $order = PHP_INT_MAX;
+        $order = \PHP_INT_MAX;
 
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$decorated = $definition->getDecoratedService()) {
@@ -49,6 +56,10 @@ class DecoratorServicePass implements CompilerPassInterface
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }
+
+            $this->currentId = $renamedId;
+            $this->processValue($definition);
+
             $definition->innerServiceId = $renamedId;
             $definition->decorationOnInvalid = $invalidBehavior;
 
@@ -78,12 +89,31 @@ class DecoratorServicePass implements CompilerPassInterface
 
             if (isset($decoratingDefinitions[$inner])) {
                 $decoratingDefinition = $decoratingDefinitions[$inner];
-                $definition->setTags(array_merge($decoratingDefinition->getTags(), $definition->getTags()));
-                $decoratingDefinition->setTags([]);
+
+                $decoratingTags = $decoratingDefinition->getTags();
+                $resetTags = [];
+
+                if (isset($decoratingTags['container.service_locator'])) {
+                    // container.service_locator has special logic and it must not be transferred out to decorators
+                    $resetTags = ['container.service_locator' => $decoratingTags['container.service_locator']];
+                    unset($decoratingTags['container.service_locator']);
+                }
+
+                $definition->setTags(array_merge($decoratingTags, $definition->getTags()));
+                $decoratingDefinition->setTags($resetTags);
                 $decoratingDefinitions[$inner] = $definition;
             }
 
-            $container->setAlias($inner, $id)->setPublic($public)->setPrivate($private);
+            $container->setAlias($inner, $id)->setPublic($public);
         }
+    }
+
+    protected function processValue($value, bool $isRoot = false)
+    {
+        if ($value instanceof Reference && $this->innerId === (string) $value) {
+            return new Reference($this->currentId, $value->getInvalidBehavior());
+        }
+
+        return parent::processValue($value, $isRoot);
     }
 }

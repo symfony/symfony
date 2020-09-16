@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "monolog/monolog": "^1.25.1|^2",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/http-kernel": "^4.4|^5.0"
@@ -25,7 +25,9 @@
         "symfony/console": "^4.4|^5.0",
         "symfony/http-client": "^4.4|^5.0",
         "symfony/security-core": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/var-dumper": "^4.4|^5.0",
+        "symfony/mailer": "^4.4|^5.0",
+        "symfony/mime": "^4.4|^5.0"
     },
     "conflict": {
         "symfony/console": "<4.4",
@@ -45,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

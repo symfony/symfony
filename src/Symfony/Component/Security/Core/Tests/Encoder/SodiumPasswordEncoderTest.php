@@ -29,12 +29,22 @@ class SodiumPasswordEncoderTest extends TestCase
         $result = $encoder->encodePassword('password', null);
         $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
+        $this->assertFalse($encoder->isPasswordValid($result, '', null));
     }
 
     public function testBCryptValidation()
     {
         $encoder = new SodiumPasswordEncoder();
         $this->assertTrue($encoder->isPasswordValid('$2y$04$M8GDODMoGQLQRpkYCdoJh.lbiZPee3SZI32RcYK49XYTolDGwoRMm', 'abc', null));
+    }
+
+    public function testNonArgonValidation()
+    {
+        $encoder = new SodiumPasswordEncoder();
+        $this->assertTrue($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password', null));
+        $this->assertFalse($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'anotherPassword', null));
+        $this->assertTrue($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'password', null));
+        $this->assertFalse($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword', null));
     }
 
     public function testEncodePasswordLength()

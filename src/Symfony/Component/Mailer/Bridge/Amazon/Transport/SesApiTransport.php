@@ -21,6 +21,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+trigger_deprecation('symfony/amazon-mailer', '5.1', 'The "%s" class is deprecated, use "%s" instead. The Amazon transport now requires "AsyncAws". Run "composer require async-aws/ses".', SesApiTransport::class, SesApiAsyncAwsTransport::class);
+
 /**
  * @author Kevin Verschaeve
  */
@@ -65,7 +67,7 @@ class SesApiTransport extends AbstractApiTransport
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 
         $property = $payload['Action'].'Result';
@@ -88,10 +90,16 @@ class SesApiTransport extends AbstractApiTransport
     private function getPayload(Email $email, Envelope $envelope): array
     {
         if ($email->getAttachments()) {
-            return [
+            $payload = [
                 'Action' => 'SendRawEmail',
                 'RawMessage.Data' => base64_encode($email->toString()),
             ];
+
+            if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+                $payload['ConfigurationSetName'] = $header->getBodyAsString();
+            }
+
+            return $payload;
         }
 
         $payload = [
@@ -112,6 +120,12 @@ class SesApiTransport extends AbstractApiTransport
         }
         if ($email->getHtmlBody()) {
             $payload['Message.Body.Html.Data'] = $email->getHtmlBody();
+        }
+        if ($email->getReplyTo()) {
+            $payload['ReplyToAddresses.member'] = $this->stringifyAddresses($email->getReplyTo());
+        }
+        if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $payload['ConfigurationSetName'] = $header->getBodyAsString();
         }
 
         return $payload;

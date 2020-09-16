@@ -53,7 +53,7 @@ class AbstractControllerTest extends TestCase
             'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
             'twig' => '?Twig\\Environment',
-            'doctrine' => '?Doctrine\\Common\\Persistence\\ManagerRegistry',
+            'doctrine' => '?Doctrine\\Persistence\\ManagerRegistry',
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
             'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
             'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
@@ -224,7 +224,7 @@ class AbstractControllerTest extends TestCase
         $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(\JSON_FORCE_OBJECT);
         $this->assertEquals('{}', $response->getContent());
     }
 
@@ -532,7 +532,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')->getMock();
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

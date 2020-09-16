@@ -74,10 +74,15 @@ class Message extends RawMessage
         $headers = clone $this->headers;
 
         if (!$headers->has('From')) {
-            throw new LogicException('An email must have a "From" header.');
+            if (!$headers->has('Sender')) {
+                throw new LogicException('An email must have a "From" or a "Sender" header.');
+            }
+            $headers->addMailboxListHeader('From', [$headers->get('Sender')->getAddress()]);
         }
 
-        $headers->addTextHeader('MIME-Version', '1.0');
+        if (!$headers->has('MIME-Version')) {
+            $headers->addTextHeader('MIME-Version', '1.0');
+        }
 
         if (!$headers->has('Date')) {
             $headers->addDateHeader('Date', new \DateTimeImmutable());
@@ -119,8 +124,12 @@ class Message extends RawMessage
 
     public function ensureValidity()
     {
-        if (!$this->headers->has('From')) {
-            throw new LogicException('An email must have a "From" header.');
+        if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {
+            throw new LogicException('An email must have a "To", "Cc", or "Bcc" header.');
+        }
+
+        if (!$this->headers->has('From') && !$this->headers->has('Sender')) {
+            throw new LogicException('An email must have a "From" or a "Sender" header.');
         }
 
         parent::ensureValidity();
@@ -133,7 +142,7 @@ class Message extends RawMessage
         } elseif ($this->headers->has('From')) {
             $sender = $this->headers->get('From')->getAddresses()[0];
         } else {
-            throw new LogicException('An email must have a "From" or a "Sender" header to compute a Messsage ID.');
+            throw new LogicException('An email must have a "From" or a "Sender" header.');
         }
 
         return bin2hex(random_bytes(16)).strstr($sender->getAddress(), '@');

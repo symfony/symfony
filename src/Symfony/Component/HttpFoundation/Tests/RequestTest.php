@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -408,12 +410,10 @@ class RequestTest extends TestCase
 
         $request->setRequestFormat('atom');
         $request->headers->set('Accept', 'application/ld+json');
-        $request->headers->set('Content-Type', 'application/merge-patch+json');
         $this->assertSame('atom', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/xml');
-        $request->headers->set('Content-Type', 'application/json');
         $this->assertSame('xml', $request->getPreferredFormat());
 
         $request = new Request();
@@ -807,7 +807,7 @@ class RequestTest extends TestCase
             ['foo=1&foo=2', 'foo=2', 'merges repeated parameters'],
             ['pa%3Dram=foo%26bar%3Dbaz&test=test', 'pa%3Dram=foo%26bar%3Dbaz&test=test', 'works with encoded delimiters'],
             ['0', '0=', 'allows "0"'],
-            ['Foo Bar&Foo%20Baz', 'Foo_Bar=&Foo_Baz=', 'normalizes encoding in keys'],
+            ['Foo Bar&Foo%20Baz', 'Foo%20Bar=&Foo%20Baz=', 'normalizes encoding in keys'],
             ['bar=Foo Bar&baz=Foo%20Baz', 'bar=Foo%20Bar&baz=Foo%20Baz', 'normalizes encoding in values'],
             ['foo=bar&&&test&&', 'foo=bar&test=', 'removes unneeded delimiters'],
             ['formula=e=m*c^2', 'formula=e%3Dm%2Ac%5E2', 'correctly treats only the first "=" as delimiter and the next as value'],
@@ -1257,6 +1257,11 @@ class RequestTest extends TestCase
     {
         $normalizedMethod = strtoupper($method);
 
+        $_POST = [];
+        $request = Request::createFromGlobals();
+        $this->assertNotInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
+
         $_GET['foo1'] = 'bar1';
         $_POST['foo2'] = 'bar2';
         $_COOKIE['foo3'] = 'bar3';
@@ -1269,6 +1274,8 @@ class RequestTest extends TestCase
         $this->assertEquals('bar3', $request->cookies->get('foo3'), '::fromGlobals() uses values from $_COOKIE');
         $this->assertEquals(['bar4'], $request->files->get('foo4'), '::fromGlobals() uses values from $_FILES');
         $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
+        $this->assertInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
 
@@ -1277,6 +1284,8 @@ class RequestTest extends TestCase
         $request = RequestContentProxy::createFromGlobals();
         $this->assertEquals($normalizedMethod, $request->getMethod());
         $this->assertEquals('mycontent', $request->request->get('content'));
+        $this->assertInstanceOf(InputBag::class, $request->request);
+        $this->assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
@@ -2269,6 +2278,51 @@ class RequestTest extends TestCase
         $this->assertSame(443, $request->getPort());
     }
 
+    public function testTrustedPrefix()
+    {
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+
+        //test with index deployed under root
+        $request = Request::create('/method');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X-Forwarded-Prefix', '/myprefix');
+        $request->headers->set('Forwarded', 'host=localhost:8080');
+
+        $this->assertSame('/myprefix', $request->getBaseUrl());
+        $this->assertSame('/myprefix', $request->getBasePath());
+        $this->assertSame('/method', $request->getPathInfo());
+    }
+
+    public function testTrustedPrefixWithSubdir()
+    {
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+
+        $server = [
+            'SCRIPT_FILENAME' => '/var/hidden/app/public/public/index.php',
+            'SCRIPT_NAME' => '/public/index.php',
+            'PHP_SELF' => '/public/index.php',
+        ];
+
+        //test with index file deployed in subdir, i.e. local dev server (insecure!!)
+        $request = Request::create('/public/method', 'GET', [], [], [], $server);
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X-Forwarded-Prefix', '/prefix');
+        $request->headers->set('Forwarded', 'host=localhost:8080');
+
+        $this->assertSame('/prefix/public', $request->getBaseUrl());
+        $this->assertSame('/prefix/public', $request->getBasePath());
+        $this->assertSame('/method', $request->getPathInfo());
+    }
+
+    public function testTrustedPrefixEmpty()
+    {
+        //check that there is no error, if no prefix is provided
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+        $request = Request::create('/method');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertSame('', $request->getBaseUrl());
+    }
+
     public function testTrustedPort()
     {
         Request::setTrustedProxies(['1.1.1.1'], -1);
@@ -2325,6 +2379,64 @@ class RequestTest extends TestCase
             ['1.1.1.1', ['REMOTE_ADDR', '2.2.2.2'], ['1.1.1.1', '2.2.2.2']],
             [null, ['REMOTE_ADDR'], []],
             [null, ['REMOTE_ADDR', '2.2.2.2'], ['2.2.2.2']],
+        ];
+    }
+
+    /**
+     * @dataProvider preferSafeContentData
+     */
+    public function testPreferSafeContent($server, bool $safePreferenceExpected)
+    {
+        $request = new Request([], [], [], [], [], $server);
+
+        $this->assertEquals($safePreferenceExpected, $request->preferSafeContent());
+    }
+
+    public function preferSafeContentData()
+    {
+        return [
+            [[], false],
+            [
+                [
+                    'HTTPS' => 'on',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'off',
+                    'HTTP_PREFER' => 'safe',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'safe',
+                ],
+                true,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'unknown-preference',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'unknown-preference=42, safe',
+                ],
+                true,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'safe, unknown-preference=42',
+                ],
+                true,
+            ],
         ];
     }
 }

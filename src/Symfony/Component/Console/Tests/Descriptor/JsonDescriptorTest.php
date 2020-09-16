@@ -30,6 +30,6 @@ class JsonDescriptorTest extends AbstractDescriptorTest
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true]);
-        $this->assertEquals(json_decode(trim($expectedDescription), true), json_decode(trim(str_replace(PHP_EOL, "\n", $output->fetch())), true));
+        $this->assertEquals(json_decode(trim($expectedDescription), true), json_decode(trim(str_replace(\PHP_EOL, "\n", $output->fetch())), true));
     }
 }

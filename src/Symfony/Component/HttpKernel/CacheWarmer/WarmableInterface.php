@@ -20,6 +20,8 @@ interface WarmableInterface
 {
     /**
      * Warms up the cache.
+     *
+     * @return string[] A list of classes or files to preload on PHP 7.4+
      */
     public function warmUp(string $cacheDir);
 }

@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -54,7 +56,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['Message'], $result['ErrorCode']), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
 
         $sentMessage->setMessageId($result['MessageID']);
@@ -82,9 +84,21 @@ class PostmarkApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ($header instanceof TagHeader) {
+                $payload['Tag'] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['Metadata'][$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
             $payload['Headers'][] = [
                 'Name' => $name,
-                'Value' => $header->toString(),
+                'Value' => $header->getBodyAsString(),
             ];
         }
 

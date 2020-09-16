@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -335,6 +336,45 @@ TABLE
 
 TABLE
             ],
+            'Cell after colspan contains new line break' => [
+                ['Foo', 'Bar', 'Baz'],
+                [
+                    [
+                        new TableCell("foo\nbar", ['colspan' => 2]),
+                        "baz\nqux",
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++-----+-----+-----+
+| Foo | Bar | Baz |
++-----+-----+-----+
+| foo       | baz |
+| bar       | qux |
++-----+-----+-----+
+
+TABLE
+            ],
+            'Cell after colspan contains multiple new lines' => [
+                ['Foo', 'Bar', 'Baz'],
+                [
+                    [
+                        new TableCell("foo\nbar", ['colspan' => 2]),
+                        "baz\nqux\nquux",
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++-----+-----+------+
+| Foo | Bar | Baz  |
++-----+-----+------+
+| foo       | baz  |
+| bar       | qux  |
+|           | quux |
++-----+-----+------+
+
+TABLE
+            ],
             'Cell with rowspan' => [
                 ['ISBN', 'Title', 'Author'],
                 [
@@ -585,6 +625,212 @@ TABLE
             ,
                 true,
             ],
+            'TabeCellStyle with align. Also with rowspan and colspan > 1' => [
+               [
+                   new TableCell(
+                       'ISBN',
+                       [
+                           'style' => new TableCellStyle([
+                               'align' => 'right',
+                           ]),
+                       ]
+                   ),
+                   'Title',
+                   new TableCell(
+                       'Author',
+                       [
+                           'style' => new TableCellStyle([
+                               'align' => 'center',
+                           ]),
+                       ]
+                   ),
+               ],
+               [
+                   [
+                       new TableCell(
+                           '<fg=red>978</>',
+                           [
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       'De Monarchia',
+                       new TableCell(
+                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                           [
+                               'rowspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                   ],
+                   [
+                       '<info>99921-58-10-7</info>',
+                       'Divine Comedy',
+                   ],
+                   new TableSeparator(),
+                   [
+                       new TableCell(
+                           '<error>test</error>',
+                           [
+                               'colspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       new TableCell(
+                           'tttt',
+                           [
+                               'style' => new TableCellStyle([
+                                   'align' => 'right',
+                               ]),
+                           ]
+                       ),
+                   ],
+               ],
+               'default',
+<<<'TABLE'
++---------------+---------------+-------------------------------------------+
+|          ISBN | Title         |                  Author                   |
++---------------+---------------+-------------------------------------------+
+|      978      | De Monarchia  |             Dante Alighieri               |
+| 99921-58-10-7 | Divine Comedy | spans multiple rows rows Dante Alighieri  |
+|               |               |         spans multiple rows rows          |
++---------------+---------------+-------------------------------------------+
+|             test              |                                      tttt |
++---------------+---------------+-------------------------------------------+
+
+TABLE
+               ,
+           ],
+            'TabeCellStyle with fg,bg. Also with rowspan and colspan > 1' => [
+                [],
+                [
+                   [
+                       new TableCell(
+                           '<fg=red>978</>',
+                           [
+                               'style' => new TableCellStyle([
+                                   'fg' => 'black',
+                                   'bg' => 'green',
+                               ]),
+                           ]
+                       ),
+                       'De Monarchia',
+                       new TableCell(
+                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                           [
+                               'rowspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                   ],
+
+                   [
+                       '<info>99921-58-10-7</info>',
+                       'Divine Comedy',
+                   ],
+                   new TableSeparator(),
+                   [
+                       new TableCell(
+                           '<error>test</error>',
+                           [
+                               'colspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       new TableCell(
+                           'tttt',
+                           [
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'right',
+                               ]),
+                           ]
+                       ),
+                   ],
+                ],
+                'default',
+<<<'TABLE'
++---------------+---------------+-------------------------------------------+
+[39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
+[39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
+|               |               |[31;42m         spans multiple rows rows          [39;49m|
++---------------+---------------+-------------------------------------------+
+|             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
++---------------+---------------+-------------------------------------------+
+
+TABLE
+            ,
+            true,
+           ],
+            'TabeCellStyle with cellFormat. Also with rowspan and colspan > 1' => [
+                [
+                    new TableCell(
+                        'ISBN',
+                        [
+                            'style' => new TableCellStyle([
+                                'cellFormat' => '<fg=black;bg=cyan>%s</>',
+                            ]),
+                        ]
+                    ),
+                    'Title',
+                    'Author',
+                ],
+                [
+                    [
+                        '978-0521567817',
+                        'De Monarchia',
+                        new TableCell(
+                            "Dante Alighieri\nspans multiple rows",
+                            [
+                                'rowspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'cellFormat' => '<info>%s</info>',
+                                ]),
+                            ]
+                        ),
+                    ],
+                    ['978-0804169127', 'Divine Comedy'],
+                    [
+                        new TableCell(
+                            'test',
+                            [
+                                'colspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'cellFormat' => '<error>%s</error>',
+                                ]),
+                            ]
+                        ),
+                        'tttt',
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++----------------+---------------+---------------------+
+|[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
++----------------+---------------+---------------------+
+[39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
+| 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
+|[37;41m test                           [39;49m| tttt                |
++----------------+---------------+---------------------+
+
+TABLE
+                ,
+                true,
+           ],
         ];
     }
 
@@ -748,7 +994,7 @@ TABLE;
             ]);
 
         $style = new TableStyle();
-        $style->setPadType(STR_PAD_LEFT);
+        $style->setPadType(\STR_PAD_LEFT);
         $table->setColumnStyle(3, $style);
 
         $table->render();
@@ -770,7 +1016,7 @@ TABLE;
     public function testThrowsWhenTheCellInAnArray()
     {
         $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing __toString, array given.');
+        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
@@ -794,7 +1040,7 @@ TABLE;
             ->setColumnWidth(3, 10);
 
         $style = new TableStyle();
-        $style->setPadType(STR_PAD_LEFT);
+        $style->setPadType(\STR_PAD_LEFT);
         $table->setColumnStyle(3, $style);
 
         $table->render();
@@ -825,7 +1071,7 @@ TABLE;
             ->setColumnWidths([15, 0, -1, 10]);
 
         $style = new TableStyle();
-        $style->setPadType(STR_PAD_LEFT);
+        $style->setPadType(\STR_PAD_LEFT);
         $table->setColumnStyle(3, $style);
 
         $table->render();
@@ -949,6 +1195,38 @@ TABLE;
         $table = new Table($this->getOutputStream());
 
         $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
+    }
+
+    public function testSectionOutputHandlesZeroRowsAfterRender()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->writeln('My Table');
+        $table = new Table($output);
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
+            ->setRows([]);
+
+        $table->render();
+
+        $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
+
+        $expected =
+            <<<TABLE
+My Table
++------+-------+--------+-------+
+|\033[32m ISBN \033[39m|\033[32m Title \033[39m|\033[32m Author \033[39m|\033[32m Price \033[39m|
++------+-------+--------+-------+
+\x1b[3A\x1b[0J+---------------+----------------------+-----------------+--------+
+|\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
++---------------+----------------------+-----------------+--------+
+| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
++---------------+----------------------+-----------------+--------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testIsNotDefinedStyleException()
@@ -1189,7 +1467,7 @@ EOTXT;
     {
         rewind($output->getStream());
 
-        return str_replace(PHP_EOL, "\n", stream_get_contents($output->getStream()));
+        return str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 
     public function testWithColspanAndMaxWith(): void

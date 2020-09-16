@@ -21,11 +21,27 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 final class Headers
 {
-    private static $uniqueHeaders = [
+    private const UNIQUE_HEADERS = [
         'date', 'from', 'sender', 'reply-to', 'to', 'cc', 'bcc',
         'message-id', 'in-reply-to', 'references', 'subject',
     ];
+    private const HEADER_CLASS_MAP = [
+        'date' => DateHeader::class,
+        'from' => MailboxListHeader::class,
+        'sender' => MailboxHeader::class,
+        'reply-to' => MailboxListHeader::class,
+        'to' => MailboxListHeader::class,
+        'cc' => MailboxListHeader::class,
+        'bcc' => MailboxListHeader::class,
+        'message-id' => IdentificationHeader::class,
+        'in-reply-to' => IdentificationHeader::class,
+        'references' => IdentificationHeader::class,
+        'return-path' => PathHeader::class,
+    ];
 
+    /**
+     * @var HeaderInterface[][]
+     */
     private $headers = [];
     private $lineLength = 76;
 
@@ -122,6 +138,22 @@ final class Headers
         return $this->add(new ParameterizedHeader($name, $value, $params));
     }
 
+    /**
+     * @return $this
+     */
+    public function addHeader(string $name, $argument, array $more = []): self
+    {
+        $parts = explode('\\', self::HEADER_CLASS_MAP[$name] ?? UnstructuredHeader::class);
+        $method = 'add'.ucfirst(array_pop($parts));
+        if ('addUnstructuredHeader' === $method) {
+            $method = 'addTextHeader';
+        } elseif ('addIdentificationHeader' === $method) {
+            $method = 'addIdHeader';
+        }
+
+        return $this->$method($name, $argument, $more);
+    }
+
     public function has(string $name): bool
     {
         return isset($this->headers[strtolower($name)]);
@@ -132,28 +164,12 @@ final class Headers
      */
     public function add(HeaderInterface $header): self
     {
-        static $map = [
-            'date' => DateHeader::class,
-            'from' => MailboxListHeader::class,
-            'sender' => MailboxHeader::class,
-            'reply-to' => MailboxListHeader::class,
-            'to' => MailboxListHeader::class,
-            'cc' => MailboxListHeader::class,
-            'bcc' => MailboxListHeader::class,
-            'message-id' => IdentificationHeader::class,
-            'in-reply-to' => IdentificationHeader::class,
-            'references' => IdentificationHeader::class,
-            'return-path' => PathHeader::class,
-        ];
+        self::checkHeaderClass($header);
 
         $header->setMaxLineLength($this->lineLength);
         $name = strtolower($header->getName());
 
-        if (isset($map[$name]) && !$header instanceof $map[$name]) {
-            throw new LogicException(sprintf('The "%s" header must be an instance of "%s" (got "%s").', $header->getName(), $map[$name], \get_class($header)));
-        }
-
-        if (\in_array($name, self::$uniqueHeaders, true) && isset($this->headers[$name]) && \count($this->headers[$name]) > 0) {
+        if (\in_array($name, self::UNIQUE_HEADERS, true) && isset($this->headers[$name]) && \count($this->headers[$name]) > 0) {
             throw new LogicException(sprintf('Impossible to set header "%s" as it\'s already defined and must be unique.', $header->getName()));
         }
 
@@ -201,7 +217,19 @@ final class Headers
 
     public static function isUniqueHeader(string $name): bool
     {
-        return \in_array($name, self::$uniqueHeaders, true);
+        return \in_array($name, self::UNIQUE_HEADERS, true);
+    }
+
+    /**
+     * @throws LogicException if the header name and class are not compatible
+     */
+    public static function checkHeaderClass(HeaderInterface $header): void
+    {
+        $name = strtolower($header->getName());
+
+        if (($c = self::HEADER_CLASS_MAP[$name] ?? null) && !$header instanceof $c) {
+            throw new LogicException(sprintf('The "%s" header must be an instance of "%s" (got "%s").', $header->getName(), $c, get_debug_type($header)));
+        }
     }
 
     public function toString(): string

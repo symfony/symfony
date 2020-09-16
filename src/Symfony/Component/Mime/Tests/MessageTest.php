@@ -17,7 +17,17 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class MessageTest extends TestCase
 {
@@ -146,5 +156,110 @@ content
 EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
+    }
+
+    public function testSymfonySerialize()
+    {
+        // we don't add from/sender to check that it's not needed to serialize an email
+        $body = new MixedPart(
+            new AlternativePart(
+                new TextPart('Text content'),
+                new TextPart('HTML content', 'utf-8', 'html')
+            ),
+            new DataPart('text data', 'text.txt')
+        );
+        $e = new Message((new Headers())->addMailboxListHeader('To', ['you@example.com']), $body);
+        $expected = clone $e;
+
+        $expectedJson = <<<EOF
+{
+    "headers": {
+        "to": [
+            {
+                "addresses": [
+                    {
+                        "address": "you@example.com",
+                        "name": ""
+                    }
+                ],
+                "name": "To",
+                "lineLength": 76,
+                "lang": null,
+                "charset": "utf-8"
+            }
+        ]
+    },
+    "body": {
+        "boundary": null,
+        "parts": [
+            {
+                "boundary": null,
+                "parts": [
+                    {
+                        "body": "Text content",
+                        "charset": "utf-8",
+                        "subtype": "plain",
+                        "disposition": null,
+                        "name": null,
+                        "encoding": "quoted-printable",
+                        "seekable": null,
+                        "headers": [],
+                        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
+                    },
+                    {
+                        "body": "HTML content",
+                        "charset": "utf-8",
+                        "subtype": "html",
+                        "disposition": null,
+                        "name": null,
+                        "encoding": "quoted-printable",
+                        "seekable": null,
+                        "headers": [],
+                        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
+                    }
+                ],
+                "headers": [],
+                "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\AlternativePart"
+            },
+            {
+                "filename": "text.txt",
+                "mediaType": "application",
+                "cid": null,
+                "handle": null,
+                "body": "text data",
+                "charset": null,
+                "subtype": "octet-stream",
+                "disposition": "attachment",
+                "name": "text.txt",
+                "encoding": "base64",
+                "seekable": null,
+                "headers": [],
+                "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
+            }
+        ],
+        "headers": [],
+        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
+    },
+    "message": null
+}
+EOF;
+
+        $extractor = new PhpDocExtractor();
+        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new MimeMessageNormalizer($propertyNormalizer),
+            new ObjectNormalizer(null, null, null, $extractor),
+            $propertyNormalizer,
+        ], [new JsonEncoder()]);
+
+        $serialized = $serializer->serialize($e, 'json');
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+
+        $n = $serializer->deserialize($serialized, Message::class, 'json');
+        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
+
+        $serialized = $serializer->serialize($e, 'json');
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
     }
 }

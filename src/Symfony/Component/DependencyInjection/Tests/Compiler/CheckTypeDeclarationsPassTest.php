@@ -13,14 +13,22 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -59,7 +67,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsWhenPassingNullToRequiredArgument()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -237,7 +245,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct" accepts "int", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -280,7 +288,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct" accepts "stdClass", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -368,7 +376,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -384,6 +392,21 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $container->register('bar', BarMethodCall::class)
             ->addMethodCall('setIterable', [new IteratorArgument([])]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 7.2
+     */
+    public function testProcessSuccessWhenPassingDefinitionForObjectType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo_object', FooObject::class)
+            ->addArgument(new Definition(Foo::class));
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 
@@ -513,6 +536,42 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessFactoryForTypeSameAsClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'callable')
+            ->setFactory([
+                new Reference('foo'),
+                'createCallable',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setCallable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessFactoryForIterableTypeAndArrayClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', Foo::class);
+        $container->register('bar', 'array')
+            ->setFactory([
+                new Reference('foo'),
+                'createArray',
+            ]);
+        $container->register('bar_call', BarMethodCall::class)
+            ->addMethodCall('setIterable', [new Reference('bar')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault()
     {
         $container = new ContainerBuilder();
@@ -541,7 +600,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessThrowsOnIterableTypeWhenScalarPassed()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable" accepts "iterable", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -551,5 +610,197 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
+    }
+
+    public function testProcessResolveExpressions()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('ccc', ['array']);
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', [new Expression("parameter('ccc')")]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenExpressionReturnsObject()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+
+        $container
+            ->register('wobble', Wobble::class)
+            ->setArguments([new Expression("service('waldo')")]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessHandleMixedEnvPlaceholder()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "foobar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "string" passed.');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(FOO)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['foo%ccc%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    public function testProcessHandleMultipleEnvPlaceholder()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "foobar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "string" passed.');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(FOO)%',
+            'fcy' => '%env(int:BAR)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%%fcy%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    public function testProcessHandleExistingEnvPlaceholder()
+    {
+        putenv('ARRAY={"foo":"bar"}');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(json:ARRAY)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+
+        putenv('ARRAY=');
+    }
+
+    public function testProcessHandleNotFoundEnvPlaceholder()
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(json:ARRAY)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSkipSkippedIds()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['a string']);
+
+        (new CheckTypeDeclarationsPass(true, ['foobar' => true]))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessHandleClosureForCallable()
+    {
+        $closureDefinition = new Definition(\Closure::class);
+        $closureDefinition->setFactory([\Closure::class, 'fromCallable']);
+        $closureDefinition->setArguments(['strlen']);
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setCallable', [$closureDefinition]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToCallable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setCallable', [new ServiceClosureArgument(new Reference('foo'))]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToClosure()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setClosure', [new ServiceClosureArgument(new Reference('foo'))]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testExpressionLanguageWithSyntheticService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('synthetic')
+            ->setSynthetic(true);
+        $container->register('baz', \stdClass::class)
+            ->addArgument(new Reference('synthetic'));
+        $container->register('bar', Bar::class)
+            ->addArgument(new Expression('service("baz").getStdClass()'));
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessResolveParameters()
+    {
+        putenv('ARRAY={"foo":"bar"}');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'env_array_param' => '%env(json:ARRAY)%',
+        ]));
+        $container->setParameter('array_param', ['foobar']);
+        $container->setParameter('string_param', 'ccc');
+
+        $definition = $container->register('foobar', BarMethodCall::class);
+        $definition
+            ->addMethodCall('setArray', ['%array_param%'])
+            ->addMethodCall('setString', ['%string_param%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
+
+        $definition->addMethodCall('setArray', ['%env_array_param%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+
+        putenv('ARRAY=');
     }
 }

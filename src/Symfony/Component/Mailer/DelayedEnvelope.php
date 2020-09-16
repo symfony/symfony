@@ -41,11 +41,11 @@ final class DelayedEnvelope extends Envelope
 
     public function getSender(): Address
     {
-        if ($this->senderSet) {
-            return parent::getSender();
+        if (!$this->senderSet) {
+            parent::setSender(self::getSenderFromHeaders($this->message->getHeaders()));
         }
 
-        return self::getSenderFromHeaders($this->message->getHeaders());
+        return parent::getSender();
     }
 
     public function setRecipients(array $recipients): void
@@ -83,14 +83,14 @@ final class DelayedEnvelope extends Envelope
 
     private static function getSenderFromHeaders(Headers $headers): Address
     {
-        if ($return = $headers->get('Return-Path')) {
-            return $return->getAddress();
-        }
         if ($sender = $headers->get('Sender')) {
             return $sender->getAddress();
         }
         if ($from = $headers->get('From')) {
             return $from->getAddresses()[0];
+        }
+        if ($return = $headers->get('Return-Path')) {
+            return $return->getAddress();
         }
 
         throw new LogicException('Unable to determine the sender of the message.');

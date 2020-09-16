@@ -1,9 +1,9 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "afaka",
         "Aghb": "kavkazskoalbánské",
         "Arab": "arabské",
+        "Aran": "nastaliq",
         "Armi": "aramejské (imperiální)",
         "Armn": "arménské",
         "Avst": "avestánské",
@@ -118,6 +118,7 @@
         "Phnx": "fénické",
         "Plrd": "Pollardova fonetická abeceda",
         "Prti": "parthské klínové",
+        "Qaag": "zawgyi",
         "Rjng": "redžanské",
         "Roro": "rongorongo",
         "Runr": "runové",

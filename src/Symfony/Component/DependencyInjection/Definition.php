@@ -26,16 +26,14 @@ class Definition
     private $file;
     private $factory;
     private $shared = true;
-    private $deprecated = false;
-    private $deprecationTemplate;
+    private $deprecation = [];
     private $properties = [];
     private $calls = [];
     private $instanceof = [];
     private $autoconfigured = false;
     private $configurator;
     private $tags = [];
-    private $public = true;
-    private $private = true;
+    private $public = false;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
@@ -587,7 +585,6 @@ class Definition
         $this->changes['public'] = true;
 
         $this->public = $boolean;
-        $this->private = false;
 
         return $this;
     }
@@ -605,18 +602,15 @@ class Definition
     /**
      * Sets if this service is private.
      *
-     * When set, the "private" state has a higher precedence than "public".
-     * In version 3.4, a "private" service always remains publicly accessible,
-     * but triggers a deprecation notice when accessed from the container,
-     * so that the service can be made really private in 4.0.
-     *
      * @return $this
+     *
+     * @deprecated since Symfony 5.2, use setPublic() instead
      */
     public function setPrivate(bool $boolean)
     {
-        $this->private = $boolean;
+        trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s()" method is deprecated, use "setPublic()" instead.', __METHOD__);
 
-        return $this;
+        return $this->setPublic(!$boolean);
     }
 
     /**
@@ -626,7 +620,7 @@ class Definition
      */
     public function isPrivate()
     {
-        return $this->private;
+        return !$this->public;
     }
 
     /**
@@ -662,6 +656,10 @@ class Definition
     public function setSynthetic(bool $boolean)
     {
         $this->synthetic = $boolean;
+
+        if (!isset($this->changes['public'])) {
+            $this->setPublic(true);
+        }
 
         return $this;
     }
@@ -705,29 +703,48 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param string $template Template message to use if the definition is deprecated
+     * @param string $package The name of the composer package that is triggering the deprecation
+     * @param string $version The version of the package that introduced the deprecation
+     * @param string $message The deprecation message to use
      *
      * @return $this
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(bool $status = true, string $template = null)
+    public function setDeprecated(/* string $package, string $version, string $message */)
     {
-        if (null !== $template) {
-            if (preg_match('#[\r\n]|\*/#', $template)) {
+        $args = \func_get_args();
+
+        if (\func_num_args() < 3) {
+            trigger_deprecation('symfony/dependency-injection', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
+
+            $status = $args[0] ?? true;
+
+            if (!$status) {
+                trigger_deprecation('symfony/dependency-injection', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
+            }
+
+            $message = (string) ($args[1] ?? null);
+            $package = $version = '';
+        } else {
+            $status = true;
+            $package = (string) $args[0];
+            $version = (string) $args[1];
+            $message = (string) $args[2];
+        }
+
+        if ('' !== $message) {
+            if (preg_match('#[\r\n]|\*/#', $message)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (false === strpos($template, '%service_id%')) {
+            if (false === strpos($message, '%service_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%service_id%" placeholder.');
             }
-
-            $this->deprecationTemplate = $template;
         }
 
         $this->changes['deprecated'] = true;
-
-        $this->deprecated = $status;
+        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::$defaultDeprecationTemplate] : [];
 
         return $this;
     }
@@ -740,11 +757,13 @@ class Definition
      */
     public function isDeprecated()
     {
-        return $this->deprecated;
+        return (bool) $this->deprecation;
     }
 
     /**
      * Message to use if this definition is deprecated.
+     *
+     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
      *
      * @param string $id Service id relying on this definition
      *
@@ -752,7 +771,21 @@ class Definition
      */
     public function getDeprecationMessage(string $id)
     {
-        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
+        trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
+
+        return $this->getDeprecation($id)['message'];
+    }
+
+    /**
+     * @param string $id Service id relying on this definition
+     */
+    public function getDeprecation(string $id): array
+    {
+        return [
+            'package' => $this->deprecation['package'],
+            'version' => $this->deprecation['version'],
+            'message' => str_replace('%service_id%', $id, $this->deprecation['message']),
+        ];
     }
 
     /**

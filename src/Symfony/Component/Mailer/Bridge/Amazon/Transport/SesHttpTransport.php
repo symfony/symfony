@@ -15,9 +15,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
+use Symfony\Component\Mime\Message;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+
+trigger_deprecation('symfony/amazon-mailer', '5.1', 'The "%s" class is deprecated, use "%s" instead. The Amazon transport now requires "AsyncAws". Run "composer require async-aws/ses".', SesHttpTransport::class, SesHttpAsyncAwsTransport::class);
 
 /**
  * @author Kevin Verschaeve
@@ -52,7 +55,7 @@ class SesHttpTransport extends AbstractHttpTransport
         $date = gmdate('D, d M Y H:i:s e');
         $auth = sprintf('AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s', $this->accessKey, $this->getSignature($date));
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), [
+        $request = [
             'headers' => [
                 'X-Amzn-Authorization' => $auth,
                 'Date' => $date,
@@ -61,11 +64,18 @@ class SesHttpTransport extends AbstractHttpTransport
                 'Action' => 'SendRawEmail',
                 'RawMessage.Data' => base64_encode($message->toString()),
             ],
-        ]);
+        ];
+
+        if (($message->getOriginalMessage() instanceof Message)
+            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $request['body']['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+        }
+
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), $request);
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 
         $message->setMessageId($result->SendRawEmailResult->MessageId);

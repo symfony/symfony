@@ -83,7 +83,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
         do {
             $file = $class->getFileName();
-            if (false !== $file && file_exists($file)) {
+            if (false !== $file && is_file($file)) {
                 foreach ($this->excludedVendors as $vendor) {
                     if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                         $file = false;
@@ -137,18 +137,68 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $defaults = $class->getDefaultProperties();
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
-                yield $p->getDocComment().$p;
+                yield $p->getDocComment();
+                yield $p->isDefault() ? '<default>' : '';
+                yield $p->isPublic() ? 'public' : 'protected';
+                yield $p->isStatic() ? 'static' : '';
+                yield '$'.$p->name;
                 yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, true);
             }
         }
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-            yield preg_replace('/^  @@.*/m', '', $m);
-
             $defaults = [];
+            $parametersWithUndefinedConstants = [];
             foreach ($m->getParameters() as $p) {
-                $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
+                if (!$p->isDefaultValueAvailable()) {
+                    $defaults[$p->name] = null;
+
+                    continue;
+                }
+
+                if (!$p->isDefaultValueConstant() || \defined($p->getDefaultValueConstantName())) {
+                    $defaults[$p->name] = $p->getDefaultValue();
+
+                    continue;
+                }
+
+                $defaults[$p->name] = $p->getDefaultValueConstantName();
+                $parametersWithUndefinedConstants[$p->name] = true;
             }
+
+            if (!$parametersWithUndefinedConstants) {
+                yield preg_replace('/^  @@.*/m', '', $m);
+            } else {
+                $t = $m->getReturnType();
+                $stack = [
+                    $m->getDocComment(),
+                    $m->getName(),
+                    $m->isAbstract(),
+                    $m->isFinal(),
+                    $m->isStatic(),
+                    $m->isPublic(),
+                    $m->isPrivate(),
+                    $m->isProtected(),
+                    $m->returnsReference(),
+                    $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t,
+                ];
+
+                foreach ($m->getParameters() as $p) {
+                    if (!isset($parametersWithUndefinedConstants[$p->name])) {
+                        $stack[] = (string) $p;
+                    } else {
+                        $t = $p->getType();
+                        $stack[] = $p->isOptional();
+                        $stack[] = $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t;
+                        $stack[] = $p->isPassedByReference();
+                        $stack[] = $p->isVariadic();
+                        $stack[] = $p->getName();
+                    }
+                }
+
+                yield implode(',', $stack);
+            }
+
             yield print_r($defaults, true);
         }
 

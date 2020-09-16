@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function setUp(): void
     {
         Inline::initialize(0, 0);
@@ -56,9 +59,10 @@ class InlineTest extends TestCase
     {
         return [
             ['!php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT],
-            ['!php/const PHP_INT_MAX', PHP_INT_MAX],
-            ['[!php/const PHP_INT_MAX]', [PHP_INT_MAX]],
-            ['{ foo: !php/const PHP_INT_MAX }', ['foo' => PHP_INT_MAX]],
+            ['!php/const PHP_INT_MAX', \PHP_INT_MAX],
+            ['[!php/const PHP_INT_MAX]', [\PHP_INT_MAX]],
+            ['{ foo: !php/const PHP_INT_MAX }', ['foo' => \PHP_INT_MAX]],
+            ['{ !php/const PHP_INT_MAX: foo }', [\PHP_INT_MAX => 'foo']],
             ['!php/const NULL', null],
         ];
     }
@@ -73,7 +77,7 @@ class InlineTest extends TestCase
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
+        $this->expectExceptionMessageMatches('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
         Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -89,21 +93,21 @@ class InlineTest extends TestCase
 
     public function testDumpNumericValueWithLocale()
     {
-        $locale = setlocale(LC_NUMERIC, 0);
+        $locale = setlocale(\LC_NUMERIC, 0);
         if (false === $locale) {
             $this->markTestSkipped('Your platform does not support locales.');
         }
 
         try {
             $requiredLocales = ['fr_FR.UTF-8', 'fr_FR.UTF8', 'fr_FR.utf-8', 'fr_FR.utf8', 'French_France.1252'];
-            if (false === setlocale(LC_NUMERIC, $requiredLocales)) {
+            if (false === setlocale(\LC_NUMERIC, $requiredLocales)) {
                 $this->markTestSkipped('Could not set any of required locales: '.implode(', ', $requiredLocales));
             }
 
             $this->assertEquals('1.2', Inline::dump(1.2));
-            $this->assertStringContainsStringIgnoringCase('fr', setlocale(LC_NUMERIC, 0));
+            $this->assertStringContainsStringIgnoringCase('fr', setlocale(\LC_NUMERIC, 0));
         } finally {
-            setlocale(LC_NUMERIC, $locale);
+            setlocale(\LC_NUMERIC, $locale);
         }
     }
 
@@ -295,8 +299,8 @@ class InlineTest extends TestCase
             ['123.45_67', 123.4567],
             ['0x4D2', 0x4D2],
             ['0x_4_D_2_', 0x4D2],
-            ['02333', 02333],
-            ['0_2_3_3_3', 02333],
+            ['0o2333', 02333],
+            ['0o_2_3_3_3', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -375,7 +379,7 @@ class InlineTest extends TestCase
             ["'quoted string'", 'quoted string'],
             ['12.30e+02', 12.30e+02],
             ['0x4D2', 0x4D2],
-            ['02333', 02333],
+            ['0o2333', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -502,6 +506,14 @@ class InlineTest extends TestCase
             ['[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', ['foo', '@foo.baz', ['%foo%' => 'foo is %foo%', 'bar' => '%foo%'], true, '@service_container']],
 
             ['{ foo: { bar: { 1: 2, baz: 3 } } }', ['foo' => ['bar' => [1 => 2, 'baz' => 3]]]],
+
+            // numeric strings with trailing whitespaces
+            ["'0123 '", '0123 '],
+            ['"0123\f"', "0123\f"],
+            ['"0123\n"', "0123\n"],
+            ['"0123\r"', "0123\r"],
+            ['"0123\t"', "0123\t"],
+            ['"0123\v"', "0123\v"],
         ];
     }
 
@@ -598,7 +610,7 @@ class InlineTest extends TestCase
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp($expectedMessage);
+        $this->expectExceptionMessageMatches($expectedMessage);
 
         Inline::parse($data);
     }
@@ -616,7 +628,7 @@ class InlineTest extends TestCase
     public function testNotSupportedMissingValue()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Malformed inline YAML string: {this, is not, supported} at line 1.');
+        $this->expectExceptionMessage('Malformed inline YAML string: "{this, is not, supported}" at line 1.');
         Inline::parse('{this, is not, supported}');
     }
 
@@ -719,5 +731,174 @@ class InlineTest extends TestCase
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $this->expectExceptionMessage("Unexpected end of line, expected one of \",}\n\" at line 1 (near \"{abc: 'def'\").");
         Inline::parse("{abc: 'def'");
+    }
+
+    /**
+     * @dataProvider getTestsForOctalNumbers
+     */
+    public function testParseOctalNumbers($expected, $yaml)
+    {
+        self::assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForOctalNumbers()
+    {
+        return [
+            'positive octal number' => [28, '0o34'],
+            'positive octal number with sign' => [28, '+0o34'],
+            'negative octal number' => [-28, '-0o34'],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getTestsForOctalNumbersYaml11Notation
+     */
+    public function testParseOctalNumbersYaml11Notation(int $expected, string $yaml)
+    {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
+
+        self::assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForOctalNumbersYaml11Notation()
+    {
+        return [
+            'positive octal number' => [28, '034'],
+            'positive octal number with separator' => [1243, '0_2_3_3_3'],
+            'negative octal number' => [-28, '-034'],
+        ];
+    }
+
+    /**
+     * @dataProvider phpObjectTagWithEmptyValueProvider
+     *
+     * @group legacy
+     */
+    public function testPhpObjectWithEmptyValue($expected, $value)
+    {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.');
+
+        $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_OBJECT));
+    }
+
+    public function phpObjectTagWithEmptyValueProvider()
+    {
+        return [
+            [false, '!php/object'],
+            [false, '!php/object '],
+            [false, '!php/object  '],
+            [[false], '[!php/object]'],
+            [[false], '[!php/object ]'],
+            [[false, 'foo'], '[!php/object  , foo]'],
+        ];
+    }
+
+    /**
+     * @dataProvider phpConstTagWithEmptyValueProvider
+     *
+     * @group legacy
+     */
+    public function testPhpConstTagWithEmptyValue($expected, $value)
+    {
+        $this->expectDeprecation('Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.');
+
+        $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_CONSTANT));
+    }
+
+    public function phpConstTagWithEmptyValueProvider()
+    {
+        return [
+            ['', '!php/const'],
+            ['', '!php/const '],
+            ['', '!php/const  '],
+            [[''], '[!php/const]'],
+            [[''], '[!php/const ]'],
+            [['', 'foo'], '[!php/const  , foo]'],
+            [['' => 'foo'], '{!php/const: foo}'],
+            [['' => 'foo'], '{!php/const : foo}'],
+            [['' => 'foo', 'bar' => 'ccc'], '{!php/const  : foo, bar: ccc}'],
+        ];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testParsePositiveOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame('0123456789', Inline::parse('0123456789'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testParseNegativeOctalNumberContainingInvalidDigits()
+    {
+        self::assertSame('-0123456789', Inline::parse('-0123456789'));
+    }
+
+    /**
+     * @dataProvider unquotedExclamationMarkThrowsProvider
+     */
+    public function testUnquotedExclamationMarkThrows(string $value)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/^Using the unquoted scalar value "!" is not supported\. You must quote it at line 1 \(near "/');
+
+        Inline::parse($value);
+    }
+
+    public function unquotedExclamationMarkThrowsProvider()
+    {
+        return [
+            ['!'],
+            ['! '],
+            ['!  '],
+            [' ! '],
+            ['[!]'],
+            ['[! ]'],
+            ['[!  ]'],
+            ['[!, "foo"]'],
+            ['["foo", !, "ccc"]'],
+            ['{foo: !}'],
+            ['{foo:     !}'],
+            ['{foo: !, bar: "ccc"}'],
+            ['{bar: "ccc", foo: ! }'],
+            ['!]]]'],
+            ['!}'],
+            ['!,}foo,]'],
+            ['! [!]'],
+        ];
+    }
+
+    /**
+     * @dataProvider quotedExclamationMarkProvider
+     */
+    public function testQuotedExclamationMark($expected, string $value)
+    {
+        $this->assertSame($expected, Inline::parse($value));
+    }
+
+    // This provider should stay consistent with unquotedExclamationMarkThrowsProvider
+    public function quotedExclamationMarkProvider()
+    {
+        return [
+            ['!', '"!"'],
+            ['! ', '"! "'],
+            [' !', '" !"'],
+            [' ! ', '" ! "'],
+            [['!'], '["!"]'],
+            [['!  '], '["!  "]'],
+            [['!', 'foo'], '["!", "foo"]'],
+            [['foo', '!', 'ccc'], '["foo", "!", "ccc"]'],
+            [['foo' => '!'], '{foo: "!"}'],
+            [['foo' => '    !'], '{foo: "    !"}'],
+            [['foo' => '!', 'bar' => 'ccc'], '{foo: "!", bar: "ccc"}'],
+            [['bar' => 'ccc', 'foo' => '! '], '{bar: "ccc", foo: "! "}'],
+            ['!]]]', '"!]]]"'],
+            ['!}', '"!}"'],
+            ['!,}foo,]', '"!,}foo,]"'],
+            [['!'], '! ["!"]'],
+        ];
     }
 }

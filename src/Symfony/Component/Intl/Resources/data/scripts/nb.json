@@ -1,10 +1,10 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "afaka",
         "Aghb": "kaukasus-albansk",
         "Ahom": "ahom",
         "Arab": "arabisk",
+        "Aran": "nastaliq",
         "Armi": "arameisk",
         "Armn": "armensk",
         "Avst": "avestisk",
@@ -121,6 +121,7 @@
         "Phnx": "fønikisk",
         "Plrd": "pollard-fonetisk",
         "Prti": "inskripsjonsparthisk",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongorongo",
         "Runr": "runer",

@@ -1,0 +1,7 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    cache_clearer.alias:
+        alias: cache_clearer
+        public: true

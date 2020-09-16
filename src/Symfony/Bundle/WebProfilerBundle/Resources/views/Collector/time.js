@@ -94,7 +94,7 @@ class TimelineEngine {
 
     createLabel(name, duration, memory, period) {
         const label = this.renderer.createText(name, period.start * this.scale, this.labelY, 'timeline-label');
-        const sublabel = this.renderer.createTspan(`  ${duration} ms / ${memory} Mb`, 'timeline-sublabel');
+        const sublabel = this.renderer.createTspan(`  ${duration} ms / ${memory} MiB`, 'timeline-sublabel');
 
         label.appendChild(sublabel);
 

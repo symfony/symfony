@@ -69,6 +69,6 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey();
+        return $token instanceof PreAuthenticatedToken && $this->providerKey === $token->getFirewallName();
     }
 }

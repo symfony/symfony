@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 class TimeTypeTest extends BaseTypeTest
 {
@@ -325,6 +326,54 @@ class TimeTypeTest extends BaseTypeTest
         $form->submit('16:09:10');
 
         $this->assertSame('14:09:10', $form->getData()->format('H:i:s'));
+    }
+
+    public function testSubmitWithoutSecondsAndBrowserAddingSeconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => false,
+        ]);
+
+        $form->submit('03:04:00');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmitWithSecondsAndBrowserAddingMicroseconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ]);
+
+        $form->submit('03:04:00.000');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04:00', $form->getViewData());
+    }
+
+    public function testSubmitWithoutSecondsAndBrowserAddingMicroseconds()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => false,
+        ]);
+
+        $form->submit('03:04:00.000');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getViewData());
     }
 
     public function testSetDataWithoutMinutes()
@@ -859,6 +908,15 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('model_timezone'));
     }
 
+    public function testViewTimezoneDefaultsToModelTimezoneIfProvided()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+
+        $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('view_timezone'));
+    }
+
     public function testPassDefaultChoiceTranslationDomain()
     {
         $form = $this->factory->create(static::TESTED_TYPE);
@@ -928,6 +986,9 @@ class TimeTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
+        if ($emptyData instanceof \Closure) {
+            $emptyData = $emptyData($form);
+        }
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($expectedData, $form->getNormData());
         $this->assertEquals($expectedData, $form->getData());
@@ -936,11 +997,17 @@ class TimeTypeTest extends BaseTypeTest
     public function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
+        $lazyEmptyData = static function (FormInterface $form) {
+            return $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
+        };
 
         return [
             'Simple field' => ['single_text', '21:23', $expectedData],
             'Compound text field' => ['text', ['hour' => '21', 'minute' => '23'], $expectedData],
             'Compound choice field' => ['choice', ['hour' => '21', 'minute' => '23'], $expectedData],
+            'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
+            'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound choice field lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }
 }

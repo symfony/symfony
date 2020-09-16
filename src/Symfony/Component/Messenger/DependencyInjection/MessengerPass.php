@@ -75,10 +75,10 @@ class MessengerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (isset($tag['bus']) && !\in_array($tag['bus'], $busIds, true)) {
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: %s).', $serviceId, $tag['bus'], $this->handlerTag, implode(', ', $busIds)));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], $this->handlerTag, implode('", "', $busIds)));
                 }
 
-                $className = $container->getDefinition($serviceId)->getClass();
+                $className = $this->getServiceClass($container, $serviceId);
                 $r = $container->getReflectionClass($className);
 
                 if (null === $r) {
@@ -102,7 +102,7 @@ class MessengerPass implements CompilerPassInterface
                             $message = $options;
                             $options = [];
                         } else {
-                            throw new RuntimeException(sprintf('The handler configuration needs to return an array of messages or an associated array of message and configuration. Found value of type "%s" at position "%d" for service "%s".', \gettype($options), $message, $serviceId));
+                            throw new RuntimeException(sprintf('The handler configuration needs to return an array of messages or an associated array of message and configuration. Found value of type "%s" at position "%d" for service "%s".', get_debug_type($options), $message, $serviceId));
                         }
                     }
 
@@ -228,11 +228,24 @@ class MessengerPass implements CompilerPassInterface
             throw new RuntimeException(sprintf('Invalid handler service "%s": argument "$%s" of method "%s::__invoke()" must have a type-hint corresponding to the message class it handles.', $serviceId, $parameters[0]->getName(), $handlerClass->getName()));
         }
 
+        if ($type instanceof \ReflectionUnionType) {
+            $types = [];
+            foreach ($type->getTypes() as $type) {
+                if (!$type->isBuiltin()) {
+                    $types[] = (string) $type;
+                }
+            }
+
+            if ($types) {
+                return $types;
+            }
+        }
+
         if ($type->isBuiltin()) {
             throw new RuntimeException(sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type));
         }
 
-        return [$parameters[0]->getType()->getName()];
+        return [$type->getName()];
     }
 
     private function registerReceivers(ContainerBuilder $container, array $busIds)
@@ -240,7 +253,7 @@ class MessengerPass implements CompilerPassInterface
         $receiverMapping = [];
 
         foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
-            $receiverClass = $container->findDefinition($id)->getClass();
+            $receiverClass = $this->getServiceClass($container, $id);
             if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
                 throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
             }
@@ -326,14 +339,32 @@ class MessengerPass implements CompilerPassInterface
             if ($container->findDefinition($messengerMiddlewareId)->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
                 $childDefinition->setArguments($arguments);
-                $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id, $childDefinition);
+                if (isset($middlewareReferences[$messengerMiddlewareId = $busId.'.middleware.'.$id])) {
+                    $messengerMiddlewareId .= '.'.ContainerBuilder::hash($arguments);
+                }
+                $container->setDefinition($messengerMiddlewareId, $childDefinition);
             } elseif ($arguments) {
                 throw new RuntimeException(sprintf('Invalid middleware factory "%s": a middleware factory must be an abstract definition.', $id));
             }
 
-            $middlewareReferences[] = new Reference($messengerMiddlewareId);
+            $middlewareReferences[$messengerMiddlewareId] = new Reference($messengerMiddlewareId);
         }
 
-        $container->getDefinition($busId)->replaceArgument(0, new IteratorArgument($middlewareReferences));
+        $container->getDefinition($busId)->replaceArgument(0, new IteratorArgument(array_values($middlewareReferences)));
+    }
+
+    private function getServiceClass(ContainerBuilder $container, string $serviceId): string
+    {
+        while (true) {
+            $definition = $container->findDefinition($serviceId);
+
+            if (!$definition->getClass() && $definition instanceof ChildDefinition) {
+                $serviceId = $definition->getParent();
+
+                continue;
+            }
+
+            return $definition->getClass();
+        }
     }
 }

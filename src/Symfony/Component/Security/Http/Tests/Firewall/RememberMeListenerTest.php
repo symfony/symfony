@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -27,7 +28,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage) = $this->getListener();
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
         ;
@@ -45,7 +46,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service) = $this->getListener();
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -57,11 +58,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn(new Request())
-        ;
 
         $this->assertNull($listener($event));
     }
@@ -73,7 +69,7 @@ class RememberMeListenerTest extends TestCase
         $exception = new AuthenticationException('Authentication failed.');
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -96,12 +92,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
+        $event = $this->getGetResponseEvent($request);
 
         $listener($event);
     }
@@ -113,7 +104,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -137,11 +128,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn(new Request())
-        ;
 
         $listener($event);
     }
@@ -151,7 +137,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -174,11 +160,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn(new Request())
-        ;
 
         $listener($event);
     }
@@ -188,7 +169,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -213,11 +194,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn(new Request())
-        ;
 
         $listener($event);
     }
@@ -227,7 +203,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager, , , $sessionStrategy) = $this->getListener(false, true, true);
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -258,25 +234,10 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(true)
         ;
 
-        $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')->getMock();
-        $request
-            ->expects($this->once())
-            ->method('hasSession')
-            ->willReturn(true)
-        ;
+        $request = new Request();
+        $request->setSession($session);
 
-        $request
-            ->expects($this->once())
-            ->method('getSession')
-            ->willReturn($session)
-        ;
-
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
+        $event = $this->getGetResponseEvent($request);
 
         $sessionStrategy
             ->expects($this->once())
@@ -292,7 +253,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, true, false);
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -327,25 +288,10 @@ class RememberMeListenerTest extends TestCase
             ->method('migrate')
         ;
 
-        $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')->getMock();
-        $request
-            ->expects($this->any())
-            ->method('hasSession')
-            ->willReturn(true)
-        ;
+        $request = new Request();
+        $request->setSession($session);
 
-        $request
-            ->expects($this->any())
-            ->method('getSession')
-            ->willReturn($session)
-        ;
-
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
+        $event = $this->getGetResponseEvent($request);
 
         $listener($event);
     }
@@ -355,7 +301,7 @@ class RememberMeListenerTest extends TestCase
         list($listener, $tokenStorage, $service, $manager, , $dispatcher) = $this->getListener(true);
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn(null)
         ;
@@ -380,12 +326,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         $event = $this->getGetResponseEvent();
-        $request = new Request();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
 
         $dispatcher
             ->expects($this->once())
@@ -399,9 +339,20 @@ class RememberMeListenerTest extends TestCase
         $listener($event);
     }
 
-    protected function getGetResponseEvent()
+    protected function getGetResponseEvent(Request $request = null): RequestEvent
     {
-        return $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $request = $request ?? new Request();
+
+        $event = $this->getMockBuilder(RequestEvent::class)
+            ->setConstructorArgs([$this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST])
+            ->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+
+        return $event;
     }
 
     protected function getResponseEvent(): ResponseEvent

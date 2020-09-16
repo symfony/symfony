@@ -25,10 +25,10 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
-        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN)) {
+        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
             $this->markTestSkipped('APCu extension is required.');
         }
-        if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
+        if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             if ('testWithCliSapi' !== $this->getName()) {
                 $this->markTestSkipped('apc.enable_cli=1 is required.');
             }
@@ -55,7 +55,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testVersion()
     {
-        $namespace = str_replace('\\', '.', \get_class($this));
+        $namespace = str_replace('\\', '.', static::class);
 
         $pool1 = new ApcuAdapter($namespace, 0, 'p1');
 
@@ -80,7 +80,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testNamespace()
     {
-        $namespace = str_replace('\\', '.', \get_class($this));
+        $namespace = str_replace('\\', '.', static::class);
 
         $pool1 = new ApcuAdapter($namespace.'_1', 0, 'p1');
 

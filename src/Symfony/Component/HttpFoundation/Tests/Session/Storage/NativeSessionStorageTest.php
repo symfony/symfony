@@ -120,6 +120,19 @@ class NativeSessionStorageTest extends TestCase
         $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
     }
 
+    public function testRegenerateWithCustomLifetime()
+    {
+        $storage = $this->getStorage();
+        $storage->start();
+        $id = $storage->getId();
+        $lifetime = 999999;
+        $storage->getBag('attributes')->set('legs', 11);
+        $storage->regenerate(false, $lifetime);
+        $this->assertNotEquals($id, $storage->getId());
+        $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
+        $this->assertEquals($lifetime, ini_get('session.cookie_lifetime'));
+    }
+
     public function testSessionGlobalIsUpToDateAfterIdRegeneration()
     {
         $storage = $this->getStorage();
@@ -181,10 +194,6 @@ class NativeSessionStorageTest extends TestCase
 
     public function testSessionOptions()
     {
-        if (\defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM is not handled in this test case.');
-        }
-
         $options = [
             'url_rewriter.tags' => 'a=href',
             'cache_expire' => '200',

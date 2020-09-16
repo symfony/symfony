@@ -1,9 +1,9 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Albania Kaukasia",
         "Arab": "Arab",
+        "Aran": "Nastaliq",
         "Armi": "Aram Imperial",
         "Armn": "Armenia",
         "Avst": "Avesta",
@@ -87,7 +87,6 @@
         "Merc": "Kursif Meroitik",
         "Mero": "Meroitik",
         "Mlym": "Malayalam",
-        "Modi": "Modi",
         "Mong": "Mongolia",
         "Moon": "Moon",
         "Mroo": "Mro",
@@ -112,6 +111,7 @@
         "Phnx": "Phoenix",
         "Plrd": "Fonetik Pollard",
         "Prti": "Prasasti Parthia",
+        "Qaag": "Zawgyi",
         "Rjng": "Rejang",
         "Roro": "Rongorongo",
         "Runr": "Runik",

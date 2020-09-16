@@ -152,7 +152,7 @@ class EncoderFactoryTest extends TestCase
         $this->assertTrue($encoder->isPasswordValid((new SodiumPasswordEncoder())->encodePassword('foo', null), 'foo', null));
         $this->assertTrue($encoder->isPasswordValid((new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT))->encodePassword('foo', null), 'foo', null));
         $this->assertTrue($encoder->isPasswordValid($digest->encodePassword('foo', null), 'foo', null));
-        $this->assertStringStartsWith(SODIUM_CRYPTO_PWHASH_STRPREFIX, $encoder->encodePassword('foo', null));
+        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $encoder->encodePassword('foo', null));
     }
 
     public function testDefaultMigratingEncoders()
@@ -160,6 +160,11 @@ class EncoderFactoryTest extends TestCase
         $this->assertInstanceOf(
             MigratingPasswordEncoder::class,
             (new EncoderFactory([SomeUser::class => ['class' => NativePasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class)
+        );
+
+        $this->assertInstanceOf(
+            MigratingPasswordEncoder::class,
+            (new EncoderFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getEncoder(SomeUser::class)
         );
 
         if (!SodiumPasswordEncoder::isSupported()) {

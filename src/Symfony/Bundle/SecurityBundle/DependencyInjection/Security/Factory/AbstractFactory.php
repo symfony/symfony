@@ -30,6 +30,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'check_path' => '/login_check',
         'use_forward' => false,
         'require_previous_session' => false,
+        'login_path' => '/login',
     ];
 
     protected $defaultSuccessHandlerOptions = [
@@ -169,7 +170,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         } else {
             $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.success_handler'));
             $successHandler->addMethodCall('setOptions', [$options]);
-            $successHandler->addMethodCall('setProviderKey', [$id]);
+            $successHandler->addMethodCall('setFirewallName', [$id]);
         }
 
         return $successHandlerId;

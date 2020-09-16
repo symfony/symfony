@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -19,6 +20,7 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -104,5 +106,23 @@ class YamlFileLoaderTest extends TestCase
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 
         $this->assertEquals($expected, $classMetadata);
+    }
+
+    public function testLoadIgnore()
+    {
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
+        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+    }
+
+    public function testLoadInvalidIgnore()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('The "ignore" value must be a boolean');
+
+        (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
     }
 }

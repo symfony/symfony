@@ -49,16 +49,19 @@ class PassConfig
         ];
 
         $this->optimizationPasses = [[
+            new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
+            new ResolveDecoratorStackPass(),
             new ResolveChildDefinitionsPass(),
             new RegisterServiceSubscribersPass(),
-            new DecoratorServicePass(),
-            new ResolveParameterPlaceHoldersPass(false),
+            new ResolveParameterPlaceHoldersPass(false, false),
             new ResolveFactoryClassPass(),
             new ResolveNamedArgumentsPass(),
             new AutowireRequiredMethodsPass(),
+            new AutowireRequiredPropertiesPass(),
             new ResolveBindingsPass(),
             new ServiceLocatorTagPass(),
+            new DecoratorServicePass(),
             new CheckDefinitionValidityPass(),
             new AutowirePass(false),
             new ResolveTaggedIteratorArgumentPass(),
@@ -70,12 +73,6 @@ class PassConfig
             new CheckReferenceValidityPass(),
             new CheckArgumentsValidityPass(false),
         ]];
-
-        $this->beforeRemovingPasses = [
-            -100 => [
-                new ResolvePrivatesPass(),
-            ],
-        ];
 
         $this->removingPasses = [[
             new RemovePrivateAliasesPass(),
@@ -90,6 +87,8 @@ class PassConfig
         $this->afterRemovingPasses = [[
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
+            new ResolveNoPreloadPass(),
+            new AliasDeprecatedPublicServicesPass(),
         ]];
     }
 

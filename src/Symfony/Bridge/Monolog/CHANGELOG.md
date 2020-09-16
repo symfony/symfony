@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+ * Added `MailerHandler`
+
 5.0.0
 -----
 
@@ -12,6 +16,7 @@ CHANGELOG
 
 * The `RouteProcessor` class has been made final
 * Added `ElasticsearchLogstashHandler`
+* Added the `ServerLogCommand`. Backport from the deprecated WebServerBundle
 
 4.3.0
 -----

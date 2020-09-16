@@ -51,9 +51,9 @@ class ResponseHeaderBagTest extends TestCase
         $this->assertTrue($bag->hasCacheControlDirective('public'));
 
         $bag = new ResponseHeaderBag(['ETag' => 'abcde']);
-        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('private'));
-        $this->assertTrue($bag->hasCacheControlDirective('must-revalidate'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
         $this->assertFalse($bag->hasCacheControlDirective('max-age'));
 
         $bag = new ResponseHeaderBag(['Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT']);
@@ -126,6 +126,14 @@ class ResponseHeaderBagTest extends TestCase
         $bag->clearCookie('foo', '/', null, true, false);
 
         $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure', $bag);
+    }
+
+    public function testClearCookieSamesite()
+    {
+        $bag = new ResponseHeaderBag([]);
+
+        $bag->clearCookie('foo', '/', null, true, false, 'none');
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure; samesite=none', $bag);
     }
 
     public function testReplace()
@@ -301,6 +309,6 @@ class ResponseHeaderBagTest extends TestCase
 
     private function assertSetCookieHeader(string $expected, ResponseHeaderBag $actual)
     {
-        $this->assertRegExp('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
+        $this->assertMatchesRegularExpression('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
     }
 }

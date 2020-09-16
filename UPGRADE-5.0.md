@@ -1,4 +1,4 @@
-UPGRADE FROM 4.x to 5.0
+UPGRADE FROM 4.4 to 5.0
 =======================
 
 BrowserKit
@@ -60,6 +60,7 @@ Debug
 -----
 
  * Removed the component in favor of the `ErrorHandler` component
+ * Replace uses of `Symfony\Component\Debug\Debug` by `Symfony\Component\ErrorHandler\Debug`
 
 DependencyInjection
 -------------------
@@ -236,12 +237,13 @@ FrameworkBundle
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
- * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
+ * Removed the `Psr\SimpleCache\CacheInterface` / `cache.app.simple` service, use `Symfony\Contracts\Cache\CacheInterface` / `cache.app` instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
  * Removed `ResolveControllerNameSubscriber`.
  * Removed `routing.loader.service`.
  * Added support for PHPUnit 8. A `void` return-type was added to the `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` method.
  * Removed the `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract` services.
+ * Removed the `router.cache_class_prefix` parameter.
 
 HttpClient
 ----------
@@ -258,7 +260,7 @@ HttpFoundation
  * The `$size` argument of the `UploadedFile` constructor has been removed.
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
  * The `getSession()` method of the `Request` class throws an exception when session is null.
- * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+ * The default value of the `$secure` and `$samesite` arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
  * The `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` interfaces have been removed,
    use `Symfony\Component\Mime\MimeTypesInterface` instead.
@@ -271,6 +273,9 @@ HttpFoundation
  * `ApacheRequest` has been removed, use the `Request` class instead.
  * The third argument of the `HeaderBag::get()` method has been removed, use method `all()` instead.
  * Getting the container from a non-booted kernel is not possible anymore.
+ * [BC BREAK] `PdoSessionHandler` with MySQL changed the type of the lifetime column,
+   make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
+   update your database.
 
 HttpKernel
 ----------
@@ -388,7 +393,7 @@ Routing
 -------
 
  * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
-   options have been removed.
+   options have been removed. If you are using multiple Router instances and need separate caches for them, set a unique `cache_dir` per Router instance instead.
  * `Serializable` implementing methods for `Route` and `CompiledRoute` are final.
    Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
    with the new serialization methods in PHP 7.4.
@@ -410,7 +415,7 @@ Security
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
 
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
@@ -434,7 +439,7 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
- * The `ListenerInterface` has been removed, turn your listeners into callables instead.
+ * The `ListenerInterface` has been removed, extend `AbstractListener` instead.
  * The `Firewall::handleRequest()` method has been removed, use `Firewall::callListeners()` instead.
  * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
    thus `serialize()` and `unserialize()` aren't available.
@@ -473,6 +478,7 @@ Security
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
  * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return a boolean value now. Please explicitly return `false` to indicate invalid credentials.
+ * Removed the `has_role()` function from security expressions, use `is_granted()` instead.
 
 SecurityBundle
 --------------
@@ -555,7 +561,7 @@ TwigBridge
 ----------
 
  * Removed argument `$rootDir` from the `DebugCommand::__construct()` method and the 5th argument must be an instance of `FileLinkFormatter`
- * removed the `$requestStack` and `$requestContext` arguments of the
+ * Removed the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
  * Removed support for implicit STDIN usage in the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
@@ -596,7 +602,7 @@ Workflow
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
  * `WorkflowInterface::apply()` has a third argument: `array $context = []`.
  * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
- * Removed support of `initial_place`. Use `initial_places` instead.
+ * Removed support of `initial_place`. Use `initial_marking` instead.
  * `MultipleStateMarkingStore` has been removed. Use `MethodMarkingStore` instead.
  * `DefinitionBuilder::setInitialPlace()` has been removed, use `DefinitionBuilder::setInitialPlaces()` instead.
 
@@ -675,4 +681,4 @@ WebProfilerBundle
 WebServerBundle
 ---------------
 
- * The bundle has been removed.
+ * The bundle has been deprecated and can be installed separately. You may also use the Symfony Local Web Server instead.

@@ -13,8 +13,10 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -42,7 +44,7 @@ class FileValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof File) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\File');
+            throw new UnexpectedTypeException($constraint, File::class);
         }
 
         if (null === $value || '' === $value) {
@@ -51,7 +53,7 @@ class FileValidator extends ConstraintValidator
 
         if ($value instanceof UploadedFile && !$value->isValid()) {
             switch ($value->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
+                case \UPLOAD_ERR_INI_SIZE:
                     $iniLimitSize = UploadedFile::getMaxFilesize();
                     if ($constraint->maxSize && $constraint->maxSize < $iniLimitSize) {
                         $limitInBytes = $constraint->maxSize;
@@ -65,43 +67,43 @@ class FileValidator extends ConstraintValidator
                     $this->context->buildViolation($constraint->uploadIniSizeErrorMessage)
                         ->setParameter('{{ limit }}', $limitAsString)
                         ->setParameter('{{ suffix }}', $suffix)
-                        ->setCode((string) UPLOAD_ERR_INI_SIZE)
+                        ->setCode((string) \UPLOAD_ERR_INI_SIZE)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_FORM_SIZE:
+                case \UPLOAD_ERR_FORM_SIZE:
                     $this->context->buildViolation($constraint->uploadFormSizeErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_FORM_SIZE)
+                        ->setCode((string) \UPLOAD_ERR_FORM_SIZE)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_PARTIAL:
+                case \UPLOAD_ERR_PARTIAL:
                     $this->context->buildViolation($constraint->uploadPartialErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_PARTIAL)
+                        ->setCode((string) \UPLOAD_ERR_PARTIAL)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_NO_FILE:
+                case \UPLOAD_ERR_NO_FILE:
                     $this->context->buildViolation($constraint->uploadNoFileErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_NO_FILE)
+                        ->setCode((string) \UPLOAD_ERR_NO_FILE)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_NO_TMP_DIR:
+                case \UPLOAD_ERR_NO_TMP_DIR:
                     $this->context->buildViolation($constraint->uploadNoTmpDirErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_NO_TMP_DIR)
+                        ->setCode((string) \UPLOAD_ERR_NO_TMP_DIR)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_CANT_WRITE:
+                case \UPLOAD_ERR_CANT_WRITE:
                     $this->context->buildViolation($constraint->uploadCantWriteErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_CANT_WRITE)
+                        ->setCode((string) \UPLOAD_ERR_CANT_WRITE)
                         ->addViolation();
 
                     return;
-                case UPLOAD_ERR_EXTENSION:
+                case \UPLOAD_ERR_EXTENSION:
                     $this->context->buildViolation($constraint->uploadExtensionErrorMessage)
-                        ->setCode((string) UPLOAD_ERR_EXTENSION)
+                        ->setCode((string) \UPLOAD_ERR_EXTENSION)
                         ->addViolation();
 
                     return;
@@ -170,12 +172,17 @@ class FileValidator extends ConstraintValidator
         }
 
         if ($constraint->mimeTypes) {
-            if (!$value instanceof FileObject) {
-                $value = new FileObject($value);
+            if ($value instanceof FileObject) {
+                $mime = $value->getMimeType();
+            } elseif (class_exists(MimeTypes::class)) {
+                $mime = MimeTypes::getDefault()->guessMimeType($path);
+            } elseif (!class_exists(FileObject::class)) {
+                throw new LogicException('You cannot validate the mime-type of files as the Mime component is not installed. Try running "composer require symfony/mime".');
+            } else {
+                $mime = (new FileObject($value))->getMimeType();
             }
 
             $mimeTypes = (array) $constraint->mimeTypes;
-            $mime = $value->getMimeType();
 
             foreach ($mimeTypes as $mimeType) {
                 if ($mimeType === $mime) {

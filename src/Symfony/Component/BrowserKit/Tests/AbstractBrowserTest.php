@@ -215,6 +215,15 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals('http://www.example.com/foo/foobar', $server['HTTP_REFERER'], '->request() sets the referer');
     }
 
+    public function testRequestRefererCanBeOverridden()
+    {
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->request('GET', 'bar', [], [], ['HTTP_REFERER' => 'xyz']);
+        $server = $client->getRequest()->getServer();
+        $this->assertEquals('xyz', $server['HTTP_REFERER'], '->request() allows referer to be overridden');
+    }
+
     public function testRequestHistory()
     {
         $client = $this->getBrowser();

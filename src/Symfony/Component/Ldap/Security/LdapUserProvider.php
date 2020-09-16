@@ -84,7 +84,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         if ($count > 1) {
-            throw new UsernameNotFoundException('More than one user found');
+            throw new UsernameNotFoundException('More than one user found.');
         }
 
         $entry = $entries[0];
@@ -105,10 +105,10 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof LdapUser) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
-        return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles());
+        return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles(), $user->getExtraFields());
     }
 
     /**
@@ -117,7 +117,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
     {
         if (!$user instanceof LdapUser) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         if (null === $this->passwordAttribute) {

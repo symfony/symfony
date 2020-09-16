@@ -30,7 +30,7 @@ class CountryValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Country) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Country');
+            throw new UnexpectedTypeException($constraint, Country::class);
         }
 
         if (null === $value || '' === $value) {
@@ -43,7 +43,7 @@ class CountryValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!Countries::exists($value)) {
+        if ($constraint->alpha3 ? !Countries::alpha3CodeExists($value) : !Countries::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Country::NO_SUCH_COUNTRY_ERROR)

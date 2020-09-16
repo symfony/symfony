@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+* deprecated the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()`. in favor of `enable_magic_methods_extraction`
+
+5.1.0
+-----
+
+* Add support for extracting accessor and mutator via PHP Reflection
+
 4.3.0
 -----
 

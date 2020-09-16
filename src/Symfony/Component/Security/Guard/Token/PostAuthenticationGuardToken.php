@@ -83,6 +83,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
     public function __unserialize(array $data): void
     {
         [$this->providerKey, $parentData] = $data;
+        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

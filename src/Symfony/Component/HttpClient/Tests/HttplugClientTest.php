@@ -11,19 +11,22 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use GuzzleHttp\Promise\FulfilledPromise as GuzzleFulfilledPromise;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
+use Http\Promise\FulfilledPromise;
 use Http\Promise\Promise;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttplugClient;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class HttplugClientTest extends TestCase
 {
-    private static $server;
-
     public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
@@ -153,5 +156,115 @@ class HttplugClientTest extends TestCase
 
         $this->expectException(RequestException::class);
         $client->sendRequest($client->createRequest('BAD.METHOD', 'http://localhost:8057'));
+    }
+
+    public function testRetry404()
+    {
+        $client = new HttplugClient(new NativeHttpClient());
+
+        $successCallableCalled = false;
+        $failureCallableCalled = false;
+
+        $promise = $client
+            ->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057/404'))
+            ->then(
+                function (ResponseInterface $response) use (&$successCallableCalled, $client) {
+                    $this->assertSame(404, $response->getStatusCode());
+                    $successCallableCalled = true;
+
+                    return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
+                },
+                function (\Exception $exception) use (&$failureCallableCalled) {
+                    $failureCallableCalled = true;
+
+                    throw $exception;
+                }
+            )
+        ;
+
+        $response = $promise->wait(true);
+
+        $this->assertTrue($successCallableCalled);
+        $this->assertFalse($failureCallableCalled);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testRetryNetworkError()
+    {
+        $client = new HttplugClient(new NativeHttpClient());
+
+        $successCallableCalled = false;
+        $failureCallableCalled = false;
+
+        $promise = $client
+            ->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057/chunked-broken'))
+            ->then(function (ResponseInterface $response) use (&$successCallableCalled) {
+                $successCallableCalled = true;
+
+                return $response;
+            }, function (\Exception $exception) use (&$failureCallableCalled, $client) {
+                $this->assertSame(NetworkException::class, \get_class($exception));
+                $this->assertSame(TransportException::class, \get_class($exception->getPrevious()));
+                $failureCallableCalled = true;
+
+                return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
+            })
+        ;
+
+        $response = $promise->wait(true);
+
+        $this->assertFalse($successCallableCalled);
+        $this->assertTrue($failureCallableCalled);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testRetryEarlierError()
+    {
+        $isFirstRequest = true;
+        $errorMessage = 'Error occurred before making the actual request.';
+
+        $client = new HttplugClient(new MockHttpClient(function () use (&$isFirstRequest, $errorMessage) {
+            if ($isFirstRequest) {
+                $isFirstRequest = false;
+                throw new TransportException($errorMessage);
+            }
+
+            return new MockResponse('OK', ['http_code' => 200]);
+        }));
+
+        $request = $client->createRequest('GET', 'http://test');
+
+        $successCallableCalled = false;
+        $failureCallableCalled = false;
+
+        $promise = $client
+            ->sendAsyncRequest($request)
+            ->then(
+                function (ResponseInterface $response) use (&$successCallableCalled) {
+                    $successCallableCalled = true;
+
+                    return $response;
+                },
+                function (\Exception $exception) use ($errorMessage, &$failureCallableCalled, $client, $request) {
+                    $this->assertSame(NetworkException::class, \get_class($exception));
+                    $this->assertSame($errorMessage, $exception->getMessage());
+                    $failureCallableCalled = true;
+
+                    // Ensure arbitrary levels of promises work.
+                    return (new FulfilledPromise(null))->then(function () use ($client, $request) {
+                        return (new GuzzleFulfilledPromise(null))->then(function () use ($client, $request) {
+                            return $client->sendAsyncRequest($request);
+                        });
+                    });
+                }
+            )
+        ;
+
+        $response = $promise->wait(true);
+
+        $this->assertFalse($successCallableCalled);
+        $this->assertTrue($failureCallableCalled);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('OK', (string) $response->getBody());
     }
 }

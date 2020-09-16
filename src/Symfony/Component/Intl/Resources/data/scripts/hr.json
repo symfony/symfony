@@ -1,8 +1,8 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "afaka pismo",
         "Arab": "arapsko pismo",
+        "Aran": "nastaliq",
         "Armi": "aramejsko pismo",
         "Armn": "armensko pismo",
         "Avst": "avestansko pismo",
@@ -112,6 +112,7 @@
         "Phnx": "feničko pismo",
         "Plrd": "pollard fonetsko pismo",
         "Prti": "pisani parthian",
+        "Qaag": "zawgyi",
         "Rjng": "rejang pismo",
         "Roro": "rongorongo pismo",
         "Runr": "runsko pismo",

@@ -17,6 +17,12 @@
                 <framework:adapter name="cache.adapter.filesystem" />
                 <framework:adapter name="cache.adapter.redis" provider="redis://foo" />
             </framework:pool>
+            <framework:pool name="cache.redis_tag_aware.foo" adapter="cache.adapter.redis_tag_aware" />
+            <framework:pool name="cache.redis_tag_aware.foo2" tags="true" adapter="cache.adapter.redis_tag_aware" />
+            <framework:pool name="cache.redis_tag_aware.bar" adapter="cache.redis_tag_aware.foo" />
+            <framework:pool name="cache.redis_tag_aware.bar2" tags="true" adapter="cache.redis_tag_aware.foo" />
+            <framework:pool name="cache.redis_tag_aware.baz" adapter="cache.redis_tag_aware.foo2" />
+            <framework:pool name="cache.redis_tag_aware.baz2" tags="true" adapter="cache.redis_tag_aware.foo2" />
         </framework:cache>
     </framework:config>
 </container>

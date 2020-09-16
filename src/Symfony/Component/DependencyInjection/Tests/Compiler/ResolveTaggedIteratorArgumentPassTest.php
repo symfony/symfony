@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -35,6 +36,22 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $properties = $container->getDefinition('d')->getProperties();
         $expected = new TaggedIteratorArgument('foo');
         $expected->setValues([new Reference('b'), new Reference('c'), new Reference('a')]);
+        $this->assertEquals($expected, $properties['foos']);
+    }
+
+    public function testProcessWithIndexes()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
+        $container->register('service_b', 'stdClass')->addTag('foo', ['key' => '2']);
+        $container->register('service_c', 'stdClass')->setProperty('foos', new TaggedIteratorArgument('foo', 'key'));
+
+        (new ResolveTaggedIteratorArgumentPass())->process($container);
+
+        $properties = $container->getDefinition('service_c')->getProperties();
+
+        $expected = new TaggedIteratorArgument('foo', 'key');
+        $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass')]);
         $this->assertEquals($expected, $properties['foos']);
     }
 }

@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -62,15 +64,17 @@ class MailgunApiTransport extends AbstractApiTransport
             'body' => $body->bodyToIterable(),
         ]);
 
-        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $response->getStatusCode()), $response);
+                $result = $response->toArray(false);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $response->getStatusCode()), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->getContent(false), $response->getStatusCode()), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $response->getStatusCode()), $response);
         }
 
+        // The assumption here is that all 200 responses are "application/json", so it's safe to call "toArray".
+        $result = $response->toArray(false);
         $sentMessage->setMessageId($result['id']);
 
         return $response;
@@ -114,7 +118,29 @@ class MailgunApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['h:'.$name] = $header->toString();
+            if ($header instanceof TagHeader) {
+                $payload['o:tag'] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['v:'.$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
+            // Check if it is a valid prefix or header name according to Mailgun API
+            $prefix = substr($name, 0, 2);
+            if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
+                $headerName = $name;
+            } else {
+                // fallback to prefix with "h:" to not break BC
+                $headerName = 'h:'.$name;
+                @trigger_error(sprintf('Not prefixing the Mailgun header name with "h:" is deprecated since Symfony  5.1. Use header name "%s" instead.', $headerName), \E_USER_DEPRECATED);
+            }
+
+            $payload[$headerName] = $header->getBodyAsString();
         }
 
         return $payload;

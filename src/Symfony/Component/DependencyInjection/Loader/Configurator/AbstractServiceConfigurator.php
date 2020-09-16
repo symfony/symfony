@@ -42,7 +42,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     /**
      * Registers a service.
      */
-    final public function set(string $id, string $class = null): ServiceConfigurator
+    final public function set(?string $id, string $class = null): ServiceConfigurator
     {
         $this->__destruct();
 
@@ -79,6 +79,18 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
         $this->__destruct();
 
         return $this->parent->get($id);
+    }
+
+    /**
+     * Registers a stack of decorator services.
+     *
+     * @param InlineServiceConfigurator[]|ReferenceConfigurator[] $services
+     */
+    final public function stack(string $id, array $services): AliasConfigurator
+    {
+        $this->__destruct();
+
+        return $this->parent->stack($id, $services);
     }
 
     /**

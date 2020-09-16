@@ -11,18 +11,20 @@
 
 namespace Symfony\Component\String;
 
-/**
- * @experimental in 5.0
- */
 function u(string $string = ''): UnicodeString
 {
     return new UnicodeString($string);
 }
 
-/**
- * @experimental in 5.0
- */
 function b(string $string = ''): ByteString
 {
     return new ByteString($string);
+}
+
+/**
+ * @return UnicodeString|ByteString
+ */
+function s(string $string): AbstractString
+{
+    return preg_match('//u', $string) ? new UnicodeString($string) : new ByteString($string);
 }

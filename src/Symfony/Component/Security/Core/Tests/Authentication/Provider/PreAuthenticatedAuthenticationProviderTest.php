@@ -30,7 +30,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         ;
         $token
             ->expects($this->once())
-            ->method('getProviderKey')
+            ->method('getFirewallName')
             ->willReturn('foo')
         ;
         $this->assertFalse($provider->supports($token));
@@ -65,7 +65,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken', $token);
         $this->assertEquals('pass', $token->getCredentials());
-        $this->assertEquals('key', $token->getProviderKey());
+        $this->assertEquals('key', $token->getFirewallName());
         $this->assertEquals([], $token->getRoleNames());
         $this->assertEquals(['foo' => 'bar'], $token->getAttributes(), '->authenticate() copies token attributes');
         $this->assertSame($user, $token->getUser());
@@ -89,7 +89,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken')->setMethods(['getUser', 'getCredentials', 'getProviderKey'])->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken')->setMethods(['getUser', 'getCredentials', 'getFirewallName'])->disableOriginalConstructor()->getMock();
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')
@@ -105,7 +105,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
         $token
             ->expects($this->any())
-            ->method('getProviderKey')
+            ->method('getFirewallName')
             ->willReturn('key')
         ;
 

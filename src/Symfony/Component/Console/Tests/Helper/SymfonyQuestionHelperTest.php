@@ -130,6 +130,49 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
+    public function testChoiceQuestionPadding()
+    {
+        $choiceQuestion = new ChoiceQuestion('qqq', [
+            'foo' => 'foo',
+            'żółw' => 'bar',
+            'łabądź' => 'baz',
+        ]);
+
+        (new SymfonyQuestionHelper())->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
+            $output = $this->createOutputInterface(),
+            $choiceQuestion
+        );
+
+        $this->assertOutputContains(<<<EOT
+ qqq:
+  [foo   ] foo
+  [żółw  ] bar
+  [łabądź] baz
+ > 
+EOT
+        , $output, true);
+    }
+
+    public function testChoiceQuestionCustomPrompt()
+    {
+        $choiceQuestion = new ChoiceQuestion('qqq', ['foo']);
+        $choiceQuestion->setPrompt(' >ccc> ');
+
+        (new SymfonyQuestionHelper())->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
+            $output = $this->createOutputInterface(),
+            $choiceQuestion
+        );
+
+        $this->assertOutputContains(<<<EOT
+ qqq:
+  [0] foo
+ >ccc> 
+EOT
+        , $output, true);
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
@@ -157,10 +200,33 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         return $mock;
     }
 
-    private function assertOutputContains($expected, StreamOutput $output)
+    private function assertOutputContains($expected, StreamOutput $output, $normalize = false)
     {
         rewind($output->getStream());
         $stream = stream_get_contents($output->getStream());
+
+        if ($normalize) {
+            $stream = str_replace(\PHP_EOL, "\n", $stream);
+        }
+
         $this->assertStringContainsString($expected, $stream);
+    }
+
+    public function testAskMultilineQuestionIncludesHelpText()
+    {
+        $expected = 'Write an essay (press Ctrl+D to continue)';
+
+        if (false !== strpos(\PHP_OS, 'WIN')) {
+            $expected = 'Write an essay (press Ctrl+Z then Enter to continue)';
+        }
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $helper = new SymfonyQuestionHelper();
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('\\'));
+        $helper->ask($input, $output = $this->createOutputInterface(), $question);
+
+        $this->assertOutputContains($expected, $output);
     }
 }

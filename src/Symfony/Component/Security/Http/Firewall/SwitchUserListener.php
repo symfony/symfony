@@ -37,14 +37,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class SwitchUserListener
+class SwitchUserListener extends AbstractListener
 {
     const EXIT_VALUE = '_exit';
 
     private $tokenStorage;
     private $provider;
     private $userChecker;
-    private $providerKey;
+    private $firewallName;
     private $accessDecisionManager;
     private $usernameParameter;
     private $role;
@@ -52,16 +52,16 @@ class SwitchUserListener
     private $dispatcher;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
     {
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $firewallName) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->tokenStorage = $tokenStorage;
         $this->provider = $provider;
         $this->userChecker = $userChecker;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
@@ -71,14 +71,10 @@ class SwitchUserListener
     }
 
     /**
-     * Handles the switch to another user.
-     *
-     * @throws \LogicException if switching to a user failed
+     * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function supports(Request $request): ?bool
     {
-        $request = $event->getRequest();
-
         // usernames can be falsy
         $username = $request->get($this->usernameParameter);
 
@@ -88,8 +84,25 @@ class SwitchUserListener
 
         // if it's still "empty", nothing to do.
         if (null === $username || '' === $username) {
-            return;
+            return false;
         }
+
+        $request->attributes->set('_switch_user_username', $username);
+
+        return true;
+    }
+
+    /**
+     * Handles the switch to another user.
+     *
+     * @throws \LogicException if switching to a user failed
+     */
+    public function authenticate(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+
+        $username = $request->attributes->get('_switch_user_username');
+        $request->attributes->remove('_switch_user_username');
 
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
@@ -131,7 +144,8 @@ class SwitchUserListener
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // User already switched, exit before seamlessly switching to another user
+            $token = $this->attemptExitUser($request);
         }
 
         $currentUsername = $token->getUsername();
@@ -144,8 +158,7 @@ class SwitchUserListener
 
             try {
                 $this->provider->loadUserByUsername($nonExistentUsername);
-                throw new \LogicException('AuthenticationException expected');
-            } catch (AuthenticationException $e) {
+            } catch (\Exception $e) {
             }
         } catch (AuthenticationException $e) {
             $this->provider->loadUserByUsername($currentUsername);
@@ -168,7 +181,8 @@ class SwitchUserListener
 
         $roles = $user->getRoles();
         $roles[] = 'ROLE_PREVIOUS_ADMIN';
-        $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
+        $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));
+        $token = new SwitchUserToken($user, $user->getPassword(), $this->firewallName, $roles, $token, $originatedFromUri);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);

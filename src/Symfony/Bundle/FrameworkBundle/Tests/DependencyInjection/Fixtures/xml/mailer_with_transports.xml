@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:mailer>
+            <framework:transport name="transport1">smtp://example1.com</framework:transport>
+            <framework:transport name="transport2">smtp://example2.com</framework:transport>
+            <framework:envelope>
+                <framework:sender>sender@example.org</framework:sender>
+                <framework:recipients>redirected@example.org</framework:recipients>
+                <framework:recipients>redirected1@example.org</framework:recipients>
+            </framework:envelope>
+            <framework:header name="from">from@example.org</framework:header>
+            <framework:header name="bcc">bcc1@example.org</framework:header>
+            <framework:header name="foo">bar</framework:header>
+        </framework:mailer>
+    </framework:config>
+</container>

@@ -11,11 +11,16 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\BrowserKit\Cookie;
+
 class LogoutTest extends AbstractWebTestCase
 {
-    public function testSessionLessRememberMeLogout()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testSessionLessRememberMeLogout(array $options)
     {
-        $client = $this->createClient(['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -33,9 +38,12 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertNull($cookieJar->get('REMEMBERME'));
     }
 
-    public function testCsrfTokensAreClearedOnLogout()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testCsrfTokensAreClearedOnLogout(array $options)
     {
-        $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $client->request('POST', '/login', [
@@ -51,13 +59,30 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
     }
 
-    public function testAccessControlDoesNotApplyOnLogout()
+    /**
+     * @dataProvider provideSecuritySystems
+     */
+    public function testAccessControlDoesNotApplyOnLogout(array $options)
     {
-        $client = $this->createClient(['test_case' => 'LogoutAccess', 'root_config' => 'config.yml']);
+        $client = $this->createClient($options + ['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');
 
         $this->assertRedirect($client->getResponse(), '/');
+    }
+
+    public function testCookieClearingOnLogout()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_cookie_clearing.yml']);
+
+        $cookieJar = $client->getCookieJar();
+        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'somedomain'));
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+        $client->request('GET', '/logout');
+
+        $this->assertRedirect($client->getResponse(), '/');
+        $this->assertNull($cookieJar->get('flavor'));
     }
 }

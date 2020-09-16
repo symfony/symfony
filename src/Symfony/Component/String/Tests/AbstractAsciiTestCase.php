@@ -56,6 +56,81 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideIndexOf
+     */
+    public function testContainsAny(?int $result, string $string, $needle)
+    {
+        $instance = static::createFromString($string);
+
+        $this->assertSame(null !== $instance->indexOf($needle), $instance->containsAny($needle));
+    }
+
+    /**
+     * @dataProvider provideIndexOfIgnoreCase
+     */
+    public function testContainsAnyIgnoreCase(?int $result, string $string, $needle)
+    {
+        $instance = static::createFromString($string);
+
+        $this->assertSame(null !== $instance->ignoreCase()->indexOf($needle), $instance->ignoreCase()->containsAny($needle));
+    }
+
+    public function testUnwrap()
+    {
+        $expected = ['hello', 'world'];
+
+        $s = static::createFromString('');
+
+        $actual = $s::unwrap([static::createFromString('hello'), static::createFromString('world')]);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider wordwrapProvider
+     */
+    public function testWordwrap($expected, $actual, $length, $break, $cut = false)
+    {
+        $instance = static::createFromString($actual);
+        $actual = $instance->wordwrap($length, $break, $cut);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function wordwrapProvider()
+    {
+        return [
+            [
+                'Lo-re-m-Ip-su-m',
+                'Lorem Ipsum',
+                2,
+                '-',
+                true,
+            ],
+            [
+                'Lorem-Ipsum',
+                'Lorem Ipsum',
+                2,
+                '-',
+            ],
+            [
+                'Lor-em-Ips-um',
+                'Lorem Ipsum',
+                3,
+                '-',
+                true,
+            ],
+            [
+                'L-o-r-e-m-I-p-s-u-m',
+                'Lorem Ipsum',
+                1,
+                '-',
+                true,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider provideWrap
      */
     public function testWrap(array $expected, array $values)
@@ -106,7 +181,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideIndexOf
      */
-    public function testIndexOf(?int $result, string $string, string $needle, int $offset)
+    public function testIndexOf(?int $result, string $string, $needle, int $offset)
     {
         $instance = static::createFromString($string);
 
@@ -125,6 +200,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [null, 'abc', 'a', -1],
             [null, '123abc', 'B', -3],
             [null, '123abc', 'b', 6],
+            [0, 'abc', ['a', 'e'], 0],
             [0, 'abc', 'a', 0],
             [1, 'abc', 'b', 1],
             [2, 'abc', 'c', 1],
@@ -136,7 +212,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideIndexOfIgnoreCase
      */
-    public function testIndexOfIgnoreCase(?int $result, string $string, string $needle, int $offset)
+    public function testIndexOfIgnoreCase(?int $result, string $string, $needle, int $offset)
     {
         $instance = static::createFromString($string);
 
@@ -153,6 +229,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [null, 'abc', 'a', -1],
             [null, 'abc', 'A', -1],
             [null, '123abc', 'B', 6],
+            [0, 'ABC', ['a', 'e'], 0],
             [0, 'ABC', 'a', 0],
             [0, 'ABC', 'A', 0],
             [1, 'ABC', 'b', 0],
@@ -1350,9 +1427,9 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideTruncate
      */
-    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis)
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
     {
-        $instance = static::createFromString($origin)->truncate($length, $ellipsis);
+        $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
         $this->assertEquals(static::createFromString($expected), $instance);
     }
@@ -1362,12 +1439,18 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             ['', '', 3, ''],
             ['', 'foo', 0, '...'],
+            ['foo', 'foo', 0, '...', false],
             ['fo', 'foobar', 2, ''],
             ['foobar', 'foobar', 10, ''],
+            ['foobar', 'foobar', 10, '...', false],
             ['foo', 'foo', 3, '...'],
             ['fo', 'foobar', 2, '...'],
             ['...', 'foobar', 3, '...'],
             ['fo...', 'foobar', 5, '...'],
+            ['foobar...', 'foobar foo', 6, '...', false],
+            ['foobar...', 'foobar foo', 7, '...', false],
+            ['foobar foo...', 'foobar foo a', 10, '...', false],
+            ['foobar foo aar', 'foobar foo aar', 12, '...', false],
         ];
     }
 
@@ -1376,5 +1459,55 @@ abstract class AbstractAsciiTestCase extends TestCase
         $instance = static::createFromString('foobar');
 
         self::assertSame('foobar', $instance->toString());
+    }
+
+    /**
+     * @dataProvider provideReverse
+     */
+    public function testReverse(string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->reverse();
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function provideReverse()
+    {
+        return [
+            ['', ''],
+            ['oof', 'foo'],
+            ["\n!!!\tTAERG SI     ynofmyS    ", "    Symfony     IS GREAT\t!!!\n"],
+        ];
+    }
+
+    /**
+     * @dataProvider provideWidth
+     */
+    public function testWidth(int $expected, string $origin, bool $ignoreAnsiDecoration = true)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->width($ignoreAnsiDecoration));
+    }
+
+    public static function provideWidth(): array
+    {
+        return [
+            [0, ''],
+            [1, 'c'],
+            [3, 'foo'],
+            [2, '⭐'],
+            [8, 'f⭐o⭐⭐'],
+            [19, 'コンニチハ, セカイ!'],
+            [6, "foo\u{0000}bar"],
+            [6, "foo\u{001b}[0mbar"],
+            [6, "foo\u{0001}bar"],
+            [6, "foo\u{0001}bar", false],
+            [4, '--ֿ--'],
+            [4, 'café'],
+            [1, 'А҈'],
+            [4, 'ᬓᬨᬮ᭄'],
+            [1, "\u{00AD}"],
+            [14, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1"], // foobarcccïfcy1
+            [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
+        ];
     }
 }

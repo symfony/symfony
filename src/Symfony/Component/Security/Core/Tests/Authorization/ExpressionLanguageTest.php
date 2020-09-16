@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\User\User;
 
@@ -35,11 +36,10 @@ class ExpressionLanguageTest extends TestCase
         $trustResolver = new AuthenticationTrustResolver();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
-        $accessDecisionManager = new AccessDecisionManager([new RoleVoter()]);
+        $accessDecisionManager = new AccessDecisionManager([new RoleVoter(), new AuthenticatedVoter($trustResolver)]);
         $authChecker = new AuthorizationChecker($tokenStorage, $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(), $accessDecisionManager);
 
         $context = [];
-        $context['trust_resolver'] = $trustResolver;
         $context['auth_checker'] = $authChecker;
         $context['token'] = $token;
 
@@ -53,8 +53,8 @@ class ExpressionLanguageTest extends TestCase
 
         $noToken = null;
         $anonymousToken = new AnonymousToken('firewall', 'anon.');
-        $rememberMeToken = new RememberMeToken($user, 'providerkey', 'firewall');
-        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'providerkey', $roles);
+        $rememberMeToken = new RememberMeToken($user, 'firewall-name', 'firewall');
+        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'firewall-name', $roles);
 
         return [
             [$noToken, 'is_anonymous()', false],

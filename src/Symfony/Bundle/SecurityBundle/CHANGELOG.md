@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added `FirewallListenerFactoryInterface`, which can be implemented by security factories to add firewall listeners
+ * Added `SortFirewallListenersPass` to make the execution order of firewall listeners configurable by
+   leveraging `Symfony\Component\Security\Http\Firewall\FirewallListenerInterface`
+ * Added ability to use comma separated ip address list for `security.access_control`
+
+5.1.0
+-----
+
+ * Added XSD for configuration
+ * Added security configuration for priority-based access decision strategy
+ * Marked the `AnonymousFactory`, `FormLoginFactory`, `FormLoginLdapFactory`, `GuardAuthenticationFactory`, `HttpBasicFactory`, `HttpBasicLdapFactory`, `JsonLoginFactory`, `JsonLoginLdapFactory`, `RememberMeFactory`, `RemoteUserFactory` and `X509Factory` as `@internal`
+ * Renamed method `AbstractFactory#createEntryPoint()` to `AbstractFactory#createDefaultEntryPoint()`
+
 5.0.0
 -----
 
@@ -20,6 +36,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added `anonymous: lazy` mode to firewalls to make them (not) start the session as late as possible
  * Added `migrate_from` option to encoders configuration.
  * Added new `argon2id` encoder, undeprecated the `bcrypt` and `argon2i` ones (using `auto` is still recommended by default.)
  * Deprecated the usage of "query_string" without a "search_dn" and a "search_password" config key in Ldap factories.
@@ -28,7 +45,6 @@ CHANGELOG
 4.3.0
 -----
 
- * Added `anonymous: lazy` mode to firewalls to make them (not) start the session as late as possible
  * Added new encoder types: `auto` (recommended), `native` and `sodium`
  * The normalization of the cookie names configured in the `logout.delete_cookies`
    option is deprecated and will be disabled in Symfony 5.0. This affects to cookies

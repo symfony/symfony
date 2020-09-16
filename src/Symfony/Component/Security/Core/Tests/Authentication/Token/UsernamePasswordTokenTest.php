@@ -24,7 +24,7 @@ class UsernamePasswordTokenTest extends TestCase
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertTrue($token->isAuthenticated());
-        $this->assertEquals('key', $token->getProviderKey());
+        $this->assertEquals('key', $token->getFirewallName());
     }
 
     public function testSetAuthenticatedToTrue()

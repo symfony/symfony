@@ -11,39 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisSender as BridgeRedisSender;
 
-/**
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-class RedisSender implements SenderInterface
-{
-    private $connection;
-    private $serializer;
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The RedisExt transport has been moved to package "symfony/redis-messenger" and will not be included by default in 6.0. Run "composer require symfony/redis-messenger".', RedisSender::class, BridgeRedisSender::class);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer;
-    }
+class_exists(BridgeRedisSender::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/redis-messenger instead.
      */
-    public function send(Envelope $envelope): Envelope
+    class RedisSender
     {
-        $encodedMessage = $this->serializer->encode($envelope);
-
-        /** @var DelayStamp|null $delayStamp */
-        $delayStamp = $envelope->last(DelayStamp::class);
-        $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
-
-        $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
-
-        return $envelope;
     }
 }

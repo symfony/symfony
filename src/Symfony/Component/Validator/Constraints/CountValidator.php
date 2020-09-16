@@ -27,7 +27,7 @@ class CountValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Count) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Count');
+            throw new UnexpectedTypeException($constraint, Count::class);
         }
 
         if (null === $value) {
@@ -60,6 +60,20 @@ class CountValidator extends ConstraintValidator
                 ->setPlural((int) $constraint->min)
                 ->setCode(Count::TOO_FEW_ERROR)
                 ->addViolation();
+
+            return;
+        }
+
+        if (null !== $constraint->divisibleBy) {
+            $this->context
+                ->getValidator()
+                ->inContext($this->context)
+                ->validate($count, [
+                    new DivisibleBy([
+                        'value' => $constraint->divisibleBy,
+                        'message' => $constraint->divisibleByMessage,
+                    ]),
+                ], $this->context->getGroup());
         }
     }
 }

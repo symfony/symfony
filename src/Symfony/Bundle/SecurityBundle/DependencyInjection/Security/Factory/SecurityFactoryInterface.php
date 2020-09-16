@@ -29,7 +29,7 @@ interface SecurityFactoryInterface
      *               - the listener id
      *               - the entry point id
      */
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint);
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProviderId, ?string $defaultEntryPointId);
 
     /**
      * Defines the position at which the provider is called.

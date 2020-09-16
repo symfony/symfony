@@ -60,7 +60,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 
     /**
@@ -72,7 +72,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
-            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', get_debug_type($data)));
         }
 
         if (!$this->isISO8601($data)) {

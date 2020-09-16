@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en-US">
+    <file id="f1" original="Graphic Example.psd">
+        <unit id="1" name="foo">
+            <segment>
+                <source></source>
+                <target>bar</target>
+            </segment>
+        </unit>
+        <unit id="2" name="bar">
+            <segment>
+                <source>bar source</source>
+                <target>baz</target>
+            </segment>
+        </unit>
+        <unit id="3">
+            <segment>
+                <source>baz</source>
+                <target>foo</target>
+            </segment>
+        </unit>
+        <unit id="4" name="qux">
+            <segment>
+                <source>qux source</source>
+            </segment>
+        </unit>
+    </file>
+</xliff>

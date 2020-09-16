@@ -1,7 +1,7 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "árabe",
+        "Aran": "nastaliq",
         "Armi": "armi",
         "Armn": "armênio",
         "Avst": "avéstico",
@@ -97,6 +97,7 @@
         "Phnx": "fenício",
         "Plrd": "fonético pollard",
         "Prti": "prti",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongorongo",
         "Runr": "rúnico",

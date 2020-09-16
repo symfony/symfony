@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "AED": [
             "AED",
@@ -104,10 +103,6 @@
         "BZD": [
             "BZD",
             "BZD"
-        ],
-        "CAD": [
-            "CA$",
-            "CAD"
         ],
         "CDF": [
             "CDF",
@@ -341,10 +336,6 @@
             "MRO",
             "MRO"
         ],
-        "MRU": [
-            "MRU",
-            "MRU"
-        ],
         "MTL": [
             "MTL",
             "Lira Maltija"
@@ -384,10 +375,6 @@
         "NIO": [
             "NIO",
             "NIO"
-        ],
-        "NPR": [
-            "NPR",
-            "NPR"
         ],
         "NZD": [
             "NZ$",
@@ -564,10 +551,6 @@
         "VEF": [
             "VEF",
             "VEF"
-        ],
-        "VES": [
-            "VES",
-            "VES"
         ],
         "VND": [
             "₫",

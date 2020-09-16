@@ -38,7 +38,7 @@ class Rfc2231EncoderTest extends TestCase
         $encoded = $encoder->encodeString($string);
 
         foreach (explode("\r\n", $encoded) as $line) {
-            $this->assertRegExp($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
+            $this->assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
         }
     }
 
@@ -53,7 +53,7 @@ class Rfc2231EncoderTest extends TestCase
         $encoded = $encoder->encodeString($string);
 
         foreach (explode("\r\n", $encoded) as $line) {
-            $this->assertRegExp($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
+            $this->assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
         }
     }
 

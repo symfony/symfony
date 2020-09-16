@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -71,7 +70,7 @@
         ],
         "ATS": [
             "ATS",
-            "ATS"
+            "Scilling na hOstaire"
         ],
         "AUD": [
             "A$",
@@ -111,7 +110,7 @@
         ],
         "BEC": [
             "BEC",
-            "BEC"
+            "Franc na Beilge (inmhalartaithe)"
         ],
         "BEF": [
             "BEF",
@@ -119,7 +118,7 @@
         ],
         "BEL": [
             "BEL",
-            "BEL"
+            "Franc na Beilge (airgeadais)"
         ],
         "BGL": [
             "BGL",
@@ -249,10 +248,6 @@
             "CLP",
             "Peso na Sile"
         ],
-        "CNH": [
-            "CNH",
-            "CNH"
-        ],
         "CNY": [
             "CN¥",
             "Yuan na Síne"
@@ -299,7 +294,7 @@
         ],
         "DDM": [
             "DDM",
-            "DDM"
+            "Marc Ghearmáin an Oirthir"
         ],
         "DEM": [
             "DEM",

@@ -22,16 +22,16 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouter()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
-        $container->register('router', '\stdClass')->setPublic(true);
+        $container->register('router.default', '\stdClass')->setPublic(true);
         $container->compile();
 
-        $router = $container->getDefinition('router');
+        $router = $container->getDefinition('router.default');
         $calls = $router->getMethodCalls();
         $this->assertCount(1, $calls);
         $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
@@ -41,14 +41,14 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouterAlias()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
         $container->register('my_router', '\stdClass')->setPublic(true);
-        $container->setAlias('router', 'my_router');
+        $container->setAlias('router.default', 'my_router');
         $container->compile();
 
         $router = $container->getDefinition('my_router');

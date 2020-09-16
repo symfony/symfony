@@ -19,20 +19,23 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Carlos Pereira De Amorim <carlos@shauri.fr>
  */
 class Event extends BaseEvent
 {
+    protected $context;
     private $subject;
     private $marking;
     private $transition;
     private $workflow;
 
-    public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null, array $context = [])
     {
         $this->subject = $subject;
         $this->marking = $marking;
         $this->transition = $transition;
         $this->workflow = $workflow;
+        $this->context = $context;
     }
 
     public function getMarking()
@@ -60,8 +63,13 @@ class Event extends BaseEvent
         return $this->workflow->getName();
     }
 
-    public function getMetadata(string $key, object $subject)
+    public function getMetadata(string $key, $subject)
     {
         return $this->workflow->getMetadataStore()->getMetadata($key, $subject);
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }

@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `AsyncDecoratorTrait` to ease processing responses without breaking async
+ * added support for pausing responses with a new `pause_handler` callable exposed as an info item
+ * added `StreamableInterface` to ease turning responses into PHP streams
+ * added `MockResponse::getRequestMethod()` and `getRequestUrl()` to allow inspecting which request has been sent
+ * added `EventSourceHttpClient` a Server-Sent events stream implementing the [EventSource specification](https://www.w3.org/TR/eventsource/#eventsource)
+ * added option "extra.curl" to allow setting additional curl options in `CurlHttpClient`
+
+5.1.0
+-----
+
+ * added `NoPrivateNetworkHttpClient` decorator
+ * added `AmpHttpClient`, a portable HTTP/2 implementation based on Amp
+ * added `LoggerAwareInterface` to `ScopingHttpClient` and `TraceableHttpClient`
+ * made `HttpClient::create()` return an `AmpHttpClient` when `amphp/http-client` is found but curl is not or too old
+
 4.4.0
 -----
 

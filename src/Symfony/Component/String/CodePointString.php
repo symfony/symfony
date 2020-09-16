@@ -21,8 +21,6 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
  * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
- *
- * @experimental in 5.0
  */
 class CodePointString extends AbstractUnicodeString
 {
@@ -67,7 +65,7 @@ class CodePointString extends AbstractUnicodeString
         $str = clone $this;
         $chunks = [];
 
-        foreach (preg_split($rx, $this->string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY) as $chunk) {
+        foreach (preg_split($rx, $this->string, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) as $chunk) {
             $str->string = $chunk;
             $chunks[] = clone $str;
         }
@@ -79,7 +77,7 @@ class CodePointString extends AbstractUnicodeString
     {
         $str = $offset ? $this->slice($offset, 1) : $this;
 
-        return '' === $str->string ? [] : [mb_ord($str->string)];
+        return '' === $str->string ? [] : [mb_ord($str->string, 'UTF-8')];
     }
 
     public function endsWith($suffix): bool

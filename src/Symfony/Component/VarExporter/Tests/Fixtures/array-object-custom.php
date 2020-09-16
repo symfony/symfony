@@ -16,6 +16,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
             [
                 "\0".'Symfony\\Component\\VarExporter\\Tests\\MyArrayObject'."\0".'unused' => 123,
             ],
+            null,
         ],
     ]
 );

@@ -1,8 +1,8 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "Chữ Afaka",
         "Arab": "Chữ Ả Rập",
+        "Aran": "Chữ Nastaliq",
         "Armi": "Chữ Imperial Aramaic",
         "Armn": "Chữ Armenia",
         "Avst": "Chữ Avestan",
@@ -113,6 +113,7 @@
         "Phnx": "Chữ Phoenicia",
         "Plrd": "Ngữ âm Pollard",
         "Prti": "Chữ Parthia Văn bia",
+        "Qaag": "Chữ Zawgyi",
         "Rjng": "Chữ Rejang",
         "Roro": "Chữ Rongorongo",
         "Runr": "Chữ Runic",

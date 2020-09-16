@@ -56,8 +56,12 @@ class DataPart extends TextPart
             $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
         }
 
+        if (false === is_readable($path)) {
+            throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
+        }
+
         if (false === $handle = @fopen($path, 'r', false)) {
-            throw new InvalidArgumentException(sprintf('Unable to open path "%s"', $path));
+            throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
         }
         $p = new self($handle, $name ?: basename($path), $contentType);
         $p->handle = $handle;

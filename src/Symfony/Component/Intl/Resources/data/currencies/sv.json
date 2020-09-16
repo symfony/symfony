@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -1032,6 +1031,10 @@
         "UYU": [
             "UYU",
             "uruguayansk peso"
+        ],
+        "UYW": [
+            "UYW",
+            "uruguayansk indexenhet för nominell lön"
         ],
         "UZS": [
             "UZS",

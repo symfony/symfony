@@ -1,7 +1,7 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "arabă",
+        "Aran": "nastaaliq",
         "Armn": "armeană",
         "Bali": "balineză",
         "Beng": "bengaleză",
@@ -53,9 +53,12 @@
         "Maya": "hieroglife maya",
         "Mlym": "malayalam",
         "Mong": "mongolă",
+        "Mtei": "meitei mayek",
         "Mymr": "birmană",
+        "Olck": "ol chiki",
         "Orya": "oriya",
         "Phnx": "feniciană",
+        "Qaag": "zawgyi",
         "Runr": "runică",
         "Sinh": "singaleză",
         "Syrc": "siriacă",

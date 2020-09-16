@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication;
 
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -31,7 +32,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
             return false;
         }
 
-        return $token instanceof AnonymousToken;
+        return $token instanceof AnonymousToken || $token instanceof NullToken;
     }
 
     /**

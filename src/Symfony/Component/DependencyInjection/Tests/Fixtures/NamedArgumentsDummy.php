@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
  */
 class NamedArgumentsDummy
 {
-    public function __construct(CaseSensitiveClass $c, $apiKey, $hostName, ContainerInterface $interface, iterable $objects)
+    public function __construct(CaseSensitiveClass $c, $apiKey, $hostName, ContainerInterface $container, iterable $objects)
     {
     }
 

@@ -36,4 +36,16 @@ class BarMethodCall
     public function setIterable(iterable $iterable)
     {
     }
+
+    public function setCallable(callable $callable): void
+    {
+    }
+
+    public function setClosure(\Closure $closure): void
+    {
+    }
+
+    public function setString(string $string)
+    {
+    }
 }

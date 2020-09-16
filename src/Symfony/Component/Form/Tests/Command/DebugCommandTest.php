@@ -42,6 +42,11 @@ class DebugCommandTest extends TestCase
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertSame(<<<TXT
 
+Built-in form types (Symfony\Component\Form\Extension\Core\Type)
+----------------------------------------------------------------
+
+ PercentType
+
 Service form types
 ------------------
 
@@ -152,6 +157,8 @@ Symfony\Component\Form\Tests\Command\FooType (foo)
 ==================================================
 
  ---------------- -----------%s
+  Info             "Info"    %s
+ ---------------- -----------%s
   Required         true      %s
  ---------------- -----------%s
   Default          -         %s
@@ -196,7 +203,7 @@ class FooType extends AbstractType
     {
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
-        $resolver->setDeprecated('bar');
+        $resolver->setDeprecated('bar', 'vendor/package', '1.1');
         $resolver->setDefault('empty_data', function (Options $options) {
             $foo = $options['foo'];
 
@@ -209,5 +216,6 @@ class FooType extends AbstractType
         $resolver->setNormalizer('foo', function (Options $options, $value) {
             return (string) $value;
         });
+        $resolver->setInfo('foo', 'Info');
     }
 }

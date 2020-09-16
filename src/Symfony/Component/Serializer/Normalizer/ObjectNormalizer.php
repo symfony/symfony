@@ -54,7 +54,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 
     /**
@@ -62,6 +62,10 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function extractAttributes(object $object, string $format = null, array $context = [])
     {
+        if (\stdClass::class === \get_class($object)) {
+            return array_keys((array) $object);
+        }
+
         // If not using groups, detect manually
         $attributes = [];
 
@@ -103,8 +107,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
         }
 
+        $checkPropertyInitialization = \PHP_VERSION_ID >= 70400;
+
         // properties
         foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
+            if ($checkPropertyInitialization && !$reflProperty->isInitialized($object)) {
+                continue;
+            }
+
             if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name, $format, $context)) {
                 continue;
             }

@@ -12,12 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -141,9 +144,9 @@ class DefinitionTest extends TestCase
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
-        $this->assertTrue($def->isPublic(), '->isPublic() returns true by default');
-        $this->assertSame($def, $def->setPublic(false), '->setPublic() implements a fluent interface');
-        $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
+        $this->assertFalse($def->isPublic(), '->isPublic() returns false by default');
+        $this->assertSame($def, $def->setPublic(true), '->setPublic() implements a fluent interface');
+        $this->assertTrue($def->isPublic(), '->isPublic() returns true if the service is public.');
     }
 
     public function testSetIsSynthetic()
@@ -174,11 +177,29 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
-        $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
+        $this->assertSame($def, $def->setDeprecated('vendor/package', '1.1', '%service_id%'), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
 
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message'], '->getDeprecation() should return an array with the formatted message template');
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetDeprecatedWithoutPackageAndVersion()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
+
+        $def = new Definition('stdClass');
         $def->setDeprecated(true, '%service_id%');
-        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
+
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message']);
+        $this->assertSame('', $deprecation['package']);
+        $this->assertSame('', $deprecation['version']);
     }
 
     /**
@@ -188,7 +209,7 @@ class DefinitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $def = new Definition('stdClass');
-        $def->setDeprecated(false, $message);
+        $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
     public function invalidDeprecationMessageProvider()
@@ -245,10 +266,10 @@ class DefinitionTest extends TestCase
         $def->addTag('foo', ['foo' => 'bar']);
         $this->assertEquals([[], ['foo' => 'bar']], $def->getTag('foo'), '->addTag() can adds the same tag several times');
         $def->addTag('bar', ['bar' => 'bar']);
-        $this->assertEquals($def->getTags(), [
+        $this->assertEquals([
             'foo' => [[], ['foo' => 'bar']],
             'bar' => [['bar' => 'bar']],
-        ], '->getTags() returns all tags');
+        ], $def->getTags(), '->getTags() returns all tags');
     }
 
     public function testSetArgument()
@@ -341,7 +362,7 @@ class DefinitionTest extends TestCase
         $def->setAutowired(true);
         $def->setConfigurator('configuration_func');
         $def->setDecoratedService(null);
-        $def->setDeprecated(true);
+        $def->setDeprecated('vendor/package', '1.1', '%service_id%');
         $def->setFactory('factory_func');
         $def->setFile('foo.php');
         $def->setLazy(true);

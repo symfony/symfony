@@ -24,7 +24,7 @@ class PreAuthenticatedTokenTest extends TestCase
         $token = new PreAuthenticatedToken('foo', 'bar', 'key', ['ROLE_FOO']);
         $this->assertTrue($token->isAuthenticated());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('key', $token->getProviderKey());
+        $this->assertEquals('key', $token->getFirewallName());
     }
 
     public function testGetCredentials()

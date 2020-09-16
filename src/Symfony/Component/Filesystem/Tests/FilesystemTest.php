@@ -282,7 +282,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileDoesNotExist($basePath);
     }
 
     public function testRemoveCleansArrayOfFilesAndDirectories()
@@ -298,8 +298,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        $this->assertFileDoesNotExist($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'file');
     }
 
     public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
@@ -315,8 +315,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        $this->assertFileDoesNotExist($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'file');
     }
 
     public function testRemoveIgnoresNonExistingFiles()
@@ -331,7 +331,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileDoesNotExist($basePath.'dir');
     }
 
     public function testRemoveCleansInvalidLinks()
@@ -355,7 +355,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileDoesNotExist($basePath);
     }
 
     public function testFilesExists()
@@ -377,7 +377,7 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('Long file names are an issue on Windows');
         }
         $basePath = $this->workspace.'\\directory\\';
-        $maxPathLength = PHP_MAXPATHLEN - 2;
+        $maxPathLength = \PHP_MAXPATHLEN - 2;
 
         $oldPath = getcwd();
         mkdir($basePath);
@@ -521,7 +521,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(753, $subdirectory);
     }
 
-    public function testChown()
+    public function testChownByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -534,7 +534,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($owner, $this->getFileOwner($dir));
     }
 
-    public function testChownRecursive()
+    public function testChownById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($dir));
+    }
+
+    public function testChownRecursiveByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -547,6 +560,21 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, $owner, true);
 
         $this->assertSame($owner, $this->getFileOwner($file));
+    }
+
+    public function testChownRecursiveById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.\DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId, true);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($file));
     }
 
     public function testChownSymlink()
@@ -624,7 +652,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, 'user'.time().mt_rand(1000, 9999));
     }
 
-    public function testChgrp()
+    public function testChgrpByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -635,6 +663,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($dir, $group);
 
         $this->assertSame($group, $this->getFileGroup($dir));
+    }
+
+    public function testChgrpById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $groupId = $this->getFileGroupId($dir);
+        $this->filesystem->chgrp($dir, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($dir));
     }
 
     public function testChgrpRecursive()
@@ -652,7 +693,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($group, $this->getFileGroup($file));
     }
 
-    public function testChgrpSymlink()
+    public function testChgrpSymlinkByName()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
@@ -667,6 +708,23 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($link, $group);
 
         $this->assertSame($group, $this->getFileGroup($link));
+    }
+
+    public function testChgrpSymlinkById()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $groupId = $this->getFileGroupId($link);
+        $this->filesystem->chgrp($link, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($link));
     }
 
     public function testChgrpLink()
@@ -735,7 +793,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->rename($file, $newPath);
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
         $this->assertFileExists($newPath);
     }
 
@@ -761,7 +819,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->rename($file, $newPath, true);
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
         $this->assertFileExists($newPath);
     }
 
@@ -783,7 +841,7 @@ class FilesystemTest extends FilesystemTestCase
         $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
 
-        // $file does not exists right now: creating "broken" links is a wanted feature
+        // $file does not exist right now: creating "broken" links is a wanted feature
         $this->filesystem->symlink($file, $link);
 
         $this->assertTrue(is_link($link));
@@ -807,7 +865,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFalse(is_link($link));
         $this->assertFalse(is_file($link));
-        $this->assertDirectoryNotExists($link);
+        $this->assertDirectoryDoesNotExist($link);
     }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
@@ -1093,10 +1151,14 @@ class FilesystemTest extends FilesystemTestCase
             ['/../aa/bb/cc', '/aa/dd/..', 'bb/cc/'],
             ['/../../aa/../bb/cc', '/aa/dd/..', '../bb/cc/'],
             ['C:/aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
+            ['C:/aa/bb/cc', 'c:/aa/dd/..', 'bb/cc/'],
             ['c:/aa/../bb/cc', 'c:/aa/dd/..', '../bb/cc/'],
             ['C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'],
             ['C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
             ['C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'],
+            ['D:/', 'C:/aa/../bb/cc', 'D:/'],
+            ['D:/aa/bb', 'C:/aa', 'D:/aa/bb/'],
+            ['D:/../../aa/../bb/cc', 'C:/aa/dd/..', 'D:/bb/cc/'],
         ];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -1283,7 +1345,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertDirectoryExists($targetPath);
         $this->assertFileExists($targetPath.'source');
-        $this->assertFileNotExists($targetPath.'target');
+        $this->assertFileDoesNotExist($targetPath.'target');
     }
 
     public function testMirrorAvoidCopyingTargetDirectoryIfInSourceDirectory()
@@ -1407,7 +1469,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringStartsWith($scheme, $filename);
 
         // The php://temp stream deletes the file after close
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
     }
 
     public function testTempnamWithPharSchemeFails()
@@ -1449,6 +1511,22 @@ class FilesystemTest extends FilesystemTestCase
 
         // Tear down
         @unlink($filename);
+    }
+
+    public function testTempnamWithSuffix()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '.bar');
+        $this->assertStringEndsWith('.bar', $filename);
+        $this->assertFileExists($filename);
+    }
+
+    public function testTempnamWithSuffix0()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '0');
+        $this->assertStringEndsWith('0', $filename);
+        $this->assertFileExists($filename);
     }
 
     public function testDumpFile()

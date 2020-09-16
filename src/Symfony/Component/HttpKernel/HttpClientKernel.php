@@ -21,6 +21,9 @@ use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(ResponseHeaderBag::class);
+
 /**
  * An implementation of a Symfony HTTP kernel using a "real" HTTP client.
  *
@@ -54,6 +57,10 @@ final class HttpClientKernel implements HttpKernelInterface
         ] + $request->attributes->get('http_client_options', []));
 
         $response = new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
+
+        $response->headers->remove('X-Body-File');
+        $response->headers->remove('X-Body-Eval');
+        $response->headers->remove('X-Content-Digest');
 
         $response->headers = new class($response->headers->all()) extends ResponseHeaderBag {
             protected function computeCacheControlValue(): string

@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -24,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @internal
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class SlackTransport extends AbstractTransport
 {
@@ -33,10 +34,10 @@ final class SlackTransport extends AbstractTransport
     private $accessToken;
     private $chatChannel;
 
-    public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accessToken = $accessToken;
-        $this->chatChannel = $chatChannel;
+        $this->chatChannel = $channel;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -44,7 +45,7 @@ final class SlackTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('slack://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return sprintf('slack://%s?channel=%s', $this->getEndpoint(), urlencode($this->chatChannel));
     }
 
     public function supports(MessageInterface $message): bool
@@ -55,10 +56,10 @@ final class SlackTransport extends AbstractTransport
     /**
      * @see https://api.slack.com/methods/chat.postMessage
      */
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
         }
         if ($message->getOptions() && !$message->getOptions() instanceof SlackOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, SlackOptions::class));
@@ -69,22 +70,24 @@ final class SlackTransport extends AbstractTransport
         }
 
         $options = $opts ? $opts->toArray() : [];
-        $options['token'] = $this->accessToken;
         if (!isset($options['channel'])) {
             $options['channel'] = $message->getRecipientId() ?: $this->chatChannel;
         }
         $options['text'] = $message->getSubject();
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/chat.postMessage', [
-            'body' => array_filter($options),
+            'json' => array_filter($options),
+            'auth_bearer' => $this->accessToken,
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Slack message: %s.', $response->getContent(false)), $response);
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
         if (!$result['ok']) {
-            throw new TransportException(sprintf('Unable to post the Slack message: %s.', $result['error']), $response);
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
         }
+
+        return new SentMessage($message, (string) $this);
     }
 }

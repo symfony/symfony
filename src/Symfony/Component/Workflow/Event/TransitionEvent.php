@@ -13,15 +13,8 @@ namespace Symfony\Component\Workflow\Event;
 
 final class TransitionEvent extends Event
 {
-    private $context;
-
     public function setContext(array $context): void
     {
         $this->context = $context;
-    }
-
-    public function getContext(): array
-    {
-        return $this->context;
     }
 }

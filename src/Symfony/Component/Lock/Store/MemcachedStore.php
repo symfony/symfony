@@ -42,11 +42,11 @@ class MemcachedStore implements PersistingStoreInterface
     public function __construct(\Memcached $memcached, int $initialTtl = 300)
     {
         if (!static::isSupported()) {
-            throw new InvalidArgumentException('Memcached extension is required');
+            throw new InvalidArgumentException('Memcached extension is required.');
         }
 
         if ($initialTtl < 1) {
-            throw new InvalidArgumentException(sprintf('%s() expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
+            throw new InvalidArgumentException(sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
         }
 
         $this->memcached = $memcached;
@@ -74,7 +74,7 @@ class MemcachedStore implements PersistingStoreInterface
     public function putOffExpiration(Key $key, float $ttl)
     {
         if ($ttl < 1) {
-            throw new InvalidTtlException(sprintf('%s() expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
+            throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
         }
 
         // Interface defines a float value but Store required an integer.

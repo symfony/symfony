@@ -14,7 +14,9 @@ namespace Symfony\Component\Security\Core\Encoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
- * PlaintextPasswordEncoder does not do any encoding.
+ * PlaintextPasswordEncoder does not do any encoding but is useful in testing environments.
+ *
+ * As this encoder is not cryptographically secure, usage of it in production environments is discouraged.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

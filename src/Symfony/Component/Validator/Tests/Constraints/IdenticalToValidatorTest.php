@@ -86,12 +86,19 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons(): array
     {
         return [
-            [1, '1', 2, '2', 'integer'],
+            [1, '1', 2, '2', 'int'],
             [2, '2', '2', '"2"', 'string'],
             ['22', '"22"', '333', '"333"', 'string'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+        ];
+    }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', false],
         ];
     }
 }

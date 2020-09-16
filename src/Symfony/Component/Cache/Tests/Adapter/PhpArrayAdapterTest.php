@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -66,8 +67,10 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     protected function tearDown(): void
     {
+        $this->createCachePool()->clear();
+
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
-            FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+            (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
         }
     }
 

@@ -12,14 +12,14 @@
 namespace Symfony\Component\Notifier\Notification;
 
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 interface ChatNotificationInterface
 {
-    public function asChatMessage(Recipient $recipient, string $transport = null): ?ChatMessage;
+    public function asChatMessage(RecipientInterface $recipient, string $transport = null): ?ChatMessage;
 }

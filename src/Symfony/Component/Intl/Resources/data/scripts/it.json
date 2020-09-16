@@ -1,8 +1,8 @@
 {
-    "Version": "36",
     "Names": {
         "Afak": "afaka",
         "Arab": "arabo",
+        "Aran": "nastaliq",
         "Armi": "aramaico imperiale",
         "Armn": "armeno",
         "Avst": "avestico",
@@ -113,6 +113,7 @@
         "Phnx": "fenicio",
         "Plrd": "fonetica di pollard",
         "Prti": "partico delle iscrizioni",
+        "Qaag": "zawgyi",
         "Rjng": "rejang",
         "Roro": "rongorongo",
         "Runr": "runico",

@@ -35,15 +35,47 @@ final class Dotenv
     private $data;
     private $end;
     private $values;
-    private $usePutenv = true;
+    private $envKey;
+    private $debugKey;
+    private $prodEnvs = ['prod'];
+    private $usePutenv = false;
 
     /**
-     * @var bool If `putenv()` should be used to define environment variables or not.
-     *           Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     * @param string $envKey
      */
-    public function __construct(bool $usePutenv = false)
+    public function __construct($envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
+    {
+        if (\in_array($envKey = (string) $envKey, ['1', ''], true)) {
+            trigger_deprecation('symfony/dotenv', '5.1', 'Passing a boolean to the constructor of "%s" is deprecated, use "Dotenv::usePutenv()".', __CLASS__);
+            $this->usePutenv = (bool) $envKey;
+            $envKey = 'APP_ENV';
+        }
+
+        $this->envKey = $envKey;
+        $this->debugKey = $debugKey;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setProdEnvs(array $prodEnvs): self
+    {
+        $this->prodEnvs = $prodEnvs;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
+     *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *
+     * @return $this
+     */
+    public function usePutenv($usePutenv = true): self
     {
         $this->usePutenv = $usePutenv;
+
+        return $this;
     }
 
     /**
@@ -66,42 +98,70 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string $path       A file to load
-     * @param string $varName    The name of the env vars that defines the app env
-     * @param string $defaultEnv The app env to use when none is defined
-     * @param array  $testEnvs   A list of app envs for which .env.local should be ignored
+     * @param string $path        A file to load
+     * @param string $envKey|null The name of the env vars that defines the app env
+     * @param string $defaultEnv  The app env to use when none is defined
+     * @param array  $testEnvs    A list of app envs for which .env.local should be ignored
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = ['test']): void
+    public function loadEnv(string $path, string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
     {
-        if (file_exists($path) || !file_exists($p = "$path.dist")) {
+        $k = $envKey ?? $this->envKey;
+
+        if (is_file($path) || !is_file($p = "$path.dist")) {
             $this->load($path);
         } else {
             $this->load($p);
         }
 
-        if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
-            $this->populate([$varName => $env = $defaultEnv]);
+        if (null === $env = $_SERVER[$k] ?? $_ENV[$k] ?? null) {
+            $this->populate([$k => $env = $defaultEnv]);
         }
 
-        if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
+        if (!\in_array($env, $testEnvs, true) && is_file($p = "$path.local")) {
             $this->load($p);
-            $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
+            $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
         }
 
         if ('local' === $env) {
             return;
         }
 
-        if (file_exists($p = "$path.$env")) {
+        if (is_file($p = "$path.$env")) {
             $this->load($p);
         }
 
-        if (file_exists($p = "$path.$env.local")) {
+        if (is_file($p = "$path.$env.local")) {
             $this->load($p);
         }
+    }
+
+    /**
+     * Loads env vars from .env.local.php if the file exists or from the other .env files otherwise.
+     *
+     * This method also configures the APP_DEBUG env var according to the current APP_ENV.
+     *
+     * See method loadEnv() for rules related to .env files.
+     */
+    public function bootEnv(string $path, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
+    {
+        $p = $path.'.local.php';
+        $env = is_file($p) ? include $p : null;
+        $k = $this->envKey;
+
+        if (\is_array($env) && (!isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+            $this->populate($env);
+        } else {
+            $this->loadEnv($path, $k, $defaultEnv, $testEnvs);
+        }
+
+        $_SERVER += $_ENV;
+
+        $k = $this->debugKey;
+        $debug = $_SERVER[$k] ?? !\in_array($_SERVER[$this->envKey], $this->prodEnvs, true);
+        $_SERVER[$k] = $_ENV[$k] = (int) $debug || (!\is_bool($debug) && filter_var($debug, \FILTER_VALIDATE_BOOLEAN)) ? '1' : '0';
     }
 
     /**
@@ -272,7 +332,10 @@ final class Dotenv
                 $this->cursor += 1 + $len;
             } elseif ('"' === $this->data[$this->cursor]) {
                 $value = '';
-                ++$this->cursor;
+
+                if (++$this->cursor === $this->end) {
+                    throw $this->createFormatException('Missing quote to end the value');
+                }
 
                 while ('"' !== $this->data[$this->cursor] || ('\\' === $this->data[$this->cursor - 1] && '\\' !== $this->data[$this->cursor - 2])) {
                     $value .= $this->data[$this->cursor];
@@ -458,10 +521,10 @@ final class Dotenv
             } elseif (isset($this->values[$name])) {
                 $value = $this->values[$name];
             } else {
-                $value = '';
+                $value = (string) getenv($name);
             }
 
-            if ('' === $value && isset($matches['default_value'])) {
+            if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
                 $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
                 if (false !== $unsupportedChars) {
                     throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));

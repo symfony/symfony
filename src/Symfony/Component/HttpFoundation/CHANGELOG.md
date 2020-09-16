@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added support for `X-Forwarded-Prefix` header
+ * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
+ * added `File::getContent()`
+ * added ability to use comma separated ip addresses for `RequestMatcher::matchIps()`
+
+5.1.0
+-----
+
+ * added `Cookie::withValue`, `Cookie::withDomain`, `Cookie::withExpires`,
+   `Cookie::withPath`, `Cookie::withSecure`, `Cookie::withHttpOnly`,
+   `Cookie::withRaw`, `Cookie::withSameSite`
+ * Deprecate `Response::create()`, `JsonResponse::create()`,
+   `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
+   `__construct()` instead)
+ * added `Request::preferSafeContent()` and `Response::setContentSafe()` to handle "safe" HTTP preference
+   according to [RFC 8674](https://tools.ietf.org/html/rfc8674)
+ * made the Mime component an optional dependency
+ * added `MarshallingSessionHandler`, `IdentityMarshaller`
+ * made `Session` accept a callback to report when the session is being used
+ * Add support for all core cache control directives
+ * Added `Symfony\Component\HttpFoundation\InputBag`
+ * Deprecated retrieving non-string values using `InputBag::get()`, use `InputBag::all()` if you need access to the collection of values
+
 5.0.0
 -----
 
@@ -17,6 +43,9 @@ CHANGELOG
  * passing arguments to `Request::isMethodSafe()` is deprecated.
  * `ApacheRequest` is deprecated, use the `Request` class instead.
  * passing a third argument to `HeaderBag::get()` is deprecated, use method `all()` instead
+ * [BC BREAK] `PdoSessionHandler` with MySQL changed the type of the lifetime column,
+   make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
+   update your database.
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
     make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.

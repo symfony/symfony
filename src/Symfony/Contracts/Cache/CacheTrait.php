@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(InvalidArgumentException::class);
+
 /**
  * An implementation of CacheInterface for PSR-6 CacheItemPoolInterface classes.
  *
@@ -41,19 +44,18 @@ trait CacheTrait
     private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null, LoggerInterface $logger = null)
     {
         if (0 > $beta = $beta ?? 1.0) {
-            throw new class(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta)) extends \InvalidArgumentException implements InvalidArgumentException {
-            };
+            throw new class(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta)) extends \InvalidArgumentException implements InvalidArgumentException { };
         }
 
         $item = $pool->getItem($key);
-        $recompute = !$item->isHit() || INF === $beta;
+        $recompute = !$item->isHit() || \INF === $beta;
         $metadata = $item instanceof ItemInterface ? $item->getMetadata() : [];
 
         if (!$recompute && $metadata) {
             $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
             $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
 
-            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX)) {
+            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, \PHP_INT_MAX) / \PHP_INT_MAX)) {
                 // force applying defaultLifetime to expiry
                 $item->expiresAt(null);
                 $logger && $logger->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [

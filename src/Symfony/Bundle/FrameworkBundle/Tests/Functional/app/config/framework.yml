@@ -1,9 +1,11 @@
 framework:
     secret:        test
-    router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
+    router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     validation:    { enabled: true, enable_annotations: true }
     csrf_protection: true
-    form: true
+    form:
+        enabled: true
+        legacy_error_messages: false
     test: true
     default_locale: en
     session:

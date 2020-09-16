@@ -73,4 +73,9 @@ class StopwatchPeriod
     {
         return $this->memory;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%.2F MiB - %d ms', $this->getMemory() / 1024 / 1024, $this->getDuration());
+    }
 }

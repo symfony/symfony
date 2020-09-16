@@ -44,6 +44,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
             'package' => 'symfony/mailchimp-mailer',
         ],
+        'mailjet' => [
+            'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
+            'package' => 'symfony/mailjet-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])

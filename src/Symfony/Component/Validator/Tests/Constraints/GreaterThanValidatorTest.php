@@ -67,8 +67,8 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons(): array
     {
         return [
-            [1, '1', 2, '2', 'integer'],
-            [2, '2', 2, '2', 'integer'],
+            [1, '1', 2, '2', 'int'],
+            [2, '2', 2, '2', 'int'],
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', '2005/01/01', 'Jan 1, 2005, 12:00 AM', 'DateTime'],
@@ -79,6 +79,13 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['22', '"22"', '333', '"333"', 'string'],
             ['22', '"22"', '22', '"22"', 'string'],
+        ];
+    }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', true],
         ];
     }
 }

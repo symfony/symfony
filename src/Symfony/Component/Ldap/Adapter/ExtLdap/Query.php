@@ -49,7 +49,7 @@ class Query extends AbstractQuery
                 continue;
             }
             if (!ldap_free_result($result)) {
-                throw new LdapException(sprintf('Could not free results: %s.', ldap_error($con)));
+                throw new LdapException('Could not free results: '.ldap_error($con));
             }
         }
         $this->results = null;
@@ -123,7 +123,7 @@ class Query extends AbstractQuery
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
                 }
 
                 $this->results[] = $search;
@@ -193,14 +193,14 @@ class Query extends AbstractQuery
         //
         // This is not supported in PHP < 7.2, so these versions will remain broken.
         $ctl = [];
-        ldap_get_option($con, LDAP_OPT_SERVER_CONTROLS, $ctl);
+        ldap_get_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
         if (!empty($ctl)) {
             foreach ($ctl as $idx => $info) {
                 if (static::PAGINATION_OID == $info['oid']) {
                     unset($ctl[$idx]);
                 }
             }
-            ldap_set_option($con, LDAP_OPT_SERVER_CONTROLS, $ctl);
+            ldap_set_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
         }
     }
 }

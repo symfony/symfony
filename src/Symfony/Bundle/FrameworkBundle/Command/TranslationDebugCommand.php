@@ -38,6 +38,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslationDebugCommand extends Command
 {
+    const EXIT_CODE_GENERAL_ERROR = 64;
+    const EXIT_CODE_MISSING = 65;
+    const EXIT_CODE_UNUSED = 66;
+    const EXIT_CODE_FALLBACK = 68;
     const MESSAGE_MISSING = 0;
     const MESSAGE_UNUSED = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
@@ -123,6 +127,9 @@ EOF
 
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
+
+        $exitCode = 0;
+
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
@@ -191,7 +198,7 @@ EOF
 
             $io->getErrorStyle()->warning($outputMessage);
 
-            return 0;
+            return self::EXIT_CODE_GENERAL_ERROR;
         }
 
         // Load the fallback catalogues
@@ -212,9 +219,13 @@ EOF
                 if ($extractedCatalogue->defines($messageId, $domain)) {
                     if (!$currentCatalogue->defines($messageId, $domain)) {
                         $states[] = self::MESSAGE_MISSING;
+
+                        $exitCode = $exitCode | self::EXIT_CODE_MISSING;
                     }
                 } elseif ($currentCatalogue->defines($messageId, $domain)) {
                     $states[] = self::MESSAGE_UNUSED;
+
+                    $exitCode = $exitCode | self::EXIT_CODE_UNUSED;
                 }
 
                 if (!\in_array(self::MESSAGE_UNUSED, $states) && true === $input->getOption('only-unused')
@@ -225,6 +236,8 @@ EOF
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
                     if ($fallbackCatalogue->defines($messageId, $domain) && $value === $fallbackCatalogue->get($messageId, $domain)) {
                         $states[] = self::MESSAGE_EQUALS_FALLBACK;
+
+                        $exitCode = $exitCode | self::EXIT_CODE_FALLBACK;
 
                         break;
                     }
@@ -241,7 +254,7 @@ EOF
 
         $io->table($headers, $rows);
 
-        return 0;
+        return $exitCode;
     }
 
     private function formatState(int $state): string

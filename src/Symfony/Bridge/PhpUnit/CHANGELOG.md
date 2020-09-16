@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * polyfill new phpunit 9.1 assertions
+
+5.1.0
+-----
+
+ * ignore verbosity settings when the build fails because of deprecations
+ * added per-group verbosity
+ * added `ExpectDeprecationTrait` to be able to define an expected deprecation from inside a test
+ * deprecated the `@expectedDeprecation` annotation, use the `ExpectDeprecationTrait::expectDeprecation()` method instead
+
 5.0.0
 -----
 
@@ -17,7 +30,7 @@ CHANGELOG
 -----
 
  * added `ClassExistsMock`
- * bumped PHP version from 5.3.3 to 5.5.9 
+ * bumped PHP version from 5.3.3 to 5.5.9
  * split simple-phpunit bin into php file with code and a shell script
 
 4.1.0

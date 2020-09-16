@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use PHPUnit\Util\Annotation\Registry;
 use PHPUnit\Util\Test;
 
 /**
@@ -32,7 +33,7 @@ class CoverageListenerTrait
     {
         $this->sutFqcnResolver = $sutFqcnResolver;
         $this->warningOnSutNotFound = $warningOnSutNotFound;
-        $this->warnings = array();
+        $this->warnings = [];
     }
 
     public function startTest($test)
@@ -43,7 +44,7 @@ class CoverageListenerTrait
 
         $annotations = $test->getAnnotations();
 
-        $ignoredAnnotations = array('covers', 'coversDefaultClass', 'coversNothing');
+        $ignoredAnnotations = ['covers', 'coversDefaultClass', 'coversNothing'];
 
         foreach ($ignoredAnnotations as $annotation) {
             if (isset($annotations['class'][$annotation]) || isset($annotations['method'][$annotation])) {
@@ -66,16 +67,56 @@ class CoverageListenerTrait
             return;
         }
 
+        $covers = $sutFqcn;
+        if (!\is_array($sutFqcn)) {
+            $covers = [$sutFqcn];
+            while ($parent = get_parent_class($sutFqcn)) {
+                $covers[] = $parent;
+                $sutFqcn = $parent;
+            }
+        }
+
+        if (class_exists(Registry::class)) {
+            $this->addCoversForDocBlockInsideRegistry($test, $covers);
+
+            return;
+        }
+
+        $this->addCoversForClassToAnnotationCache($test, $covers);
+    }
+
+    private function addCoversForClassToAnnotationCache($test, $covers)
+    {
         $r = new \ReflectionProperty(Test::class, 'annotationCache');
         $r->setAccessible(true);
 
         $cache = $r->getValue();
-        $cache = array_replace_recursive($cache, array(
-            \get_class($test) => array(
-                'covers' => \is_array($sutFqcn) ? $sutFqcn : array($sutFqcn),
-            ),
-        ));
+        $cache = array_replace_recursive($cache, [
+            \get_class($test) => [
+                'covers' => $covers,
+            ],
+        ]);
+
         $r->setValue(Test::class, $cache);
+    }
+
+    private function addCoversForDocBlockInsideRegistry($test, $covers)
+    {
+        $docBlock = Registry::getInstance()->forClassName(\get_class($test));
+
+        $symbolAnnotations = new \ReflectionProperty($docBlock, 'symbolAnnotations');
+        $symbolAnnotations->setAccessible(true);
+
+        // Exclude internal classes; PHPUnit 9.1+ is picky about tests covering, say, a \RuntimeException
+        $covers = array_filter($covers, function ($class) {
+            $reflector = new ReflectionClass($class);
+
+            return $reflector->isUserDefined();
+        });
+
+        $symbolAnnotations->setValue($docBlock, array_replace($docBlock->symbolAnnotations(), [
+            'covers' => $covers,
+        ]));
     }
 
     private function findSutFqcn($test)

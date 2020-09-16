@@ -5,6 +5,7 @@ framework:
     form:
         csrf_protection:
             field_name: _csrf
+        legacy_error_messages: false
     http_method_override: false
     esi:
         enabled: true
@@ -16,6 +17,7 @@ framework:
     router:
         resource:     '%kernel.project_dir%/config/routing.xml'
         type:         xml
+        utf8:         true
     session:
         storage_id:      session.storage.native
         handler_id:      session.handler.native_file
@@ -40,6 +42,7 @@ framework:
         default_path: '%kernel.project_dir%/translations'
         cache_dir: '%kernel.cache_dir%/translations'
         paths: ['%kernel.project_dir%/Fixtures/translations']
+        enabled_locales: [fr, en]
     validation:
         enabled: true
     annotations:

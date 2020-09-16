@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -51,13 +53,14 @@ class MandrillApiTransport extends AbstractApiTransport
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('error' === ($result['status'] ?? false)) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']), $response);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $result['code']), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email (code %d).', $result['code']), $response);
         }
 
-        $sentMessage->setMessageId($result['_id']);
+        $firstRecipient = reset($result);
+        $sentMessage->setMessageId($firstRecipient['_id']);
 
         return $response;
     }
@@ -93,10 +96,14 @@ class MandrillApiTransport extends AbstractApiTransport
                 'type' => $headers->get('Content-Type')->getBody(),
             ];
 
+            if ($name = $headers->getHeaderParameter('Content-Disposition', 'name')) {
+                $att['name'] = $name;
+            }
+
             if ('inline' === $disposition) {
-                $payload['images'][] = $att;
+                $payload['message']['images'][] = $att;
             } else {
-                $payload['attachments'][] = $att;
+                $payload['message']['attachments'][] = $att;
             }
         }
 
@@ -106,7 +113,19 @@ class MandrillApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['message']['headers'][] = $name.': '.$header->toString();
+            if ($header instanceof TagHeader) {
+                $payload['message']['tags'] = explode(',', $header->getValue());
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['message']['metadata'][$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
+            $payload['message']['headers'][$name] = $header->getBodyAsString();
         }
 
         return $payload;

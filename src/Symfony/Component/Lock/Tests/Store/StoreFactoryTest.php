@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
+use Symfony\Component\Lock\Store\MongoDbStore;
 use Symfony\Component\Lock\Store\PdoStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -49,6 +50,10 @@ class StoreFactoryTest extends TestCase
         if (class_exists(\Memcached::class)) {
             yield [new \Memcached(), MemcachedStore::class];
         }
+        if (class_exists(\MongoDB\Collection::class)) {
+            yield [$this->createMock(\MongoDB\Collection::class), MongoDbStore::class];
+            yield ['mongodb://localhost/test?collection=lock', MongoDbStore::class];
+        }
         if (class_exists(\Zookeeper::class)) {
             yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
             yield ['zookeeper://localhost:2181', ZookeeperStore::class];
@@ -61,6 +66,9 @@ class StoreFactoryTest extends TestCase
         }
         if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
             yield ['redis://localhost', RedisStore::class];
+            yield ['redis://localhost?lazy=1', RedisStore::class];
+            yield ['redis://localhost?redis_cluster=1', RedisStore::class];
+            yield ['redis://localhost?redis_cluster=1&lazy=1', RedisStore::class];
         }
         if (class_exists(\PDO::class)) {
             yield ['sqlite:/tmp/sqlite.db', PdoStore::class];

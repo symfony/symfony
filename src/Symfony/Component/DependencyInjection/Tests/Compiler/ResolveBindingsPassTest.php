@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
@@ -36,6 +37,7 @@ class ResolveBindingsPassTest extends TestCase
 
         $bindings = [
             CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
+            'Psr\Container\ContainerInterface $container' => new BoundArgument(new ServiceLocatorArgument([]), true, BoundArgument::INSTANCEOF_BINDING),
             'iterable $objects' => new BoundArgument(new TaggedIteratorArgument('tag.name'), true, BoundArgument::INSTANCEOF_BINDING),
         ];
 
@@ -50,7 +52,13 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals([0 => new Reference('foo'), 1 => '123', 4 => new TaggedIteratorArgument('tag.name')], $definition->getArguments());
+        $expected = [
+            0 => new Reference('foo'),
+            1 => '123',
+            3 => new ServiceLocatorArgument([]),
+            4 => new TaggedIteratorArgument('tag.name'),
+        ];
+        $this->assertEquals($expected, $definition->getArguments());
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
@@ -85,7 +93,10 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = [CaseSensitiveClass::class => new BoundArgument(new Reference('foo'))];
+        $bindings = [
+            CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
+            CaseSensitiveClass::class.' $c' => new BoundArgument(new Reference('bar')),
+        ];
 
         // Explicit service id
         $definition1 = $container->register('def1', NamedArgumentsDummy::class);
@@ -96,11 +107,16 @@ class ResolveBindingsPassTest extends TestCase
         $definition2->addArgument(new TypedReference(CaseSensitiveClass::class, CaseSensitiveClass::class));
         $definition2->setBindings($bindings);
 
+        $definition3 = $container->register('def3', NamedArgumentsDummy::class);
+        $definition3->addArgument(new TypedReference(CaseSensitiveClass::class, CaseSensitiveClass::class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, 'c'));
+        $definition3->setBindings($bindings);
+
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
         $this->assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
         $this->assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
+        $this->assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
     }
 
     public function testScalarSetter()
@@ -153,5 +169,20 @@ class ResolveBindingsPassTest extends TestCase
         (new DefinitionErrorExceptionPass())->process($container);
 
         $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+    }
+
+    public function testEmptyBindingTypehint()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Did you forget to add the type "string" to argument "$apiKey" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy::__construct()"?');
+
+        $container = new ContainerBuilder();
+        $bindings = [
+            'string $apiKey' => new BoundArgument('foo'),
+        ];
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setBindings($bindings);
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
     }
 }

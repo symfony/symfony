@@ -63,18 +63,24 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
     }
 
-    public function isRetryable(Envelope $message): bool
+    /**
+     * @param \Throwable|null $throwable The cause of the failed handling
+     */
+    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         return $retries < $this->maxRetries;
     }
 
-    public function getWaitingTime(Envelope $message): int
+    /**
+     * @param \Throwable|null $throwable The cause of the failed handling
+     */
+    public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
-        $delay = $this->delayMilliseconds * pow($this->multiplier, $retries);
+        $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;

@@ -12,12 +12,13 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -32,7 +33,7 @@ class ErrorListener implements EventSubscriberInterface
     protected $logger;
     protected $debug;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
+    public function __construct($controller, LoggerInterface $logger = null, bool $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;
@@ -46,7 +47,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->logException($event->getThrowable(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
+    public function onKernelException(ExceptionEvent $event)
     {
         if (null === $this->controller) {
             return;
@@ -78,12 +79,15 @@ class ErrorListener implements EventSubscriberInterface
 
         $event->setResponse($response);
 
-        if ($this->debug && $eventDispatcher instanceof EventDispatcherInterface) {
-            $cspRemovalListener = function ($event) use (&$cspRemovalListener, $eventDispatcher) {
-                $event->getResponse()->headers->remove('Content-Security-Policy');
-                $eventDispatcher->removeListener(KernelEvents::RESPONSE, $cspRemovalListener);
-            };
-            $eventDispatcher->addListener(KernelEvents::RESPONSE, $cspRemovalListener, -128);
+        if ($this->debug) {
+            $event->getRequest()->attributes->set('_remove_csp_headers', true);
+        }
+    }
+
+    public function removeCspHeader(ResponseEvent $event): void
+    {
+        if ($this->debug && $event->getRequest()->attributes->get('_remove_csp_headers', false)) {
+            $event->getResponse()->headers->remove('Content-Security-Policy');
         }
     }
 
@@ -98,7 +102,7 @@ class ErrorListener implements EventSubscriberInterface
         $r = new \ReflectionFunction(\Closure::fromCallable($event->getController()));
         $r = $r->getParameters()[$k] ?? null;
 
-        if ($r && (!$r->hasType() || FlattenException::class === $r->getType()->getName())) {
+        if ($r && (!($r = $r->getType()) instanceof \ReflectionNamedType || \in_array($r->getName(), [FlattenException::class, LegacyFlattenException::class], true))) {
             $arguments = $event->getArguments();
             $arguments[$k] = FlattenException::createFromThrowable($e);
             $event->setArguments($arguments);
@@ -113,6 +117,7 @@ class ErrorListener implements EventSubscriberInterface
                 ['logKernelException', 0],
                 ['onKernelException', -128],
             ],
+            KernelEvents::RESPONSE => ['removeCspHeader', -128],
         ];
     }
 

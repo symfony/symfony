@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineClearEntityManagerWorkerSubscriber;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 

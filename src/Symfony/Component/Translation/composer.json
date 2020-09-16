@@ -16,8 +16,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php80": "^1.15",
         "symfony/translation-contracts": "^2"
     },
     "require-dev": {
@@ -47,6 +48,7 @@
         "psr/log-implementation": "To use logging capability in translator"
     },
     "autoload": {
+        "files": [ "Resources/functions/translatable.php" ],
         "psr-4": { "Symfony\\Component\\Translation\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
@@ -55,7 +57,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

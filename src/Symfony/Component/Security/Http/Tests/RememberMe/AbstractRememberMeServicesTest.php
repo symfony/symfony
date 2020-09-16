@@ -39,6 +39,17 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertNull($service->autoLogin(new Request()));
     }
 
+    public function testAutoLoginReturnsNullAfterLoginFail()
+    {
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
+
+        $request = new Request();
+        $request->cookies->set('foo', 'foo');
+
+        $service->loginFail($request);
+        $this->assertNull($service->autoLogin($request));
+    }
+
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
         $this->expectException('RuntimeException');
@@ -78,7 +89,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
         $this->assertSame($user, $returnedToken->getUser());
         $this->assertSame('foosecret', $returnedToken->getSecret());
-        $this->assertSame('fookey', $returnedToken->getProviderKey());
+        $this->assertSame('fookey', $returnedToken->getFirewallName());
     }
 
     /**

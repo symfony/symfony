@@ -35,6 +35,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     private $files = [];
 
     private static $startTime;
+    private static $valuesCache = [];
 
     /**
      * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
@@ -57,7 +58,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     {
         self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
 
-        return \function_exists('opcache_invalidate') && ('cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN)) && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN);
+        return \function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOLEAN));
     }
 
     /**
@@ -116,6 +117,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 $values[$id] = null;
             } elseif (!\is_object($value)) {
                 $values[$id] = $value;
+            } elseif (!$value instanceof LazyValue) {
+                $values[$id] = $value();
             } elseif (false === $values[$id] = include $value->file) {
                 unset($values[$id], $this->values[$id]);
                 $missingIds[] = $id;
@@ -137,14 +140,20 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 try {
                     $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
 
-                    if (\is_array($expiresAt = include $file)) {
+                    if (isset(self::$valuesCache[$file])) {
+                        [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
+                    } elseif (\is_array($expiresAt = include $file)) {
+                        if ($this->appendOnly) {
+                            self::$valuesCache[$file] = $expiresAt;
+                        }
+
                         [$expiresAt, $this->values[$id]] = $expiresAt;
                     } elseif ($now < $expiresAt) {
                         $this->values[$id] = new LazyValue($file);
                     }
 
                     if ($now >= $expiresAt) {
-                        unset($this->values[$id], $missingIds[$k]);
+                        unset($this->values[$id], $missingIds[$k], self::$valuesCache[$file]);
                     }
                 } catch (\ErrorException $e) {
                     unset($missingIds[$k]);
@@ -173,7 +182,13 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
             $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
             $getExpiry = true;
 
-            if (\is_array($expiresAt = include $file)) {
+            if (isset(self::$valuesCache[$file])) {
+                [$expiresAt, $value] = self::$valuesCache[$file];
+            } elseif (\is_array($expiresAt = include $file)) {
+                if ($this->appendOnly) {
+                    self::$valuesCache[$file] = $expiresAt;
+                }
+
                 [$expiresAt, $value] = $expiresAt;
             } elseif ($this->appendOnly) {
                 $value = new LazyValue($file);
@@ -211,7 +226,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 try {
                     $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
+                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
                 }
             } elseif (\is_string($value)) {
                 // Wrap "N;" in a closure to not confuse it with an encoded `null`
@@ -220,19 +235,21 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 }
                 $value = var_export($value, true);
             } elseif (!is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
             } else {
                 $value = var_export($value, true);
             }
 
             $encodedKey = rawurlencode($key);
 
-            if (!$isStaticValue) {
+            if ($isStaticValue) {
+                $value = "return [{$expiry}, {$value}];";
+            } elseif ($this->appendOnly) {
+                $value = "return [{$expiry}, static function () { return {$value}; }];";
+            } else {
                 // We cannot use a closure here because of https://bugs.php.net/76982
                 $value = str_replace('\Symfony\Component\VarExporter\Internal\\', '', $value);
                 $value = "namespace Symfony\Component\VarExporter\Internal;\n\nreturn \$getExpiry ? {$expiry} : {$value};";
-            } else {
-                $value = "return [{$expiry}, {$value}];";
             }
 
             $file = $this->files[$key] = $this->getFile($key, true);
@@ -243,10 +260,11 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 @opcache_invalidate($file, true);
                 @opcache_compile_file($file);
             }
+            unset(self::$valuesCache[$file]);
         }
 
         if (!$ok && !is_writable($this->directory)) {
-            throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
+            throw new CacheException(sprintf('Cache directory is not writable (%s).', $this->directory));
         }
 
         return $ok;
@@ -276,6 +294,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
     protected function doUnlink($file)
     {
+        unset(self::$valuesCache[$file]);
+
         if (self::isSupported()) {
             @opcache_invalidate($file, true);
         }

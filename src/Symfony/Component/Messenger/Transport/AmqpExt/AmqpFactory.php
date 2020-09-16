@@ -11,25 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-class AmqpFactory
-{
-    public function createConnection(array $credentials): \AMQPConnection
-    {
-        return new \AMQPConnection($credentials);
-    }
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory as BridgeAmqpFactory;
 
-    public function createChannel(\AMQPConnection $connection): \AMQPChannel
-    {
-        return new \AMQPChannel($connection);
-    }
+trigger_deprecation('symfony/messenger', '5.1', 'The "%s" class is deprecated, use "%s" instead. The AmqpExt transport has been moved to package "symfony/amqp-messenger" and will not be included by default in 6.0. Run "composer require symfony/amqp-messenger".', AmqpFactory::class, BridgeAmqpFactory::class);
 
-    public function createQueue(\AMQPChannel $channel): \AMQPQueue
-    {
-        return new \AMQPQueue($channel);
-    }
+class_exists(BridgeAmqpFactory::class);
 
-    public function createExchange(\AMQPChannel $channel): \AMQPExchange
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/amqp-messenger instead.
+     */
+    class AmqpFactory
     {
-        return new \AMQPExchange($channel);
     }
 }

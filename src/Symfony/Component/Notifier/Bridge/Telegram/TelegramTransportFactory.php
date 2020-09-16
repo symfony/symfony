@@ -20,10 +20,13 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 final class TelegramTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @return TelegramTransport
+     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
@@ -47,11 +50,11 @@ final class TelegramTransportFactory extends AbstractTransportFactory
     private function getToken(Dsn $dsn): string
     {
         if (null === $dsn->getUser() && null === $dsn->getPassword()) {
-            throw new IncompleteDsnException('Missing token');
+            throw new IncompleteDsnException('Missing token.', $dsn->getOriginalDsn());
         }
 
         if (null === $dsn->getPassword()) {
-            throw new IncompleteDsnException('Malformed token');
+            throw new IncompleteDsnException('Malformed token.', $dsn->getOriginalDsn());
         }
 
         return sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());

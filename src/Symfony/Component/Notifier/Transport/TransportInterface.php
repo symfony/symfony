@@ -13,18 +13,19 @@ namespace Symfony\Component\Notifier\Transport;
 
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 interface TransportInterface
 {
     /**
      * @throws TransportExceptionInterface
      */
-    public function send(MessageInterface $message): void;
+    public function send(MessageInterface $message): ?SentMessage;
 
     public function supports(MessageInterface $message): bool;
 

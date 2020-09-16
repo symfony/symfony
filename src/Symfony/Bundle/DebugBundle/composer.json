@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "ext-xml": "*",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/twig-bridge": "^4.4|^5.0",
@@ -29,7 +29,7 @@
     },
     "conflict": {
         "symfony/config": "<4.4",
-        "symfony/dependency-injection": "<4.4"
+        "symfony/dependency-injection": "<5.2"
     },
     "suggest": {
         "symfony/config": "For service container configuration",
@@ -44,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     }
 }

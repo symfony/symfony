@@ -1,0 +1,4 @@
+'Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy':
+  attributes:
+    ignored1:
+      ignore: foo

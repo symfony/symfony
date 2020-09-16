@@ -1,7 +1,7 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "arabské",
+        "Aran": "nastaliq",
         "Armn": "arménske",
         "Bali": "balijský",
         "Beng": "bengálske",
@@ -38,9 +38,12 @@
         "Maya": "mayské hieroglyfy",
         "Mlym": "malajálamske",
         "Mong": "mongolské",
+        "Mtei": "mejtej majek (manipurské)",
         "Mymr": "barmské",
+        "Olck": "santálske (ol chiki)",
         "Orya": "uríjske",
         "Osma": "osmanský",
+        "Qaag": "zawgyi",
         "Runr": "Runové písmo",
         "Sinh": "sinhálske",
         "Taml": "tamilské",

@@ -1,9 +1,11 @@
 framework:
     secret: test
-    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     validation: { enabled: true, enable_annotations: true }
     csrf_protection: true
-    form: true
+    form:
+        enabled: true
+        legacy_error_messages: false
     test: ~
     default_locale: en
     session:
@@ -19,8 +21,6 @@ security:
             pattern: ^/secure/
             http_basic: { realm: "Secure Gateway API" }
             entry_point: firewall_entry_point.entry_point.stub
-        default:
-            anonymous: ~
     access_control:
         - { path: ^/secure/, roles: ROLE_SECURE }
     providers:

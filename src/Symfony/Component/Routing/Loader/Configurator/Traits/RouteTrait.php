@@ -19,7 +19,7 @@ trait RouteTrait
     /**
      * @var RouteCollection|Route
      */
-    private $route;
+    protected $route;
 
     /**
      * Adds defaults.
@@ -157,6 +157,18 @@ trait RouteTrait
     final public function format(string $format): self
     {
         $this->route->addDefaults(['_format' => $format]);
+
+        return $this;
+    }
+
+    /**
+     * Adds the "_stateless" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function stateless(bool $stateless = true): self
+    {
+        $this->route->addDefaults(['_stateless' => $stateless]);
 
         return $this;
     }

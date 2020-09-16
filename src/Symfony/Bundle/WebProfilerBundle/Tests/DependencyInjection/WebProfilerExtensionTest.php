@@ -62,6 +62,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'))->setPublic(true);
         $this->container->setParameter('kernel.bundles', []);
         $this->container->setParameter('kernel.cache_dir', __DIR__);
+        $this->container->setParameter('kernel.build_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.project_dir', __DIR__);
         $this->container->setParameter('kernel.charset', 'UTF-8');

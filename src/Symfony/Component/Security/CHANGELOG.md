@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added attributes on `Passport`
+ * Changed `AuthorizationChecker` to call the access decision manager in unauthenticated sessions with a `NullToken`
+ * [BC break] Removed `AccessListener::PUBLIC_ACCESS` in favor of `AuthenticatedVoter::PUBLIC_ACCESS`
+ * Added `Passport` to `LoginFailureEvent`.
+ * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
+ * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
+ * Added translator to `\Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator` and `\Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener` to translate authentication failure messages
+ * Added a CurrentUser attribute to force the UserValueResolver to resolve an argument to the current user.
+
+5.1.0
+-----
+
+ * Added access decision strategy to override access decisions by voter service priority
+ * Added `IS_ANONYMOUS`, `IS_REMEMBERED`, `IS_IMPERSONATOR`
+ * Hash the persistent RememberMe token value in database.
+ * Added `LogoutEvent` to allow custom logout listeners.
+ * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface` in favor of listening on the `LogoutEvent`.
+ * Added experimental new security using `Http\Authenticator\AuthenticatorInterface`, `Http\Authentication\AuthenticatorManager` and `Http\Firewall\AuthenticatorManagerListener`.
+ * Added `CustomUserMessageAccountStatusException` to be used when extending `UserCheckerInterface`
+ * Deprecated `RememberMeServicesInterface` implementations without `logout(Request $request, Response $response, TokenInterface $token)` method, this method will be required in Symfony 6.0.
+
 5.0.0
 -----
 
@@ -15,7 +39,7 @@ CHANGELOG
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
       || $this->authorizationChecker->isGranted('ROLE_ADMIN')
@@ -62,6 +86,7 @@ CHANGELOG
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
  * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()`
  * Added new `argon2id` encoder, undeprecated the `bcrypt` and `argon2i` ones (using `auto` is still recommended by default.)
+ * Added `AbstractListener` which replaces the deprecated `ListenerInterface`
 
 4.3.0
 -----

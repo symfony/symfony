@@ -44,10 +44,10 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     public function provideInvalidComparisons(): array
     {
         return [
-            [0, '0', 0, '0', 'integer'],
-            [2, '2', 0, '0', 'integer'],
-            [2.5, '2.5', 0, '0', 'integer'],
-            [333, '333', 0, '0', 'integer'],
+            [0, '0', 0, '0', 'int'],
+            [2, '2', 0, '0', 'int'],
+            [2.5, '2.5', 0, '0', 'int'],
+            [333, '333', 0, '0', 'int'],
         ];
     }
 
@@ -108,6 +108,14 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
     {
         $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
+    }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
     }
 
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()

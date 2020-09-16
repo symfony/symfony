@@ -30,6 +30,10 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
             // get class loaders wrapped by DebugClassLoader
             if ($function[0] instanceof DebugClassLoader) {
                 $function = $function[0]->getClassLoader();
+
+                if (!\is_array($function)) {
+                    continue;
+                }
             }
 
             if ($function[0] instanceof ComposerClassLoader) {
@@ -78,12 +82,28 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
 
         return [
             [
+                'Class "WhizBangFactory" not found',
+                "Attempted to load class \"WhizBangFactory\" from the global namespace.\nDid you forget a \"use\" statement?",
+            ],
+            [
                 'Class \'WhizBangFactory\' not found',
                 "Attempted to load class \"WhizBangFactory\" from the global namespace.\nDid you forget a \"use\" statement?",
             ],
             [
+                'Class "Foo\\Bar\\WhizBangFactory" not found',
+                "Attempted to load class \"WhizBangFactory\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
                 'Class \'Foo\\Bar\\WhizBangFactory\' not found',
                 "Attempted to load class \"WhizBangFactory\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
+                'Interface "Foo\\Bar\\WhizBangInterface" not found',
+                "Attempted to load interface \"WhizBangInterface\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
+            ],
+            [
+                'Trait "Foo\\Bar\\WhizBangTrait" not found',
+                "Attempted to load trait \"WhizBangTrait\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
             ],
             [
                 'Class \'UndefinedFunctionError\' not found',
@@ -121,7 +141,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
     public function testEnhanceWithFatalError()
     {
         $error = (new ClassNotFoundErrorEnhancer())->enhance(new FatalError('foo', 0, [
-            'type' => E_ERROR,
+            'type' => \E_ERROR,
             'message' => "Class 'FooBarCcc' not found",
             'file' => $expectedFile = realpath(__FILE__),
             'line' => $expectedLine = __LINE__,

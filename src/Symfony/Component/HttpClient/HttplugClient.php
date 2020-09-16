@@ -12,16 +12,17 @@
 namespace Symfony\Component\HttpClient;
 
 use GuzzleHttp\Promise\Promise as GuzzlePromise;
+use GuzzleHttp\Promise\RejectedPromise;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient as HttplugInterface;
+use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Message\RequestFactory;
 use Http\Message\StreamFactory;
 use Http\Message\UriFactory;
 use Http\Promise\Promise;
-use Http\Promise\RejectedPromise;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;
@@ -75,9 +76,13 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
-            $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
-            $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
-            $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
+            try {
+                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
+                $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
+                $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
+            } catch (NotFoundException $e) {
+                throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been found. Try running "composer require nyholm/psr7".', 0, $e);
+            }
         }
 
         $this->waitLoop = new HttplugWaitLoop($this->client, $this->promisePool, $this->responseFactory, $this->streamFactory);
@@ -109,7 +114,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         try {
             $response = $this->sendPsr7Request($request, true);
         } catch (NetworkException $e) {
-            return new RejectedPromise($e);
+            return new HttplugPromise(new RejectedPromise($e));
         }
 
         $waitLoop = $this->waitLoop;
@@ -179,7 +184,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         } elseif (\is_resource($body)) {
             $stream = $this->streamFactory->createStreamFromResource($body);
         } else {
-            throw new \InvalidArgumentException(sprintf('%s() expects string, resource or StreamInterface, %s given.', __METHOD__, \gettype($body)));
+            throw new \InvalidArgumentException(sprintf('"%s()" expects string, resource or StreamInterface, "%s" given.', __METHOD__, get_debug_type($body)));
         }
 
         if ($stream->isSeekable()) {

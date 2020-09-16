@@ -4,6 +4,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
 
+if (PHP_VERSION_ID >= 80000) {
+    require __DIR__.'/uniontype_classes.php';
+    require __DIR__.'/autowiring_classes_80.php';
+}
+
 class Foo
 {
 }
@@ -183,12 +188,6 @@ class MultipleArgumentsOptionalScalar
 class MultipleArgumentsOptionalScalarLast
 {
     public function __construct(A $a, Lille $lille, $foo = 'some_val')
-    {
-    }
-}
-class MultipleArgumentsOptionalScalarNotReallyOptional
-{
-    public function __construct(A $a, $foo = 'default_val', Lille $lille)
     {
     }
 }

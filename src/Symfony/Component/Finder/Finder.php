@@ -582,7 +582,7 @@ class Finder implements \IteratorAggregate, \Countable
         foreach ((array) $dirs as $dir) {
             if (is_dir($dir)) {
                 $resolvedDirs[] = $this->normalizeDir($dir);
-            } elseif ($glob = glob($dir, (\defined('GLOB_BRACE') ? GLOB_BRACE : 0) | GLOB_ONLYDIR | GLOB_NOSORT)) {
+            } elseif ($glob = glob($dir, (\defined('GLOB_BRACE') ? \GLOB_BRACE : 0) | \GLOB_ONLYDIR | \GLOB_NOSORT)) {
                 sort($glob);
                 $resolvedDirs = array_merge($resolvedDirs, array_map([$this, 'normalizeDir'], $glob));
             } else {
@@ -700,7 +700,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         $minDepth = 0;
-        $maxDepth = PHP_INT_MAX;
+        $maxDepth = \PHP_INT_MAX;
 
         foreach ($this->depths as $comparator) {
             switch ($comparator->getOperator()) {
@@ -735,7 +735,7 @@ class Finder implements \IteratorAggregate, \Countable
 
         $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
-        if ($minDepth > 0 || $maxDepth < PHP_INT_MAX) {
+        if ($minDepth > 0 || $maxDepth < \PHP_INT_MAX) {
             $iterator = new Iterator\DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
         }
 
@@ -782,6 +782,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     private function normalizeDir(string $dir): string
     {
+        if ('/' === $dir) {
+            return $dir;
+        }
+
         $dir = rtrim($dir, '/'.\DIRECTORY_SEPARATOR);
 
         if (preg_match('#^(ssh2\.)?s?ftp://#', $dir)) {

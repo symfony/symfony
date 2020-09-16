@@ -101,6 +101,9 @@ class StreamedResponseTest extends TestCase
         $this->assertFalse($response->getContent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreate()
     {
         $response = StreamedResponse::create(function () {}, 204);

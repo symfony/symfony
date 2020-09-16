@@ -324,7 +324,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        $this->expectException(Warning::class);
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
@@ -334,6 +340,10 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrencyReturn($formatter, $value)
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        }
+
         $this->assertFalse(@$formatter->format($value, NumberFormatter::TYPE_CURRENCY));
     }
 
@@ -373,13 +383,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function formatFractionDigitsProvider()
     {
-        return [
-            [1.123, '1.123', null, 0],
-            [1.123, '1', 0, 0],
-            [1.123, '1.1', 1, 1],
-            [1.123, '1.12', 2, 2],
-            [1.123, '1.123', -1, 0],
-        ];
+        yield [1.123, '1.123', null, 0];
+        yield [1.123, '1', 0, 0];
+        yield [1.123, '1.1', 1, 1];
+        yield [1.123, '1.12', 2, 2];
+        yield [1.123, '1.123', -1, 0];
     }
 
     /**
@@ -405,13 +413,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function formatGroupingUsedProvider()
     {
-        return [
-            [1000, '1,000', null, 1],
-            [1000, '1000', 0, 0],
-            [1000, '1,000', 1, 1],
-            [1000, '1,000', 2, 1],
-            [1000, '1,000', -1, 1],
-        ];
+        yield [1000, '1,000', null, 1];
+        yield [1000, '1000', 0, 0];
+        yield [1000, '1,000', 1, 1];
+        yield [1000, '1,000', 2, 1];
+        yield [1000, '1,000', -1, 1];
     }
 
     /**
@@ -600,7 +606,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
         $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enSymbols');
         $r->setAccessible(true);
-        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+        $expected = $r->getValue();
 
         for ($i = 0; $i <= 17; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getSymbol($i));
@@ -617,7 +623,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
         $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enTextAttributes');
         $r->setAccessible(true);
-        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+        $expected = $r->getValue();
 
         for ($i = 0; $i <= 5; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getTextAttribute($i));
@@ -699,7 +705,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        $this->expectException(Warning::class);
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
@@ -819,7 +831,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
-        $this->expectException(Warning::class);
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->expectException(\ValueError::class);
+        } elseif (method_exists($this, 'expectWarning')) {
+            $this->expectWarning();
+        } else {
+            $this->expectException(Warning::class);
+        }
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);

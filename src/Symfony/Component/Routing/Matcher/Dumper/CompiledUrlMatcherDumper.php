@@ -244,7 +244,7 @@ EOF;
      * Last but not least:
      *  - Because it is not possibe to mix unicode/non-unicode patterns in a single regexp, several of them can be generated.
      *  - The same regexp can be used several times when the logic in the switch rejects the match. When this happens, the
-     *    matching-but-failing subpattern is blacklisted by replacing its name by "(*F)", which forces a failure-to-match.
+     *    matching-but-failing subpattern is excluded by replacing its name by "(*F)", which forces a failure-to-match.
      *    To ease this backlisting operation, the name of subpatterns is also the string offset where the replacement should occur.
      */
     private function compileDynamicRoutes(RouteCollection $collection, bool $matchHost, int $chunkLimit, array &$conditions): array

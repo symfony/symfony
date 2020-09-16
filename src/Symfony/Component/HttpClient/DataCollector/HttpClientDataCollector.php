@@ -15,11 +15,13 @@ use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\VarDumper\Caster\ImgStub;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-final class HttpClientDataCollector extends DataCollector
+final class HttpClientDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var TraceableHttpClient[]
@@ -36,7 +38,7 @@ final class HttpClientDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->initData();
+        $this->reset();
 
         foreach ($this->clients as $name => $client) {
             [$errorCount, $traces] = $this->collectOnClient($client);
@@ -48,6 +50,13 @@ final class HttpClientDataCollector extends DataCollector
 
             $this->data['request_count'] += \count($traces);
             $this->data['error_count'] += $errorCount;
+        }
+    }
+
+    public function lateCollect()
+    {
+        foreach ($this->clients as $client) {
+            $client->reset();
         }
     }
 
@@ -69,23 +78,12 @@ final class HttpClientDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function reset()
-    {
-        $this->initData();
-        foreach ($this->clients as $client) {
-            $client->reset();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'http_client';
     }
 
-    private function initData()
+    public function reset()
     {
         $this->data = [
             'clients' => [],
@@ -117,11 +115,11 @@ final class HttpClientDataCollector extends DataCollector
 
             unset($info['filetime'], $info['http_code'], $info['ssl_verify_result'], $info['content_type']);
 
-            if ($trace['method'] === $info['http_method']) {
+            if (($info['http_method'] ?? null) === $trace['method']) {
                 unset($info['http_method']);
             }
 
-            if ($trace['url'] === $info['url']) {
+            if (($info['url'] ?? null) === $trace['url']) {
                 unset($info['url']);
             }
 
@@ -131,8 +129,31 @@ final class HttpClientDataCollector extends DataCollector
                 }
             }
 
+            if (\is_string($content = $trace['content'])) {
+                $contentType = 'application/octet-stream';
+
+                foreach ($info['response_headers'] ?? [] as $h) {
+                    if (0 === stripos($h, 'content-type: ')) {
+                        $contentType = substr($h, \strlen('content-type: '));
+                        break;
+                    }
+                }
+
+                if (0 === strpos($contentType, 'image/') && class_exists(ImgStub::class)) {
+                    $content = new ImgStub($content, $contentType, '');
+                } else {
+                    $content = [$content];
+                }
+
+                $content = ['response_content' => $content];
+            } elseif (\is_array($content)) {
+                $content = ['response_json' => $content];
+            } else {
+                $content = [];
+            }
+
             $debugInfo = array_diff_key($info, $baseInfo);
-            $info = array_diff_key($info, $debugInfo) + ['debug_info' => $debugInfo];
+            $info = ['info' => $debugInfo] + array_diff_key($info, $debugInfo) + $content;
             unset($traces[$i]['info']); // break PHP reference used by TraceableHttpClient
             $traces[$i]['info'] = $this->cloneVar($info);
             $traces[$i]['options'] = $this->cloneVar($trace['options']);

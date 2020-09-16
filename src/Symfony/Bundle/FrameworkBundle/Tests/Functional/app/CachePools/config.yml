@@ -1,5 +1,5 @@
 imports:
-    - { resource: ../config/default.yml }
+    - { resource: default.yml }
 
 framework:
     cache:

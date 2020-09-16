@@ -51,7 +51,7 @@ class FileBagTest extends TestCase
             'name' => '',
             'type' => '',
             'tmp_name' => '',
-            'error' => UPLOAD_ERR_NO_FILE,
+            'error' => \UPLOAD_ERR_NO_FILE,
             'size' => 0,
         ]]);
 
@@ -64,7 +64,7 @@ class FileBagTest extends TestCase
             'name' => [''],
             'type' => [''],
             'tmp_name' => [''],
-            'error' => [UPLOAD_ERR_NO_FILE],
+            'error' => [\UPLOAD_ERR_NO_FILE],
             'size' => [0],
         ]]);
 
@@ -77,7 +77,7 @@ class FileBagTest extends TestCase
             'name' => ['file1' => ''],
             'type' => ['file1' => ''],
             'tmp_name' => ['file1' => ''],
-            'error' => ['file1' => UPLOAD_ERR_NO_FILE],
+            'error' => ['file1' => \UPLOAD_ERR_NO_FILE],
             'size' => ['file1' => 0],
         ]]);
 

@@ -16,7 +16,7 @@ $container->register('foo', 'stdClass')->setPublic(true)
 $container->register('bar', 'stdClass')->setPublic(true)
    ->addArgument(new Reference('bar_%env(BAR)%'));
 
-$container->register('bar_%env(BAR)%', 'stdClass')->setPublic(false);
-$container->register('baz_%env(BAR)%', 'stdClass')->setPublic(false);
+$container->register('bar_%env(BAR)%', 'stdClass');
+$container->register('baz_%env(BAR)%', 'stdClass');
 
 return $container;

@@ -58,7 +58,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "double" given to "env(FLOATISH)".');
+        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "float" given to "env(FLOATISH)".');
 
         $container = new ContainerBuilder();
         $container->setParameter('env(FLOATISH)', 3.2);
@@ -101,7 +101,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     public function testNulledEnvInConfig()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
-        $this->expectExceptionMessage('Invalid type for path "env_extension.int_node". Expected int, but got NULL.');
+        $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
         $container->registerExtension(new EnvExtension());

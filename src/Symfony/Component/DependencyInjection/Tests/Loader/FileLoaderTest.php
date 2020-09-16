@@ -75,7 +75,7 @@ class FileLoaderTest extends TestCase
                 ['foo', 'bar'],
             ],
             'mixedcase' => ['MixedCaseKey' => 'value'],
-            'constant' => PHP_EOL,
+            'constant' => \PHP_EOL,
             'bar' => '%foo%',
             'escape' => '@escapeme',
             'foo_bar' => new Reference('foo_bar'),
@@ -89,6 +89,7 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
@@ -121,7 +122,6 @@ class FileLoaderTest extends TestCase
             // load everything, except OtherDir/AnotherSub & Foo.php
             'Prototype/{%other_dir%/AnotherSub,Foo.php}'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
@@ -135,6 +135,13 @@ class FileLoaderTest extends TestCase
                 BarInterface::class,
             ],
             array_keys($container->getAliases())
+        );
+
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            'Prototype/NotExistingDir'
         );
     }
 
@@ -151,7 +158,6 @@ class FileLoaderTest extends TestCase
                 'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
             ]
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Foo::class));
         $this->assertTrue($container->has(Baz::class));
@@ -165,9 +171,7 @@ class FileLoaderTest extends TestCase
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
         $prototype = new Definition();
-        $prototype->setPublic(true)->setPrivate(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
@@ -185,7 +189,7 @@ class FileLoaderTest extends TestCase
         $alias = $container->getAlias(FooInterface::class);
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
+        $this->assertTrue($alias->isPrivate());
     }
 
     public function testMissingParentClass()
@@ -199,11 +203,10 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
             'Prototype/%bad_classes_dir%/*'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(MissingParent::class));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
             $container->getDefinition(MissingParent::class)->getErrors()[0]
         );
@@ -212,13 +215,12 @@ class FileLoaderTest extends TestCase
     public function testRegisterClassesWithBadPrefix()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
+        $this->expectExceptionMessageMatches('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
         // the Sub is missing from namespace prefix
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/Sub/*');
-        $loader->registerAliasesForSinglyImplementedInterfaces();
     }
 
     public function testRegisterClassesWithIncompatibleExclude()
@@ -234,12 +236,13 @@ class FileLoaderTest extends TestCase
             'Prototype/*',
             'yaml/*'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
     }
 }
 
 class TestFileLoader extends FileLoader
 {
+    public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+
     public function load($resource, string $type = null)
     {
         return $resource;

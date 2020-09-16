@@ -15,13 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\DisableAutoMapping;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type as TypeConstraint;
+use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
@@ -85,7 +86,7 @@ class PropertyInfoLoaderTest extends TestCase
             ))
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
 
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
@@ -164,11 +165,12 @@ class PropertyInfoLoaderTest extends TestCase
         $readOnlyMetadata = $classMetadata->getPropertyMetadata('readOnly');
         $this->assertEmpty($readOnlyMetadata);
 
+        /** @var PropertyMetadata[] $noAutoMappingMetadata */
         $noAutoMappingMetadata = $classMetadata->getPropertyMetadata('noAutoMapping');
         $this->assertCount(1, $noAutoMappingMetadata);
+        $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
-        $this->assertCount(1, $noAutoMappingConstraints);
-        $this->assertInstanceOf(DisableAutoMapping::class, $noAutoMappingConstraints[0]);
+        $this->assertCount(0, $noAutoMappingConstraints, 'DisableAutoMapping constraint is not added in the list');
     }
 
     /**
@@ -195,7 +197,8 @@ class PropertyInfoLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [true, null],
+            [false, null],
+            [true, '{.*}'],
             [true, '{^'.preg_quote(PropertyInfoLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];
@@ -215,15 +218,17 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_BOOL)]
             );
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
             ->addLoader($propertyInfoLoader)
             ->getValidator()
         ;
 
+        /** @var ClassMetadata $classMetadata */
         $classMetadata = $validator->getMetadataFor(new PropertyInfoLoaderNoAutoMappingEntity());
         $this->assertEmpty($classMetadata->getPropertyMetadata('string'));
-        $this->assertCount(3, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->constraints);
+        $this->assertCount(2, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->constraints);
+        $this->assertSame(AutoMappingStrategy::ENABLED, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->getAutoMappingStrategy());
     }
 }

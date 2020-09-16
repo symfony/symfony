@@ -42,11 +42,6 @@ class ExtensionPass implements CompilerPassInterface
         $viewDir = \dirname((new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension'))->getFileName(), 2).'/Resources/views';
         $templateIterator = $container->getDefinition('twig.template_iterator');
         $templatePaths = $templateIterator->getArgument(1);
-        $cacheWarmer = null;
-        if ($container->hasDefinition('twig.cache_warmer')) {
-            $cacheWarmer = $container->getDefinition('twig.cache_warmer');
-            $cacheWarmerPaths = $cacheWarmer->getArgument(2);
-        }
         $loader = $container->getDefinition('twig.loader.native_filesystem');
 
         if ($container->has('mailer')) {
@@ -54,9 +49,6 @@ class ExtensionPass implements CompilerPassInterface
             $loader->addMethodCall('addPath', [$emailPath, 'email']);
             $loader->addMethodCall('addPath', [$emailPath, '!email']);
             $templatePaths[$emailPath] = 'email';
-            if ($cacheWarmer) {
-                $cacheWarmerPaths[$emailPath] = 'email';
-            }
         }
 
         if ($container->has('form.extension')) {
@@ -65,15 +57,9 @@ class ExtensionPass implements CompilerPassInterface
             $coreThemePath = $viewDir.'/Form';
             $loader->addMethodCall('addPath', [$coreThemePath]);
             $templatePaths[$coreThemePath] = null;
-            if ($cacheWarmer) {
-                $cacheWarmerPaths[$coreThemePath] = null;
-            }
         }
 
         $templateIterator->replaceArgument(1, $templatePaths);
-        if ($cacheWarmer) {
-            $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $cacheWarmerPaths);
-        }
 
         if ($container->has('router')) {
             $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
@@ -88,10 +74,6 @@ class ExtensionPass implements CompilerPassInterface
                     ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
                 ;
             }
-        }
-
-        if (!$container->has('http_kernel')) {
-            $container->removeDefinition('twig.controller.preview_error');
         }
 
         if ($container->has('request_stack')) {

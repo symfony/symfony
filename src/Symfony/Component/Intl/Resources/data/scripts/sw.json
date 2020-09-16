@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "Arab": "Kiarabu",
         "Armn": "Kiarmenia",
@@ -13,7 +12,7 @@
         "Grek": "Kigiriki",
         "Gujr": "Kigujarati",
         "Guru": "Kigurmukhi",
-        "Hanb": "Hanb",
+        "Hanb": "Kihan chenye Bopomofo",
         "Hang": "Kihangul",
         "Hani": "Kihan",
         "Hans": "Rahisi",

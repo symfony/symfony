@@ -59,17 +59,37 @@ class CommandTesterTest extends TestCase
     public function testGetOutput()
     {
         rewind($this->tester->getOutput()->getStream());
-        $this->assertEquals('foo'.PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
+        $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
     }
 
     public function testGetDisplay()
     {
-        $this->assertEquals('foo'.PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+        $this->assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+    }
+
+    public function testGetDisplayWithoutCallingExecuteBefore()
+    {
+        $tester = new CommandTester(new Command());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Output not initialized');
+
+        $tester->getDisplay();
     }
 
     public function testGetStatusCode()
     {
         $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
+    }
+
+    public function testGetStatusCodeWithoutCallingExecuteBefore()
+    {
+        $tester = new CommandTester(new Command());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Status code not initialized');
+
+        $tester->getStatusCode();
     }
 
     public function testCommandFromApplication()

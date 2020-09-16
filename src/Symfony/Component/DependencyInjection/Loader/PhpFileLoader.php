@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
  */
 class PhpFileLoader extends FileLoader
 {
+    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+
     /**
      * {@inheritdoc}
      */
@@ -62,7 +64,7 @@ class PhpFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && 'php' === pathinfo($resource, PATHINFO_EXTENSION)) {
+        if (null === $type && 'php' === pathinfo($resource, \PATHINFO_EXTENSION)) {
             return true;
         }
 

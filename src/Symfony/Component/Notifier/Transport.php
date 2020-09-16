@@ -11,10 +11,21 @@
 
 namespace Symfony\Component\Notifier;
 
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
+use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
+use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\FailoverTransport;
@@ -29,15 +40,26 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 class Transport
 {
     private const FACTORY_CLASSES = [
         SlackTransportFactory::class,
         TelegramTransportFactory::class,
+        MattermostTransportFactory::class,
         NexmoTransportFactory::class,
+        RocketChatTransportFactory::class,
         TwilioTransportFactory::class,
+        InfobipTransportFactory::class,
+        OvhCloudTransportFactory::class,
+        FirebaseTransportFactory::class,
+        SinchTransportFactory::class,
+        FreeMobileTransportFactory::class,
+        ZulipTransportFactory::class,
+        MobytTransportFactory::class,
+        SmsapiTransportFactory::class,
+        EsendexTransportFactory::class,
     ];
 
     private $factories;

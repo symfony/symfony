@@ -35,7 +35,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
         $this->trueValue = $trueValue;
         $this->falseValues = $falseValues;
         if (\in_array($this->trueValue, $this->falseValues, true)) {
-            throw new InvalidArgumentException('The specified "true" value is contained in the false-values');
+            throw new InvalidArgumentException('The specified "true" value is contained in the false-values.');
         }
     }
 

@@ -26,6 +26,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MailgunHttpTransport extends AbstractHttpTransport
 {
+    use MailgunHeadersTrait;
+
     private const HOST = 'api.%region_dot%mailgun.net';
 
     private $key;
@@ -67,10 +69,10 @@ class MailgunHttpTransport extends AbstractHttpTransport
         $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $response->getStatusCode()), $response);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $response->getStatusCode()), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->getContent(false), $response->getStatusCode()), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $response->getStatusCode()), $response);
         }
 
         $message->setMessageId($result['id']);

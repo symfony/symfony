@@ -26,13 +26,11 @@ class FirewallMap implements FirewallMapInterface
 {
     private $container;
     private $map;
-    private $contexts;
 
     public function __construct(ContainerInterface $container, iterable $map)
     {
         $this->container = $container;
         $this->map = $map;
-        $this->contexts = new \SplObjectStorage();
     }
 
     public function getListeners(Request $request)

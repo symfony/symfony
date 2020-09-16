@@ -31,9 +31,11 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
+     * @param callable|null $filter The callable filtering the choices
+     *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromChoices(iterable $choices, callable $value = null);
+    public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/);
 
     /**
      * Creates a choice list that is loaded with the given loader.
@@ -42,9 +44,11 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
+     * @param callable|null $filter The callable filtering the choices
+     *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null);
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/);
 
     /**
      * Creates a view for the given choice list.

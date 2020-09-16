@@ -40,7 +40,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof AbstractComparison) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\AbstractComparison');
+            throw new UnexpectedTypeException($constraint, AbstractComparison::class);
         }
 
         if (null === $value) {
@@ -55,7 +55,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             try {
                 $comparedValue = $this->getPropertyAccessor()->getValue($object, $path);
             } catch (NoSuchPropertyException $e) {
-                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $path, \get_class($constraint), $e->getMessage()), 0, $e);
+                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $path, get_debug_type($constraint)).$e->getMessage(), 0, $e);
             }
         } else {
             $comparedValue = $constraint->value;
@@ -72,7 +72,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             try {
                 $comparedValue = new $dateTimeClass($comparedValue);
             } catch (\Exception $e) {
-                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, \get_class($constraint)));
+                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, get_debug_type($constraint)));
             }
         }
 

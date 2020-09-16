@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "Deva": "devanagari",
         "Gujr": "gujarati",
@@ -7,6 +6,7 @@
         "Hans": "idéogrammes han simplifiés",
         "Hant": "idéogrammes han traditionnels",
         "Hrkt": "syllabaires japonais",
+        "Olck": "ol chiki",
         "Zsye": "zsye"
     }
 }

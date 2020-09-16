@@ -34,7 +34,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @internal
  */
-abstract class AbstractPreAuthenticatedListener
+abstract class AbstractPreAuthenticatedListener extends AbstractListener
 {
     protected $logger;
     private $tokenStorage;
@@ -53,26 +53,37 @@ abstract class AbstractPreAuthenticatedListener
     }
 
     /**
-     * Handles pre-authentication.
+     * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function supports(Request $request): ?bool
     {
-        $request = $event->getRequest();
-
         try {
-            list($user, $credentials) = $this->getPreAuthenticatedData($request);
+            $request->attributes->set('_pre_authenticated_data', $this->getPreAuthenticatedData($request));
         } catch (BadCredentialsException $e) {
             $this->clearToken($e);
 
-            return;
+            return false;
         }
+
+        return true;
+    }
+
+    /**
+     * Handles pre-authentication.
+     */
+    public function authenticate(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+
+        [$user, $credentials] = $request->attributes->get('_pre_authenticated_data');
+        $request->attributes->remove('_pre_authenticated_data');
 
         if (null !== $this->logger) {
             $this->logger->debug('Checking current security token.', ['token' => (string) $this->tokenStorage->getToken()]);
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
+            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getFirewallName() && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }
@@ -117,7 +128,7 @@ abstract class AbstractPreAuthenticatedListener
     private function clearToken(AuthenticationException $exception)
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {

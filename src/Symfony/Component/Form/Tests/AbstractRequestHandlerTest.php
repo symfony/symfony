@@ -338,10 +338,10 @@ abstract class AbstractRequestHandlerTest extends TestCase
     public function getPostMaxSizeFixtures()
     {
         return [
-            [pow(1024, 3) + 1, '1G', true, ['{{ max }}' => '1G']],
-            [pow(1024, 3), '1G', false],
-            [pow(1024, 2) + 1, '1M', true, ['{{ max }}' => '1M']],
-            [pow(1024, 2), '1M', false],
+            [1024 ** 3 + 1, '1G', true, ['{{ max }}' => '1G']],
+            [1024 ** 3, '1G', false],
+            [1024 ** 2 + 1, '1M', true, ['{{ max }}' => '1M']],
+            [1024 ** 2, '1M', false],
             [1024 + 1, '1K', true, ['{{ max }}' => '1K']],
             [1024, '1K', false],
             [null, '1K', false],
@@ -371,14 +371,14 @@ abstract class AbstractRequestHandlerTest extends TestCase
     public function uploadFileErrorCodes()
     {
         return [
-            'no error' => [UPLOAD_ERR_OK, null],
-            'upload_max_filesize ini directive' => [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_INI_SIZE],
-            'MAX_FILE_SIZE from form' => [UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_FORM_SIZE],
-            'partially uploaded' => [UPLOAD_ERR_PARTIAL, UPLOAD_ERR_PARTIAL],
-            'no file upload' => [UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_FILE],
-            'missing temporary directory' => [UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_NO_TMP_DIR],
-            'write failure' => [UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_CANT_WRITE],
-            'stopped by extension' => [UPLOAD_ERR_EXTENSION, UPLOAD_ERR_EXTENSION],
+            'no error' => [\UPLOAD_ERR_OK, null],
+            'upload_max_filesize ini directive' => [\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_INI_SIZE],
+            'MAX_FILE_SIZE from form' => [\UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_FORM_SIZE],
+            'partially uploaded' => [\UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_PARTIAL],
+            'no file upload' => [\UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_NO_FILE],
+            'missing temporary directory' => [\UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_NO_TMP_DIR],
+            'write failure' => [\UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_CANT_WRITE],
+            'stopped by extension' => [\UPLOAD_ERR_EXTENSION, \UPLOAD_ERR_EXTENSION],
         ];
     }
 

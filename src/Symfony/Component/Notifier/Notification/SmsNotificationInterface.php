@@ -12,14 +12,14 @@
 namespace Symfony\Component\Notifier\Notification;
 
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.0
+ * @experimental in 5.1
  */
 interface SmsNotificationInterface
 {
-    public function asSmsMessage(Recipient $recipient, string $transport = null): ?SmsMessage;
+    public function asSmsMessage(SmsRecipientInterface $recipient, string $transport = null): ?SmsMessage;
 }

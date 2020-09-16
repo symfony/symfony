@@ -58,7 +58,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeOption($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
     }
 
@@ -108,7 +108,15 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function getOptionDefinition(OptionsResolver $optionsResolver, string $option)
     {
-        $definition = [
+        $definition = [];
+
+        if ($info = $optionsResolver->getInfo($option)) {
+            $definition = [
+                'info' => $info,
+            ];
+        }
+
+        $definition += [
             'required' => $optionsResolver->isRequired($option),
             'deprecated' => $optionsResolver->isDeprecated($option),
         ];
@@ -121,7 +129,7 @@ abstract class Descriptor implements DescriptorInterface
             'allowedTypes' => 'getAllowedTypes',
             'allowedValues' => 'getAllowedValues',
             'normalizers' => 'getNormalizers',
-            'deprecationMessage' => 'getDeprecationMessage',
+            'deprecation' => 'getDeprecation',
         ];
 
         foreach ($map as $key => $method) {
@@ -132,8 +140,10 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
-        if (isset($definition['deprecationMessage']) && \is_string($definition['deprecationMessage'])) {
-            $definition['deprecationMessage'] = strtr($definition['deprecationMessage'], ['%name%' => $option]);
+        if (isset($definition['deprecation']) && isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
+            $definition['deprecationMessage'] = strtr($definition['deprecation']['message'], ['%name%' => $option]);
+            $definition['deprecationPackage'] = $definition['deprecation']['package'];
+            $definition['deprecationVersion'] = $definition['deprecation']['version'];
         }
 
         return $definition;

@@ -30,7 +30,7 @@ class LanguageValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Language) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Language');
+            throw new UnexpectedTypeException($constraint, Language::class);
         }
 
         if (null === $value || '' === $value) {
@@ -43,7 +43,7 @@ class LanguageValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!Languages::exists($value)) {
+        if ($constraint->alpha3 ? !Languages::alpha3CodeExists($value) : !Languages::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)

@@ -1,5 +1,4 @@
 {
-    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -16,6 +15,10 @@
         "AFN": [
             "AFN",
             "afgán afghani"
+        ],
+        "ALK": [
+            "ALK",
+            "albán lek (1946–1965)"
         ],
         "ALL": [
             "ALL",
@@ -85,6 +88,10 @@
             "BAM",
             "bosznia-hercegovinai konvertibilis márka"
         ],
+        "BAN": [
+            "BAN",
+            "bosznia-hercegovinai új dínár (1994–1997)"
+        ],
         "BBD": [
             "BBD",
             "barbadosi dollár"
@@ -109,9 +116,17 @@
             "BGL",
             "Bolgár kemény leva"
         ],
+        "BGM": [
+            "BGM",
+            "bolgár szocialista leva"
+        ],
         "BGN": [
             "BGN",
             "bolgár új leva"
+        ],
+        "BGO": [
+            "BGO",
+            "bolgár leva (1879–1952)"
         ],
         "BHD": [
             "BHD",
@@ -581,6 +596,10 @@
             "MAF",
             "Marokkói frank"
         ],
+        "MDC": [
+            "MDC",
+            "moldáv kupon"
+        ],
         "MDL": [
             "MDL",
             "moldován lei"
@@ -596,6 +615,10 @@
         "MKD": [
             "MKD",
             "macedon dínár"
+        ],
+        "MKN": [
+            "MKN",
+            "macedón dénár (1992–1993)"
         ],
         "MLF": [
             "MLF",
@@ -1044,6 +1067,10 @@
         "YUN": [
             "YUN",
             "Jugoszláv konvertibilis dínár"
+        ],
+        "YUR": [
+            "YUR",
+            "jugoszláv reformált dinár (1992–1993)"
         ],
         "ZAL": [
             "ZAL",

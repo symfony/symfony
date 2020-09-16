@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Annotation;
 
+use Attribute;
+
 /**
  * Annotation class for @Route().
  *
@@ -18,7 +20,9 @@ namespace Symfony\Component\Routing\Annotation;
  * @Target({"CLASS", "METHOD"})
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  */
+#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class Route
 {
     private $path;
@@ -31,19 +35,64 @@ class Route
     private $methods = [];
     private $schemes = [];
     private $condition;
-    private $locale;
-    private $format;
-    private $utf8;
+    private $priority;
 
     /**
-     * @param array $data An array of key/value parameters
+     * @param array|string      $data         data array managed by the Doctrine Annotations library or the path
+     * @param array|string|null $path
+     * @param string[]          $requirements
+     * @param string[]          $methods
+     * @param string[]          $schemes
      *
      * @throws \BadMethodCallException
      */
-    public function __construct(array $data)
-    {
+    public function __construct(
+        $data = [],
+        $path = null,
+        string $name = null,
+        array $requirements = [],
+        array $options = [],
+        array $defaults = [],
+        string $host = null,
+        array $methods = [],
+        array $schemes = [],
+        string $condition = null,
+        int $priority = null,
+        string $locale = null,
+        string $format = null,
+        bool $utf8 = null,
+        bool $stateless = null
+    ) {
+        if (\is_string($data)) {
+            $data = ['path' => $data];
+        } elseif (!\is_array($data)) {
+            throw new \TypeError(sprintf('"%s": Argument $data is expected to be a string or array, got "%s".', __METHOD__, get_debug_type($data)));
+        }
+        if (null !== $path && !\is_string($path) && !\is_array($path)) {
+            throw new \TypeError(sprintf('"%s": Argument $path is expected to be a string, array or null, got "%s".', __METHOD__, get_debug_type($path)));
+        }
+
+        $data['path'] = $data['path'] ?? $path;
+        $data['name'] = $data['name'] ?? $name;
+        $data['requirements'] = $data['requirements'] ?? $requirements;
+        $data['options'] = $data['options'] ?? $options;
+        $data['defaults'] = $data['defaults'] ?? $defaults;
+        $data['host'] = $data['host'] ?? $host;
+        $data['methods'] = $data['methods'] ?? $methods;
+        $data['schemes'] = $data['schemes'] ?? $schemes;
+        $data['condition'] = $data['condition'] ?? $condition;
+        $data['priority'] = $data['priority'] ?? $priority;
+        $data['locale'] = $data['locale'] ?? $locale;
+        $data['format'] = $data['format'] ?? $format;
+        $data['utf8'] = $data['utf8'] ?? $utf8;
+        $data['stateless'] = $data['stateless'] ?? $stateless;
+
+        $data = array_filter($data, static function ($value): bool {
+            return null !== $value;
+        });
+
         if (isset($data['localized_paths'])) {
-            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', \get_class($this)));
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', static::class));
         }
 
         if (isset($data['value'])) {
@@ -67,14 +116,19 @@ class Route
         }
 
         if (isset($data['utf8'])) {
-            $data['options']['utf8'] = filter_var($data['utf8'], FILTER_VALIDATE_BOOLEAN) ?: false;
+            $data['options']['utf8'] = filter_var($data['utf8'], \FILTER_VALIDATE_BOOLEAN) ?: false;
             unset($data['utf8']);
+        }
+
+        if (isset($data['stateless'])) {
+            $data['defaults']['_stateless'] = filter_var($data['stateless'], \FILTER_VALIDATE_BOOLEAN) ?: false;
+            unset($data['stateless']);
         }
 
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, \get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, static::class));
             }
             $this->$method($value);
         }
@@ -178,5 +232,15 @@ class Route
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function setPriority(int $priority): void
+    {
+        $this->priority = $priority;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
     }
 }

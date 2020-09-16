@@ -13,25 +13,27 @@ addons:
         - slapd
         - zookeeperd
         - libzookeeper-mt-dev
-        - rabbitmq-server
 
 env:
     global:
         - MIN_PHP=7.2.5
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
-        - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
-        - MESSENGER_REDIS_DSN=redis://127.0.0.1:7006/messages
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
 
 matrix:
     include:
         - php: 7.2
-          env: php_extra="7.4snapshot"
+          env: php_extra="7.4"
         - php: 7.3
           env: deps=high
-        - php: 7.4snapshot
+        - php: 7.4
           env: deps=low
+        - php: nightly
+          services: [memcached]
     fast_finish: true
+    allow_failures:
+        - php: nightly
+          services: [memcached]
 
 cache:
     directories:
@@ -39,28 +41,15 @@ cache:
         - php-$MIN_PHP
         - ~/php-ext
 
-services:
-    - memcached
-    - mongodb
-    - redis-server
-    - rabbitmq
-    - docker
-
 before_install:
     - |
-      # Enable Sury ppa
+      # Enable extra ppa
       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
       sudo add-apt-repository -y ppa:ondrej/php
       sudo rm /etc/apt/sources.list.d/google-chrome.list
       sudo rm /etc/apt/sources.list.d/mongodb-3.4.list
       sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev
-
-    - |
-      # Start Redis cluster
-      docker pull grokzen/redis-cluster:5.0.4
-      docker run -d -p 7000:7000 -p 7001:7001 -p 7002:7002 -p 7003:7003 -p 7004:7004 -p 7005:7005 -p 7006:7006 -p 7007:7007 -e "STANDALONE=true" --name redis-cluster grokzen/redis-cluster:5.0.4
-      export REDIS_CLUSTER_HOSTS='localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
+      sudo apt install -y librabbitmq-dev libsodium-dev php-uuid zlib1g-dev
 
     - |
       # General configuration
@@ -134,6 +123,23 @@ before_install:
       }
       export -f tpecl
 
+      install_apcu_dev () {
+          local ref=$1
+          local INI=$2
+
+          wget https://github.com/krakjoe/apcu/archive/${ref}.zip
+          unzip ${ref}.zip
+          cd apcu-${ref}
+          phpize
+          ./configure
+          make
+          mv modules/apcu.so $(php -r "echo ini_get('extension_dir');")
+          echo 'extension = apcu.so' >> $INI
+          cd ..
+          rm -rf apcu-${ref} ${ref}.zip
+      }
+      export -f install_apcu_dev
+
     - |
       # Install sigchild-enabled PHP to test the Process component on the lowest PHP matrix line
       if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
@@ -148,10 +154,13 @@ before_install:
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           echo date.timezone = Europe/Paris >> $INI
           echo memory_limit = -1 >> $INI
+          echo default_socket_timeout = 10 >> $INI
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          echo extension = memcached.so >> $INI
+          if [[ $PHP != nightly ]]; then
+              echo extension = memcached.so >> $INI
+          fi
       done
 
     - |
@@ -163,17 +172,22 @@ before_install:
           if ! php --ri sodium > /dev/null; then
               tfold ext.libsodium tpecl libsodium sodium.so $INI
           fi
+          if [[ $PHP = nightly ]]; then
+              tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
+              tfold ext.apcu install_apcu_dev 9c36db45100d4d27ec33072f4be90f1f5a0108b7 $INI
+          else
+              tfold ext.apcu tpecl apcu-5.1.18 apcu.so $INI
+              tfold ext.mongodb tpecl mongodb-1.6.16 mongodb.so $INI
+              tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI
+              tfold ext.amqp tpecl amqp-1.10.2 amqp.so $INI
+              tfold ext.redis tpecl redis-5.2.2 redis.so $INI "no"
+          fi
 
-          tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
-          tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
-          tfold ext.igbinary tpecl igbinary-2.0.8 igbinary.so $INI
-          tfold ext.zookeeper tpecl zookeeper-0.7.1 zookeeper.so $INI
-          tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
-          tfold ext.redis tpecl redis-4.3.0 redis.so $INI "no"
+          tfold ext.igbinary tpecl igbinary-3.1.5 igbinary.so $INI
       done
     - |
       # List all php extensions with versions
-    - php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+      php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
 
     - |
       # Load fixtures
@@ -239,6 +253,13 @@ install:
       fi
 
     - |
+      # Set composer's platform to php 7.4 if we're on php 8.
+      if [[ $PHP = nightly ]]; then
+          composer config platform.php 7.4.99
+          export SYMFONY_DEPRECATIONS_HELPER=max[total]=999
+      fi
+
+    - |
       # Install symfony/flex
       if [[ $deps = low ]]; then
           export SYMFONY_REQUIRE='>=3.4'
@@ -260,12 +281,14 @@ install:
       run_tests () {
           set -e
           export PHP=$1
+
           if [[ $PHP != 7.4* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
               echo -e "\\n\\e[33;1mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               return
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
@@ -282,7 +305,7 @@ install:
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
                   COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort)
-                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb)
                   [[ ! $COMPONENTS ]] || tfold 'phpunit install' SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1 ./phpunit install
                   [[ ! $COMPONENTS ]] || echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               fi
@@ -297,7 +320,7 @@ install:
           else
               if [[ $PHP = 7.4* ]]; then
                   # add return types before running the test suite
-                  rm vendor/symfony/contracts -Rf
+                  rm src/Symfony/Contracts -Rf && mv vendor/symfony/contracts src/Symfony/Contracts
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader
@@ -307,7 +330,10 @@ install:
               fi
 
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold src/Symfony/Component/Console.tty $PHPUNIT --group tty
+
+              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
+              tfold src/Symfony/Bridge/Twig.tty $PHPUNIT src/Symfony/Bridge/Twig --group tty
+
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/

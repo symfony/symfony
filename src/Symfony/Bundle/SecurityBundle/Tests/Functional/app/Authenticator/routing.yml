@@ -1,0 +1,4 @@
+profile:
+    path: /profile
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ProfileController

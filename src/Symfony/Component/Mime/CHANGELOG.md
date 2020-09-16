@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Add support for DKIM
+ * Deprecated `Address::fromString()`, use `Address::create()` instead
+
 4.4.0
 -----
 

@@ -35,7 +35,7 @@ class NodeBuilderTest extends TestCase
 
     public function testAddingANewNodeType()
     {
-        $class = __NAMESPACE__.'\\SomeNodeDefinition';
+        $class = SomeNodeDefinition::class;
 
         $builder = new BaseNodeBuilder();
         $node = $builder
@@ -47,7 +47,7 @@ class NodeBuilderTest extends TestCase
 
     public function testOverridingAnExistingNodeType()
     {
-        $class = __NAMESPACE__.'\\SomeNodeDefinition';
+        $class = SomeNodeDefinition::class;
 
         $builder = new BaseNodeBuilder();
         $node = $builder
@@ -66,7 +66,7 @@ class NodeBuilderTest extends TestCase
 
         $this->assertInstanceOf(\get_class($node1), $node2);
 
-        $builder->setNodeClass('CuStOm', __NAMESPACE__.'\\SomeNodeDefinition');
+        $builder->setNodeClass('CuStOm', SomeNodeDefinition::class);
 
         $node1 = $builder->node('', 'CUSTOM');
         $node2 = $builder->node('', 'custom');

@@ -49,7 +49,10 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
         foreach ($adapters as $adapter) {
             if (!$adapter instanceof CacheItemPoolInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', \get_class($adapter), CacheItemPoolInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
+            }
+            if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $adapter instanceof ApcuAdapter && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+                continue; // skip putting APCu in the chain when the backend is disabled
             }
 
             if ($adapter instanceof AdapterInterface) {
@@ -61,20 +64,17 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $this->adapterCount = \count($this->adapters);
 
         $this->syncItem = \Closure::bind(
-            static function ($sourceItem, $item) use ($defaultLifetime) {
-                $item->value = $sourceItem->value;
-                $item->expiry = $sourceItem->expiry;
-                $item->isHit = $sourceItem->isHit;
-                $item->metadata = $sourceItem->metadata;
-
+            static function ($sourceItem, $item, $sourceMetadata = null) use ($defaultLifetime) {
                 $sourceItem->isTaggable = false;
-                unset($sourceItem->metadata[CacheItem::METADATA_TAGS]);
+                $sourceMetadata = $sourceMetadata ?? $sourceItem->metadata;
+                unset($sourceMetadata[CacheItem::METADATA_TAGS]);
 
-                if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
-                    $defaultLifetime = $sourceItem->defaultLifetime;
-                }
-                if (0 < $defaultLifetime && ($item->defaultLifetime <= 0 || $defaultLifetime < $item->defaultLifetime)) {
-                    $item->defaultLifetime = $defaultLifetime;
+                $item->value = $sourceItem->value;
+                $item->isHit = $sourceItem->isHit;
+                $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
+
+                if (0 < $defaultLifetime) {
+                    $item->expiresAfter($defaultLifetime);
                 }
 
                 return $item;
@@ -95,7 +95,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             $adapter = $this->adapters[$i];
             if (isset($this->adapters[++$i])) {
                 $callback = $wrap;
-                $beta = INF === $beta ? INF : 0;
+                $beta = \INF === $beta ? \INF : 0;
             }
             if ($adapter instanceof CacheInterface) {
                 $value = $adapter->get($key, $callback, $beta, $metadata);
@@ -103,7 +103,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);
             }
             if (null !== $item) {
-                ($this->syncItem)($lastItem = $lastItem ?? $item, $item);
+                ($this->syncItem)($lastItem = $lastItem ?? $item, $item, $metadata);
             }
 
             return $value;

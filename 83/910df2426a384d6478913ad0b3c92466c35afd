@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-31T17:17:10Z
+
+Can you make it work currently using only `php.ini` settings?
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-08-31T22:01:22Z
+
+> Can you make it work currently using only `php.ini` settings?
+
+I do not really understand, wdym? Connect to amqp with ssl ?
+If yes, it do actually work. The PR just allow amqps string (aws actually give you an amqps string only)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-31T22:04:47Z
+
+In https://github.com/php-amqp/php-amqp/pull/205, it looks like setting the `amqp.cacert` ini setting is enought to use SSL, isn't it?
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-01T08:09:27Z
+
+> In [php-amqp/php-amqp#205](https://github.com/php-amqp/php-amqp/pull/205), it looks like setting the `amqp.cacert` ini setting is enought to use SSL, isn't it?
+
+It is :
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-11T11:44:57Z
+
+> Cosmetic review.
+
+I actually have added a new exception, I'm not sure it is useful and require to have a new PR merged first. The SSLException class, what do you think about it? Should I use a RuntimeException, a LogicException, or the new one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-16T08:16:01Z
+
+@vasilvestre Can you check the tests please? They seem to be broken by the changes introduced by this PR.
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-16T08:16:48Z
+
+> @vasilvestre Can you check the tests please? They seem to be broken by the changes introduced by this PR.
+
+Yes I'm actualling trying to search how we should handle ini parameters in tests, these are my own test, I think in phpunit.xml but the parameters should depend of system running tests, it could break on windows..
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-16T09:40:08Z
+
+@fabpot it will pass this time :)

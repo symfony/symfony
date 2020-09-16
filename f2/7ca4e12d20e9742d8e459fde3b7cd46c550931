@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by kdambekalns at 2020-09-15T10:29:20Z
+
+I'd love to help, but none of the linked issues are known to me… 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-15T10:32:57Z
+
+Oups sorry @kdambekalns , bad ping.
+
+@edguar could you please have a look?
+
+---------------------------------------------------------------------------
+
+by Surfoo at 2020-09-15T19:53:42Z
+
+Hello  @nicolas-grekas,
+
+Works for me, thank you!
+
+Just for my curiosity, why don't you have some unit tests on a matrix of differents environments?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-15T19:54:54Z
+
+Having a matrix of possible iconv implementations looks impossible to me. That's a zoo I know nothing about...

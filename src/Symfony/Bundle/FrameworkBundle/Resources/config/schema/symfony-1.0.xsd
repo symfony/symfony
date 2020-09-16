@@ -650,8 +650,9 @@
             <xsd:element name="rate" type="rate_limiter_rate" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="lock" type="xsd:string" />
-        <xsd:attribute name="storage" type="xsd:string" />
+        <xsd:attribute name="lock-factory" type="xsd:string" />
+        <xsd:attribute name="storage-service" type="xsd:string" />
+        <xsd:attribute name="cache-pool" type="xsd:string" />
         <xsd:attribute name="strategy" type="xsd:string" />
         <xsd:attribute name="limit" type="xsd:int" />
         <xsd:attribute name="interval" type="xsd:string" />

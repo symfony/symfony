@@ -12,6 +12,7 @@ CHANGELOG
  * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
  * Added translator to `\Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator` and `\Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener` to translate authentication failure messages
  * Added a CurrentUser attribute to force the UserValueResolver to resolve an argument to the current user.
+ * Added `LoginThrottlingListener`.
 
 5.1.0
 -----

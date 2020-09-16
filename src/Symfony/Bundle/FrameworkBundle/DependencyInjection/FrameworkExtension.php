@@ -2190,38 +2190,31 @@ class FrameworkExtension extends Extension
 
         $loader->load('rate_limiter.php');
 
-        $locks = [];
-        $storages = [];
         foreach ($config['limiters'] as $name => $limiterConfig) {
-            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
-
-            if (!isset($locks[$limiterConfig['lock']])) {
-                $locks[$limiterConfig['lock']] = new Reference($limiterConfig['lock']);
-            }
-            $limiter->addArgument($locks[$limiterConfig['lock']]);
-            unset($limiterConfig['lock']);
-
-            if (!isset($storages[$limiterConfig['storage']])) {
-                $storageId = $limiterConfig['storage'];
-                // cache pools are configured by the FrameworkBundle, so they
-                // exists in the scoped ContainerBuilder provided to this method
-                if ($container->has($storageId)) {
-                    if ($container->findDefinition($storageId)->hasTag('cache.pool')) {
-                        $container->register('limiter.storage.'.$storageId, CacheStorage::class)->addArgument(new Reference($storageId));
-                        $storageId = 'limiter.storage.'.$storageId;
-                    }
-                }
-
-                $storages[$limiterConfig['storage']] = new Reference($storageId);
-            }
-            $limiter->replaceArgument(1, $storages[$limiterConfig['storage']]);
-            unset($limiterConfig['storage']);
-
-            $limiterConfig['id'] = $name;
-            $limiter->replaceArgument(0, $limiterConfig);
-
-            $container->registerAliasForArgument($limiterId, Limiter::class, $name.'.limiter');
+            self::registerRateLimiter($container, $name, $limiterConfig);
         }
+    }
+
+    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
+    {
+        $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
+
+        $limiter->addArgument(new Reference($limiterConfig['lock_factory']));
+        unset($limiterConfig['lock_factory']);
+
+        $storageId = $limiterConfig['storage_service'] ?? null;
+        if (null === $storageId) {
+            $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
+        }
+
+        $limiter->replaceArgument(1, new Reference($storageId));
+        unset($limiterConfig['storage']);
+        unset($limiterConfig['cache_pool']);
+
+        $limiterConfig['id'] = $name;
+        $limiter->replaceArgument(0, $limiterConfig);
+
+        $container->registerAliasForArgument($limiterId, Limiter::class, $name.'.limiter');
     }
 
     private function resolveTrustedHeaders(array $headers): int

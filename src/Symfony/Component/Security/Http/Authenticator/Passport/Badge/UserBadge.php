@@ -50,6 +50,11 @@ class UserBadge implements BadgeInterface
         $this->userLoader = $userLoader;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->userIdentifier;
+    }
+
     public function getUser(): UserInterface
     {
         if (null === $this->user) {

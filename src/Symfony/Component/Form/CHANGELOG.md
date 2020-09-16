@@ -4,7 +4,6 @@ CHANGELOG
 5.2.0
 -----
 
- * added `FormErrorNormalizer`
  * Added support for using the `{{ label }}` placeholder in constraint messages, which is replaced in the `ViolationMapper` by the corresponding field form label.
 
 5.1.0

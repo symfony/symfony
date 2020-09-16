@@ -116,7 +116,7 @@ trait TransportResponseTrait
         $debug .= "< \r\n";
 
         if (!$info['http_code']) {
-            throw new TransportException('Invalid or missing HTTP status line.');
+            throw new TransportException(sprintf('Invalid or missing HTTP status line for "%s".', implode('', $info['url'])));
         }
     }
 
@@ -181,7 +181,7 @@ trait TransportResponseTrait
 
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
                             if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
-                                $multi->handlesActivity[$j] = [null, new TransportException('Error while processing content unencoding.')];
+                                $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
                                 continue;
                             }
 

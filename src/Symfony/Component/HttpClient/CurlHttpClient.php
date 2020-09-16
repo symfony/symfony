@@ -565,6 +565,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLINFO_REDIRECT_COUNT,
         ];
 
+        if (\defined('CURLOPT_HTTP09_ALLOWED')) {
+            $curloptsToCheck[] = \CURLOPT_HTTP09_ALLOWED;
+        }
+
         $methodOpts = [
             \CURLOPT_POST,
             \CURLOPT_PUT,

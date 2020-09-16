@@ -22,6 +22,15 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class MemcachedAdapter extends AbstractAdapter
 {
+    /**
+     * We are replacing characters that are illegal in Memcached keys with reserved characters from
+     * {@see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
+This conversation was marked as resolved by lstrojny
+     * Note: don’t use {@see \Symfony\Component\Cache\Adapter\AbstractAdapter::NS_SEPARATOR}.
+     */
+    private const RESERVED_MEMCACHED = " \n\r\t\v\f\0";
+    private const RESERVED_PSR6 = '@()\{}/';
+
     protected $maxIdLength = 250;
 
     private static $defaultClientOptions = [
@@ -246,7 +255,7 @@ class MemcachedAdapter extends AbstractAdapter
 
         $encodedValues = [];
         foreach ($values as $key => $value) {
-            $encodedValues[rawurlencode($key)] = $value;
+            $encodedValues[self::encodeKey($key)] = $value;
         }
 
         return $this->checkResultCode($this->getClient()->setMulti($encodedValues, $lifetime)) ? $failed : false;
@@ -258,13 +267,13 @@ class MemcachedAdapter extends AbstractAdapter
     protected function doFetch(array $ids)
     {
         try {
-            $encodedIds = array_map('rawurlencode', $ids);
+            $encodedIds = array_map('self::encodeKey', $ids);
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
             $result = [];
             foreach ($encodedResult as $key => $value) {
-                $result[rawurldecode($key)] = $this->marshaller->unmarshall($value);
+                $result[self::decodeKey($key)] = $this->marshaller->unmarshall($value);
             }
 
             return $result;
@@ -278,7 +287,7 @@ class MemcachedAdapter extends AbstractAdapter
      */
     protected function doHave(string $id)
     {
-        return false !== $this->getClient()->get(rawurlencode($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
+        return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
 
     /**
@@ -287,7 +296,7 @@ class MemcachedAdapter extends AbstractAdapter
     protected function doDelete(array $ids)
     {
         $ok = true;
-        $encodedIds = array_map('rawurlencode', $ids);
+        $encodedIds = array_map('self::encodeKey', $ids);
         foreach ($this->checkResultCode($this->getClient()->deleteMulti($encodedIds)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;
@@ -331,5 +340,15 @@ class MemcachedAdapter extends AbstractAdapter
         }
 
         return $this->client = $this->lazyClient;
+    }
+
+    private static function encodeKey(string $key): string
+    {
+        return strtr($key, self::RESERVED_MEMCACHED, self::RESERVED_PSR6);
+    }
+
+    private static function decodeKey(string $key): string
+    {
+        return strtr($key, self::RESERVED_PSR6, self::RESERVED_MEMCACHED);
     }
 }

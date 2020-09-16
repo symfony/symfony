@@ -366,6 +366,26 @@
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Ova vrednost treba da bude između {{ min }} i {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Ova vrednost nije ispravno ime poslužitelja (hostname).</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Broj elemenata u ovoj kolekciji bi trebalo da bude deljiv sa {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Ova vrednost bi trebalo da zadovoljava namjanje jedno od narednih ograničenja:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Svaki element ove kolekcije bi trebalo da zadovolji sopstveni skup ograničenja.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Ova vrednost nije ispravna međunarodna identifikaciona oznaka hartija od vrednosti (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

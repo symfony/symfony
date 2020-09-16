@@ -163,4 +163,38 @@ class RequestMatcherTest extends TestCase
         $matcher->matchAttribute('foo', 'babar');
         $this->assertFalse($matcher->matches($request));
     }
+
+    public function testIps()
+    {
+        $matcher = new RequestMatcher();
+
+        $request = Request::create('', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
+
+        $matcher->matchIp('127.0.0.1');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchIp('192.168.0.1');
+        $this->assertFalse($matcher->matches($request));
+
+        $matcher->matchIps('127.0.0.1');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchIps('127.0.0.1, ::1');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchIps('192.168.0.1, ::1');
+        $this->assertFalse($matcher->matches($request));
+
+        $matcher->matchIps(['127.0.0.1', '::1']);
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchIps(['192.168.0.1', '::1']);
+        $this->assertFalse($matcher->matches($request));
+
+        $matcher->matchIps(['1.1.1.1', '2.2.2.2', '127.0.0.1, ::1']);
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchIps(['1.1.1.1', '2.2.2.2', '192.168.0.1, ::1']);
+        $this->assertFalse($matcher->matches($request));
+    }
 }

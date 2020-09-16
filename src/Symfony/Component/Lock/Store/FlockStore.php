@@ -16,6 +16,7 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
  * FlockStore is a PersistingStoreInterface implementation using the FileSystem flock.
@@ -27,7 +28,7 @@ use Symfony\Component\Lock\Key;
  * @author Romain Neutron <imprec@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class FlockStore implements BlockingStoreInterface
+class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
     private $lockPath;
 
@@ -53,7 +54,15 @@ class FlockStore implements BlockingStoreInterface
      */
     public function save(Key $key)
     {
-        $this->lock($key, false);
+        $this->lock($key, false, false);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function saveRead(Key $key)
+    {
+        $this->lock($key, true, false);
     }
 
     /**
@@ -61,33 +70,48 @@ class FlockStore implements BlockingStoreInterface
      */
     public function waitAndSave(Key $key)
     {
-        $this->lock($key, true);
+        $this->lock($key, false, true);
     }
 
-    private function lock(Key $key, bool $blocking)
+    /**
+     * {@inheritdoc}
+     */
+    public function waitAndSaveRead(Key $key)
     {
+        $this->lock($key, true, true);
+    }
+
+    private function lock(Key $key, bool $read, bool $blocking)
+    {
+        $handle = null;
         // The lock is maybe already acquired.
         if ($key->hasState(__CLASS__)) {
-            return;
-        }
-
-        $fileName = sprintf('%s/sf.%s.%s.lock',
-            $this->lockPath,
-            preg_replace('/[^a-z0-9\._-]+/i', '-', $key),
-            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
-        );
-
-        // Silence error reporting
-        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-        if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-            if ($handle = fopen($fileName, 'x')) {
-                chmod($fileName, 0666);
-            } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                usleep(100); // Give some time for chmod() to complete
-                $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+            [$stateRead, $handle] = $key->getState(__CLASS__);
+            // Check for promotion or demotion
+            if ($stateRead === $read) {
+                return;
             }
         }
-        restore_error_handler();
+
+        if (!$handle) {
+            $fileName = sprintf('%s/sf.%s.%s.lock',
+                $this->lockPath,
+                preg_replace('/[^a-z0-9\._-]+/i', '-', $key),
+                strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
+            );
+
+            // Silence error reporting
+            set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+            if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                if ($handle = fopen($fileName, 'x')) {
+                    chmod($fileName, 0666);
+                } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                    usleep(100); // Give some time for chmod() to complete
+                    $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+                }
+            }
+            restore_error_handler();
+        }
 
         if (!$handle) {
             throw new LockStorageException($error, 0, null);
@@ -95,12 +119,12 @@ class FlockStore implements BlockingStoreInterface
 
         // On Windows, even if PHP doc says the contrary, LOCK_NB works, see
         // https://bugs.php.net/54129
-        if (!flock($handle, \LOCK_EX | ($blocking ? 0 : \LOCK_NB))) {
+        if (!flock($handle, ($read ? \LOCK_SH : \LOCK_EX) | ($blocking ? 0 : \LOCK_NB))) {
             fclose($handle);
             throw new LockConflictedException();
         }
 
-        $key->setState(__CLASS__, $handle);
+        $key->setState(__CLASS__, [$read, $handle]);
     }
 
     /**
@@ -121,7 +145,7 @@ class FlockStore implements BlockingStoreInterface
             return;
         }
 
-        $handle = $key->getState(__CLASS__);
+        $handle = $key->getState(__CLASS__)[1];
 
         flock($handle, \LOCK_UN | \LOCK_NB);
         fclose($handle);

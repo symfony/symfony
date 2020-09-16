@@ -36,7 +36,7 @@ class IbanValidator extends ConstraintValidator
      *
      * @see https://www.swift.com/sites/default/files/resources/iban_registry.pdf
      */
-    private static $formats = [
+    private const FORMATS = [
         'AD' => 'AD\d{2}\d{4}\d{4}[\dA-Z]{12}', // Andorra
         'AE' => 'AE\d{2}\d{3}\d{16}', // United Arab Emirates
         'AL' => 'AL\d{2}\d{8}[\dA-Z]{16}', // Albania
@@ -182,7 +182,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         // ...have a format available
-        if (!\array_key_exists($countryCode, self::$formats)) {
+        if (!\array_key_exists($countryCode, self::FORMATS)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)
@@ -192,7 +192,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         // ...and have a valid format
-        if (!preg_match('/^'.self::$formats[$countryCode].'$/', $canonicalized)
+        if (!preg_match('/^'.self::FORMATS[$countryCode].'$/', $canonicalized)
         ) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))

@@ -30,7 +30,7 @@ class ConsoleFormatter implements FormatterInterface
     const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
     const SIMPLE_DATE = 'H:i:s';
 
-    private static $levelColorMap = [
+    private const LEVEL_COLOR_MAP = [
         Logger::DEBUG => 'fg=white',
         Logger::INFO => 'fg=green',
         Logger::NOTICE => 'fg=blue',
@@ -100,7 +100,7 @@ class ConsoleFormatter implements FormatterInterface
     {
         $record = $this->replacePlaceHolder($record);
 
-        $levelColor = self::$levelColorMap[$record['level']];
+        $levelColor = self::LEVEL_COLOR_MAP[$record['level']];
 
         if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
             $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);

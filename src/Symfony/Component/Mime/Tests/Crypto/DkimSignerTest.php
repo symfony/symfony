@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Email;
  */
 class DkimSignerTest extends TestCase
 {
-    private static $pk = <<<EOF
+    private const PK = <<<EOF
 -----BEGIN RSA PRIVATE KEY-----
 MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
 ndP2DY2nUyz0vpmJlcDOjDwTGs8U/C7zn7PDdZ8EuuxlAa7oNo/38YYV+5Oki93m
@@ -55,7 +55,7 @@ EOF;
             ->text("Some body \n \n This \r\n\r\n is really interesting and at the same time very long line to see if everything works as expected, does it?\r\n\r\n\r\n\r\n")
             ->date(new \DateTimeImmutable('2005-10-15', new \DateTimeZone('Europe/Paris')));
 
-        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf');
+        $signer = new DkimSigner(self::PK, 'testdkim.symfony.net', 'sf');
         $signedMessage = $signer->sign($message, [
             'header_canon' => $headerCanon,
             'body_canon' => $bodyCanon,
@@ -102,7 +102,7 @@ EOF;
             ->text($body)
         ;
 
-        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf');
+        $signer = new DkimSigner(self::PK, 'testdkim.symfony.net', 'sf');
         $signedMessage = $signer->sign($message, [
             'body_canon' => $bodyCanon,
             'body_max_length' => $maxLength,

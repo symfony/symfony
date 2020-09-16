@@ -27,7 +27,7 @@ class FileType extends AbstractType
     const KIB_BYTES = 1024;
     const MIB_BYTES = 1048576;
 
-    private static $suffixes = [
+    private const SUFFIXES = [
         1 => 'bytes',
         self::KIB_BYTES => 'KiB',
         self::MIB_BYTES => 'MiB',
@@ -238,7 +238,7 @@ class FileType extends AbstractType
             $sizeAsString = (string) round($size / $coef, 2);
         }
 
-        return [$limitAsString, self::$suffixes[$coef]];
+        return [$limitAsString, self::SUFFIXES[$coef]];
     }
 
     /**

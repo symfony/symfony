@@ -22,7 +22,7 @@ class TimezonesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $zones = [
+    private const ZONES = [
         'Africa/Abidjan',
         'Africa/Accra',
         'Africa/Addis_Ababa',
@@ -458,7 +458,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Pacific/Wake',
         'Pacific/Wallis',
     ];
-    private static $zonesNoCountry = [
+    private const ZONES_NO_COUNTRY = [
         'Antarctica/Troll',
         'CST6CDT',
         'EST5EDT',
@@ -470,7 +470,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetIds()
     {
-        $this->assertEquals(self::$zones, Timezones::getIds());
+        $this->assertEquals(self::ZONES, Timezones::getIds());
     }
 
     /**
@@ -483,7 +483,7 @@ class TimezonesTest extends ResourceBundleTestCase
         sort($zones);
 
         $this->assertNotEmpty($zones);
-        $this->assertEmpty(array_diff($zones, self::$zones));
+        $this->assertEmpty(array_diff($zones, self::ZONES));
     }
 
     public function testGetNamesDefaultLocale()
@@ -631,7 +631,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
             $this->addToAssertionCount(1);
         } catch (MissingResourceException $e) {
-            if (\in_array($timezone, self::$zonesNoCountry, true)) {
+            if (\in_array($timezone, self::ZONES_NO_COUNTRY, true)) {
                 $this->markTestSkipped();
             } else {
                 $this->fail();
@@ -643,7 +643,7 @@ class TimezonesTest extends ResourceBundleTestCase
     {
         return array_map(function ($timezone) {
             return [$timezone];
-        }, self::$zones);
+        }, self::ZONES);
     }
 
     /**

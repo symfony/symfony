@@ -37,7 +37,7 @@ class DateIntervalType extends AbstractType
         'minutes',
         'seconds',
     ];
-    private static $widgets = [
+    private const WIDGETS = [
         'text' => TextType::class,
         'integer' => IntegerType::class,
         'choice' => ChoiceType::class,
@@ -112,7 +112,7 @@ class DateIntervalType extends AbstractType
                         $childOptions['choices'] = $options[$part];
                         $childOptions['placeholder'] = $options['placeholder'][$part];
                     }
-                    $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions);
+                    $childForm = $builder->create($part, self::WIDGETS[$options['widget']], $childOptions);
                     if ('integer' === $options['widget']) {
                         $childForm->addModelTransformer(
                             new ReversedTransformer(

@@ -16,12 +16,12 @@ use Symfony\Component\Intl\Locale;
 
 abstract class ResourceBundleTestCase extends TestCase
 {
-    // Include the locales statically so that the data providers are decoupled
+    // Include the locales here so that the data providers are decoupled
     // from the Intl class. Otherwise tests will fail if the intl extension is
     // not loaded, because it is NOT possible to skip the execution of data
     // providers.
 
-    private static $locales = [
+    private const LOCALES = [
         'af',
         'af_NA',
         'af_ZA',
@@ -675,7 +675,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'zu_ZA',
     ];
 
-    private static $localeAliases = [
+    private const LOCALE_ALIASES = [
         'az_AZ' => 'az_Latn_AZ',
         'bs_BA' => 'bs_Latn_BA',
         'en_NH' => 'en_VU',
@@ -757,12 +757,12 @@ abstract class ResourceBundleTestCase extends TestCase
 
     protected function getLocales()
     {
-        return self::$locales;
+        return self::LOCALES;
     }
 
     protected function getLocaleAliases()
     {
-        return self::$localeAliases;
+        return self::LOCALE_ALIASES;
     }
 
     protected function getRootLocales()

@@ -28,7 +28,7 @@ class Escaper
     // first to ensure proper escaping because str_replace operates iteratively
     // on the input arrays. This ordering of the characters avoids the use of strtr,
     // which performs more slowly.
-    private static $escapees = ['\\', '\\\\', '\\"', '"',
+    private const ESCAPEES = ['\\', '\\\\', '\\"', '"',
                                      "\x00",  "\x01",  "\x02",  "\x03",  "\x04",  "\x05",  "\x06",  "\x07",
                                      "\x08",  "\x09",  "\x0a",  "\x0b",  "\x0c",  "\x0d",  "\x0e",  "\x0f",
                                      "\x10",  "\x11",  "\x12",  "\x13",  "\x14",  "\x15",  "\x16",  "\x17",
@@ -36,7 +36,7 @@ class Escaper
                                      "\x7f",
                                      "\xc2\x85", "\xc2\xa0", "\xe2\x80\xa8", "\xe2\x80\xa9",
                                ];
-    private static $escaped = ['\\\\', '\\"', '\\\\', '\\"',
+    private const ESCAPED = ['\\\\', '\\"', '\\\\', '\\"',
                                      '\\0',   '\\x01', '\\x02', '\\x03', '\\x04', '\\x05', '\\x06', '\\a',
                                      '\\b',   '\\t',   '\\n',   '\\v',   '\\f',   '\\r',   '\\x0e', '\\x0f',
                                      '\\x10', '\\x11', '\\x12', '\\x13', '\\x14', '\\x15', '\\x16', '\\x17',
@@ -66,7 +66,7 @@ class Escaper
      */
     public static function escapeWithDoubleQuotes(string $value): string
     {
-        return sprintf('"%s"', str_replace(self::$escapees, self::$escaped, $value));
+        return sprintf('"%s"', str_replace(self::ESCAPEES, self::ESCAPED, $value));
     }
 
     /**

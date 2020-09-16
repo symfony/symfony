@@ -20,8 +20,8 @@ use Twig\Node\Node;
 
 class TranslationDefaultDomainNodeVisitorTest extends TestCase
 {
-    private static $message = 'message';
-    private static $domain = 'domain';
+    private const MESSAGE = 'message';
+    private const DOMAIN = 'domain';
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testDefaultDomainAssignment(Node $node)
@@ -30,7 +30,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
-        $defaultDomain = TwigNodeProvider::getTransDefaultDomainTag(self::$domain);
+        $defaultDomain = TwigNodeProvider::getTransDefaultDomainTag(self::DOMAIN);
         $visitor->enterNode($defaultDomain, $env);
         $visitor->leaveNode($defaultDomain, $env);
 
@@ -46,7 +46,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, self::$domain]], $visitor->getMessages());
+        $this->assertEquals([[self::MESSAGE, self::DOMAIN]], $visitor->getMessages());
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
@@ -72,16 +72,16 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, null]], $visitor->getMessages());
+        $this->assertEquals([[self::MESSAGE, null]], $visitor->getMessages());
     }
 
     public function getDefaultDomainAssignmentTestData()
     {
         return [
-            [TwigNodeProvider::getTransFilter(self::$message)],
-            [TwigNodeProvider::getTransTag(self::$message)],
+            [TwigNodeProvider::getTransFilter(self::MESSAGE)],
+            [TwigNodeProvider::getTransTag(self::MESSAGE)],
             // with named arguments
-            [TwigNodeProvider::getTransFilter(self::$message, null, [
+            [TwigNodeProvider::getTransFilter(self::MESSAGE, null, [
                 'arguments' => new ArrayExpression([], 0),
             ])],
         ];

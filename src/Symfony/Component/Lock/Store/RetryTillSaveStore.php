@@ -16,8 +16,10 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
  * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
@@ -25,7 +27,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements BlockingStoreInterface, SharedLockStoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -74,6 +76,24 @@ class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
         $this->logger->warning('Failed to store the "{resource}" lock. Abort after {retry} retry.', ['resource' => $key, 'retry' => $retry]);
 
         throw new LockConflictedException();
+    }
+
+    public function saveRead(Key $key)
+    {
+        if (!$this->decorated instanceof SharedLockStoreInterface) {
+            throw new NotSupportedException(sprintf('The "%s" store must decorate a "%s" store.', get_debug_type($this), ShareLockStoreInterface::class));
+        }
+
+        $this->decorated->saveRead($key);
+    }
+
+    public function waitAndSaveRead(Key $key)
+    {
+        if (!$this->decorated instanceof SharedLockStoreInterface) {
+            throw new NotSupportedException(sprintf('The "%s" store must decorate a "%s" store.', get_debug_type($this), ShareLockStoreInterface::class));
+        }
+
+        $this->decorated->waitAndSaveRead($key);
     }
 
     /**

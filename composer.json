@@ -78,6 +78,7 @@
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
+        "symfony/rate-limiter": "self.version",
         "symfony/routing": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",

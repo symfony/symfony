@@ -53,6 +53,24 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testItCanBeConstructedWithAnAmqpsDsn()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => 'localhost',
+                'port' => 5671,
+                'vhost' => '/',
+                'cacert' => '/etc/ssl/certs',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqps://localhost?'.
+                'cacert=/etc/ssl/certs')
+        );
+    }
+
     public function testItGetsParametersFromTheDsn()
     {
         $this->assertEquals(
@@ -314,6 +332,45 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testItSetupsTheTTLConnection()
+    {
+        $amqpConnection = $this->createMock(\AMQPConnection::class);
+        $amqpChannel = $this->createMock(\AMQPChannel::class);
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpQueue0 = $this->createMock(\AMQPQueue::class);
+        $amqpQueue1 = $this->createMock(\AMQPQueue::class);
+
+        $factory = $this->createMock(AmqpFactory::class);
+        $factory->method('createConnection')->willReturn($amqpConnection);
+        $factory->method('createChannel')->willReturn($amqpChannel);
+        $factory->method('createExchange')->willReturn($amqpExchange);
+        $factory->method('createQueue')->will($this->onConsecutiveCalls($amqpQueue0, $amqpQueue1));
+
+        $amqpExchange->expects($this->once())->method('declareExchange');
+        $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpQueue0->expects($this->once())->method('declareQueue');
+        $amqpQueue0->expects($this->exactly(2))->method('bind')->withConsecutive(
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key0'],
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key1']
+        );
+        $amqpQueue1->expects($this->once())->method('declareQueue');
+        $amqpQueue1->expects($this->exactly(2))->method('bind')->withConsecutive(
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key2'],
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key3']
+        );
+
+        $dsn = 'amqps://localhost?'.
+            'cacert=/etc/ssl/certs&'.
+            'exchange[default_publish_routing_key]=routing_key&'.
+            'queues[queue0][binding_keys][0]=binding_key0&'.
+            'queues[queue0][binding_keys][1]=binding_key1&'.
+            'queues[queue1][binding_keys][0]=binding_key2&'.
+            'queues[queue1][binding_keys][1]=binding_key3';
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->publish('body');
+    }
+
     public function testBindingArguments()
     {
         $amqpConnection = $this->createMock(\AMQPConnection::class);
@@ -504,6 +561,27 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://user:secretpassword@localhost', [], $factory);
         $connection->channel();
+    }
+
+    public function testNoCaCertOnSslConnectionFromDsn()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No CA certificate has been provided. Set "amqp.cacert" in your php.ini or pass the "cacert" parameter in the DSN to use SSL. Alternatively, you can use amqp:// to use without SSL.');
+
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $oldCaCertValue = ini_set('amqp.cacert', '');
+
+        try {
+            Connection::fromDsn('amqps://', [], $factory);
+        } finally {
+            ini_set('amqp.cacert', $oldCaCertValue);
+        }
     }
 
     public function testAmqpStampHeadersAreUsed()

@@ -267,7 +267,14 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         if ($options['bindto']) {
-            $curlopts[file_exists($options['bindto']) ? \CURLOPT_UNIX_SOCKET_PATH : \CURLOPT_INTERFACE] = $options['bindto'];
+            if (file_exists($options['bindto'])) {
+                $curlopts[\CURLOPT_UNIX_SOCKET_PATH] = $options['bindto'];
+            } elseif (preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
+                $curlopts[\CURLOPT_INTERFACE] = $matches[1];
+                $curlopts[\CURLOPT_LOCALPORT] = $matches[2];
+            } else {
+                $curlopts[\CURLOPT_INTERFACE] = $options['bindto'];
+            }
         }
 
         if (0 < $options['max_duration']) {

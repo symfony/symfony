@@ -55,6 +55,7 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -242,6 +243,12 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
+        $metadataStoreDefinition = $workflowDefinition->getArgument(3);
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $metadataStoreDefinition->getArgument(0));
 
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
@@ -266,7 +273,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $metadataStoreDefinition = $stateMachineDefinition->getArgument(3);
         $this->assertInstanceOf(Definition::class, $metadataStoreDefinition);
-        $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);
         $this->assertSame(['title' => 'workflow title'], $workflowMetadata);

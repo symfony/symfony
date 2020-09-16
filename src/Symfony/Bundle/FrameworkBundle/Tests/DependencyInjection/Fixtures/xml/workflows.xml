@@ -35,6 +35,10 @@
                 <framework:from>approved_by_spellchecker</framework:from>
                 <framework:to>published</framework:to>
             </framework:transition>
+            <framework:metadata>
+                <framework:title>article workflow</framework:title>
+                <framework:description>workflow for articles</framework:description>
+            </framework:metadata>
         </framework:workflow>
 
         <framework:workflow name="pull_request">

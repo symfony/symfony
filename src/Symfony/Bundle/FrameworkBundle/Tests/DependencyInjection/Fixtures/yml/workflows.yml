@@ -5,6 +5,9 @@ framework:
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
             initial_marking: [draft]
+            metadata:
+                title: article workflow
+                description: workflow for articles
             places:
                 # simple format
                 - draft

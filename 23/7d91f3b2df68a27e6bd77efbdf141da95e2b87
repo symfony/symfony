@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-16T15:38:56Z
+
+This PR is now ready to merge imho.
+
+Based on suggestions from @weaverryan, the SecurityBundle now configures a "default" limiter for login throttling. A user can override this by configuring the `limiter` setting. This required some changes in the RateLimiter configuration - which is probably now a bit easier to understand and less magic than before.

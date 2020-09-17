@@ -152,7 +152,7 @@ trait MicroKernelTrait
     {
         $file = (new \ReflectionObject($this))->getFileName();
         /* @var RoutingPhpFileLoader $kernelLoader */
-        $kernelLoader = $loader->getResolver()->resolve($file);
+        $kernelLoader = $loader->getResolver()->resolve($file, 'php');
         $kernelLoader->setCurrentDir(\dirname($file));
         $collection = new RouteCollection();
 

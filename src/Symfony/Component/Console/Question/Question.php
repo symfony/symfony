@@ -63,6 +63,18 @@ class Question
     }
 
     /**
+     * Changes the default answer.
+     *
+     * @return mixed
+     */
+    public function setDefault($default = null)
+    {
+        return $this->default = $default;
+
+        return $this;
+    }
+
+    /**
      * Returns whether the user response accepts newline characters.
      */
     public function isMultiline(): bool

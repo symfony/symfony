@@ -36,11 +36,13 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionals
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1480,6 +1482,23 @@ abstract class FrameworkExtensionTest extends TestCase
             'resolve' => [],
         ];
         $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
+    }
+
+    public function testHttpClientRetry()
+    {
+        if (!class_exists(RetryableHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+        $container = $this->createContainerFromFile('http_client_retry');
+
+        $this->assertSame([429, 500], $container->getDefinition('http_client.retry.decider')->getArgument(0));
+        $this->assertSame(100, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(0));
+        $this->assertSame(2, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(1));
+        $this->assertSame(0, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(2));
+        $this->assertSame(2, $container->getDefinition('http_client.retry')->getArgument(3));
+
+        $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retry')->getClass());
+        $this->assertSame(4, $container->getDefinition('foo.retry.exponential_backoff')->getArgument(1));
     }
 
     public function testHttpClientWithQueryParameterKey()

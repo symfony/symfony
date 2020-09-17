@@ -10,6 +10,7 @@ CHANGELOG
  * added `MockResponse::getRequestMethod()` and `getRequestUrl()` to allow inspecting which request has been sent
  * added `EventSourceHttpClient` a Server-Sent events stream implementing the [EventSource specification](https://www.w3.org/TR/eventsource/#eventsource)
  * added option "extra.curl" to allow setting additional curl options in `CurlHttpClient`
+ * added `RetryableHttpClient` to automatically retry failed HTTP requests.
 
 5.1.0
 -----

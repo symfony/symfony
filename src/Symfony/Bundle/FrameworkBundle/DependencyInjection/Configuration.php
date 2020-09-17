@@ -17,6 +17,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -1369,6 +1370,25 @@ class Configuration implements ConfigurationInterface
                     ->info('HTTP Client configuration')
                     ->{!class_exists(FullStack::class) && class_exists(HttpClient::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('scoped_client')
+                    ->beforeNormalization()
+                        ->always(function ($config) {
+                            if (empty($config['scoped_clients']) || !\is_array($config['default_options']['retry_failed'] ?? null)) {
+                                return $config;
+                            }
+
+                            foreach ($config['scoped_clients'] as &$scopedConfig) {
+                                if (!isset($scopedConfig['retry_failed']) || true === $scopedConfig['retry_failed']) {
+                                    $scopedConfig['retry_failed'] = $config['default_options']['retry_failed'];
+                                    continue;
+                                }
+                                if (\is_array($scopedConfig['retry_failed'])) {
+                                    $scopedConfig['retry_failed'] = $scopedConfig['retry_failed'] + $config['default_options']['retry_failed'];
+                                }
+                            }
+
+                            return $config;
+                        })
+                    ->end()
                     ->children()
                         ->integerNode('max_host_connections')
                             ->info('The maximum number of connections to a single host.')
@@ -1454,6 +1474,7 @@ class Configuration implements ConfigurationInterface
                                         ->variableNode('md5')->end()
                                     ->end()
                                 ->end()
+                                ->append($this->addHttpClientRetrySection())
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
@@ -1596,6 +1617,7 @@ class Configuration implements ConfigurationInterface
                                             ->variableNode('md5')->end()
                                         ->end()
                                     ->end()
+                                    ->append($this->addHttpClientRetrySection())
                                 ->end()
                             ->end()
                         ->end()
@@ -1603,6 +1625,50 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function addHttpClientRetrySection()
+    {
+        $root = new NodeBuilder();
+
+        return $root
+            ->arrayNode('retry_failed')
+                ->fixXmlConfig('http_code')
+                ->canBeEnabled()
+                ->addDefaultsIfNotSet()
+                ->beforeNormalization()
+                    ->always(function ($v) {
+                        if (isset($v['backoff_service']) && (isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']))) {
+                            throw new \InvalidArgumentException('The "backoff_service" option cannot be used along with the "delay", "multiplier" or "max_delay" options.');
+                        }
+                        if (isset($v['decider_service']) && (isset($v['http_codes']))) {
+                            throw new \InvalidArgumentException('The "decider_service" option cannot be used along with the "http_codes" options.');
+                        }
+
+                        return $v;
+                    })
+                ->end()
+                ->children()
+                    ->scalarNode('backoff_service')->defaultNull()->info('service id to override the retry backoff')->end()
+                    ->scalarNode('decider_service')->defaultNull()->info('service id to override the retry decider')->end()
+                    ->arrayNode('http_codes')
+                        ->performNoDeepMerging()
+                        ->beforeNormalization()
+                            ->ifArray()
+                            ->then(function ($v) {
+                                return array_filter(array_values($v));
+                            })
+                        ->end()
+                        ->prototype('integer')->end()
+                        ->info('A list of HTTP status code that triggers a retry')
+                        ->defaultValue([423, 425, 429, 500, 502, 503, 504, 507, 510])
+                    ->end()
+                    ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
+                    ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used)')->end()
+                    ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: (delay * (multiple ^ retries))')->end()
+                    ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()
+                ->end()
+            ;
     }
 
     private function addMailerSection(ArrayNodeDefinition $rootNode)

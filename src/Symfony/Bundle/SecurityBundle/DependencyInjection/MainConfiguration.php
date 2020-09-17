@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
@@ -194,7 +195,9 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()
             ->scalarNode('access_denied_handler')->end()
-            ->scalarNode('entry_point')->end()
+            ->scalarNode('entry_point')
+                ->info(sprintf('An enabled authenticator name or a service id that implements "%s"', AuthenticationEntryPointInterface::class))
+            ->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
             ->booleanNode('lazy')->defaultFalse()->end()

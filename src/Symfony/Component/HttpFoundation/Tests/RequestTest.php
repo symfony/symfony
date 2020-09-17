@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -1248,6 +1249,30 @@ class RequestTest extends TestCase
             ['delete'],
             ['patch'],
         ];
+    }
+
+    public function testToArrayEmpty()
+    {
+        $req = new Request();
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Response body is empty.');
+        $req->toArray();
+    }
+
+    public function testToArrayNonJson()
+    {
+        $req = new Request([], [], [], [], [], [], 'foobar');
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessageMatches('|Could not decode request body.+|');
+        $req->toArray();
+    }
+
+    public function testToArray()
+    {
+        $req = new Request([], [], [], [], [], [], json_encode([]));
+        $this->assertEquals([], $req->toArray());
+        $req = new Request([], [], [], [], [], [], json_encode(['foo' => 'bar']));
+        $this->assertEquals(['foo' => 'bar'], $req->toArray());
     }
 
     /**

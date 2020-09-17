@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-14T09:03:34Z
+
+Nice feature!
+
+A quick question: would end-users need to change their code to use this special HTTP client instead of the default one? If that's the case, I find it too cumbersome. What if we provide this feature via a config option of any HTTP client?
+
+```php
+'retry_failed' => [
+    'max_retries' => 2,             // -1 = infinite
+    'wait_after_retries' => 10,     // seconds
+    'retry_model' => 'exponential', // 'linear' or 'exponential' (== "exponential backoff")
+]
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-14T11:25:02Z
+
+Refactor implementation to use `AsyncDecoratorTrait`.
+Added a `RetryStrategy` (very similar to the one in Messenger)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-14T13:10:31Z
+
+This PR is RFR, thank you for the suggestion @javiereguiluz and thank you @nicolas-grekas  for your help.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-14T16:50:22Z
+
+Btw, do we have access to the request when deciding to retry ? Or is is impossible to implement the case of attempting retry only for idempotent methods ?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-14T17:32:23Z
+
+> In case of a 429 response, should we automatically try to read the Retry-After header ?
+
+Good idea, I added it. (I'm not sure how it should behave in case of conflict with delay computed by the backof...)
+
+> Also, should we have a single RetryStrategyInterface covering both the check whether retry should be done and the computation of the backoff delay ? Or should they be separate interfaces that can be replaced separately ? I see potential for customizing conditions for the retry while still keeping exponential backoff (for instance checking the request method to retry only idempotent requests)
+
+Yeah, I hesitate a lot to split this interface in 2:
+```
+interface Decider
+function shouldRetry(); // deal with exception and http status
+
+interface Strategy
+function isRetryable(); // retryCount < maxRetryCount
+function getWaitingTime();
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-14T17:44:52Z
+
+> > In case of a 429 response, should we automatically try to read the Retry-After header ?
+>
+> Good idea, I added it. (I'm not sure how it should behave in case of conflict with delay computed by the backof...)
+
+https://github.com/hashicorp/go-retryablehttp makes the `retry-after` header win (this is where I got this idea btw)
+
+> Yeah, I hesitate a lot to split this interface in 2:
+
+If we look in the go implementation (see just above in my message), the handling of a maximum number of retry is managed by the client itself rather than being delegated to an extension point (there isn't really a point changing the way a `max_retries` is checked, and you definitely don't want to allow removing that check). This leaves with the Decider interface with one method, and the BackOff interface with only `getWaitingTime` (or maybe `getDelay` would be a better name)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-09-14T21:53:17Z
+
+I split the interface in 2:
+
+1) DeciderInterface {function shouldRetry():bool;}
+- `HttpCodeDecider implements DeciderInterface` which return true when the response code belongs to a defined list
+
+2) BackOffInterface {function getDelay(): int;}
+- `ExponentialBackOff implements BackOffInterface` (previously named Multiplier)
+- `HttpHeaderBackOff implements BackOffInterface` that use the HttpHeader to define the delay (and use a BackOffInterface fallback when header is not set)

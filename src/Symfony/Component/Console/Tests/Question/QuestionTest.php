@@ -40,6 +40,13 @@ class QuestionTest extends TestCase
         self::assertSame('Default value', $question->getDefault());
     }
 
+    public function testSetDefault()
+    {
+        $question = new Question('Test question', 'Default value');
+        $question->setDefault('A New Default');
+        self::assertSame('A New Default', $question->getDefault());
+    }
+
     public function testGetDefaultDefault()
     {
         self::assertNull($this->question->getDefault());

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+* Added `Question::setDefault()`
+
 5.2.0
 -----
 

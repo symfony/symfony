@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dmolineus at 2020-09-17T06:24:06Z
+
+Failing integration test `AmqpExtIntegrationTest` seems to be unrelated.

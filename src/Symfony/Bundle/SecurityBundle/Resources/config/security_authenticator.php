@@ -25,6 +25,7 @@ use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
+use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
@@ -112,6 +113,13 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        ->set('security.listener.login_throttling', LoginThrottlingListener::class)
+            ->abstract()
+            ->args([
+                service('request_stack'),
+                abstract_arg('rate limiter'),
+            ])
 
         // Authenticators
         ->set('security.authenticator.http_basic', HttpBasicAuthenticator::class)

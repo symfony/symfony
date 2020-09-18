@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-09-18T08:46:08Z
+
+Thank you @digilist. That's indeed a good catch. 👍 Doesn't this also apply to the `3.4` branch?
+
+---------------------------------------------------------------------------
+
+by digilist at 2020-09-18T09:20:00Z
+
+@xabbuh yes, makes sense, I adjusted the changes for 3.4 and rebased to 3.4

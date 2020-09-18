@@ -78,7 +78,11 @@ class TimezoneValidator extends ConstraintValidator
     private static function getPhpTimezones(int $zone, string $countryCode = null): array
     {
         if (null !== $countryCode) {
-            return @\DateTimeZone::listIdentifiers($zone, $countryCode) ?: [];
+            try {
+                return @\DateTimeZone::listIdentifiers($zone, $countryCode) ?: [];
+            } catch (\ValueError $e) {
+                return [];
+            }
         }
 
         return \DateTimeZone::listIdentifiers($zone);

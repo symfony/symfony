@@ -127,7 +127,7 @@ class Inline
             }
 
             // some comments are allowed at the end
-            if (preg_replace('/\s+#.*$/A', '', substr($value, $i))) {
+            if (preg_replace('/\s*#.*$/A', '', substr($value, $i))) {
                 throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 

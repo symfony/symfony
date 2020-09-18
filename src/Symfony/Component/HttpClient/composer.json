@@ -23,7 +23,7 @@
     "require": {
         "php": ">=7.2.5",
         "psr/log": "^1.0",
-        "symfony/http-client-contracts": "^2.1.1",
+        "symfony/http-client-contracts": "^2.2",
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.0|^2"

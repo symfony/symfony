@@ -153,6 +153,7 @@ class Parser
         $this->refs = [];
         $this->skippedLineNumbers = [];
         $this->locallySkippedLineNumbers = [];
+        $this->totalNumberOfLines = null;
 
         if (null !== $e) {
             throw $e;

@@ -158,7 +158,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function getLocale()
     {
-        return $this->locale;
+        return $this->locale ?? \Locale::getDefault();
     }
 
     /**

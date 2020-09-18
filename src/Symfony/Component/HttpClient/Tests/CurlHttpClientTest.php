@@ -34,6 +34,74 @@ class CurlHttpClientTest extends HttpClientTestCase
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false]);
     }
 
+    public function testBindToPort()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
+        $response->getStatusCode();
+
+        $r = new \ReflectionProperty($response, 'handle');
+        $r->setAccessible(true);
+
+        $curlInfo = curl_getinfo($r->getValue($response));
+
+        self::assertSame('127.0.0.1', $curlInfo['local_ip']);
+        self::assertSame(9876, $curlInfo['local_port']);
+    }
+
+    /**
+     * @requires PHP 7.2.17
+     */
+    public function testHttp2PushVulcain()
+    {
+        $client = $this->getVulcainClient();
+        $logger = new TestLogger();
+        $client->setLogger($logger);
+
+        $responseAsArray = $client->request('GET', 'https://127.0.0.1:3000/json', [
+            'headers' => [
+                'Preload' => '/documents/*/id',
+            ],
+        ])->toArray();
+
+        foreach ($responseAsArray['documents'] as $document) {
+            $client->request('GET', 'https://127.0.0.1:3000'.$document['id'])->toArray();
+        }
+
+        $client->reset();
+
+        $expected = [
+            'Request: "GET https://127.0.0.1:3000/json"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/1"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/2"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/3"',
+            'Response: "200 https://127.0.0.1:3000/json"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/1"',
+            'Response: "200 https://127.0.0.1:3000/json/1"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/2"',
+            'Response: "200 https://127.0.0.1:3000/json/2"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/3"',
+            'Response: "200 https://127.0.0.1:3000/json/3"',
+        ];
+        $this->assertSame($expected, $logger->logs);
+    }
+
+    /**
+     * @requires PHP 7.2.17
+     */
+    public function testHttp2PushVulcainWithUnusedResponse()
+    {
+        $client = $this->getVulcainClient();
+        $logger = new TestLogger();
+        $client->setLogger($logger);
+
+        $responseAsArray = $client->request('GET', 'https://127.0.0.1:3000/json', [
+            'headers' => [
+                'Preload' => '/documents/*/id',
+            ],
+        ])->toArray();
+    }
+
     public function testTimeoutIsNotAFatalError()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

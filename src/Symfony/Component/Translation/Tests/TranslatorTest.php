@@ -19,6 +19,19 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
+    private $defaultLocale;
+
+    protected function setUp(): void
+    {
+        $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
+    }
+
     /**
      * @dataProvider getInvalidLocalesTests
      */

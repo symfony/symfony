@@ -331,7 +331,7 @@
 
     <xsd:complexType name="metadata">
         <xsd:sequence>
-            <xsd:any minOccurs="0" processContents="lax"/>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
         </xsd:sequence>
     </xsd:complexType>
 

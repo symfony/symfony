@@ -107,8 +107,10 @@ class Application implements ResetInterface
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        putenv('LINES='.$this->terminal->getHeight());
-        putenv('COLUMNS='.$this->terminal->getWidth());
+        if (\function_exists('putenv')) {
+            @putenv('LINES='.$this->terminal->getHeight());
+            @putenv('COLUMNS='.$this->terminal->getWidth());
+        }
 
         if (null === $input) {
             $input = new ArgvInput();
@@ -891,7 +893,9 @@ class Application implements ResetInterface
             $input->setInteractive(false);
         }
 
-        putenv('SHELL_VERBOSITY='.$shellVerbosity);
+        if (\function_exists('putenv')) {
+            @putenv('SHELL_VERBOSITY='.$shellVerbosity);
+        }
         $_ENV['SHELL_VERBOSITY'] = $shellVerbosity;
         $_SERVER['SHELL_VERBOSITY'] = $shellVerbosity;
     }

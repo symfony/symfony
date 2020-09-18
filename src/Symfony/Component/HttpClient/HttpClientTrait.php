@@ -198,16 +198,22 @@ trait HttpClientTrait
                 continue;
             }
 
+            if ('auth_ntlm' === $name) {
+                if (!\extension_loaded('curl')) {
+                    $msg = 'try installing the "curl" extension to use "%s" instead.';
+                } else {
+                    $msg = 'try using "%s" instead.';
+                }
+
+                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", '.$msg, __CLASS__, CurlHttpClient::class));
+            }
+
             $alternatives = [];
 
             foreach ($defaultOptions as $key => $v) {
                 if (levenshtein($name, $key) <= \strlen($name) / 3 || false !== strpos($key, $name)) {
                     $alternatives[] = $key;
                 }
-            }
-
-            if ('auth_ntlm' === $name) {
-                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", try using CurlHttpClient instead.', __CLASS__));
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported option "%s" passed to "%s", did you mean "%s"?', $name, __CLASS__, implode('", "', $alternatives ?: array_keys($defaultOptions))));

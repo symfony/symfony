@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -167,41 +168,57 @@ class TraceableEventDispatcherTest extends TestCase
 
     public function testLogger()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = new BufferingLogger();
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch(), $logger);
         $tdispatcher->addListener('foo', $listener1 = function () {});
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->exactly(2))
-            ->method('debug')
-            ->withConsecutive(
-                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']],
-                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']]
-            );
-
         $tdispatcher->dispatch('foo');
+
+        $this->assertSame([
+            [
+                'debug',
+                'Notified event "{event}" to listener "{listener}".',
+                ['event' => 'foo', 'listener' => 'closure'],
+            ],
+            [
+                'debug',
+                'Notified event "{event}" to listener "{listener}".',
+                ['event' => 'foo', 'listener' => 'closure'],
+            ],
+        ], $logger->cleanLogs());
     }
 
     public function testLoggerWithStoppedEvent()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = new BufferingLogger();
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch(), $logger);
         $tdispatcher->addListener('foo', $listener1 = function (Event $event) { $event->stopPropagation(); });
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->exactly(3))
-            ->method('debug')
-            ->withConsecutive(
-                ['Notified event "{event}" to listener "{listener}".', ['event' => 'foo', 'listener' => 'closure']],
-                ['Listener "{listener}" stopped propagation of the event "{event}".', ['event' => 'foo', 'listener' => 'closure']],
-                ['Listener "{listener}" was not called for event "{event}".', ['event' => 'foo', 'listener' => 'closure']]
-            );
-
         $tdispatcher->dispatch('foo');
+
+        $this->assertSame([
+            [
+                'debug',
+                'Notified event "{event}" to listener "{listener}".',
+                ['event' => 'foo', 'listener' => 'closure'],
+            ],
+            [
+                'debug',
+                'Listener "{listener}" stopped propagation of the event "{event}".',
+                ['event' => 'foo', 'listener' => 'closure'],
+            ],
+            [
+                'debug',
+                'Listener "{listener}" was not called for event "{event}".',
+                ['event' => 'foo', 'listener' => 'closure'],
+            ],
+        ], $logger->cleanLogs());
     }
 
     public function testDispatchCallListeners()

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-09-18T08:58:42Z
+
+how does this behave for unquoted values ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-09-18T09:16:31Z
+
+@stof Works the same as before because the internal pointer already points at the end of the unquoted string when the changed line of code is reached. Though I added an additional test case to ensure this doesn't accidentally break in the future.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-18T09:17:47Z
+
+@xabbuh great

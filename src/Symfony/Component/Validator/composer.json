@@ -34,7 +34,7 @@
         "symfony/expression-language": "^5.1",
         "symfony/cache": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
-        "symfony/phpunit-bridge": "^5.1",
+        "symfony/phpunit-bridge": "^5.1.1",
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",

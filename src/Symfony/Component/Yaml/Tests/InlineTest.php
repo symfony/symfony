@@ -860,4 +860,14 @@ class InlineTest extends TestCase
     {
         self::assertSame('-0123456789', Inline::parse('-0123456789'));
     }
+
+    public function testParseCommentNotPrefixedBySpaces()
+    {
+        self::assertSame('foo', Inline::parse('"foo"#comment'));
+    }
+
+    public function testParseUnquotedStringContainingHashTagNotPrefixedBySpace()
+    {
+        self::assertSame('foo#nocomment', Inline::parse('foo#nocomment'));
+    }
 }

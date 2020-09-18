@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-02-18T09:30:32Z
+
+Can you please give more details about the envisioned benefits?
+This is a BC break so it likely won't be accepted.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-02-18T10:01:01Z
+
+Well, the benefit is that you can combine behavior of various activation strategies when using composition.
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-02-18T10:12:45Z
+
+What I have in mind is to provide (in a dedicated bundle) a new ActivationStrategy implementation to be able to change dynamicaly (through endpoint or cli command or whatever) the actionLevel of ErrorLevelActivationStrategy or ChannelLevelActivationStrategy, and keep compatibility with HttpCodeActivationStrategy.
+The use case would be to enable debug log for a short term period to be able to understand what is going wrong on the application, then switch back to the original log level.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-02-18T19:58:17Z
+
+You've basically implemented the decorator pattern for activation strategies. I see the benefit of stacking/decorating strategies, but the current implementation might break code that relies on the current inheritance. What we could do:
+
+* Keep the inheritance, but stop calling the parent methods. Since we override all methods anyway, that shouldn't be much of a problem. In Symfony 6, we can drop the parent class and switch to the interface. The downside is that we cannot trigger proper deprecations on this, can we?
+
+* Create your decorators as new classes and deprecate the current strategy classes. For instance, we would just deprecate `HttpCodeActivationStrategy` and create a new class `HttpCodeActivationStrategyDecorator` that should be used instead.
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-02-18T21:41:17Z
+
+I see the point. Let me work on your second proposal. Additionally it will be more convenient to handle in monolog-bundle during the deprecated period.
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-02-27T15:18:53Z
+
+@derrabus @stof @nicolas-grekas Here is a new proposal regarding your feedback
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-02-29T11:37:42Z
+
+Looks good to me.
+
+I wonder if we should finalize the new decorator classes. We should rather encourage people to stack decorators than to extend ours.
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-03-19T17:59:19Z
+
+Just rebased on master, anything else I can do ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-16T14:38:02Z
+
+Instead of creating new classes, I would instead accept both constructor signatures (we've done that multiple times in the past). The main benefit is to avoid having new class names.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-06T07:16:15Z
+
+@pvgnd Do you still want to work on this PR? What do you think of my proposal?
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-09-06T08:18:55Z
+
+Hello @fabpot, your proposal was my first attempt before comments from other contributors. Introducing new classes allows us to make them final, which will discourage to break the decorator pattern. This will also make easier the deprecated code cleaning.
+
+If you prefer to keep old classes and manage 2 constructor signatures, I can rework the PR. Please let me know and I'll give some time to rework on this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-11T05:23:43Z
+
+If the goal was to make these classes final, you can mark them as such via the `@final` annotation at first and we would make them final in 6.0.
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2020-09-13T11:35:39Z
+
+OK @fabpot I will update the PR
+
+---------------------------------------------------------------------------
+
+by mm-pvgnd at 2020-09-17T15:58:23Z
+
+@fabpot Can you have a look please and tell me if it's OK for you?

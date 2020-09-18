@@ -111,6 +111,14 @@ class SplCaster
                 $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
 
                 return $a;
+            } catch (\Error $e) {
+                if ('Object not initialized' !== $e->getMessage()) {
+                    throw $e;
+                }
+
+                $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
+
+                return $a;
             }
         }
 

@@ -2438,6 +2438,39 @@ YAML;
             $this->parser->parse($yaml)
         );
     }
+
+    /**
+     * This is a regression test for a bug where a YAML block with a nested multiline string using | was parsed without
+     * a trailing \n when a shorter YAML document was parsed before.
+     *
+     * When a shorter document was parsed before, the nested string did not have a \n at the end of the string, because
+     * the Parser thought it was the end of the file, even though it is not.
+     */
+    public function testParsingMultipleDocuments()
+    {
+        $shortDocument = 'foo: bar';
+        $longDocument = <<<YAML
+a:
+    b: |
+        row
+        row2
+c: d
+YAML;
+
+        $expected = ['a' => ['b' => "row\nrow2\n"], 'c' => 'd'];
+
+        // The parser was not used before, so there is a new line after row2
+        $this->assertSame($expected, $this->parser->parse($longDocument));
+
+        $parser = new Parser();
+        // The first parsing set and fixed the totalNumberOfLines in the Parser before, so parsing the short document here
+        // to reproduce the issue. If the issue would not have been fixed, the next assertion will fail
+        $parser->parse($shortDocument);
+
+        // After the total number of lines has been rset the result will be the same as if a new parser was used
+        // (before, there was no \n after row2)
+        $this->assertSame($expected, $parser->parse($longDocument));
+    }
 }
 
 class B

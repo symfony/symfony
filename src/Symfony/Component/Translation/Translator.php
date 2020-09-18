@@ -91,6 +91,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
     {
+        if ('' === $locale) {
+            trigger_deprecation('symfony/translator', '5.2', sprintf('Passing "" as the $locale argument to %s::%s() is deprecated, it will throw an InvalidArgumentException in version 6.0.', static::class, __METHOD__));
+        }
+
         $this->setLocale($locale);
 
         if (null === $formatter) {
@@ -158,7 +162,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function getLocale()
     {
-        return $this->locale;
+        return $this->locale ?: \Locale::getDefault();
     }
 
     /**

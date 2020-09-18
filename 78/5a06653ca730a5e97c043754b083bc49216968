@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-10T16:50:47Z
+
+Tests seems broken by this change.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-10T17:00:39Z
+
+@jschaedl we need to ensure a fixed default locale still, see e.g. https://github.com/symfony/symfony/commit/7fce86f1dba28a172b3b113c330078875fb1dda5#diff-59203b25094d9f89c0a4abd9864d8a9c
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-09-16T15:43:10Z
+
+@ro0NL Thanks for the hint :-)
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-09-18T07:37:55Z
+
+@ro0NL I reverted things as discussed.

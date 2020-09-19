@@ -36,7 +36,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
-                new InputOption('failed-transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failed transport'),
+                new InputOption('failure-transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport'),
             ])
             ->setDescription('Shows one or more messages from the failure transport')
             ->setHelp(<<<'EOF'
@@ -59,28 +59,32 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        $failedTransport = $input->getOption('failed-transport');
-        $receiver = $this->getReceiver($failedTransport);
+        $failureTransportName = $input->getOption('failure-transport');
+        if ($failureTransportName === null) {
+            $failureTransportName = $this->getGlobalFailureReceiverName();
+        }
+
+        $receiver = $this->getReceiver($failureTransportName);
 
         $this->printPendingMessagesMessage($receiver, $io);
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $this->getReceiverName($failedTransport)));
+            throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $failureTransportName));
         }
 
         if (null === $id = $input->getArgument('id')) {
-            $this->listMessages($failedTransport, $io, $input->getOption('max'));
+            $this->listMessages($failureTransportName, $io, $input->getOption('max'));
         } else {
-            $this->showMessage($failedTransport, $id, $io);
+            $this->showMessage($failureTransportName, $id, $io);
         }
 
         return 0;
     }
 
-    private function listMessages(?string $failedTransport, SymfonyStyle $io, int $max)
+    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max)
     {
         /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransport);
+        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $rows = [];
@@ -110,10 +114,10 @@ EOF
         $io->comment('Run <comment>messenger:failed:show {id} -vv</comment> to see message details.');
     }
 
-    private function showMessage(?string $failedTransport, string $id, SymfonyStyle $io)
+    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io)
     {
         /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransport);
+        $receiver = $this->getReceiver($failedTransportName);
         $envelope = $receiver->find($id);
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));

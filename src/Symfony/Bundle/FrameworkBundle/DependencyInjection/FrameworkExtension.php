@@ -1861,27 +1861,15 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
-
-        $hasAnyFailureTransport = false;
-
+        
         $failureTransports = [];
-        $failureTransportsServiceLocatorId = 'messenger.failure_transports.locator';
-        $failureTransportsByName = [];
-        $failureTransportsByNameServiceLocatorId = 'messenger.failure_transports_by_name.locator';
 
         if ($config['failure_transport']) {
             if (!isset($senderReferences[$config['failure_transport']])) {
                 throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
-
-            $hasAnyFailureTransport = true;
-            $failureTransportRef = $senderReferences[$config['failure_transport']];
-            $failureTransportsByName[$config['failure_transport']] = $failureTransportRef;
-
-            $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(0, $failureTransportRef);
-            $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(2, null);
+            
+            $failureTransports[$config['failure_transport']] = $senderReferences[$config['failure_transport']];
         }
 
         foreach ($config['transports'] as $name => $transport) {
@@ -1890,41 +1878,31 @@ class FrameworkExtension extends Extension
                     throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $transport['failure_transport']));
                 }
 
-                $hasAnyFailureTransport = true;
-                $failureTransports[$name] = $senderReferences[$transport['failure_transport']];
-                $failureTransportsByName[$transport['failure_transport']] = $senderReferences[$transport['failure_transport']];
+                $failureTransports[$transport['failure_transport']] = $senderReferences[$transport['failure_transport']];
             }
         }
 
-        if ($hasAnyFailureTransport) {
+        $failureTransportsServiceLocatorId = 'messenger.failure_transports.locator';
+        if (\count($failureTransports) > 0) {
             $failureTransportsServiceLocator = ServiceLocatorTagPass::register($container, $failureTransports, $failureTransportsServiceLocatorId);
+            
             $container->getDefinition($failureTransportsServiceLocatorId)
-                ->replaceArgument(0, $failureTransports)
-                ->replaceArgument(1, $failureTransportsServiceLocator);
+                ->replaceArgument(0, $failureTransports);
+            
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(0, $senderReferences[$config['failure_transport']] ?? null);
-            $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(2, \count($failureTransports) > 0 ? $failureTransportsServiceLocator : null);
-
-            $failureTransportsByNameServiceLocator = ServiceLocatorTagPass::register($container, $failureTransportsByName, $failureTransportsByNameServiceLocatorId);
-            $container->getDefinition($failureTransportsByNameServiceLocatorId)
-                ->replaceArgument(0, $failureTransportsByName)
-                ->replaceArgument(1, $failureTransportsByNameServiceLocator);
-
+                ->replaceArgument(0, $failureTransportsServiceLocator);
+            
+            $globalFailureReceiver = $config['failure_transport'] ?? null;
             $container->getDefinition('console.command.messenger_failed_messages_retry')
-                ->replaceArgument(0, $config['failure_transport'] ?? null)
-                ->replaceArgument(1, $failureTransportsByName[$config['failure_transport']] ?? null)
-                ->replaceArgument(5, $container->getDefinition($failureTransportsByNameServiceLocatorId));
-
+                ->replaceArgument(0, $globalFailureReceiver)
+                ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocator));
             $container->getDefinition('console.command.messenger_failed_messages_show')
-                ->replaceArgument(0, $config['failure_transport'] ?? null)
-                ->replaceArgument(1, $failureTransportsByName[$config['failure_transport']] ?? null)
-                ->replaceArgument(2, $container->getDefinition($failureTransportsByNameServiceLocatorId));
-
+                ->replaceArgument(0, $globalFailureReceiver)
+                ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocatorId));
             $container->getDefinition('console.command.messenger_failed_messages_remove')
-                ->replaceArgument(0, $config['failure_transport'] ?? null)
-                ->replaceArgument(1, $failureTransportsByName[$config['failure_transport']] ?? null)
-                ->replaceArgument(2, $container->getDefinition($failureTransportsByNameServiceLocatorId));
+                ->replaceArgument(0, $globalFailureReceiver)
+                ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocatorId));
+            
         } else {
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');

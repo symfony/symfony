@@ -45,12 +45,11 @@ class FailedMessagesShowCommandTest extends TestCase
 
         $command = new FailedMessagesShowCommand(
             null,
-            null,
             $serviceLocator
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(['id' => 15, '--failed-transport' => $receiverName]);
+        $tester->execute(['id' => 15, '--failure-transport' => $receiverName]);
 
         $this->assertStringContainsString(sprintf(<<<EOF
  ------------- --------------------- 
@@ -77,12 +76,10 @@ EOF
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);
-        $serviceLocator = $this->createMock(ServiceLocator::class);
 
         $command = new FailedMessagesShowCommand(
             'failure_receiver',
-            $receiver,
-            $serviceLocator
+            $receiver
         );
 
         $tester = new CommandTester($command);
@@ -113,13 +110,15 @@ EOF
             $redeliveryStamp1,
             $redeliveryStamp2,
         ]);
+        
+        $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);
         $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
-            'failure_receiver',
-            $receiver,
+            $globalFailureReceiverName,
             $serviceLocator
         );
 
@@ -142,13 +141,14 @@ EOF
 
     public function testReceiverShouldBeListable()
     {
+        $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ReceiverInterface::class);
         $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
-            'failure_receiver',
-            $receiver,
-            $serviceLocator
+            $globalFailureReceiverName,
+            $receiver
         );
 
         $this->expectExceptionMessage('The "failure_receiver" receiver does not support listing or showing specific messages.');

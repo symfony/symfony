@@ -32,12 +32,11 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             null,
-            null,
             $serviceLocator
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(['id' => [$messageId], '--failed-transport' => $anotherFailedTransport, '--force' => true]);
+        $tester->execute(['id' => [$messageId], '--failure-transport' => $anotherFailedTransport, '--force' => true]);
 
         $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
@@ -45,13 +44,14 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
     public function testRemoveUniqueMessage()
     {
+        $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
         $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
-            'failure_receiver',
-            $receiver,
+            $globalFailureReceiverName,
             $serviceLocator
         );
 
@@ -64,6 +64,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
     public function testRemoveMultipleMessages()
     {
+        $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
@@ -71,11 +72,11 @@ class FailedMessagesRemoveCommandTest extends TestCase
             new Envelope(new \stdClass())
         );
         $serviceLocator = $this->createMock(ServiceLocator::class);
-
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        
         $command = new FailedMessagesRemoveCommand(
-            'failure_receiver',
-            $receiver,
-            $serviceLocator
+            $globalFailureReceiverName,
+            $receiver
         );
 
         $tester = new CommandTester($command);
@@ -89,16 +90,17 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
     public function testRemoveMultipleMessagesAndDisplayMessages()
     {
+        $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
             new Envelope(new \stdClass())
         );
         $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
-            'failure_receiver',
-            $receiver,
+            $globalFailureReceiverName,
             $serviceLocator
         );
 

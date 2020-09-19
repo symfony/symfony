@@ -29,29 +29,25 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 abstract class AbstractFailedMessagesCommand extends Command
 {
-    private $receiverName;
-    private $receiver;
-    /**
-     * @var ServiceLocator
-     */
+    private $globalFailureReceiverName;
     private $failureTransports;
 
-    public function __construct(?string $receiverName, ?ReceiverInterface $receiver, ServiceLocator $failureTransports)
+    public function __construct(?string $globalFailureReceiverName, $failureTransports)
     {
-        $this->receiverName = $receiverName;
-        $this->receiver = $receiver;
         $this->failureTransports = $failureTransports;
+        $this->globalFailureReceiverName = $globalFailureReceiverName;
+        if (!$failureTransports instanceof ServiceLocator) {
+            trigger_deprecation('symfony/messenger', '5.2', 'Passing failureTransports should now pass a ServiceLocator', __METHOD__);
 
+            $this->failureTransports = new ServiceLocator([$this->globalFailureReceiverName => function() use ($failureTransports) { return $failureTransports; }]);
+        } 
+        
         parent::__construct();
     }
 
-    protected function getReceiverName(?string $name): string
+    protected function getGlobalFailureReceiverName(): ?string
     {
-        if (null === $name) {
-            return $this->receiverName;
-        }
-
-        return $name;
+        return $this->globalFailureReceiverName;
     }
 
     /**
@@ -125,12 +121,8 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function getReceiver(?string $name): ReceiverInterface
+    protected function getReceiver(string $name): ReceiverInterface
     {
-        if (null === $name) {
-            return $this->receiver;
-        }
-
         return $this->failureTransports->get($name);
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -130,6 +131,13 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
+        // failed transports
+        ->set('messenger.failure_transports.locator', ServiceLocator::class)
+            ->args([
+                abstract_arg('failed transports map by name'),
+            ])
+            ->tag('container.service_locator')
+        
         // retry
         ->set('messenger.retry_strategy_locator')
             ->args([

@@ -60,10 +60,10 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         $failureTransportName = $input->getOption('failure-transport');
-        if ($failureTransportName === null) {
+        if (null === $failureTransportName) {
             $failureTransportName = $this->getGlobalFailureReceiverName();
         }
-        
+
         $receiver = $this->getReceiver($failureTransportName);
 
         $shouldForce = $input->getOption('force');

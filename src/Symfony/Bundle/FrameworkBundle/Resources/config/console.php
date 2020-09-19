@@ -170,7 +170,7 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
                 service('logger'),
-                abstract_arg('Receivers')
+                abstract_arg('Receivers'),
             ])
             ->tag('console.command', ['command' => 'messenger:failed:retry'])
 

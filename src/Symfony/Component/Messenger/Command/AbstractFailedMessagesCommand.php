@@ -39,9 +39,9 @@ abstract class AbstractFailedMessagesCommand extends Command
         if (!$failureTransports instanceof ServiceLocator) {
             trigger_deprecation('symfony/messenger', '5.2', 'Passing failureTransports should now pass a ServiceLocator', __METHOD__);
 
-            $this->failureTransports = new ServiceLocator([$this->globalFailureReceiverName => function() use ($failureTransports) { return $failureTransports; }]);
-        } 
-        
+            $this->failureTransports = new ServiceLocator([$this->globalFailureReceiverName => function () use ($failureTransports) { return $failureTransports; }]);
+        }
+
         parent::__construct();
     }
 

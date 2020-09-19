@@ -110,7 +110,7 @@ EOF
             $redeliveryStamp1,
             $redeliveryStamp2,
         ]);
-        
+
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);

@@ -1862,14 +1862,14 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
-        
+
         $failureTransports = [];
 
         if ($config['failure_transport']) {
             if (!isset($senderReferences[$config['failure_transport']])) {
                 throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
-            
+
             $failureTransports[$config['failure_transport']] = $senderReferences[$config['failure_transport']];
         }
 
@@ -1886,13 +1886,13 @@ class FrameworkExtension extends Extension
         $failureTransportsServiceLocatorId = 'messenger.failure_transports.locator';
         if (\count($failureTransports) > 0) {
             $failureTransportsServiceLocator = ServiceLocatorTagPass::register($container, $failureTransports, $failureTransportsServiceLocatorId);
-            
+
             $container->getDefinition($failureTransportsServiceLocatorId)
                 ->replaceArgument(0, $failureTransports);
-            
+
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
                 ->replaceArgument(0, $failureTransportsServiceLocator);
-            
+
             $globalFailureReceiver = $config['failure_transport'] ?? null;
             $container->getDefinition('console.command.messenger_failed_messages_retry')
                 ->replaceArgument(0, $globalFailureReceiver)
@@ -1904,7 +1904,6 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.messenger_failed_messages_remove')
                 ->replaceArgument(0, $globalFailureReceiver)
                 ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocatorId));
-            
         } else {
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');

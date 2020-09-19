@@ -34,7 +34,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         // the bus should be called in the worker
         $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
-        
+
         $command = new FailedMessagesRetryCommand(
             'failure_receiver',
             $receiver,

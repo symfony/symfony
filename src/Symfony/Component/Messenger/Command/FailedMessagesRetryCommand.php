@@ -36,7 +36,7 @@ use Symfony\Component\Messenger\Worker;
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:retry';
-    
+
     private $eventDispatcher;
     private $messageBus;
     private $logger;
@@ -48,8 +48,8 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
         $this->messageBus = $messageBus;
         $this->logger = $logger;
         $this->globalReceiverName = $globalReceiverName;
-        
-        parent::__construct($globalReceiverName, $failureTransports === null ? $globalReceiver : $failureTransports);
+
+        parent::__construct($globalReceiverName, null === $failureTransports ? $globalReceiver : $failureTransports);
     }
 
     /**
@@ -100,10 +100,10 @@ EOF
         }
 
         $failureTransportName = $input->getOption('failure-transport');
-        if ($failureTransportName === null) {
+        if (null === $failureTransportName) {
             $failureTransportName = $this->getGlobalFailureReceiverName();
         }
-        
+
         $receiver = $this->getReceiver($failureTransportName);
         $this->printPendingMessagesMessage($receiver, $io);
 

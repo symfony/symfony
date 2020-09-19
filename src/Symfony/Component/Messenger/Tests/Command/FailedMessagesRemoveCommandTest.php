@@ -73,7 +73,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         );
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
-        
+
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
             $receiver

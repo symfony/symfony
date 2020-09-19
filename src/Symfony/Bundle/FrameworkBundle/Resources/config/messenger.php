@@ -137,7 +137,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('failed transports map by name'),
             ])
             ->tag('container.service_locator')
-        
+
         // retry
         ->set('messenger.retry_strategy_locator')
             ->args([

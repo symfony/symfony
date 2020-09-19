@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-12T21:05:09Z
+
+The segfault that be observed in https://travis-ci.org/github/symfony/symfony/jobs/726646852 (line 3655) appeared after my changes to the `ReflectionCaster` class. I can reproduce it locally (php 8.0 67d21bf237 on macOS 10.15) by just executing
+
+```
+./phpunit src/Symfony/Component/VarDumper/Tests/Caster/ReflectionCasterTest.php
+```
+
+But when I rerun that command a couple of times, it eventually works and the tests pass. I haven't been able to isolate the problem yet, but maybe this is an interesting find for @nikic or @beberlei that helps with stabilizing the reflection API for attributes.
+
+<img width="909" alt="Bildschirmfoto 2020-09-12 um 22 59 17" src="https://user-images.githubusercontent.com/1506493/93004880-98046a80-f54b-11ea-9d9b-057cf27f487a.png">
+
+---------------------------------------------------------------------------
+
+by beberlei at 2020-09-12T21:20:05Z
+
+Do you have the stacktrace for the segfault?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-14T08:13:59Z
+
+I use the `dump()` function a lot when debugging on php 8 because I don't have a working PhpStorm/Xdebug-Setup for php 8 yet. It would be extremely helpful to be able to see attributes in the dumped output. But I understand that the policy you mentioned also applies to VarDumper, so I'm going to rebase the PR on master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-18T16:00:42Z
+
+for `.github/patch-types.php`:
+`src/Symfony/Component/VarDumper/Tests/Fixtures/MyAttribute.php`

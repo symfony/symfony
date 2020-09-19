@@ -170,20 +170,21 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
                 service('logger'),
+                abstract_arg('Receivers')
             ])
             ->tag('console.command', ['command' => 'messenger:failed:retry'])
 
         ->set('console.command.messenger_failed_messages_show', FailedMessagesShowCommand::class)
             ->args([
                 abstract_arg('Receiver name'),
-                abstract_arg('Receiver'),
+                abstract_arg('Receivers'),
             ])
             ->tag('console.command', ['command' => 'messenger:failed:show'])
 
         ->set('console.command.messenger_failed_messages_remove', FailedMessagesRemoveCommand::class)
             ->args([
                 abstract_arg('Receiver name'),
-                abstract_arg('Receiver'),
+                abstract_arg('Receivers'),
             ])
             ->tag('console.command', ['command' => 'messenger:failed:remove'])
 

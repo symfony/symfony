@@ -1850,6 +1850,7 @@ class FrameworkExtension extends Extension
         }
 
         $sendersServiceLocator = ServiceLocatorTagPass::register($container, $senderReferences);
+
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, $sendersServiceLocator)
@@ -1895,7 +1896,8 @@ class FrameworkExtension extends Extension
             $globalFailureReceiver = $config['failure_transport'] ?? null;
             $container->getDefinition('console.command.messenger_failed_messages_retry')
                 ->replaceArgument(0, $globalFailureReceiver)
-                ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocator));
+                ->replaceArgument(1, $senderReferences[$config['failure_transport']])
+                ->replaceArgument(5, $container->getDefinition($failureTransportsServiceLocator));
             $container->getDefinition('console.command.messenger_failed_messages_show')
                 ->replaceArgument(0, $globalFailureReceiver)
                 ->replaceArgument(1, $container->getDefinition($failureTransportsServiceLocatorId));

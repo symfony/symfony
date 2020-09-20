@@ -239,7 +239,7 @@ class UnicodeString extends AbstractUnicodeString
             $result = '';
             $indexOf = $this->ignoreCase ? 'grapheme_stripos' : 'grapheme_strpos';
 
-            while ('' !== $tail && false !== $i = $indexOf($tail, $from)) {
+            while ('' !== $tail && false !== $i = $indexOf($tail, $from, 0)) {
                 $slice = grapheme_substr($tail, 0, $i);
                 $result .= $slice.$to;
                 $tail = substr($tail, \strlen($slice) + \strlen($from));

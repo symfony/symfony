@@ -651,7 +651,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports');
-        
+
         // transport 2 exists but does not appear in the mapping
         $expectedFailureTransports = [
             'failure_transport_1' => new Reference('messenger.transport.failure_transport_1'),
@@ -659,10 +659,10 @@ abstract class FrameworkExtensionTest extends TestCase
         ];
         $failureTransportsLocator = $container->getDefinition('messenger.failure_transports.locator');
         $this->assertEquals($expectedFailureTransports, $failureTransportsLocator->getArgument(0));
-        
+
         $expectedFailureTransportsByTransportName = [
             'transport_1' => new Reference('messenger.transport.failure_transport_1'),
-            'transport_3' =>  new Reference('messenger.transport.failure_transport_3'),
+            'transport_3' => new Reference('messenger.transport.failure_transport_3'),
         ];
 
         $failureTransportsByTransportNameLocator = $container->getDefinition('messenger.failure_transports_by_transport_name.locator');
@@ -683,7 +683,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $expectedFailureTransportsByTransportName = [
             'transport_1' => new Reference('messenger.transport.failure_transport_1'),
-            'transport_3' =>  new Reference('messenger.transport.failure_transport_3'),
+            'transport_3' => new Reference('messenger.transport.failure_transport_3'),
         ];
 
         $failureTransportsByTransportNameLocator = $container->getDefinition('messenger.failure_transports_by_transport_name.locator');

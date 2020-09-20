@@ -19,7 +19,6 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendFailedMessageToFailureTransportListenerTest extends TestCase
 {
@@ -27,9 +26,9 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
-        
+
         $listener = new SendFailedMessageToFailureTransportListener(null, null, null);
-        
+
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);

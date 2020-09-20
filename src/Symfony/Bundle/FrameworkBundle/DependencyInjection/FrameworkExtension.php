@@ -1887,12 +1887,12 @@ class FrameworkExtension extends Extension
                 $failureTransports[$transport['failure_transport']] = $senderReferences[$transport['failure_transport']];
             }
         }
-        
+
         if (\count($failureTransports) > 0) {
             $failureTransportsServiceLocator = ServiceLocatorTagPass::register($container, $failureTransports, $failureTransportsServiceLocatorId);
             $container->getDefinition($failureTransportsServiceLocatorId)
                 ->replaceArgument(0, $failureTransports);
-            
+
             $globalFailureReceiver = $config['failure_transport'] ?? null;
             $container->getDefinition('console.command.messenger_failed_messages_retry')
                 ->replaceArgument(0, $globalFailureReceiver)

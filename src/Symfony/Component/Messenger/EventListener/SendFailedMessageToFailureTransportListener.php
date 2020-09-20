@@ -99,9 +99,9 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
 
         return $this->globalFailureSender;
     }
-    
+
     private function hasFailureTransports(WorkerMessageFailedEvent $event): bool
     {
-        return ($this->failureSenders instanceof ServiceLocator && $this->failureSenders->has($event->getReceiverName())) || $this->globalFailureSender !== null;
+        return ($this->failureSenders instanceof ServiceLocator && $this->failureSenders->has($event->getReceiverName())) || null !== $this->globalFailureSender;
     }
 }

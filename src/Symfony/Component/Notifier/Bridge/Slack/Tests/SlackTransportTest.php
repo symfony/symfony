@@ -78,7 +78,7 @@ final class SlackTransportTest extends TestCase
     public function testSendWithErrorResponseThrows(): void
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessageRegExp('/testErrorCode/');
+        $this->expectExceptionMessageMatches('/testErrorCode/');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

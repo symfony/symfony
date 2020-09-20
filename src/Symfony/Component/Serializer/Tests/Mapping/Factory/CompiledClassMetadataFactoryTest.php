@@ -26,7 +26,7 @@ final class CompiledClassMetadataFactoryTest extends TestCase
     public function testItThrowAnExceptionWhenCacheFileIsNotFound()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageRegExp('#File ".*/Fixtures/not-found-serializer.class.metadata.php" could not be found.#');
+        $this->expectExceptionMessageMatches('#File ".*/Fixtures/not-found-serializer.class.metadata.php" could not be found.#');
 
         $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/not-found-serializer.class.metadata.php', $classMetadataFactory);

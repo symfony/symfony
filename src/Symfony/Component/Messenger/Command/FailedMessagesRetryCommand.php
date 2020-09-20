@@ -129,7 +129,7 @@ EOF
 
     private function runInteractive(string $failureTransportName, ReceiverInterface $failedTransport, SymfonyStyle $io, bool $shouldForce)
     {
-        $receiver = $this->getReceiver($failedTransport);
+        $receiver = $this->getReceiver($failureTransportName);
         $count = 0;
         if ($receiver instanceof ListableReceiverInterface) {
             // for listable receivers, find the messages one-by-one
@@ -154,7 +154,7 @@ EOF
                     break;
                 }
 
-                $this->retrySpecificIds($failedTransport, $ids, $io, $shouldForce);
+                $this->retrySpecificIds($failureTransportName, $ids, $io, $shouldForce);
             }
         } else {
             // get() and ask messages one-by-one

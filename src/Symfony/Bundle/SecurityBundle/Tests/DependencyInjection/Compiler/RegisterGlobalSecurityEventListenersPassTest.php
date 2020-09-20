@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
-class RegisterGlobalSecurtyEventListenersPassTest extends TestCase
+class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 {
     private $container;
 

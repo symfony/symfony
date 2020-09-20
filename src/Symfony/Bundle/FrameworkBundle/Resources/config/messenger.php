@@ -137,6 +137,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('failed transports map by name'),
             ])
             ->tag('container.service_locator')
+        ->set('messenger.failure_transports_by_transport_name.locator', ServiceLocator::class)
+            ->args([
+                abstract_arg('failed transports map by transport name'),
+            ])
+            ->tag('container.service_locator')
 
         // retry
         ->set('messenger.retry_strategy_locator')
@@ -166,8 +171,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)
             ->args([
-                abstract_arg('failure transport'),
+                abstract_arg('global failure transport'),
                 service('logger')->ignoreOnInvalid(),
+                abstract_arg('failure transports by transport name locator'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

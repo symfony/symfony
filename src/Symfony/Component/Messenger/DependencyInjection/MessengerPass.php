@@ -298,18 +298,6 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
-
-        $failedCommandIds = [
-            'console.command.messenger_failed_messages_retry',
-            'console.command.messenger_failed_messages_show',
-            'console.command.messenger_failed_messages_remove',
-        ];
-        foreach ($failedCommandIds as $failedCommandId) {
-            if ($container->hasDefinition($failedCommandId)) {
-                $definition = $container->getDefinition($failedCommandId);
-                $definition->replaceArgument(1, $receiverMapping[$definition->getArgument(0)]);
-            }
-        }
     }
 
     private function registerBusToCollector(ContainerBuilder $container, string $busId)

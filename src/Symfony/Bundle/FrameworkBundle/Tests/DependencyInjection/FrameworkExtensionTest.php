@@ -651,62 +651,43 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports');
-        $failureTransportsLocatorDefinition = $container->getDefinition('messenger.failure_transports.locator');
-
-        /** @var Reference $failureTransportsMapping */
-        $failureTransportsMapping = $failureTransportsLocatorDefinition->getArgument(0);
-
+        
         // transport 2 exists but does not appear in the mapping
-        $expectedFailureTransportsMapping = [
-            'transport_1' => 'failure_transport_1',
-            'transport_3' => 'failure_transport_3',
+        $expectedFailureTransports = [
+            'failure_transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'failure_transport_3' => new Reference('messenger.transport.failure_transport_3'),
+        ];
+        $failureTransportsLocator = $container->getDefinition('messenger.failure_transports.locator');
+        $this->assertEquals($expectedFailureTransports, $failureTransportsLocator->getArgument(0));
+        
+        $expectedFailureTransportsByTransportName = [
+            'transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'transport_3' =>  new Reference('messenger.transport.failure_transport_3'),
         ];
 
-        $failedTransports = [
-            'failure_transport_1',
-            'failure_transport_3',
-        ];
-
-        foreach ($failureTransportsMapping as $transportName => $ref) {
-            if (\in_array($transportName, $failedTransports)) {
-                continue;
-            }
-
-            $this->assertSame('messenger.transport.'.$expectedFailureTransportsMapping[$transportName], (string) $ref, sprintf('The transport "%s" does not have the expected failed transport reference', $transportName));
-        }
-
-        $this->assertTrue(true);
+        $failureTransportsByTransportNameLocator = $container->getDefinition('messenger.failure_transports_by_transport_name.locator');
+        $this->assertEquals($expectedFailureTransportsByTransportName, $failureTransportsByTransportNameLocator->getArgument(0));
     }
 
     public function testMessengerMultipleFailureTransportsWithGlobalFailureTransport()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global');
-        $failureTransportsLocatorDefinition = $container->getDefinition('messenger.failure_transports.locator');
 
-        /** @var Reference $failureTransportsMapping */
-        $failureTransportsMapping = $failureTransportsLocatorDefinition->getArgument(0);
+        $expectedFailureTransports = [
+            'failure_transport_global' => new Reference('messenger.transport.failure_transport_global'),
+            'failure_transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'failure_transport_3' => new Reference('messenger.transport.failure_transport_3'),
+        ];
+        $failureTransportsLocator = $container->getDefinition('messenger.failure_transports.locator');
+        $this->assertEquals($expectedFailureTransports, $failureTransportsLocator->getArgument(0));
 
-        $expectedFailureTransportsMapping = [
-            'transport_1' => 'failure_transport_1',
-            'transport_2' => 'failure_transport_global',
-            'transport_3' => 'failure_transport_3',
+        $expectedFailureTransportsByTransportName = [
+            'transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'transport_3' =>  new Reference('messenger.transport.failure_transport_3'),
         ];
 
-        $failed_transports = [
-            'failure_transport_global',
-            'failure_transport_1',
-            'failure_transport_3',
-        ];
-
-        foreach ($failureTransportsMapping as $transportName => $ref) {
-            if (\in_array($transportName, $failed_transports)) {
-                continue;
-            }
-
-            $this->assertSame('messenger.transport.'.$expectedFailureTransportsMapping[$transportName], (string) $ref, sprintf('The transport "%s" does not have the expected failed transport reference', $transportName));
-        }
-
-        $this->assertTrue(true);
+        $failureTransportsByTransportNameLocator = $container->getDefinition('messenger.failure_transports_by_transport_name.locator');
+        $this->assertEquals($expectedFailureTransportsByTransportName, $failureTransportsByTransportNameLocator->getArgument(0));
     }
 
     public function testMessengerTransports()
@@ -760,6 +741,8 @@ abstract class FrameworkExtensionTest extends TestCase
             'failed' => new Reference('messenger.transport.failed'),
         ];
         $this->assertEquals($expectedFailureTransports, $failureTransportsLocator->getArgument(0));
+        $failureTransportsByTransportNameLocator = $container->getDefinition('messenger.failure_transports_by_transport_name.locator');
+        $this->assertEquals([], $failureTransportsByTransportNameLocator->getArgument(0));
     }
 
     public function testMessengerRouting()

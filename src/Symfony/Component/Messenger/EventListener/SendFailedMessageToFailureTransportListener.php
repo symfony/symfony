@@ -28,19 +28,14 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {
-    /**
-     * @var ServiceLocator|SenderInterface
-     */
-    private $failureSender;
+    private $failureSenders;
+    private $globalFailureSender;
     private $logger;
 
-    public function __construct($failureSender, LoggerInterface $logger = null)
+    public function __construct(?SenderInterface $globalFailureSender, LoggerInterface $logger = null, ?ServiceLocator $failureSenders = null)
     {
-        if (!$failureSender instanceof ServiceLocator) {
-            trigger_deprecation('symfony/messenger', '5.2', 'Passing failureTransports should now pass a ServiceLocator', __METHOD__);
-        }
-
-        $this->failureSender = $failureSender;
+        $this->globalFailureSender = $globalFailureSender;
+        $this->failureSenders = $failureSenders;
         $this->logger = $logger;
     }
 
@@ -50,8 +45,8 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        $hasFailureTransports = $this->failureSender instanceof ServiceLocator && $this->failureSender->has($event->getReceiverName());
-        if (null === !$hasFailureTransports) {
+        $hasFailureTransports = $this->hasFailureTransports($event);
+        if (!$hasFailureTransports) {
             return;
         }
 
@@ -98,10 +93,15 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
 
     private function getFailureSender(string $receiverName): ?SenderInterface
     {
-        if ($this->failureSender instanceof ServiceLocator && $this->failureSender->has($receiverName)) {
-            return $this->failureSender->get($receiverName);
+        if ($this->failureSenders instanceof ServiceLocator && $this->failureSenders->has($receiverName)) {
+            return $this->failureSenders->get($receiverName);
         }
 
-        return $this->failureSender;
+        return $this->globalFailureSender;
+    }
+    
+    private function hasFailureTransports(WorkerMessageFailedEvent $event): bool
+    {
+        return ($this->failureSenders instanceof ServiceLocator && $this->failureSenders->has($event->getReceiverName())) || $this->globalFailureSender !== null;
     }
 }

@@ -1267,7 +1267,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('failure_transport')
                                         ->defaultNull()
                                         ->info('Transport name to send failed messages to (after all retries have failed).')
-                                    ->end()            
+                                    ->end()
                                     ->arrayNode('retry_strategy')
                                         ->addDefaultsIfNotSet()
                                         ->beforeNormalization()

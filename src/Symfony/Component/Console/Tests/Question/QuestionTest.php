@@ -45,6 +45,7 @@ class QuestionTest extends TestCase
         $question = new Question('Test question', 'Default value');
         $question->setDefault('A New Default');
         self::assertSame('A New Default', $question->getDefault());
+        self::assertSame('Question', get_class($question));
     }
 
     public function testGetDefaultDefault()

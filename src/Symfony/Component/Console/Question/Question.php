@@ -69,7 +69,7 @@ class Question
      */
     public function setDefault($default = null)
     {
-        return $this->default = $default;
+        $this->default = $default;
 
         return $this;
     }

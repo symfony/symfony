@@ -104,6 +104,7 @@ class Parser
             $this->refs = [];
             $this->skippedLineNumbers = [];
             $this->locallySkippedLineNumbers = [];
+            $this->totalNumberOfLines = null;
         }
 
         return $data;
@@ -728,7 +729,7 @@ class Parser
         if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
-            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs((int) $modifiers));
+            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers));
 
             if ('' !== $matches['tag'] && '!' !== $matches['tag']) {
                 if ('!!binary' === $matches['tag']) {

@@ -64,6 +64,7 @@ use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowEvents;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -245,6 +246,12 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
+        $metadataStoreDefinition = $container->getDefinition('workflow.article.metadata_store');
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $metadataStoreDefinition->getArgument(0));
 
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
@@ -273,6 +280,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
         $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);
         $this->assertSame(['title' => 'workflow title'], $workflowMetadata);

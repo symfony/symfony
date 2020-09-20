@@ -154,8 +154,9 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
     {
+        $labelTranslationParameters = \func_get_args()[6] ?? [];
         $accessor = $this->propertyAccessor;
 
         if (\is_string($label)) {

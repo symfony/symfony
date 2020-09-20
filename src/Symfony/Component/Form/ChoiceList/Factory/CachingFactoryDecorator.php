@@ -181,8 +181,9 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * @param array|callable|Cache\ChoiceAttr|null             $attr                       The option or static option generating the HTML attributes
      * @param array|callable|Cache\ChoiceTranslationParameters $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
     {
+        $labelTranslationParameters = \func_get_args()[6] ?? [];
         $cache = true;
 
         if ($preferredChoices instanceof Cache\PreferredChoice) {

@@ -52,7 +52,7 @@
     },
     "conflict": {
         "symfony/console": "<4.4",
-        "symfony/form": "<5.1",
+        "symfony/form": "<5.2",
         "symfony/http-foundation": "<4.4",
         "symfony/http-kernel": "<4.4",
         "symfony/translation": "<5.2",

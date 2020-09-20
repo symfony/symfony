@@ -69,8 +69,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null, $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
     {
+        $labelTranslationParameters = \func_get_args()[6] ?? [];
         $preferredViews = [];
         $preferredViewsOrder = [];
         $otherViews = [];

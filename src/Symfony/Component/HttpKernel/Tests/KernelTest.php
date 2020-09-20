@@ -16,6 +16,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -473,6 +474,34 @@ EOF;
         $this->assertNotInstanceOf($containerClass, $kernel->getContainer());
         $this->assertFileExists($containerFile);
         $this->assertFileExists(\dirname($containerFile).'.legacy');
+    }
+
+    public function testKernelExtension()
+    {
+        $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
+            public function load(array $configs, ContainerBuilder $container)
+            {
+                $container->setParameter('test.extension-registered', true);
+            }
+
+            public function getNamespace()
+            {
+                return '';
+            }
+
+            public function getXsdValidationBasePath()
+            {
+                return false;
+            }
+
+            public function getAlias()
+            {
+                return 'test-extension';
+            }
+        };
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test.extension-registered'));
     }
 
     public function testKernelPass()

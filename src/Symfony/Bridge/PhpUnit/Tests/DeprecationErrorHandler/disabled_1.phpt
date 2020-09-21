@@ -33,5 +33,5 @@ class Test
 EOPHP
 );
 ?>
---EXPECTF--
-
+--EXPECTREGEX--
+.{0}

@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\DependencyInjection;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\ParameterNormalizer;
 use Symfony\Component\Cache\Messenger\EarlyExpirationDispatcher;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -176,7 +177,14 @@ class CachePoolPass implements CompilerPassInterface
                     ]);
                     $pool->addTag($this->reversibleTag);
                 } elseif ('namespace' !== $attr || ArrayAdapter::class !== $class) {
-                    $pool->replaceArgument($i++, $tags[0][$attr]);
+                    $argument = $tags[0][$attr];
+
+                    if ('default_lifetime' === $attr && !is_numeric($argument)) {
+                        $argument = (new Definition('int', [$argument]))
+                            ->setFactory([ParameterNormalizer::class, 'normalizeDuration']);
+                    }
+
+                    $pool->replaceArgument($i++, $argument);
                 }
                 unset($tags[0][$attr]);
             }

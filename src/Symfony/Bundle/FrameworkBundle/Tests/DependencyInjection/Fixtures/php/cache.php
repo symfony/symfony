@@ -22,7 +22,10 @@ $container->loadFromExtension('framework', [
                 'provider' => 'app.cache_pool',
             ],
             'cache.def' => [
-                'default_lifetime' => 11,
+                'default_lifetime' => 'PT11S',
+            ],
+            'cache.expr' => [
+                'default_lifetime' => '13 seconds',
             ],
             'cache.chain' => [
                 'default_lifetime' => 12,

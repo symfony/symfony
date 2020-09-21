@@ -22,10 +22,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Remotes;
 
-/**
- * @final
- */
-class TranslationPushCommand extends Command
+final class TranslationPushCommand extends Command
 {
     use TranslationTrait;
 
@@ -87,10 +84,10 @@ Full example:
 
   <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
-This command will push all translations linked to domains messages & validators
-for the locale en. Remote translations for the specified domains & locale will
+This command will push all translations linked to domains messages and validators
+for the locale en. Remote translations for the specified domains and locale will
 be erased if they're not present locally and overwritten if it's the
-case. Remote translations for others domains & locales will be ignored.
+case. Remote translations for others domains and locales will be ignored.
 EOF
             )
         ;

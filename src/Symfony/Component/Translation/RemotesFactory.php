@@ -13,18 +13,12 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Remote\Dsn;
-use Symfony\Component\Translation\Remote\NullRemoteFactory;
 use Symfony\Component\Translation\Remote\RemoteDecorator;
 use Symfony\Component\Translation\Remote\RemoteFactoryInterface;
 use Symfony\Component\Translation\Remote\RemoteInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RemotesFactory
 {
-    private const FACTORY_CLASSES = [
-        LocoRemoteFactory::class,
-    ];
-
     private $factories;
     private $enabledLocales;
 
@@ -43,8 +37,8 @@ class RemotesFactory
         foreach ($config as $name => $currentConfig) {
             $remotes[$name] = $this->fromString(
                 $currentConfig['dsn'],
-                empty($currentConfig['locales']) ? $this->enabledLocales : $currentConfig['locales'],
-                empty($currentConfig['domains']) ? [] : $currentConfig['domains']
+                !$currentConfig['locales'] ? $this->enabledLocales : $currentConfig['locales'],
+                !$currentConfig['domains'] ? [] : $currentConfig['domains']
             );
         }
 
@@ -65,19 +59,5 @@ class RemotesFactory
         }
 
         throw new UnsupportedSchemeException($dsn);
-    }
-
-    /**
-     * @return RemoteFactoryInterface[]
-     */
-    private static function getDefaultFactories(HttpClientInterface $client = null): iterable
-    {
-        foreach (self::FACTORY_CLASSES as $factoryClass) {
-            if (class_exists($factoryClass)) {
-                yield new $factoryClass($client);
-            }
-        }
-
-        yield new NullRemoteFactory($client);
     }
 }

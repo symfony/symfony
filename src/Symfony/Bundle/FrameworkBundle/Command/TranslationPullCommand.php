@@ -23,10 +23,7 @@ use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Remotes;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
-/**
- * @final
- */
-class TranslationPullCommand extends Command
+final class TranslationPullCommand extends Command
 {
     use TranslationTrait;
 
@@ -81,7 +78,7 @@ You can overwrite existing translations:
 
   <info>php %command.full_name% --force remote</info>
 
-You can remote local translations which are not present on the remote:
+You can remove local translations which are not present on the remote:
 
   <info>php %command.full_name% --delete-obsolete remote</info>
 
@@ -89,10 +86,10 @@ Full example:
 
   <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
-This command will pull all translations linked to domains messages & validators
-for the locale en. Local translations for the specified domains & locale will
+This command will pull all translations linked to domains messages and validators
+for the locale en. Local translations for the specified domains and locale will
 be erased if they're not present on the remote and overwritten if it's the
-case. Local translations for others domains & locales will be ignored.
+case. Local translations for others domains and locales will be ignored.
 EOF
             )
         ;

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Translation\Bridge\Crowdin;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\Exception\TransportException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Remote\AbstractRemote;
 use Symfony\Component\Translation\TranslatorBag;
@@ -20,22 +23,23 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in 5.2
- * @final
  *
  * In Crowdin:
  */
-class CrowdinRemote extends AbstractRemote
+final class CrowdinRemote extends AbstractRemote
 {
-    protected const HOST = 'crowdin.com/api/v2';
+    protected const HOST = 'api.crowdin.com';
 
     private $apiKey;
     private $loader;
+    private $logger;
     private $defaultLocale;
 
-    public function __construct(string $apiKey, HttpClientInterface $client = null, LoaderInterface $loader = null, string $defaultLocale = null)
+    public function __construct(string $apiKey, HttpClientInterface $client = null, LoaderInterface $loader = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->apiKey = $apiKey;
         $this->loader = $loader;
+        $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
 
         parent::__construct($client);
@@ -53,7 +57,26 @@ class CrowdinRemote extends AbstractRemote
 
     public function read(array $domains, array $locales): TranslatorBag
     {
-        // TODO: Implement read() method.
+        $filter = $domains ? implode(',', $domains) : '*';
+        $translatorBag = new TranslatorBag();
+
+        foreach ($locales as $locale) {
+            $response = $this->client->request('GET', sprintf('https://%s/api/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locale, $filter), [
+                'headers' => $this->getDefaultHeaders(),
+            ]);
+
+            $responseContent = $response->getContent(false);
+
+            if (Response::HTTP_OK !== $response->getStatusCode()) {
+                throw new TransportException('Unable to read the Loco response: '.$responseContent, $response);
+            }
+
+            foreach ($domains as $domain) {
+                $translatorBag->addCatalogue($this->loader->load($responseContent, $locale, $domain));
+            }
+        }
+
+        return $translatorBag;
     }
 
     public function delete(TranslatorBag $translations): void

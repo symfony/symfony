@@ -23,14 +23,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in 5.2
- * @final
  *
  * In Loco:
  * tags refers to Symfony's translation domains
  * assets refers to Symfony's translation keys
  * translations refers to Symfony's translation messages
  */
-class LocoRemote extends AbstractRemote
+final class LocoRemote extends AbstractRemote
 {
     protected const HOST = 'localise.biz';
 

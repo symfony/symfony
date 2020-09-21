@@ -14,27 +14,27 @@ namespace Symfony\Component\Translation\Remote;
 use Symfony\Component\Translation\TranslatorBag;
 
 /**
- * Remote is used to sync translations with a remote.
+ * Providers are used to sync translations with a translation provider.
  */
 interface RemoteInterface
 {
     /**
-     * Write given translation to the remote.
+     * Writes given translation to the provider.
      *
      * * Translations available in the MessageCatalogue only must be created.
-     * * Translations available in both the MessageCatalogue and on the remote
+     * * Translations available in both the MessageCatalogue and on the provider
      * must be overwritten.
      * * Translations available on the remote only must be kept.
      */
     public function write(TranslatorBag $translations, bool $override = false): void;
 
     /**
-     * This method must return asked translations.
+     * Returns asked translations.
      */
     public function read(array $domains, array $locales): TranslatorBag;
 
     /**
-     * This method must delete all translation given in the TranslatorBag.
+     * Delete all translation given in the TranslatorBag.
      */
     public function delete(TranslatorBag $translations): void;
 }

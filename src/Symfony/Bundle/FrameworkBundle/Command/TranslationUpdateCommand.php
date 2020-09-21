@@ -105,7 +105,7 @@ Example running against default messages directory
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
 
-You can sort the output with the <comment>--sort</comment> flag:
+You can sort the output with the <comment>--sort</> flag:
 
     <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
     <info>php %command.full_name% --dump-messages --sort=desc fr</info>

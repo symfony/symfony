@@ -23,15 +23,10 @@ final class LocoRemoteFactory extends AbstractRemoteFactory
      */
     public function create(Dsn $dsn): RemoteInterface
     {
-        $scheme = $dsn->getScheme();
-        $apiKey = $this->getUser($dsn);
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $port = $dsn->getPort();
-
-        if ('loco' === $scheme) {
-            return (new LocoRemote($apiKey, $this->client, $this->logger, $this->loader, $this->defaultLocale))
-                ->setHost($host)
-                ->setPort($port)
+        if ('loco' === $dsn->getScheme()) {
+            return (new LocoRemote($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+                ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
+                ->setPort($dsn->getPort())
             ;
         }
 

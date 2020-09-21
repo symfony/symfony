@@ -1204,8 +1204,8 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
         }
 
-        if (!empty($config['remotes'])) {
-            if (empty($config['enabled_locales'])) {
+        if ($config['remotes']) {
+            if (!$config['enabled_locales']) {
                 throw new LogicException('You must specify framework.translator.enabled_locales in order to use remotes.');
             }
 

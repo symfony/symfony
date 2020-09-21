@@ -39,7 +39,7 @@ class RemoteDecorator implements RemoteInterface
      */
     public function read(array $domains, array $locales): TranslatorBag
     {
-        $domains = empty($this->domains) ? $domains : array_intersect($this->domains, $domains);
+        $domains = $this->domains ? $domains : array_intersect($this->domains, $domains);
         $locales = array_intersect($this->locales, $locales);
 
         return $this->remote->read($domains, $locales);

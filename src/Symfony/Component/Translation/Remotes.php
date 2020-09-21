@@ -14,10 +14,7 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Remote\RemoteInterface;
 
-/**
- * @final
- */
-class Remotes
+final class Remotes
 {
     private $remotes;
 

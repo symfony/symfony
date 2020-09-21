@@ -56,7 +56,7 @@ abstract class AbstractUidType extends GuidType
         }
 
         if ($value instanceof AbstractUid) {
-            return $value;
+            return (string) $value;
         }
 
         if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {

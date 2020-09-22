@@ -35,7 +35,7 @@
             <td>
                 <?= $this->formatLogMessage($log['message'], $log['context']); ?>
                 <?php if ($log['context']) { ?>
-                <pre class="text-muted prewrap m-t-5"><?= json_encode($log['context'], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES); ?></pre>
+                <pre class="text-muted prewrap m-t-5"><?= $this->escape(json_encode($log['context'], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)); ?></pre>
                 <?php } ?>
             </td>
         </tr>

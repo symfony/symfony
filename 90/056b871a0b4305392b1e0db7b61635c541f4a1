@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-13T14:58:03Z
+
+Fabbot failure appears false. Or at least, the referenced line was purposely changed to NOT include quotes 6 months ago: https://github.com/symfony/symfony/commit/daf1c6605eb3571e2176c46281acba36b37cf536#diff-7dae227729788bbef8c05ebb6f0f1345R210
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-19T05:58:30Z
+
+Friendly ping

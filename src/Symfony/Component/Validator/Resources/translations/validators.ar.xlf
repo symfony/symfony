@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>يجب أن يفي كل عنصر من عناصر هذه المجموعة بمجموعة القيود الخاصة به.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target> صالح (ISIN) هذه القيمة ليست رقم تعريف الأوراق المالية الدولي.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

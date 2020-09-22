@@ -322,7 +322,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(['outOfScope' => true], PropertyDummy::class);
 
         $this->assertEquals(new PropertyDummy(), $obj);
-        $this->assertEquals('out_of_scope', PropertyDummy::$outOfScope);
+        $this->assertEquals('out_of_scope', PropertyDummy::OUT_OF_SCOPE);
     }
 
     public function testUnableToNormalizeObjectAttribute()
@@ -403,7 +403,7 @@ class PropertyNormalizerTest extends TestCase
 
 class PropertyDummy
 {
-    public static $outOfScope = 'out_of_scope';
+    public const OUT_OF_SCOPE = 'out_of_scope';
     public $foo;
     private $bar;
     protected $camelCase;

@@ -1062,7 +1062,7 @@ class ResponseTest extends ResponseTestCase
      */
     public function testReasonPhraseDefaultsAgainstIana($code, $reasonPhrase)
     {
-        $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
+        $this->assertEquals($reasonPhrase, Response::STATUS_TEXTS[$code]);
     }
 
     public function testSetContentSafe()

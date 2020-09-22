@@ -36,7 +36,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinTypes = [
+    public const BUILTIN_TYPES = [
         self::BUILTIN_TYPE_INT,
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
@@ -48,6 +48,11 @@ class Type
         self::BUILTIN_TYPE_NULL,
         self::BUILTIN_TYPE_ITERABLE,
     ];
+
+    /**
+     * @deprecated since Symfony 5.2, use BUILTIN_TYPES instead
+     */
+    public static $builtinTypes = self::BUILTIN_TYPES;
 
     private $builtinType;
     private $nullable;

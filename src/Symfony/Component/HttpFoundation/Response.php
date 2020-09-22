@@ -144,7 +144,7 @@ class Response
      *
      * @var array
      */
-    public static $statusTexts = [
+    public const STATUS_TEXTS = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',            // RFC2518
@@ -208,6 +208,11 @@ class Response
         510 => 'Not Extended',                                                // RFC2774
         511 => 'Network Authentication Required',                             // RFC6585
     ];
+
+    /**
+     * @deprecated since Symfony 5.2, use STATUS_TEXTS instead
+     */
+    public static $statusTexts = self::STATUS_TEXTS;
 
     /**
      * @throws \InvalidArgumentException When the HTTP status code is not valid
@@ -470,7 +475,7 @@ class Response
         }
 
         if (null === $text) {
-            $this->statusText = isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : 'unknown status';
+            $this->statusText = isset(self::STATUS_TEXTS[$code]) ? self::STATUS_TEXTS[$code] : 'unknown status';
 
             return $this;
         }

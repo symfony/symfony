@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  */
 abstract class AbstractCloner implements ClonerInterface
 {
-    public static $defaultCasters = [
+    public const DEFAULT_CASTERS = [
         '__PHP_Incomplete_Class' => ['Symfony\Component\VarDumper\Caster\Caster', 'castPhpIncompleteClass'],
 
         'Symfony\Component\VarDumper\Caster\CutStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
@@ -176,6 +176,11 @@ abstract class AbstractCloner implements ClonerInterface
         'RdKafka\TopicConf' => ['Symfony\Component\VarDumper\Caster\RdKafkaCaster', 'castTopicConf'],
     ];
 
+    /**
+     * @deprecated since Symfony 5.2, use DEFAULT_CASTERS instead
+     */
+    public static $defaultCasters = self::DEFAULT_CASTERS;
+
     protected $maxItems = 2500;
     protected $maxString = -1;
     protected $minDepth = 1;
@@ -193,7 +198,7 @@ abstract class AbstractCloner implements ClonerInterface
     public function __construct(array $casters = null)
     {
         if (null === $casters) {
-            $casters = static::$defaultCasters;
+            $casters = static::DEFAULT_CASTERS;
         }
         $this->addCasters($casters);
     }

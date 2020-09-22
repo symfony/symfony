@@ -35,7 +35,7 @@ class EmailValidator extends ConstraintValidator
 
     public function __construct(string $defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
-        if (!\in_array($defaultMode, Email::$validationModes, true)) {
+        if (!\in_array($defaultMode, Email::VALIDATION_MODES, true)) {
             throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
         }
 
@@ -72,7 +72,7 @@ class EmailValidator extends ConstraintValidator
             $constraint->mode = $this->defaultMode;
         }
 
-        if (!\in_array($constraint->mode, Email::$validationModes, true)) {
+        if (!\in_array($constraint->mode, Email::VALIDATION_MODES, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
         }
 

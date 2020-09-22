@@ -85,7 +85,7 @@ class Process implements \IteratorAggregate
      *
      * User-defined errors must use exit codes in the 64-113 range.
      */
-    public static $exitCodes = [
+    public const EXIT_CODES = [
         0 => 'OK',
         1 => 'General error',
         2 => 'Misuse of shell builtins',
@@ -127,6 +127,11 @@ class Process implements \IteratorAggregate
         // 158 - not defined
         159 => 'Bad syscall',
     ];
+
+    /**
+     * @deprecated since Symfony 5.2, use EXIT_CODES instead
+     */
+    public static $exitCodes = self::EXIT_CODES;
 
     /**
      * @param array          $command The command to run and its arguments listed as separate entries

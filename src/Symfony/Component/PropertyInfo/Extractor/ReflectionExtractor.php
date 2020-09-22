@@ -35,17 +35,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      */
-    public static $defaultMutatorPrefixes = ['add', 'remove', 'set'];
+    public const DEFAULT_MUTATOR_PREFIXES = ['add', 'remove', 'set'];
 
     /**
      * @internal
      */
-    public static $defaultAccessorPrefixes = ['get', 'is', 'has', 'can'];
+    public const DEFAULT_ACCESSOR_PREFIXES = ['get', 'is', 'has', 'can'];
 
     /**
      * @internal
      */
-    public static $defaultArrayMutatorPrefixes = ['add', 'remove'];
+    public const DEFAULT_ARRAY_MUTATOR_PREFIXES = ['add', 'remove'];
 
     public const ALLOW_PRIVATE = 1;
     public const ALLOW_PROTECTED = 2;
@@ -75,9 +75,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null)
     {
-        $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
-        $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
-        $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
+        $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::DEFAULT_MUTATOR_PREFIXES;
+        $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::DEFAULT_ACCESSOR_PREFIXES;
+        $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::DEFAULT_ARRAY_MUTATOR_PREFIXES;
         $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);

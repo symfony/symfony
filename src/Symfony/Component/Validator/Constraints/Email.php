@@ -39,7 +39,7 @@ class Email extends Constraint
      *
      * @internal
      */
-    public static $validationModes = [
+    public const VALIDATION_MODES = [
         self::VALIDATION_MODE_HTML5,
         self::VALIDATION_MODE_STRICT,
         self::VALIDATION_MODE_LOOSE,
@@ -51,7 +51,7 @@ class Email extends Constraint
 
     public function __construct($options = null)
     {
-        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
+        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 

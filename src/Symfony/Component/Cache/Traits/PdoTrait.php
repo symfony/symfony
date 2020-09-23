@@ -17,6 +17,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -85,6 +86,7 @@ trait PdoTrait
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
+     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable()
@@ -392,7 +394,7 @@ trait PdoTrait
             if (null === $driver && !($result instanceof DriverResult ? $result : $stmt)->rowCount()) {
                 try {
                     $insertStmt->execute();
-                } catch (DBALException $e) {
+                } catch (DBALException | Exception $e) {
                 } catch (\PDOException $e) {
                     // A concurrent write won, let it be
                 }

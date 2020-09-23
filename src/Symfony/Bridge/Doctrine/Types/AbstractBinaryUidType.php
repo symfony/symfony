@@ -79,4 +79,12 @@ abstract class AbstractBinaryUidType extends GuidType
             throw ConversionException::conversionFailed($value, $this->getName());
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return true;
+    }
 }

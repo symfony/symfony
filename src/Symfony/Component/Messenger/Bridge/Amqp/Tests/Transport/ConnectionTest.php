@@ -535,7 +535,12 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->never())->method('bind');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__5000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
+        $delayExchange->expects($this->once())->method('publish')->with(
+            '{}',
+            'delay_messages__5000',
+            AMQP_NOPARAM,
+            ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]
+        );
 
         $connection = Connection::fromDsn('amqp://localhost', ['delay' => ['exchange_name' => '']], $factory);
         $connection->publish('{}', [], 5000);
@@ -570,7 +575,12 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay__origin_queue_name_5000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay__origin_queue_name_5000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
+        $delayExchange->expects($this->once())->method('publish')->with(
+            '{}',
+            'delay__origin_queue_name_5000',
+            AMQP_NOPARAM,
+            ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]
+        );
 
         $amqpStamp = new AmqpStamp(null, AMQP_NOPARAM, [], 'origin_queue_name');
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
@@ -606,7 +616,12 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->never())->method('bind');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay__origin_queue_name_5000', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
+        $delayExchange->expects($this->once())->method('publish')->with(
+            '{}',
+            'delay__origin_queue_name_5000',
+            AMQP_NOPARAM,
+            ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]
+        );
 
         $amqpStamp = new AmqpStamp(null, AMQP_NOPARAM, [], 'origin_queue_name');
         $connection = Connection::fromDsn('amqp://localhost', ['delay' => ['exchange_name' => '']], $factory);

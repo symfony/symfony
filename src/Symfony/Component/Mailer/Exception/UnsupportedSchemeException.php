@@ -48,6 +48,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-mailer',
         ],
+        'sendinblue' => [
+            'class' => Bridge\Sendinblue\Transport\SendinblueTransportFactory::class,
+            'package' => 'symfony/sendinblue-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])

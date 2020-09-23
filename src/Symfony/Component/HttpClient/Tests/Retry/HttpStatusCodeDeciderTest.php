@@ -12,30 +12,21 @@
 namespace Symfony\Component\HttpClient\Tests\Retry;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\Exception\TransportException;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\HttpStatusCodeDecider;
 
 class HttpStatusCodeDeciderTest extends TestCase
 {
-    public function testShouldRetryException()
-    {
-        $decider = new HttpStatusCodeDecider([500]);
-
-        self::assertTrue($decider->shouldRetry('GET', 'http://example.com/', [], new MockResponse(), new TransportException()));
-    }
-
     public function testShouldRetryStatusCode()
     {
         $decider = new HttpStatusCodeDecider([500]);
 
-        self::assertTrue($decider->shouldRetry('GET', 'http://example.com/', [], new MockResponse('', ['http_code' => 500]), null));
+        self::assertTrue($decider->shouldRetry('GET', 'http://example.com/', [], 500, [], null));
     }
 
     public function testIsNotRetryableOk()
     {
         $decider = new HttpStatusCodeDecider([500]);
 
-        self::assertFalse($decider->shouldRetry('GET', 'http://example.com/', [], new MockResponse(''), null));
+        self::assertFalse($decider->shouldRetry('GET', 'http://example.com/', [], 200, [], null));
     }
 }

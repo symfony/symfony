@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Retry;
 
-use Symfony\Component\Messenger\Exception\InvalidArgumentException;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * A retry backOff with a constant or exponential retry delay.
@@ -57,7 +57,7 @@ final class ExponentialBackOff implements RetryBackOffInterface
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
     }
 
-    public function getDelay(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, ResponseInterface $partialResponse, \Throwable $throwable = null): int
+    public function getDelay(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent, ?TransportExceptionInterface $exception): int
     {
         $delay = $this->delayMilliseconds * $this->multiplier ** $retryCount;
 

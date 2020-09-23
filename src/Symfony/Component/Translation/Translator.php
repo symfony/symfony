@@ -163,7 +163,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         }
 
         $this->assertValidLocale($locale);
-        $this->locale = $locale;
+        $this->locale = $locale ?? (class_exists(\Locale::class) ? \Locale::getDefault() : 'en');
     }
 
     /**
@@ -171,7 +171,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function getLocale()
     {
-        return $this->locale ?? \Locale::getDefault();
+        return $this->locale;
     }
 
     /**

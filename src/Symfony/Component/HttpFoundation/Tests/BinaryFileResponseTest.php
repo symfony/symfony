@@ -81,7 +81,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     /**
      * @dataProvider provideRanges
      */
-    public function testRequests($requestRange, $offset, $length, $responseRange)
+    public function testRequests($statusCode, $requestRange, $offset, $length, $responseRange, $streamsEntireFile)
     {
         $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream'])->setAutoEtag();
 
@@ -105,15 +105,16 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(206, $response->getStatusCode());
+        $this->assertEquals($statusCode, $response->getStatusCode());
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
         $this->assertSame((string) $length, $response->headers->get('Content-Length'));
+        $this->assertEquals($streamsEntireFile, $response->streamsEntireFile());
     }
 
     /**
      * @dataProvider provideRanges
      */
-    public function testRequestsWithoutEtag($requestRange, $offset, $length, $responseRange)
+    public function testRequestsWithoutEtag($statusCode, $requestRange, $offset, $length, $responseRange, $streamsEntireFile)
     {
         $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
 
@@ -137,18 +138,21 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(206, $response->getStatusCode());
+        $this->assertEquals($statusCode, $response->getStatusCode());
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
+        $this->assertEquals($streamsEntireFile, $response->streamsEntireFile());
     }
 
     public function provideRanges()
     {
         return [
-            ['bytes=1-4', 1, 4, 'bytes 1-4/35'],
-            ['bytes=-5', 30, 5, 'bytes 30-34/35'],
-            ['bytes=30-', 30, 5, 'bytes 30-34/35'],
-            ['bytes=30-30', 30, 1, 'bytes 30-30/35'],
-            ['bytes=30-34', 30, 5, 'bytes 30-34/35'],
+            [206, 'bytes=1-4', 1, 4, 'bytes 1-4/35', false],
+            [206, 'bytes=-5', 30, 5, 'bytes 30-34/35', false],
+            [206, 'bytes=30-', 30, 5, 'bytes 30-34/35', false],
+            [206, 'bytes=30-30', 30, 1, 'bytes 30-30/35', false],
+            [206, 'bytes=30-34', 30, 5, 'bytes 30-34/35', false],
+            [200, 'bytes=0-', 0, 35, null, true],
+            [200, 'bytes=0-34', 0, 35, null, true],
         ];
     }
 

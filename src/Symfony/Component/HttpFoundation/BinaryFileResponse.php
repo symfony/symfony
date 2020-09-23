@@ -356,4 +356,13 @@ class BinaryFileResponse extends Response
 
         return $this;
     }
+
+    /**
+     * Returns true if the entire file is streamed when calling sendContent().
+     * Usually this will return false when the client requests a specific range of the file with the Range header.
+     */
+    public function streamsEntireFile(): bool
+    {
+        return -1 === $this->maxlen && 0 === $this->offset;
+    }
 }

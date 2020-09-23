@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.14
+------
+
+ * [BC BREAK] added `streamsEntireFile()` to `BinaryFileResponse`.
+
 4.4.0
 -----
 

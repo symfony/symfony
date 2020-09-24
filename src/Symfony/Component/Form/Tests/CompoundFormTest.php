@@ -55,7 +55,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testDisabledFormsInvalidEvenChildrenInvalid()
+    public function testDisabledFormsValidEvenIfChildrenInvalid()
     {
         $form = $this->getBuilder('person')
             ->setDisabled(true)
@@ -68,7 +68,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->get('name')->addError(new FormError('Invalid'));
 
-        $this->assertFalse($form->isValid());
+        $this->assertTrue($form->isValid());
     }
 
     public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()

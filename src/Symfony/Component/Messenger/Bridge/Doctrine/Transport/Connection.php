@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Comparator;
@@ -121,6 +122,7 @@ class Connection implements ResetInterface
      * @return string The inserted id
      *
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
@@ -220,7 +222,7 @@ class Connection implements ResetInterface
     {
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException $exception) {
+        } catch (DBALException | Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -229,7 +231,7 @@ class Connection implements ResetInterface
     {
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException $exception) {
+        } catch (DBALException | Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }

@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -126,7 +127,7 @@ class PdoStore implements PersistingStoreInterface
 
         try {
             $stmt->execute();
-        } catch (DBALException $e) {
+        } catch (DBALException | Exception $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         } catch (\PDOException $e) {
@@ -240,6 +241,7 @@ class PdoStore implements PersistingStoreInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
+     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable(): void

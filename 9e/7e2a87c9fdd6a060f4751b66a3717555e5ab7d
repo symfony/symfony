@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-08-14T13:47:46Z
+
+Looking at the failing tests I just noticed I did not fix all cases yet. Before putting more efforts in, what do you think of the proposed solution @xabbuh?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-31T17:45:59Z
+
+@fancyweb up to move this forward?
+@xabbuh any comment?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-09-01T12:51:34Z
+
+@fancyweb Isn't the test just failing because of the bug you are fixing here? I mean the test does not set the `html5` option and thus now the deprecation is properly triggered which wasn't the case before while it should have been.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-19T07:34:50Z
+
+@fancyweb Can you have a look at the last comment?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-09-24T09:54:43Z
+
+@xabbuh I finally took the time to look at this and you were right. I set the html5 option to false on the failing test.

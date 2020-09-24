@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-16T08:42:46Z
+
+> min or max option indicate that the Range
+
+since this is using some heuristic logic, I would suggest reporting this when min AND max are can be parsed as dates.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-12T07:32:49Z
+
+@przemyslaw-bogusz Any comments about @nicolas-grekas suggestion?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2020-08-16T21:19:15Z
+
+@nicolas-grekas I've modified the PR. As I understand, if one of the boundries is null and the other one is parsable DateTime string, this should also return `invalidDateTimeMessage` instead of `invalidMessage`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-19T07:17:47Z
+
+@przemyslaw-bogusz I think you're right for your latest question. Still willing to finish this PR for master?

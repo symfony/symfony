@@ -69,12 +69,7 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
 
-        return new self(
-            $previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(),
-            $previousStamp->flags ?? \AMQP_NOPARAM,
-            $attr,
-            $originQueueName
-        );
+        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr, $originQueueName);
     }
 
     public static function createWithAttributes(array $attributes, self $previousStamp = null, string $originQueueName = null): self

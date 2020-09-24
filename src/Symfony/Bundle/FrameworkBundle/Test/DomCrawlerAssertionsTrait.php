@@ -15,6 +15,8 @@ use PHPUnit\Framework\Constraint\LogicalAnd;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint as DomCrawlerConstraint;
+use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorAttributeValueSame;
+use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorExists;
 
 /**
  * Ideas borrowed from Laravel Dusk's assertions.
@@ -80,6 +82,22 @@ trait DomCrawlerAssertionsTrait
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
             new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue))
+        ), $message);
+    }
+
+    public static function assertCheckboxChecked(string $fieldName, string $message = ''): void
+    {
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
+            new CrawlerSelectorExists("input[name=\"$fieldName\"]"),
+            new CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'checked', 'checked')
+        ), $message);
+    }
+
+    public static function assertCheckboxNotChecked(string $fieldName, string $message = ''): void
+    {
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
+            new CrawlerSelectorExists("input[name=\"$fieldName\"]"),
+            new LogicalNot(new CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'checked', 'checked'))
         ), $message);
     }
 

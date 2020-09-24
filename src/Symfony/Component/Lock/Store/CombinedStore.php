@@ -16,7 +16,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
@@ -29,7 +28,6 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  */
 class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
 {
-    use BlockingSharedLockStoreTrait;
     use ExpiringStoreTrait;
     use LoggerAwareTrait;
 
@@ -97,26 +95,17 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
 
     public function saveRead(Key $key)
     {
-        if (null === $this->sharedLockStores) {
-            $this->sharedLockStores = [];
-            foreach ($this->stores as $store) {
-                if ($store instanceof SharedLockStoreInterface) {
-                    $this->sharedLockStores[] = $store;
-                }
-            }
-        }
-
         $successCount = 0;
+        $failureCount = 0;
         $storesCount = \count($this->stores);
-        $failureCount = $storesCount - \count($this->sharedLockStores);
 
-        if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
-            throw new NotSupportedException(sprintf('The store "%s" does not contains enough compatible store to met the requirements.', get_debug_type($this)));
-        }
-
-        foreach ($this->sharedLockStores as $store) {
+        foreach ($this->stores as $store) {
             try {
-                $store->saveRead($key);
+                if ($store instanceof SharedLockStoreInterface) {
+                    $store->saveRead($key);
+                } else {
+                    $store->save($key);
+                }
                 ++$successCount;
             } catch (\Exception $e) {
                 $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);

@@ -7,6 +7,8 @@ CHANGELOG
  * `MongoDbStore` does not implement `BlockingStoreInterface` anymore, typehint against `PersistingStoreInterface` instead.
  * added support for shared locks
  * added `NoLock`
+ * deprecated `NotSupportedException`, it shouldn't be thrown anymore.
+ * deprecated `RetryTillSaveStore`, logic has been moved in `Lock` and is not needed anymore.
 
 5.1.0
 -----

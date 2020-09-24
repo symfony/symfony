@@ -16,12 +16,12 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-interface SharedLockStoreInterface extends PersistingStoreInterface
+interface BlockingSharedLockStoreInterface extends SharedLockStoreInterface
 {
     /**
-     * Stores the resource if it's not locked for reading by someone else.
+     * Waits until a key becomes free for reading, then stores the resource.
      *
      * @throws LockConflictedException
      */
-    public function saveRead(Key $key);
+    public function waitAndSaveRead(Key $key);
 }

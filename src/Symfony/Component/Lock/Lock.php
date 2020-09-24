@@ -19,7 +19,6 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
  * Lock is the default implementation of the LockInterface.
@@ -70,9 +69,16 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         try {
             if ($blocking) {
                 if (!$this->store instanceof BlockingStoreInterface) {
-                    throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', get_debug_type($this->store)));
+                    while (true) {
+                        try {
+                            $this->store->wait($this->key);
+                        } catch (LockConflictedException $e) {
+                            usleep((100 + random_int(-10, 10)) * 1000);
+                        }
+                    }
+                } else {
+                    $this->store->waitAndSave($this->key);
                 }
-                $this->store->waitAndSave($this->key);
             } else {
                 $this->store->save($this->key);
             }
@@ -116,7 +122,9 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     {
         try {
             if (!$this->store instanceof SharedLockStoreInterface) {
-                throw new NotSupportedException(sprintf('The store "%s" does not support shared locks.', get_debug_type($this->store)));
+                $this->logger->debug('Store does not support ReadLocks, fallback to WriteLock.', ['resource' => $this->key]);
+
+                return $this->acquire($blocking);
             }
             if ($blocking) {
                 $this->store->waitAndSaveRead($this->key);
@@ -125,7 +133,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             }
 
             $this->dirty = true;
-            $this->logger->debug('Successfully acquired the "{resource}" lock.', ['resource' => $this->key]);
+            $this->logger->debug('Successfully acquired the "{resource}" lock for reading.', ['resource' => $this->key]);
 
             if ($this->ttl) {
                 $this->refresh();

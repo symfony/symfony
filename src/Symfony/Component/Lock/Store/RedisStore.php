@@ -31,7 +31,6 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class RedisStore implements SharedLockStoreInterface
 {
     use ExpiringStoreTrait;
-    use BlockingSharedLockStoreTrait;
 
     private $redis;
     private $initialTtl;

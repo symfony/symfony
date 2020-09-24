@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-03-04T12:32:51Z
+
+We need to be careful here, type=number is increasingly seen as providing bad UX.
+E.g. https://bradfrost.com/blog/post/you-probably-dont-need-input-typenumber/
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-03-04T12:38:28Z
+
+Thats' a good point, and actually it is specified in the norm that they should not be used for non-sequential inputs (ie., bank account numbers...). Maybe it would be worth a warning in `NumberType` documentation?
+
+Fortunately here with monetary amounts & percentages we should be safe, there are legit use cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-04T16:08:48Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-05-06T16:12:13Z
+
+Thanks you for the heads up, I rebased code & updated `CHANGELOG.md`
+I will work on a PR for documentation tomorrow.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-05-07T14:21:06Z
+
+Fabbot and Travis are green, AppVeyor failed because of a quota. If someone can please restart it, it should pass.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-01T11:52:57Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-09-03T14:57:51Z
+
+For me, the code part was done. I was waiting for some "formal" approval before doing the doc update.
+Everything can be over pretty quickly, I think that addition is still relevant

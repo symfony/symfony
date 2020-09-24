@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
 use Doctrine\DBAL\Abstraction\Result;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -87,7 +88,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->ack('dummy_id');
@@ -97,7 +103,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->reject('dummy_id');

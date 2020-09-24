@@ -11,6 +11,7 @@ CHANGELOG
  * Added `TemplateAwareDataCollectorInterface` and `AbstractDataCollector` to simplify custom data collector creation and leverage autoconfiguration
  * Add `cache.adapter.redis_tag_aware` tag to use `RedisCacheAwareAdapter`
  * added `framework.http_client.retry_failing` configuration tree
+ * added `assertCheckboxChecked()` and `assertCheckboxNotChecked()` in `WebTestCase`
 
 5.1.0
 -----

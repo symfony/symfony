@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by mnapoli at 2020-09-24T08:59:23Z
+
+I also needed to assert on selects and that wasn't possible to add a similar helper.
+
+So I went a different route and opened #38288: I think both PRs can be merged because they can cover different use cases (this PR doesn't require a form).

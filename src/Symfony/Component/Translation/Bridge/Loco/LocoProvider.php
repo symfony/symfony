@@ -27,11 +27,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * In Loco:
  * tags refers to Symfony's translation domains
  * assets refers to Symfony's translation keys
- * translations refers to Symfony's translation messages
+ * translations refers to Symfony's translated messages
  */
 final class LocoProvider extends AbstractProvider
 {
-    protected const HOST = 'localise.biz';
+    protected const HOST = 'localise.biz/api';
 
     /** @var string */
     private $apiKey;
@@ -92,7 +92,7 @@ final class LocoProvider extends AbstractProvider
         $translatorBag = new TranslatorBag();
 
         foreach ($locales as $locale) {
-            $response = $this->client->request('GET', sprintf('https://%s/api/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locale, $filter), [
+            $response = $this->client->request('GET', sprintf('https://%s/export/locale/%s.xlf?filter=%s', $this->getEndpoint(), $locale, $filter), [
                 'headers' => $this->getDefaultHeaders(),
             ]);
 
@@ -135,13 +135,16 @@ final class LocoProvider extends AbstractProvider
     protected function getDefaultHeaders(): array
     {
         return [
-            'Authorization' => 'Loco '.$this->apiKey,
+            'Authorization' => 'Loco ' . $this->apiKey,
         ];
     }
 
+    /**
+     * This function allows creation of a new translation key.
+     */
     private function createAsset(string $id): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/api/assets', $this->getEndpoint()), [
+        $response = $this->client->request('POST', sprintf('https://%s/assets', $this->getEndpoint()), [
             'headers' => $this->getDefaultHeaders(),
             'body' => [
                 'name' => $id,
@@ -162,13 +165,13 @@ final class LocoProvider extends AbstractProvider
 
     private function translateAsset(string $id, string $message, string $locale): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/api/translations/%s/%s', $this->getEndpoint(), $id, $locale), [
+        $response = $this->client->request('POST', sprintf('https://%s/translations/%s/%s', $this->getEndpoint(), $id, $locale), [
             'headers' => $this->getDefaultHeaders(),
             'body' => $message,
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add translation message (for key: "%s") to Loco: "%s".', $id, $response->getContent(false)), $response);
+            throw new TransportException(sprintf('Unable to add translation message "%s" (for key: "%s") to Loco: "%s".', $message, $id, $response->getContent(false)), $response);
         }
     }
 
@@ -180,7 +183,7 @@ final class LocoProvider extends AbstractProvider
             $this->createTag($tag);
         }
 
-        $response = $this->client->request('POST', sprintf('https://%s/api/tags/%s.json', $this->getEndpoint(), $tag), [
+        $response = $this->client->request('POST', sprintf('https://%s/tags/%s.json', $this->getEndpoint(), $tag), [
             'headers' => $this->getDefaultHeaders(),
             'body' => $idsAsString,
         ]);
@@ -192,7 +195,7 @@ final class LocoProvider extends AbstractProvider
 
     private function createTag(string $tag): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/api/tags.json', $this->getEndpoint()), [
+        $response = $this->client->request('POST', sprintf('https://%s/tags.json', $this->getEndpoint()), [
             'headers' => $this->getDefaultHeaders(),
             'body' => [
                 'name' => $tag,
@@ -206,7 +209,7 @@ final class LocoProvider extends AbstractProvider
 
     private function getTags(): array
     {
-        $response = $this->client->request('GET', sprintf('https://%s/api/tags.json', $this->getEndpoint()), [
+        $response = $this->client->request('GET', sprintf('https://%s/tags.json', $this->getEndpoint()), [
             'headers' => $this->getDefaultHeaders(),
         ]);
 
@@ -221,7 +224,7 @@ final class LocoProvider extends AbstractProvider
 
     private function deleteAsset(string $id): void
     {
-        $response = $this->client->request('DELETE', sprintf('https://%s/api/assets/%s.json', $this->getEndpoint(), $id), [
+        $response = $this->client->request('DELETE', sprintf('https://%s/assets/%s.json', $this->getEndpoint(), $id), [
             'headers' => $this->getDefaultHeaders(),
         ]);
 

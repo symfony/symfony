@@ -9,32 +9,32 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Crowdin;
+namespace Symfony\Component\Translation\Bridge\Phrase;
 
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 
-final class CrowdinProviderFactory extends AbstractProviderFactory
+final class PhraseProviderFactory extends AbstractProviderFactory
 {
     /**
-     * @return CrowdinProvider
+     * @return PhraseProvider
      */
     public function create(Dsn $dsn): ProviderInterface
     {
-        if ('crowdin' === $dsn->getScheme()) {
-            return (new CrowdinProvider($this->getUser($dsn), $this->getPassword($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+        if ('phrase' === $dsn->getScheme()) {
+            return (new PhraseProvider($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort())
             ;
         }
 
-        throw new UnsupportedSchemeException($dsn, 'crowdin', $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, 'phrase', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['crowdin'];
+        return ['phrase'];
     }
 }

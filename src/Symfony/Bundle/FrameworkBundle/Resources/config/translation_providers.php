@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
+use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 
@@ -34,6 +35,13 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.provider_factory')
 
         ->set('translation.provider_factory.crowdin', CrowdinProviderFactory::class)
+            ->args([
+                service('translator.data_collector')->nullOnInvalid(),
+            ])
+            ->parent('translation.provider_factory.abstract')
+            ->tag('translation.provider_factory')
+
+        ->set('translation.provider_factory.phrase', PhraseProviderFactory::class)
             ->args([
                 service('translator.data_collector')->nullOnInvalid(),
             ])

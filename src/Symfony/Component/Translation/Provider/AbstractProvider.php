@@ -26,6 +26,7 @@ abstract class AbstractProvider implements ProviderInterface
     public function __construct(HttpClientInterface $client = null)
     {
         $this->client = $client;
+
         if (null === $client) {
             if (!class_exists(HttpClient::class)) {
                 throw new LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));

@@ -12,6 +12,7 @@ CHANGELOG
  * Add `cache.adapter.redis_tag_aware` tag to use `RedisCacheAwareAdapter`
  * added `framework.http_client.retry_failing` configuration tree
  * added `assertCheckboxChecked()` and `assertCheckboxNotChecked()` in `WebTestCase`
+ * added `assertFormValue()` and `assertNoFormValue()` in `WebTestCase`
 
 5.1.0
 -----

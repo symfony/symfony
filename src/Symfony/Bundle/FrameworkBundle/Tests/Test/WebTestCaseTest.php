@@ -236,6 +236,22 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
     }
 
+    public function testAssertFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
+    }
+
+    public function testAssertNoFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Field "rememberMe" has a value in form "#form".');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+    }
+
     public function testAssertRequestAttributeValueSame()
     {
         $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'bar');

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-20T15:11:56Z
+
+Seems like the RFC 6750 bearer format was used here: https://tools.ietf.org/html/rfc6750#section-2.1
+
+But I see no reason to prevent any other token format here, "bearer" isn't directly coupled to OAuth2.0, right?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-09-22T09:35:59Z
+
+Could you add a testcase?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-22T09:41:18Z
+
+I think this still deserves reporting to Jetbrains that their OAuth tokens don't actually respect the OAuth stack.
+
+But we might indeed be less strict here, accepting more things that servers provide as tokens.
+
+---------------------------------------------------------------------------
+
+by stephanvierkant at 2020-09-22T12:01:34Z
+
+> I think this still deserves reporting to Jetbrains that their OAuth tokens don't actually respect the OAuth stack.
+>
+> But we might indeed be less strict here, accepting more things that servers provide as tokens.
+
+https://youtrack.jetbrains.com/issue/JPS-10419

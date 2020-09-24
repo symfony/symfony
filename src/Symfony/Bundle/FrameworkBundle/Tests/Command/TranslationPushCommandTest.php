@@ -28,30 +28,30 @@ class TranslationPushCommandTest extends TestCase
     private $translationDir;
 
     /**
-     * @dataProvider remotesProvider
+     * @dataProvider providersProvider
      */
-    public function testPushNewMessages($remotes)
+    public function testPushNewMessages($providers)
     {
         $tester = $this->createCommandTester(
             ['messages' => ['new.foo' => 'newFoo']],
             ['messages' => ['old.foo' => 'oldFoo']],
-            $remotes,
+            $providers,
             ['en'],
             ['messages']
         );
-        foreach ($remotes as $name => $remote) {
+        foreach ($providers as $name => $provider) {
             $tester->execute([
                 'command' => 'translation:push',
-                'remote' => $name,
+                'provider' => $name,
             ]);
             $this->assertRegExp('/New local translations are sent to/', $tester->getDisplay());
         }
     }
 
-    public function remotesProvider()
+    public function providersProvider()
     {
         yield [
-            ['loco' => $this->getMockBuilder('Symfony\Component\Translation\Bridge\Loco\LocoRemote')->disableOriginalConstructor()->getMock()],
+            ['loco' => $this->getMockBuilder('Symfony\Component\Translation\Bridge\Loco\LocoProvider')->disableOriginalConstructor()->getMock()],
         ];
     }
 
@@ -71,7 +71,7 @@ class TranslationPushCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester($remoteMessages = [], $localMessages = [], array $remotes = [], array $locales = [], array $domains = [], HttpKernel\KernelInterface $kernel = null, array $transPaths = [])
+    private function createCommandTester($providerMessages = [], $localMessages = [], array $providers = [], array $locales = [], array $domains = [], HttpKernel\KernelInterface $kernel = null, array $transPaths = [])
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -100,21 +100,21 @@ class TranslationPushCommandTest extends TestCase
                 ['xlf', 'yml', 'yaml']
             );
 
-        $remotesMock = $this->getMockBuilder('Symfony\Component\Translation\Remotes')
-            ->setConstructorArgs([$remotes])
+        $providersMock = $this->getMockBuilder('Symfony\Component\Translation\TranslationProviders')
+            ->setConstructorArgs([$providers])
             ->getMock();
 
-        /** @var MockObject $remote */
-        foreach ($remotes as $name => $remote) {
-            $remote
+        /** @var MockObject $provider */
+        foreach ($providers as $name => $provider) {
+            $provider
                 ->expects($this->any())
                 ->method('read')
                 ->willReturnCallback(
-                    function (array $domains, array $locales) use ($remoteMessages) {
+                    function (array $domains, array $locales) use ($providerMessages) {
                         $translatorBag = new TranslatorBag();
                         foreach ($locales as $locale) {
                             foreach ($domains as $domain) {
-                                $translatorBag->addCatalogue((new MessageCatalogue($locale, $remoteMessages)), $domain);
+                                $translatorBag->addCatalogue((new MessageCatalogue($locale, $providerMessages)), $domain);
                             }
                         }
 
@@ -122,10 +122,10 @@ class TranslationPushCommandTest extends TestCase
                     }
                 );
 
-            $remotesMock
+            $providersMock
                 ->expects($this->once())
                 ->method('get')->with($name)
-                ->willReturnReference($remote);
+                ->willReturnReference($provider);
         }
 
         if (null === $kernel) {
@@ -151,7 +151,7 @@ class TranslationPushCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationPushCommand($remotesMock, $reader, $this->translationDir.'/translations', $transPaths, ['en', 'fr', 'nl']);
+        $command = new TranslationPushCommand($providersMock, $reader, $this->translationDir.'/translations', $transPaths, ['en', 'fr', 'nl']);
 
         $application = new Application($kernel);
         $application->add($command);

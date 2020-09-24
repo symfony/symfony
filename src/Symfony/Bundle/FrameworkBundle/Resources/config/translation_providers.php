@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Translation\Bridge\Crowdin\CrowdinRemoteFactory;
-use Symfony\Component\Translation\Bridge\Loco\LocoRemoteFactory;
-use Symfony\Component\Translation\Remote\AbstractRemoteFactory;
+use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
+use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
+use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('translation.remote_factory.abstract', AbstractRemoteFactory::class)
+        ->set('translation.provider_factory.abstract', AbstractProviderFactory::class)
             ->args([
                 service('http_client')->ignoreOnInvalid(),
                 service('translation.loader.xliff_raw'),
@@ -26,18 +26,18 @@ return static function (ContainerConfigurator $container) {
             ])
             ->abstract()
 
-        ->set('translation.remote_factory.loco', LocoRemoteFactory::class)
+        ->set('translation.provider_factory.loco', LocoProviderFactory::class)
             ->args([
                 service('translator.data_collector')->nullOnInvalid(),
             ])
-            ->parent('translation.remote_factory.abstract')
-            ->tag('translation.remote_factory')
+            ->parent('translation.provider_factory.abstract')
+            ->tag('translation.provider_factory')
 
-        ->set('translation.remote_factory.crowdin', CrowdinRemoteFactory::class)
+        ->set('translation.provider_factory.crowdin', CrowdinProviderFactory::class)
             ->args([
                 service('translator.data_collector')->nullOnInvalid(),
             ])
-            ->parent('translation.remote_factory.abstract')
-            ->tag('translation.remote_factory')
+            ->parent('translation.provider_factory.abstract')
+            ->tag('translation.provider_factory')
     ;
 };

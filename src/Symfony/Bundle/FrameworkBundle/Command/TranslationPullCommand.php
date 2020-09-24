@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
-use Symfony\Component\Translation\Remotes;
+use Symfony\Component\Translation\TranslationProviders;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 final class TranslationPullCommand extends Command
@@ -29,16 +29,16 @@ final class TranslationPullCommand extends Command
 
     protected static $defaultName = 'translation:pull';
 
-    private $remotes;
+    private $providers;
     private $writer;
     private $reader;
     private $defaultLocale;
     private $transPaths;
     private $enabledLocales;
 
-    public function __construct(Remotes $remotes, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
+    public function __construct(TranslationProviders $providers, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
     {
-        $this->remotes = $remotes;
+        $this->providers = $providers;
         $this->writer = $writer;
         $this->defaultLocale = $defaultLocale;
         $this->transPaths = $transPaths;
@@ -56,39 +56,39 @@ final class TranslationPullCommand extends Command
      */
     protected function configure()
     {
-        $keys = $this->remotes->keys();
-        $defaultRemote = 1 === \count($keys) ? $keys[0] : null;
+        $keys = $this->providers->keys();
+        $defaultProvider = 1 === \count($keys) ? $keys[0] : null;
 
         $this
             ->setDefinition([
-                new InputArgument('remote', null !== $defaultRemote ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The remote to pull translations from.', $defaultRemote),
-                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with remote ones (it will delete not synchronized messages).'),
-                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available locally but not on remote.'),
+                new InputArgument('provider', null !== $defaultProvider ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The provider to pull translations from.', $defaultProvider),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with provider ones (it will delete not synchronized messages).'),
+                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available locally but not on provider.'),
                 new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull. (Do not forget +intl-icu suffix if nedded).'),
                 new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to pull.'),
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format.', 'xlf'),
                 new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version.', '1.2'),
             ])
-            ->setDescription('Pull translations from a given remote.')
+            ->setDescription('Pull translations from a given provider.')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> pull translations from the given remote. Only
+The <info>%command.name%</info> pull translations from the given provider. Only
 new translations are pulled, existing ones are not overwritten.
 
 You can overwrite existing translations:
 
-  <info>php %command.full_name% --force remote</info>
+  <info>php %command.full_name% --force provider</info>
 
-You can remove local translations which are not present on the remote:
+You can remove local translations which are not present on the provider:
 
-  <info>php %command.full_name% --delete-obsolete remote</info>
+  <info>php %command.full_name% --delete-obsolete provider</info>
 
 Full example:
 
-  <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
+  <info>php %command.full_name% provider --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
 This command will pull all translations linked to domains messages and validators
 for the locale en. Local translations for the specified domains and locale will
-be erased if they're not present on the remote and overwritten if it's the
+be erased if they're not present on the provider and overwritten if it's the
 case. Local translations for others domains and locales will be ignored.
 EOF
             )
@@ -102,7 +102,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $remoteStorage = $this->remotes->get($remote = $input->getArgument('remote'));
+        $providerStorage = $this->providers->get($provider = $input->getArgument('provider'));
         $locales = $input->getOption('locales') ?: $this->enabledLocales;
         $domains = $input->getOption('domains');
         $force = $input->getOption('force');
@@ -116,14 +116,14 @@ EOF
             $writeOptions['xliff_version'] = $input->getOption('xliff-version');
         }
 
-        $remoteTranslations = $remoteStorage->read($domains, $locales);
+        $providerTranslations = $providerStorage->read($domains, $locales);
 
         if ($force) {
             if ($deleteObsolete) {
                 $io->note('The --delete-obsolete option is ineffective with --force');
             }
 
-            foreach ($remoteTranslations->getCatalogues() as $catalogue) {
+            foreach ($providerTranslations->getCatalogues() as $catalogue) {
                 $operation = new TargetOperation((new MessageCatalogue($catalogue->getLocale())), $catalogue);
                 $operation->moveMessagesToIntlDomainsIfPossible();
                 $this->writer->write($operation->getResult(), $input->getOption('output-format'), $writeOptions);
@@ -131,7 +131,7 @@ EOF
 
             $io->success(sprintf(
                 'Local translations are up to date with %s (for [%s] locale(s), and [%s] domain(s)).',
-                $remote,
+                $provider,
                 implode(', ', $locales),
                 implode(', ', $domains)
             ));
@@ -142,7 +142,7 @@ EOF
         $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
         if ($deleteObsolete) {
-            $obsoleteTranslations = $localTranslations->diff($remoteTranslations);
+            $obsoleteTranslations = $localTranslations->diff($providerTranslations);
             $translationsWithoutObsoleteToWrite = $localTranslations->diff($obsoleteTranslations);
 
             foreach ($translationsWithoutObsoleteToWrite->getCatalogues() as $catalogue) {
@@ -152,15 +152,15 @@ EOF
             $io->success('Obsolete translations are locally removed.');
         }
 
-        $translationsToWrite = $remoteTranslations->diff($localTranslations);
+        $translationsToWrite = $providerTranslations->diff($localTranslations);
 
         foreach ($translationsToWrite->getCatalogues() as $catalogue) {
             $this->writer->write($catalogue, $input->getOption('output-format'), $writeOptions);
         }
 
         $io->success(sprintf(
-            'New remote translations from %s are written locally (for [%s] locale(s), and [%s] domain(s)).',
-            $remote,
+            'New provider translations from %s are written locally (for [%s] locale(s), and [%s] domain(s)).',
+            $provider,
             implode(', ', $locales),
             implode(', ', $domains)
         ));

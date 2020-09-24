@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Remote;
+namespace Symfony\Component\Translation\Provider;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-abstract class AbstractRemote implements RemoteInterface
+abstract class AbstractProvider implements ProviderInterface
 {
     protected const HOST = 'localhost';
 

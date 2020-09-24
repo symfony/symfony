@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Remote;
+namespace Symfony\Component\Translation\Provider;
 
 use Symfony\Component\Translation\TranslatorBag;
 
 /**
  * Providers are used to sync translations with a translation provider.
  */
-interface RemoteInterface
+interface ProviderInterface
 {
     /**
      * Writes given translation to the provider.
@@ -24,7 +24,7 @@ interface RemoteInterface
      * * Translations available in the MessageCatalogue only must be created.
      * * Translations available in both the MessageCatalogue and on the provider
      * must be overwritten.
-     * * Translations available on the remote only must be kept.
+     * * Translations available on the provider only must be kept.
      */
     public function write(TranslatorBag $translations, bool $override = false): void;
 

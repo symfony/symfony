@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Remote;
+namespace Symfony\Component\Translation\Provider;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\IncompleteDsnException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-abstract class AbstractRemoteFactory implements RemoteFactoryInterface
+abstract class AbstractProviderFactory implements ProviderFactoryInterface
 {
     /** @var HttpClientInterface|null */
     protected $client;

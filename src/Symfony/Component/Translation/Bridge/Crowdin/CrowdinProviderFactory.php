@@ -12,19 +12,19 @@
 namespace Symfony\Component\Translation\Bridge\Crowdin;
 
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
-use Symfony\Component\Translation\Remote\AbstractRemoteFactory;
-use Symfony\Component\Translation\Remote\Dsn;
-use Symfony\Component\Translation\Remote\RemoteInterface;
+use Symfony\Component\Translation\Provider\AbstractProviderFactory;
+use Symfony\Component\Translation\Provider\Dsn;
+use Symfony\Component\Translation\Provider\ProviderInterface;
 
-final class CrowdinRemoteFactory extends AbstractRemoteFactory
+final class CrowdinProviderFactory extends AbstractProviderFactory
 {
     /**
-     * @return CrowdinRemote
+     * @return CrowdinProvider
      */
-    public function create(Dsn $dsn): RemoteInterface
+    public function create(Dsn $dsn): ProviderInterface
     {
         if ('crowdin' === $dsn->getScheme()) {
-            return (new CrowdinRemote($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+            return (new CrowdinProvider($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort())
             ;

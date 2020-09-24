@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Remote;
+namespace Symfony\Component\Translation\Provider;
 
 use Symfony\Component\Translation\TranslatorBag;
 
-class RemoteDecorator implements RemoteInterface
+class ProviderDecorator implements ProviderInterface
 {
-    private $remote;
+    private $provider;
     private $locales;
     private $domains;
 
-    public function __construct(RemoteInterface $remote, array $locales, array $domains = [])
+    public function __construct(ProviderInterface $provider, array $locales, array $domains = [])
     {
-        $this->remote = $remote;
+        $this->provider = $provider;
         $this->locales = $locales;
         $this->domains = $domains;
     }
@@ -31,7 +31,7 @@ class RemoteDecorator implements RemoteInterface
      */
     public function write(TranslatorBag $translations, bool $override = false): void
     {
-        $this->remote->write($translations, $override);
+        $this->provider->write($translations, $override);
     }
 
     /**
@@ -42,7 +42,7 @@ class RemoteDecorator implements RemoteInterface
         $domains = $this->domains ? $domains : array_intersect($this->domains, $domains);
         $locales = array_intersect($this->locales, $locales);
 
-        return $this->remote->read($domains, $locales);
+        return $this->provider->read($domains, $locales);
     }
 
     /**
@@ -50,6 +50,6 @@ class RemoteDecorator implements RemoteInterface
      */
     public function delete(TranslatorBag $translations): void
     {
-        $this->remote->delete($translations);
+        $this->provider->delete($translations);
     }
 }

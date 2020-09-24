@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Translation\Exception;
 
-use Symfony\Component\Translation\Remote\Dsn;
+use Symfony\Component\Translation\Provider\Dsn;
 
 class UnsupportedSchemeException extends LogicException
 {

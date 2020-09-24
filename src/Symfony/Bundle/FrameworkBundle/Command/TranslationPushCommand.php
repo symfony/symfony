@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
-use Symfony\Component\Translation\Remotes;
+use Symfony\Component\Translation\TranslationProviders;
 
 final class TranslationPushCommand extends Command
 {
@@ -28,15 +28,15 @@ final class TranslationPushCommand extends Command
 
     protected static $defaultName = 'translation:push';
 
-    private $remotes;
+    private $providers;
     private $reader;
     private $transPaths;
     private $enabledLocales;
     private $arrayLoader;
 
-    public function __construct(Remotes $remotes, TranslationReaderInterface $reader, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
+    public function __construct(TranslationProviders $providers, TranslationReaderInterface $reader, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
     {
-        $this->remotes = $remotes;
+        $this->providers = $providers;
         $this->reader = $reader;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
@@ -54,40 +54,40 @@ final class TranslationPushCommand extends Command
      */
     protected function configure()
     {
-        $keys = $this->remotes->keys();
-        $defaultRemote = 1 === \count($keys) ? $keys[0] : null;
+        $keys = $this->providers->keys();
+        $defaultProvider = 1 === \count($keys) ? $keys[0] : null;
 
         $this
             ->setDefinition([
-                new InputArgument('remote', null !== $defaultRemote ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The remote to push translations to.', $defaultRemote),
+                new InputArgument('provider', null !== $defaultProvider ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The provider to push translations to.', $defaultProvider),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with local ones (it will delete not synchronized messages).'),
-                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available on remote but not locally.'),
+                new InputOption('delete-obsolete', null, InputOption::VALUE_NONE, 'Delete translations available on provider but not locally.'),
                 new InputOption('domains', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the domains to push.'),
                 new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to push.', $this->enabledLocales),
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format.', 'xlf'),
                 new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version.', '1.2'),
             ])
-            ->setDescription('Push translations to a given remote.')
+            ->setDescription('Push translations to a given provider.')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> push translations to the given remote. Only new
+The <info>%command.name%</info> push translations to the given provider. Only new
 translations are pushed, existing ones are not overwritten.
 
 You can overwrite existing translations:
 
-  <info>php %command.full_name% --force remote</info>
+  <info>php %command.full_name% --force provider</info>
 
-You can delete remote translations which are not present locally:
+You can delete provider translations which are not present locally:
 
-  <info>php %command.full_name% --delete-obsolete remote</info>
+  <info>php %command.full_name% --delete-obsolete provider</info>
 
 Full example:
 
-  <info>php %command.full_name% remote --force --delete-obsolete --domains=messages,validators --locales=en</info>
+  <info>php %command.full_name% provider --force --delete-obsolete --domains=messages,validators --locales=en</info>
 
 This command will push all translations linked to domains messages and validators
-for the locale en. Remote translations for the specified domains and locale will
+for the locale en. Provider translations for the specified domains and locale will
 be erased if they're not present locally and overwritten if it's the
-case. Remote translations for others domains and locales will be ignored.
+case. Provider translations for others domains and locales will be ignored.
 EOF
             )
         ;
@@ -99,12 +99,12 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (empty($this->enabledLocales)) {
-            throw new InvalidArgumentException('You must defined framework.translator.enabled_locales config key in order to work with remotes.');
+            throw new InvalidArgumentException('You must defined framework.translator.enabled_locales config key in order to work with providers.');
         }
 
         $io = new SymfonyStyle($input, $output);
 
-        $remoteStorage = $this->remotes->get($remote = $input->getArgument('remote'));
+        $providerStorage = $this->providers->get($provider = $input->getArgument('provider'));
         $domains = $input->getOption('domains');
         $locales = $input->getOption('locales');
         $force = $input->getOption('force');
@@ -117,37 +117,37 @@ EOF
         }
 
         if (!$deleteObsolete && $force) {
-            $remoteStorage->write($localTranslations);
+            $providerStorage->write($localTranslations);
 
             return 0;
         }
 
-        $remoteTranslations = $remoteStorage->read($domains, $locales);
+        $providerTranslations = $providerStorage->read($domains, $locales);
 
         if ($deleteObsolete) {
-            $obsoleteMessages = $remoteTranslations->diff($localTranslations);
-            $remoteStorage->delete($obsoleteMessages);
+            $obsoleteMessages = $providerTranslations->diff($localTranslations);
+            $providerStorage->delete($obsoleteMessages);
 
             $io->success(sprintf(
                 'Obsolete translations on %s are deleted (for [%s] locale(s), and [%s] domain(s)).',
-                $remote,
+                $provider,
                 implode(', ', $locales),
                 implode(', ', $domains)
             ));
         }
 
-        $translationsToWrite = $localTranslations->diff($remoteTranslations);
+        $translationsToWrite = $localTranslations->diff($providerTranslations);
 
         if ($force) {
-            $translationsToWrite->addBag($localTranslations->intersect($remoteTranslations));
+            $translationsToWrite->addBag($localTranslations->intersect($providerTranslations));
         }
 
-        $remoteStorage->write($translationsToWrite);
+        $providerStorage->write($translationsToWrite);
 
         $io->success(sprintf(
             '%s local translations are sent to %s (for [%s] locale(s), and [%s] domain(s)).',
             $force ? 'All' : 'New',
-            $remote,
+            $provider,
             implode(', ', $locales),
             implode(', ', $domains)
         ));

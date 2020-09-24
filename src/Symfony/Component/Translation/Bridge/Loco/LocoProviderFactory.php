@@ -12,19 +12,19 @@
 namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
-use Symfony\Component\Translation\Remote\AbstractRemoteFactory;
-use Symfony\Component\Translation\Remote\Dsn;
-use Symfony\Component\Translation\Remote\RemoteInterface;
+use Symfony\Component\Translation\Provider\AbstractProviderFactory;
+use Symfony\Component\Translation\Provider\Dsn;
+use Symfony\Component\Translation\Provider\ProviderInterface;
 
-final class LocoRemoteFactory extends AbstractRemoteFactory
+final class LocoProviderFactory extends AbstractProviderFactory
 {
     /**
-     * @return LocoRemote
+     * @return LocoProvider
      */
-    public function create(Dsn $dsn): RemoteInterface
+    public function create(Dsn $dsn): ProviderInterface
     {
         if ('loco' === $dsn->getScheme()) {
-            return (new LocoRemote($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+            return (new LocoProvider($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort())
             ;

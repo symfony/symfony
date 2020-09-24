@@ -86,8 +86,8 @@ class TranslationPullCommandTest extends TestCase
                 ['xlf', 'yml', 'yaml']
             );
 
-        $remotes = $this->getMockBuilder('Symfony\Component\Translation\Remotes')->getMock();
-        $remotes
+        $providers = $this->getMockBuilder('Symfony\Component\Translation\TranslationProviders')->getMock();
+        $providers
             ->expects($this->any())
             ->method('keys')
             ->willReturn(
@@ -117,7 +117,7 @@ class TranslationPullCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationPullCommand($remotes, $writer, $loader, 'en', $this->translationDir.'/translations', $transPaths, ['en', 'fr', 'nl']);
+        $command = new TranslationPullCommand($providers, $writer, $loader, 'en', $this->translationDir.'/translations', $transPaths, ['en', 'fr', 'nl']);
 
         $application = new Application($kernel);
         $application->add($command);

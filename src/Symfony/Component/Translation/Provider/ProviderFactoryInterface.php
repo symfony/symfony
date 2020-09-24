@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Remote;
+namespace Symfony\Component\Translation\Provider;
 
 use Symfony\Component\Translation\Exception\IncompleteDsnException;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 
-interface RemoteFactoryInterface
+interface ProviderFactoryInterface
 {
     /**
      * @throws UnsupportedSchemeException
      * @throws IncompleteDsnException
      */
-    public function create(Dsn $dsn): RemoteInterface;
+    public function create(Dsn $dsn): ProviderInterface;
 
     public function supports(Dsn $dsn): bool;
 }

@@ -236,7 +236,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('console.command.translation_pull', TranslationPullCommand::class)
             ->args([
-                service('translation.remotes'),
+                service('TranslationProviders'),
                 service('translation.writer'),
                 service('translation.reader'),
                 param('kernel.default_locale'),
@@ -248,7 +248,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('console.command.translation_push', TranslationPushCommand::class)
             ->args([
-                service('translation.remotes'),
+                service('TranslationProviders'),
                 service('translation.reader'),
                 param('translator.default_path'),
                 [], // Translator paths

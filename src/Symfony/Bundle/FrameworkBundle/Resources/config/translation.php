@@ -41,10 +41,10 @@ use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Loader\XliffRawLoader;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\LoggingTranslator;
+use Symfony\Component\Translation\ProvidersFactory;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
-use Symfony\Component\Translation\Remotes;
-use Symfony\Component\Translation\RemotesFactory;
+use Symfony\Component\Translation\TranslationProviders;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -165,15 +165,15 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
 
-        ->set('translation.remotes', Remotes::class)
-            ->factory([service('translation.remotes_factory'), 'fromConfig'])
+        ->set('translation.providers', TranslationProviders::class)
+            ->factory([service('translation.providers_factory'), 'fromConfig'])
             ->args([
-                [], // Remotes
+                [], // TranslationProviders
             ])
 
-        ->set('translation.remotes_factory', RemotesFactory::class)
+        ->set('translation.providers_factory', ProvidersFactory::class)
             ->args([
-                tagged_iterator('translation.remote_factory'),
+                tagged_iterator('translation.provider_factory'),
                 [], // Enabled locales
             ])
     ;

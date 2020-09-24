@@ -141,7 +141,7 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Translation\Bridge\Loco\LocoRemoteFactory;
+use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1143,7 +1143,7 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('translation.php');
-        $loader->load('translation_remotes.php');
+        $loader->load('translation_providers.php');
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);
@@ -1204,9 +1204,9 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
         }
 
-        if ($config['remotes']) {
+        if ($config['providers']) {
             if (!$config['enabled_locales']) {
-                throw new LogicException('You must specify framework.translator.enabled_locales in order to use remotes.');
+                throw new LogicException('You must specify framework.translator.enabled_locales in order to use providers.');
             }
 
             if ($container->hasDefinition('console.command.translation_pull')) {
@@ -1223,14 +1223,14 @@ class FrameworkExtension extends Extension
                 ;
             }
 
-            $container->getDefinition('translation.remotes_factory')
+            $container->getDefinition('translation.providers_factory')
                 ->replaceArgument(1, $config['enabled_locales'])
             ;
 
-            $container->getDefinition('translation.remotes')->setArgument(0, $config['remotes']);
+            $container->getDefinition('translation.providers')->setArgument(0, $config['providers']);
 
             $classToServices = [
-                LocoRemoteFactory::class => 'translation.remote_factory.loco',
+                LocoProviderFactory::class => 'translation.provider_factory.loco',
             ];
 
             foreach ($classToServices as $class => $service) {
@@ -1300,9 +1300,10 @@ class FrameworkExtension extends Extension
                 ]);
         }
 
-        if (!empty($config['remotes'])) {
+        if (!empty($config['providers'])) {
             if (empty($config['enabled_locales'])) {
-                throw new LogicException('You must specify framework.translator.enabled_locales in order to use remotes.');
+                throw new LogicException('You must specify framework.translator.enabled_locales in order to use providers.');
+                throw new LogicException('You must specify framework.translator.enabled_locales in order to use providers.');
             }
 
             if ($container->hasDefinition('console.command.translation_pull')) {
@@ -1319,14 +1320,14 @@ class FrameworkExtension extends Extension
                 ;
             }
 
-            $container->getDefinition('translation.remotes_factory')
+            $container->getDefinition('translation.providers_factory')
                 ->replaceArgument(1, $config['enabled_locales'])
             ;
 
-            $container->getDefinition('translation.remotes')->setArgument(0, $config['remotes']);
+            $container->getDefinition('TranslationProviders')->setArgument(0, $config['providers']);
 
             $classToServices = [
-                LocoRemoteFactory::class => 'translation.remote_factory.loco',
+                LocoProviderFactory::class => 'translation.provider_factory.loco',
             ];
 
             foreach ($classToServices as $class => $service) {

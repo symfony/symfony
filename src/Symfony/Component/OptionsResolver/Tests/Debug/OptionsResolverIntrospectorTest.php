@@ -257,13 +257,15 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = function (Options $options, $value) {});
+        $resolver->setDefined('bar');
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = function (Options $options, $value) {}, ['bar']);
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame([
             'package' => 'vendor/package',
             'version' => '1.1',
             'message' => $closure,
+            'closure_trigger_options' => ['bar'],
         ], $debug->getDeprecation('foo'));
     }
 

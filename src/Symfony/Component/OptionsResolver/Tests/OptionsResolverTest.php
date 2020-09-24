@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
@@ -749,6 +750,94 @@ class OptionsResolverTest extends TestCase
             [],
             null,
             0,
+        ];
+
+        yield 'The message closure is executed if the deprecated option is not given but one of its closure trigger options is' => [
+            static function (OptionsResolver $resolver): void {
+                $resolver
+                    ->setDefaults([
+                        'foo' => true,
+                        'bar' => null,
+                    ])
+                    ->setDeprecated('foo', 'vendor/package', '1.1', static function (): string {
+                        return 'Writing a test is not deprecated.';
+                    }, [
+                        'bar',
+                    ]);
+            },
+            [
+                'bar' => 'bar value',
+            ],
+            [
+                'type' => \E_USER_DEPRECATED,
+                'message' => 'Since vendor/package 1.1: Writing a test is not deprecated.',
+            ],
+            1,
+        ];
+
+        yield 'The message closure is executed if the deprecated option is given as well as one of its closure trigger options' => [
+            static function (OptionsResolver $resolver): void {
+                $resolver
+                    ->setDefaults([
+                        'foo' => true,
+                        'bar' => null,
+                    ])
+                    ->setDeprecated('foo', 'vendor/package', '1.1', static function (): string {
+                        return 'Writing a test is not deprecated.';
+                    }, [
+                        'bar',
+                    ]);
+            },
+            [
+                'foo' => false,
+                'bar' => 'bar value',
+            ],
+            [
+                'type' => \E_USER_DEPRECATED,
+                'message' => 'Since vendor/package 1.1: Writing a test is not deprecated.',
+            ],
+            1,
+        ];
+
+        yield 'The message closure is not executed if the deprecated option is not given and none of its closure trigger options are' => [
+            static function (OptionsResolver $resolver): void {
+                $resolver
+                    ->setDefaults([
+                        'foo' => true,
+                        'bar' => null,
+                    ])
+                    ->setDeprecated('foo', 'vendor/package', '1.1', static function (): string {
+                        return 'Writing a test is not deprecated.';
+                    }, [
+                        'bar',
+                    ]);
+            },
+            [],
+            null,
+            0,
+        ];
+
+        yield 'The message closure is executed if the deprecated option is given but none of its closure trigger options are' => [
+            static function (OptionsResolver $resolver): void {
+                $resolver
+                    ->setDefaults([
+                        'foo' => true,
+                        'bar' => null,
+                    ])
+                    ->setDeprecated('foo', 'vendor/package', '1.1', static function (): string {
+                        return 'Writing a test is not deprecated.';
+                    }, [
+                        'bar',
+                    ]);
+            },
+            [
+                'foo' => false,
+            ],
+            [
+                'type' => \E_USER_DEPRECATED,
+                'message' => 'Since vendor/package 1.1: Writing a test is not deprecated.',
+            ],
+            1,
         ];
     }
 
@@ -2497,5 +2586,58 @@ class OptionsResolverTest extends TestCase
             ->setDefined('foo')
             ->setDeprecated('foo')
         ;
+    }
+
+    public function testSetDeprecatedFailsWithInvalidClosureTriggerOptionsType()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid type for the $closureTriggerOptions argument, expected an array of strings, but got "string".');
+
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo', 'foo/bar', '2.9', static function (): string {
+                return '';
+            }, 'ccc');
+    }
+
+    public function testSetDeprecatedFailsWithClosureTriggerOptionsButStringMessage()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $closureTriggerOptions argument must only be given when the message is a \Closure.');
+
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo', 'foo/bar', '2.9', 'Writing a test is not deprecated.', [
+                'ccc',
+            ]);
+    }
+
+    public function testSetDeprecatedFailsWithUnknownClosureTriggerOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "ccc" does not exist, defined options are: "foo", "bar".');
+
+        $this->resolver
+            ->setDefined('foo')
+            ->setDefined('bar')
+            ->setDeprecated('foo', 'foo/bar', '2.9', static function (): string {
+                return '';
+            }, [
+                'ccc',
+            ]);
+    }
+
+    public function testSetDeprecatedFailsWithDeprecatedOptionInClosureTriggerOption()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $closureTriggerOptions argument must not contain the deprecated option.');
+
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo', 'foo/bar', '2.9', static function (): string {
+                return '';
+            }, [
+                'foo',
+            ]);
     }
 }

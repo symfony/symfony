@@ -435,11 +435,14 @@ class OptionsResolver implements Options
      * passed to the closure is the value of the option after validating it
      * and before normalizing it.
      *
-     * @param string          $package The name of the composer package that is triggering the deprecation
-     * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
+     * @param string          $package               The name of the composer package that is triggering the deprecation
+     * @param string          $version               The version of the package that introduced the deprecation
+     * @param string|\Closure $message               The deprecation message to use
+     * @param string[]        $closureTriggerOptions The options that also trigger the execution of the closure when they are resolved
+     *                                               This is useful when the deprecation is at the same time conditional, actually generated with its default value, and dependent of the value of others options.
+     *                                               In this case, those others options should be passed as the closure trigger options.
      */
-    public function setDeprecated(string $option/*, string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self
+    public function setDeprecated(string $option/*, string $package, string $version, $message = 'The option "%name%" is deprecated.', array $closureTriggerOptions = [] */): self
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be deprecated from a lazy option or normalizer.');
@@ -471,11 +474,37 @@ class OptionsResolver implements Options
             return $this;
         }
 
+        if (\func_num_args() < 5) {
+            $closureTriggerOptions = [];
+        } else {
+            if (!\is_array($closureTriggerOptions = $args[4])) {
+                throw new InvalidArgumentException(sprintf('Invalid type for the $closureTriggerOptions argument, expected an array of strings, but got "%s".', get_debug_type($closureTriggerOptions)));
+            }
+        }
+
+        if ($closureTriggerOptions && !$message instanceof \Closure) {
+            throw new InvalidArgumentException('The $closureTriggerOptions argument must only be given when the message is a \Closure.');
+        }
+
+        foreach ($closureTriggerOptions as $closureTriggerOption) {
+            if (!isset($this->defined[$closureTriggerOption])) {
+                throw new UndefinedOptionsException(sprintf('The option "%s" does not exist, defined options are: "%s".', $this->formatOptions([$closureTriggerOption]), implode('", "', array_keys($this->defined))));
+            }
+
+            if ($closureTriggerOption === $option) {
+                throw new InvalidArgumentException('The $closureTriggerOptions argument must not contain the deprecated option.');
+            }
+        }
+
         $this->deprecated[$option] = [
             'package' => $package,
             'version' => $version,
             'message' => $message,
         ];
+
+        if ($closureTriggerOptions) {
+            $this->deprecated[$option]['closure_trigger_options'] = $closureTriggerOptions;
+        }
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -1077,9 +1106,24 @@ class OptionsResolver implements Options
             }
         }
 
+        if ($doTriggerDeprecation = $triggerDeprecation && isset($this->deprecated[$option])) {
+            if (!isset($this->given[$option]) && (!$this->calling || !\is_string($this->deprecated[$option]['message']))) {
+                $doTriggerDeprecation = false;
+                if (isset($this->deprecated[$option]['closure_trigger_options'])) {
+                    foreach ($this->deprecated[$option]['closure_trigger_options'] as $closureTriggerOption) {
+                        if (isset($this->given[$closureTriggerOption])) {
+                            $doTriggerDeprecation = true;
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         // Check whether the option is deprecated
         // and it is provided by the user or is being called from a lazy evaluation
-        if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || ($this->calling && \is_string($this->deprecated[$option])))) {
+        if ($doTriggerDeprecation) {
             $deprecation = $this->deprecated[$option];
             $message = $this->deprecated[$option]['message'];
 

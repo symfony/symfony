@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added the `$closureTriggerOptions` argument to the `OptionsResolver::setDeprecated()` method.
+
 5.1.0
 -----
 

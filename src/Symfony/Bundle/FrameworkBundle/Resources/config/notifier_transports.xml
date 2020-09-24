@@ -54,5 +54,9 @@
             <tag name="chatter.transport_factory" />
             <tag name="texter.transport_factory" />
         </service>
+
+        <service id="notifier.transport_factory.sendinblue" class="Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory" parent="notifier.transport_factory.abstract">
+            <tag name="texter.transport_factory" />
+        </service>
     </services>
 </container>

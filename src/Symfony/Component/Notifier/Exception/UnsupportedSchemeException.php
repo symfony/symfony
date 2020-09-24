@@ -35,7 +35,7 @@ class UnsupportedSchemeException extends LogicException
             'package' => 'symfony/mattermost-notifier',
         ],
         'nexmo' => [
-            'class' => Bridge\Nexmo\NexmoTransportFactory::class,
+            'class' => Bridge\Nexmo\SendinblueTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',
         ],
         'rocketchat' => [
@@ -60,6 +60,10 @@ class UnsupportedSchemeException extends LogicException
         ],
         'sinch' => [
             'class' => Bridge\Sinch\SinchTransportFactory::class,
+            'package' => 'symfony/sinch-notifier',
+        ],
+        'sendinblue' => [
+            'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
             'package' => 'symfony/sinch-notifier',
         ],
     ];

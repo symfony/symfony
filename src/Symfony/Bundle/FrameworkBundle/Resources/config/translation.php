@@ -79,9 +79,6 @@ return static function (ContainerConfigurator $container) {
         ->set('translator.formatter.default', MessageFormatter::class)
             ->args([service('identity_translator')])
 
-        ->set('translation.loader.array', ArrayLoader::class)
-            ->tag('translation.loader', ['alias' => 'array'])
-
         ->set('translation.loader.php', PhpFileLoader::class)
             ->tag('translation.loader', ['alias' => 'php'])
 

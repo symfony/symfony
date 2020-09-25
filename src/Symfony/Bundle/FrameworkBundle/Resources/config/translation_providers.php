@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('translation.provider_factory.poeditor', PoEditorProviderFactory::class)
             ->args([
-                service('translation.loader.array'),
+                service('translation.loader.xliff_raw'),
             ])
             ->parent('translation.provider_factory.abstract')
             ->tag('translation.provider_factory')

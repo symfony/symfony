@@ -93,12 +93,7 @@ final class PoEditorProvider extends AbstractProvider
                     'api_token' => $this->apiKey,
                     'id' => $this->projectId,
                     'language' => $locale,
-                    /*
-                     * POEditor XLF export not support Terms as <source>.
-                     * The source tag is either empty or equals to Default Language Reference translation.
-                     * This is why we have to export in json, parse it, and load it with ArrayLoader.
-                     */
-                    'type' => 'key_value_json',
+                    'type' => 'xlf',
                     'filters' => json_encode(['translated']),
                     'tags' => json_encode($domains),
                 ],
@@ -114,18 +109,8 @@ final class PoEditorProvider extends AbstractProvider
                 'headers' => $this->getDefaultHeaders(),
             ]);
 
-            $responseContent = json_decode($response->getContent(), true);
-
-            $content = [];
-
-            foreach ($responseContent as $translation) {
-                $content += $translation;
-            }
-
-            if ($responseContent) {
-                foreach ($domains as $domain) {
-                    $translatorBag->addCatalogue($this->loader->load($content, $locale, $domain));
-                }
+            foreach ($domains as $domain) {
+                $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domain));
             }
         }
 

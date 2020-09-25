@@ -232,6 +232,34 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
+    public function testConstraintsInDifferentGroupsOnSingleFieldWithAdditionalFieldThatHasNoConstraintsAddedBeforeTheFieldWithConstraints()
+    {
+        $form = $this->formFactory->create(FormType::class, null, [
+            'validation_groups' => new GroupSequence(['group1', 'group2']),
+        ])
+            ->add('bar')
+            ->add('foo', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'groups' => ['group1'],
+                    ]),
+                    new Length([
+                        'groups' => ['group2'],
+                        'max' => 3,
+                    ]),
+                ],
+            ]);
+        $form->submit([
+            'foo' => 'test@example.com',
+        ]);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $errors);
+        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+    }
+
     public function testCascadeValidationToChildFormsUsingPropertyPaths()
     {
         $form = $this->formFactory->create(FormType::class, null, [

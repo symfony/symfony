@@ -9,6 +9,7 @@ CHANGELOG
  * added support for translating `Translatable` objects
  * added the `t()` function to easily create `Translatable` objects
  * Added support for extracting messages from the `t()` function
+ * Added `field_*` Twig functions to access string values from Form fields
 
 5.0.0
 -----

@@ -12,8 +12,11 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
+use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -27,6 +30,13 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator = null)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -55,6 +65,12 @@ final class FormExtension extends AbstractExtension
             new TwigFunction('form_end', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
             new TwigFunction('csrf_token', ['Symfony\Component\Form\FormRenderer', 'renderCsrfToken']),
             new TwigFunction('form_parent', 'Symfony\Bridge\Twig\Extension\twig_get_form_parent'),
+            new TwigFunction('field_name', [$this, 'getFieldName']),
+            new TwigFunction('field_value', [$this, 'getFieldValue']),
+            new TwigFunction('field_label', [$this, 'getFieldLabel']),
+            new TwigFunction('field_help', [$this, 'getFieldHelp']),
+            new TwigFunction('field_errors', [$this, 'getFieldErrors']),
+            new TwigFunction('field_choices', [$this, 'getFieldChoices']),
         ];
     }
 
@@ -78,6 +94,80 @@ final class FormExtension extends AbstractExtension
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
             new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
         ];
+    }
+
+    public function getFieldName(FormView $view): string
+    {
+        $view->setRendered();
+
+        return $view->vars['full_name'];
+    }
+
+    public function getFieldValue(FormView $view): string
+    {
+        return $view->vars['value'];
+    }
+
+    public function getFieldLabel(FormView $view): string
+    {
+        return $this->createFieldTranslation(
+            $view->vars['label'],
+            $view->vars['label_translation_parameters'] ?: [],
+            $view->vars['translation_domain']
+        );
+    }
+
+    public function getFieldHelp(FormView $view): string
+    {
+        return $this->createFieldTranslation(
+            $view->vars['help'],
+            $view->vars['help_translation_parameters'] ?: [],
+            $view->vars['translation_domain']
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFieldErrors(FormView $view): iterable
+    {
+        /** @var FormError $error */
+        foreach ($view->vars['errors'] as $error) {
+            yield $error->getMessage();
+        }
+    }
+
+    /**
+     * @return string[]|string[][]
+     */
+    public function getFieldChoices(FormView $view): iterable
+    {
+        yield from $this->createFieldChoicesList($view->vars['choices'], $view->vars['choice_translation_domain']);
+    }
+
+    private function createFieldChoicesList(iterable $choices, $translationDomain): iterable
+    {
+        foreach ($choices as $choice) {
+            $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
+
+            if ($choice instanceof ChoiceGroupView) {
+                yield $translatableLabel => $this->createFieldChoicesList($choice, $translationDomain);
+
+                continue;
+            }
+
+            /* @var ChoiceView $choice */
+            yield $translatableLabel => $choice->value;
+        }
+    }
+
+    private function createFieldTranslation(?string $value, array $parameters, $domain): string
+    {
+        if (!$this->translator || !$value || false === $domain) {
+            return $value;
+        }
+
+        return $this->translator->trans($value, $parameters, $domain);
     }
 }
 

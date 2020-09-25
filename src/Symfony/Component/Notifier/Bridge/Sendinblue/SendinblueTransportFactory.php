@@ -35,11 +35,14 @@ final class SendinblueTransportFactory extends AbstractTransportFactory
 
         $scheme = $dsn->getScheme();
         $apiKey = $this->getUser($dsn);
+        $type = $dsn->getOption('type', 'transactional');
+        $tag = $dsn->getOption('tag');
+        $webUrl = $dsn->getOption('webUrl');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
         if ('sendinblue' === $scheme) {
-            return (new SendinblueTransport($apiKey, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new SendinblueTransport($apiKey, $sender, $type, $tag, $webUrl, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());

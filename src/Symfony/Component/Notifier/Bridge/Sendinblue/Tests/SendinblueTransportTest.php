@@ -70,7 +70,7 @@ final class SendinblueTransportTest extends TestCase
     private function initTransport(?HttpClientInterface $client = null): SendinblueTransport
     {
         return (new SendinblueTransport(
-            'api-key', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)
+            'api-key', '0611223344', 'transactional', null, null, $client ?: $this->createMock(HttpClientInterface::class)
         ))->setHost('host.test');
     }
 }

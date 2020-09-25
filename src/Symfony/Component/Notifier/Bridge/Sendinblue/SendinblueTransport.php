@@ -31,11 +31,17 @@ final class SendinblueTransport extends AbstractTransport
 
     private $apiKey;
     private $sender;
+    private $type;
+    private $tag;
+    private $webUrl;
 
-    public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, string $sender, string $type, string $tag = null, string $webUrl = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->sender = $sender;
+        $this->type = $type;
+        $this->tag = $tag;
+        $this->webUrl = $webUrl;
 
         parent::__construct($client, $dispatcher);
     }
@@ -57,11 +63,7 @@ final class SendinblueTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
-            'json' => [
-                'sender' => $this->sender,
-                'recipient' => $message->getPhone(),
-                'content' => $message->getSubject(),
-            ],
+            'json' => $this->getPayload($message),
             'headers' => [
                 'api-key' => $this->apiKey,
             ],
@@ -79,5 +81,23 @@ final class SendinblueTransport extends AbstractTransport
         $message->setMessageId($success['messageId']);
 
         return $message;
+    }
+
+    private function getPayload(MessageInterface $message): array
+    {
+        $payload = [
+            'sender' => $this->sender,
+            'recipient' => $message->getPhone(),
+            'content' => $message->getSubject(),
+            'type' => $this->type,
+        ];
+        if ($this->tag) {
+            $payload['tag'] = $this->tag;
+        }
+        if ($this->webUrl) {
+            $payload['webUrl'] = $this->webUrl;
+        }
+
+        return $payload;
     }
 }

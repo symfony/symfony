@@ -27,7 +27,7 @@ class TranslatableTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', [$translatable->getMessage() => $translation], $locale, $translatable->getDomain());
 
-        $this->assertEquals($expected, Translatable::trans($translator, $translatable, $locale));
+        $this->assertSame($expected, Translatable::trans($translator, $translatable, $locale));
     }
 
     /**
@@ -39,7 +39,12 @@ class TranslatableTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', $messages, 'fr', '');
 
-        $this->assertEquals($expected, Translatable::trans($translator, $translatable, 'fr'));
+        $this->assertSame($expected, Translatable::trans($translator, $translatable, 'fr'));
+    }
+
+    public function testToString()
+    {
+        $this->assertSame('Symfony is great!', (string) new Translatable('Symfony is great!'));
     }
 
     public function getTransTests()

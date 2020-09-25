@@ -127,13 +127,13 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
     {
         $response = $this->responseFactory->createResponse($symfonyResponse->getStatusCode(), Response::$statusTexts[$symfonyResponse->getStatusCode()] ?? '');
 
-        if ($symfonyResponse instanceof BinaryFileResponse) {
+        if ($symfonyResponse instanceof BinaryFileResponse && !$symfonyResponse->headers->has('Content-Range')) {
             $stream = $this->streamFactory->createStreamFromFile(
                 $symfonyResponse->getFile()->getPathname()
             );
         } else {
             $stream = $this->streamFactory->createStreamFromFile('php://temp', 'wb+');
-            if ($symfonyResponse instanceof StreamedResponse) {
+            if ($symfonyResponse instanceof StreamedResponse || $symfonyResponse instanceof BinaryFileResponse) {
                 ob_start(function ($buffer) use ($stream) {
                     $stream->write($buffer);
 

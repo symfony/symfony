@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Phrase;
+namespace Symfony\Component\Translation\Bridge\PoEditor;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class PhraseProviderFactory extends AbstractProviderFactory
+final class PoEditorProviderFactory extends AbstractProviderFactory
 {
     /** @var LoaderInterface */
     private $loader;
@@ -36,18 +36,18 @@ final class PhraseProviderFactory extends AbstractProviderFactory
      */
     public function create(Dsn $dsn): ProviderInterface
     {
-        if ('phrase' === $dsn->getScheme()) {
-            return (new PhraseProvider($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+        if ('poeditor' === $dsn->getScheme()) {
+            return (new PoEditorProvider($this->getUser($dsn), $this->getPassword($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort())
             ;
         }
 
-        throw new UnsupportedSchemeException($dsn, 'phrase', $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, 'poeditor', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['phrase'];
+        return ['poeditor'];
     }
 }

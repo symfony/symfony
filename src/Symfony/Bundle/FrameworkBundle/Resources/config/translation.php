@@ -28,6 +28,7 @@ use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 use Symfony\Component\Translation\Loader\IcuResFileLoader;
@@ -77,6 +78,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('translator.formatter.default', MessageFormatter::class)
             ->args([service('identity_translator')])
+
+        ->set('translation.loader.array', ArrayLoader::class)
+            ->tag('translation.loader', ['alias' => 'array'])
 
         ->set('translation.loader.php', PhpFileLoader::class)
             ->tag('translation.loader', ['alias' => 'php'])

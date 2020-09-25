@@ -11,13 +11,26 @@
 
 namespace Symfony\Component\Translation\Bridge\Loco;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class LocoProviderFactory extends AbstractProviderFactory
 {
+    /** @var LoaderInterface */
+    private $loader;
+
+    public function __construct(HttpClientInterface $client = null, LoggerInterface $logger = null, string $defaultLocale = null, LoaderInterface $loader = null)
+    {
+        parent::__construct($client, $logger, $defaultLocale);
+
+        $this->loader = $loader;
+    }
+
     /**
      * @return LocoProvider
      */

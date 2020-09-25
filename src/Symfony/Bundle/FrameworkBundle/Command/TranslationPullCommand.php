@@ -40,6 +40,7 @@ final class TranslationPullCommand extends Command
     {
         $this->providers = $providers;
         $this->writer = $writer;
+        $this->reader = $reader;
         $this->defaultLocale = $defaultLocale;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
@@ -102,7 +103,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $providerStorage = $this->providers->get($provider = $input->getArgument('provider'));
+        $provider = $this->providers->get($input->getArgument('provider'));
         $locales = $input->getOption('locales') ?: $this->enabledLocales;
         $domains = $input->getOption('domains');
         $force = $input->getOption('force');
@@ -116,7 +117,7 @@ EOF
             $writeOptions['xliff_version'] = $input->getOption('xliff-version');
         }
 
-        $providerTranslations = $providerStorage->read($domains, $locales);
+        $providerTranslations = $provider->read($domains, $locales);
 
         if ($force) {
             if ($deleteObsolete) {
@@ -131,7 +132,7 @@ EOF
 
             $io->success(sprintf(
                 'Local translations are up to date with %s (for [%s] locale(s), and [%s] domain(s)).',
-                $provider,
+                $input->getArgument('provider'),
                 implode(', ', $locales),
                 implode(', ', $domains)
             ));
@@ -159,8 +160,8 @@ EOF
         }
 
         $io->success(sprintf(
-            'New provider translations from %s are written locally (for [%s] locale(s), and [%s] domain(s)).',
-            $provider,
+            'New translations from %s are written locally (for [%s] locale(s), and [%s] domain(s)).',
+            $input->getArgument('provider'),
             implode(', ', $locales),
             implode(', ', $domains)
         ));

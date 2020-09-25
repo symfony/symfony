@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslationProviders;
 
@@ -32,7 +31,6 @@ final class TranslationPushCommand extends Command
     private $reader;
     private $transPaths;
     private $enabledLocales;
-    private $arrayLoader;
 
     public function __construct(TranslationProviders $providers, TranslationReaderInterface $reader, string $defaultTransPath = null, array $transPaths = [], array $enabledLocales = [])
     {
@@ -40,7 +38,6 @@ final class TranslationPushCommand extends Command
         $this->reader = $reader;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
-        $this->arrayLoader = new ArrayLoader();
 
         if (null !== $defaultTransPath) {
             $this->transPaths[] = $defaultTransPath;
@@ -104,7 +101,7 @@ EOF
 
         $io = new SymfonyStyle($input, $output);
 
-        $providerStorage = $this->providers->get($provider = $input->getArgument('provider'));
+        $provider = $this->providers->get($provider = $input->getArgument('provider'));
         $domains = $input->getOption('domains');
         $locales = $input->getOption('locales');
         $force = $input->getOption('force');
@@ -117,16 +114,16 @@ EOF
         }
 
         if (!$deleteObsolete && $force) {
-            $providerStorage->write($localTranslations);
+            $provider->write($localTranslations, true);
 
             return 0;
         }
 
-        $providerTranslations = $providerStorage->read($domains, $locales);
+        $providerTranslations = $provider->read($domains, $locales);
 
         if ($deleteObsolete) {
             $obsoleteMessages = $providerTranslations->diff($localTranslations);
-            $providerStorage->delete($obsoleteMessages);
+            $provider->delete($obsoleteMessages);
 
             $io->success(sprintf(
                 'Obsolete translations on %s are deleted (for [%s] locale(s), and [%s] domain(s)).',
@@ -142,12 +139,12 @@ EOF
             $translationsToWrite->addBag($localTranslations->intersect($providerTranslations));
         }
 
-        $providerStorage->write($translationsToWrite);
+        $provider->write($translationsToWrite);
 
         $io->success(sprintf(
             '%s local translations are sent to %s (for [%s] locale(s), and [%s] domain(s)).',
             $force ? 'All' : 'New',
-            $provider,
+            $input->getArgument('provider'),
             implode(', ', $locales),
             implode(', ', $domains)
         ));

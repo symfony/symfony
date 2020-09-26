@@ -93,7 +93,8 @@ Use the --memory-limit option to stop the worker if it exceeds a given memory us
 
     <info>php %command.full_name% <receiver-name> --memory-limit=128M</info>
 
-Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached (if a message is being handled, the worker will stop after the processing finished):
+Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached.
+If a message is being handled, the worker will stop after the processing is finished:
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
 

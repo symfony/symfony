@@ -29,6 +29,11 @@ final class Translatable
         $this->domain = $domain;
     }
 
+    public function __toString(): string
+    {
+        return $this->message;
+    }
+
     public function getMessage(): string
     {
         return $this->message;

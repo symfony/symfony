@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by sylfabre at 2020-09-25T14:14:24Z
+
+@nicolas-grekas I'll explain why I'm working on this PR so you get the context.
+
+I've found out this issue can happen:
+1. Send a message to a transport, expected to take a total of 3700 seconds to process (this is a design problem somewhere but keep this out of the current discussion)
+2. As per the doc, by default, the message will be redelivered after 3600 if not acknowledged
+3. Run a first `messenger:consume --time-limit=3599` command => Command A
+4. Command A picks the message
+5. 1000 seconds later, run a second `messenger:consume --time-limit=3599` command => Command B
+6. Command B waits as no messages are available
+
+* Expected behavior while reading the current state of the doc: command A exists after 3599 seconds, the message gets visible again and is now handled by command B: so at any time, only one command handles the message => no concurrency
+* Actual behavior while diving in the current code: command A keeps running the message after 3599 seconds, the message gets visible again so it is also handled by command B: so both commands now handle the same message at the same time.
+
+I'm no expert with documentation but I've been misled by the current state of the documentation so I'm willing to put some effort to fix it and I appreciate your help to do so.

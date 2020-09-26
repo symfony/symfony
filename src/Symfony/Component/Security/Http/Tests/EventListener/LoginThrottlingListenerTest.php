@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
+use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 class LoginThrottlingListenerTest extends TestCase
 {
@@ -34,17 +35,24 @@ class LoginThrottlingListenerTest extends TestCase
     {
         $this->requestStack = new RequestStack();
 
-        $limiter = new Limiter([
+        $localLimiter = new Limiter([
             'id' => 'login',
             'strategy' => 'fixed_window',
             'limit' => 3,
             'interval' => '1 minute',
         ], new InMemoryStorage());
+        $globalLimiter = new Limiter([
+            'id' => 'login',
+            'strategy' => 'fixed_window',
+            'limit' => 6,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+        $limiter = new DefaultLoginRateLimiter($globalLimiter, $localLimiter);
 
         $this->listener = new LoginThrottlingListener($this->requestStack, $limiter);
     }
 
-    public function testPreventsLoginWhenOverThreshold()
+    public function testPreventsLoginWhenOverLocalThreshold()
     {
         $request = $this->createRequest();
         $passport = $this->createPassport('wouter');
@@ -59,21 +67,19 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
     }
 
-    public function testSuccessfulLoginResetsCount()
+    public function testPreventsLoginWhenOverGlobalThreshold()
     {
-        $this->expectNotToPerformAssertions();
-
         $request = $this->createRequest();
-        $passport = $this->createPassport('wouter');
+        $passports = [$this->createPassport('wouter'), $this->createPassport('ryan')];
 
         $this->requestStack->push($request);
 
-        for ($i = 0; $i < 3; ++$i) {
-            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+        for ($i = 0; $i < 6; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 2]));
         }
 
-        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
-        $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
     private function createPassport($username)

@@ -118,7 +118,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 service('request_stack'),
-                abstract_arg('rate limiter'),
+                abstract_arg('request rate limiter'),
             ])
 
         // Authenticators

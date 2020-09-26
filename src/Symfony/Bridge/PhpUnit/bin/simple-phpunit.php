@@ -203,7 +203,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         'requires' => ['php' => '*'],
     ];
 
-    $stableVersions = array_filter($info['versions'], function($v) {
+    $stableVersions = array_filter($info['versions'], function ($v) {
         return !preg_match('/-dev$|^dev-/', $v);
     });
 

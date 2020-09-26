@@ -6,7 +6,7 @@
 
   <namespace prefix="custom">Symfony\Component\Validator\Tests\Fixtures\</namespace>
 
-  <class name="Symfony\Component\Validator\Tests\Fixtures\Entity">
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity">
 
     <group-sequence>
        <value>Foo</value>
@@ -115,7 +115,7 @@
     </getter>
   </class>
 
-  <class name="Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity">
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity">
 
     <!-- GROUP SEQUENCE PROVIDER -->
     <group-sequence-provider />

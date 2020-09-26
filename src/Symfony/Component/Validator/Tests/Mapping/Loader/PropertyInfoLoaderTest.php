@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
 use Symfony\Component\Validator\Validation;

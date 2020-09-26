@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Fixtures;
 
-use Attribute;
-
-#[Attribute]
+#[\Attribute]
 final class MyAttribute
 {
     public function __construct(

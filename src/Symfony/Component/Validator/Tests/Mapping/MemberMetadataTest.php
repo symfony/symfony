@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -30,7 +31,7 @@ class MemberMetadataTest extends TestCase
     protected function setUp(): void
     {
         $this->metadata = new TestMemberMetadata(
-            'Symfony\Component\Validator\Tests\Fixtures\Entity',
+            Entity::class,
             'getLastName',
             'lastName'
         );

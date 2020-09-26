@@ -20,6 +20,16 @@ class RangeTest extends TestCase
         ]);
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
+    {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
+        eval('new \Symfony\Component\Validator\Constraints\Range(min: "min", minPropertyPath: "minPropertyPath");');
+    }
+
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
@@ -28,6 +38,16 @@ class RangeTest extends TestCase
             'max' => 'max',
             'maxPropertyPath' => 'maxPropertyPath',
         ]);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
+    {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
+        eval('new \Symfony\Component\Validator\Constraints\Range(max: "max", maxPropertyPath: "maxPropertyPath");');
     }
 
     public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
@@ -39,8 +59,7 @@ class RangeTest extends TestCase
 
     public function testThrowsNoDefaultOptionConfiguredException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-        $this->expectExceptionMessage('No default option is configured');
+        $this->expectException(\TypeError::class);
         new Range('value');
     }
 

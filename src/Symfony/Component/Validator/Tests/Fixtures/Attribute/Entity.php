@@ -9,21 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Fixtures;
+namespace Symfony\Component\Validator\Tests\Fixtures\Attribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
+use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-/**
- * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
- * @Assert\GroupSequence({"Foo", "Entity"})
- * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
- */
+#[
+    ConstraintA,
+    Assert\GroupSequence(['Foo', 'Entity']),
+    Assert\Callback([CallbackClass::class, 'callback']),
+]
 class Entity extends EntityParent implements EntityInterfaceB
 {
     /**
-     * @Assert\NotNull
-     * @Assert\Range(min=3)
      * @Assert\All({@Assert\NotNull, @Assert\Range(min=3)}),
      * @Assert\All(constraints={@Assert\NotNull, @Assert\Range(min=3)})
      * @Assert\Collection(fields={
@@ -32,14 +33,14 @@ class Entity extends EntityParent implements EntityInterfaceB
      * })
      * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */
+    #[
+        Assert\NotNull,
+        Assert\Range(min: 3),
+    ]
     public $firstName;
-    /**
-     * @Assert\Valid
-     */
+    #[Assert\Valid]
     public $childA;
-    /**
-     * @Assert\Valid
-     */
+    #[Assert\Valid]
     public $childB;
     protected $lastName;
     public $reference;
@@ -68,9 +69,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->lastName = $lastName;
     }
 
-    /**
-     * @Assert\NotNull
-     */
+    #[Assert\NotNull]
     public function getLastName()
     {
         return $this->lastName;
@@ -80,17 +79,13 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @Assert\IsTrue
-     */
+    #[Assert\IsTrue]
     public function isValid()
     {
         return 'valid';
     }
 
-    /**
-     * @Assert\IsTrue
-     */
+    #[Assert\IsTrue]
     public function hasPermissions()
     {
         return 'permissions';
@@ -101,16 +96,12 @@ class Entity extends EntityParent implements EntityInterfaceB
         return 'Overridden data';
     }
 
-    /**
-     * @Assert\Callback(payload="foo")
-     */
+    #[Assert\Callback(payload: 'foo')]
     public function validateMe(ExecutionContextInterface $context)
     {
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public static function validateMeStatic($object, ExecutionContextInterface $context)
     {
     }

@@ -18,9 +18,9 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
-use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 
 /**
@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Reference;
  */
 abstract class AbstractValidatorTest extends TestCase
 {
-    const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    const ENTITY_CLASS = Entity::class;
 
     const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
 

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Annotation;
 
-use Attribute;
-
 /**
  * Annotation class for @Route().
  *
@@ -22,7 +20,7 @@ use Attribute;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Route
 {
     private $path;

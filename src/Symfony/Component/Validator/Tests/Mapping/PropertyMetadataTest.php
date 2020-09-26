@@ -13,16 +13,17 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy;
 
 class PropertyMetadataTest extends TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    const CLASSNAME = Entity::class;
     const CLASSNAME_74 = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74';
     const CLASSNAME_74_PROXY = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy';
-    const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    const PARENTCLASS = EntityParent::class;
 
     public function testInvalidPropertyName()
     {

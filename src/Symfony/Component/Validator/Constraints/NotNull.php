@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class NotNull extends Constraint
 {
     const IS_NULL_ERROR = 'ad32d13f-c3d4-423b-909a-857b961eb720';
@@ -28,4 +29,11 @@ class NotNull extends Constraint
     ];
 
     public $message = 'This value should not be null.';
+
+    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    {
+        parent::__construct($options ?? [], $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

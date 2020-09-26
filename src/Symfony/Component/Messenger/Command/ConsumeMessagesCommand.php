@@ -67,7 +67,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
-                new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
+                new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can handle new messages'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
             ])
@@ -93,7 +93,7 @@ Use the --memory-limit option to stop the worker if it exceeds a given memory us
 
     <info>php %command.full_name% <receiver-name> --memory-limit=128M</info>
 
-Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached:
+Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached (if a message is being handled, the worker will stop after the processing finished):
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
 

@@ -111,7 +111,7 @@ trait HttpClientTrait
             throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string or an array, "%s" given.', get_debug_type($options['auth_basic'])));
         }
 
-        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._=~+/0-9a-zA-Z]++$}', $options['auth_bearer']))) {
+        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._=:~+/0-9a-zA-Z]++$}', $options['auth_bearer']))) {
             throw new InvalidArgumentException(sprintf('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, %s given.', \is_string($options['auth_bearer']) ? 'invalid string' : '"'.get_debug_type($options['auth_bearer']).'"'));
         }
 

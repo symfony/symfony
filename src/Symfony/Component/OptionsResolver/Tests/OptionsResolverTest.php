@@ -524,7 +524,9 @@ class OptionsResolverTest extends TestCase
     {
         $count = 0;
         error_clear_last();
-        set_error_handler(function () use (&$count) {
+        set_error_handler(function (int $type) use (&$count) {
+            $this->assertSame(\E_USER_DEPRECATED, $type);
+
             ++$count;
 
             return false;

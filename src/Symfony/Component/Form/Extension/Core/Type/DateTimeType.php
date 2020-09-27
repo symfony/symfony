@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -338,13 +339,22 @@ class DateTimeType extends AbstractType
 
             return $timeWidget;
         });
-        $resolver->setNormalizer('html5', function (Options $options, $html5) {
-            if ($html5 && self::HTML5_FORMAT !== $options['format']) {
-                throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
-            }
+        foreach (['html5', 'format'] as $option) {
+            $resolver->setDeprecated($option, static function (Options $options, $value) use ($option): string {
+                try {
+                    $html5 = 'html5' === $option ? $value : $options['html5'];
+                    $format = 'format' === $option ? $value : $options['format'];
+                } catch (OptionDefinitionException $e) {
+                    return '';
+                }
 
-            return $html5;
-        });
+                if ($html5 && self::HTML5_FORMAT !== $format) {
+                    throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
+                }
+
+                return $html5;
+            });
+        }
     }
 
     /**

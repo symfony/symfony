@@ -108,6 +108,7 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
@@ -2217,6 +2218,7 @@ class FrameworkExtension extends Extension
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
+            SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
         ];
 
         foreach ($classToServices as $class => $service) {

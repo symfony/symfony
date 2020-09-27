@@ -7,6 +7,22 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.45 (2020-09-27)
+
+ * bug #38228 [Yaml Parser] Fix edge cases when parsing multiple documents (digilist)
+ * bug #38229 [Yaml] fix parsing comments not prefixed by a space (xabbuh)
+ * bug #38131 [Validator] allow consumers to mock all methods (xabbuh)
+ * bug #37097 DateTime validator support for trailing data (stefankleff)
+ * bug #38116 [Console] Silence warnings on sapi_windows_cp_set() call (chalasr)
+ * bug #38114 [Console] guard $argv + $token against null, preventing unnecessary exceptions (bilogic)
+ * bug #38099 Prevent parsing invalid octal digits as octal numbers (julienfalque)
+ * bug #38091 [DI] fix ContainerBuilder on PHP8 (nicolas-grekas)
+ * bug #38080 [Console] Make sure $maxAttempts is an int or null (derrabus)
+ * bug #38073 [VarDumper] Fix caster for invalid SplFileInfo objects on php 8 (derrabus)
+ * bug #38071 [PhpUnitBridge] Adjust output parsing of CoverageListenerTrait for PHPUnit 9.3 (sanmai, derrabus)
+ * bug #38049 [Debug] Parse "x not found" errors correctly on php 8 (derrabus)
+ * bug #38024 [Console] Fix undefined index for inconsistent command name definition (chalasr)
+
 * 3.4.44 (2020-08-31)
 
  * bug #37949 [Yaml] fix more numeric cases changing in PHP 8 (xabbuh)

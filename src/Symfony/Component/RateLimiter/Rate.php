@@ -74,6 +74,16 @@ final class Rate
     }
 
     /**
+     * Calculates the next moment of token availability.
+     *
+     * @return \DateTimeImmutable the next moment a token will be available
+     */
+    public function calculateNextTokenAvailability(): \DateTimeImmutable
+    {
+        return (new \DateTimeImmutable())->add($this->refillTime);
+    }
+
+    /**
      * Calculates the number of new free tokens during $duration.
      *
      * @param float $duration interval in seconds

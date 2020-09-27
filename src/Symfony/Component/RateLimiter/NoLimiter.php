@@ -23,9 +23,9 @@ namespace Symfony\Component\RateLimiter;
  */
 final class NoLimiter implements LimiterInterface
 {
-    public function consume(int $tokens = 1): bool
+    public function consume(int $tokens = 1): Limit
     {
-        return true;
+        return new Limit(\INF, new \DateTimeImmutable(), true, 'no_limit');
     }
 
     public function reset(): void

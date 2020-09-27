@@ -48,7 +48,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
         $limiterKey = $this->createLimiterKey($username, $request);
 
         $limiter = $this->limiter->create($limiterKey);
-        if (!$limiter->consume()) {
+        if (!$limiter->consume()->isAccepted()) {
             throw new TooManyLoginAttemptsAuthenticationException();
         }
     }

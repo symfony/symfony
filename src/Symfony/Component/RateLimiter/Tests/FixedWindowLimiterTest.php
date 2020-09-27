@@ -40,8 +40,10 @@ class FixedWindowLimiterTest extends TestCase
             sleep(5);
         }
 
-        $this->assertTrue($limiter->consume());
-        $this->assertFalse($limiter->consume());
+        $limit = $limiter->consume();
+        $this->assertTrue($limit->isAccepted());
+        $limit = $limiter->consume();
+        $this->assertFalse($limit->isAccepted());
     }
 
     public function testConsumeOutsideInterval()
@@ -55,7 +57,9 @@ class FixedWindowLimiterTest extends TestCase
         $limiter->consume(9);
         // ...try bursting again at the start of the next window
         sleep(10);
-        $this->assertTrue($limiter->consume(10));
+        $limit = $limiter->consume(10);
+        $this->assertEquals(0, $limit->getRemainingTokens());
+        $this->assertEquals(time() + 60, $limit->getRetryAfter()->getTimestamp());
     }
 
     private function createLimiter(): FixedWindowLimiter

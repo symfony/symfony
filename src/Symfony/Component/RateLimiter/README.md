@@ -32,7 +32,7 @@ $limiter->reserve(1)->wait();
 // ... execute the code
 
 // only claims 1 token if it's free at this moment (useful if you plan to skip this process)
-if ($limiter->consume(1)) {
+if ($limiter->consume(1)->isAccepted()) {
    // ... execute the code
 }
 ```

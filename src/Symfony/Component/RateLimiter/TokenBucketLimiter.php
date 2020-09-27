@@ -103,14 +103,20 @@ final class TokenBucketLimiter implements LimiterInterface
     /**
      * {@inheritdoc}
      */
-    public function consume(int $tokens = 1): bool
+    public function consume(int $tokens = 1): Limit
     {
+        $bucket = $this->storage->fetch($this->id);
+        if (null === $bucket) {
+            $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
+        }
+        $now = microtime(true);
+
         try {
             $this->reserve($tokens, 0);
 
-            return true;
+            return new Limit($bucket->getAvailableTokens($now) - $tokens, $this->rate->calculateNextTokenAvailability(), true);
         } catch (MaxWaitDurationExceededException $e) {
-            return false;
+            return new Limit($bucket->getAvailableTokens($now), $this->rate->calculateNextTokenAvailability(), false);
         }
     }
 }

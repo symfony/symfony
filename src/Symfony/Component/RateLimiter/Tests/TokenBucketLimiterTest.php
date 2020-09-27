@@ -69,13 +69,21 @@ class TokenBucketLimiterTest extends TestCase
 
     public function testConsume()
     {
-        $limiter = $this->createLimiter();
+        $rate = Rate::perSecond(10);
+        $limiter = $this->createLimiter(10, $rate);
 
         // enough free tokens
-        $this->assertTrue($limiter->consume(5));
+        $limit = $limiter->consume(5);
+        $this->assertTrue($limit->isAccepted());
+        $this->assertEquals(5, $limit->getRemainingTokens());
+        $this->assertEqualsWithDelta(time(), $limit->getRetryAfter()->getTimestamp(), 1);
         // there are only 5 available free tokens left now
-        $this->assertFalse($limiter->consume(10));
-        $this->assertTrue($limiter->consume(5));
+        $limit = $limiter->consume(10);
+        $this->assertEquals(5, $limit->getRemainingTokens());
+
+        $limit = $limiter->consume(5);
+        $this->assertEquals(0, $limit->getRemainingTokens());
+        $this->assertEqualsWithDelta(time(), $limit->getRetryAfter()->getTimestamp(), 1);
     }
 
     private function createLimiter($initialTokens = 10, Rate $rate = null)

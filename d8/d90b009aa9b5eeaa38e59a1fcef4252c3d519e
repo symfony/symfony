@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-08-31T07:52:35Z
+
+The method is also used in [src/Symfony/Component/Cache/Traits/RedisTrait.php](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Cache/Traits/RedisTrait.php) and in [src/Symfony/Component/Messenger/Bridge/Redis/Transport/Connection.php
+](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Bridge/Redis/Transport/Connection.php)
+
+Would you advise updating these also? If yes, can you please update the PR?
+I'm fine with dropping support for Redis 3 on 5.2.
+
+Can you please add a note in the UPGRADE-5.2 file, in each component's section?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-06T07:51:06Z
+
+@jonashrem Still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by jonashrem at 2020-09-06T20:27:18Z
+
+@fabpot yes, I was just a bit busy the last days. I still plan looking into this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-09T09:25:45Z
+
+/cc @andrerom btw, any opinion about the proposed bump to Redis >= 4?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2020-09-11T18:25:06Z
+
+For master that should be ok from my POV 👍
+
+Make sure to mention it clearly in release notes though, not everyone expect bumps in requirements in minor releases.
+
+---------------------------------------------------------------------------
+
+by jonashrem at 2020-09-13T12:53:12Z
+
+I replaced the other occurrences.
+
+For the failing auto-tests, is it possible the test instance is still using redis 3?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-14T09:06:28Z
+
+> For the failing auto-tests, is it possible the test instance is still using redis 3?
+
+The CI runs Redis 6 apparently, but the failures are helpful: `Predis` doesn't know about the unlink command. Looking at the code, that's the case: https://github.com/predis/predis/tree/main/src/Command/Redis
+
+Would you like to send a PR there to add the command?
+
+Also, can't we add a command "manually" on our side in order to teach Predis about it?
+
+Last note here: don't forget to add a note in the UPGRADE-5.2 file, in each component's section.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-24T14:29:34Z
+
+@jonashrem friendly ping. Are you OK with my previous comment?
+
+---------------------------------------------------------------------------
+
+by jonashrem at 2020-09-24T14:37:25Z
+
+> @jonashrem friendly ping. Are you OK with my previous comment?
+
+yes, that's fine. I will look into this further if it's possible to set this manually.
+
+---------------------------------------------------------------------------
+
+by jonashrem at 2020-09-27T10:32:11Z
+
+oh, that's a very good idea.
+
+In this case we don't even loose backwards compatibility with redis 3.x.
+
+Very nice.
+
+So for my understanding when the Integration tests run through there is nothing left to do here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-27T10:34:23Z
+
+> So for my understanding when the Integration tests run through there is nothing left to do here?
+
+Correct, there should be nothing else to do here. Now waiting for the CI to be green for the components.

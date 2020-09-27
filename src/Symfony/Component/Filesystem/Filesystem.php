@@ -599,13 +599,13 @@ class Filesystem
      */
     public function isAbsolutePath($file)
     {
-        return strspn($file, '/\\', 0, 1)
+        return '' !== (string) $file && (strspn($file, '/\\', 0, 1)
             || (\strlen($file) > 3 && ctype_alpha($file[0])
                 && ':' === $file[1]
                 && strspn($file, '/\\', 2, 1)
             )
             || null !== parse_url($file, \PHP_URL_SCHEME)
-        ;
+        );
     }
 
     /**

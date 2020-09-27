@@ -42,6 +42,8 @@ Lock
 ----
 
  * `MongoDbStore` does not implement `BlockingStoreInterface` anymore, typehint against `PersistingStoreInterface` instead.
+ * deprecated `NotSupportedException`, it shouldn't be thrown anymore.
+ * deprecated `RetryTillSaveStore`, logic has been moved in `Lock` and is not needed anymore.
 
 Mime
 ----

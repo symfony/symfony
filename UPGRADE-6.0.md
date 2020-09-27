@@ -77,6 +77,12 @@ Inflector
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
 
+Lock
+----
+
+ * Removed the `NotSupportedException`. It shouldn't be thrown anymore.
+ * Removed the `RetryTillSaveStore`. Logic has been moved in `Lock` and is not needed anymore.
+
 Mailer
 ------
 

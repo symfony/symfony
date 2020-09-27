@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
@@ -353,18 +352,6 @@ class CombinedStoreTest extends AbstractStoreTest
             ->with($key);
 
         $this->store->delete($key);
-    }
-
-    public function testSaveReadWithIncompatibleStores()
-    {
-        $key = new Key(uniqid(__METHOD__, true));
-
-        $badStore = $this->createMock(PersistingStoreInterface::class);
-
-        $store = new CombinedStore([$badStore], new UnanimousStrategy());
-        $this->expectException(NotSupportedException::class);
-
-        $store->saveRead($key);
     }
 
     public function testSaveReadWithCompatibleStore()

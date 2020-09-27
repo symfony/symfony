@@ -16,18 +16,21 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\SharedLockStoreInterface;
+
+trigger_deprecation('symfony/lock', '5.2', '%s is deprecated, the "%s" class provides the logic when store is not blocking.', RetryTillSaveStore::class, Lock::class);
 
 /**
  * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
  * blocking storage.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @deprecated since Symfony 5.2
  */
-class RetryTillSaveStore implements BlockingStoreInterface, SharedLockStoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -76,24 +79,6 @@ class RetryTillSaveStore implements BlockingStoreInterface, SharedLockStoreInter
         $this->logger->warning('Failed to store the "{resource}" lock. Abort after {retry} retry.', ['resource' => $key, 'retry' => $retry]);
 
         throw new LockConflictedException();
-    }
-
-    public function saveRead(Key $key)
-    {
-        if (!$this->decorated instanceof SharedLockStoreInterface) {
-            throw new NotSupportedException(sprintf('The "%s" store must decorate a "%s" store.', get_debug_type($this), ShareLockStoreInterface::class));
-        }
-
-        $this->decorated->saveRead($key);
-    }
-
-    public function waitAndSaveRead(Key $key)
-    {
-        if (!$this->decorated instanceof SharedLockStoreInterface) {
-            throw new NotSupportedException(sprintf('The "%s" store must decorate a "%s" store.', get_debug_type($this), ShareLockStoreInterface::class));
-        }
-
-        $this->decorated->waitAndSaveRead($key);
     }
 
     /**

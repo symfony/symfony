@@ -144,7 +144,10 @@ class BundleEntryReaderTest extends TestCase
                 [self::RES_DIR, 'en_GB'],
                 [self::RES_DIR, 'en']
             )
-            ->willReturnOnConsecutiveCalls(self::$data, self::$fallbackData);
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new ResourceBundleNotFoundException()),
+                self::$fallbackData
+            );
 
         $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
@@ -283,7 +286,7 @@ class BundleEntryReaderTest extends TestCase
                 [self::RES_DIR, 'en_GB'],
                 [self::RES_DIR, 'en']
             )
-            ->willReturnOnConsecutiveCalls(['Foo' => 'Baz'], ['Foo' => 'Baz']);
+            ->willReturnOnConsecutiveCalls(['Foo' => 'Baz'], ['Foo' => 'Bar']);
 
         $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true);
     }

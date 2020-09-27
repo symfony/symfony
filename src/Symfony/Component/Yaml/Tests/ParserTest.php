@@ -2457,19 +2457,13 @@ a:
 c: d
 YAML;
 
-        $expected = ['a' => ['b' => "row\nrow2\n"], 'c' => 'd'];
-
-        // The parser was not used before, so there is a new line after row2
-        $this->assertSame($expected, $this->parser->parse($longDocument));
-
-        $parser = new Parser();
         // The first parsing set and fixed the totalNumberOfLines in the Parser before, so parsing the short document here
         // to reproduce the issue. If the issue would not have been fixed, the next assertion will fail
-        $parser->parse($shortDocument);
+        $this->parser->parse($shortDocument);
 
-        // After the total number of lines has been rset the result will be the same as if a new parser was used
+        // After the total number of lines has been reset the result will be the same as if a new parser was used
         // (before, there was no \n after row2)
-        $this->assertSame($expected, $parser->parse($longDocument));
+        $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
 }
 

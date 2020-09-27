@@ -955,7 +955,11 @@ class ResponseTest extends ResponseTestCase
             ],
         ]);
 
-        $ianaHttpStatusCodes->loadXML(file_get_contents('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml', false, $context));
+        if (!$rawStatusCodes = file_get_contents('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml', false, $context)) {
+            $this->markTestSkipped('The IANA server is throttling the list of status codes');
+        }
+
+        $ianaHttpStatusCodes->loadXML($rawStatusCodes);
         if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
             self::fail('Invalid IANA\'s HTTP status code list.');
         }

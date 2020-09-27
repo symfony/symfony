@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -328,13 +329,23 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('days', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
 
-        $resolver->setNormalizer('html5', function (Options $options, $html5) {
-            if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {
-                throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
-            }
+        foreach (['html5', 'widget', 'format'] as $option) {
+            $resolver->setDeprecated($option, static function (Options $options, $value) use ($option): string {
+                try {
+                    $html5 = 'html5' === $option ? $value : $options['html5'];
+                    $widget = 'widget' === $option ? $value : $options['widget'];
+                    $format = 'format' === $option ? $value : $options['format'];
+                } catch (OptionDefinitionException $e) {
+                    return '';
+                }
 
-            return $html5;
-        });
+                if ($html5 && 'single_text' === $widget && self::HTML5_FORMAT !== $format) {
+                    throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
+                }
+
+                return $html5;
+            });
+        }
     }
 
     /**

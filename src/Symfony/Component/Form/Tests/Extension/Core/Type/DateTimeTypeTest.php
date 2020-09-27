@@ -520,6 +520,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'widget' => 'single_text',
             'date_format' => \IntlDateFormatter::SHORT,
             'format' => null,
+            'html5' => false,
         ]);
         $view = $form->createView();
 

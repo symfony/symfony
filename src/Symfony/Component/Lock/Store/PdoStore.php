@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
@@ -163,7 +162,7 @@ class PdoStore implements PersistingStoreInterface
         $result = $stmt->execute();
 
         // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
-        if (!($result instanceof Result ? $result : $stmt)->rowCount() && !$this->exists($key)) {
+        if (!(\is_object($result) ? $result : $stmt)->rowCount() && !$this->exists($key)) {
             throw new LockConflictedException();
         }
 
@@ -195,7 +194,7 @@ class PdoStore implements PersistingStoreInterface
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $result = $stmt->execute();
 
-        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
+        return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**

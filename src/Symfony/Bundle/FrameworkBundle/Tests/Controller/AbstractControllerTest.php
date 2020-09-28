@@ -514,6 +514,22 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals($form, $controller->createForm('foo'));
     }
 
+    public function testCreateNamedForm()
+    {
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
+        
+        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $formFactory->expects($this->once())->method('createNamed')->willReturn($form);
+        
+        $container = new Container();
+        $container->set('form.factory', $formFactory);
+        
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        
+        $this->assertEquals($form, $controller->createNamedForm('foo', 'bar'));
+    }
+
     public function testCreateFormBuilder()
     {
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilderInterface')->getMock();

@@ -15,6 +15,9 @@ where:
  - `API_KEY` is your api key from your Sendinblue account
  - `PHONE` is your sender's phone number
 
+You can also add **type**, **tag** and **webUrl** in parameter like the sender.
+Those parameters are optional.
+
 See more info at https://developers.sendinblue.com/reference#sendtransacsms
 
 Resources

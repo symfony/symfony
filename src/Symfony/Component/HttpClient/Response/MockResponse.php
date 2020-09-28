@@ -41,7 +41,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     /**
      * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
      *                                       yielding an empty string simulates an idle timeout,
-     *                                       exceptions are turned to TransportException
+     *                                       exceptions are turned to ProviderException
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
      */

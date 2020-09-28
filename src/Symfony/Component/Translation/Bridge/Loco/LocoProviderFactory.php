@@ -19,6 +19,11 @@ use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 5.2
+ */
 final class LocoProviderFactory extends AbstractProviderFactory
 {
     /** @var LoaderInterface */

@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation\Bridge\PoEditor;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\Exception\TransportException;
+use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProvider;
 use Symfony\Component\Translation\TranslatorBag;
@@ -71,13 +71,13 @@ final class PoEditorProvider extends AbstractProvider
                     $terms[] = [
                         'term' => $id,
                         'reference' => $id,
-                        'tags' => [$domain]
+                        'tags' => [$domain],
                     ];
                     $translations[$locale][] = [
                         'term' => $id,
                         'translation' => [
                             'content' => $message,
-                        ]
+                        ],
                     ];
                 }
                 $this->addTerms($terms);
@@ -110,7 +110,7 @@ final class PoEditorProvider extends AbstractProvider
             $exportResponseContent = $exportResponse->getContent(false);
 
             if (Response::HTTP_OK !== $exportResponse->getStatusCode()) {
-                throw new TransportException('Unable to read the POEditor response: '.$exportResponseContent, $exportResponse);
+                throw new ProviderException('Unable to read the POEditor response: '.$exportResponseContent, $exportResponse);
             }
 
             $response = $this->client->request('GET', json_decode($exportResponseContent, true)['result']['url'], [
@@ -159,7 +159,7 @@ final class PoEditorProvider extends AbstractProvider
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to POEditor: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add new translation key (%s) to POEditor: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
@@ -171,12 +171,12 @@ final class PoEditorProvider extends AbstractProvider
                 'api_token' => $this->apiKey,
                 'id' => $this->projectId,
                 'language' => $locale,
-                'data' => json_encode($translations)
+                'data' => json_encode($translations),
             ],
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add translation messages to POEditor: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add translation messages to POEditor: "%s".', $response->getContent(false)), $response);
         }
     }
 
@@ -188,12 +188,12 @@ final class PoEditorProvider extends AbstractProvider
                 'api_token' => $this->apiKey,
                 'id' => $this->projectId,
                 'language' => $locale,
-                'data' => json_encode($translations)
+                'data' => json_encode($translations),
             ],
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add translation messages to POEditor: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add translation messages to POEditor: "%s".', $response->getContent(false)), $response);
         }
     }
 
@@ -204,12 +204,12 @@ final class PoEditorProvider extends AbstractProvider
             'body' => [
                 'api_token' => $this->apiKey,
                 'id' => $this->projectId,
-                'data' => json_encode($ids)
+                'data' => json_encode($ids),
             ],
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to delete translation keys on POEditor: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to delete translation keys on POEditor: "%s".', $response->getContent(false)), $response);
         }
     }
 }

@@ -13,11 +13,8 @@ namespace Symfony\Component\Translation\Bridge\Transifex;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Part\DataPart;
-use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\Translation\Exception\TransifexNoResourceException;
-use Symfony\Component\Translation\Exception\TransportException;
+use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProvider;
 use Symfony\Component\Translation\TranslatorBag;
@@ -93,13 +90,12 @@ final class TransifexProvider extends AbstractProvider
 
     public function delete(TranslatorBag $translations): void
     {
-
     }
 
     protected function getDefaultHeaders(): array
     {
         return [
-            'Authorization' => 'Basic ' . base64_encode('api:' . $this->apiKey),
+            'Authorization' => 'Basic '.base64_encode('api:'.$this->apiKey),
             'Content-Type' => 'application/json',
         ];
     }
@@ -110,13 +106,13 @@ final class TransifexProvider extends AbstractProvider
             'headers' => $this->getDefaultHeaders(),
         ]);
 
-        $resources = array_reduce(json_decode($response->getContent(), true), function($carry, $resource) {
+        $resources = array_reduce(json_decode($response->getContent(), true), function ($carry, $resource) {
             $carry[] = $resource['name'];
 
             return $carry;
         }, []);
 
-        if (in_array($id, $resources)) {
+        if (\in_array($id, $resources)) {
             return;
         }
 
@@ -137,7 +133,7 @@ final class TransifexProvider extends AbstractProvider
         }
 
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to Transifex: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add new translation key (%s) to Transifex: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
@@ -146,12 +142,12 @@ final class TransifexProvider extends AbstractProvider
         $response = $this->client->request('PUT', sprintf('https://%s/project/%s/resource/%s/translation/%s/', $this->getEndpoint(), $this->getProjectSlug($domain), $id, $locale), [
             'headers' => $this->getDefaultHeaders(),
             'body' => json_encode([
-                'content' => $message
+                'content' => $message,
             ]),
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to translate "%s : %s" in locale "%s" to Transifex: (status code: "%s") "%s".', $id, $message, $locale, $response->getStatusCode(), $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to translate "%s : "%s"" in locale "%s" to Transifex: (status code: "%s") "%s".', $id, $message, $locale, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
@@ -163,13 +159,13 @@ final class TransifexProvider extends AbstractProvider
             'headers' => $this->getDefaultHeaders(),
         ]);
 
-        $projectNames = array_reduce(json_decode($response->getContent(), true), function($carry, $project) {
+        $projectNames = array_reduce(json_decode($response->getContent(), true), function ($carry, $project) {
             $carry[] = $project['name'];
 
             return $carry;
         }, []);
 
-        if (in_array($projectName, $projectNames)) {
+        if (\in_array($projectName, $projectNames)) {
             return;
         }
 
@@ -178,20 +174,20 @@ final class TransifexProvider extends AbstractProvider
             'body' => json_encode([
                 'name' => $projectName,
                 'slug' => $this->getProjectSlug($domain),
-                'description' => $domain . ' translations domain',
+                'description' => $domain.' translations domain',
                 'source_language_code' => $this->defaultLocale,
-                'repository_url' => 'http://github.com/php-translation/symfony' // @todo: only for test purpose, to remove
+                'repository_url' => 'http://github.com/php-translation/symfony', // @todo: only for test purpose, to remove
             ]),
         ]);
 
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add new project named "%s" to Transifex: (status code: "%s") "%s".', $projectName, $response->getStatusCode(), $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add new project named "%s" to Transifex: (status code: "%s") "%s".', $projectName, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
     private function getProjectName(string $domain): string
     {
-        return $this->projectSlug . '-' . $domain;
+        return $this->projectSlug.'-'.$domain;
     }
 
     private function getProjectSlug(string $domain): string

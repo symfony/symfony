@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\Exception\TransportException;
+use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProvider;
 use Symfony\Component\Translation\TranslatorBag;
@@ -104,7 +104,7 @@ final class LocoProvider extends AbstractProvider
             $responseContent = $response->getContent(false);
 
             if (Response::HTTP_OK !== $response->getStatusCode()) {
-                throw new TransportException('Unable to read the Loco response: '.$responseContent, $response);
+                throw new ProviderException('Unable to read the Loco response: '.$responseContent, $response);
             }
 
             foreach ($domains as $domain) {
@@ -140,7 +140,7 @@ final class LocoProvider extends AbstractProvider
     protected function getDefaultHeaders(): array
     {
         return [
-            'Authorization' => 'Loco ' . $this->apiKey,
+            'Authorization' => 'Loco '.$this->apiKey,
         ];
     }
 
@@ -164,7 +164,7 @@ final class LocoProvider extends AbstractProvider
                 'id' => $id,
             ]);
         } elseif (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add new translation key (%s) to Loco: (status code: "%s") "%s".', $id, $response->getStatusCode(), $response->getContent(false)), $response);
         }
     }
 
@@ -176,7 +176,7 @@ final class LocoProvider extends AbstractProvider
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add translation message "%s" (for key: "%s") to Loco: "%s".', $message, $id, $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add translation message "%s" (for key: "%s") to Loco: "%s".', $message, $id, $response->getContent(false)), $response);
         }
     }
 
@@ -194,7 +194,7 @@ final class LocoProvider extends AbstractProvider
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add tag (%s) on translation keys (%s) to Loco: "%s".', $tag, $idsAsString, $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add tag (%s) on translation keys (%s) to Loco: "%s".', $tag, $idsAsString, $response->getContent(false)), $response);
         }
     }
 
@@ -208,7 +208,7 @@ final class LocoProvider extends AbstractProvider
         ]);
 
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to create tag (%s) on Loco: "%s".', $tag, $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to create tag (%s) on Loco: "%s".', $tag, $response->getContent(false)), $response);
         }
     }
 
@@ -221,7 +221,7 @@ final class LocoProvider extends AbstractProvider
         $content = $response->getContent(false);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to get tags on Loco: "%s".', $content), $response);
+            throw new ProviderException(sprintf('Unable to get tags on Loco: "%s".', $content), $response);
         }
 
         return json_decode($content);
@@ -234,7 +234,7 @@ final class LocoProvider extends AbstractProvider
         ]);
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to add new translation key (%s) to Loco: "%s".', $id, $response->getContent(false)), $response);
+            throw new ProviderException(sprintf('Unable to add new translation key (%s) to Loco: "%s".', $id, $response->getContent(false)), $response);
         }
     }
 }

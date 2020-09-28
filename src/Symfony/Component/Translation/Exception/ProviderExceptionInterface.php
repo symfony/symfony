@@ -14,9 +14,9 @@ namespace Symfony\Component\Translation\Exception;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
-interface TransportExceptionInterface extends ExceptionInterface
+interface ProviderExceptionInterface extends ExceptionInterface
 {
     public function getDebug(): string;
 }

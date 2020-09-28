@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
-use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
 use Symfony\Component\Translation\Bridge\Transifex\TransifexProviderFactory;
@@ -38,6 +37,7 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.provider_factory.crowdin', CrowdinProviderFactory::class)
             ->args([
                 service('translation.loader.xliff_raw'),
+                service('translation.dumper.xliff'),
             ])
             ->parent('translation.provider_factory.abstract')
             ->tag('translation.provider_factory')
@@ -52,7 +52,7 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.provider_factory.transifex', TransifexProviderFactory::class)
             ->args([
                 service('translation.loader.xliff_raw'),
-                service('slugger')
+                service('slugger'),
             ])
             ->parent('translation.provider_factory.abstract')
             ->tag('translation.provider_factory')

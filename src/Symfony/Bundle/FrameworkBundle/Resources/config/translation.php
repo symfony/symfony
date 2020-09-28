@@ -28,7 +28,6 @@ use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
-use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 use Symfony\Component\Translation\Loader\IcuResFileLoader;

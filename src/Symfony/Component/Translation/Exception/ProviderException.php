@@ -18,10 +18,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @experimental in 5.2
  */
-class TransportException extends RuntimeException implements TransportExceptionInterface
+class ProviderException extends RuntimeException implements ProviderExceptionInterface
 {
     private $response;
-    private $debug = '';
+    private $debug;
 
     public function __construct(string $message, ResponseInterface $response, int $code = 0, \Exception $previous = null)
     {

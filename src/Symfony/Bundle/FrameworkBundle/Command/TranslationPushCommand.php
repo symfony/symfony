@@ -21,6 +21,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslationProviders;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 5.2
+ */
 final class TranslationPushCommand extends Command
 {
     use TranslationTrait;

@@ -23,6 +23,11 @@ use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslationProviders;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 5.2
+ */
 final class TranslationPullCommand extends Command
 {
     use TranslationTrait;

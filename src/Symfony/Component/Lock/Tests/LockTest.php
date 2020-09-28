@@ -13,11 +13,13 @@ namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -40,7 +42,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    public function testAcquireNoBlockingStoreInterface()
+    public function testAcquireNoBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
@@ -54,6 +56,44 @@ class LockTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquire(false));
+    }
+
+    public function testAcquireBlockingWithPersistingStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('save');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquire(true));
+    }
+
+    public function testAcquireBlockingRetryWithPersistingStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquire(true));
     }
 
     public function testAcquireReturnsFalse()
@@ -90,7 +130,7 @@ class LockTest extends TestCase
         $this->assertFalse($lock->acquire(false));
     }
 
-    public function testAcquireBlocking()
+    public function testAcquireBlockingWithBlockingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -371,5 +411,97 @@ class LockTest extends TestCase
         yield [[], false];
         yield [[0.1], false];
         yield [[-0.1, null], false];
+    }
+
+    public function testAcquireReadNoBlockingWithSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(SharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('saveRead');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(false));
+    }
+
+    public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(BlockingSharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('waitAndSaveRead');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(SharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('saveRead')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithBlockingLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(BlockingStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('waitAndSave');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithPersistingStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
     }
 }

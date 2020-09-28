@@ -71,7 +71,8 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                 if (!$this->store instanceof BlockingStoreInterface) {
                     while (true) {
                         try {
-                            $this->store->wait($this->key);
+                            $this->store->save($this->key);
+                            break;
                         } catch (LockConflictedException $e) {
                             usleep((100 + random_int(-10, 10)) * 1000);
                         }
@@ -127,7 +128,18 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                 return $this->acquire($blocking);
             }
             if ($blocking) {
-                $this->store->waitAndSaveRead($this->key);
+                if (!$this->store instanceof BlockingSharedLockStoreInterface) {
+                    while (true) {
+                        try {
+                            $this->store->saveRead($this->key);
+                            break;
+                        } catch (LockConflictedException $e) {
+                            usleep((100 + random_int(-10, 10)) * 1000);
+                        }
+                    }
+                } else {
+                    $this->store->waitAndSaveRead($this->key);
+                }
             } else {
                 $this->store->saveRead($this->key);
             }

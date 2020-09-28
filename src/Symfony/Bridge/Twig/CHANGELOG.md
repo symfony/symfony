@@ -6,7 +6,7 @@ CHANGELOG
 
  * added the `impersonation_exit_url()` and `impersonation_exit_path()` functions. They return a URL that allows to switch back to the original user.
  * added the `workflow_transition()` function to easily retrieve a specific transition object
- * added support for translating `Translatable` objects
+ * added support for translating `TranslatableInterface` objects
  * added the `t()` function to easily create `Translatable` objects
  * Added support for extracting messages from the `t()` function
 

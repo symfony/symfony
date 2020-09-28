@@ -19,6 +19,11 @@ use Symfony\Component\Translation\TranslatorBag;
 interface ProviderInterface
 {
     /**
+     * Returns the Provider name.
+     */
+    public function getName(): string;
+
+    /**
      * Writes given translation to the provider.
      *
      * * Translations available in the MessageCatalogue only must be created.

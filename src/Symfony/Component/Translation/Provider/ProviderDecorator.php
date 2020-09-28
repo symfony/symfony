@@ -26,6 +26,11 @@ class ProviderDecorator implements ProviderInterface
         $this->domains = $domains;
     }
 
+    public function getName(): string
+    {
+        return $this->provider->getName();
+    }
+
     /**
      * {@inheritdoc}
      */

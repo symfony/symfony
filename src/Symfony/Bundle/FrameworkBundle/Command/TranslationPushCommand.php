@@ -101,7 +101,7 @@ EOF
 
         $io = new SymfonyStyle($input, $output);
 
-        $provider = $this->providers->get($provider = $input->getArgument('provider'));
+        $provider = $this->providers->get($input->getArgument('provider'));
         $domains = $input->getOption('domains');
         $locales = $input->getOption('locales');
         $force = $input->getOption('force');

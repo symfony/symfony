@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Phrase;
+namespace Symfony\Component\Translation\Bridge\Transifex;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
@@ -19,35 +20,39 @@ use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class PhraseProviderFactory extends AbstractProviderFactory
+final class TransifexProviderFactory extends AbstractProviderFactory
 {
     /** @var LoaderInterface */
     private $loader;
 
-    public function __construct(HttpClientInterface $client = null, LoggerInterface $logger = null, string $defaultLocale = null, LoaderInterface $loader = null)
+    /** @var AsciiSlugger */
+    private $slugger;
+
+    public function __construct(HttpClientInterface $client = null, LoggerInterface $logger = null, string $defaultLocale = null, LoaderInterface $loader = null, AsciiSlugger $slugger = null)
     {
         parent::__construct($client, $logger, $defaultLocale);
 
         $this->loader = $loader;
+        $this->slugger = $slugger;
     }
 
     /**
-     * @return PhraseProvider
+     * @return TransifexProvider
      */
     public function create(Dsn $dsn): ProviderInterface
     {
-        if ('phrase' === $dsn->getScheme()) {
-            return (new PhraseProvider($this->getUser($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale))
+        if ('transifex' === $dsn->getScheme()) {
+            return (new TransifexProvider($this->getUser($dsn), $this->getPassword($dsn), $this->client, $this->loader, $this->logger, $this->defaultLocale, $this->slugger))
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort())
             ;
         }
 
-        throw new UnsupportedSchemeException($dsn, 'phrase', $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, 'transifex', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['phrase'];
+        return ['transifex'];
     }
 }

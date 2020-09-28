@@ -39,7 +39,7 @@ final class TranslatorBag implements TranslatorBagInterface
         $domains = [];
 
         foreach ($this->catalogues as $catalogue) {
-            $domains += $catalogue->all();
+            $domains += $catalogue->getDomains();
         }
 
         return array_unique($domains);

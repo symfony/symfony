@@ -143,8 +143,8 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
-use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
+use Symfony\Component\Translation\Bridge\Transifex\TransifexProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1235,8 +1235,8 @@ class FrameworkExtension extends Extension
             $classToServices = [
                 LocoProviderFactory::class => 'translation.provider_factory.loco',
                 CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
-                PhraseProviderFactory::class => 'translation.provider_factory.phrase',
                 PoEditorProviderFactory::class => 'translation.provider_factory.poeditor',
+                TransifexProviderFactory::class => 'translation.provider_factory.transifex',
             ];
 
             foreach ($classToServices as $class => $service) {
@@ -1335,8 +1335,8 @@ class FrameworkExtension extends Extension
             $classToServices = [
                 LocoProviderFactory::class => 'translation.provider_factory.loco',
                 CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
-                PhraseProviderFactory::class => 'translation.provider_factory.phrase',
                 PoEditorProviderFactory::class => 'translation.provider_factory.poeditor',
+                TransifexProviderFactory::class => 'translation.provider_factory.transifex',
             ];
 
             foreach ($classToServices as $class => $service) {

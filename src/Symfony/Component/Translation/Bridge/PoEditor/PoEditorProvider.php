@@ -25,6 +25,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @experimental in 5.2
  *
  * In POeditor:
+ * Terms refers to Symfony's translation keys;
+ * Translations refers to Symfony's translated messages;
+ * tags refers to Symfony's translation domains
  */
 final class PoEditorProvider extends AbstractProvider
 {
@@ -50,6 +53,11 @@ final class PoEditorProvider extends AbstractProvider
     public function __toString(): string
     {
         return sprintf('poeditor://%s', $this->getEndpoint());
+    }
+
+    public function getName(): string
+    {
+        return 'poeditor';
     }
 
     public function write(TranslatorBag $translatorBag, bool $override = false): void

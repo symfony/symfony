@@ -25,8 +25,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @experimental in 5.2
  *
  * In Loco:
- * tags refers to Symfony's translation domains
- * assets refers to Symfony's translation keys
+ * tags refers to Symfony's translation domains;
+ * assets refers to Symfony's translation keys;
  * translations refers to Symfony's translated messages
  */
 final class LocoProvider extends AbstractProvider
@@ -60,12 +60,17 @@ final class LocoProvider extends AbstractProvider
         return sprintf('loco://%s', $this->getEndpoint());
     }
 
+    public function getName(): string
+    {
+        return 'loco';
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function write(TranslatorBag $translations, bool $override = false): void
+    public function write(TranslatorBag $translatorBag, bool $override = false): void
     {
-        foreach ($translations->getCatalogues() as $catalogue) {
+        foreach ($translatorBag->getCatalogues() as $catalogue) {
             foreach ($catalogue->all() as $domain => $messages) {
                 $locale = $catalogue->getLocale();
                 $ids = [];

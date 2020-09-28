@@ -53,6 +53,11 @@ final class CrowdinProvider extends AbstractProvider
         return sprintf('crowdin://%s', $this->getEndpoint());
     }
 
+    public function getName(): string
+    {
+        return 'crowdin';
+    }
+
     public function write(TranslatorBag $translations, bool $override = false): void
     {
         foreach ($translations->getCatalogues() as $catalogue) {

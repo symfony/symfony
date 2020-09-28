@@ -15,7 +15,7 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Component\Translation\Translatable;
+use Symfony\Contracts\Translation\Translatable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
@@ -104,17 +104,17 @@ final class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @param ?string|Translatable $message The message id (may also be an object that can be cast to string)
+     * @param string|\Stringable|Translatable|null $message
      */
     public function trans($message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
         if ($message instanceof Translatable) {
             $arguments += $message->getParameters();
-            $domain = $message->getDomain();
+            $domain = $message->getDomain() ?? $domain;
             $message = $message->getMessage();
         }
 
-        if (null === $message || '' === $message) {
+        if ('' === $message = (string) $message) {
             return '';
         }
 
@@ -125,7 +125,7 @@ final class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
-    public function createTranslatable(string $message, array $parameters = [], string $domain = 'messages'): Translatable
+    public function createTranslatable(string $message, array $parameters = [], string $domain = null): Translatable
     {
         return new Translatable($message, $parameters, $domain);
     }

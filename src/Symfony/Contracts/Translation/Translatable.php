@@ -9,20 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation;
-
-use Symfony\Contracts\Translation\TranslatorInterface;
+namespace Symfony\Contracts\Translation;
 
 /**
  * @author Nate Wiebe <nate@northern.co>
  */
-final class Translatable
+class Translatable
 {
     private $message;
     private $parameters;
     private $domain;
 
-    public function __construct(string $message, array $parameters = [], string $domain = 'messages')
+    public function __construct(string $message, array $parameters = [], string $domain = null)
     {
         $this->message = $message;
         $this->parameters = $parameters;
@@ -31,7 +29,7 @@ final class Translatable
 
     public function __toString(): string
     {
-        return $this->message;
+        return $this->getMessage();
     }
 
     public function getMessage(): string
@@ -44,13 +42,13 @@ final class Translatable
         return $this->parameters;
     }
 
-    public function getDomain(): string
+    public function getDomain(): ?string
     {
         return $this->domain;
     }
 
-    public static function trans(TranslatorInterface $translator, self $translatable, ?string $locale = null): string
+    public function trans(TranslatorInterface $translator, string $locale = null): string
     {
-        return $translator->trans($translatable->getMessage(), $translatable->getParameters(), $translatable->getDomain(), $locale);
+        return $translator->trans($this->getMessage(), $this->getParameters(), $this->getDomain(), $locale);
     }
 }

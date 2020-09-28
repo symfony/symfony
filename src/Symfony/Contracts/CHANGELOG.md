@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added `Translation\Translatable` to represent a message that can be translated
+ * made `Translation\TranslatorTrait::getLocale()` fallback to intl's `Locale::getDefault()` when available
+
+2.2.0
+-----
+
+ * added `Service\Attribute\Required` attribute for PHP 8
+
 2.1.3
 -----
 

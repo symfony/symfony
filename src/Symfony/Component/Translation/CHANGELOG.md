@@ -6,7 +6,6 @@ CHANGELOG
 
  * added support for calling `trans` with ICU formatted messages
  * added `PseudoLocalizationTranslator`
- * added `Translatable` objects that represent a message that can be translated
  * added the `t()` function to easily create `Translatable` objects
  * Added support for extracting messages from `Translatable` objects
 

@@ -43,7 +43,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Display this help message",
+                        "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
                     "quiet": {
@@ -146,7 +146,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Display this help message",
+                        "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
                     "quiet": {

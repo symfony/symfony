@@ -55,7 +55,7 @@ To output raw command help
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no
@@ -173,7 +173,7 @@ The output format (txt, xml, json, or md)
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no

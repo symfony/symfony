@@ -28,7 +28,7 @@ Usage:
   %s
 
 Options:
-  -h, --help            Display this help message
+  -h, --help            Display help for the given command. When no command is given display help for the %s command
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
       --ansi            Force ANSI output

@@ -53,6 +53,10 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $server['REQUEST_URI'] = $uri->getPath();
             $server['QUERY_STRING'] = $uri->getQuery();
 
+            if ('' !== $server['QUERY_STRING']) {
+                $server['REQUEST_URI'] .= '?'.$server['QUERY_STRING'];
+            }
+
             if ('https' === $uri->getScheme()) {
                 $server['HTTPS'] = 'on';
             }
@@ -60,7 +64,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
         $server['REQUEST_METHOD'] = $psrRequest->getMethod();
 
-        $server = array_replace($server, $psrRequest->getServerParams());
+        $server = array_replace($psrRequest->getServerParams(), $server);
 
         $parsedBody = $psrRequest->getParsedBody();
         $parsedBody = \is_array($parsedBody) ? $parsedBody : [];

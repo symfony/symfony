@@ -133,8 +133,8 @@ class CovertTest extends TestCase
                 'SERVER_NAME' => 'dunglas.fr',
                 'SERVER_PORT' => null,
                 'HTTP_X_SYMFONY' => '2.8',
-                'REQUEST_URI' => '/testCreateRequest?bar[baz]=42&foo=1',
-                'QUERY_STRING' => 'foo=1&bar[baz]=42',
+                'REQUEST_URI' => '/testCreateRequest?foo=1&bar%5Bbaz%5D=42',
+                'QUERY_STRING' => 'foo=1&bar%5Bbaz%5D=42',
             ],
             'Content'
         );

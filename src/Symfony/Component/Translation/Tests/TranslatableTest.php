@@ -27,7 +27,7 @@ class TranslatableTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', [$translatable->getMessage() => $translation], $locale, $translatable->getDomain());
 
-        $this->assertSame($expected, Translatable::trans($translator, $translatable, $locale));
+        $this->assertSame($expected, $translatable->trans($translator, $locale));
     }
 
     /**
@@ -39,7 +39,7 @@ class TranslatableTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', $messages, 'fr', '');
 
-        $this->assertSame($expected, Translatable::trans($translator, $translatable, 'fr'));
+        $this->assertSame($expected, $translatable->trans($translator, 'fr'));
     }
 
     public function testToString()

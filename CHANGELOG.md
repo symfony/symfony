@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+# 2.0.2 (2020-09-29)
+
+  * Fix populating server params from URI in HttpFoundationFactory
+  * Create cookies as raw in HttpFoundationFactory
+  * Fix BinaryFileResponse with Content-Range PsrHttpFactory
+
 # 2.0.1 (2020-06-25)
 
   * Don't normalize query string in PsrHttpFactory

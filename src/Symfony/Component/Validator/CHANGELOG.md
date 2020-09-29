@@ -30,6 +30,7 @@ CHANGELOG
     */
    ```
  * added the `Isin` constraint and validator
+ * added the `ULID` constraint and validator
 
 5.1.0
 -----

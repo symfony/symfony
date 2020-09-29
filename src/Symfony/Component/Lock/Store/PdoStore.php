@@ -74,7 +74,6 @@ class PdoStore implements PersistingStoreInterface
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
-     * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
     public function __construct($connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)

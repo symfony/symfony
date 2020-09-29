@@ -15,6 +15,12 @@ jobs:
                 php: ['7.2', '7.4']
 
         services:
+            postgres:
+                image: postgres:9.6-alpine
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_PASSWORD: 'password'
             redis:
                 image: redis:6.0.0
                 ports:
@@ -144,6 +150,7 @@ jobs:
                     MEMCACHED_HOST: localhost
                     MONGODB_HOST: localhost
                     KAFKA_BROKER: localhost:9092
+                    POSTGRES_HOST: localhost
 
             -   name: Run HTTP push tests
                 if: matrix.php == '7.4'

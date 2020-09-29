@@ -15,9 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
 use Symfony\Component\Lock\Store\MongoDbStore;
 use Symfony\Component\Lock\Store\PdoStore;
+use Symfony\Component\Lock\Store\PostgreSqlStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Store\StoreFactory;
@@ -77,18 +79,24 @@ class StoreFactoryTest extends TestCase
             yield ['sqlite::memory:', PdoStore::class];
             yield ['mysql:host=localhost;dbname=test;', PdoStore::class];
             yield ['pgsql:host=localhost;dbname=test;', PdoStore::class];
+            yield ['pgsql+advisory:host=localhost;dbname=test;', PostgreSqlStore::class];
             yield ['oci:host=localhost;dbname=test;', PdoStore::class];
             yield ['sqlsrv:server=localhost;Database=test', PdoStore::class];
             yield ['mysql://server.com/test', PdoStore::class];
             yield ['mysql2://server.com/test', PdoStore::class];
             yield ['pgsql://server.com/test', PdoStore::class];
+            yield ['pgsql+advisory://server.com/test', PostgreSqlStore::class];
             yield ['postgres://server.com/test', PdoStore::class];
+            yield ['postgres+advisory://server.com/test', PostgreSqlStore::class];
             yield ['postgresql://server.com/test', PdoStore::class];
+            yield ['postgresql+advisory://server.com/test', PostgreSqlStore::class];
             yield ['sqlite:///tmp/test', PdoStore::class];
             yield ['sqlite3:///tmp/test', PdoStore::class];
             yield ['oci:///server.com/test', PdoStore::class];
             yield ['mssql:///server.com/test', PdoStore::class];
         }
+
+        yield ['in-memory', InMemoryStore::class];
 
         yield ['flock', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];

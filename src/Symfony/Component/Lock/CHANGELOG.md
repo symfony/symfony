@@ -9,6 +9,8 @@ CHANGELOG
  * added `NoLock`
  * deprecated `NotSupportedException`, it shouldn't be thrown anymore.
  * deprecated `RetryTillSaveStore`, logic has been moved in `Lock` and is not needed anymore.
+ * added `InMemoryStore`
+ * added `PostgreSqlStore`
 
 5.1.0
 -----

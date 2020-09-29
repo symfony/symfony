@@ -102,6 +102,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function saveRead(Key $key)
     {
         $script = '

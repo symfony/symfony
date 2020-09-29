@@ -182,6 +182,23 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $this->assertEquals('Binary', $psrResponse->getBody()->__toString());
     }
 
+    public function testCreateResponseFromBinaryFileWithRange()
+    {
+        $path = tempnam($this->tmpDir, uniqid());
+        file_put_contents($path, 'Binary');
+
+        $request = new Request();
+        $request->headers->set('Range', 'bytes=1-4');
+
+        $response = new BinaryFileResponse($path, 200, ['Content-Type' => 'plain/text']);
+        $response->prepare($request);
+
+        $psrResponse = $this->factory->createResponse($response);
+
+        $this->assertEquals('inar', $psrResponse->getBody()->__toString());
+        $this->assertSame('bytes 1-4/6', $psrResponse->getHeaderLine('Content-Range'));
+    }
+
     public function testUploadErrNoFile()
     {
         $file = new UploadedFile('', '', null, UPLOAD_ERR_NO_FILE, true);

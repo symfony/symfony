@@ -33,6 +33,7 @@ CHANGELOG
  * added the `ULID` constraint and validator
  * added support for UUIDv6 in `Uuid` constraint
  * enabled the validator to load constraints from PHP attributes
+ * deprecated the `NumberConstraintTrait` trait
 
 5.1.0
 -----

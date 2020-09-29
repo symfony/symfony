@@ -105,6 +105,8 @@ Validator
     */
    ```
 
+ * Deprecated the `NumberConstraintTrait` trait.
+
 Security
 --------
 

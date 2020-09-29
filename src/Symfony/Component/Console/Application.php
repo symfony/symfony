@@ -77,6 +77,7 @@ class Application implements ResetInterface
     private $dispatcher;
     private $terminal;
     private $defaultCommand;
+    private $invokeMethod;
     private $singleCommand = false;
     private $initialized;
     private $signalRegistry;
@@ -88,6 +89,7 @@ class Application implements ResetInterface
         $this->version = $version;
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
+        $this->invokeMethod = 'php';
         $this->signalRegistry = new SignalRegistry();
         if (\defined('SIGINT')) {
             $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2];
@@ -1143,6 +1145,28 @@ class Application implements ResetInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Sets the recommended invoke method.
+     *
+     * @return self
+     */
+    public function setInvokeMethod(string $invokeMethod)
+    {
+        $this->invokeMethod = $invokeMethod;
+
+        return $this;
+    }
+
+    /**
+     * Gets the recommended invoke method.
+     *
+     * @return string The method that should be used to invoke this Application.
+     */
+    public function getInvokeMethod()
+    {
+        return $this->invokeMethod;
     }
 
     /**

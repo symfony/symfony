@@ -530,10 +530,12 @@ class Command
         $isSingleCommand = $this->application && $this->application->isSingleCommand();
 
         $placeholders = [
+            '%application.invoke_method%',
             '%command.name%',
             '%command.full_name%',
         ];
         $replacements = [
+            ltrim($this->application->getInvokeMethod().' '),
             $name,
             $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
         ];

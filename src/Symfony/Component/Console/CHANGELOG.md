@@ -12,6 +12,9 @@ CHANGELOG
     * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
     * Added `SignalableCommandInterface` interface
  * Added `TableCellStyle` class to customize table cell
+ * Added `Application::$invokeMethod` property:
+    * Added set and get methods.
+    * Added new `%application.invoke_method%` placeholder for help texts.
 
 5.1.0
 -----

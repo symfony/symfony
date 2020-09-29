@@ -218,7 +218,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             isset($cookieDomain) ? $cookieDomain : null,
             isset($cookieSecure),
             isset($cookieHttpOnly),
-            false,
+            true,
             isset($samesite) ? $samesite : null
         );
     }

@@ -31,6 +31,7 @@ CHANGELOG
    ```
  * added the `Isin` constraint and validator
  * added the `ULID` constraint and validator
+ * added support for UUIDv6 in `Uuid` constraint
 
 5.1.0
 -----

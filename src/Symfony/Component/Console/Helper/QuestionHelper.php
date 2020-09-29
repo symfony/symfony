@@ -521,6 +521,7 @@ class QuestionHelper extends Helper
         while (false !== ($char = fgetc($inputStream))) {
             $ret .= $char;
         }
+        $this->inputStream = fopen('php://stdin', 'r');
 
         return $ret;
     }

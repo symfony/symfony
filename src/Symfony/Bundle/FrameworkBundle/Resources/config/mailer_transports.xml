@@ -35,6 +35,10 @@
             <tag name="mailer.transport_factory" />
         </service>
 
+        <service id="mailer.transport_factory.mailjet" class="Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory" parent="mailer.transport_factory.abstract">
+            <tag name="mailer.transport_factory" />
+        </service>
+
         <service id="mailer.transport_factory.null" class="Symfony\Component\Mailer\Transport\NullTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>

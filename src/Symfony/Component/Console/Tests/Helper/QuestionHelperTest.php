@@ -461,19 +461,64 @@ EOD;
         $question = new Question('Write an essay');
         $question->setMultiline(true);
 
-        $this->assertEquals($essay, $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+        $this->assertSame($essay, $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
     }
 
     public function testAskMultilineResponseWithSingleNewline()
     {
-        $response = $this->getInputStream("\n");
+        $response = $this->getInputStream(\PHP_EOL);
 
         $dialog = new QuestionHelper();
 
         $question = new Question('Write an essay');
         $question->setMultiline(true);
 
-        $this->assertEquals('', $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+        $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithDataAfterNewline()
+    {
+        $response = $this->getInputStream(\PHP_EOL.'this is text');
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithMultipleNewlinesAtEnd()
+    {
+        $typedText = 'This is a body'.\PHP_EOL.\PHP_EOL;
+        $response = $this->getInputStream($typedText);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertSame('This is a body', $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithWithCursorInMiddleOfSeekableInputStream()
+    {
+        $input = <<<EOD
+This
+is
+some
+input
+EOD;
+        $response = $this->getInputStream($input);
+        fseek($response, 8);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertSame("some\ninput", $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+        $this->assertSame(8, ftell($response));
     }
 
     /**

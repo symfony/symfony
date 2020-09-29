@@ -1162,7 +1162,7 @@ class Application implements ResetInterface
     /**
      * Gets the recommended invoke method.
      *
-     * @return string The method that should be used to invoke this Application.
+     * @return string the method that should be used to invoke this Application
      */
     public function getInvokeMethod()
     {

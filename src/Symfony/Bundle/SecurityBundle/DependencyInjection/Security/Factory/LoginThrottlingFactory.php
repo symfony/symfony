@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\RateLimiter\Limiter;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 
 /**
@@ -60,9 +61,13 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             throw new \LogicException('Login throttling requires symfony/security-http:^5.2.');
         }
 
+        if (!class_exists(Limiter::class)) {
+            throw new \LogicException('Login throttling requires symfony/rate-limiter to be installed and enabled.');
+        }
+
         if (!isset($config['limiter'])) {
             if (!class_exists(FrameworkExtension::class) || !method_exists(FrameworkExtension::class, 'registerRateLimiter')) {
-                throw new \LogicException('You must either configure a rate limiter for "security.firewalls.'.$firewallName.'.login_throttling" or install symfony/framework-bundle:^5.2');
+                throw new \LogicException('You must either configure a rate limiter for "security.firewalls.'.$firewallName.'.login_throttling" or install symfony/framework-bundle:^5.2.');
             }
 
             FrameworkExtension::registerRateLimiter($container, $config['limiter'] = '_login_'.$firewallName, [

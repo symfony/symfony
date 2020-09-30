@@ -1,0 +1,164 @@
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-24T21:04:29Z
+
+@wouterj how should I handle the Redirect login fail attempts ?
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-26T14:41:25Z
+
+> Thank you @vasilvestre! And I'm sorry for not being available at the second half of the week.
+>
+> This PR looks good to me - all pending comments are minor ones no big design changes. The only thing I'm wondering about is whether to use FQCN in the configuration - that might not be very easy to use for Yaml and XML users. Would love feedback from the core team about this.
+
+I just finish the PR on a live coding session, it was a nice moment so no problem!
+
+Yeah FQCN isn't fine for YAML and XML, how is the core team dealing with it recently?
+I switched from 'fixed_window' to FQCN because of previous discussion, what should we go for?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-27T03:12:10Z
+
+I'm not comfortable using a FQCN in configuration, I would prefer to keep using strings instead.
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-27T13:47:39Z
+
+> I'm not comfortable using a FQCN in configuration, I would prefer to keep using strings instead.
+
+Strings are back.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-09-27T14:09:55Z
+
+It was my understanding the FQCN was only being dropped in config, not `Limit::getStrategy()`?
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-27T14:10:32Z
+
+> It was my understanding the FQCN was only being dropped in config, not `Limit::getStrategy()`?
+
+Well I do not really understand what you mean actually, where should we use it?
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-09-27T14:15:34Z
+
+[This](https://github.com/symfony/symfony/pull/38257#discussion_r492694910) should still be an option, no?
+
+I thought Fabien's comment was about removing FQCN from the configuration.
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-27T14:17:46Z
+
+Limiter isn't set at this moment, we set it in limiter itself in create()
+
+```php
+public function create(?string $key = null): LimiterInterface
+{
+    $id = $this->config['id'].$key;
+    $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();
+
+    switch ($this->config['strategy']) {
+        case 'token_bucket':
+            return new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock);
+
+        case 'fixed_window':
+            return new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
+
+        default:
+            throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket" or "fixed_window".', $this->config['strategy']));
+    }
+}
+```
+
+Edit : OK I got it mate sorry ! I haven't worked yet on headers and this isn't the goal here so I didn't think about it. This will be useful in future, when we will be able to attach a response or whatever and set headers, that's it ?
+ Fixed now !
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-27T16:21:21Z
+
+Flaky test here but fixable through https://github.com/symfony/symfony/issues/38320
+
+Edit : It's already merged so I rebased and test should all pass :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-29T07:06:32Z
+
+So, now, I'm wondering about the design:
+
+Why didn't we add `getRemainingTokens` and `getRetryAfter` to `LimiterInterface` instead?
+Also, I don't see the point of `getStrategy` and `getMetadata`, those look like leaking configuration to me, nothing that can be dealt with from an abstract pov.
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-29T07:15:08Z
+
+> So, now, I'm wondering about the design:
+>
+> Why didn't we add `getRemainingTokens` and `getRetryAfter` to `LimiterInterface` instead?
+> Also, I don't see the point of `getStrategy` and `getMetadata`, those look like leaking configuration to me, nothing that can be dealt with from an abstract pov.
+
+See https://github.com/symfony/symfony/pull/38257#discussion_r492071555 for history details, it's not needed right now but it will be useful for test, as shown there : https://github.com/symfony/symfony/pull/38257#discussion_r492694910
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-29T07:28:06Z
+
+I'm not convinced at all that the abstraction needs to provide reflective information. Wiring should be tested by another mean IMHO.
+
+> Why didn't we add getRemainingTokens and getRetryAfter to LimiterInterface instead?
+
+We should also resolve this question :)
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-29T07:57:08Z
+
+@wouterj I think Nicolas is right here, the Limit object isn't that useful. WDYT?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-29T12:57:11Z
+
+> Why didn't we add `getRemainingTokens` and `getRetryAfter` to `LimiterInterface` instead?
+
+Please note that I'm far from experienced with rate limiting (I just wanted login throttling), but my ideas on this:
+
+* This state information differs per `$key`, so it's not a real clean getter but instead `getRemainingTokens($key)` and `getRetryAfter($key)`. Not a deal breaker, just seems a bit code-smelly.
+* This state information can be changed at any moment by another process - which is why `consume()` is protected by a lock. My idea was that it's the most useful to provide information on the state at the moment the decision was made - not at an arbitrary moment in time.
+* Returning this object from `consume()` has the advantage of IO blocking the retry time in the process. E.g:
+   ```php
+   while (!($limit = $limiter->consume())->isAccepted()) {
+       $limit->wait();
+   }
+   ```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-29T16:14:18Z
+
+Thanks @wouterj, that makes sense!
+We now need to settle about `getStrategy` and `getMetadata` (which I'd currently prefer removing, please explain why if you disagree), then good to go on my side.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-29T16:23:52Z
+
+> We now need to settle about getStrategy and getMetadata (which I'd currently prefer removing, please explain why if you disagree), then good to go on my side.
+
+I don't have a strong opinion on this one (and not a real use-case). If you think it's better to remove it, let's do that. It's easier to add it if we find good use-cases than to remove it in the future :)
+
+---------------------------------------------------------------------------
+
+by vasilvestre at 2020-09-29T22:32:49Z
+
+The ci check fail happens on a code part I haven't modified, what to do ?

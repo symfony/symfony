@@ -863,18 +863,45 @@ EOF;
                 }
             }
 
-            if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-                $factoryCode = $definition->isShared() ? ($asFile ? "\$this->load('%s', false)" : '$this->%s(false)') : '$this->factories[%2$s](false)';
-                $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
+            if (!$definition->isShared()) {
+                $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
+            }
+
+            if ($isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition)) {
+                if (!$definition->isShared()) {
+                    $code .= sprintf('        %s = %1$s ?? ', $factory);
+
+                    if ($asFile) {
+                        $code .= "function () {\n";
+                        $code .= "            return self::do(\$container);\n";
+                        $code .= "        };\n\n";
+                    } else {
+                        $code .= sprintf("\\Closure::fromCallable([\$this, '%s']);\n\n", $methodName);
+                    }
+                }
+
+                $factoryCode = $asFile ? 'self::do($container, false)' : sprintf('$this->%s(false)', $methodName);
+                $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $factoryCode);
                 $code .= $asFile ? preg_replace('/function \(([^)]*+)\) {/', 'function (\1) use ($container) {', $factoryCode) : $factoryCode;
             }
 
-            $code .= $this->addServiceInclude($id, $definition);
+            $c = $this->addServiceInclude($id, $definition);
+
+            if ('' !== $c && $isProxyCandidate && !$definition->isShared()) {
+                $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
+                $code .= "        static \$include = true;\n\n";
+                $code .= "        if (\$include) {\n";
+                $code .= $c;
+                $code .= "            \$include = false;\n";
+                $code .= "        }\n\n";
+            } else {
+                $code .= $c;
+            }
+
             $c = $this->addInlineService($id, $definition);
 
-            if (!$definition->isShared()) {
+            if (!$isProxyCandidate && !$definition->isShared()) {
                 $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
-                $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
                 $lazyloadInitialization = $definition->isLazy() ? '$lazyLoad = true' : '';
 
                 $c = sprintf("        %s = function (%s) {\n%s        };\n\n        return %1\$s();\n", $factory, $lazyloadInitialization, $c);

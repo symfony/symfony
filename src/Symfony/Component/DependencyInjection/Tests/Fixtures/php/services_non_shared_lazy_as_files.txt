@@ -28,14 +28,32 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
-
-        $container->factories['non_shared_foo'] = function ($lazyLoad = true) use ($container) {
-            return new \Bar\FooLazyClass();
+        $container->factories['non_shared_foo'] = $container->factories['non_shared_foo'] ?? function () use ($container) {
+            return self::do($container);
         };
 
-        return $container->factories['non_shared_foo']();
+        // lazy factory for Bar\FooLazyClass
+
+        static $include = true;
+
+        if ($include) {
+            include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
+
+            $include = false;
+        }
+
+        return new \Bar\FooLazyClass();
     }
+}
+
+    [Container%s/proxy.php] => <?php
+
+namespace Container%s;
+
+// proxy code for Bar\FooLazyClass
+
+if (!\class_exists('proxy', false)) {
+    \class_alias(__NAMESPACE__.'\\proxy', 'proxy', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -105,6 +123,13 @@ class ProjectServiceContainer extends Container
 
         return class_exists($class, false) ? $class::do($this, $lazyLoad) : $service;
     }
+
+    protected function createProxy($class, \Closure $factory)
+    {
+        class_exists($class, false) || require __DIR__.'/'.$class.'.php';
+
+        return $factory();
+    }
 }
 
     [ProjectServiceContainer.preload.php] => <?php
@@ -120,6 +145,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 require __DIR__.'/Container%s/ProjectServiceContainer.php';
+require __DIR__.'/Container%s/proxy.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

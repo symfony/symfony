@@ -17,7 +17,7 @@ class InvariantViolation
     private $message;
     private $exception;
 
-    public function __construct($normalizedValue, string $message, ?\Throwable $exception = null)
+    public function __construct($normalizedValue, string $message, \Throwable $exception)
     {
         $this->normalizedValue = $normalizedValue;
         $this->message = $message;
@@ -34,7 +34,7 @@ class InvariantViolation
         return $this->message;
     }
 
-    public function getException(): ?\Throwable
+    public function getException(): \Throwable
     {
         return $this->exception;
     }

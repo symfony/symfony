@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added a `FrenchInflector` class
+ * added the `AbstractString::normalizeNewline()` method
 
 5.1.0
 -----

@@ -1510,4 +1510,34 @@ abstract class AbstractAsciiTestCase extends TestCase
             [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
         ];
     }
+
+    /**
+     * @dataProvider provideNormalizeNewline
+     */
+    public function testNormalizeNewline(string $expected, string $origin, string $to)
+    {
+        $this->assertEquals($expected, static::createFromString($origin)->normalizeNewline($to));
+    }
+
+    public function provideNormalizeNewline()
+    {
+        return [
+            ['ccc', 'ccc', "\r\n"],
+            ["\r\n", "\r\n", "\r\n"],
+            ["\r\n", "\r", "\r\n"],
+            ["\r\n", "\n", "\r\n"],
+            ["foo\r\n\r\n\r\nbar\r\n\r\n\r\n", "foo\r\r\n\r\nbar\n\n\r", "\r\n"],
+            ['ccc', 'ccc', "\r\n"],
+            ["\n", "\r\n", "\n"],
+            ["\n", "\r", "\n"],
+            ["\n", "\n", "\n"],
+            ["\n\n\nfoo\n\nbar\n", "\r\r\r\nfoo\r\n\nbar\r", "\n"],
+            ['ccc', 'ccc', "\r\n"],
+            ["\r", "\r\n", "\r"],
+            ["\r", "\r", "\r"],
+            ["\r", "\n", "\r"],
+            ["\rfoo\r\r\rbar\r\r\r", "\rfoo\n\n\r\nbar\r\r\r\n", "\r"],
+            ["\rコンニチ\rハ,セカイ!\r\r\ré\r⭐\r\r", "\rコンニチ\r\nハ,セカイ!\n\n\r\né\r⭐\r\r\n", "\r"],
+        ];
+    }
 }

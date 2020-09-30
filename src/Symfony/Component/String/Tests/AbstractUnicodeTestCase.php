@@ -590,4 +590,28 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             ]
         );
     }
+
+    public function provideNormalizeNewline()
+    {
+        return array_merge(
+            parent::provideNormalizeNewline(),
+            [
+                ["\n\n\n\n\n", "\u{0085}\u{000b}\u{000c}\u{2028}\u{2029}", "\n"],
+                ['ccc', 'ccc', "\u{0085}"],
+                ["\u{0085}", "\u{0085}", "\u{0085}"],
+                ["\u{000b}", "\u{0085}", "\u{000b}"],
+                ["\u{000c}", "\u{0085}", "\u{000c}"],
+                ["\u{2028}", "\u{0085}", "\u{2028}"],
+                ["\u{2029}", "\u{0085}", "\u{2029}"],
+            ]
+        );
+    }
+
+    public function testNormalizeNewlineWithInvalidTo()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid target newline: expected "\r", "\n", "\r\n", "\u{0085}", "\u{000b}", "\u{000c}", "\u{2028}" or "\u{2029}", got "ccc".');
+
+        static::createFromString('foobar')->normalizeNewline('ccc');
+    }
 }

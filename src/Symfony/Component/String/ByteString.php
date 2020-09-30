@@ -262,6 +262,20 @@ class ByteString extends AbstractString
         return $matches;
     }
 
+    /**
+     * @param string $to The target newline:
+     *
+     * @return \Symfony\Component\String\AbstractString
+     */
+    public function normalizeNewline(string $to = "\n"): AbstractString
+    {
+        if (!\in_array($to, ["\r", "\n", "\r\n"], true)) {
+            throw new InvalidArgumentException(sprintf('Invalid target newline: expected "\r", "\n" or "\r\n", got "%s".', $to));
+        }
+
+        return $this->replaceMatches('/\R/', $to);
+    }
+
     public function padBoth(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;

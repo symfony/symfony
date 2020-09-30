@@ -267,6 +267,15 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    public function normalizeNewline(string $to = "\n"): AbstractString
+    {
+        if (!\in_array($to, ["\r", "\n", "\r\n", "\u{0085}", "\u{000b}", "\u{000c}", "\u{2028}", "\u{2029}"], true)) {
+            throw new InvalidArgumentException(sprintf('Invalid target newline: expected "\r", "\n", "\r\n", "\u{0085}", "\u{000b}", "\u{000c}", "\u{2028}" or "\u{2029}", got "%s".', $to));
+        }
+
+        return $this->replaceMatches('/\R/u', $to);
+    }
+
     public function padBoth(int $length, string $padStr = ' '): parent
     {
         if ('' === $padStr || !preg_match('//u', $padStr)) {

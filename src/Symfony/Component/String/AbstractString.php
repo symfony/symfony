@@ -427,6 +427,13 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     abstract public function match(string $regexp, int $flags = 0, int $offset = 0): array;
 
     /**
+     * @param string $to the target newline
+     *
+     * @return static
+     */
+    abstract public function normalizeNewline(string $to = "\n"): self;
+
+    /**
      * @return static
      */
     abstract public function padBoth(int $length, string $padStr = ' '): self;

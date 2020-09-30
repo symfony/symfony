@@ -99,4 +99,22 @@ class ByteStringTest extends AbstractAsciiTestCase
             ]
         );
     }
+
+    public function provideNormalizeNewline()
+    {
+        return array_merge(
+            parent::provideNormalizeNewline(),
+            [
+                ["\n\xE9\n", "\r\xE9\n", "\n"],
+            ]
+        );
+    }
+
+    public function testNormalizeNewlineWithInvalidTo()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid target newline: expected "\r", "\n" or "\r\n", got "ccc".');
+
+        static::createFromString('foobar')->normalizeNewline('ccc');
+    }
 }

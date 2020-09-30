@@ -25,17 +25,28 @@ final class CompoundLimiter implements LimiterInterface
      */
     public function __construct(array $limiters)
     {
+        if (!$limiters) {
+            throw new \LogicException(sprintf('"%s::%s()" require at least one limiter.', self::class, __METHOD__));
+        }
         $this->limiters = $limiters;
     }
 
-    public function consume(int $tokens = 1): bool
+    public function consume(int $tokens = 1): Limit
     {
-        $allow = true;
+        $minimalLimit = null;
         foreach ($this->limiters as $limiter) {
-            $allow = $limiter->consume($tokens) && $allow;
+            $limit = $limiter->consume($tokens);
+
+            if (0 === $limit->getRemainingTokens()) {
+                return $limit;
+            }
+
+            if (null === $minimalLimit || $limit->getRemainingTokens() < $minimalLimit->getRemainingTokens()) {
+                $minimalLimit = $limit;
+            }
         }
 
-        return $allow;
+        return $minimalLimit;
     }
 
     public function reset(): void

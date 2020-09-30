@@ -43,7 +43,7 @@ final class FixedWindowLimiter implements LimiterInterface
     /**
      * {@inheritdoc}
      */
-    public function consume(int $tokens = 1): bool
+    public function consume(int $tokens = 1): Limit
     {
         $this->lock->acquire(true);
 
@@ -54,17 +54,28 @@ final class FixedWindowLimiter implements LimiterInterface
             }
 
             $hitCount = $window->getHitCount();
-            $availableTokens = $this->limit - $hitCount;
+            $availableTokens = $this->getAvailableTokens($hitCount);
+            $windowStart = \DateTimeImmutable::createFromFormat('U', time());
             if ($availableTokens < $tokens) {
-                return false;
+                return new Limit($availableTokens, $this->getRetryAfter($windowStart), false);
             }
 
             $window->add($tokens);
             $this->storage->save($window);
 
-            return true;
+            return new Limit($this->getAvailableTokens($window->getHitCount()), $this->getRetryAfter($windowStart), true);
         } finally {
             $this->lock->release();
         }
+    }
+
+    public function getAvailableTokens(int $hitCount): int
+    {
+        return $this->limit - $hitCount;
+    }
+
+    private function getRetryAfter(\DateTimeImmutable $windowStart): \DateTimeImmutable
+    {
+        return $windowStart->add(new \DateInterval(sprintf('PT%sS', $this->interval)));
     }
 }

@@ -24,7 +24,7 @@ interface LimiterInterface
      *
      * @param int $tokens the number of tokens required
      */
-    public function consume(int $tokens = 1): bool;
+    public function consume(int $tokens = 1): Limit;
 
     /**
      * Resets the limit.

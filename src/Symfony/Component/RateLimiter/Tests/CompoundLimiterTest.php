@@ -38,19 +38,20 @@ class CompoundLimiterTest extends TestCase
         $limiter3 = $this->createLimiter(12, new \DateInterval('PT30S'));
         $limiter = new CompoundLimiter([$limiter1, $limiter2, $limiter3]);
 
-        $this->assertFalse($limiter->consume(5), 'Limiter 1 reached the limit');
+        // Reach limiter 1 limit, verify that limiter2 available tokens reduced by 5 and fetch successfully limiter 1
+        $this->assertEquals(3, $limiter->consume(5)->getRemainingTokens(), 'Limiter 1 reached the limit');
         sleep(1); // reset limiter1's window
-        $limiter->consume(2);
+        $this->assertTrue($limiter->consume(2)->isAccepted());
 
-        $this->assertTrue($limiter->consume());
-        $this->assertFalse($limiter->consume(), 'Limiter 2 reached the limit');
+        // Reach limiter 2 limit, verify that limiter2 available tokens reduced by 5 and and fetch successfully
+        $this->assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 2 has no remaining tokens left');
         sleep(9); // reset limiter2's window
+        $this->assertTrue($limiter->consume(3)->isAccepted());
 
-        $this->assertTrue($limiter->consume(3));
-        $this->assertFalse($limiter->consume(), 'Limiter 3 reached the limit');
+        // Reach limiter 3 limit, verify that limiter2 available tokens reduced by 5 and fetch successfully
+        $this->assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 3 reached the limit');
         sleep(20); // reset limiter3's window
-
-        $this->assertTrue($limiter->consume());
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     private function createLimiter(int $limit, \DateInterval $interval): FixedWindowLimiter

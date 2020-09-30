@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
+
 /**
  * @author Valentin Silvestre <vsilvestre.pro@gmail.com>
  *
@@ -32,6 +34,18 @@ class Limit
     public function isAccepted(): bool
     {
         return $this->accepted;
+    }
+
+    /**
+     * @throws RateLimitExceededException if not accepted
+     */
+    public function ensureAccepted(): self
+    {
+        if (!$this->accepted) {
+            throw new RateLimitExceededException($this);
+        }
+
+        return $this;
     }
 
     public function getRetryAfter(): \DateTimeImmutable

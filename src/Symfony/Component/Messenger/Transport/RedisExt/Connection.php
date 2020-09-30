@@ -54,7 +54,7 @@ class Connection
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
         if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $this->connection->getLastError()));
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];

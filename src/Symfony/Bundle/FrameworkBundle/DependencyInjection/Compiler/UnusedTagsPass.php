@@ -23,6 +23,7 @@ class UnusedTagsPass implements CompilerPassInterface
 {
     private $knownTags = [
         'annotations.cached_reader',
+        'assets.package',
         'auto_alias',
         'cache.pool',
         'cache.pool.clearer',

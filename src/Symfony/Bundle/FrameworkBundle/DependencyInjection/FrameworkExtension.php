@@ -1057,7 +1057,6 @@ class FrameworkExtension extends Extension
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
-        $namedPackages = [];
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
@@ -1071,15 +1070,11 @@ class FrameworkExtension extends Extension
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 
-            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
+            $packageDefinition = $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version)
+                ->addTag('assets.package', ['package' => $name]);
+            $container->setDefinition('assets._package_'.$name, $packageDefinition);
             $container->registerAliasForArgument('assets._package_'.$name, PackageInterface::class, $name.'.package');
-            $namedPackages[$name] = new Reference('assets._package_'.$name);
         }
-
-        $container->getDefinition('assets.packages')
-            ->replaceArgument(0, new Reference('assets._default_package'))
-            ->replaceArgument(1, $namedPackages)
-        ;
     }
 
     /**

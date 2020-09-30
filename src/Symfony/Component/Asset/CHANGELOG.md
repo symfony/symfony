@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * the `Packages` constructor accepts any iterable.
+
 5.1.0
 -----
 

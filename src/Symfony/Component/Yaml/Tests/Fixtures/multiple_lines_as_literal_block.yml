@@ -1,6 +1,6 @@
 data:
     single_line: 'foo bar baz'
-    multi_line: |
+    multi_line: |-
         foo
         line with trailing spaces:
           

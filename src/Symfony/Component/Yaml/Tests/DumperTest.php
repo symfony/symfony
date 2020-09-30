@@ -493,19 +493,16 @@ YAML;
         $data = [
             'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
         ];
-        $expected = <<<YAML
-foo: !bar |
-    foo
-    line with trailing spaces:
-      
-    bar
-    integer like line:
-    123456789
-    empty line:
-    
-    baz
-
-YAML;
+        $expected = "foo: !bar |\n".
+            "    foo\n".
+            "    line with trailing spaces:\n".
+            "      \n".
+            "    bar\n".
+            "    integer like line:\n".
+            "    123456789\n".
+            "    empty line:\n".
+            "    \n".
+            '    baz';
 
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
@@ -545,7 +542,9 @@ YAML;
             ],
         ];
 
-        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block_leading_space_in_first_line.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $expected = "data:\n    multi_line: |4-\n            the first line has leading spaces\n        The second line does not.";
+
+        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
@@ -566,6 +565,18 @@ YAML;
                 'foo' => "bar\n\rbaz: qux",
             ],
         ], 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
+    public function testNoTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
+    {
+        $data = [
+            "a\nb",
+            "c\nd",
+        ];
+        $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $this->assertSame("- |-\n    a\n    b\n- |-\n    c\n    d", $yaml);
+        $this->assertSame($data, Yaml::parse($yaml));
     }
 
     public function testZeroIndentationThrowsException()

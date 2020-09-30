@@ -1320,7 +1320,7 @@ final class MimeTypes implements MimeTypesInterface
         'image/ief' => ['ief'],
         'image/jls' => ['jls'],
         'image/jp2' => ['jp2', 'jpg2'],
-        'image/jpeg' => ['jpeg', 'jpg', 'jpe'],
+        'image/jpeg' => ['jpg', 'jpeg', 'jpe'],
         'image/jpeg2000' => ['jp2', 'jpg2'],
         'image/jpeg2000-image' => ['jp2', 'jpg2'],
         'image/jph' => ['jph'],

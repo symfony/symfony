@@ -15,9 +15,6 @@ use Symfony\Component\Serializer\InvariantViolation;
 
 final class InvariantViolationException extends \RuntimeException implements ExceptionInterface
 {
-    /**
-     * @var array<string, array<InvariantViolation>>
-     */
     private $violations;
 
     /**

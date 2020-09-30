@@ -13,19 +13,8 @@ namespace Symfony\Component\Serializer;
 
 class InvariantViolation
 {
-    /**
-     * @var mixed
-     */
     private $normalizedValue;
-
-    /**
-     * @var string
-     */
     private $message;
-
-    /**
-     * @var \Throwable|null
-     */
     private $exception;
 
     public function __construct($normalizedValue, string $message, ?\Throwable $exception = null)

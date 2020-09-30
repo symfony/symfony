@@ -603,8 +603,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertUrlPackage($container, $defaultPackage, ['http://cdn.example.com'], 'SomeVersionScheme', '%%s?version=%%s');
 
         // packages
-        $packages = $packages->getArgument(1);
-        $this->assertCount(9, $packages);
+        $packageTags = $container->findTaggedServiceIds('assets.package');
+        $this->assertCount(9, $packageTags);
+
+        $packages = [];
+        foreach ($packageTags as $serviceId => $tagAttributes) {
+            $packages[$tagAttributes[0]['package']] = $serviceId;
+        }
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');

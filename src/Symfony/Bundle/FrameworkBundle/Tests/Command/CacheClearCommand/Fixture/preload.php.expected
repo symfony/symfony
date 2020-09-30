@@ -1,5 +1,0 @@
-<?php
-
-if (file_exists(__DIR__.'/test/var/cache/test/Symfony_Bundle_FrameworkBundle_Tests_Command_CacheClearCommand_Fixture_TestAppKernelTestDebugContainer.preload.php')) {
-    require __DIR__.'/test/var/cache/test/Symfony_Bundle_FrameworkBundle_Tests_Command_CacheClearCommand_Fixture_TestAppKernelTestDebugContainer.preload.php';
-}

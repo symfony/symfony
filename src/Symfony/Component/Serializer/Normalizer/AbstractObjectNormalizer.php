@@ -335,14 +335,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             try {
-                $denormalizedValue = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
-                try {
-                    $this->setAttributeValue($object, $attribute, $denormalizedValue, $format, $context);
-                } catch (InvalidArgumentException $e) {
-                    throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
-                }
+                $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
             } catch (InvariantViolationException $exception) {
                 $invariantViolations += $exception->getViolationsNestedIn($attribute);
+            }
+
+            try {
+                $this->setAttributeValue($object, $attribute, $value, $format, $context);
+            } catch (InvalidArgumentException $e) {
+                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
             }
         }
 

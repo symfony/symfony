@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Fixtures;
 
-use Attribute;
-
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_CLASS_CONST | Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS_CONST | \Attribute::TARGET_PROPERTY)]
 final class RepeatableAttribute
 {
     private string $string;

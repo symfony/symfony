@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Fixtures;
+namespace Symfony\Component\Validator\Tests\Fixtures\Annotation;
 
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA;
 
 class EntityParent implements EntityInterfaceA
 {

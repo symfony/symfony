@@ -1,0 +1,186 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-27T08:42:57Z
+
+> The downside is that all those constructors generate the need for some boilerplate code that was previously abstracted away by the Constraint class.
+
+this is a pure implementation concern, isn't it? that's fine to me then.
+
+> We could find a way to flatten those constraints so we can recreate them without nesting.
+
+This would be the best IMHO. Any idea? Here is one that could be compatible with IDE autocompletion:
+```
+#[Assert\All(constraints: foo)]
+#[Assert\NotNull(group: foo)]
+#[Assert\Length(max: 6, group: foo)]
+```
+
+Dunno how this would work technically, but I feel like it could.
+
+Any better idea?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-27T08:45:27Z
+
+Another idea, similar to how the config component works (indentation would be "manual"):
+```php
+#[Assert\All]
+	#[Assert\NotNull]
+	#[Assert\Length(max: 6)]
+#[EndAssert\All]
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-27T09:09:39Z
+
+I prefer the previous recommendation based on `#[Assert\All(constraints: foo)]` (and `#[Assert\Any(constraints: foo)]` ?)  Nested attributes look cumbersome.
+
+Given that PHP attributes use the exact same syntax that Rust has been using for years, we could look into them for inspiration. A random example taken from [this library](https://github.com/Keats/validator):
+
+```rust
+struct SignupData {
+    #[validate(email)]
+    mail: String,
+    #[validate(phone)]
+    phone: String,
+    #[validate(url)]
+    site: String,
+    #[validate(length(min = 1), custom = "validate_unique_username")]
+    #[serde(rename = "firstName")]
+    first_name: String,
+    #[validate(range(min = 18, max = 20))]
+    age: u32,
+}
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-28T09:50:17Z
+
+> Another idea, similar to how the config component works (indentation would be "manual"):
+>
+> ```
+> #[Assert\All]
+>     #[Assert\NotNull]
+>     #[Assert\Length(max: 6)]
+> #[EndAssert\All]
+> ```
+
+So, we would basically have dedicated start/end attributes as a bracket around nested attributes. And the annotation loader would understand how to transform a series of attributes to the expected nested structure. That'll work, I guess, though I would not reuse an existing attribute as start marker. Otherwise things might get complicated if one day php really implements nested attributes.
+
+Regarding the code-style: You can combine multiple attributes into one `#[]`. We can use that construct to group nested constraints:
+
+```php
+#[Assert\BeginAll,
+    AssertNotNull,
+    Assert\Length(max: 6),
+Assert\EndAll]
+#[SomeOtherConstraint]
+#[SomeUnrelatedAttribute]
+```
+
+This is of course just a visual aid. There is no way to query for the individual attribute blocks via reflection.
+
+Another idea that I had was to define an array structure that can be converted easily to a constructor call.
+
+```php
+#[Assert\All(constraints: [
+    [Assert\NotNull::class],
+    [Assert\Length::class, 'max' => 6],
+])]
+```
+
+We could provide a helper function (via a trait or the abstract `Constraint` class) to parse those arrays and emulate nested attributes this way. But we would again lose IDE support, at least for the inner constraints.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-28T13:02:57Z
+
+> Assert\BeginAll
+
+not convinced at all.
+
+I like your idea of tricking the syntax to emulate nested attributes.
+That leads to another proposal, based on a generic `End` attribute (quite similar to how the config component does nesting btw):
+
+```php
+#[Assert\All,
+    AssertNotNull,
+    Assert\Length(max: 6),
+EndAssert]
+```
+
+Such a list could be interpreted quite generically I think, from an implementation pov;
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-28T13:17:38Z
+
+Not having a distinct starter for a nested block makes the implementation more difficult, but I think we can do without. The generic `EndAssert` is a good idea. I'll give it a try.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-28T13:31:31Z
+
+Here are some other proposals to flatten the nested attributes. Taking this example from Symfony Docs:
+
+```php
+class User
+{
+    /**
+     * @Assert\All({
+     *     @Assert\NotBlank,
+     *     @Assert\Length(min=5)
+     * })
+     */
+    protected $favoriteColors = [];
+}
+```
+
+We could add a "special marker" in the attribute name to say that this only applies to items (the idea would be to get this "marker" somehow and turn it into a config option ... not duplicating all constraint for items):
+
+```php
+class User
+{
+    #[Assert\Items\NotBlank]
+    #[Assert\Items\Length(min: 5)]
+    protected $favoriteColors = [];
+}
+```
+
+Another idea: add an option which tells Symfony if this applies to the property or to each of its elements:
+
+```php
+class User
+{
+    #[Assert\NotBlank, apply_to: items]
+    #[Assert\Length(min: 5), apply_to: items]
+    protected $favoriteColors = [];
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-28T13:35:12Z
+
+@javiereguiluz I'm not sure how this would work: how would one tell they want either `Sequentially`, `AtLeastOneOf`, or `All` (or any other composite constraint)?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-28T15:20:55Z
+
+Before this PR escalates into a discussion on nesting: Reviews of the actual code of this PR would be very much appreciated. 😃
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-28T15:53:32Z
+
+> Do you want to merge this first and iterate?
+
+Yes, please. This way, others could join in and migrate more constraints while I work on the nesting.
+
+> Just don't miss adding an entry in the changelog.
+
+Added!

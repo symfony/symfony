@@ -4,7 +4,7 @@ MbString åpplicätion
   command [options] [arguments]
 
 <comment>Options:</comment>
-  <info>-h, --help</info>            Display this help message
+  <info>-h, --help</info>            Display help for the given command. When no command is given display help for the <info>list</info> command
   <info>-q, --quiet</info>           Do not output any message
   <info>-V, --version</info>         Display this application version
   <info>    --ansi</info>            Force ANSI output

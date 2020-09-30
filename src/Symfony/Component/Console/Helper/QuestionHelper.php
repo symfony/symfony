@@ -517,11 +517,53 @@ class QuestionHelper extends Helper
             return fgets($inputStream, 4096);
         }
 
+        $multiLineStreamReader = $this->cloneInputStream($inputStream);
+        if (null === $multiLineStreamReader) {
+            return false;
+        }
+
         $ret = '';
-        while (false !== ($char = fgetc($inputStream))) {
+        while (false !== ($char = fgetc($multiLineStreamReader))) {
+            if (\PHP_EOL === "{$ret}{$char}") {
+                break;
+            }
             $ret .= $char;
         }
 
         return $ret;
+    }
+
+    /**
+     * Clones an input stream in order to act on one instance of the same
+     * stream without affecting the other instance.
+     *
+     * @param resource $inputStream The handler resource
+     *
+     * @return resource|null The cloned resource, null in case it could not be cloned
+     */
+    private function cloneInputStream($inputStream)
+    {
+        $streamMetaData = stream_get_meta_data($inputStream);
+        $seekable = $streamMetaData['seekable'] ?? false;
+        $mode = $streamMetaData['mode'] ?? 'rb';
+        $uri = $streamMetaData['uri'] ?? null;
+
+        if (null === $uri) {
+            return null;
+        }
+
+        $cloneStream = fopen($uri, $mode);
+
+        // For seekable and writable streams, add all the same data to the
+        // cloned stream and then seek to the same offset.
+        if (true === $seekable && !\in_array($mode, ['r', 'rb', 'rt'])) {
+            $offset = ftell($inputStream);
+            rewind($inputStream);
+            stream_copy_to_stream($inputStream, $cloneStream);
+            fseek($inputStream, $offset);
+            fseek($cloneStream, $offset);
+        }
+
+        return $cloneStream;
     }
 }

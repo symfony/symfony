@@ -43,4 +43,9 @@ class Limit
     {
         return $this->availableTokens;
     }
+
+    public function wait(): void
+    {
+        sleep(($this->retryAfter->getTimestamp() - time()) * 1e6);
+    }
 }

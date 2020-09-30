@@ -37,10 +37,6 @@ final class CompoundLimiter implements LimiterInterface
         foreach ($this->limiters as $limiter) {
             $limit = $limiter->consume($tokens);
 
-            if (0 === $limit->getRemainingTokens()) {
-                return $limit;
-            }
-
             if (null === $minimalLimit || $limit->getRemainingTokens() < $minimalLimit->getRemainingTokens()) {
                 $minimalLimit = $limit;
             }

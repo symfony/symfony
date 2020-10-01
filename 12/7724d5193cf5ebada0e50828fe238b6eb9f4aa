@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-09-28T12:10:06Z
+
+@wouterj why is the `reset` method part of the interface while the previous discussion agreed on removing it ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-28T13:21:16Z
+
+> @wouterj why is the reset method part of the interface while the previous discussion agreed on removing it ?
+
+I'm thinking about the interface/abstract class as a generic "request rate limiter" - not necessarily limited to login throttling. The normal `LimiterInterface` also has a `reset()` method and when looking at reference implementations (Laravel's and Graham Campbell's limiters), they have a clear/reset functionality as well.
+
+Instead of duplicating the `LimiterInterface`, we could also remove the `string` typehint from that interface - and allow any type of data to be passed. That would make the component even more flexible, but we're loosing the benefits of more strictly typed contracts.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-30T05:49:13Z
+
+Can you rebase to take changes from #38257 into account?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-30T10:06:15Z
+
+Rebased and added the `Limit` logic to the request rate limiter (and also updated login throttling failure message to indicate wait time).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-09-30T15:25:58Z
+
+Rebase needed again :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-30T16:09:33Z
+
+Yes, and Fabien discovered a bug: the login throttling feature doesn't yet work if the username is invalid. I'll investigate later this day.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-30T19:19:01Z
+
+Rebased and fixed the last bug + added tests

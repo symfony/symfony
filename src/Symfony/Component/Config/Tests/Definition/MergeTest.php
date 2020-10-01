@@ -189,4 +189,31 @@ class MergeTest extends TestCase
 
         $this->assertEquals(['append_elements' => ['a', 'b', 'c', 'd']], $tree->merge($a, $b));
     }
+
+    public function testMergingOfVariablePrototype()
+    {
+        $tb = new TreeBuilder('root', 'array');
+
+        $tree = $tb
+            ->getRootNode()
+                ->children()
+                    ->arrayNode('config')
+                        ->prototype('variable')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $a = [
+            'config' => ['a' => null],
+        ];
+
+        $b = [
+            'config' => ['a' => 'bar'],
+        ];
+
+        $merge = $tree->merge($a, $b);
+        $this->assertEquals(['config' => ['a' => 'bar']], $merge);
+    }
 }

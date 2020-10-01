@@ -171,12 +171,12 @@ class SerializerTest extends TestCase
     {
         yield 'no_body' => [
             ['headers' => ['type' => 'bar']],
-            'Encoded envelope should have at least a "body" and some "headers".',
+            'Encoded envelope should have at least a "body".',
         ];
 
         yield 'no_headers' => [
             ['body' => '{}'],
-            'Encoded envelope should have at least a "body" and some "headers".',
+            'Encoded envelope does not have a "type" header.',
         ];
 
         yield 'no_headers_type' => [

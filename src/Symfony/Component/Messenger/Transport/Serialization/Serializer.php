@@ -69,12 +69,8 @@ class Serializer implements SerializerInterface
      */
     public function decode(array $encodedEnvelope): Envelope
     {
-        $headersRequired = !isset($this->context[self::TYPE_RESOLVER]) || $this->context[self::TYPE_RESOLVER] instanceof HeaderTypeResolver;
-        if (empty($encodedEnvelope['body']) || ($headersRequired && empty($encodedEnvelope['headers']))) {
-            $message = $headersRequired ?
-                'Encoded envelope should have at least a "body" and some "headers".' :
-                'Encoded envelope should have at least a "body".';
-            throw new MessageDecodingFailedException($message);
+        if (empty($encodedEnvelope['body'])) {
+            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);

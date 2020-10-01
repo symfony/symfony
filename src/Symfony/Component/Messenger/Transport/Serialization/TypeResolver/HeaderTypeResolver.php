@@ -20,23 +20,20 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
  */
 final class HeaderTypeResolver implements TypeResolverInterface
 {
-    /**
-     * @var string
-     */
-    private $field;
+    private $headerName;
 
-    public function __construct(string $field = 'type')
+    public function __construct(string $headerName = 'type')
     {
-        $this->field = $field;
+        $this->headerName = $headerName;
     }
 
     public function resolve(array $encodedEnvelope): string
     {
         $headers = $encodedEnvelope['headers'] ?? [];
-        if (!isset($headers[$this->field]) || !$headers[$this->field]) {
-            throw new MessageDecodingFailedException(sprintf('Encoded envelope does not have a "%s" header.', $this->field));
+        if (!isset($headers[$this->headerName]) || !$headers[$this->headerName]) {
+            throw new MessageDecodingFailedException(sprintf('Encoded envelope does not have a "%s" header.', $this->headerName));
         }
 
-        return $headers[$this->field];
+        return $headers[$this->headerName];
     }
 }

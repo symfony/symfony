@@ -64,8 +64,9 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
 
         $listener->onMessageFailed($event);
     }
-    
-    public function testItSendsToTheFailureTransportWithMultipleFailedTransports() {
+
+    public function testItSendsToTheFailureTransportWithMultipleFailedTransports()
+    {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) {
             /* @var Envelope $envelope */
@@ -86,7 +87,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
 
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->method('get')->with('my_receiver')->willReturn($sender);
-        
+
         $listener = new SendFailedMessageToFailureTransportListener($serviceLocator);
 
         $exception = new \Exception('no!');

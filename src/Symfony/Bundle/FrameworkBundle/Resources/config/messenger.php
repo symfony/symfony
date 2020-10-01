@@ -171,9 +171,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)
             ->args([
-                abstract_arg('global failure transport'),
+                abstract_arg('failure transports'),
                 service('logger')->ignoreOnInvalid(),
-                abstract_arg('failure transports by transport name locator'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

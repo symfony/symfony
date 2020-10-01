@@ -33,13 +33,13 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
      */
     private $failureSenders;
     private $logger;
-    
+
     public function __construct($failureSenders, LoggerInterface $logger = null)
     {
         if (!$failureSenders instanceof ServiceLocator) {
             trigger_deprecation('symfony/messenger', '5.2', 'Passing failureSenders should now pass a ServiceLocator with all the failure transports', __METHOD__);
         }
-        
+
         $this->failureSenders = $failureSenders;
         $this->logger = $logger;
     }
@@ -101,7 +101,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         if ($this->failureSenders instanceof SenderInterface) {
             return $this->failureSenders;
         }
-        
+
         return $this->failureSenders->get($receiverName);
     }
 

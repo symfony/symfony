@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-01T09:29:22Z
+
+Can you rebase on 5.1 (5.0 is not maintained anymore)?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-10-01T10:17:14Z
+
+@fabpot done. I still think doing it in 5.0 for the https://github.com/symfony/symfony/tree/5.0 endpoint (public web UI) has some value, but overall it could/should be automated anyway :P

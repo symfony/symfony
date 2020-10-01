@@ -17,8 +17,10 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\RateLimiter\Limiter;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
+use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -50,7 +52,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
     {
         $builder
             ->children()
-                ->scalarNode('limiter')->info('The name of the limiter that you defined under "framework.rate_limiter".')->end()
+                ->scalarNode('limiter')->info(sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
             ->end();
     }
@@ -70,18 +72,27 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
                 throw new \LogicException('You must either configure a rate limiter for "security.firewalls.'.$firewallName.'.login_throttling" or install symfony/framework-bundle:^5.2.');
             }
 
-            FrameworkExtension::registerRateLimiter($container, $config['limiter'] = '_login_'.$firewallName, [
+            $limiterOptions = [
                 'strategy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
                 'interval' => '1 minute',
                 'lock_factory' => 'lock.factory',
                 'cache_pool' => 'cache.app',
-            ]);
+            ];
+            FrameworkExtension::registerRateLimiter($container, $localId = '_login_local_'.$firewallName, $limiterOptions);
+
+            $limiterOptions['limit'] = 5 * $config['max_attempts'];
+            FrameworkExtension::registerRateLimiter($container, $globalId = '_login_global_'.$firewallName, $limiterOptions);
+
+            $container->register($config['limiter'] = 'security.login_throttling.'.$firewallName.'.limiter', DefaultLoginRateLimiter::class)
+                ->addArgument(new Reference('limiter.'.$globalId))
+                ->addArgument(new Reference('limiter.'.$localId))
+            ;
         }
 
         $container
             ->setDefinition('security.listener.login_throttling.'.$firewallName, new ChildDefinition('security.listener.login_throttling'))
-            ->replaceArgument(1, new Reference('limiter.'.$config['limiter']))
+            ->replaceArgument(1, new Reference($config['limiter']))
             ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName]);
 
         return [];

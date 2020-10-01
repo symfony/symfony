@@ -12,13 +12,12 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\RateLimiter\Limiter;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
-use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -30,7 +29,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
     private $requestStack;
     private $limiter;
 
-    public function __construct(RequestStack $requestStack, Limiter $limiter)
+    public function __construct(RequestStack $requestStack, RequestRateLimiterInterface $limiter)
     {
         $this->requestStack = $requestStack;
         $this->limiter = $limiter;
@@ -44,33 +43,18 @@ final class LoginThrottlingListener implements EventSubscriberInterface
         }
 
         $request = $this->requestStack->getMasterRequest();
-        $username = $passport->getBadge(UserBadge::class)->getUserIdentifier();
-        $limiterKey = $this->createLimiterKey($username, $request);
+        $request->attributes->set(Security::LAST_USERNAME, $passport->getBadge(UserBadge::class)->getUserIdentifier());
 
-        $limiter = $this->limiter->create($limiterKey);
-        if (!$limiter->consume()->isAccepted()) {
-            throw new TooManyLoginAttemptsAuthenticationException();
+        $limit = $this->limiter->consume($request);
+        if (!$limit->isAccepted()) {
+            throw new TooManyLoginAttemptsAuthenticationException(ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
         }
-    }
-
-    public function onSuccessfulLogin(LoginSuccessEvent $event): void
-    {
-        $limiterKey = $this->createLimiterKey($event->getAuthenticatedToken()->getUsername(), $event->getRequest());
-        $limiter = $this->limiter->create($limiterKey);
-
-        $limiter->reset();
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckPassportEvent::class => ['checkPassport', 64],
-            LoginSuccessEvent::class => 'onSuccessfulLogin',
+            CheckPassportEvent::class => ['checkPassport', 2080],
         ];
-    }
-
-    private function createLimiterKey($username, Request $request): string
-    {
-        return $username.$request->getClientIp();
     }
 }

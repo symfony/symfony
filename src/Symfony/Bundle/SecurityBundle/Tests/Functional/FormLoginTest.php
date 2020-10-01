@@ -108,7 +108,10 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
     }
 
-    public function testLoginThrottling()
+    /**
+     * @dataProvider provideInvalidCredentials
+     */
+    public function testLoginThrottling($username, $password)
     {
         if (!class_exists(LoginThrottlingListener::class)) {
             $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
@@ -117,17 +120,23 @@ class FormLoginTest extends AbstractWebTestCase
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['_username'] = 'johannes';
-        $form['_password'] = 'wrong';
+        $form['_username'] = $username;
+        $form['_password'] = $password;
         $client->submit($form);
 
         $client->followRedirect()->selectButton('login')->form();
-        $form['_username'] = 'johannes';
-        $form['_password'] = 'wrong';
+        $form['_username'] = $username;
+        $form['_password'] = $password;
         $client->submit($form);
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Too many failed login attempts, please try again later.', $text);
+        $this->assertStringContainsString('Too many failed login attempts, please try again in 1 minute.', $text);
+    }
+
+    public function provideInvalidCredentials()
+    {
+        yield 'invalid_password' => ['johannes', 'wrong'];
+        yield 'invalid_username' => ['wrong', 'wrong'];
     }
 
     public function provideClientOptions()

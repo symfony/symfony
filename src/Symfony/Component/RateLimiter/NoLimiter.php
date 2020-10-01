@@ -25,7 +25,7 @@ final class NoLimiter implements LimiterInterface
 {
     public function consume(int $tokens = 1): Limit
     {
-        return new Limit(\INF, new \DateTimeImmutable(), true, 'no_limit');
+        return new Limit(\INF, new \DateTimeImmutable(), true);
     }
 
     public function reset(): void

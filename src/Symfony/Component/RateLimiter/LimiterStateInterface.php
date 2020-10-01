@@ -12,11 +12,17 @@
 namespace Symfony\Component\RateLimiter;
 
 /**
+ * Representing the stored state of the limiter.
+ *
+ * Classes implementing this interface must be serializable,
+ * which is used by the storage implementations to store the
+ * object.
+ *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @experimental in 5.2
  */
-interface LimiterStateInterface extends \Serializable
+interface LimiterStateInterface
 {
     public function getId(): string;
 

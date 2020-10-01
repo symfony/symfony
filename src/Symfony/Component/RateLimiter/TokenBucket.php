@@ -70,15 +70,22 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens($this->burstSize);
     }
 
-    public function serialize(): string
+    /**
+     * @internal
+     */
+    public function __sleep(): array
     {
-        return serialize([$this->id, $this->tokens, $this->timer, $this->burstSize, (string) $this->rate]);
+        $this->stringRate = (string) $this->rate;
+
+        return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
     }
 
-    public function unserialize($serialized): void
+    /**
+     * @internal
+     */
+    public function __wakeup(): void
     {
-        [$this->id, $this->tokens, $this->timer, $this->burstSize, $rate] = unserialize($serialized);
-
-        $this->rate = Rate::fromString($rate);
+        $this->rate = Rate::fromString($this->stringRate);
+        unset($this->stringRate);
     }
 }

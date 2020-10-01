@@ -48,15 +48,13 @@ final class Window implements LimiterStateInterface
         return $this->hitCount;
     }
 
-    public function serialize(): string
+    /**
+     * @internal
+     */
+    public function __sleep(): array
     {
         // $intervalInSeconds is not serialized, it should only be set
         // upon first creation of the Window.
-        return serialize([$this->id, $this->hitCount]);
-    }
-
-    public function unserialize($serialized): void
-    {
-        [$this->id, $this->hitCount] = unserialize($serialized);
+        return ['id', 'hitCount'];
     }
 }

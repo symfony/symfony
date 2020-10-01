@@ -1808,7 +1808,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->scalarNode('cache_pool')
                                         ->info('The cache pool to use for storing the current limiter state')
-                                        ->defaultValue('cache.app')
+                                        ->defaultValue('cache.rate_limiter')
                                     ->end()
                                     ->scalarNode('storage_service')
                                         ->info('The service ID of a custom storage implementation, this precedes any configured "cache_pool"')

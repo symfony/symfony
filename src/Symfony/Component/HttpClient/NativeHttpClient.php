@@ -225,7 +225,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $resolveRedirect = self::createRedirectResolver($options, $host, $proxy, $noProxy, $info, $onProgress);
         $context = stream_context_create($context, ['notification' => $notification]);
-        self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy, $noProxy);
+        self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy, $noProxy, 'https:' === $url['scheme']);
 
         return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolveRedirect, $onProgress, $this->logger);
     }
@@ -411,14 +411,14 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
-                self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, $noProxy);
+                self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, $noProxy, 'https:' === $url['scheme']);
             }
 
             return implode('', $url);
         };
     }
 
-    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy, array $noProxy)
+    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy, array $noProxy, bool $isSsl)
     {
         if (null === $proxy) {
             return stream_context_set_option($context, 'http', 'header', $requestHeaders);
@@ -435,7 +435,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         }
 
         stream_context_set_option($context, 'http', 'proxy', $proxy['url']);
-        stream_context_set_option($context, 'http', 'request_fulluri', true);
+        stream_context_set_option($context, 'http', 'request_fulluri', !$isSsl);
 
         if (null !== $proxy['auth']) {
             $requestHeaders[] = 'Proxy-Authorization: '.$proxy['auth'];

@@ -20,7 +20,6 @@ CHANGELOG
  * allowed loading and dumping tags with an attribute named "name"
  * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
  * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
- * deprecated PHP-DSL's `inline()` function, use `service()` instead
  * added support of PHP8 static return type for withers
  * added `AliasDeprecatedPublicServicesPass` to deprecate public services to private
 

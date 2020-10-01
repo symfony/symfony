@@ -1,0 +1,193 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T11:51:42Z
+
+Hello, I'm not sure I get what the issue is here.
+
+> `"Host": "3.211.1.78"`
+
+Where is this line coming from?
+
+Note that HTTP/1.1 section 5.3.2 tells that the full uri must be used when going through a proxy:
+https://tools.ietf.org/html/rfc7230#section-5.3.2
+
+> So this can break many things.
+
+can you give more hints about this? could your proxy be non-compliant? How does it behave when using CurlHttpClient?
+
+---------------------------------------------------------------------------
+
+by bohanyang at 2020-10-01T12:39:17Z
+
+> Where is this line coming from?
+
+I'm not sure what changed the `Host` header for now.
+
+> could your proxy be non-compliant?
+
+I'm testing it with [privoxy](https://www.google.com/search?q=privoxy), I don't know which proxy is compliant if it isn't.
+CurlHttpClient works just fine, same result as setting `request_fulluri` to false.
+
+Tested on Symfony 5.1.6, Debian 9, PHP (deb.sury.org) 7.4.10, curl 7.72.0 (from unstable repo to enable the debug log)
+Privoxy working on 127.0.0.1:7777 version 3.0.28, default config, without sending/redirecting the traffic to another proxy (e.g. SOCKS)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\HttpClient;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$client = new NativeHttpClient();
+$resp = $client->request('GET', 'https://httpbin.org/get');
+echo $resp->getContent();
+echo $resp->getInfo('debug');
+```
+
+### Without `request_fulluri`
+```
+{
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip",
+    "Host": "httpbin.org",
+    "User-Agent": "Symfony HttpClient/Native",
+    "X-Amzn-Trace-Id": "Root=1-5f75cd34-5daa0a902c40e8df6a4cdd5b"
+  },
+  "origin": "xxx.xxx.xxx.xxx",
+  "url": "https://httpbin.org/get"
+}
+* Hostname was NOT found in DNS cache
+* Added httpbin.org:0:34.194.129.11 to DNS cache
+* Establish HTTP proxy tunnel to tcp://127.0.0.1:7777
+> GET https://34.194.129.11/get HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip
+Host: httpbin.org
+User-Agent: Symfony HttpClient/Native
+
+< HTTP/1.1 200 OK
+< Date: Thu, 01 Oct 2020 12:36:04 GMT
+< Content-Type: application/json
+< Content-Length: 300
+< Connection: close
+< Server: gunicorn/19.9.0
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Credentials: true
+<
+```
+
+### CurlHttpClient
+```
+{
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip",
+    "Host": "httpbin.org",
+    "User-Agent": "Symfony HttpClient/Curl",
+    "X-Amzn-Trace-Id": "Root=1-5f75cbd9-51a4f7a44f1eaa3326be6796"
+  },
+  "origin": "xxx.xxx.xxx.xxx",
+  "url": "https://httpbin.org/get"
+}
+* Uses proxy env variable https_proxy == 'http://127.0.0.1:7777'
+*   Trying 127.0.0.1:7777...
+* Connected to 127.0.0.1 (127.0.0.1) port 7777 (#0)
+* allocate connect buffer!
+* Establish HTTP proxy tunnel to httpbin.org:443
+> CONNECT httpbin.org:443 HTTP/1.1
+Host: httpbin.org:443
+Proxy-Connection: Keep-Alive
+
+< HTTP/1.1 200 Connection established
+<
+* Proxy replied 200 to CONNECT request
+* CONNECT phase completed!
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* CONNECT phase completed!
+* CONNECT phase completed!
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES128-GCM-SHA256
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: CN=httpbin.org
+*  start date: Jan 18 00:00:00 2020 GMT
+*  expire date: Feb 18 12:00:00 2021 GMT
+*  subjectAltName: host "httpbin.org" matched cert's "httpbin.org"
+*  issuer: C=US; O=Amazon; OU=Server CA 1B; CN=Amazon
+*  SSL certificate verify ok.
+* Using HTTP2, server supports multi-use
+* Connection state changed (HTTP/2 confirmed)
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+* Using Stream ID: 1 (easy handle 0x556304296990)
+> GET /get HTTP/2
+Host: httpbin.org
+accept: */*
+user-agent: Symfony HttpClient/Curl
+accept-encoding: gzip
+
+* Connection state changed (MAX_CONCURRENT_STREAMS == 128)!
+< HTTP/2 200
+< date: Thu, 01 Oct 2020 12:30:17 GMT
+< content-type: application/json
+< content-length: 298
+< server: gunicorn/19.9.0
+< access-control-allow-origin: *
+< access-control-allow-credentials: true
+<
+* Connection #0 to host 127.0.0.1 left intact
+```
+
+> can you give more hints about this?
+
+So for example httpbin can be accessed like `curl -k https://3.211.1.78/get`, but many others don't.
+The `Host` information is lost, a web server uses the `Host` to find out which website is being accessed.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-01T13:01:21Z
+
+According to https://www.php.net/manual/fr/context.http.php#context.http.request-fulluri, the `request_fulluri` context param is precisely creating non-standard requests, so that they work with non-standard proxies.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T13:02:03Z
+
+Thanks for the insights. Looking at the details, this means that the fulluri should be used only when https is *not* in use.
+
+The patch should be `stream_context_set_option($context, 'http', 'request_fulluri', !$isSsl);`
+
+`$isSsl` being a new argument on the method, whose value is `'https:' === $url['scheme']`
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-01T13:06:20Z
+
+> Thanks for the insights. Looking at the details, this means that the fulluri should be used only when https is _not_ in use.
+
+why would it depend on https ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T13:09:48Z
+
+- When doing https, the CONNECT method is used and the remaining of the stream is encrypted: the remote server must see only the path
+- When doing http, GET is used: the proxy sees the headers and routes accordingly. It does so according to section 5.3.2 above, using the full URI.
+
+---------------------------------------------------------------------------
+
+by bohanyang at 2020-10-01T16:01:17Z
+
+Patch applied. Worked with privoxy.
+But my "non-standard-compliant" HTTP proxy ([v2ray](https://github.com/v2fly/v2ray-core) written in Go)
+seems need `request_fulluri` to be false to work...
+Could we make it configurable?

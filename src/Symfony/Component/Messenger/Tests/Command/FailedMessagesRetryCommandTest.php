@@ -40,8 +40,7 @@ class FailedMessagesRetryCommandTest extends TestCase
             $receiver,
             $bus,
             $dispatcher,
-            new NullLogger(),
-            null
+            new NullLogger()
         );
 
         $tester = new CommandTester($command);
@@ -67,11 +66,10 @@ class FailedMessagesRetryCommandTest extends TestCase
 
         $command = new FailedMessagesRetryCommand(
             null,
-            null,
+            $serviceLocator,
             $bus,
             $dispatcher,
-            new NullLogger(),
-            $serviceLocator
+            new NullLogger()
         );
 
         $tester = new CommandTester($command);

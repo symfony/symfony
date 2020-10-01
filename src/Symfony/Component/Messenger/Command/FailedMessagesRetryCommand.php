@@ -42,14 +42,14 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
     private $logger;
     private $globalReceiverName;
 
-    public function __construct(?string $globalReceiverName, ?ReceiverInterface $globalReceiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, ?ServiceLocator $failureTransports = null)
+    public function __construct(?string $globalReceiverName, $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
         $this->globalReceiverName = $globalReceiverName;
 
-        parent::__construct($globalReceiverName, null === $failureTransports ? $globalReceiver : $failureTransports);
+        parent::__construct($globalReceiverName, $failureTransports);
     }
 
     /**

@@ -363,4 +363,33 @@ class CookieTest extends TestCase
 
         $this->assertFalse($cookie->isSecure());
     }
+
+    public function testMaxAge()
+    {
+        $futureDateOneHour = gmdate('D, d-M-Y H:i:s T', time() + 3600);
+
+        $cookie = Cookie::fromString('foo=bar; Max-Age=3600; path=/');
+        $this->assertEquals('foo=bar; expires='.$futureDateOneHour.'; Max-Age=3600; path=/', $cookie->__toString());
+
+        $cookie = Cookie::fromString('foo=bar; expires='.$futureDateOneHour.'; Max-Age=3600; path=/');
+        $this->assertEquals('foo=bar; expires='.$futureDateOneHour.'; Max-Age=3600; path=/', $cookie->__toString());
+
+        $futureDateHalfHour = gmdate('D, d-M-Y H:i:s T', time() + 1800);
+
+        // Max-Age value takes precedence before expires
+        $cookie = Cookie::fromString('foo=bar; expires='.$futureDateHalfHour.'; Max-Age=3600; path=/');
+        $this->assertEquals('foo=bar; expires='.$futureDateOneHour.'; Max-Age=3600; path=/', $cookie->__toString());
+    }
+
+    public function testExpiredWithMaxAge()
+    {
+        $cookie = Cookie::fromString('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; Max-Age=0; path=/');
+        $this->assertEquals('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; Max-Age=0; path=/', $cookie->__toString());
+
+        $futureDate = gmdate('D, d-M-Y H:i:s T', time() + 864000);
+
+        $cookie = Cookie::fromString('foo=bar; expires='.$futureDate.'; Max-Age=0; path=/');
+        $this->assertEquals(time(), $cookie->getExpiresTime());
+        $this->assertEquals('foo=bar; expires='.gmdate('D, d-M-Y H:i:s T', $cookie->getExpiresTime()).'; Max-Age=0; path=/', $cookie->__toString());
+    }
 }

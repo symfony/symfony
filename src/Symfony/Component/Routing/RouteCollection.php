@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * A RouteCollection represents a set of Route instances.
@@ -31,6 +33,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
     private $routes = [];
 
     /**
+     * @var Alias[]
+     */
+    private $aliases = [];
+
+    /**
      * @var array
      */
     private $resources = [];
@@ -44,6 +51,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         foreach ($this->routes as $name => $route) {
             $this->routes[$name] = clone $route;
+        }
+
+        foreach ($this->aliases as $alias => $route) {
+            $this->aliases[$alias] = clone $route;
         }
     }
 
@@ -80,7 +91,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
             trigger_deprecation('symfony/routing', '5.1', 'The "%s()" method will have a new "int $priority = 0" argument in version 6.0, not defining it is deprecated.', __METHOD__);
         }
 
-        unset($this->routes[$name], $this->priorities[$name]);
+        unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
 
         $this->routes[$name] = $route;
 
@@ -114,6 +125,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function get(string $name)
     {
+        if (isset($this->aliases[$name])) {
+            return $this->get((string) $this->aliases[$name]);
+        }
+
         return isset($this->routes[$name]) ? $this->routes[$name] : null;
     }
 
@@ -125,7 +140,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function remove($name)
     {
         foreach ((array) $name as $n) {
-            unset($this->routes[$n], $this->priorities[$n]);
+            unset($this->routes[$n], $this->priorities[$n], $this->aliases[$n]);
         }
     }
 
@@ -138,12 +153,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
         foreach ($collection->all() as $name => $route) {
-            unset($this->routes[$name], $this->priorities[$name]);
+            unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
             $this->routes[$name] = $route;
 
             if (isset($collection->priorities[$name])) {
                 $this->priorities[$name] = $collection->priorities[$name];
             }
+        }
+
+        foreach ($collection->getAliases() as $alias => $route) {
+            $this->setAlias($alias, $route);
         }
 
         foreach ($collection->getResources() as $resource) {
@@ -302,5 +321,66 @@ class RouteCollection implements \IteratorAggregate, \Countable
         if (!isset($this->resources[$key])) {
             $this->resources[$key] = $resource;
         }
+    }
+
+    /**
+     * Sets an alias for an existing route.
+     *
+     * @param string       $alias The alias to create
+     * @param string|Alias $route The route to alias
+     *
+     * @throws InvalidArgumentException if the id is not a string or an Alias
+     * @throws InvalidArgumentException if the alias is for itself
+     */
+    public function setAlias(string $alias, $route): Alias
+    {
+        if (\is_string($route)) {
+            $route = new Alias($route);
+        } elseif (!$route instanceof Alias) {
+            throw new InvalidArgumentException('$route must be a string, or an Alias object.');
+        }
+
+        if ($alias === (string) $route) {
+            throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
+        }
+
+        unset($this->routes[$alias], $this->priorities[$alias]);
+
+        return $this->aliases[$alias] = $route;
+    }
+
+    /**
+     * @return array<string, Alias>
+     */
+    public function getAliases(): array
+    {
+        return $this->aliases;
+    }
+
+    /**
+     * @return string[] An array of resolved route names
+     */
+    public function resolveAliases(): array
+    {
+        $resolvedAliases = [];
+        foreach ($this->aliases as $alias => $target) {
+            $resolved = $this->resolveAlias((string) $target);
+            if (null === $resolved) {
+                throw new RouteNotFoundException(sprintf('Target route "%s" for alias "%s" is not defined.', $target, $alias));
+            }
+
+            $resolvedAliases[$alias] = $resolved;
+        }
+
+        return $resolvedAliases;
+    }
+
+    private function resolveAlias(string $alias): ?string
+    {
+        if (isset($this->aliases[$alias])) {
+            return $this->resolveAlias((string) $this->aliases[$alias]);
+        }
+
+        return isset($this->routes[$alias]) ? $alias : null;
     }
 }

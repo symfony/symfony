@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Alias;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -255,5 +257,32 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertSame('/fun', $compiledUrlGenerator->generate('fun.en'));
         $this->assertSame('/fun', $compiledUrlGenerator->generate('fun', ['_locale' => 'en']));
         $this->assertSame('/amusant', $compiledUrlGenerator->generate('fun.fr', ['_locale' => 'en']));
+    }
+
+    public function testAliases()
+    {
+        $this->routeCollection->add('a', new Route('/hello'));
+        $this->routeCollection->setAlias('b', 'a');
+        $this->routeCollection->setAlias('c', new Alias('b'));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+
+        $this->assertSame('/hello', $compiledUrlGenerator->generate('b'));
+        $this->assertSame('/hello', $compiledUrlGenerator->generate('c'));
+    }
+
+    public function testTargetAliasNotExisting()
+    {
+        $this->expectException(RouteNotFoundException::class);
+
+        $this->routeCollection->setAlias('a', 'not-existing');
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+
+        $compiledUrlGenerator->generate('a');
     }
 }

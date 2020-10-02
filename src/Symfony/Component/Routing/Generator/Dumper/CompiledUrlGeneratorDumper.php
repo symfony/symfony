@@ -24,8 +24,9 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
 {
     public function getCompiledRoutes(): array
     {
+        $routes = $this->getRoutes();
         $compiledRoutes = [];
-        foreach ($this->getRoutes()->all() as $name => $route) {
+        foreach ($routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $compiledRoutes[$name] = [
@@ -36,6 +37,10 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
                 $compiledRoute->getHostTokens(),
                 $route->getSchemes(),
             ];
+        }
+
+        foreach ($routes->resolveAliases() as $alias => $target) {
+            $compiledRoutes[$alias] = $compiledRoutes[$target];
         }
 
         return $compiledRoutes;

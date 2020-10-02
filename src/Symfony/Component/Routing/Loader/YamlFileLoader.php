@@ -34,7 +34,7 @@ class YamlFileLoader extends FileLoader
     use PrefixTrait;
 
     private static $availableKeys = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'alias',
     ];
     private $yamlParser;
 
@@ -113,6 +113,12 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
     {
+        if (isset($config['alias'])) {
+            $collection->setAlias($name, $config['alias']);
+
+            return;
+        }
+
         $defaults = isset($config['defaults']) ? $config['defaults'] : [];
         $requirements = isset($config['requirements']) ? $config['requirements'] : [];
         $options = isset($config['options']) ? $config['options'] : [];
@@ -242,6 +248,12 @@ class YamlFileLoader extends FileLoader
         }
         if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".', $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)));
+        }
+        if (isset($config['alias'])) {
+            if (1 === \count($config)) {
+                return;
+            }
+            throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify other keys than "alias" for "%s".', $path, $name));
         }
         if (isset($config['resource']) && isset($config['path'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "resource" key and the "path" key for "%s". Choose between an import and a route definition.', $path, $name));

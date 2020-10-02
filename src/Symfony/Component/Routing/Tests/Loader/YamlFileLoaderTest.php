@@ -435,4 +435,14 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
+
+    public function testImportingAliases()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.yaml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('yaml'), $routes);
+    }
 }

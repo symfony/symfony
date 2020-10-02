@@ -563,4 +563,14 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
+
+    public function testImportingAliases()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
 }

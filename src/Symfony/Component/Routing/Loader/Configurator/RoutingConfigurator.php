@@ -58,6 +58,11 @@ class RoutingConfigurator
         return new CollectionConfigurator($this->collection, $name);
     }
 
+    final public function alias(string $name, string $referencedName): void
+    {
+        $this->collection->setAlias($name, $referencedName);
+    }
+
     /**
      * @return static
      */

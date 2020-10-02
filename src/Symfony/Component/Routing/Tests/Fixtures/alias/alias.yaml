@@ -1,0 +1,12 @@
+route:
+  path: /hello
+overrided:
+  path: /
+alias:
+  alias: route
+alias2:
+  alias: route
+deep:
+  alias: alias
+_import:
+  resource: override.yaml

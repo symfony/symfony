@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Alias;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -709,6 +711,23 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('../../about', $generator->generate('unrelated',
             [], UrlGeneratorInterface::RELATIVE_PATH)
         );
+    }
+
+    public function testAliases()
+    {
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/hello'));
+        $routes->setAlias('b', 'a');
+        $routes->setAlias('c', new Alias('b'));
+        $routes->setAlias('d', 'non-existent');
+
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/hello', $generator->generate('b'));
+        $this->assertSame('/app.php/hello', $generator->generate('c'));
+
+        $this->expectException(RouteNotFoundException::class);
+        $generator->generate('d');
     }
 
     /**

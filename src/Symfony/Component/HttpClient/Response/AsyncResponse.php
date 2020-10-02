@@ -206,6 +206,11 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
             foreach ($client->stream($wrappedResponses, $timeout) as $response => $chunk) {
                 $r = $asyncMap[$response];
 
+                if (null === $chunk->getError() && $chunk->isFirst()) {
+                    // Ensure no exception is thrown on destruct for the wrapped response
+                    $r->response->getStatusCode();
+                }
+
                 if (!$r->passthru) {
                     if (null !== $chunk->getError() || $chunk->isLast()) {
                         unset($asyncMap[$response]);
@@ -217,11 +222,6 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
 
                     yield $r => $chunk;
                     continue;
-                }
-
-                if (null === $chunk->getError() && $chunk->isFirst()) {
-                    // Ensure no exception is thrown on destruct for the wrapped response
-                    $r->response->getStatusCode();
                 }
 
                 foreach (self::passthru($r->client, $r, $chunk, $asyncMap) as $chunk) {

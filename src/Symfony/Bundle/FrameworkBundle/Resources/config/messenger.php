@@ -152,6 +152,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('senders service locator'),
                 service('messenger.retry_strategy_locator'),
                 service('logger')->ignoreOnInvalid(),
+                service('event_dispatcher'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

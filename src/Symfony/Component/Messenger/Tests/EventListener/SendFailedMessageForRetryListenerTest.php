@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SendFailedMessageForRetryListenerTest extends TestCase
 {
@@ -107,7 +108,10 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
         $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
 
-        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())->method('dispatch');
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator, null, $eventDispatcher);
 
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 

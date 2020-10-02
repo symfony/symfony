@@ -104,6 +104,7 @@ class Worker
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->dispatchEvent($event);
+        $envelope = $event->getEnvelope();
 
         if (!$event->shouldHandle()) {
             return;
@@ -123,7 +124,9 @@ class Worker
                 $envelope = $throwable->getEnvelope();
             }
 
-            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable));
+            $failedEvent = new WorkerMessageFailedEvent($envelope, $transportName, $throwable);
+            $this->dispatchEvent($failedEvent);
+            $envelope = $failedEvent->getEnvelope();
 
             if (!$rejectFirst) {
                 $receiver->reject($envelope);
@@ -132,7 +135,9 @@ class Worker
             return;
         }
 
-        $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $transportName));
+        $handledEvent = new WorkerMessageHandledEvent($envelope, $transportName);
+        $this->dispatchEvent($handledEvent);
+        $envelope = $handledEvent->getEnvelope();
 
         if (null !== $this->logger) {
             $message = $envelope->getMessage();

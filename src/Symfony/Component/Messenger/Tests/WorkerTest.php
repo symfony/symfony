@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
@@ -243,14 +244,45 @@ class WorkerTest extends TestCase
         // make sure they were processed in the correct order
         $this->assertSame([$envelope1, $envelope2, $envelope3, $envelope4, $envelope5, $envelope6], $processedEnvelopes);
     }
+
+    public function testWorkerMessageReceivedEventMutability()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $stamp = new class() implements StampInterface {
+        };
+        $listener = function (WorkerMessageReceivedEvent $event) use ($stamp) {
+            $event->addStamps($stamp);
+        };
+
+        $eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
+
+        $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker->run();
+
+        $envelope = current($receiver->getAcknowledgedEnvelopes());
+        $this->assertCount(1, $envelope->all(\get_class($stamp)));
+    }
 }
 
 class DummyReceiver implements ReceiverInterface
 {
     private $deliveriesOfEnvelopes;
+    private $acknowledgedEnvelopes;
+    private $rejectedEnvelopes;
     private $acknowledgeCount = 0;
     private $rejectCount = 0;
 
+    /**
+     * @param Envelope[][] $deliveriesOfEnvelopes
+     */
     public function __construct(array $deliveriesOfEnvelopes)
     {
         $this->deliveriesOfEnvelopes = $deliveriesOfEnvelopes;
@@ -266,11 +298,13 @@ class DummyReceiver implements ReceiverInterface
     public function ack(Envelope $envelope): void
     {
         ++$this->acknowledgeCount;
+        $this->acknowledgedEnvelopes[] = $envelope;
     }
 
     public function reject(Envelope $envelope): void
     {
         ++$this->rejectCount;
+        $this->rejectedEnvelopes[] = $envelope;
     }
 
     public function getAcknowledgeCount(): int
@@ -281,5 +315,10 @@ class DummyReceiver implements ReceiverInterface
     public function getRejectCount(): int
     {
         return $this->rejectCount;
+    }
+
+    public function getAcknowledgedEnvelopes(): array
+    {
+        return $this->acknowledgedEnvelopes;
     }
 }

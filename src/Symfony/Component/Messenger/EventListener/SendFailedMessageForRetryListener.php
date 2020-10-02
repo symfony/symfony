@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageRetriedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -24,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
@@ -33,13 +35,15 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     private $sendersLocator;
     private $retryStrategyLocator;
     private $logger;
+    private $eventDispatcher;
     private $historySize;
 
-    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, int $historySize = 10)
+    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
     {
         $this->sendersLocator = $sendersLocator;
         $this->retryStrategyLocator = $retryStrategyLocator;
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
         $this->historySize = $historySize;
     }
 
@@ -74,6 +78,10 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
             // re-send the message for retry
             $this->getSenderForTransport($event->getReceiverName())->send($retryEnvelope);
+
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new WorkerMessageRetriedEvent($retryEnvelope, $event->getReceiverName()));
+            }
         } else {
             if (null !== $this->logger) {
                 $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);

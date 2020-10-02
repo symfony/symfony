@@ -62,6 +62,22 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testRetry404WithThrow()
+    {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            $this->assertTrue($chunk->isFirst());
+            $this->assertSame(404, $context->getStatusCode());
+            $context->getResponse()->cancel();
+            $context->replaceRequest('GET', 'http://localhost:8057/404');
+            $context->passthru();
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+
+        $this->expectException(ClientExceptionInterface::class);
+        $response->getContent(true);
+    }
+
     public function testRetryTransportError()
     {
         $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {

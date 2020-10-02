@@ -155,15 +155,7 @@ abstract class AbstractFailedMessagesCommand extends Command
     protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
     {
         if (null === \func_get_args()[1]) {
-            trigger_deprecation(
-                'symfony/messenger',
-                '5.2',
-                sprintf(
-                    'Using the "getLastRedeliveryStampWithException" method in the "%s" class is deprecated, use the "Envelope::last(%s)" instead.',
-                    self::class,
-                    ErrorDetailsStamp::class
-                )
-            );
+            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "getLastRedeliveryStampWithException" method in the "%s" class is deprecated, use the "Envelope::last(%s)" instead.', self::class, ErrorDetailsStamp::class));
         }
 
         // Use ErrorDetailsStamp instead if it is available

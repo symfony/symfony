@@ -18,6 +18,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 /**
@@ -82,13 +84,25 @@ EOF
 
         $rows = [];
         foreach ($envelopes as $envelope) {
-            $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope);
+            /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+            $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+            /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
+            $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+            $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
+
+            $errorMessage = '';
+            if (null !== $lastErrorDetailsStamp) {
+                $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
+            } elseif (null !== $lastRedeliveryStampWithException) {
+                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
+                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
+            }
 
             $rows[] = [
                 $this->getMessageId($envelope),
                 \get_class($envelope->getMessage()),
-                null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getRedeliveredAt()->format('Y-m-d H:i:s'),
-                null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getExceptionMessage(),
+                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                $errorMessage,
             ];
         }
 

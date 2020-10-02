@@ -11,10 +11,8 @@
 namespace Symfony\Component\Messenger\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -49,16 +47,10 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        $throwable = $event->getThrowable();
-        if ($throwable instanceof HandlerFailedException) {
-            $throwable = $throwable->getNestedExceptions()[0];
-        }
-
-        $flattenedException = class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
         $envelope = $envelope->with(
             new SentToFailureTransportStamp($event->getReceiverName()),
             new DelayStamp(0),
-            new RedeliveryStamp(0, $throwable->getMessage(), $flattenedException)
+            new RedeliveryStamp(0)
         );
 
         if (null !== $this->logger) {

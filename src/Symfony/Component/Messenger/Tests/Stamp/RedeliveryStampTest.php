@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase
@@ -22,16 +21,6 @@ class RedeliveryStampTest extends TestCase
         $stamp = new RedeliveryStamp(10);
         $this->assertSame(10, $stamp->getRetryCount());
         $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getRedeliveredAt());
-        $this->assertNull($stamp->getExceptionMessage());
-        $this->assertNull($stamp->getFlattenException());
-    }
-
-    public function testGettersPopulated()
-    {
-        $flattenException = new FlattenException();
-        $stamp = new RedeliveryStamp(10, 'exception message', $flattenException);
-        $this->assertSame('exception message', $stamp->getExceptionMessage());
-        $this->assertSame($flattenException, $stamp->getFlattenException());
     }
 
     public function testSerialization()

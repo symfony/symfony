@@ -306,7 +306,7 @@ class Cookie
      */
     public function isExpired()
     {
-        return null !== $this->expires && 0 != $this->expires && $this->expires < time();
+        return null !== $this->expires && 0 != $this->expires && $this->expires <= time();
     }
 
     /**

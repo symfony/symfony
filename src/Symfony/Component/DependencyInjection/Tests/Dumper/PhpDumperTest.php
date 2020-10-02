@@ -307,6 +307,7 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {

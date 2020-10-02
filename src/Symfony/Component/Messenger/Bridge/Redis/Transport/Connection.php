@@ -71,11 +71,11 @@ class Connection
         }
 
         if (null !== $auth && !$this->connection->auth($auth)) {
-            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
         }
 
         if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
         }
 
         foreach (['stream', 'group', 'consumer'] as $key) {

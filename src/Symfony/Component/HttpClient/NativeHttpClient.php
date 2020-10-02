@@ -215,15 +215,18 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $context = stream_context_create($context, ['notification' => $notification]);
 
         $resolver = static function ($multi) use ($context, $options, $url, &$info, $onProgress) {
-            [$host, $port, $url['authority']] = self::dnsResolve($url, $multi, $info, $onProgress);
+            [$host, $port] = self::parseHostPort($url, $info);
 
             if (!isset($options['normalized_headers']['host'])) {
                 $options['headers'][] = 'Host: '.$host.$port;
             }
 
-            stream_context_set_option($context, 'ssl', 'peer_name', $host);
             $proxy = self::getProxy($options['proxy'], $url, $options['no_proxy']);
-            self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy);
+
+            if (!self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy, 'https:' === $url['scheme'])) {
+                $ip = self::dnsResolve($host, $multi, $info, $onProgress);
+                $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
+            }
 
             return [self::createRedirectResolver($options, $host, $proxy, $info, $onProgress), implode('', $url)];
         };
@@ -269,9 +272,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     }
 
     /**
-     * Resolves the IP of the host using the local DNS cache if possible.
+     * Extracts the host and the port from the URL.
      */
-    private static function dnsResolve(array $url, NativeClientState $multi, array &$info, ?\Closure $onProgress): array
+    private static function parseHostPort(array $url, array &$info): array
     {
         if ($port = parse_url($url['authority'], \PHP_URL_PORT) ?: '') {
             $info['primary_port'] = $port;
@@ -280,8 +283,14 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $info['primary_port'] = 'http:' === $url['scheme'] ? 80 : 443;
         }
 
-        $host = parse_url($url['authority'], \PHP_URL_HOST);
+        return [parse_url($url['authority'], \PHP_URL_HOST), $port];
+    }
 
+    /**
+     * Resolves the IP of the host using the local DNS cache if possible.
+     */
+    private static function dnsResolve($host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
+    {
         if (null === $ip = $multi->dnsCache[$host] ?? null) {
             $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
             $now = microtime(true);
@@ -304,7 +313,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $onProgress();
         }
 
-        return [$host, $port, substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host))];
+        return $ip;
     }
 
     /**
@@ -367,24 +376,33 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 }
             }
 
-            [$host, $port, $url['authority']] = self::dnsResolve($url, $multi, $info, $onProgress);
-            stream_context_set_option($context, 'ssl', 'peer_name', $host);
+            [$host, $port] = self::parseHostPort($url, $info);
 
             if (false !== (parse_url($location, \PHP_URL_HOST) ?? false)) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
-                self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy);
+                $dnsResolve = !self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, 'https:' === $url['scheme']);
+            } else {
+                $dnsResolve = isset(stream_context_get_options($context)['ssl']['peer_name']);
+            }
+
+            if ($dnsResolve) {
+                $ip = self::dnsResolve($host, $multi, $info, $onProgress);
+                $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
 
             return implode('', $url);
         };
     }
 
-    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy): bool
+    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy, bool $isSsl): bool
     {
         if (null === $proxy) {
-            return stream_context_set_option($context, 'http', 'header', $requestHeaders);
+            stream_context_set_option($context, 'http', 'header', $requestHeaders);
+            stream_context_set_option($context, 'ssl', 'peer_name', $host);
+
+            return false;
         }
 
         // Matching "no_proxy" should follow the behavior of curl
@@ -393,17 +411,24 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $dotRule = '.'.ltrim($rule, '.');
 
             if ('*' === $rule || $host === $rule || substr($host, -\strlen($dotRule)) === $dotRule) {
-                return stream_context_set_option($context, 'http', 'header', $requestHeaders);
+                stream_context_set_option($context, 'http', 'proxy', null);
+                stream_context_set_option($context, 'http', 'request_fulluri', false);
+                stream_context_set_option($context, 'http', 'header', $requestHeaders);
+                stream_context_set_option($context, 'ssl', 'peer_name', $host);
+
+                return false;
             }
         }
-
-        stream_context_set_option($context, 'http', 'proxy', $proxy['url']);
-        stream_context_set_option($context, 'http', 'request_fulluri', true);
 
         if (null !== $proxy['auth']) {
             $requestHeaders[] = 'Proxy-Authorization: '.$proxy['auth'];
         }
 
-        return stream_context_set_option($context, 'http', 'header', $requestHeaders);
+        stream_context_set_option($context, 'http', 'proxy', $proxy['url']);
+        stream_context_set_option($context, 'http', 'request_fulluri', !$isSsl);
+        stream_context_set_option($context, 'http', 'header', $requestHeaders);
+        stream_context_set_option($context, 'ssl', 'peer_name', null);
+
+        return true;
     }
 }

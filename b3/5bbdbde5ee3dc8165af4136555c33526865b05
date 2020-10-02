@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-01T14:10:45Z
+
+> for my understanding, this means you're going to add a decider in async-aws that will chck both the status code and this specific content-type to decide to wait for the body, isn't it?
+
+yes. The decider should avoid as possible downloading the body. It can take a quick decision when statusCode is 2xx, 429, 5xx... Or content-type is unknow or content-length is too big.
+
+but in some case (status = 400 + contentType = json + content-length < XXX) then it'll ask to the client to provide the body to take the decision.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-01T15:54:05Z
+
+> (I force-pushed a patch on `AsyncResponse` and confirmed it works)
+
+Confirmed, it works. I pushed a commit about fixing wrong exception namespace

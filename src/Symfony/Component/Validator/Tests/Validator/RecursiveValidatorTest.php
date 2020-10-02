@@ -2153,6 +2153,25 @@ class RecursiveValidatorTest extends TestCase
 
         $this->assertCount(2, $this->validator->validate($entity, new TestConstraintHashesDoNotCollide()));
     }
+
+    public function testValidatedConstraintsHashesDoNotCollideWithSameConstraintValidatingDifferentProperties()
+    {
+        $value = new \stdClass();
+
+        $entity = new Entity();
+        $entity->firstName = $value;
+        $entity->setLastName($value);
+
+        $validator = $this->validator->startContext($entity);
+
+        $constraint = new IsNull();
+        $validator->atPath('firstName')
+            ->validate($entity->firstName, $constraint);
+        $validator->atPath('lastName')
+            ->validate($entity->getLastName(), $constraint);
+
+        $this->assertCount(2, $validator->getViolations());
+    }
 }
 
 final class TestConstraintHashesDoNotCollide extends Constraint

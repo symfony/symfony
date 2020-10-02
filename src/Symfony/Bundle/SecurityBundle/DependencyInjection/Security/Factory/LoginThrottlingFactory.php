@@ -76,8 +76,6 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
                 'strategy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
                 'interval' => '1 minute',
-                'lock_factory' => 'lock.factory',
-                'cache_pool' => 'cache.app',
             ];
             FrameworkExtension::registerRateLimiter($container, $localId = '_login_local_'.$firewallName, $limiterOptions);
 

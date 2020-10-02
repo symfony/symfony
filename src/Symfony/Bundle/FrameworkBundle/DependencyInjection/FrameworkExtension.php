@@ -2254,6 +2254,9 @@ class FrameworkExtension extends Extension
 
     public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
     {
+        // default configuration (when used by other DI extensions)
+        $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
+
         $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
 
         $limiter->addArgument(new Reference($limiterConfig['lock_factory']));

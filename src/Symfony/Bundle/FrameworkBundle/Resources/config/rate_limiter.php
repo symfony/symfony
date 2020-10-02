@@ -15,6 +15,10 @@ use Symfony\Component\RateLimiter\Limiter;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('cache.rate_limiter')
+            ->parent('cache.app')
+            ->tag('cache.pool')
+
         ->set('limiter', Limiter::class)
             ->abstract()
             ->args([

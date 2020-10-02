@@ -61,15 +61,13 @@ trait CommonResponseTrait
                 return $content;
             }
 
-            if ('HEAD' === $this->getInfo('http_method') || \in_array($this->getInfo('http_code'), [204, 304], true)) {
-                return '';
+            if (null === $this->content) {
+                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
             }
-
-            throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
-        }
-
-        foreach (self::stream([$this]) as $chunk) {
-            // Chunks are buffered in $this->content already
+        } else {
+            foreach (self::stream([$this]) as $chunk) {
+                // Chunks are buffered in $this->content already
+            }
         }
 
         rewind($this->content);

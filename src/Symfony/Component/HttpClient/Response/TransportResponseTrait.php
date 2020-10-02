@@ -207,6 +207,10 @@ trait TransportResponseTrait
 
                                 $chunk = new ErrorChunk($response->offset, $e);
                             } else {
+                                if (0 === $response->offset && null === $response->content) {
+                                    $response->content = fopen('php://memory', 'w+');
+                                }
+
                                 $chunk = new LastChunk($response->offset);
                             }
                         } elseif ($chunk instanceof ErrorChunk) {

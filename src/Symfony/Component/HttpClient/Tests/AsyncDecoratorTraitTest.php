@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -195,5 +196,31 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
         $this->assertStringContainsString('HTTP_HOST', $response->getContent());
+    }
+
+    public function testDestructErrorResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            yield $chunk;
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+        $this->assertSame(404, $response->getStatusCode());
+        // Exception should not be thrown since the status code is checked
+        unset($response);
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+        $this->assertSame('application/json', $response->getHeaders(false)['content-type'][0]);
+        // Exception should not be thrown since headers are checked
+        unset($response);
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+        $this->assertSame('/404', $response->toArray(false)['REQUEST_URI']);
+        // Exception should not be thrown since getContent(false) is called
+        unset($response);
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+        $this->expectException(ClientException::class);
+        unset($response);
     }
 }

@@ -166,6 +166,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         if (null !== $httpException) {
             throw $httpException;
         }
+
+        // Deactivate underlying response throwing on HTTP errors
+        $this->response->getStatusCode();
     }
 
     /**

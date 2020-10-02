@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-20T22:32:02Z
+
+> a way to update the enveloppe in worker message events (fixed by adding AbstractWorkerMessageEvent::setEnvelope())
+
+Can you please provide a use case for this?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-03-21T11:35:03Z
+
+@chalasr we're aggregating some metadata for each message (`received_at`, `waiting_time`, etc...)
+thus, in order to track messages, we affect an [id with a stamp once message is sent to transport](https://github.com/SymfonyCasts/messenger-monitor-bundle/blob/master/src/EventListener/AddStampOnMessageSentListener.php) leveraging `SendMessageToTransportsEvent::setEnvelope()`.
+
+But if a message is sent by another system (eg: in a micro-services architecture), we cannot use `SendMessageToTransportsEvent` and need another hook to add this id.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-03-21T13:42:20Z
+
+@nikophil Works for me, thanks.
+
+Can you add a CHANGELOG entry for this?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-05-03T17:07:21Z
+
+I'm still supportive of this feature, but we would need @Tobion to reconsider his vote :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-17T12:36:28Z
+
+@Tobion Can you have another look at this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-06T07:12:35Z
+
+@nikophil Still willing to finish this PR?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-09-06T12:28:10Z
+
+Hi, yes sorry, i'll do that shortly
+
+---------------------------------------------------------------------------
+
+by nikophil at 2020-10-01T07:53:30Z
+
+@fabpot @Tobion i've fixed the PR, sorry for the delay

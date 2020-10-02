@@ -115,15 +115,13 @@ trait ResponseTrait
                 return $content;
             }
 
-            if ('HEAD' === $this->info['http_method'] || \in_array($this->info['http_code'], [204, 304], true)) {
-                return '';
+            if (null === $this->content) {
+                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
             }
-
-            throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
-        }
-
-        foreach (self::stream([$this]) as $chunk) {
-            // Chunks are buffered in $this->content already
+        } else {
+            foreach (self::stream([$this]) as $chunk) {
+                // Chunks are buffered in $this->content already
+            }
         }
 
         rewind($this->content);
@@ -376,6 +374,10 @@ trait ResponseTrait
 
                                 $chunk = new ErrorChunk($response->offset, $e);
                             } else {
+                                if (0 === $response->offset && null === $response->content) {
+                                    $response->content = fopen('php://memory', 'w+');
+                                }
+
                                 $chunk = new LastChunk($response->offset);
                             }
                         } elseif ($chunk instanceof ErrorChunk) {

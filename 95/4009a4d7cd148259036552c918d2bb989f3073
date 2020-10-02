@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2020-02-09T12:41:57Z
+
+Also I think the error details stamp should be added by each retry (not just when failing at the end).
+So when each retry has the same error, it will not duplicate the error details due to the new equals check. But when each retry has a different problem it would be nice to see that actually. (We should also limit this to say 3 different errors so the message does not grow too big again).
+
+When we have the retry errors, the failed command should be able to list all the errors (not just diplay the last one).
+
+With this feature added, the PR would actually give a nice DX improvement. Currently it's just a small refactoring without much gain for users.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-02-09T15:24:47Z
+
+Hi @Tobion, thank you for your review.
+
+The idea for this PR is that it paves the way for a few follow-up PRs that include more changes and DX improvement (like a limit on the amount of error stamps). In order to keep this PR as small as possible (to make reviewing easier), @weaverryan and I decided to break the total work up in several separate PRs.
+
+I'll look over your suggestions and rebase and make changes this week.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2020-07-07T09:57:00Z
+
+This is a really nice improvement! Any way to push this forward? It would be helpful to port this into 5.x as a BC layer, and be able to start relying on it.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-07-07T10:19:56Z
+
+Hi @weaverryan & @Jean85, thanks for the review and kind words.
+I'm sorry I haven't had much time to work on this after covid (work suddenly got a bit stressful, causing me to want to spend less time programming in my free time).
+
+I hope I have time soon to rebase and do some more work on this.
+
+@weaverryan The main reason for this PR is to decouple the retries (how many times have we done this and when should we stop trying?) from the errors (what went wrong?). We saw some issues where the errors caused problems with the envelope getting too large (especially when the retry number was high). Decoupling this can help us in the future by for example limiting the maximum amount of error stamps (by removing the oldest) without losing information about retries.
+
+Right now, this PR also includes ignoring duplicated errors (in case the same error as the last one occurs), since it wouldn't add any new information.
+
+Perhaps it would also be easier to hook into the flow of things when these stamps are separated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-19T07:21:06Z
+
+@TimoBakx Do you think you will have to time to work on this PR in the near future?
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-09-19T07:56:28Z
+
+@fabpot Yes, I should have time in the weekends of weeks 39, 40 and 41.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-09-25T11:49:59Z
+
+@Tobion, @weaverryan I have rebased the code with the recent master branch and included your suggestions.
+
+Edit: AppVeyor fails due to an unrelated test.

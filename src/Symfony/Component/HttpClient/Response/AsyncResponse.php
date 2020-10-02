@@ -206,9 +206,13 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
             foreach ($client->stream($wrappedResponses, $timeout) as $response => $chunk) {
                 $r = $asyncMap[$response];
 
-                if (null === $chunk->getError() && $chunk->isFirst()) {
-                    // Ensure no exception is thrown on destruct for the wrapped response
-                    $r->response->getStatusCode();
+                if (null === $chunk->getError() && 0 === $r->offset) {
+                    if ($chunk->isFirst()) {
+                        // Ensure no exception is thrown on destruct for the wrapped response
+                        $r->response->getStatusCode();
+                    } elseif (null === $r->content && $chunk->isLast()) {
+                        $r->content = fopen('php://memory', 'w+');
+                    }
                 }
 
                 if (!$r->passthru) {

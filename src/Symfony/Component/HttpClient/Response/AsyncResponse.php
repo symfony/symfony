@@ -219,6 +219,11 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                     continue;
                 }
 
+                if (null === $chunk->getError() && $chunk->isFirst()) {
+                    // Ensure no exception is thrown on destruct for the wrapped response
+                    $r->response->getStatusCode();
+                }
+
                 foreach (self::passthru($r->client, $r, $chunk, $asyncMap) as $chunk) {
                     yield $r => $chunk;
                 }

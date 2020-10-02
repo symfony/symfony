@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Tests\Retry;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
 
 class ExponentialBackOffTest extends TestCase
@@ -24,7 +23,7 @@ class ExponentialBackOffTest extends TestCase
     {
         $backOff = new ExponentialBackOff($delay, $multiplier, $maxDelay);
 
-        self::assertSame($expectedDelay, $backOff->getDelay($previousRetries, 'GET', 'http://example.com/', [], new MockResponse(), null));
+        self::assertSame($expectedDelay, $backOff->getDelay($previousRetries, 'GET', 'http://example.com/', [], 200, [], null, null));
     }
 
     public function provideDelay(): iterable

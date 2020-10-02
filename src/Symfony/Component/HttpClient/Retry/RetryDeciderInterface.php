@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpClient\Retry;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
-
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -20,6 +18,10 @@ interface RetryDeciderInterface
 {
     /**
      * Returns whether the request should be retried.
+     *
+     * @param ?string $responseContent Null is passed when the body did not arrive yet
+     *
+     * @return ?bool Returns null to signal that the body is required to take a decision
      */
-    public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, ResponseInterface $partialResponse, \Throwable $throwable = null): bool;
+    public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool;
 }

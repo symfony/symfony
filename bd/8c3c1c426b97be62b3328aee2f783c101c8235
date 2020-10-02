@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T16:34:02Z
+
+/cc @wouterj
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-01T20:04:15Z
+
+I've been thinking about this one a bit during the past weeks (this is one of 2 major design choices in the RateLimiter component that doesn't yet feel completely grounded at the perfect solution).
+
+I think there are 2 different use-cases for a generic rate limiter that is provided by the component:
+A) Check the rate with the intention to *drop* the overflowing requests
+B) Check the rate with the intention to *wait* till the request can be processed
+
+I would say that this exception is very useful in cases like (A), but a bit difficult in cases like (B). I've not yet created a PR like this, because we can use the current solutions in both cases.
+
+One interesting thing:
+The `TokenBucketLimiter` already has these 2 cases in its interface - as it can reserve tokens in the future: `consume()` for (A) and `reserve()` for (B). Maybe we should reintroduce `reserve()` in the `LimiterInterface` and somehow create such reservation feature for the window algorithms (although we can't guarantee that they have a valid hit at the `retryAt` date).
+
+If we manage to separate these 2 cases for the `FixedWindow` limiter, we can always throw an exception on `consume()` and return a state at `reserve()`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-10-01T23:59:03Z
+
+@wouterj and I discussed this PR on slack and came to the conclusion that adding `Limit::ensureAccepted()` which throws a `RateLimitExceededException` (if not accepted) is the preferred and simplest solution. This behaviour is completely *opt-in*.

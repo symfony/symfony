@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 use PHPUnit\Util\Test;
+use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
 
 /**
  * @internal
@@ -83,6 +84,11 @@ class Deprecation
 
                 return;
             }
+
+            if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
+                return;
+            }
+
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
         }

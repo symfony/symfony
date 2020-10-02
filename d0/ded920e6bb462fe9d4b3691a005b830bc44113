@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-01T12:21:58Z
+
+> shouldn't we even have a separate cache pool per limiter to avoid cache key conflicts ?
+
+The cache keys are prefixed by the limiter ID - which is unique for each limiter. So key conflicts should not be possible.

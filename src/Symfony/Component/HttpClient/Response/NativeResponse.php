@@ -135,6 +135,11 @@ final class NativeResponse implements ResponseInterface
                 $this->info['request_header'] = sprintf("> %s %s HTTP/%s \r\n", $context['http']['method'], $this->info['request_header'], $context['http']['protocol_version']);
                 $this->info['request_header'] .= implode("\r\n", $context['http']['header'])."\r\n\r\n";
 
+                if (\array_key_exists('peer_name', $context['ssl']) && null === $context['ssl']['peer_name']) {
+                    unset($context['ssl']['peer_name']);
+                    $this->context = stream_context_create([], ['options' => $context] + stream_context_get_params($this->context));
+                }
+
                 // Send request and follow redirects when needed
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
                 self::addResponseHeaders($http_response_header, $this->info, $this->headers, $this->info['debug']);

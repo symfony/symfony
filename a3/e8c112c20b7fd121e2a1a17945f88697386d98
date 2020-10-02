@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-29T07:25:41Z
+
+I think it would be better to replace the constructor argument and use a dedicated data structure instead.
+
+My proposal would be this one:
+```php
+$f1 = new FormDataPart([
+    ['foo' => 'one'],
+    ['foo' => 'two'],
+]);
+```
+
+the logic would be:
+
+when the main array has a numeric key, then enforce `1 === count($value)`, then take `key($value)` as the exact key to put in the output.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2020-09-29T22:48:02Z
+
+@nicolas-grekas The PR has been updated according to your suggestion.
+
+A limitation of this approach in comparison to the previous one is if the field name is actually meant to be an integer, eg the following will now throw an exception:
+
+```php
+$f1 = new FormDataPart([
+    '1' => [
+        'a' => 'one',
+        'b' => 'two',
+    ],
+]);
+```
+
+The only way to achieve something like this now would be to manually name the fields appropriately:
+
+```php
+$f1 = new FormDataPart([
+    ['1[a]' => 'one'],
+    ['1[b]' => 'two'],
+]);
+```
+
+Since I doubt using integers as field names is common, this shouldn't be an issue, nonetheless I wanted to point it out just in case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-30T09:52:20Z
+
+@HypeMC could you please consider sending a PR to the doc to tell about this behavior?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2020-09-30T10:29:24Z
+
+@nicolas-grekas Yep, sure, will do this week, tnx.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-02T09:11:01Z
+
+This looks like a new feature to me btw. We should merge it in master. (now rebased for master)
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2020-10-02T13:16:20Z
+
+@nicolas-grekas This looks more like a bug to me since it's not possible to make a valid request with the current code. Also, when considering that the actual `sprintf` part was added as bug in https://github.com/symfony/symfony/pull/34032 it really doesn't make sense to view this as anything different. Then there's the fact that the fix is only a couple of lines & doesn't introduce any BC.
+
+Without this fix, users using Sf4 won't be ably to make valid requests until they upgrade. Since some only use LTS versions in their production apps, it'll be some time till they get this fix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-02T13:19:58Z
+
+Unfortunately, that's a new feature and as such it must be merged in master. There is no such thing as "a couple of lines" and "no BC breaks" in semantic versioning.

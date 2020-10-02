@@ -131,7 +131,7 @@ class Route implements \Serializable
     public function setPath(string $pattern)
     {
         if (false !== strpbrk($pattern, '?<')) {
-            $pattern = preg_replace_callback('#\{(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
+            $pattern = preg_replace_callback('#\{(!?\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
                 if (isset($m[3][0])) {
                     $this->setDefault($m[1], '?' !== $m[3] ? substr($m[3], 1) : null);
                 }

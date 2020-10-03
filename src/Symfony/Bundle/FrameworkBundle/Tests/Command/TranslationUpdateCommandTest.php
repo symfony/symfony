@@ -32,6 +32,14 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpMessagesAsTreeAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--as-tree' => 1]);
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpSortedMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);

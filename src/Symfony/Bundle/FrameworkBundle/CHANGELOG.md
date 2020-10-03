@@ -13,6 +13,7 @@ CHANGELOG
  * added `framework.http_client.retry_failing` configuration tree
  * added `assertCheckboxChecked()` and `assertCheckboxNotChecked()` in `WebTestCase`
  * added `assertFormValue()` and `assertNoFormValue()` in `WebTestCase`
+ * Added "--as-tree=3" option to `translation:update` command to dump messages as a tree-like structure. The given value defines the level where to switch to inline YAML
 
 5.1.0
 -----

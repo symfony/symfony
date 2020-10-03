@@ -114,7 +114,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         return $authenticatorIds;
     }
 
-    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): ?string
+    public function registerEntryPoint(ContainerBuilder $container, string $firewallName, array $config): ?string
     {
         try {
             return $this->determineEntryPoint(null, $config);

@@ -25,6 +25,7 @@
         "symfony/property-access": "^4.4|^5.0"
     },
     "require-dev": {
+        "symfony/cache": "^4.4|^5.0",
         "symfony/rate-limiter": "^5.2",
         "symfony/routing": "^4.4|^5.0",
         "symfony/security-csrf": "^4.4|^5.0",

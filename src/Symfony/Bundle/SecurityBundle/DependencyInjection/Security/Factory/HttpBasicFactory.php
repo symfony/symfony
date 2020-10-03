@@ -82,9 +82,9 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
         ;
     }
 
-    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
+    public function registerEntryPoint(ContainerBuilder $container, string $firewallName, array $config): string
     {
-        $entryPointId = 'security.authentication.basic_entry_point.'.$id;
+        $entryPointId = 'security.authentication.basic_entry_point.'.$firewallName;
         $container
             ->setDefinition($entryPointId, new ChildDefinition('security.authentication.basic_entry_point'))
             ->addArgument($config['realm'])

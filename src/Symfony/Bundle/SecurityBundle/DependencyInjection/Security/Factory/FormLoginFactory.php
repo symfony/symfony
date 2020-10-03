@@ -97,9 +97,9 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $this->registerEntryPoint($container, $id, $config);
     }
 
-    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
+    public function registerEntryPoint(ContainerBuilder $container, string $firewallName, array $config): string
     {
-        $entryPointId = 'security.authentication.form_entry_point.'.$id;
+        $entryPointId = 'security.authentication.form_entry_point.'.$firewallName;
         $container
             ->setDefinition($entryPointId, new ChildDefinition('security.authentication.form_entry_point'))
             ->addArgument(new Reference('security.http_utils'))

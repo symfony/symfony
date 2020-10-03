@@ -196,7 +196,7 @@ class ExceptionListener
     {
         if (null === $this->authenticationEntryPoint) {
             if (null !== $this->logger) {
-                $this->logger->notice(sprintf('No Authentication entry point configured, returning a %s HTTP response. Configure "entry_point" on the firewall ("{firewall_name}") if you want to modify the response.', Response::HTTP_UNAUTHORIZED), ['firewall_name' => $this->providerKey]);
+                $this->logger->notice(sprintf('No Authentication entry point configured, returning a %s HTTP response. Configure "entry_point" on the firewall "%s" if you want to modify the response.', Response::HTTP_UNAUTHORIZED, $this->firewallName));
             }
 
             throw new HttpException(Response::HTTP_UNAUTHORIZED, $authException->getMessage(), $authException, [], $authException->getCode());

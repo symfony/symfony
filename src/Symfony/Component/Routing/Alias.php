@@ -28,7 +28,7 @@ final class Alias
      *
      * @return string The alias name
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->name;
     }

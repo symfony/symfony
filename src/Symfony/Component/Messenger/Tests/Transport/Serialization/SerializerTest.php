@@ -314,18 +314,9 @@ class SerializerTest extends TestCase
      */
     public function testDecodingWithTypeResolver(array $serializerContext, array $encodedEnvelope, object $expectedInstance, bool $useFullSerializer)
     {
-        $interfaces = SerializerComponentInterface::class;
-
-        if ($useFullSerializer) {
-            $interfaces = [
-                $interfaces,
-                SerializerComponent\Encoder\DecoderInterface::class,
-                SerializerComponent\Normalizer\DenormalizerInterface::class,
-            ];
-        }
-
+        $serializerToMock = $useFullSerializer ? SymfonySerializerRealInterface::class : SerializerComponentInterface::class;
         $serializer = new Serializer(
-            $symfonySerializer = $this->createMock($interfaces),
+            $symfonySerializer = $this->createMock($serializerToMock),
             'json',
             $serializerContext
         );
@@ -413,4 +404,8 @@ class DummySymfonySerializerInvalidConstructor
     public function __construct(string $missingArgument)
     {
     }
+}
+
+interface SymfonySerializerRealInterface extends SerializerComponentInterface, SerializerComponent\Normalizer\NormalizerInterface, SerializerComponent\Normalizer\DenormalizerInterface, SerializerComponent\Encoder\EncoderInterface, SerializerComponent\Encoder\DecoderInterface
+{
 }

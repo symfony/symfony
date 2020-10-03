@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-08-06T07:50:10Z
+
+fixed by #37590
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-06T07:53:01Z
+
+@jderusse Shall we close then? Should we also close #35350?
+
+---------------------------------------------------------------------------
+
+by Jontsa at 2020-08-06T08:05:05Z
+
+#37590 partially fixes this issue. StoreFactory still does not support the same exact DSN syntax as Symfony\Component\Cache\Adapter\AbstractAdapter for Redis connections.
+
+But this PR can be closed if we do not want to allow DSN with multiple Redis hosts for Locks.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-08-06T08:10:14Z
+
+You're right @Jontsa.
+
+Can you, please, rebase your PR and keep the part about DSN pattern?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-05T14:41:43Z
+
+@Jontsa Do you time to finish this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-11T05:41:52Z
+
+@Jontsa I think you will need to rebase on the current 4.4 branch as there are some conflicts.

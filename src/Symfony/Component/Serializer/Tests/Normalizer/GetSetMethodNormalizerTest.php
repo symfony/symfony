@@ -247,10 +247,10 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    protected function getNormalizerForCircularReference(): GetSetMethodNormalizer
+    protected function getNormalizerForCircularReference(array $defaultContext): GetSetMethodNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, null, null, $defaultContext);
         new Serializer([$normalizer]);
 
         return $normalizer;

@@ -365,9 +365,9 @@ class ObjectNormalizerTest extends TestCase
 
     // circular reference
 
-    protected function getNormalizerForCircularReference(): ObjectNormalizer
+    protected function getNormalizerForCircularReference(array $defaultContext): ObjectNormalizer
     {
-        $normalizer = new ObjectNormalizer();
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
         new Serializer([$normalizer]);
 
         return $normalizer;

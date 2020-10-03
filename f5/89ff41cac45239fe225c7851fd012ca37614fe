@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-17T16:28:00Z
+
+what about using an InputBag for return? That way we're effectively decoding the request body (payload) as done when using `$request->request` .. but lazy.
+
+Which raises another question, can we provide decoded payload from `$request->request` in a lazy way? The door was opened with https://github.com/symfony/symfony/pull/37327, and then a bit closed with https://github.com/symfony/symfony/pull/37265 :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-17T16:38:22Z
+
+e.g. `InputBag::fromString` holding the string itself, then lazy decode it.
+
+```php
+if ($_POST) {
+   $this->request = new InputBag($_POST);
+} elseif($this->getContent()) {
+  $this->request = InputBag::fromString($this->getContent()[, $contentType]);
+}
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-17T16:40:44Z
+
+really, we get HTTP 400 for free this way :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-09-17T21:58:52Z
+
+I don't have so much to say about the implementation but I have the same use case. I added a trait in my application to solve this issue, but having something native / in core  would be really nice.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-09-18T06:47:19Z
+
+Thank you for the reviews and feedback.
+
+> That way we're effectively decoding the request body (payload) as done when using $request->request .. but lazy.
+
+@ro0NL Im not sure what you mean. How is it lazy and what is the benefit?
+
+Note that there is technically a difference between `$_POST` and the request body. For once, a HTTP GET request can have a body that wont be parsed into the `$_POST` super global.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-18T08:00:20Z
+
+AFAIK the $_POST vars are obtained from the request content. So this is about providing consistent access, to a decoded request body, using `$request->request->get('key')`.
+
+The lazy part is about decoding JSON only when needed ;)
+
+If $_POST is filled, i think we can assume it always supersedes.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-09-19T12:28:17Z
+
+Tests failures seems related though https://ci.appveyor.com/project/fabpot/symfony/builds/35272847#L1155.
+```
+1) Symfony\Component\HttpFoundation\Tests\RequestTest::testToArrayNonJson
+Failed asserting that exception message 'Syntax error' contains 'Could not decode request body.'.
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-09-20T08:33:00Z
+
+Oops, Sorry.
+
+The code example in the PR header is updated.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-09-20T18:21:43Z
+
+Thank you! 🙏
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T16:49:56Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-01T19:12:39Z
+
+Thank you for the ping. The PR is rebased

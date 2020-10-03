@@ -251,6 +251,7 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['alias'])) {
             if (1 === \count($config)) {
+                // No need to continue, if an alias is set, it's the only desired key
                 return;
             }
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify other keys than "alias" for "%s".', $path, $name));

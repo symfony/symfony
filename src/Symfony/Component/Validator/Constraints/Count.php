@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Count extends Constraint
 {
     const TOO_FEW_ERROR = 'bef8e338-6ae5-4caf-b8e2-50e7b0579e69';
@@ -40,19 +41,47 @@ class Count extends Constraint
     public $max;
     public $divisibleBy;
 
-    public function __construct($options = null)
-    {
-        if (null !== $options && !\is_array($options)) {
-            $options = [
-                'min' => $options,
-                'max' => $options,
-            ];
-        } elseif (\is_array($options) && isset($options['value']) && !isset($options['min']) && !isset($options['max'])) {
-            $options['min'] = $options['max'] = $options['value'];
-            unset($options['value']);
+    /**
+     * {@inheritdoc}
+     *
+     * @param int|array|null $exactly The expected exact count or a set of options
+     */
+    public function __construct(
+        $exactly = null,
+        int $min = null,
+        int $max = null,
+        int $divisibleBy = null,
+        string $exactMessage = null,
+        string $minMessage = null,
+        string $maxMessage = null,
+        string $divisibleByMessage = null,
+        array $groups = null,
+        $payload = null,
+        array $options = []
+    ) {
+        if (\is_array($exactly)) {
+            $options = array_merge($exactly, $options);
+            $exactly = $options['value'] ?? null;
         }
 
-        parent::__construct($options);
+        $min = $min ?? $options['min'] ?? null;
+        $max = $max ?? $options['max'] ?? null;
+
+        unset($options['value'], $options['min'], $options['max']);
+
+        if (null !== $exactly && null === $min && null === $max) {
+            $min = $max = $exactly;
+        }
+
+        parent::__construct($options, $groups, $payload);
+
+        $this->min = $min;
+        $this->max = $max;
+        $this->divisibleBy = $divisibleBy ?? $this->divisibleBy;
+        $this->exactMessage = $exactMessage ?? $this->exactMessage;
+        $this->minMessage = $minMessage ?? $this->minMessage;
+        $this->maxMessage = $maxMessage ?? $this->maxMessage;
+        $this->divisibleByMessage = $divisibleByMessage ?? $this->divisibleByMessage;
 
         if (null === $this->min && null === $this->max && null === $this->divisibleBy) {
             throw new MissingOptionsException(sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);

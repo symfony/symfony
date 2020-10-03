@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraint;
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Luhn extends Constraint
 {
     const INVALID_CHARACTERS_ERROR = 'dfad6d23-1b74-4374-929b-5cbb56fc0d9e';
@@ -34,4 +35,15 @@ class Luhn extends Constraint
     ];
 
     public $message = 'Invalid card number.';
+
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

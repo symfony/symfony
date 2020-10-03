@@ -111,6 +111,19 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     */
+    public function testValidStrictUuidWithWhitespacesNamed()
+    {
+        $this->validator->validate(
+            "\x09\x09216fff40-98d9-11e3-a5e2-0800200c9a66",
+            eval('return new \Symfony\Component\Validator\Constraints\Uuid(normalizer: "trim", versions: [\Symfony\Component\Validator\Constraints\Uuid::V1_MAC]);')
+        );
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getInvalidStrictUuids
      */
     public function testInvalidStrictUuids($uuid, $code, $versions = null)
@@ -236,5 +249,21 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ['216fff40-98d9-11e3-a5e2-0800200c9a6', Uuid::TOO_SHORT_ERROR],
             ['216fff40-98d9-11e3-a5e2-0800200c9a666', Uuid::TOO_LONG_ERROR],
         ];
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidNonStrictUuidNamed()
+    {
+        $this->validator->validate(
+            '216fff40-98d9-11e3-a5e2_0800200c9a66',
+            eval('return new \Symfony\Component\Validator\Constraints\Uuid(strict: false, message: "myMessage");')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"216fff40-98d9-11e3-a5e2_0800200c9a66"')
+            ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
     }
 }

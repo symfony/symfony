@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
  * @author Renan Taranto <renantaranto@gmail.com>
@@ -39,4 +41,41 @@ class UrlTest extends TestCase
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Url(['normalizer' => new \stdClass()]);
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributes()
+    {
+        $metadata = new ClassMetadata(UrlDummy::class);
+        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+
+        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        self::assertSame(['http', 'https'], $aConstraint->protocols);
+        self::assertFalse($aConstraint->relativeProtocol);
+        self::assertNull($aConstraint->normalizer);
+
+        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        self::assertSame(['ftp', 'gopher'], $bConstraint->protocols);
+        self::assertSame('trim', $bConstraint->normalizer);
+        self::assertSame('myMessage', $bConstraint->message);
+        self::assertSame(['Default', 'UrlDummy'], $bConstraint->groups);
+
+        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        self::assertTrue($cConstraint->relativeProtocol);
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
+    }
+}
+
+class UrlDummy
+{
+    #[Url]
+    private $a;
+
+    #[Url(message: 'myMessage', protocols: ['ftp', 'gopher'], normalizer: 'trim')]
+    private $b;
+
+    #[Url(relativeProtocol: true, groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

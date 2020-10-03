@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Uuid extends Constraint
 {
     const TOO_SHORT_ERROR = 'aa314679-dac9-4f54-bf97-b2049df8f2a3';
@@ -46,6 +47,15 @@ class Uuid extends Constraint
     const V5_SHA1 = 5;
     const V6_SORTABLE = 6;
 
+    const ALL_VERSIONS = [
+        self::V1_MAC,
+        self::V2_DCE,
+        self::V3_MD5,
+        self::V4_RANDOM,
+        self::V5_SHA1,
+        self::V6_SORTABLE,
+    ];
+
     /**
      * Message to display when validation fails.
      *
@@ -69,20 +79,30 @@ class Uuid extends Constraint
      *
      * @var int[]
      */
-    public $versions = [
-        self::V1_MAC,
-        self::V2_DCE,
-        self::V3_MD5,
-        self::V4_RANDOM,
-        self::V5_SHA1,
-        self::V6_SORTABLE,
-    ];
+    public $versions = self::ALL_VERSIONS;
 
     public $normalizer;
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    /**
+     * {@inheritdoc}
+     *
+     * @param int[]|null $versions
+     */
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $versions = null,
+        bool $strict = null,
+        callable $normalizer = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->versions = $versions ?? $this->versions;
+        $this->strict = $strict ?? $this->strict;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));

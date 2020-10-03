@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Laurent Masforné <l.masforne@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Isin extends Constraint
 {
     const VALIDATION_LENGTH = 12;
@@ -35,4 +36,11 @@ class Isin extends Constraint
     ];
 
     public $message = 'This is not a valid International Securities Identification Number (ISIN).';
+
+    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

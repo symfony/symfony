@@ -151,6 +151,23 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidAlpha3LanguageNamed()
+    {
+        $this->validator->validate(
+            'DE',
+            eval('return new \Symfony\Component\Validator\Constraints\Language(alpha3: true, message: "myMessage");')
+        );
+
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidateUsingCountrySpecificLocale()
     {
         IntlTestHelper::requireFullIntl($this, false);

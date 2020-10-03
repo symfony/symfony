@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Timezone;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
  * @author Javier Spagnoletti <phansys@gmail.com>
@@ -62,4 +64,38 @@ class TimezoneTest extends TestCase
         yield [0];
         yield [\DateTimeZone::ALL_WITH_BC + 1];
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributes()
+    {
+        $metadata = new ClassMetadata(TimezoneDummy::class);
+        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+
+        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        self::assertSame(\DateTimeZone::ALL, $aConstraint->zone);
+
+        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        self::assertSame(\DateTimeZone::PER_COUNTRY, $bConstraint->zone);
+        self::assertSame('DE', $bConstraint->countryCode);
+        self::assertSame('myMessage', $bConstraint->message);
+        self::assertSame(['Default', 'TimezoneDummy'], $bConstraint->groups);
+
+        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
+    }
+}
+
+class TimezoneDummy
+{
+    #[Timezone]
+    private $a;
+
+    #[Timezone(zone: \DateTimeZone::PER_COUNTRY, countryCode: 'DE', message: 'myMessage')]
+    private $b;
+
+    #[Timezone(groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

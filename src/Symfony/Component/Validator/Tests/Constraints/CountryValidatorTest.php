@@ -152,6 +152,22 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidAlpha3CountryNamed()
+    {
+        $this->validator->validate(
+            'DE',
+            eval('return new \Symfony\Component\Validator\Constraints\Country(alpha3: true, message: "myMessage");')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidateUsingCountrySpecificLocale()
     {
         // in order to test with "en_GB"

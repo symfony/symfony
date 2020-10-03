@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Length extends Constraint
 {
     const TOO_SHORT_ERROR = '9ff3fdc4-b214-49db-8718-39c315e33d45';
@@ -43,19 +44,49 @@ class Length extends Constraint
     public $normalizer;
     public $allowEmptyString = false;
 
-    public function __construct($options = null)
-    {
-        if (null !== $options && !\is_array($options)) {
-            $options = [
-                'min' => $options,
-                'max' => $options,
-            ];
-        } elseif (\is_array($options) && isset($options['value']) && !isset($options['min']) && !isset($options['max'])) {
-            $options['min'] = $options['max'] = $options['value'];
-            unset($options['value']);
+    /**
+     * {@inheritdoc}
+     *
+     * @param int|array|null $exactly The expected exact length or a set of options
+     */
+    public function __construct(
+        $exactly = null,
+        int $min = null,
+        int $max = null,
+        string $charset = null,
+        callable $normalizer = null,
+        string $exactMessage = null,
+        string $minMessage = null,
+        string $maxMessage = null,
+        string $charsetMessage = null,
+        array $groups = null,
+        $payload = null,
+        array $options = []
+    ) {
+        if (\is_array($exactly)) {
+            $options = array_merge($exactly, $options);
+            $exactly = $options['value'] ?? null;
         }
 
-        parent::__construct($options);
+        $min = $min ?? $options['min'] ?? null;
+        $max = $max ?? $options['max'] ?? null;
+
+        unset($options['value'], $options['min'], $options['max']);
+
+        if (null !== $exactly && null === $min && null === $max) {
+            $min = $max = $exactly;
+        }
+
+        parent::__construct($options, $groups, $payload);
+
+        $this->min = $min;
+        $this->max = $max;
+        $this->charset = $charset ?? $this->charset;
+        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->exactMessage = $exactMessage ?? $this->exactMessage;
+        $this->minMessage = $minMessage ?? $this->minMessage;
+        $this->maxMessage = $maxMessage ?? $this->maxMessage;
+        $this->charsetMessage = $charsetMessage ?? $this->charsetMessage;
 
         if (null === $this->min && null === $this->max) {
             throw new MissingOptionsException(sprintf('Either option "min" or "max" must be given for constraint "%s".', __CLASS__), ['min', 'max']);

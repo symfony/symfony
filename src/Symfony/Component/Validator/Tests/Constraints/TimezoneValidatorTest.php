@@ -180,6 +180,21 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     */
+    public function testInvalidGroupedTimezoneNamed()
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Timezone(zone: \DateTimeZone::AMERICA, message: "myMessage");');
+
+        $this->validator->validate('Europe/Berlin', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"Europe/Berlin"')
+            ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getValidGroupedTimezonesByCountry
      */
     public function testValidGroupedTimezonesByCountry(string $timezone, string $country)

@@ -78,6 +78,21 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidDateNamed()
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Date(message: "myMessage");');
+
+        $this->validator->validate('foobar', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"foobar"')
+            ->setCode(Date::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public function getInvalidDates()
     {
         return [

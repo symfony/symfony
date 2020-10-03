@@ -48,7 +48,7 @@ class IsbnValidator extends ConstraintValidator
         $canonical = str_replace('-', '', $value);
 
         // Explicitly validate against ISBN-10
-        if ('isbn10' === $constraint->type) {
+        if (Isbn::ISBN_10 === $constraint->type) {
             if (true !== ($code = $this->validateIsbn10($canonical))) {
                 $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
                     ->setParameter('{{ value }}', $this->formatValue($value))
@@ -60,7 +60,7 @@ class IsbnValidator extends ConstraintValidator
         }
 
         // Explicitly validate against ISBN-13
-        if ('isbn13' === $constraint->type) {
+        if (Isbn::ISBN_13 === $constraint->type) {
             if (true !== ($code = $this->validateIsbn13($canonical))) {
                 $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
                     ->setParameter('{{ value }}', $this->formatValue($value))
@@ -174,9 +174,9 @@ class IsbnValidator extends ConstraintValidator
     {
         if (null !== $constraint->message) {
             return $constraint->message;
-        } elseif ('isbn10' === $type) {
+        } elseif (Isbn::ISBN_10 === $type) {
             return $constraint->isbn10Message;
-        } elseif ('isbn13' === $type) {
+        } elseif (Isbn::ISBN_13 === $type) {
             return $constraint->isbn13Message;
         }
 

@@ -56,12 +56,11 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    public function testPasswordIsValid()
+    /**
+     * @dataProvider provideConstraints
+     */
+    public function testPasswordIsValid(UserPassword $constraint)
     {
-        $constraint = new UserPassword([
-            'message' => 'myMessage',
-        ]);
-
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
@@ -72,12 +71,11 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testPasswordIsNotValid()
+    /**
+     * @dataProvider provideConstraints
+     */
+    public function testPasswordIsNotValid(UserPassword $constraint)
     {
-        $constraint = new UserPassword([
-            'message' => 'myMessage',
-        ]);
-
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
@@ -87,6 +85,15 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->assertRaised();
+    }
+
+    public function provideConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            yield 'named arguments' => [eval('return new \Symfony\Component\Security\Core\Validator\Constraints\UserPassword(message: "myMessage");')];
+        }
     }
 
     /**

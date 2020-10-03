@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Url extends Constraint
 {
     const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
@@ -33,9 +34,21 @@ class Url extends Constraint
     public $relativeProtocol = false;
     public $normalizer;
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $protocols = null,
+        bool $relativeProtocol = null,
+        callable $normalizer = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->protocols = $protocols ?? $this->protocols;
+        $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));

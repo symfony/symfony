@@ -84,4 +84,18 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'not unique objects' => [[$object, $object]],
         ];
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidValueNamed()
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Unique(message: "myMessage");');
+        $this->validator->validate([1, 2, 3, 3], $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
 }

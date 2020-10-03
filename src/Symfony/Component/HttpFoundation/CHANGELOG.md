@@ -8,6 +8,7 @@ CHANGELOG
  * added `HeaderUtils::parseQuery()`: it does the same as `parse_str()` but preserves dots in variable names
  * added `File::getContent()`
  * added ability to use comma separated ip addresses for `RequestMatcher::matchIps()`
+ * added `Request::toArray()` to parse a JSON request body to an array
  * added `RateLimiter\RequestRateLimiterInterface` and `RateLimiter\AbstractRequestRateLimiter`
 
 5.1.0

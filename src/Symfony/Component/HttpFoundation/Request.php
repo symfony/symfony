@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -1567,6 +1568,34 @@ class Request
         }
 
         return $this->content;
+    }
+
+    /**
+     * Gets the request body decoded as array, typically from a JSON payload.
+     *
+     * @throws JsonException When the body cannot be decoded to an array
+     */
+    public function toArray(): array
+    {
+        if ('' === $content = $this->getContent()) {
+            throw new JsonException('Response body is empty.');
+        }
+
+        try {
+            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0));
+        } catch (\JsonException $e) {
+            throw new JsonException('Could not decode request body.', $e->getCode(), $e);
+        }
+
+        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error()) {
+            throw new JsonException('Could not decode request body: '.json_last_error_msg(), json_last_error());
+        }
+
+        if (!\is_array($content)) {
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned.', get_debug_type($content)));
+        }
+
+        return $content;
     }
 
     /**

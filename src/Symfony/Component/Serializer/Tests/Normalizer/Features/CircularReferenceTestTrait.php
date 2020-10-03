@@ -10,23 +10,36 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 trait CircularReferenceTestTrait
 {
-    abstract protected function getNormalizerForCircularReference(): NormalizerInterface;
+    abstract protected function getNormalizerForCircularReference(array $defaultContext): NormalizerInterface;
 
     abstract protected function getSelfReferencingModel();
 
-    public function testUnableToNormalizeCircularReference()
+    public function provideUnableToNormalizeCircularReference(): array
     {
-        $normalizer = $this->getNormalizerForCircularReference();
+        return [
+            [[], [], 1],
+            [['circular_reference_limit' => 2], [], 2],
+            [['circular_reference_limit' => 2], ['circular_reference_limit' => 3], 3],
+        ];
+    }
+
+    /**
+     * @dataProvider provideUnableToNormalizeCircularReference
+     */
+    public function testUnableToNormalizeCircularReference(array $defaultContext, array $context, int $expectedLimit)
+    {
+        $normalizer = $this->getNormalizerForCircularReference($defaultContext);
 
         $obj = $this->getSelfReferencingModel();
 
         $this->expectException(CircularReferenceException::class);
-        $normalizer->normalize($obj, null, ['circular_reference_limit' => 2]);
+        $this->expectExceptionMessage(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d).', \get_class($obj), $expectedLimit));
+        $normalizer->normalize($obj, null, $context);
     }
 
     public function testCircularReferenceHandler()
     {
-        $normalizer = $this->getNormalizerForCircularReference();
+        $normalizer = $this->getNormalizerForCircularReference([]);
 
         $obj = $this->getSelfReferencingModel();
         $expected = ['me' => \get_class($obj)];

@@ -163,9 +163,9 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer();
     }
 
-    protected function getNormalizerForCircularReference(): PropertyNormalizer
+    protected function getNormalizerForCircularReference(array $defaultContext): PropertyNormalizer
     {
-        $normalizer = new PropertyNormalizer();
+        $normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
         new Serializer([$normalizer]);
 
         return $normalizer;

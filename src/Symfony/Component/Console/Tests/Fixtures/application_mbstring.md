@@ -19,11 +19,11 @@ Displays help for a command
 
 The help command displays help for a given command:
 
-  php app/console help list
+  app/console help list
 
 You can also output the help in other formats by using the --format option:
 
-  php app/console help --format=xml list
+  app/console help --format=xml list
 
 To display the list of available commands, please use the list command.
 
@@ -131,19 +131,19 @@ Lists commands
 
 The list command lists all commands:
 
-  php app/console list
+  app/console list
 
 You can also display the commands for a specific namespace:
 
-  php app/console list test
+  app/console list test
 
 You can also output the information in other formats by using the --format option:
 
-  php app/console list --format=xml
+  app/console list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  php app/console list --raw
+  app/console list --raw
 
 ### Arguments
 

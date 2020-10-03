@@ -12,6 +12,7 @@ CHANGELOG
     * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
     * Added `SignalableCommandInterface` interface
  * Added `TableCellStyle` class to customize table cell
+ * Removed `php ` prefix invocation from help messages.
 
 5.1.0
 -----

@@ -153,7 +153,7 @@ class CommandTest extends TestCase
     public function testGetProcessedHelp()
     {
         $command = new \TestCommand();
-        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
         $this->assertStringContainsString('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly');
         $this->assertStringNotContainsString('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name%');
 
@@ -162,7 +162,7 @@ class CommandTest extends TestCase
         $this->assertStringContainsString('description', $command->getProcessedHelp(), '->getProcessedHelp() falls back to the description');
 
         $command = new \TestCommand();
-        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
         $application = new Application();
         $application->add($command);
         $application->setDefaultCommand('namespace:name', true);

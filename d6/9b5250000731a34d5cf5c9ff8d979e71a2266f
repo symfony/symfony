@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-02T14:19:37Z
+
+Can you have a look at [deps=low failures](https://travis-ci.org/github/symfony/symfony/jobs/732247821#L6219), please?
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-10-02T14:31:59Z
+
+> Can you have a look at [deps=low failures](https://travis-ci.org/github/symfony/symfony/jobs/732247821#L6219), please?
+
+Sure, I'm ont it.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-10-02T14:58:31Z
+
+So, to sum up, the issue is coming from old PhpDocExtractor versions not supporting `array<x>` notations. I believe support was introduced in version 4+ of `phpdocumentor/reflection-docblock` (for instance [this issue](https://github.com/phpDocumentor/TypeResolver/issues/89) has a few details...).
+With `deps=high`, we are using version 5, it works. With `deps=low`, we are using version 3, which won't guess any type (so return NULL, and test case won't work).
+
+ `PhpDocExtractor` code is quite intricated with PhpDocumentor, and it is not quite obvious something can be mocked / worked around. There was already a method to detect if we are using PhpDocumentor5, so I'm using it. That's the best option I could think of.
+Another option would be not to test that type is detected, since we can't control what PhpDocumentor is outputting. So I could remove [those lines](https://github.com/symfony/symfony/pull/38385/files#diff-0ecd6142af9284668fce7690f37fdd08R122-R124), the test would only check no exception is thrown.

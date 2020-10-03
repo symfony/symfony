@@ -1,0 +1,373 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-09-13T18:19:38Z
+
+Why didn't you choose to implement this feature with a signed token? It would avoid using a db
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-14T07:18:47Z
+
+Because you can't revoke specific signed tokens? I would agree that having something as sensitive as logins without any control over it would not be a great way to implement it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-09-14T08:03:02Z
+
+> Because you can't revoke specific signed tokens?
+
+The token would have a very short TTL (like one hour)
+
+> I would agree that having something as sensitive as logins without any control over it would not be a great way to implement it
+
+This is how jwt works and so many people are using it (and most of the time this is for wrong reasons, but this is out of topic)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-14T09:12:52Z
+
+> This is how jwt works and so many people are using it (and most of the time this is for wrong reasons, but this is out of topic)
+
+I know JWT and understand that, thank you. That doesn't change the fact the you are passing control over an essential part of your application out of your control.
+
+This feature is fundamentally the same as a "password reset" procedure (as both allow login without knowing the credentials) – and for example Laravel decided to NOT just use signed URLs, but keep using a database-based system: https://github.com/laravel/framework/pull/23706
+
+Maybe there are some arguments that also apply here.
+
+---------------------------------------------------------------------------
+
+by linaori at 2020-09-14T09:25:08Z
+
+I'm not too familiar with JWT tokens. If you have a token that's valid for 1h, how do you expire this? Usually you'd want a login url valid for maybe 10 to 30 minutes _and only usable once_. The latter doesn't seem possible with a token that can only expire after time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-14T09:28:50Z
+
+Regarding the linked Laravel issue, read https://github.com/laravel/framework/pull/23706#issuecomment-376904157 which makes me think that they chose not to do it because they had an already working solution. But they do point out that having a database has some issues (when the table schema changes for instance). I think it's worth exploring a solution without a DB?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-14T11:59:33Z
+
+I think it would be beneficial to be able to
+
+- invalidate specific tokens
+- allow only a single usage per token
+
+In case of just signed URLs, you could invalidate it by changing your signing secret, but that seems rather excessive. Invalidation after usage doesn't seem to be possible at all.
+
+In this case I would be as careful as possible, as there is no real way back, if you gave control away to the user.
+I understand however, that the ease of usage (and the fact that it's optional) shifts the decision in the direction of just signed URLs.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-09-14T12:47:35Z
+
+> I'm not too familiar with JWT tokens. If you have a token that's valid for 1h, how do you expire this?
+
+You can not natively. If you want to do so, you have to save all rejected tokens in a DB, and for each login (so each API call) you look at your DB if the token is expired. And... you totally defeat the purpose of JWT.
+
+Anyway, JWT is out of topic here :) This was just an example to demonstracte that "signed token" can not be revoked natively
+
+---
+
+About signed token VS token in DB, I think signed **token is good enough**.
+
+I **totally agree that DB token are more secure** though.
+
+**BUT** Let's be pragmatic. In theory, you can revoke a DB token, but is this a real use case? What would be the workflow?
+
+1. Someone ask a token
+2. then say "Oh, now I don't want this token !"
+3. Contact the support to delete it,
+4. Hope they will delete in within XX minutes (if they don't, anyway the link will not work)
+
+IMHO, it's acceptable to use a signed token with a very short validity (lets say 15 minutes). We could / should mention that flaw in the documentation and that's all. And if someone want something in the DB, they could implement it on their own.
+
+So let's try to summary everything to take a decision:
+
+|  | Pros | Cons |
+|-|-|-|
+| DB | * works only once<br>* revocable | * need a DB<br>* more complex (core)<br>* need custom code (userland) <br>* more complex (userland) |
+| signed | * does't need custom code<br>* very simple to implement (Core)<br>* very simple to implement (User land)<br>* does not need DB | * can not be revoked<br>* works many times |
+
+---
+
+Note: in the signed token, we could also add the User IP address to increase the security.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-09-14T12:56:37Z
+
+> very short validity (lets say 15 minutes)
+
+I would advise against using this very short durations because emails can take time to be delivered (eg when the destination server has greylisting enabled)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-14T12:59:50Z
+
+> emails can take time to be delivered
+
+For that reason, I wouldn't include user IP address in the signature either. The probability of changing IPs is not zero if we consider a timespan of several hours.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-14T13:53:23Z
+
+Hi!
+
+Magic login links are still relatively new and there isn't clear guidance on security aspects. Some people show using JWT (so, links that cannot be expired after a single use) while others are adamant that they *must* expire after the first use. Reset passwords links *should* expire after a single use, and a magic link is *similar* to those.
+
+In the absence of clear guidance, we should see what the biggest services do: both Auth0 and Slack only allow a magic link to be used *once*.
+
+<img width="446" alt="Screen Shot 2020-09-14 at 9 45 43 AM" src="https://user-images.githubusercontent.com/121003/93094012-5cfb5780-f66f-11ea-93eb-fe8fbd3bbb17.png">
+
+That is enough for me to think that we should "err" on the side of caution and stored tokens in the database where they can be invalidated after 1 use.
+
+I *still* think the users will be very easy to implement. In both cases, a Maker command will take care of everything. With a database layer, the only added files are the entity & repository classes, both of which are quite small thanks to a trait in core (and of course, you could implement your own storage layer). In [reset-password-bundle](https://github.com/SymfonyCasts/reset-password-bundle) we haven't gotten any complaints or pushback yet on requiring persistence.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-14T19:08:18Z
+
+> > emails can take time to be delivered
+>
+> For that reason, I wouldn't include user IP address in the signature either. The probability of changing IPs is not zero if we consider a timespan of several hours.
+
+I don't think we should consider this. Magic login is a login action, it should not take more than 1 or 2 minutes. Otherwise it's not at all UX friendly enough to ever login.
+
+Which is also a reason why I originally considered using the Notifier component here; that would allow switching to an alternative (e.g. sms or notification) using the same authenticator.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-16T13:35:31Z
+
+This is ready!
+
+Probably the biggest decision is this: should we accept this into core? Or would we prefer this as its own bundle (e.g. `symfonycasts/magic-link`)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-16T13:59:42Z
+
+Regarding where to merge this feature, I think we should have a broader discussion about such features. Would we want to have totp auth in Symfony or rely on a third party bundle? Would we want to have the security bundles from SymfonyCasts in Symfony itself? I can see pros and cons, it's not clear cut to me.
+
+---------------------------------------------------------------------------
+
+by linaori at 2020-09-16T14:09:46Z
+
+While the features are fairly situational, I'd say the same goes for things like ldap login. I can already think of 2 different scenarios where I'd want to use this feature in my application. I'm not against putting this in a 3rd party bundle, though I think it would be awesome to have it work out-of-the-box in the code of Symfony.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-16T14:54:23Z
+
+Both solutions are OK to me (because we know that `symfonycasts/*` packages are of high quality and they will be maintained for newer Symfony versions).
+
+However, I'd prefer to keep this (and other common features) inside the Symfony security package. "Decoupling" every feature and creating "micro packages" would be worse in my opinion (for us to maintain, for us to document, for developers to use, etc.).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-09-16T15:46:30Z
+
+I'm in favor of merging this in core.
+
+Regarding the general question, I'd say that only bundles/features that have a strong dependency on third-party libs should live outside of core. It's mostly features that implement complex protocols like JWT, 2FA, OAuth, WebAuthn, ... those are features that should build on robust implementations, proven by crypto/security experts.
+For the rest, it's subjective (whether it is common enough, well implemented, and the core team is comfortable enough for maintaining it).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-16T16:03:22Z
+
++1 for having it in core as well
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-16T16:07:24Z
+
+I think @chalasr's criteria are quite good: If it doesn't require much classes (and no external libraries), let's merge it in Symfony Core. Symfony has quite a good coverage of "old" authentication mechanisms (form login, http basic, pre authenticated), but it's lacking a bit in modern solutions. I think having some modern solutions can help a great deal in making the component more modern and exciting.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2020-09-16T19:59:54Z
+
+I like it! Having such high level features in Symfony core make sense to improve the whole Symfony ecosystem DX.
+
+However I think this has to be improved while it’s experimental to make the system decoupled from   Doctrine and keep the Symfony components strength regarding reusability.
+
+Also, please don’t use the Magic word in this feature. There is nothing magic at all. It’s just an unusual authentication method!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-17T00:56:37Z
+
+> However I think this has to be improved while it’s experimental to make the system decoupled from Doctrine and keep the Symfony components strength regarding reusability.
+
+Don't worry - it's not coupled at all :). We give you some tools to make using it with Doctrine easy. But if you want to use a different implementation, you only need to implement 2 simple classes/interfaces. It's built with flexibility in mind, but is also decoupled.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-17T07:34:13Z
+
+@weaverryan you have studied solutions like this, so your opinion is what matters here ... but after thinking a bit about this, I wondered if a database-less solution could work.
+
+Could we design "login links" like these?
+
+```
+/<configurable-login-path>?user=weaverryan&until=1600327398&signature=29bc95601d6e5ced7b39dbf484640180
+/<configurable-login-path>?user=fabien@symfony.com&until=1600327533&signature=e4a2bb406ceac7008c594c8e657f6980
+```
+
+The URL contains:
+
+* `user` : the "username" of the app user (which can be an email, an UUID, etc.)
+* `until`: the "expires at" timestamp
+* `signature`: this would replace the concept of "hashed verifier"
+
+The signature could be created like this:
+
+```
+md5($appSecret.$userQueryParam.$untilQueryParam)
+```
+
+or even:
+
+```
+md5($appSecret.$userQueryParam.$untilQueryParam.$userPassword)
+```
+
+Could something like this work? I fear that I'm missing some security issues 🤔
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-09-17T07:37:23Z
+
+> Could something like this work? I fear that I'm missing some security issues :thinking:
+
+The biggest Security concern here is that you can't make these tokens one-time-pass*. I think that's an important element of login links: they should be usable only once. E.g. if a link is valid for a day or hour, I should not be able to use the same link to sign in multiple times during that timespan.
+
+_*: it's not 100% true, we could have an incrementing integer in the token and require new login actions to have a higher integer than the previous one. That would still require storing the integer though._
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-17T07:44:40Z
+
+I see 😞   This could be solved by saving the user "last login at" and adding a `since` query param to the "login link", so you can check if there's been `0` logins since the link was generated. Otherwise, deny the login.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-09-17T09:17:25Z
+
+> I think that's an important element of login links: they should be usable only once.
+
+Does that create a problem if that link is transferred through a channel that tries to fetch a preview of a URL, like WhatsApp for instance?
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2020-09-17T10:00:48Z
+
+> > I think that's an important element of login links: they should be usable only once.
+>
+> Does that create a problem if that link is transferred through a channel that tries to fetch a preview of a URL, like WhatsApp for instance?
+
+I've actually experienced this with one of my own implementations. There are mail clients that do the same (they probably scan the resulting page for security concerns). I'm not sure on how this would be solved correctly though (requiring a user interaction on the login page to confirm the login action does seem to be the right UX).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-18T00:42:54Z
+
+Hi friends!
+
+I have a number of changes to make (thanks for the reviews!) but there are 2 main big things currently being discussed:
+
+1) Requiring "action" to log in
+
+> Does that create a problem if that link is transferred through a channel that tries to fetch a preview of a URL, like
+> WhatsApp for instance?
+> I'm not sure on how this would be solved correctly though (requiring a user interaction on the login page to confirm the login action does seem to be the right UX).
+
+That's a great catch, and I noticed the Slack implementation does this - and this is almost certainly why :). Another implementation loads a temporary page, which (via JavaScript) validates reCAPTCHA, ultimately sends an AJAX request with the "token" + reCAPTCHA to an endpoint (which creates the authentication) and then redirects. And of course, half the internet doesn't do this, because they don't expire their "magic links" when they are used :p.
+
+2) Database Storage
+
+So.. the whole thing with storing it is so that we can invalidate a link after a single use. This security feature also creates the above issue :/.
+
+There is actually another solution, which is more secure, but creates new practical problems for users. Auth0 uses a "state" parameter. Basically, they store "state" in the session (think OAuth) so that you can only login using the same browser as was used to send the link. They do this for security, but it can create its *own* set of problems, where people have email clients that open a different browser.
+
+Anyways, if you do the "state" solution in the session... I don't see why would couldn't store the whole darn magic link token in the session.
+
+The tl;dr at the moment is that there is a long continuum of magic link implementations from least secure (tokens don't expire on usage, life is easy) to very secure (tokens expire on usage + they validate via captcha before doing this + a state parameter is stored in the session).
+
+So... what should our policy be? Only ship the 100% absolutely most secure implementation? Ship one that is "quite good" and add a disclaimer? Allow the user to choose between a secure and less secure solution?
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2020-09-18T21:23:26Z
+
+How about both? That way, as developer you can choose the version that matches your requirements. And maybe that could be as simple as just a single bool configuration parameter.
+
+1. One without expiring links and thus without the need of a database (with appropriate disclaimer). I would still opt for a pretty short lived url by the way, say 15, maybe 30 minutes.
+2. One that does give you the most secure implementation (one-time use, database storage, intermediate page with login and a short lived url)
+
+Wouldn't it also make sense to have the lifetime configurable? (Or is that already implemented within this MR?)
+
+Personally, I would never again consider using a session state for any interaction that involves an intermediate e-mail action. I've had my fair share of users back in my helpdesk days that just kept failing (and complaining) as they couldn't verify their e-mail address because they didn't open the link in the same browser session.
+Next to that, I do believe that even without the session state users will still be ignorant enough to request the link on their laptop and open it on their phone (as that gave the notification first), and not understand why they didn't login on their laptop. This latter case can be solved though by only authenticating the session that requested the link, but that would obviously require more frontend and backend implementation.
+
+But, with all this discussion, we probably just want to decide on two important questions: how far do we want to go, and does it still belong in the core? I personally feel that a separate bundle would be more fitting in this case, as I do like to have the security level configurable with a possibility of a 99.99% secure method. Note that I might be a bit biased as I personally dislike magic link logins (I really prefer my random passwords combined with a TOTP or hardware second factor 😄).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-19T22:54:22Z
+
+Yep, I've got a plan for this and it is basically to allow the most "convenient/less secure" functionality with ways to opt-in to more security. In truth, the correct level of security vs user convenience needs to be up to the user - a content site that contains no user data vs a bank are totally different things. And we can use MakerBundle & docs to educate the users to help them make the right choice.
+
+So... just give me a little bit of time to refactor this.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-28T17:25:40Z
+
+Hi!
+
+This is ready, with an entirely different implementation 🙃
+
+1) There is no "storage" - this leverages signed URLs
+
+2) You can choose whether or not you want your tokens to expire after a certain number of uses (e.g. 1). To power that, when enabled, we store expired URL signatures (hashes) in a cache pool.
+
+I've updated the PR description with usage example and security implications. This would be a feature that we educate (in the docs and Maker command) the tradeoffs of the different security levels. For example, if you want to expire tokens after 1 use (better security), then you will need to do more work in your app (Maker can help) to avoid mail clients from "previewing" the URL and thus "expiring" the token. This feature - and those docs - can serve as a big help for people implementing this feature at their required security level.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-28T18:56:17Z
+
+Note: after talking with Wouter, I'm going to refactor to use the existing "user provider" system and add the user's password hash as part of the signature in the URL. Basically, this will match the "remember me" token functionality, which makes sense - as a "magic login link" and "remember me" token are identical ideas.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-09-29T01:24:35Z
+
+This is ready again! I'm quite proud of this version :). The PR description has been fully updated. Highlights:
+
+1) No storage - everything is done with a signed URL (it doesn't actually use `UriSigner`, but the same concept). The user loading uses the existing user provider system.
+2) A cache is used to store "token usage" so that you can limit tokens to be used a set number of times
+3) The new `signature_properties` allows the user to configure which fields on User should invalidate all existing tokens when changed. Common examples would be `[id, email, password]`. Assuming `User::getUsername()` returns a true username (not an email or something else), then this would invalid links if the email address changed, the password changed or if suddenly the username were connected with a different "id" in the database. You can even use this to invalidate all *existing* login links with an extra field on user (I describe this in the PR description).
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-10-01T17:04:27Z
+
+Btw, this PR should be ready
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-10-02T14:59:11Z
+
+I really like the new design. I did not review the code (yet) But 👍🏼 for the feature

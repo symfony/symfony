@@ -19,8 +19,6 @@ namespace Symfony\Component\Messenger\Transport\Serialization\TypeResolver;
 interface TypeResolverInterface
 {
     /**
-     * @throws \Symfony\Component\Messenger\Exception\MessageDecodingFailedException
-     *
      * @return string the FQDN class to use as deserialization format
      */
     public function resolve(array $encodedEnvelope): string;

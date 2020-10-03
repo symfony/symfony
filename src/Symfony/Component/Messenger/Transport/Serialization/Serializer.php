@@ -100,18 +100,18 @@ class Serializer implements SerializerInterface
             return $this->serializer->deserialize($encodedEnvelope['body'], $type, $this->format, $context);
         }
 
-        if ($resolver instanceof DecodedAwareTypeResolverInterface) {
-            if (!$this->serializer instanceof DecoderInterface || !$this->serializer instanceof DenormalizerInterface) {
-                throw new MessageDecodingFailedException(sprintf('A serializer implementing "%s" and "%s" is needed to use "%s".', DecoderInterface::class, DenormalizerInterface::class, \get_class($resolver)));
-            }
-
-            $decodedBody = $this->serializer->decode($encodedEnvelope['body'], $this->format, $context);
-            $type = $resolver->resolve($encodedEnvelope, $decodedBody);
-
-            return $this->serializer->denormalize($decodedBody, $type, $this->format, $context);
+        if (!$resolver instanceof DecodedAwareTypeResolverInterface) {
+            throw new MessageDecodingFailedException(sprintf('"%s" must be an instance of "%s" or "%s", "%s" given.', self::TYPE_RESOLVER, TypeResolverInterface::class, DecodedAwareTypeResolverInterface::class, \is_object($resolver) ? \get_class($resolver) : \gettype($resolver)));
         }
 
-        throw new MessageDecodingFailedException(sprintf(sprintf('"%s" must be an instance of "%s" or "%s", "%s" given.', self::TYPE_RESOLVER, TypeResolverInterface::class, DecodedAwareTypeResolverInterface::class, \is_object($resolver) ? \get_class($resolver) : \gettype($resolver))));
+        if (!$this->serializer instanceof DecoderInterface || !$this->serializer instanceof DenormalizerInterface) {
+            throw new MessageDecodingFailedException(sprintf('A serializer implementing "%s" and "%s" is needed to use "%s".', DecoderInterface::class, DenormalizerInterface::class, \get_class($resolver)));
+        }
+
+        $decodedBody = $this->serializer->decode($encodedEnvelope['body'], $this->format, $context);
+        $type = $resolver->resolve($encodedEnvelope, $decodedBody);
+
+        return $this->serializer->denormalize($decodedBody, $type, $this->format, $context);
     }
 
     /**

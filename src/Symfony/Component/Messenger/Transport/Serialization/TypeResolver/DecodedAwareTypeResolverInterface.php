@@ -18,5 +18,10 @@ namespace Symfony\Component\Messenger\Transport\Serialization\TypeResolver;
  */
 interface DecodedAwareTypeResolverInterface
 {
+    /**
+     * @return string the FQDN class to use as deserialization format
+     *
+     * @param array $body decoded message body
+     */
     public function resolve(array $encodedEnvelope, array $body): string;
 }

@@ -140,6 +140,11 @@ class Dummy extends ParentDummy
      */
     public $arrayWithKeysAndComplexValue;
 
+    /**
+     * @var array<string,mixed>
+     */
+    public $arrayOfMixed;
+
     public static function getStatic()
     {
     }

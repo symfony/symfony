@@ -117,6 +117,22 @@ class PhpDocExtractorTest extends TestCase
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
             ['emptyVar', null, $this->isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
+            [
+                'arrayWithKeys',
+                $this->isPhpDocumentorV5() ? [
+                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING)),
+                ] : null,
+                null,
+                null,
+            ],
+            [
+                'arrayOfMixed',
+                $this->isPhpDocumentorV5() ? [
+                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null),
+                ] : null,
+                null,
+                null,
+            ],
         ];
     }
 

@@ -1,0 +1,268 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-29T15:44:43Z
+
+Here's a completely different proposal: what if we forget about Twig filters and functions and just design form Twig variables like this:
+
+```
+<form_name>.<field_name>.<field_property>
+```
+
+In practice, using the same example as above:
+
+```twig
+<input
+    name="{{ form.username.name }}"
+    value="{{ form.username.value }}"
+    placeholder="{{ form.username.label|trans }}"
+    class="form-control"
+/>
+
+{% for error in form.username.errors %}
+    <div class="text-danger mb-2">
+        {{ error }}
+    </div>
+{% endfor %}
+
+<select name="{{ form.country.name }}" class="form-control">
+    <option value="">{{ form.country.label|trans }}</option>
+
+    {% for label, value in form.country.choices %}
+        <option value="{{ value }}">{{ label|trans }}</option>
+    {% endfor %}
+</select>
+
+{% for error in form.country.errors %}
+    <div class="text-danger mb-2">
+        {{ error }}
+    </div>
+{% endfor %}
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-09-29T16:06:25Z
+
+i think we should aim for improved form vars from the backend yes. AFAIK `form.vars` is generally fine already (looking at the proposed functions here :))
+
+#35082 is basically asking for `Translatable` support in the backend.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2020-09-29T17:03:44Z
+
+@javiereguiluz my main concern about this is DX:
+
+1/ Autocompletion for dynamic variables is hard (whereas for functions it's already handled by Symfony IDE plugins)
+2/ What happens when you call `form.username.choices`? By having functions, we give ourselves room to have more complex behaviors, including logic checks, translations, etc.
+3/ Adding generic dynamic variables feels a bit like adding dynamic properties on classes. And if you're talking about adding an object there, I'm not sure what's the benefit compared to using Twig functions :) .
+
+@ro0NL The `form.vars` array contains dozens of values that are dependent on the type of field and are quite obscure. Using them is not intuitive at all (not autocompleted, not documented, not sure about their BC over time, ...). Introducing a Twig function as a layer allows us to do this refactoring without breaking too much the Twig rendering IMO.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-29T17:09:13Z
+
+I see an issue with `form.username.name`: what is `name` here ? the `name` variable of the username FormView, or the `name` *child* of the FormView ? Expecting to use ArrayAccess to mix variables and children will be a nightmare (that's why we have `.vars` when you want to access variables). And don't forget that in Symfony, we have a tree of Form/FormView, not a flat list of fields inside a top-level form.
+
+On a side note, our existing API for FormView already suffers from conflict issues in Twig. The `.` operator will try ArrayAccess first and getters after that, meaning that `.vars` could either be the `vars` child item or the `getVars()` method, which can create WTF moments when someone adds such a child in a form and things suddenly break in your template (the safe way to write form themes would imply using `form.getVars()` instead of `form.vars` to forbid going through the ArrayAccess API)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-29T18:55:35Z
+
+@tgalopin @stof in my comment I was biased by EasyAdmin, where we pass a simple `field` variable to the templates and we can access everything from it: original value, formatted value, all configuration properties, all form variables, etc. (with full IDE autocomplete too).
+
+@stof about what does `form.foo.name` means ... `form.foo` is always our "value object" of form field properties, so `form.foo.name` is "our thing" and `form.foo.value.name` is the "name" of the value being edited in the form field.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2020-09-29T20:55:15Z
+
+I just pushed an update. I added an example in the description on how to use this PR to display optgroups.
+
+@nicolas-grekas It now returns translated strings if a translator is provided and direct values otherwise. I also added the wiring with the TwigBundle.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-09-29T23:14:57Z
+
+Here is a table with some comparison:
+
+before | after | points
+--- | --- | ---
+`{{ form.username.vars.full_name }}`<br>`{% do form.username.setRendered() %}` | `{{ field_name(form.username) }}` | +1
+`{{ form.username.vars.value }} ` | `{{ field_value(form.username) }}` | -1 but +1 (for consistency) = 0
+`{{ form.username.vars.label\|trans(`<br>`form.username.vars.label_trans_params,`<br>`form.username.vars.translation_domain) }}` | `{{ field_label(form.username) }}` | +1 !!
+`{{ form.username.vars.help\|trans(`<br>`form.username.vars.help_trans_params,`<br>`form.username.vars.translation_domain) }}` | `{{ field_help(form.username) }}` | +1 !!
+
+Also a big +1 for `field_choices` diff.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-09-30T06:34:46Z
+
+The translation features look very nice 👍
+
+Here's a question: if this is merged, what will be the strategy to document Symfony Forms? Only show `field_*()` helpers? Keep showing `form_*()`?
+
+I haven't looked into the internals of this proposal, so I don't know if things are configurable or not. For example:
+
+```
+Use this to display the form field label:
+
+{{ field_label(form.foo) }}
+
+If you want to customize the label in the template, you need to use
+a completely different function:
+
+{{ form_label(form.foo, 'Lorem Ipsum') }}
+```
+
+This would be confusing 😐
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-30T07:30:07Z
+
+I really love the idea, but one thing I would like to see as well is a helper that takes a label and a translation domain (`false`-able), and returns the (maybe) translated string.
+Basically a wrapper around:
+
+```twig
+{%- if translation_domain is same as(false) -%}
+     {%- if label_html is same as(false) -%}
+         {{- label -}}
+     {%- else -%}
+         {{- label|raw -}}
+     {%- endif -%}
+ {%- else -%}
+```
+
+It's great if this is handled for the core properties, but often times, you need it for custom `data-` properties or things like `placeholder`. So it would be great to have a simple helper function (or macro) that accepts parameters instead of relying on globally defined variables.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2020-09-30T09:31:11Z
+
+@yceruto note that you missed the `vars` in your before examples (not a huge difference, but that matters as it's a bit obscure whe you don't know about it):
+
+```
+{{ form.username.vars.label|trans(
+form.username.vars.label_trans_params,
+form.username.vars.translation_domain) }}
+```
+
+@apfelbox I don't understand what you propose: isn't this already what the `trans` filter already covers? What's the additional feature not handled by the trans filter?
+
+@javiereguiluz my point of view is that we should aim at relying less on the `form_*` functions in the long term. They are not easy to use, have a very specific syntax without any autocompletion and they hide the HTML. Using inline functions like the one proposed here require a tiny bit more code but they are much easier to work with over time IMO.
+
+In the short term though, it's not feasible to only have inline functions, it would be a way too big change for a only small benefit. My POV in the short term is therefore that we should introduce these field functions at the beginning of the documentation (the first thing we describe relative to how to render forms), and then we mention additional form functions that are useful (form_start, form_rest, form_end, ...).
+
+IMHO we don't need to mention the `form_row`, `form_widget` and other similar functions in the Getting started of the forms doc, but instead in the doc dedicated to rendering only.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2020-09-30T09:31:59Z
+
+I just updated the PR following @yceruto review
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-30T09:50:02Z
+
+@tgalopin I would like a default filter / function, that basically does the `if`-structure above..
+
+So basically instead of
+
+```twig
+{%- if translation_domain is same as(false) -%}
+    {%- if label_html is same as(false) -%}
+        {{- label -}}
+    {%- else -%}
+        {{- label|raw -}}
+    {%- endif -%}
+{%- else -%}
+    {%- if label_html is same as(false) -%}
+        {{- label|trans(label_translation_parameters, translation_domain) -}}
+    {%- else -%}
+        {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
+    {%- endif -%}
+{%- endif -%}
+
+{# .. snip .. #}
+
+{%- if translation_domain is same as(false) -%}
+    {%- if placeholder_html is same as(false) -%}
+        {{- placeholder -}}
+    {%- else -%}
+        {{- placeholder|raw -}}
+    {%- endif -%}
+{%- else -%}
+    {%- if placeholder_html is same as(false) -%}
+        {{- placeholder|trans(placeholder_translation_parameters, translation_domain) -}}
+    {%- else -%}
+        {{- placeholder|trans(placeholder_translation_parameters, translation_domain)|raw -}}
+    {%- endif -%}
+{%- endif -%}
+
+{# ... snip ... #}
+
+(same for `help` here)
+```
+
+I would like to just be able to
+
+```twig
+{# name tbd #}
+{{- form_translate_label(label, translation_domain, label_translation_parameters, label_html) -}}
+{{- form_translate_label(placeholder, translation_domain, placeholder_translation_parameters, placeholder_html) -}}
+{# ... #}
+```
+
+So encapsulate the whole logic of
+
+* label
+* + optional translation domain
+* + optional "isHtml" handling
+* + parameter handler
+
+that needs to be duplicated throughout the whole template (especially if you have additional translatable labels (like I have above with my custom `placeholder` params).
+
+---------------------------------------------------------------------------
+
+by stof at 2020-09-30T09:53:01Z
+
+Putting the handling of `label_html` inside a filter will be a pain: it means that the output of the filter must be *conditionally* safe for auto-escaping, or that it has to handle escaping on its own to be always safe...
+
+On a side note, `placeholder_html` does not really make sense (unless your `placeholder` concept is not the HTML one, which would be confusing)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2020-09-30T10:00:28Z
+
+@apfelbox as you are already in the view, I don't see the use case for that: either you want to be generic, in which case `form_` functions are easier to manipulate from the backend, or you don't want to and you can simply make the proper trans filter yourself in the view. In any case, I think this should be debated in a different PR if we want to do so.
+
+@stof thanks, fixed it.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2020-09-30T10:37:50Z
+
+> On a side note, `placeholder_html` does not really make sense (unless your `placeholder` concept is not the HTML one, which would be confusing)
+
+I know that 😉
+It actually can differ, because things like rich selects can have more sophisticated placeholders, but let's not digress.
+
+> @apfelbox as you are already in the view, I don't see the use case for that: [...]
+
+The use case is that you might have a lot of different translatable elements and then you have to copy the same code throughout your whole template.
+
+> In any case, I think this should be debated in a different PR if we want to do so.
+
+I agree. Especially as the "proper" solution for this specific issue would be a different solution altogether 😅
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-09-30T13:24:35Z
+
+I don't think these functions will replace the actual form_* functions somehow, but they would improve the way we customize form themes.

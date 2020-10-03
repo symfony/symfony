@@ -56,6 +56,13 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
+        // if the attribute is set, this is a lazy firewall. The previous
+        // support call already indicated support, so return null and avoid
+        // recreating the cookie
+        if ($request->attributes->has('_remember_me_token')) {
+            return null;
+        }
+
         $token = $this->rememberMeServices->autoLogin($request);
         if (null === $token) {
             return false;

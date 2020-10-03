@@ -1793,7 +1793,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['serializer']['symfony_serializer']['context']);
             $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);
         }
-
+        
         $senderAliases = [];
         $transportRetryReferences = [];
         foreach ($config['transports'] as $name => $transport) {
@@ -1802,7 +1802,11 @@ class FrameworkExtension extends Extension
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
-                ->addTag('messenger.receiver', ['alias' => $name])
+                ->addTag('messenger.receiver', [
+                        'alias' => $name,
+                        'failure_transport' => $transport['failure_transport'] ?? null
+                    ]
+                )
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
@@ -1873,8 +1877,9 @@ class FrameworkExtension extends Extension
             if (!isset($senderReferences[$config['failure_transport']])) {
                 throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
-
+            
             $failureTransports[$config['failure_transport']] = $senderReferences[$config['failure_transport']];
+            $container->setAlias('messenger.failure_transports.default_transport', $config['failure_transport']);
         }
 
         foreach ($config['transports'] as $name => $transport) {
@@ -1909,8 +1914,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition($failureTransportsByTransportNameServiceLocatorId)
                 ->replaceArgument(0, $failureTransportsByTransportName);
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(0, $senderReferences[$config['failure_transport']] ?? null)
-                ->replaceArgument(2, $failureTransportsByTransportNameServiceLocator);
+                ->replaceArgument(0, $failureTransportsByTransportNameServiceLocator);
         } else {
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');

@@ -130,7 +130,7 @@ class MessengerPass implements CompilerPassInterface
                     if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                         $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" "%s" not found.', $serviceId, $message, $messageLocation));
+                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" %s not found.', $serviceId, $message, $messageLocation));
                     }
 
                     if (!$r->hasMethod($method)) {
@@ -298,6 +298,18 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
+
+        $failedCommandIds = [
+            'console.command.messenger_failed_messages_retry',
+            'console.command.messenger_failed_messages_show',
+            'console.command.messenger_failed_messages_remove',
+        ];
+        foreach ($failedCommandIds as $failedCommandId) {
+            if ($container->hasDefinition($failedCommandId)) {
+                $definition = $container->getDefinition($failedCommandId);
+                $definition->replaceArgument(1, $receiverMapping[$definition->getArgument(0)]);
+            }
+        }
     }
 
     private function registerBusToCollector(ContainerBuilder $container, string $busId)

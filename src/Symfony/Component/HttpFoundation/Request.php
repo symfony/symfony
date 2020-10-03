@@ -1574,8 +1574,10 @@ class Request
      * Gets the request body decoded as array, typically from a JSON payload.
      *
      * @throws JsonException When the body cannot be decoded to an array
+     *
+     * @return array
      */
-    public function toArray(): array
+    public function toArray()
     {
         if ('' === $content = $this->getContent()) {
             throw new JsonException('Response body is empty.');

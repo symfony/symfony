@@ -58,12 +58,14 @@ class StoreFactoryTest extends TestCase
         }
         if (class_exists(\Memcached::class) && class_exists(AbstractAdapter::class)) {
             yield ['memcached://server.com', MemcachedStore::class];
+            yield ['memcached:?host[localhost]&host[localhost:12345]', MemcachedStore::class];
         }
-        if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
+        if ((class_exists(\Redis::class) || class_exists(\Predis\Client::class)) && class_exists(AbstractAdapter::class)) {
             yield ['redis://localhost', RedisStore::class];
             yield ['redis://localhost?lazy=1', RedisStore::class];
             yield ['redis://localhost?redis_cluster=1', RedisStore::class];
             yield ['redis://localhost?redis_cluster=1&lazy=1', RedisStore::class];
+            yield ['redis:?host[localhost]&host[localhost:6379]&redis_cluster=1', RedisStore::class];
         }
         if (class_exists(\PDO::class)) {
             yield ['sqlite:/tmp/sqlite.db', PdoStore::class];

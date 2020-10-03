@@ -60,7 +60,7 @@ class StoreFactoryTest extends TestCase
             yield ['memcached://server.com', MemcachedStore::class];
             yield ['memcached:?host[localhost]&host[localhost:12345]', MemcachedStore::class];
         }
-        if ((class_exists(\Redis::class) || class_exists(\Predis\Client::class)) && class_exists(AbstractAdapter::class)) {
+        if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
             yield ['redis://localhost', RedisStore::class];
             yield ['redis://localhost?lazy=1', RedisStore::class];
             yield ['redis://localhost?redis_cluster=1', RedisStore::class];

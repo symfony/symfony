@@ -281,6 +281,29 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testBinaryFormatNamed()
+    {
+        fseek($this->file, 10, \SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
+
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\File(maxSize: 10, binaryFormat: true, maxSizeMessage: "myMessage");');
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', '10')
+            ->setParameter('{{ size }}', '11')
+            ->setParameter('{{ suffix }}', 'bytes')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
+            ->setCode(File::TOO_LARGE_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidMimeType()
     {
         $file = $this
@@ -329,7 +352,10 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidMimeType()
+    /**
+     * @dataProvider provideMimeTypeConstraints
+     */
+    public function testInvalidMimeType(File $constraint)
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
@@ -344,11 +370,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
-        $constraint = new File([
-            'mimeTypes' => ['image/png', 'image/jpg'],
-            'mimeTypesMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate($file, $constraint);
 
         $this->buildViolation('myMessage')
@@ -358,6 +379,20 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
+    }
+
+    public function provideMimeTypeConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new File([
+            'mimeTypes' => ['image/png', 'image/jpg'],
+            'mimeTypesMessage' => 'myMessage',
+        ])];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            yield 'named arguments' => [
+                eval('return new \Symfony\Component\Validator\Constraints\File(mimeTypes: ["image/png", "image/jpg"], mimeTypesMessage: "myMessage");'),
+            ];
+        }
     }
 
     public function testInvalidWildcardMimeType()
@@ -391,13 +426,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDisallowEmpty()
+    /**
+     * @dataProvider provideDisallowEmptyConstraints
+     */
+    public function testDisallowEmpty(File $constraint)
     {
         ftruncate($this->file, 0);
-
-        $constraint = new File([
-            'disallowEmptyMessage' => 'myMessage',
-        ]);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -406,6 +440,19 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::EMPTY_ERROR)
             ->assertRaised();
+    }
+
+    public function provideDisallowEmptyConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new File([
+            'disallowEmptyMessage' => 'myMessage',
+        ])];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            yield 'named arguments' => [
+                eval('return new \Symfony\Component\Validator\Constraints\File(disallowEmptyMessage: "myMessage");'),
+            ];
+        }
     }
 
     /**

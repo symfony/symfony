@@ -60,6 +60,14 @@ class RememberMeAuthenticatorTest extends TestCase
         yield [$this->createMock(TokenInterface::class), null];
     }
 
+    public function testConsecutiveSupportsCalls()
+    {
+        $this->rememberMeServices->expects($this->once())->method('autoLogin')->with($this->request)->willReturn($this->createMock(TokenInterface::class));
+
+        $this->assertNull($this->authenticator->supports($this->request));
+        $this->assertNull($this->authenticator->supports($this->request));
+    }
+
     public function testAuthenticate()
     {
         $this->request->attributes->set('_remember_me_token', new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));

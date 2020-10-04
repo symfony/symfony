@@ -82,12 +82,12 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            'image/jpeg',
+            'image/png',
             filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
-        $this->assertEquals('jpeg', $file->guessClientExtension());
+        $this->assertEquals('png', $file->guessClientExtension());
     }
 
     public function testCaseSensitiveMimeType()

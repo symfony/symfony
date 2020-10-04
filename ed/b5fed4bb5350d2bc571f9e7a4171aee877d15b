@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-06T04:04:12Z
+
+@jschaedl Will you have time to finish this PR? Any blockers?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-13T11:05:09Z
+
+We might need to take into account the new `SentMessage` class (not sure if this is worth it though).
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-08-17T06:24:17Z
+
+@fabpot
+
+> @jschaedl Will you have time to finish this PR? Any blockers?
+
+Sorry for the delay. There are no blockers so far, only limited time. But will try to work on this PR at the end of this week.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-30T08:03:26Z
+
+@jschaedl Do you think you will have something that we can merge before the end of the week (for 5.2)? Even if it's not finished?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-10-01T06:40:48Z
+
+Hi @fabpot, yes I think so. I was planning to work on it tmrw again and will let you know how far I've come.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-10-02T09:08:35Z
+
+@fabpot Ready for review. :-)

@@ -54,7 +54,7 @@ class Token
     /**
      * Tests the current token for a type and/or a value.
      *
-     * @param array|int   $type  The type to test
+     * @param string      $type  The type to test
      * @param string|null $value The token value
      *
      * @return bool

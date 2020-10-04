@@ -22,6 +22,7 @@ class FlockStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;
     use SharedLockStoreTestTrait;
+    use UnserializableTestTrait;
 
     /**
      * {@inheritdoc}

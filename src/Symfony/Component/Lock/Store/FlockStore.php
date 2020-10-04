@@ -125,6 +125,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         }
 
         $key->setState(__CLASS__, [$read, $handle]);
+        $key->markUnserializable();
     }
 
     /**

@@ -65,6 +65,7 @@ class ZookeeperStore implements PersistingStoreInterface
         $token = $this->getUniqueToken($key);
 
         $this->createNewLock($resource, $token);
+        $key->markUnserializable();
 
         $this->checkNotExpired($key);
     }

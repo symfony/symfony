@@ -23,6 +23,8 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  */
 class ZookeeperStoreTest extends AbstractStoreTest
 {
+    use UnserializableTestTrait;
+
     /**
      * @return ZookeeperStore
      */

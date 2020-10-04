@@ -55,8 +55,10 @@ final class Transports implements TransportInterface
     public function send(MessageInterface $message): SentMessage
     {
         if (!$transport = $message->getTransport()) {
-            foreach ($this->transports as $transport) {
+            foreach ($this->transports as $transportName => $transport) {
                 if ($transport->supports($message)) {
+                    $message->transport($transportName);
+
                     return $transport->send($message);
                 }
             }

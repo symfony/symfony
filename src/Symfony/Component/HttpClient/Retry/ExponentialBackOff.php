@@ -39,7 +39,7 @@ final class ExponentialBackOff implements RetryBackOffInterface
      * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
      * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
      */
-    public function __construct(int $delayMilliseconds = 1000, float $multiplier = 2, int $maxDelayMilliseconds = 0)
+    public function __construct(int $delayMilliseconds = 1000, float $multiplier = 2.0, int $maxDelayMilliseconds = 0)
     {
         if ($delayMilliseconds < 0) {
             throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
@@ -47,7 +47,7 @@ final class ExponentialBackOff implements RetryBackOffInterface
         $this->delayMilliseconds = $delayMilliseconds;
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
+            throw new InvalidArgumentException(sprintf('Multiplier must be greater than or equal to one: "%s" given.', $multiplier));
         }
         $this->multiplier = $multiplier;
 
@@ -65,6 +65,6 @@ final class ExponentialBackOff implements RetryBackOffInterface
             return $this->maxDelayMilliseconds;
         }
 
-        return $delay;
+        return (int) $delay;
     }
 }

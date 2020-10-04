@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by qurben at 2020-10-03T13:52:22Z
+
+Symfony 5.1.6 + this patch fixes remember me in my application.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-03T14:04:04Z
+
+Quick note: The `RememberMeAuthenticator` is a bit ugly. This is because the `AbstractRememberMeServices` already does almost everything that the authenticator should do. We should probably try to refactor the remember me services, to also decouple when remember me should be used, vs actually setting the remember me cookie.

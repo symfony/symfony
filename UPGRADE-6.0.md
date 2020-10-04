@@ -184,6 +184,8 @@ Validator
     */
    ```
 
+ * Removed the `NumberConstraintTrait` trait.
+
 Yaml
 ----
 

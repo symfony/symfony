@@ -13,21 +13,18 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-trigger_deprecation('symfony/validator', '5.2', '%s is deprecated.', NumberConstraintTrait::class);
-
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+ * @internal
  *
- * @deprecated since Symfony 5.2
+ * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+ * @author Alexander M. Turek <me@derrabus.de>
  */
-trait NumberConstraintTrait
+trait ZeroComparisonConstraintTrait
 {
-    private function configureNumberConstraintOptions($options): array
+    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
     {
         if (null === $options) {
             $options = [];
-        } elseif (!\is_array($options)) {
-            $options = [$this->getDefaultOption() => $options];
         }
 
         if (isset($options['propertyPath'])) {
@@ -38,8 +35,11 @@ trait NumberConstraintTrait
             throw new ConstraintDefinitionException(sprintf('The "value" option of the "%s" constraint cannot be set.', static::class));
         }
 
-        $options['value'] = 0;
+        parent::__construct(0, null, $message, $groups, $payload, $options);
+    }
 
-        return $options;
+    public function validatedBy(): string
+    {
+        return parent::class.'Validator';
     }
 }

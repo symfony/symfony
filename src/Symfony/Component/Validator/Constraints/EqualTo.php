@@ -18,6 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  * @author Daniel Holmes <daniel@danielholmes.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class EqualTo extends AbstractComparison
 {
     const NOT_EQUAL_ERROR = '478618a7-95ba-473d-9101-cabd45e49115';

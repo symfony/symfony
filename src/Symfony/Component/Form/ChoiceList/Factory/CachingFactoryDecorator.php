@@ -183,10 +183,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
     {
-        if (\count(\func_get_args()) < 7) {
-            trigger_deprecation('symfony/form', '5.2', 'Calling %s without passing the label translation parameters is deprecated.', __METHOD__);
-        }
-
         $labelTranslationParameters = \func_get_args()[6] ?? [];
         $cache = true;
 

@@ -7,6 +7,23 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.15 (2020-10-04)
+
+ * bug #36291 [Lock] Fix StoreFactory to accept same DSN syntax as AbstractAdapter (Jontsa)
+ * bug #38390 [Serializer][Minor] Fix circular reference exception message (bad limit displayed) (l-vo)
+ * bug #38388 [HttpClient] Always "buffer" empty responses (nicolas-grekas)
+ * bug #38380 [Form] propagate validation groups to subforms (johanderuijter, xabbuh)
+ * bug #38377  Ignore more deprecations for Mockery mocks (fancyweb)
+ * bug #38375 [HttpClient] fix using proxies with NativeHttpClient (nicolas-grekas)
+ * bug #38372 [Routing] fix using !important and defaults/reqs in inline route definitions (nicolas-grekas)
+ * bug #38373 [ErrorHandler][DebugClassLoader] Do not check Mockery mocks classes (fancyweb)
+ * bug #38368 [HttpClient] Fix using https with proxies (bohanyang)
+ * bug #38350 [TwigBundle] Only remove kernel exception listener if twig is used (dmolineus)
+ * bug #38360 [BrowserKit] Cookie expiration at current timestamp (iquito)
+ * bug #38358 [Messenger] Fix redis connection error message (alexander-schranz)
+ * bug #38343 Revert "bug #38063 [FrameworkBundle] generate preload.php in src/ to make opcache.preload predictable" (nicolas-grekas)
+ * bug #38336 [PhpUnitBridge] Fixed class_alias() for PHPUnit\Framework\Error\Error (stevegrunwell)
+
 * 4.4.14 (2020-09-27)
 
  * bug #38248 [HttpClient] Allow bearer token with colon (stephanvierkant)

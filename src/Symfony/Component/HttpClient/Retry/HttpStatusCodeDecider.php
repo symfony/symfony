@@ -28,7 +28,7 @@ final class HttpStatusCodeDecider implements RetryDeciderInterface
         $this->statusCodes = $statusCodes;
     }
 
-    public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool
+    public function shouldRetry(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool
     {
         return \in_array($responseStatusCode, $this->statusCodes, true);
     }

@@ -9,6 +9,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
 use Symfony\Component\HttpClient\Retry\HttpStatusCodeDecider;
 use Symfony\Component\HttpClient\Retry\RetryDeciderInterface;
+use Symfony\Component\HttpClient\Retry\StatelessStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 
 class RetryableHttpClientTest extends TestCase
@@ -20,8 +21,10 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new StatelessStrategy(
+                new HttpStatusCodeDecider([500]),
+                new ExponentialBackOff(0)
+            ),
             1
         );
 
@@ -38,8 +41,10 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new StatelessStrategy(
+                new HttpStatusCodeDecider([500]),
+                new ExponentialBackOff(0)
+            ),
             1
         );
 
@@ -56,13 +61,15 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new class() implements RetryDeciderInterface {
-                public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent): ?bool
-                {
-                    return null === $responseContent ? null : 200 !== $responseCode;
-                }
-            },
-            new ExponentialBackOff(0),
+            new StatelessStrategy(
+                new class() implements RetryDeciderInterface {
+                    public function shouldRetry(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent): ?bool
+                    {
+                        return null === $responseContent ? null : 200 !== $responseCode;
+                    }
+                },
+                new ExponentialBackOff(0)
+            ),
             1
         );
 
@@ -78,13 +85,15 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new class() implements RetryDeciderInterface {
-                public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent, \Throwable $throwable = null): ?bool
-                {
-                    return null;
-                }
-            },
-            new ExponentialBackOff(0),
+            new StatelessStrategy(
+                new class() implements RetryDeciderInterface {
+                    public function shouldRetry(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent, \Throwable $throwable = null): ?bool
+                    {
+                        return null;
+                    }
+                },
+                new ExponentialBackOff(0)
+            ),
             1
         );
 
@@ -100,8 +109,10 @@ class RetryableHttpClientTest extends TestCase
             new MockHttpClient([
                 new MockResponse('', ['http_code' => 500]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new StatelessStrategy(
+                new HttpStatusCodeDecider([500]),
+                new ExponentialBackOff(0)
+            ),
             0
         );
 

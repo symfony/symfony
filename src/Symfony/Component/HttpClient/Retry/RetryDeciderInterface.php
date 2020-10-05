@@ -23,5 +23,5 @@ interface RetryDeciderInterface
      *
      * @return ?bool Returns null to signal that the body is required to take a decision
      */
-    public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool;
+    public function shouldRetry(int $retryCount, string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool;
 }

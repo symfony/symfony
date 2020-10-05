@@ -15,10 +15,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
-use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
-use Symfony\Component\HttpClient\Retry\HttpStatusCodeDecider;
-use Symfony\Component\HttpClient\Retry\RetryBackOffInterface;
-use Symfony\Component\HttpClient\Retry\RetryDeciderInterface;
+use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
+use Symfony\Component\HttpClient\Retry\StatelessStrategy;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -33,7 +31,6 @@ class RetryableHttpClient implements HttpClientInterface
 {
     use AsyncDecoratorTrait;
 
-    private $decider;
     private $strategy;
     private $maxRetries;
     private $logger;
@@ -41,26 +38,25 @@ class RetryableHttpClient implements HttpClientInterface
     /**
      * @param int $maxRetries The maximum number of times to retry
      */
-    public function __construct(HttpClientInterface $client, RetryDeciderInterface $decider = null, RetryBackOffInterface $strategy = null, int $maxRetries = 3, LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client, RetryStrategyInterface $strategy = null, int $maxRetries = 3, LoggerInterface $logger = null)
     {
         $this->client = $client;
-        $this->decider = $decider ?? new HttpStatusCodeDecider();
-        $this->strategy = $strategy ?? new ExponentialBackOff();
+        $this->strategy = $strategy ?? new StatelessStrategy();
         $this->maxRetries = $maxRetries;
         $this->logger = $logger ?: new NullLogger();
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        if ($this->maxRetries <= 0) {
+        $retryToken = $this->strategy->getToken($method, $url, $options);
+
+        if (null === $retryToken || $this->maxRetries <= 0) {
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
         $retryCount = 0;
-        $content = '';
-        $firstChunk = null;
 
-        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$retryCount, &$content, &$firstChunk) {
+        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, $retryToken, &$retryCount, &$content, &$firstChunk) {
             $exception = null;
             try {
                 if ($chunk->isTimeout() || null !== $chunk->getInformationalStatus()) {
@@ -69,14 +65,14 @@ class RetryableHttpClient implements HttpClientInterface
                     return;
                 }
             } catch (TransportExceptionInterface $exception) {
-                // catch TransportExceptionInterface to send it to strategy.
+                // catch TransportExceptionInterface to send it to RetryToken::getDelay().
             }
 
             $statusCode = $context->getStatusCode();
             $headers = $context->getHeaders();
             if (null === $exception) {
                 if ($chunk->isFirst()) {
-                    $shouldRetry = $this->decider->shouldRetry($method, $url, $options, $statusCode, $headers, null);
+                    $shouldRetry = $retryToken->shouldRetry($retryCount, $statusCode, $headers, null);
 
                     if (false === $shouldRetry) {
                         $context->passthru();
@@ -85,7 +81,7 @@ class RetryableHttpClient implements HttpClientInterface
                         return;
                     }
 
-                    // Decider need body to decide
+                    // Body is needed to decide
                     if (null === $shouldRetry) {
                         $firstChunk = $chunk;
                         $content = '';
@@ -94,12 +90,15 @@ class RetryableHttpClient implements HttpClientInterface
                     }
                 } else {
                     $content .= $chunk->getContent();
+
                     if (!$chunk->isLast()) {
                         return;
                     }
-                    $shouldRetry = $this->decider->shouldRetry($method, $url, $options, $statusCode, $headers, $content);
+
+                    $shouldRetry = $retryToken->shouldRetry($retryCount, $statusCode, $headers, $content);
+
                     if (null === $shouldRetry) {
-                        throw new \LogicException(sprintf('The "%s::shouldRetry" method must not return null when called with a body.', \get_class($this->decider)));
+                        throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with a body.', get_debug_type($retryToken)));
                     }
 
                     if (false === $shouldRetry) {
@@ -116,7 +115,7 @@ class RetryableHttpClient implements HttpClientInterface
             $context->setInfo('retry_count', $retryCount);
             $context->getResponse()->cancel();
 
-            $delay = $this->getDelayFromHeader($headers) ?? $this->strategy->getDelay($retryCount, $method, $url, $options, $statusCode, $headers, $chunk instanceof LastChunk ? $content : null, $exception);
+            $delay = $this->getDelayFromHeader($headers) ?? $retryToken->getDelay($retryCount, $statusCode, $headers, $chunk instanceof LastChunk ? $content : null, $exception);
             ++$retryCount;
 
             $this->logger->info('Error returned by the server. Retrying #{retryCount} using {delay} ms delay: '.($exception ? $exception->getMessage() : 'StatusCode: '.$statusCode), [

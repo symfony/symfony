@@ -20,13 +20,13 @@ class HttpStatusCodeDeciderTest extends TestCase
     {
         $decider = new HttpStatusCodeDecider([500]);
 
-        self::assertTrue($decider->shouldRetry('GET', 'http://example.com/', [], 500, [], null));
+        self::assertTrue($decider->shouldRetry(1, 'GET', 'http://example.com/', [], 500, [], null));
     }
 
     public function testIsNotRetryableOk()
     {
         $decider = new HttpStatusCodeDecider([500]);
 
-        self::assertFalse($decider->shouldRetry('GET', 'http://example.com/', [], 200, [], null));
+        self::assertFalse($decider->shouldRetry(1, 'GET', 'http://example.com/', [], 200, [], null));
     }
 }

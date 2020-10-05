@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-22T05:02:12Z
+
+As this is a new feature, this should be based on master.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-09-30T06:04:38Z
+
+@lstrojny Can you take Nicolas's comment into account; we will close 5.2 for new feature tomorrow, would be great to have this one in.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2020-09-30T22:07:39Z
+
+@fabpot @nicolas-grekas while working on the issue I found a bug with how the prefix seed is handled. Because the prefix seed is hashed before setting it as a constructor argument, env variables will not be properly handled. In fact what gets hashed is the `%%env(…)%%` expression, not the value. The same issue happened with the previous solution for the default lifetime. That’s why I went a different direction and introduced a parameter normalizer that converts the date expression and hashes the namespace expression on instantiation by configuring the normalizer as a factory method. As this is arguably a bugfix now I leave the work based on 4.4 for now.
+
+Questions:
+* Does the general direction make sense? If so, I'll add and fix tests
+* Is 4.4 the right target?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T16:37:12Z
+
+I'd prefer not adding a runtime factory for this.
+The seed was resolved at compile-time, which is enough, isn't it?
+Can't we do the same for the default lifetime?
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2020-10-01T21:40:56Z
+
+@nicolas-grekas unfortunately not, the compile time resolving is broken and additionally only resolving at compile time leads to unexpected results, where one would expect to pass a different env value for the seed and it‘s not picked up
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T21:45:38Z
+
+If it's broken ("broken" to be defined) we should fix it. Computing the seed (aka the namespaces of the pools) at runtime is not supported and shoudln't be IMHO. There are many config options that are not compatible with runtime configuration, this is one of them (although this one is compatible with compile time evaluation, which is not the case for many options).
+
+Reconsidering this is another story, not for this PR at least.

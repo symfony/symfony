@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
@@ -27,6 +28,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -34,10 +36,13 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionals
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -49,12 +54,17 @@ use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
+use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -81,7 +91,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $def = $container->getDefinition('property_accessor');
-        $this->assertFalse($def->getArgument(0));
+        $this->assertSame(PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_GET, $def->getArgument(0));
         $this->assertFalse($def->getArgument(1));
         $this->assertTrue($def->getArgument(3));
     }
@@ -90,7 +100,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('property_accessor');
         $def = $container->getDefinition('property_accessor');
-        $this->assertTrue($def->getArgument(0));
+        $this->assertSame(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_CALL, $def->getArgument(0));
         $this->assertTrue($def->getArgument(1));
         $this->assertFalse($def->getArgument(3));
     }
@@ -216,6 +226,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
+        $this->assertNull($container->getDefinition('workflow.article')->getArgument('index_4'), 'Workflows has eventsToDispatch=null');
+
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
@@ -234,6 +246,12 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
+        $metadataStoreDefinition = $container->getDefinition('workflow.article.metadata_store');
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $metadataStoreDefinition->getArgument(0));
 
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
@@ -256,9 +274,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame(['start'], $stateMachineDefinition->getArgument(2));
 
-        $metadataStoreDefinition = $stateMachineDefinition->getArgument(3);
-        $this->assertInstanceOf(Definition::class, $metadataStoreDefinition);
+        $metadataStoreReference = $stateMachineDefinition->getArgument(3);
+        $this->assertInstanceOf(Reference::class, $metadataStoreReference);
+        $this->assertSame('state_machine.pull_request.metadata_store', (string) $metadataStoreReference);
+
+        $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
         $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);
         $this->assertSame(['title' => 'workflow title'], $workflowMetadata);
@@ -421,6 +443,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('workflows_explicitly_enabled_named_workflows');
 
         $this->assertTrue($container->hasDefinition('workflow.workflows.definition'));
+    }
+
+    public function testWorkflowsWithNoDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_no_events_to_dispatch');
+
+        $eventsToDispatch = $container->getDefinition('state_machine.my_workflow')->getArgument('index_4');
+
+        $this->assertSame([], $eventsToDispatch);
+    }
+
+    public function testWorkflowsWithSpecifiedDispatchedEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_specified_events_to_dispatch');
+
+        $eventsToDispatch = $container->getDefinition('state_machine.my_workflow')->getArgument('index_4');
+
+        $this->assertSame([WorkflowEvents::LEAVE, WorkflowEvents::COMPLETED], $eventsToDispatch);
     }
 
     public function testEnabledPhpErrorsConfig()
@@ -638,6 +678,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('redis://127.0.0.1:6379/messages', $transportArguments[0]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.beanstalkd'));
+        $transportFactory = $container->getDefinition('messenger.transport.beanstalkd')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.beanstalkd')->getArguments();
+
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertCount(3, $transportArguments);
+        $this->assertSame('beanstalkd://127.0.0.1:11300', $transportArguments[0]);
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.beanstalkd.factory'));
 
         $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
@@ -1115,6 +1165,17 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(-910, $tag[0]['priority']);
     }
 
+    public function testFormErrorNormalizerRegistred()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.form_error');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals(FormErrorNormalizer::class, $definition->getClass());
+        $this->assertEquals(-915, $tag[0]['priority']);
+    }
+
     public function testJsonSerializableNormalizerRegistered()
     {
         $container = $this->createContainerFromFile('full');
@@ -1272,27 +1333,67 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 'PT11S');
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.expr', 'cache.app', '13 seconds');
 
         $chain = $container->getDefinition('cache.chain');
 
         $this->assertSame(ChainAdapter::class, $chain->getClass());
 
+        $this->assertCount(2, $chain->getArguments());
+        $this->assertCount(3, $chain->getArguments()[0]);
+
+        $expectedSeed = $chain->getArgument(0)[1]->getArgument(0);
         $expected = [
             [
                 (new ChildDefinition('cache.adapter.array'))
                     ->replaceArgument(0, 12),
                 (new ChildDefinition('cache.adapter.filesystem'))
-                    ->replaceArgument(0, 'xctxZ1lyiH')
+                    ->replaceArgument(0, $expectedSeed)
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
                     ->replaceArgument(0, new Reference('.cache_connection.kYdiLgf'))
-                    ->replaceArgument(1, 'xctxZ1lyiH')
+                    ->replaceArgument(1, $expectedSeed)
                     ->replaceArgument(2, 12),
             ],
             12,
         ];
         $this->assertEquals($expected, $chain->getArguments());
+    }
+
+    public function testRedisTagAwareAdapter(): void
+    {
+        $container = $this->createContainerFromFile('cache', [], true);
+
+        $aliasesForArguments = [];
+        $argNames = [
+            'cacheRedisTagAwareFoo',
+            'cacheRedisTagAwareFoo2',
+            'cacheRedisTagAwareBar',
+            'cacheRedisTagAwareBar2',
+            'cacheRedisTagAwareBaz',
+            'cacheRedisTagAwareBaz2',
+        ];
+        foreach ($argNames as $argumentName) {
+            $aliasesForArguments[] = sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
+            $aliasesForArguments[] = sprintf('%s $%s', CacheInterface::class, $argumentName);
+            $aliasesForArguments[] = sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
+        }
+
+        foreach ($aliasesForArguments as $aliasForArgumentStr) {
+            $aliasForArgument = $container->getAlias($aliasForArgumentStr);
+            $this->assertNotNull($aliasForArgument, sprintf("No alias found for '%s'", $aliasForArgumentStr));
+
+            $def = $container->getDefinition((string) $aliasForArgument);
+            $this->assertInstanceOf(ChildDefinition::class, $def, sprintf("No definition found for '%s'", $aliasForArgumentStr));
+
+            $defParent = $container->getDefinition($def->getParent());
+            if ($defParent instanceof ChildDefinition) {
+                $defParent = $container->getDefinition($defParent->getParent());
+            }
+
+            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
+        }
     }
 
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
@@ -1383,7 +1484,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
-            'base_uri' => 'http://example.com',
             'headers' => [
                 'bar' => 'baz',
             ],
@@ -1391,6 +1491,23 @@ abstract class FrameworkExtensionTest extends TestCase
             'resolve' => [],
         ];
         $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
+    }
+
+    public function testHttpClientRetry()
+    {
+        if (!class_exists(RetryableHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+        $container = $this->createContainerFromFile('http_client_retry');
+
+        $this->assertSame([429, 500], $container->getDefinition('http_client.retry.decider')->getArgument(0));
+        $this->assertSame(100, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(0));
+        $this->assertSame(2, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(1));
+        $this->assertSame(0, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(2));
+        $this->assertSame(2, $container->getDefinition('http_client.retry')->getArgument(3));
+
+        $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retry')->getClass());
+        $this->assertSame(4, $container->getDefinition('foo.retry.exponential_backoff')->getArgument(1));
     }
 
     public function testHttpClientWithQueryParameterKey()
@@ -1436,13 +1553,29 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $defaultOptions['peer_fingerprint']);
     }
 
-    public function testMailer(): void
+    public function provideMailer(): array
     {
-        $container = $this->createContainerFromFile('mailer');
+        return [
+            ['mailer_with_dsn', ['main' => 'smtp://example.com']],
+            ['mailer_with_transports', [
+                'transport1' => 'smtp://example1.com',
+                'transport2' => 'smtp://example2.com',
+            ]],
+        ];
+    }
+
+    /**
+     * @dataProvider provideMailer
+     */
+    public function testMailer(string $configFile, array $expectedTransports): void
+    {
+        $container = $this->createContainerFromFile($configFile);
 
         $this->assertTrue($container->hasAlias('mailer'));
+        $this->assertTrue($container->hasDefinition('mailer.transports'));
+        $this->assertSame($expectedTransports, $container->getDefinition('mailer.transports')->getArgument(0));
         $this->assertTrue($container->hasDefinition('mailer.default_transport'));
-        $this->assertSame('smtp://example.com', $container->getDefinition('mailer.default_transport')->getArgument(0));
+        $this->assertSame(current($expectedTransports), $container->getDefinition('mailer.default_transport')->getArgument(0));
         $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
@@ -1469,12 +1602,28 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
+    public function testHttpClientMockResponseFactory()
+    {
+        $container = $this->createContainerFromFile('http_client_mock_response_factory');
+
+        $definition = $container->getDefinition('http_client');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(1, $definition->getArguments());
+
+        $argument = $definition->getArgument(0);
+
+        $this->assertInstanceOf(Reference::class, $argument);
+        $this->assertSame('my_response_factory', (string) $argument);
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
             'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
             'kernel.bundles_metadata' => ['FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..']],
             'kernel.cache_dir' => __DIR__,
+            'kernel.build_dir' => __DIR__,
             'kernel.project_dir' => __DIR__,
             'kernel.debug' => false,
             'kernel.environment' => 'test',

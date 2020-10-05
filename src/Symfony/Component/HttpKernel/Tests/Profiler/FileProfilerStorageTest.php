@@ -318,8 +318,8 @@ class FileProfilerStorageTest extends TestCase
 
         $tokens = $this->storage->find('', '', 10, '');
         $this->assertCount(2, $tokens);
-        $this->assertContains($tokens[0]['status_code'], [200, 404]);
-        $this->assertContains($tokens[1]['status_code'], [200, 404]);
+        $this->assertContains((int) $tokens[0]['status_code'], [200, 404]);
+        $this->assertContains((int) $tokens[1]['status_code'], [200, 404]);
     }
 
     public function testMultiRowIndexFile()
@@ -354,7 +354,7 @@ class FileProfilerStorageTest extends TestCase
         $h = tmpfile();
 
         fwrite($h, "line1\n\n\nline2\n");
-        fseek($h, 0, SEEK_END);
+        fseek($h, 0, \SEEK_END);
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));

@@ -66,8 +66,15 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     private $transliterators = [];
 
-    public function __construct(string $defaultLocale = null, array $symbolsMap = null)
+    /**
+     * @param array|\Closure|null $symbolsMap
+     */
+    public function __construct(string $defaultLocale = null, $symbolsMap = null)
     {
+        if (null !== $symbolsMap && !\is_array($symbolsMap) && !$symbolsMap instanceof \Closure) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, Closure or null, "%s" given.', __METHOD__, \gettype($symbolMap)));
+        }
+
         $this->defaultLocale = $defaultLocale;
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
@@ -103,9 +110,16 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             $transliterator = (array) $this->createTransliterator($locale);
         }
 
+        if ($this->symbolsMap instanceof \Closure) {
+            $symbolsMap = $this->symbolsMap;
+            array_unshift($transliterator, static function ($s) use ($symbolsMap, $locale) {
+                return $symbolsMap($s, $locale);
+            });
+        }
+
         $unicodeString = (new UnicodeString($string))->ascii($transliterator);
 
-        if (isset($this->symbolsMap[$locale])) {
+        if (\is_array($this->symbolsMap) && isset($this->symbolsMap[$locale])) {
             foreach ($this->symbolsMap[$locale] as $char => $replace) {
                 $unicodeString = $unicodeString->replace($char, ' '.$replace.' ');
             }

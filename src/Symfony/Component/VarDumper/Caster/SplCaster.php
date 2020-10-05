@@ -94,10 +94,32 @@ class SplCaster
         unset($a["\0SplFileInfo\0fileName"]);
         unset($a["\0SplFileInfo\0pathName"]);
 
-        if (false === $c->getPathname()) {
-            $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
+        if (\PHP_VERSION_ID < 80000) {
+            if (false === $c->getPathname()) {
+                $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
 
-            return $a;
+                return $a;
+            }
+        } else {
+            try {
+                $c->isReadable();
+            } catch (\RuntimeException $e) {
+                if ('Object not initialized' !== $e->getMessage()) {
+                    throw $e;
+                }
+
+                $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
+
+                return $a;
+            } catch (\Error $e) {
+                if ('Object not initialized' !== $e->getMessage()) {
+                    throw $e;
+                }
+
+                $a[$prefix.'⚠'] = 'The parent constructor was not called: the object is in an invalid state';
+
+                return $a;
+            }
         }
 
         foreach ($map as $key => $accessor) {

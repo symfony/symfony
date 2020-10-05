@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeatu
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\CustomAuthenticatorFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
@@ -27,6 +28,8 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginLdapFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\LoginLinkFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\LoginThrottlingFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUserFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
@@ -63,6 +66,8 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
         $extension->addSecurityListenerFactory(new AnonymousFactory());
         $extension->addSecurityListenerFactory(new CustomAuthenticatorFactory());
+        $extension->addSecurityListenerFactory(new LoginThrottlingFactory());
+        $extension->addSecurityListenerFactory(new LoginLinkFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
@@ -74,6 +79,8 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new RegisterLdapLocatorPass());
         // must be registered after RegisterListenersPass (in the FrameworkBundle)
         $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
+        // execute after ResolveChildDefinitionsPass optimization pass, to ensure class names are set
+        $container->addCompilerPass(new SortFirewallListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $container->addCompilerPass(new AddEventAliasesPass(array_merge(
             AuthenticationEvents::ALIASES,

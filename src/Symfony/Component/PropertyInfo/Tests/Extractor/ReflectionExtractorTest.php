@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
@@ -30,6 +31,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var ReflectionExtractor
      */
@@ -60,6 +63,9 @@ class ReflectionExtractorTest extends TestCase
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
                 'nestedIterators',
+                'arrayWithKeys',
+                'arrayWithKeysAndComplexValue',
+                'arrayOfMixed',
                 'foo',
                 'foo2',
                 'foo3',
@@ -108,6 +114,9 @@ class ReflectionExtractorTest extends TestCase
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
                 'nestedIterators',
+                'arrayWithKeys',
+                'arrayWithKeysAndComplexValue',
+                'arrayOfMixed',
                 'foo',
                 'foo2',
                 'foo3',
@@ -146,6 +155,9 @@ class ReflectionExtractorTest extends TestCase
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
                 'nestedIterators',
+                'arrayWithKeys',
+                'arrayWithKeysAndComplexValue',
+                'arrayOfMixed',
                 'foo',
                 'foo2',
                 'foo3',
@@ -414,6 +426,7 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableBoolProp'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))], $this->extractor->getTypes(Php74Dummy::class, 'stringCollection'));
     }
 
     /**
@@ -516,6 +529,51 @@ class ReflectionExtractorTest extends TestCase
             [Php71DummyExtended2::class, 'string', false, false, '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [Php71DummyExtended2::class, 'string', true, false,  '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [Php71DummyExtended2::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+        ];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetReadInfoDeprecatedEnableMagicCallExtractionInContext()
+    {
+        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getReadInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
+
+        $extractor = new ReflectionExtractor();
+        $extractor->getReadInfo(\stdClass::class, 'foo', [
+            'enable_magic_call_extraction' => true,
+        ]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetWriteInfoDeprecatedEnableMagicCallExtractionInContext()
+    {
+        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getWriteInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
+
+        $extractor = new ReflectionExtractor();
+        $extractor->getWriteInfo(\stdClass::class, 'foo', [
+            'enable_magic_call_extraction' => true,
+        ]);
+    }
+
+    /**
+     * @dataProvider extractConstructorTypesProvider
+     */
+    public function testExtractConstructorTypes(string $property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function extractConstructorTypesProvider(): array
+    {
+        return [
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['date', null],
+            ['dateObject', null],
+            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['ddd', null],
         ];
     }
 }

@@ -25,8 +25,8 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
-    use ProxyTrait;
     use ContractsTrait;
+    use ProxyTrait;
 
     private $namespace;
     private $namespaceLen;
@@ -88,7 +88,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                     $item["\0*\0value"] = ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
                 }
                 $innerItem->set($item["\0*\0value"]);
-                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', $item["\0*\0expiry"])) : null);
+                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', 0 === $item["\0*\0expiry"] ? \PHP_INT_MAX : $item["\0*\0expiry"])) : null);
             },
             null,
             CacheItem::class

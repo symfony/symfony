@@ -13,11 +13,11 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\GetterMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 
 class GetterMetadataTest extends TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    const CLASSNAME = Entity::class;
 
     public function testInvalidPropertyName()
     {
@@ -64,7 +64,7 @@ class GetterMetadataTest extends TestCase
     public function testUndefinedMethodNameThrowsException()
     {
         $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
-        $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Entity".');
+        $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity".');
         new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }
 }

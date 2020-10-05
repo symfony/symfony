@@ -53,8 +53,8 @@ class ExpressionLanguageTest extends TestCase
 
         $noToken = null;
         $anonymousToken = new AnonymousToken('firewall', 'anon.');
-        $rememberMeToken = new RememberMeToken($user, 'providerkey', 'firewall');
-        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'providerkey', $roles);
+        $rememberMeToken = new RememberMeToken($user, 'firewall-name', 'firewall');
+        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'firewall-name', $roles);
 
         return [
             [$noToken, 'is_anonymous()', false],

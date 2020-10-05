@@ -64,4 +64,15 @@ class SluggerTest extends TestCase
         $slug = (string) $slugger->slug('yo & tu a esta dirección slug@test.es', '_', 'es');
         $this->assertSame('yo_y_tu_a_esta_direccion_slug_en_senal_test_es', $slug);
     }
+
+    public function testSlugClosure()
+    {
+        $slugger = new AsciiSlugger(null, function ($s, $locale) {
+            $this->assertSame('foo', $locale);
+
+            return str_replace('❤️', 'love', $s);
+        });
+
+        $this->assertSame('love', (string) $slugger->slug('❤️', '-', 'foo'));
+    }
 }

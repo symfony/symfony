@@ -23,11 +23,11 @@ class GitignoreTest extends TestCase
         $regex = Gitignore::toRegex($patterns);
 
         foreach ($matchingCases as $matchingCase) {
-            $this->assertRegExp($regex, $matchingCase, sprintf('Failed asserting path [%s] matches gitignore patterns [%s] using regex [%s]', $matchingCase, $patterns, $regex));
+            $this->assertMatchesRegularExpression($regex, $matchingCase, sprintf('Failed asserting path [%s] matches gitignore patterns [%s] using regex [%s]', $matchingCase, $patterns, $regex));
         }
 
         foreach ($nonMatchingCases as $nonMatchingCase) {
-            $this->assertNotRegExp($regex, $nonMatchingCase, sprintf('Failed asserting path [%s] not matching gitignore patterns [%s] using regex [%s]', $nonMatchingCase, $patterns, $regex));
+            $this->assertDoesNotMatchRegularExpression($regex, $nonMatchingCase, sprintf('Failed asserting path [%s] not matching gitignore patterns [%s] using regex [%s]', $nonMatchingCase, $patterns, $regex));
         }
     }
 
@@ -47,6 +47,7 @@ class GitignoreTest extends TestCase
             [
                 '
                     *
+                    !/bin
                     !/bin/bash
                 ',
                 ['bin/cat', 'abc/bin/cat'],
@@ -99,8 +100,8 @@ class GitignoreTest extends TestCase
             ],
             [
                 'app/cache/',
-                ['app/cache/file.txt', 'app/cache/dir1/dir2/file.txt', 'a/app/cache/file.txt'],
-                [],
+                ['app/cache/file.txt', 'app/cache/dir1/dir2/file.txt'],
+                ['a/app/cache/file.txt'],
             ],
             [
                 '
@@ -132,6 +133,15 @@ class GitignoreTest extends TestCase
                 another_file.txt',
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt', 'another_file.txt'],
                 ['a/app/cache/file.txt', 'IamComment', '#IamComment'],
+            ],
+            [
+                '
+                /app/**
+                !/app/bin
+                !/app/bin/test
+                ',
+                ['app/test/file', 'app/bin/file'],
+                ['app/bin/test'],
             ],
         ];
     }

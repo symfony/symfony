@@ -22,17 +22,21 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
     private $handler;
 
     /**
-     * @param array  $options     Options for processing a successful authentication attempt
-     * @param string $providerKey The provider key
+     * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(AuthenticationSuccessHandlerInterface $handler, array $options, string $providerKey)
+    public function __construct(AuthenticationSuccessHandlerInterface $handler, array $options, string $firewallName)
     {
         $this->handler = $handler;
         if (method_exists($handler, 'setOptions')) {
             $this->handler->setOptions($options);
         }
-        if (method_exists($handler, 'setProviderKey')) {
-            $this->handler->setProviderKey($providerKey);
+
+        if (method_exists($handler, 'setFirewallName')) {
+            $this->handler->setFirewallName($firewallName);
+        } elseif (method_exists($handler, 'setProviderKey')) {
+            trigger_deprecation('symfony/security-http', '5.2', 'Method "%s::setProviderKey()" is deprecated, rename the method to "setFirewallName()" instead.', \get_class($handler));
+
+            $this->handler->setProviderKey($firewallName);
         }
     }
 

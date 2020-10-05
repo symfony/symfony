@@ -48,14 +48,14 @@ trait CacheTrait
         }
 
         $item = $pool->getItem($key);
-        $recompute = !$item->isHit() || INF === $beta;
+        $recompute = !$item->isHit() || \INF === $beta;
         $metadata = $item instanceof ItemInterface ? $item->getMetadata() : [];
 
         if (!$recompute && $metadata) {
             $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
             $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
 
-            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX)) {
+            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, \PHP_INT_MAX) / \PHP_INT_MAX)) {
                 // force applying defaultLifetime to expiry
                 $item->expiresAt(null);
                 $logger && $logger->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [

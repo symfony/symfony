@@ -23,13 +23,13 @@ class ThrowableUtils
         }
 
         if ($throwable instanceof \ParseError) {
-            return E_PARSE;
+            return \E_PARSE;
         }
 
         if ($throwable instanceof \TypeError) {
-            return E_RECOVERABLE_ERROR;
+            return \E_RECOVERABLE_ERROR;
         }
 
-        return E_ERROR;
+        return \E_ERROR;
     }
 }

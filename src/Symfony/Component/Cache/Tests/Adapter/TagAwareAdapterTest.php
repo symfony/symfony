@@ -15,10 +15,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
-use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -34,7 +36,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     /**
@@ -162,6 +164,25 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($anotherPool->hasItem($itemKey));
     }
 
+    public function testInvalidateTagsWithArrayAdapter()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter());
+
+        $item = $adapter->getItem('foo');
+
+        $this->assertFalse($item->isHit());
+
+        $item->tag('bar');
+        $item->expiresAfter(100);
+        $adapter->save($item);
+
+        $this->assertTrue($adapter->getItem('foo')->isHit());
+
+        $adapter->invalidateTags(['bar']);
+
+        $this->assertFalse($adapter->getItem('foo')->isHit());
+    }
+
     public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemAndOnlyHasTags()
     {
         $pool = $this->createCachePool();
@@ -184,7 +205,7 @@ class TagAwareAdapterTest extends AdapterTestCase
      */
     private function getPruneableMock(): AdapterInterface
     {
-        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
+        $pruneable = $this->createMock(PrunableAdapter::class);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -196,7 +217,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 
     private function getFailingPruneableMock(): AdapterInterface
     {
-        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
+        $pruneable = $this->createMock(PrunableAdapter::class);
 
         $pruneable
             ->expects($this->atLeastOnce())

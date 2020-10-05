@@ -44,6 +44,7 @@ class Uuid extends Constraint
     const V3_MD5 = 3;
     const V4_RANDOM = 4;
     const V5_SHA1 = 5;
+    const V6_SORTABLE = 6;
 
     /**
      * Message to display when validation fails.
@@ -74,6 +75,7 @@ class Uuid extends Constraint
         self::V3_MD5,
         self::V4_RANDOM,
         self::V5_SHA1,
+        self::V6_SORTABLE,
     ];
 
     public $normalizer;

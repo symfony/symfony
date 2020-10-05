@@ -20,6 +20,7 @@ final class FrenchInflector implements InflectorInterface
 {
     /**
      * A list of all rules for pluralise.
+     *
      * @see https://la-conjugaison.nouvelobs.com/regles/grammaire/le-pluriel-des-noms-121.php
      */
     private static $pluralizeRegexp = [

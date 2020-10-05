@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\Constraint\LogicalNot;
+use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
 
@@ -553,6 +554,6 @@ trait PolyfillAssertTrait
      */
     public static function assertDoesNotMatchRegularExpression($pattern, $string, $message = '')
     {
-        static::assertNotRegExp($message, $string, $message);
+        static::assertNotRegExp($pattern, $string, $message);
     }
 }

@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends TestCase
@@ -31,7 +32,7 @@ class AnnotationLoaderTest extends TestCase
     {
         $reader = new AnnotationReader();
         $loader = new AnnotationLoader($reader);
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
@@ -44,14 +45,17 @@ class AnnotationLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadata()
+    /**
+     * @dataProvider provideNamespaces
+     */
+    public function testLoadClassMetadata(string $namespace)
     {
         $loader = new AnnotationLoader(new AnnotationReader());
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata($namespace.'\Entity');
 
         $loader->loadClassMetadata($metadata);
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected = new ClassMetadata($namespace.'\Entity');
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
@@ -83,16 +87,18 @@ class AnnotationLoaderTest extends TestCase
 
     /**
      * Test MetaData merge with parent annotation.
+     *
+     * @dataProvider provideNamespaces
      */
-    public function testLoadParentClassMetadata()
+    public function testLoadParentClassMetadata(string $namespace)
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 
         // Load Parent MetaData
-        $parent_metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $parent_metadata = new ClassMetadata($namespace.'\EntityParent');
         $loader->loadClassMetadata($parent_metadata);
 
-        $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent = new ClassMetadata($namespace.'\EntityParent');
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 
@@ -101,27 +107,29 @@ class AnnotationLoaderTest extends TestCase
 
     /**
      * Test MetaData merge with parent annotation.
+     *
+     * @dataProvider provideNamespaces
      */
-    public function testLoadClassMetadataAndMerge()
+    public function testLoadClassMetadataAndMerge(string $namespace)
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 
         // Load Parent MetaData
-        $parent_metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $parent_metadata = new ClassMetadata($namespace.'\EntityParent');
         $loader->loadClassMetadata($parent_metadata);
 
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata($namespace.'\Entity');
 
         // Merge parent metaData.
         $metadata->mergeConstraints($parent_metadata);
 
         $loader->loadClassMetadata($metadata);
 
-        $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent = new ClassMetadata($namespace.'\EntityParent');
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected = new ClassMetadata($namespace.'\Entity');
         $expected->mergeConstraints($expected_parent);
 
         $expected->setGroupSequence(['Foo', 'Entity']);
@@ -153,17 +161,29 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadGroupSequenceProviderAnnotation()
+    /**
+     * @dataProvider provideNamespaces
+     */
+    public function testLoadGroupSequenceProviderAnnotation(string $namespace)
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');
+        $metadata = new ClassMetadata($namespace.'\GroupSequenceProviderEntity');
         $loader->loadClassMetadata($metadata);
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');
+        $expected = new ClassMetadata($namespace.'\GroupSequenceProviderEntity');
         $expected->setGroupSequenceProvider(true);
         $expected->getReflectionClass();
 
         $this->assertEquals($expected, $metadata);
+    }
+
+    public function provideNamespaces(): iterable
+    {
+        yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
+        }
     }
 }

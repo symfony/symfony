@@ -61,15 +61,13 @@ trait CommonResponseTrait
                 return $content;
             }
 
-            if ('HEAD' === $this->getInfo('http_method') || \in_array($this->getInfo('http_code'), [204, 304], true)) {
-                return '';
+            if (null === $this->content) {
+                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
             }
-
-            throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
-        }
-
-        foreach (self::stream([$this]) as $chunk) {
-            // Chunks are buffered in $this->content already
+        } else {
+            foreach (self::stream([$this]) as $chunk) {
+                // Chunks are buffered in $this->content already
+            }
         }
 
         rewind($this->content);
@@ -97,12 +95,12 @@ trait CommonResponseTrait
         }
 
         try {
-            $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
+            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
             throw new JsonException($e->getMessage().sprintf(' for "%s".', $this->getInfo('url')), $e->getCode());
         }
 
-        if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
+        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error()) {
             throw new JsonException(json_last_error_msg().sprintf(' for "%s".', $this->getInfo('url')), json_last_error());
         }
 

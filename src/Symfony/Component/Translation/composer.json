@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.15",
-        "symfony/translation-contracts": "^2"
+        "symfony/translation-contracts": "^2.3"
     },
     "require-dev": {
         "symfony/config": "^4.4|^5.0",
@@ -48,6 +48,7 @@
         "psr/log-implementation": "To use logging capability in translator"
     },
     "autoload": {
+        "files": [ "Resources/functions.php" ],
         "psr-4": { "Symfony\\Component\\Translation\\": "" },
         "exclude-from-classmap": [
             "/Tests/"

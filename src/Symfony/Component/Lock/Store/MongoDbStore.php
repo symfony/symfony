@@ -19,15 +19,14 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
-use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockStorageException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * MongoDbStore is a StoreInterface implementation using MongoDB as a storage
@@ -46,7 +45,7 @@ use Symfony\Component\Lock\Key;
  *
  * @author Joe Bennett <joe@assimtech.com>
  */
-class MongoDbStore implements BlockingStoreInterface
+class MongoDbStore implements PersistingStoreInterface
 {
     private $collection;
     private $client;
@@ -72,8 +71,8 @@ class MongoDbStore implements BlockingStoreInterface
      *      driverOptions: Array of driver options. [used when $mongo is a URI]
      *
      * When using a URI string:
-     *      the database is determined from the "database" option, otherwise the uri's path is used.
-     *      the collection is determined from the "collection" option, otherwise the uri's "collection" querystring parameter is used.
+     *      The database is determined from the uri's path, otherwise the "database" option is used. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
+     *      The collection is determined from the uri's "collection" querystring parameter, otherwise the "collection" option is used.
      *
      * For example: mongodb://myuser:mypass@myhost/mydatabase?collection=mycollection
      *
@@ -104,34 +103,20 @@ class MongoDbStore implements BlockingStoreInterface
         if ($mongo instanceof Collection) {
             $this->collection = $mongo;
         } elseif ($mongo instanceof Client) {
-            if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" option when constructing with a "%s".', __METHOD__, Client::class));
-            }
-            if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" option when constructing with a "%s".', __METHOD__, Client::class));
-            }
-
             $this->client = $mongo;
         } elseif (\is_string($mongo)) {
-            if (false === $parsedUrl = parse_url($mongo)) {
-                throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $mongo));
-            }
-            $query = [];
-            if (isset($parsedUrl['query'])) {
-                parse_str($parsedUrl['query'], $query);
-            }
-            $this->options['collection'] = $query['collection'] ?? $this->options['collection'] ?? null;
-            $this->options['database'] = ltrim($parsedUrl['path'] ?? '', '/') ?: $this->options['database'] ?? null;
-            if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option when constructing with a URI.', __METHOD__));
-            }
-            if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option when constructing with a URI.', __METHOD__));
-            }
-
-            $this->uri = $mongo;
+            $this->uri = $this->skimUri($mongo);
         } else {
             throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, get_debug_type($mongo)));
+        }
+
+        if (!($mongo instanceof Collection)) {
+            if (null === $this->options['database']) {
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+            }
+            if (null === $this->options['collection']) {
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+            }
         }
 
         if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
@@ -141,6 +126,36 @@ class MongoDbStore implements BlockingStoreInterface
         if ($this->initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
+    }
+
+    /**
+     * Extract default database and collection from given connection URI and remove collection querystring.
+     *
+     * Non-standard parameters are removed from the URI to improve libmongoc's re-use of connections.
+     *
+     * @see https://www.php.net/manual/en/mongodb.connection-handling.php
+     */
+    private function skimUri(string $uri): string
+    {
+        if (false === $parsedUrl = parse_url($uri)) {
+            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+        }
+        $pathDb = ltrim($parsedUrl['path'] ?? '', '/') ?: null;
+        if (null !== $pathDb) {
+            $this->options['database'] = $pathDb;
+        }
+
+        $matches = [];
+        if (preg_match('/^(.*[\?&])collection=([^&#]*)&?(([^#]*).*)$/', $uri, $matches)) {
+            $prefix = $matches[1];
+            $this->options['collection'] = $matches[2];
+            if (empty($matches[4])) {
+                $prefix = substr($prefix, 0, -1);
+            }
+            $uri = $prefix.$matches[3];
+        }
+
+        return $uri;
     }
 
     /**
@@ -201,19 +216,11 @@ class MongoDbStore implements BlockingStoreInterface
             throw new LockAcquiringException('Failed to acquire lock.', 0, $e);
         }
 
-        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->options['gcProbablity'])) {
+        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbablity'])) {
             $this->createTtlIndex();
         }
 
         $this->checkNotExpired($key);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function waitAndSave(Key $key)
-    {
-        throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', __CLASS__));
     }
 
     /**

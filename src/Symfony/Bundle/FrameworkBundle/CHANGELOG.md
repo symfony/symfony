@@ -8,6 +8,11 @@ CHANGELOG
  * Added `framework.trusted_proxies` and `framework.trusted_headers` configuration options
  * Deprecated the public `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
    `cache_clearer`, `filesystem` and `validator` services to private.
+ * Added `TemplateAwareDataCollectorInterface` and `AbstractDataCollector` to simplify custom data collector creation and leverage autoconfiguration
+ * Add `cache.adapter.redis_tag_aware` tag to use `RedisCacheAwareAdapter`
+ * added `framework.http_client.retry_failing` configuration tree
+ * added `assertCheckboxChecked()` and `assertCheckboxNotChecked()` in `WebTestCase`
+ * added `assertFormValue()` and `assertNoFormValue()` in `WebTestCase`
 
 5.1.0
 -----

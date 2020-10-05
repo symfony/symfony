@@ -1,0 +1,39 @@
+{
+  "name": "symfony/mailjet-mailer",
+  "type": "symfony-bridge",
+  "description": "Symfony Mailjet Mailer Bridge",
+  "keywords": [],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Fabien Potencier",
+      "email": "fabien@symfony.com"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.2.5",
+    "symfony/mailer": "^4.4|^5.0"
+  },
+  "require-dev": {
+    "symfony/http-client": "^4.4|^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "5.2-dev"
+    }
+  }
+}

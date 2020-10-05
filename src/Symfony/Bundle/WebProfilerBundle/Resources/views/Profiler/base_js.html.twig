@@ -1,5 +1,5 @@
-{# This file is partially duplicated in TwigBundle/Resources/views/base_js.html.twig. If you
-   make any change in this file, verify the same change is needed in the other file. #}
+{# This file is partially duplicated in src/Symfony/Component/ErrorHandler/Resources/assets/js/exception.js.
+   If you make any change in this file, verify the same change is needed in the other file. #}
 <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
@@ -473,7 +473,11 @@
                                 }
                             };
                         }
-                        addEventListener(document.getElementById('sfToolbarHideButton-' + newToken), 'click', function (event) {
+                        var hideButton = document.getElementById('sfToolbarHideButton-' + newToken);
+                        var hideButtonSvg = hideButton.querySelector('svg');
+                        hideButtonSvg.setAttribute('aria-hidden', 'true');
+                        hideButtonSvg.setAttribute('focusable', 'false');
+                        addEventListener(hideButton, 'click', function (event) {
                             event.preventDefault();
 
                             var p = this.parentNode;
@@ -482,7 +486,11 @@
                             document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
                             setPreference('toolbar/displayState', 'none');
                         });
-                        addEventListener(document.getElementById('sfToolbarMiniToggler-' + newToken), 'click', function (event) {
+                        var showButton = document.getElementById('sfToolbarMiniToggler-' + newToken);
+                        var showButtonSvg = showButton.querySelector('svg');
+                        showButtonSvg.setAttribute('aria-hidden', 'true');
+                        showButtonSvg.setAttribute('focusable', 'false');
+                        addEventListener(showButton, 'click', function (event) {
                             event.preventDefault();
 
                             var elem = this.parentNode;

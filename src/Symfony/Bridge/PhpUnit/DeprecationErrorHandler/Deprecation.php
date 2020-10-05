@@ -52,17 +52,24 @@ class Deprecation
      */
     public function __construct($message, array $trace, $file)
     {
+        if (isset($trace[2]['function']) && 'trigger_deprecation' === $trace[2]['function']) {
+            $file = $trace[2]['file'];
+            array_splice($trace, 1, 1);
+        }
+
         $this->trace = $trace;
         $this->message = $message;
-        $i = \count($trace);
-        while (1 < $i && $this->lineShouldBeSkipped($trace[--$i])) {
+        $i = \count($this->trace);
+        while (1 < $i && $this->lineShouldBeSkipped($this->trace[--$i])) {
             // No-op
         }
-        $line = $trace[$i];
+        $line = $this->trace[$i];
         $this->triggeringFile = $file;
         if (isset($line['object']) || isset($line['class'])) {
-            if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
-                $parsedMsg = unserialize($this->message);
+            set_error_handler(function () {});
+            $parsedMsg = unserialize($this->message);
+            restore_error_handler();
+            if ($parsedMsg && isset($parsedMsg['deprecation'])) {
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];
@@ -77,6 +84,11 @@ class Deprecation
 
                 return;
             }
+
+            if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
+                return;
+            }
+
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
         }
@@ -141,6 +153,10 @@ class Deprecation
     public function isLegacy()
     {
         $class = $this->originatingClass();
+        if ((new \ReflectionClass($class))->isInternal()) {
+            return false;
+        }
+
         $method = $this->originatingMethod();
 
         return 0 === strpos($method, 'testLegacy')
@@ -264,7 +280,10 @@ class Deprecation
                     if (file_exists($v.'/composer/installed.json')) {
                         self::$vendors[] = $v;
                         $loader = require $v.'/autoload.php';
-                        $paths = self::getSourcePathsFromPrefixes(array_merge($loader->getPrefixes(), $loader->getPrefixesPsr4()));
+                        $paths = self::addSourcePathsFromPrefixes(
+                            array_merge($loader->getPrefixes(), $loader->getPrefixesPsr4()),
+                            $paths
+                        );
                     }
                 }
             }
@@ -280,15 +299,17 @@ class Deprecation
         return self::$vendors;
     }
 
-    private static function getSourcePathsFromPrefixes(array $prefixesByNamespace)
+    private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths)
     {
         foreach ($prefixesByNamespace as $prefixes) {
             foreach ($prefixes as $prefix) {
                 if (false !== realpath($prefix)) {
-                    yield realpath($prefix);
+                    $paths[] = realpath($prefix);
                 }
             }
         }
+
+        return $paths;
     }
 
     /**

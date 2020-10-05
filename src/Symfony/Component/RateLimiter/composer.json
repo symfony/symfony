@@ -1,0 +1,38 @@
+{
+    "name": "symfony/rate-limiter",
+    "type": "library",
+    "description": "Symfony Rate Limiter Component",
+    "keywords": ["limiter", "rate-limiter"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wouter de Jong",
+            "email": "wouter@wouterj.nl"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/lock": "^5.2",
+        "symfony/options-resolver": "^5.1"
+    },
+    "require-dev": {
+        "psr/cache": "^1.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\RateLimiter\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

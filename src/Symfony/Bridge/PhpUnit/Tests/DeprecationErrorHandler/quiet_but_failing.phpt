@@ -35,5 +35,5 @@ require __DIR__.'/fake_vendor/acme/outdated-lib/outdated_file.php';
 --EXPECTF--
 Remaining indirect deprecation notices (1)
 
-  1x: deprecatedApi is deprecated! You should stop relying on it!
+  1x: Since acme/lib 3.0: deprecatedApi is deprecated, use deprecatedApi_new instead.
     1x in SomeService::deprecatedApi from acme\lib

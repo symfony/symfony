@@ -19,14 +19,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetter;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetterInterface;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
-    const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    const CLASS_NAME = Entity::class;
+    const PARENT_CLASS = EntityParent::class;
     const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
     const INTERFACE_B_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB';
     const PARENT_INTERFACE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParentInterface';

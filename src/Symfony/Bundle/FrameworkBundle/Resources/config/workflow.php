@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('marking store'),
                 service('event_dispatcher')->ignoreOnInvalid(),
                 abstract_arg('workflow name'),
+                abstract_arg('events to dispatch'),
             ])
             ->abstract()
             ->public()
@@ -34,6 +35,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('marking store'),
                 service('event_dispatcher')->ignoreOnInvalid(),
                 abstract_arg('workflow name'),
+                abstract_arg('events to dispatch'),
             ])
             ->abstract()
             ->public()

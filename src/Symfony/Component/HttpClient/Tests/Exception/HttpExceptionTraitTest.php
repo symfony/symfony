@@ -22,15 +22,24 @@ class HttpExceptionTraitTest extends TestCase
 {
     public function provideParseError(): iterable
     {
-        yield ['application/ld+json', '{"hydra:title": "An error occurred", "hydra:description": "Some details"}'];
-        yield ['application/problem+json', '{"title": "An error occurred", "detail": "Some details"}'];
-        yield ['application/vnd.api+json', '{"title": "An error occurred", "detail": "Some details"}'];
+        $errorWithoutMessage = 'HTTP/1.1 400 Bad Request returned for "http://example.com".';
+
+        $errorWithMessage = <<<ERROR
+An error occurred
+
+Some details
+ERROR;
+
+        yield ['application/ld+json', '{"hydra:title": "An error occurred", "hydra:description": "Some details"}', $errorWithMessage];
+        yield ['application/problem+json', '{"title": "An error occurred", "detail": "Some details"}', $errorWithMessage];
+        yield ['application/vnd.api+json', '{"title": "An error occurred", "detail": "Some details"}', $errorWithMessage];
+        yield ['application/json', '{"title": "An error occurred", "detail": {"field_name": ["Some details"]}}', $errorWithoutMessage];
     }
 
     /**
      * @dataProvider provideParseError
      */
-    public function testParseError(string $mimeType, string $json): void
+    public function testParseError(string $mimeType, string $json, string $expectedMessage): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response
@@ -47,12 +56,7 @@ class HttpExceptionTraitTest extends TestCase
 
         $e = new TestException($response);
         $this->assertSame(400, $e->getCode());
-        $this->assertSame(<<<ERROR
-An error occurred
-
-Some details
-ERROR
-, $e->getMessage());
+        $this->assertSame($expectedMessage, $e->getMessage());
     }
 }
 

@@ -77,7 +77,7 @@ final class OvhCloudTransport extends AbstractTransport
         $headers['X-Ovh-Application'] = $this->applicationKey;
         $headers['X-Ovh-Timestamp'] = $now;
 
-        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.json_encode($content, JSON_UNESCAPED_SLASHES).'+'.$now;
+        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.json_encode($content, \JSON_UNESCAPED_SLASHES).'+'.$now;
         $headers['X-Ovh-Consumer'] = $this->consumerKey;
         $headers['X-Ovh-Signature'] = '$1$'.sha1($toSign);
 
@@ -105,7 +105,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('%s/auth/time', $this->getEndpoint());
+        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

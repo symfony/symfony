@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * Added a `delete_after_reject` option to the DSN to allow control over message
+   deletion, similar to `delete_after_ack`.
+
 5.1.0
 -----
 

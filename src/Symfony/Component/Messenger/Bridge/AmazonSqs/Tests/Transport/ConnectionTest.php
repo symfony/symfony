@@ -106,6 +106,24 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithSslMode()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'endpoint' => 'http://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://localhost/queue?sslmode=disable', [], $httpClient)
+        );
+    }
+
+    public function testFromDsnWithSslModeOnDefault()
+    {
+        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default/queue?sslmode=disable', [], $httpClient)
+        );
+    }
+
     public function testFromDsnWithCustomEndpointAndPort()
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
@@ -158,6 +176,30 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithInvalidQueryString()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found in DSN: [foo]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default?foo=foo');
+    }
+
+    public function testFromDsnWithInvalidOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found: [bar]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default', ['bar' => 'bar']);
+    }
+
+    public function testFromDsnWithInvalidQueryStringAndOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option found: [bar]. Allowed options are [buffer_size, wait_time, poll_timeout, visibility_timeout, auto_setup, access_key, secret_key, endpoint, region, queue_name, account, sslmode].');
+
+        Connection::fromDsn('sqs://default?foo=foo', ['bar' => 'bar']);
+    }
+
     public function testKeepGettingPendingMessages()
     {
         $client = $this->createMock(SqsClient::class);
@@ -165,31 +207,36 @@ class ConnectionTest extends TestCase
             ->method('getQueueUrl')
             ->with(['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123])
             ->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
-        $client->expects($this->at(1))
+        $client->expects($this->exactly(2))
             ->method('receiveMessage')
-            ->with([
-                'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                'MaxNumberOfMessages' => 9,
-                'WaitTimeSeconds' => 20,
-                'MessageAttributeNames' => ['All'],
-                'VisibilityTimeout' => null,
-            ])
-            ->willReturn(ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
-                new Message(['MessageId' => 1, 'Body' => 'this is a test']),
-                new Message(['MessageId' => 2, 'Body' => 'this is a test']),
-                new Message(['MessageId' => 3, 'Body' => 'this is a test']),
-            ]]));
-        $client->expects($this->at(2))
-            ->method('receiveMessage')
-            ->with([
-                'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                'MaxNumberOfMessages' => 9,
-                'WaitTimeSeconds' => 20,
-                'MessageAttributeNames' => ['All'],
-                'VisibilityTimeout' => null,
-            ])
-            ->willReturn(ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
-            ]]));
+            ->withConsecutive(
+                [
+                    [
+                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                        'MaxNumberOfMessages' => 9,
+                        'WaitTimeSeconds' => 20,
+                        'MessageAttributeNames' => ['All'],
+                        'VisibilityTimeout' => null,
+                    ],
+                ],
+                [
+                    [
+                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                        'MaxNumberOfMessages' => 9,
+                        'WaitTimeSeconds' => 20,
+                        'MessageAttributeNames' => ['All'],
+                        'VisibilityTimeout' => null,
+                    ],
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                    new Message(['MessageId' => 1, 'Body' => 'this is a test']),
+                    new Message(['MessageId' => 2, 'Body' => 'this is a test']),
+                    new Message(['MessageId' => 3, 'Body' => 'this is a test']),
+                ]]),
+                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => []])
+            );
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $this->assertNotNull($connection->get());

@@ -166,30 +166,29 @@ class Configuration
             }
         }
 
-        if (isset($normalizedConfiguration['disabled'])) {
+        $normalizedConfiguration += [
+            'max' => [],
+            'disabled' => false,
+            'verbose' => true,
+            'quiet' => [],
+        ];
+
+        if ('' === $normalizedConfiguration['disabled'] || filter_var($normalizedConfiguration['disabled'], \FILTER_VALIDATE_BOOLEAN)) {
             return self::inDisabledMode();
         }
 
         $verboseOutput = [];
-        if (!isset($normalizedConfiguration['verbose'])) {
-            $normalizedConfiguration['verbose'] = true;
-        }
-
         foreach (['unsilenced', 'direct', 'indirect', 'self', 'other'] as $group) {
-            $verboseOutput[$group] = (bool) $normalizedConfiguration['verbose'];
+            $verboseOutput[$group] = filter_var($normalizedConfiguration['verbose'], \FILTER_VALIDATE_BOOLEAN);
         }
 
-        if (isset($normalizedConfiguration['quiet']) && \is_array($normalizedConfiguration['quiet'])) {
+        if (\is_array($normalizedConfiguration['quiet'])) {
             foreach ($normalizedConfiguration['quiet'] as $shushedGroup) {
                 $verboseOutput[$shushedGroup] = false;
             }
         }
 
-        return new self(
-            isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
-            '',
-            $verboseOutput
-        );
+        return new self($normalizedConfiguration['max'], '', $verboseOutput);
     }
 
     /**

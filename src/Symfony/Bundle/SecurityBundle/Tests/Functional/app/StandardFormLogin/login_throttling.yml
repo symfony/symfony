@@ -1,0 +1,12 @@
+imports:
+    - { resource: ./config.yml }
+
+framework:
+    lock: ~
+    rate_limiter: ~
+
+security:
+    firewalls:
+        default:
+            login_throttling:
+                max_attempts: 1

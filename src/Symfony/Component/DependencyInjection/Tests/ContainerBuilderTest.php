@@ -911,22 +911,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals([], $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
 
-    public function testResolveTagAttributtes()
-    {
-        $builder = new ContainerBuilder();
-        $builder->getParameterBag()->add(['foo_argument' => 'foo']);
-
-        $builder
-            ->register('foo', 'Bar\FooClass')
-            ->addTag('foo', ['foo' => '%foo_argument%'])
-        ;
-        $this->assertEquals($builder->findTaggedServiceIds('foo'), [
-            'foo' => [
-                ['foo' => 'foo'],
-            ],
-        ], '->findTaggedServiceIds() replaces parameters in tag attributes');
-    }
-
     public function testFindUnusedTags()
     {
         $builder = new ContainerBuilder();

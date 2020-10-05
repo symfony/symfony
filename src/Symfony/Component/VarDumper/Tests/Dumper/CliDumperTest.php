@@ -46,7 +46,7 @@ class CliDumperTest extends TestCase
         $dumper->dump($data);
         $out = ob_get_clean();
         $out = preg_replace('/[ \t]+$/m', '', $out);
-        $intMax = PHP_INT_MAX;
+        $intMax = \PHP_INT_MAX;
         $res = (int) $var['res'];
 
         $this->assertStringMatchesFormat(
@@ -495,7 +495,7 @@ EOTXT
         yield [
             ['foo' => 'bar'],
             0,
-<<<EOTXT
+            <<<EOTXT
 \e[0;38;5;208m\e[38;5;38marray:1\e[0;38;5;208m [\e[m
   \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
 \e[0;38;5;208m]\e[m
@@ -503,20 +503,20 @@ EOTXT
 EOTXT
         ];
 
-        yield [[], AbstractDumper::DUMP_LIGHT_ARRAY, "\e[0;38;5;208m\e[38;5;38m\e[0;38;5;208m[]\e[m\n"];
+        yield [[], AbstractDumper::DUMP_LIGHT_ARRAY, "\e[0;38;5;208m[]\e[m\n"];
 
         yield [
             ['foo' => 'bar'],
             AbstractDumper::DUMP_LIGHT_ARRAY,
             <<<EOTXT
-\e[0;38;5;208m\e[38;5;38m\e[0;38;5;208m[\e[m
+\e[0;38;5;208m[\e[m
   \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
 \e[0;38;5;208m]\e[m
 
 EOTXT
         ];
 
-        yield [[], 0, "\e[0;38;5;208m\e[38;5;38m\e[0;38;5;208m[]\e[m\n"];
+        yield [[], 0, "\e[0;38;5;208m[]\e[m\n"];
     }
 
     /**

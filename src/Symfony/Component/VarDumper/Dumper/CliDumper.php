@@ -145,8 +145,8 @@ class CliDumper extends AbstractDumper
                 $style = 'num';
 
                 switch (true) {
-                    case INF === $value:  $value = 'INF'; break;
-                    case -INF === $value: $value = '-INF'; break;
+                    case \INF === $value:  $value = 'INF'; break;
+                    case -\INF === $value: $value = '-INF'; break;
                     case is_nan($value):  $value = 'NAN'; break;
                     default:
                         $value = (string) $value;
@@ -269,6 +269,10 @@ class CliDumper extends AbstractDumper
      */
     public function enterHash(Cursor $cursor, int $type, $class, bool $hasChild)
     {
+        if (null === $this->colors) {
+            $this->colors = $this->supportsColors();
+        }
+
         $this->dumpKey($cursor);
         $attr = $cursor->attr;
 
@@ -283,8 +287,7 @@ class CliDumper extends AbstractDumper
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource', $attr).($hasChild ? ' {' : ' ');
         } else {
-            $unstyledPrefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? 'array:'.$class : '';
-            $prefix = $this->style('note', $unstyledPrefix, $attr).($unstyledPrefix ? ' [' : '[');
+            $prefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? $this->style('note', 'array:'.$class).' [' : '[';
         }
 
         if (($cursor->softRefCount || 0 < $cursor->softRefHandle) && empty($attr['cut_hash'])) {
@@ -519,12 +522,14 @@ class CliDumper extends AbstractDumper
                         case '--color=yes':
                         case '--color=force':
                         case '--color=always':
+                        case '--colors=always':
                             return static::$defaultColors = true;
 
                         case '--no-ansi':
                         case '--color=no':
                         case '--color=none':
                         case '--color=never':
+                        case '--colors=never':
                             return static::$defaultColors = false;
                     }
                 }

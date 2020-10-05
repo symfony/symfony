@@ -118,7 +118,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $url = $this->url;
 
         set_error_handler(function ($type, $msg) use (&$url) {
-            if (E_NOTICE !== $type || 'fopen(): Content-type not specified assuming application/x-www-form-urlencoded' !== $msg) {
+            if (\E_NOTICE !== $type || 'fopen(): Content-type not specified assuming application/x-www-form-urlencoded' !== $msg) {
                 throw new TransportException($msg);
             }
 
@@ -143,6 +143,11 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
                 $this->info['request_header'] = sprintf("> %s %s HTTP/%s \r\n", $context['http']['method'], $this->info['request_header'], $context['http']['protocol_version']);
                 $this->info['request_header'] .= implode("\r\n", $context['http']['header'])."\r\n\r\n";
+
+                if (\array_key_exists('peer_name', $context['ssl']) && null === $context['ssl']['peer_name']) {
+                    unset($context['ssl']['peer_name']);
+                    $this->context = stream_context_create([], ['options' => $context] + stream_context_get_params($this->context));
+                }
 
                 // Send request and follow redirects when needed
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
@@ -177,7 +182,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         if (isset($this->headers['content-length'])) {
             $this->remaining = (int) $this->headers['content-length'][0];
         } elseif ('chunked' === ($this->headers['transfer-encoding'][0] ?? null)) {
-            stream_filter_append($this->buffer, 'dechunk', STREAM_FILTER_WRITE);
+            stream_filter_append($this->buffer, 'dechunk', \STREAM_FILTER_WRITE);
             $this->remaining = -1;
         } else {
             $this->remaining = -2;
@@ -192,7 +197,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
             return;
         }
 
-        $host = parse_url($this->info['redirect_url'] ?? $this->url, PHP_URL_HOST);
+        $host = parse_url($this->info['redirect_url'] ?? $this->url, \PHP_URL_HOST);
         $this->multi->openHandles[$this->id] = [&$this->pauseExpiry, $h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info, $host];
         $this->multi->hosts[$host] = 1 + ($this->multi->hosts[$host] ?? 0);
     }
@@ -327,8 +332,8 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
             if ($response->pauseExpiry && microtime(true) < $response->pauseExpiry) {
                 // Create empty open handles to tell we still have pending requests
-                $multi->openHandles[$i] = [INF, null, null, null];
-            } elseif ($maxHosts && $maxHosts > ($multi->hosts[parse_url($response->url, PHP_URL_HOST)] ?? 0)) {
+                $multi->openHandles[$i] = [\INF, null, null, null];
+            } elseif ($maxHosts && $maxHosts > ($multi->hosts[parse_url($response->url, \PHP_URL_HOST)] ?? 0)) {
                 // Open the next pending request - this is a blocking operation so we do only one of them
                 $response->open();
                 $multi->sleep = false;

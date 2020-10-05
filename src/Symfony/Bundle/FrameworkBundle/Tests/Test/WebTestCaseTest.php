@@ -71,7 +71,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response('', 302, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/', 302);
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('is redirected and has header "Location" with value "https://example.com/" and status code is 301.');
+        $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
     }
 
@@ -218,6 +218,38 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="password"]" and does not have a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
+    }
+
+    public function testAssertCheckboxChecked()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and has a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
+    }
+
+    public function testAssertCheckboxNotChecked()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and does not have a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
+    }
+
+    public function testAssertFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
+    }
+
+    public function testAssertNoFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Field "rememberMe" has a value in form "#form".');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
     }
 
     public function testAssertRequestAttributeValueSame()

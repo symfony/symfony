@@ -48,17 +48,17 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $this->maxRetries = $maxRetries;
 
         if ($delayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" passed.', $delayMilliseconds));
+            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
         $this->delayMilliseconds = $delayMilliseconds;
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" passed.', $multiplier));
+            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
         }
         $this->multiplier = $multiplier;
 
         if ($maxDelayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" passed.', $maxDelayMilliseconds));
+            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
     }
@@ -80,7 +80,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
-        $delay = $this->delayMilliseconds * pow($this->multiplier, $retries);
+        $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;

@@ -10,6 +10,10 @@ $container->loadFromExtension('framework', [
                 FrameworkExtensionTest::class,
             ],
             'initial_marking' => ['draft'],
+            'metadata' => [
+                'title' => 'article workflow',
+                'description' => 'workflow for articles'
+            ],
             'places' => [
                 'draft',
                 'wait_for_journalist',

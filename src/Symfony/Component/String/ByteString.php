@@ -235,7 +235,7 @@ class ByteString extends AbstractString
 
     public function match(string $regexp, int $flags = 0, int $offset = 0): array
     {
-        $match = ((PREG_PATTERN_ORDER | PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
+        $match = ((\PREG_PATTERN_ORDER | \PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
 
         if ($this->ignoreCase) {
             $regexp .= 'i';
@@ -244,7 +244,7 @@ class ByteString extends AbstractString
         set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
 
         try {
-            if (false === $match($regexp, $this->string, $matches, $flags | PREG_UNMATCHED_AS_NULL, $offset)) {
+            if (false === $match($regexp, $this->string, $matches, $flags | \PREG_UNMATCHED_AS_NULL, $offset)) {
                 $lastError = preg_last_error();
 
                 foreach (get_defined_constants(true)['pcre'] as $k => $v) {
@@ -265,7 +265,7 @@ class ByteString extends AbstractString
     public function padBoth(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_BOTH);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_BOTH);
 
         return $str;
     }
@@ -273,7 +273,7 @@ class ByteString extends AbstractString
     public function padEnd(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_RIGHT);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_RIGHT);
 
         return $str;
     }
@@ -281,7 +281,7 @@ class ByteString extends AbstractString
     public function padStart(int $length, string $padStr = ' '): parent
     {
         $str = clone $this;
-        $str->string = str_pad($this->string, $length, $padStr, STR_PAD_LEFT);
+        $str->string = str_pad($this->string, $length, $padStr, \STR_PAD_LEFT);
 
         return $str;
     }

@@ -35,7 +35,7 @@ final class HttpClientKernel implements HttpKernelInterface
 
     public function __construct(HttpClientInterface $client = null)
     {
-        if (!class_exists(HttpClient::class)) {
+        if (null === $client && !class_exists(HttpClient::class)) {
             throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
@@ -53,10 +53,13 @@ final class HttpClientKernel implements HttpKernelInterface
         $response = $this->client->request($request->getMethod(), $request->getUri(), [
             'headers' => $headers,
             'body' => $body,
-            'max_redirects' => 0,
         ] + $request->attributes->get('http_client_options', []));
 
         $response = new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
+
+        $response->headers->remove('X-Body-File');
+        $response->headers->remove('X-Body-Eval');
+        $response->headers->remove('X-Content-Digest');
 
         $response->headers = new class($response->headers->all()) extends ResponseHeaderBag {
             protected function computeCacheControlValue(): string

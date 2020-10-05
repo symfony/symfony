@@ -89,6 +89,14 @@ class UuidTest extends TestCase
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
+    public function testV6IsSeeded()
+    {
+        $uuidV1 = Uuid::v1();
+        $uuidV6 = Uuid::v6();
+
+        $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
+    }
+
     public function testBinary()
     {
         $uuid = new UuidV4(self::A_UUID_V4);

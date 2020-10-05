@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
@@ -60,9 +61,9 @@ class SessionStrategyListenerTest extends TestCase
         $listener->onSuccessfulLogin($this->createEvent('api_firewall'));
     }
 
-    private function createEvent($providerKey)
+    private function createEvent($firewallName)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new User('test', null)), $this->token, $this->request, null, $providerKey);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function ($username) { return new User($username, null); })), $this->token, $this->request, null, $firewallName);
     }
 
     private function configurePreviousSession()

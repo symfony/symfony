@@ -67,13 +67,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService($lazyLoad = true)
     {
+        $this->factories['service_container']['foo'] = $this->factories['service_container']['foo'] ?? \Closure::fromCallable([$this, 'getFooService']);
+
         // lazy factory for stdClass
 
-        $this->factories['service_container']['foo'] = function ($lazyLoad = true) {
-            return new \stdClass();
-        };
-
-        return $this->factories['service_container']['foo']();
+        return new \stdClass();
     }
 }
 

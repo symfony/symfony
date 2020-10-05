@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -28,12 +29,15 @@ class MoneyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // Values used in HTML5 number inputs should be formatted as in "1234.5", ie. 'en' format without grouping,
+        // according to https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
         $builder
             ->addViewTransformer(new MoneyToLocalizedStringTransformer(
                 $options['scale'],
                 $options['grouping'],
                 $options['rounding_mode'],
-                $options['divisor']
+                $options['divisor'],
+                $options['html5'] ? 'en' : null
             ))
         ;
     }
@@ -44,6 +48,10 @@ class MoneyType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['money_pattern'] = self::getPattern($options['currency']);
+
+        if ($options['html5']) {
+            $view->vars['type'] = 'number';
+        }
     }
 
     /**
@@ -58,6 +66,7 @@ class MoneyType extends AbstractType
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
+            'html5' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true)
                     ? $previousValue
@@ -76,6 +85,16 @@ class MoneyType extends AbstractType
         ]);
 
         $resolver->setAllowedTypes('scale', 'int');
+
+        $resolver->setAllowedTypes('html5', 'bool');
+
+        $resolver->setNormalizer('grouping', function (Options $options, $value) {
+            if ($value && $options['html5']) {
+                throw new LogicException('Cannot use the "grouping" option when the "html5" option is enabled.');
+            }
+
+            return $value;
+        });
     }
 
     /**

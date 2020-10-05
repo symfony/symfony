@@ -213,7 +213,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         foreach ($this->children as $name => $child) {
             if (!\array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
-                    $ex = new InvalidConfigurationException(sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath()));
+                    $message = sprintf('The child config "%s" under "%s" must be configured', $name, $this->getPath());
+                    if ($child->getInfo()) {
+                        $message .= sprintf(": %s", $child->getInfo());
+                    } else {
+                        $message .= '.';
+                    }
+                    $ex = new InvalidConfigurationException($message);
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -298,7 +304,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $guesses = [];
 
             foreach (array_keys($value) as $subject) {
-                $minScore = INF;
+                $minScore = \INF;
                 foreach ($proposals as $proposal) {
                     $distance = levenshtein($subject, $proposal);
                     if ($distance <= $minScore && $distance < 3) {

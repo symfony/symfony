@@ -30,7 +30,7 @@ use Symfony\Component\String\Inflector\InflectorInterface;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     /**
      * @internal
@@ -51,6 +51,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     public const ALLOW_PROTECTED = 2;
     public const ALLOW_PUBLIC = 4;
 
+    /** @var int Allow none of the magic methods */
+    public const DISALLOW_MAGIC_METHODS = 0;
+    /** @var int Allow magic __get methods */
+    public const ALLOW_MAGIC_GET = 1 << 0;
+    /** @var int Allow magic __set methods */
+    public const ALLOW_MAGIC_SET = 1 << 1;
+    /** @var int Allow magic __call methods */
+    public const ALLOW_MAGIC_CALL = 1 << 2;
+
     private const MAP_TYPES = [
         'integer' => Type::BUILTIN_TYPE_INT,
         'boolean' => Type::BUILTIN_TYPE_BOOL,
@@ -62,6 +71,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $arrayMutatorPrefixes;
     private $enableConstructorExtraction;
     private $methodReflectionFlags;
+    private $magicMethodsFlags;
     private $propertyReflectionFlags;
     private $inflector;
 
@@ -73,7 +83,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null)
+    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null, int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET)
     {
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
@@ -81,6 +91,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
+        $this->magicMethodsFlags = $magicMethodsFlags;
         $this->inflector = $inflector ?? new EnglishInflector();
 
         $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
@@ -130,18 +141,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            try {
-                $reflectionProperty = new \ReflectionProperty($class, $property);
-                $type = $reflectionProperty->getType();
-                if (null !== $type) {
-                    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass());
-                }
-            } catch (\ReflectionException $e) {
-                // noop
-            }
-        }
-
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
@@ -159,6 +158,56 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
             return $fromDefaultValue;
+        }
+
+        if (\PHP_VERSION_ID >= 70400) {
+            try {
+                $reflectionProperty = new \ReflectionProperty($class, $property);
+                $type = $reflectionProperty->getType();
+                if (null !== $type) {
+                    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass());
+                }
+            } catch (\ReflectionException $e) {
+                // noop
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        try {
+            $reflection = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+        if (!$reflectionConstructor = $reflection->getConstructor()) {
+            return null;
+        }
+        if (!$reflectionParameter = $this->getReflectionParameterFromConstructor($property, $reflectionConstructor)) {
+            return null;
+        }
+        if (!$reflectionType = $reflectionParameter->getType()) {
+            return null;
+        }
+        if (!$types = $this->extractFromReflectionType($reflectionType, $reflectionConstructor->getDeclaringClass())) {
+            return null;
+        }
+
+        return $types;
+    }
+
+    private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter
+    {
+        $reflectionParameter = null;
+        foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {
+            if ($reflectionParameter->getName() === $property) {
+                return $reflectionParameter;
+            }
         }
 
         return null;
@@ -230,7 +279,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
-        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
+        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
+        $allowMagicGet = (bool) ($magicMethods & self::ALLOW_MAGIC_GET);
+
+        if (isset($context['enable_magic_call_extraction'])) {
+            trigger_deprecation('symfony/property-info', '5.2', 'Using the "enable_magic_call_extraction" context option in "%s()" is deprecated. Use "enable_magic_methods_extraction" instead.', __METHOD__);
+
+            $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        }
 
         $hasProperty = $reflClass->hasProperty($property);
         $camelProp = $this->camelize($property);
@@ -258,7 +315,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisiblityForProperty($reflProperty), $reflProperty->isStatic(), true);
         }
 
-        if ($reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
+        if ($allowMagicGet && $reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
             return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
         }
 
@@ -272,7 +329,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * {@inheritdoc}
      */
-    public function getWriteInfo(string $class, string $property, array $context = []): PropertyWriteInfo
+    public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
     {
         try {
             $reflClass = new \ReflectionClass($class);
@@ -281,7 +338,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
-        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
+        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
+        $allowMagicSet = (bool) ($magicMethods & self::ALLOW_MAGIC_SET);
+
+        if (isset($context['enable_magic_call_extraction'])) {
+            trigger_deprecation('symfony/property-info', '5.2', 'Using the "enable_magic_call_extraction" context option in "%s()" is deprecated. Use "enable_magic_methods_extraction" instead.', __METHOD__);
+
+            $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        }
+
         $allowConstruct = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
         $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
 
@@ -308,9 +374,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisiblityForMethod($removerMethod), $removerMethod->isStatic()));
 
             return $mutator;
-        } else {
-            $errors = array_merge($errors, $adderAndRemoverErrors);
         }
+
+        $errors = array_merge($errors, $adderAndRemoverErrors);
 
         foreach ($this->mutatorPrefixes as $mutatorPrefix) {
             $methodName = $mutatorPrefix.$camelized;
@@ -330,12 +396,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         $getsetter = lcfirst($camelized);
 
-        [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $getsetter, 1);
-        if ($allowGetterSetter && $accessible) {
-            $method = $reflClass->getMethod($getsetter);
+        if ($allowGetterSetter) {
+            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $getsetter, 1);
+            if ($accessible) {
+                $method = $reflClass->getMethod($getsetter);
 
-            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisiblityForMethod($method), $method->isStatic());
-        } else {
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisiblityForMethod($method), $method->isStatic());
+            }
+
             $errors = array_merge($errors, $methodAccessibleErrors);
         }
 
@@ -345,28 +413,32 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisiblityForProperty($reflProperty), $reflProperty->isStatic());
         }
 
-        [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
-        if ($accessible) {
-            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
-        } else {
+        if ($allowMagicSet) {
+            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
+            if ($accessible) {
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+            }
+
             $errors = array_merge($errors, $methodAccessibleErrors);
         }
 
-        [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__call', 2);
-        if ($allowMagicCall && $accessible) {
-            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, 'set'.$camelized, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
-        } else {
+        if ($allowMagicCall) {
+            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__call', 2);
+            if ($accessible) {
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, 'set'.$camelized, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+            }
+
             $errors = array_merge($errors, $methodAccessibleErrors);
         }
 
         if (!$allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
-            $errors = array_merge($errors, [sprintf(
+            $errors[] = sprintf(
                 'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
                 'the new value must be an array or an instance of \Traversable',
                 $property,
                 $reflClass->getName(),
                 implode('()", "', [$adderAccessName, $removerAccessName])
-            )]);
+            );
         }
 
         $noneProperty = new PropertyWriteInfo();
@@ -626,7 +698,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars): array
     {
         if (!\is_array($this->arrayMutatorPrefixes) && 2 !== \count($this->arrayMutatorPrefixes)) {
-            return null;
+            return [null, null, []];
         }
 
         [$addPrefix, $removePrefix] = $this->arrayMutatorPrefixes;
@@ -642,7 +714,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             if ($addMethodFound && $removeMethodFound) {
                 return [$addMethod, $removeMethod, []];
-            } elseif ($addMethodFound && !$removeMethodFound) {
+            }
+
+            if ($addMethodFound && !$removeMethodFound) {
                 $errors[] = sprintf('The add method "%s" in class "%s" was found, but the corresponding remove method "%s" was not found', $addMethod, $reflClass->getName(), $removeMethod);
             } elseif (!$addMethodFound && $removeMethodFound) {
                 $errors[] = sprintf('The remove method "%s" in class "%s" was found, but the corresponding add method "%s" was not found', $removeMethod, $reflClass->getName(), $addMethod);

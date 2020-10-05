@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
-use Doctrine\DBAL\Abstraction\Result;
+use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
-use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
@@ -30,7 +31,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getResultMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -53,7 +53,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -64,7 +64,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getResultMock(false);
 
         $queryBuilder
@@ -82,7 +81,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertNull($doctrineEnvelope);
     }
@@ -91,7 +90,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->ack('dummy_id');
@@ -101,7 +105,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->reject('dummy_id');
@@ -146,18 +155,13 @@ class ConnectionTest extends TestCase
 
     private function getResultMock($expectedResult)
     {
-        $stmt = $this->createMock(interface_exists(Result::class) ? Result::class : Statement::class);
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
 
         $stmt->expects($this->once())
-            ->method(interface_exists(Result::class) ? 'fetchAssociative' : 'fetch')
+            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
-    }
-
-    private function getSchemaSynchronizerMock(): SchemaSynchronizer
-    {
-        return $this->createMock(SchemaSynchronizer::class);
     }
 
     /**
@@ -264,7 +268,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $id = 1;
         $stmt = $this->getResultMock([
             'id' => $id,
@@ -288,7 +291,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->find($id);
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -299,7 +302,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $message1 = [
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -311,9 +313,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(interface_exists(Result::class) ? Result::class : Statement::class);
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
         $stmt->expects($this->once())
-            ->method(interface_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
+            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection
@@ -335,7 +337,7 @@ class ConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelopes = $connection->findAll();
 
         $this->assertEquals(1, $doctrineEnvelopes[0]['id']);

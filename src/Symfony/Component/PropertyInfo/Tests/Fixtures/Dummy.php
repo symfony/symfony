@@ -130,6 +130,21 @@ class Dummy extends ParentDummy
      */
     public $nestedIterators;
 
+    /**
+     * @var array<string,string>
+     */
+    public $arrayWithKeys;
+
+    /**
+     * @var array<string,array<integer,null|string>|null>
+     */
+    public $arrayWithKeysAndComplexValue;
+
+    /**
+     * @var array<string,mixed>
+     */
+    public $arrayOfMixed;
+
     public static function getStatic()
     {
     }

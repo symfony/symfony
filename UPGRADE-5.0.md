@@ -237,7 +237,7 @@ FrameworkBundle
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
- * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
+ * Removed the `Psr\SimpleCache\CacheInterface` / `cache.app.simple` service, use `Symfony\Contracts\Cache\CacheInterface` / `cache.app` instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
  * Removed `ResolveControllerNameSubscriber`.
  * Removed `routing.loader.service`.
@@ -260,7 +260,7 @@ HttpFoundation
  * The `$size` argument of the `UploadedFile` constructor has been removed.
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
  * The `getSession()` method of the `Request` class throws an exception when session is null.
- * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+ * The default value of the `$secure` and `$samesite` arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
  * The `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` interfaces have been removed,
    use `Symfony\Component\Mime\MimeTypesInterface` instead.
@@ -561,7 +561,7 @@ TwigBridge
 ----------
 
  * Removed argument `$rootDir` from the `DebugCommand::__construct()` method and the 5th argument must be an instance of `FileLinkFormatter`
- * removed the `$requestStack` and `$requestContext` arguments of the
+ * Removed the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
  * Removed support for implicit STDIN usage in the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
@@ -681,4 +681,4 @@ WebProfilerBundle
 WebServerBundle
 ---------------
 
- * The bundle has been removed.
+ * The bundle has been deprecated and can be installed separately. You may also use the Symfony Local Web Server instead.

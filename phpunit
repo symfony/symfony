@@ -12,7 +12,11 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
         if (false === getenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT') && false !== strpos(@file_get_contents(__DIR__.'/src/Symfony/Component/HttpKernel/Kernel.php'), 'const MAJOR_VERSION = 3;')) {
             putenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1');
         }
-        putenv('SYMFONY_PHPUNIT_VERSION=8.3');
+        if (\PHP_VERSION_ID < 70300) {
+            putenv('SYMFONY_PHPUNIT_VERSION=8.5');
+        } else {
+            putenv('SYMFONY_PHPUNIT_VERSION=9.3');
+        }
     } elseif (\PHP_VERSION_ID >= 70000) {
         putenv('SYMFONY_PHPUNIT_VERSION=6.5');
     }

@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
@@ -29,7 +31,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadataReturnsFalseIfEmpty()
     {
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
 
@@ -45,7 +47,7 @@ class YamlFileLoaderTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $loader->loadClassMetadata($metadata);
     }
@@ -64,7 +66,7 @@ class YamlFileLoaderTest extends TestCase
     public function testDoNotModifyStateIfExceptionIsThrown()
     {
         $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
         try {
             $loader->loadClassMetadata($metadata);
         } catch (\InvalidArgumentException $e) {
@@ -77,7 +79,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
@@ -93,11 +95,11 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadata()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $loader->loadClassMetadata($metadata);
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected = new ClassMetadata(Entity::class);
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new ConstraintB());
@@ -127,12 +129,12 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadataWithConstants()
     {
         $loader = new YamlFileLoader(__DIR__.'/mapping-with-constants.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $metadata = new ClassMetadata(Entity::class);
 
         $loader->loadClassMetadata($metadata);
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
-        $expected->addPropertyConstraint('firstName', new Range(['max' => PHP_INT_MAX]));
+        $expected = new ClassMetadata(Entity::class);
+        $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
 
         $this->assertEquals($expected, $metadata);
     }
@@ -140,11 +142,11 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadGroupSequenceProvider()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');
+        $metadata = new ClassMetadata(GroupSequenceProviderEntity::class);
 
         $loader->loadClassMetadata($metadata);
 
-        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');
+        $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);

@@ -200,10 +200,10 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string $package The name of the composer package that is triggering the deprecation
      * @param string $version The version of the package that introduced the deprecation
-     * @param string $message The deprecation message to use
+     * @param string $message the deprecation message to use
      *
      * You can use %node% and %path% placeholders in your message to display,
-     * respectively, the node name and its complete path.
+     * respectively, the node name and its complete path
      */
     public function setDeprecated(?string $package/*, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
     {

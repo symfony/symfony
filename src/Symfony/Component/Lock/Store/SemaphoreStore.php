@@ -76,6 +76,7 @@ class SemaphoreStore implements BlockingStoreInterface
         }
 
         $key->setState(__CLASS__, $resource);
+        $key->markUnserializable();
     }
 
     /**

@@ -63,6 +63,8 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -79,11 +81,14 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -94,18 +99,25 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
+use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\Notifier\Recipient\AdminRecipient;
+use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -115,6 +127,9 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
+use Symfony\Component\RateLimiter\Limiter;
+use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
@@ -128,6 +143,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -138,6 +154,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -162,6 +179,8 @@ class FrameworkExtension extends Extension
     private $messengerConfigEnabled = false;
     private $mailerConfigEnabled = false;
     private $httpClientConfigEnabled = false;
+    private $notifierConfigEnabled = false;
+    private $lockConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -363,7 +382,7 @@ class FrameworkExtension extends Extension
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['notifier'])) {
+        if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
@@ -394,8 +413,16 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['lock'])) {
+        if ($this->lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['rate_limiter'])) {
+            if (!interface_exists(LimiterInterface::class)) {
+                throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
+            }
+
+            $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -426,6 +453,8 @@ class FrameworkExtension extends Extension
             ->addTag('container.env_var_loader');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
+        $container->registerForAutoconfiguration(CallbackInterface::class)
+            ->addTag('container.reversible');
         $container->registerForAutoconfiguration(ServiceLocator::class)
             ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
@@ -628,6 +657,10 @@ class FrameworkExtension extends Extension
             $loader->load('http_client_debug.php');
         }
 
+        if ($this->notifierConfigEnabled) {
+            $loader->load('notifier_debug.php');
+        }
+
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
@@ -733,6 +766,7 @@ class FrameworkExtension extends Extension
                 }
             }
             $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
+            $container->setDefinition(sprintf('%s.metadata_store', $workflowId), $metadataStoreDefinition);
 
             // Create places
             $places = array_column($workflow['places'], 'name');
@@ -744,7 +778,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
-            $definitionDefinition->addArgument($metadataStoreDefinition);
+            $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
             $definitionDefinition->addTag('workflow.definition', [
                 'name' => $name,
                 'type' => $type,
@@ -768,6 +802,7 @@ class FrameworkExtension extends Extension
                 $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             }
             $workflowDefinition->replaceArgument(3, $name);
+            $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);
@@ -1082,7 +1117,7 @@ class FrameworkExtension extends Extension
 
         if (null !== $jsonManifestPath) {
             $definitionName = 'assets.json_manifest_version_strategy';
-            if (0 === strpos(parse_url($jsonManifestPath, PHP_URL_SCHEME), 'http')) {
+            if (0 === strpos(parse_url($jsonManifestPath, \PHP_URL_SCHEME), 'http')) {
                 $definitionName = 'assets.remote_json_manifest_version_strategy';
             }
 
@@ -1212,11 +1247,26 @@ class FrameworkExtension extends Extension
 
             $translator->replaceArgument(4, $options);
         }
+
+        if ($config['pseudo_localization']['enabled']) {
+            $options = $config['pseudo_localization'];
+            unset($options['enabled']);
+
+            $container
+                ->register('translator.pseudo', PseudoLocalizationTranslator::class)
+                ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
+                ->setArguments([
+                    new Reference('translator.pseudo.inner'),
+                    $options,
+                ]);
+        }
     }
 
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)
     {
         if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.validator_debug');
+
             return;
         }
 
@@ -1408,9 +1458,14 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_access.php');
 
+        $magicMethods = PropertyAccessor::DISALLOW_MAGIC_METHODS;
+        $magicMethods |= $config['magic_call'] ? PropertyAccessor::MAGIC_CALL : 0;
+        $magicMethods |= $config['magic_get'] ? PropertyAccessor::MAGIC_GET : 0;
+        $magicMethods |= $config['magic_set'] ? PropertyAccessor::MAGIC_SET : 0;
+
         $container
             ->getDefinition('property_accessor')
-            ->replaceArgument(0, $config['magic_call'])
+            ->replaceArgument(0, $magicMethods)
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
             ->replaceArgument(4, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
@@ -1497,6 +1552,10 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(UnwrappingDenormalizer::class) || !class_exists(PropertyAccessor::class)) {
             $container->removeDefinition('serializer.denormalizer.unwrapping');
+        }
+
+        if (!class_exists(Headers::class)) {
+            $container->removeDefinition('serializer.normalizer.mime_message');
         }
 
         $serializerLoaders = [];
@@ -1667,6 +1726,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
         }
 
+        if (class_exists(BeanstalkdTransportFactory::class)) {
+            $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
+        }
+
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
@@ -1725,6 +1788,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');
+            $container->removeDefinition('messenger.transport.beanstalkd.factory');
             $container->removeAlias(SerializerInterface::class);
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
@@ -1856,8 +1920,11 @@ class FrameworkExtension extends Extension
         foreach ($config['pools'] as $name => $pool) {
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 
+            $isRedisTagAware = ['cache.adapter.redis_tag_aware'] === $pool['adapters'];
             foreach ($pool['adapters'] as $provider => $adapter) {
-                if ($config['pools'][$adapter]['tags'] ?? false) {
+                if (($config['pools'][$adapter]['adapters'] ?? null) === ['cache.adapter.redis_tag_aware']) {
+                    $isRedisTagAware = true;
+                } elseif ($config['pools'][$adapter]['tags'] ?? false) {
                     $pool['adapters'][$provider] = $adapter = '.'.$adapter.'.inner';
                 }
             }
@@ -1872,7 +1939,10 @@ class FrameworkExtension extends Extension
                 $pool['reset'] = 'reset';
             }
 
-            if ($pool['tags']) {
+            if ($isRedisTagAware) {
+                $tagAwareId = $name;
+                $container->setAlias('.'.$name.'.inner', $name);
+            } elseif ($pool['tags']) {
                 if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
                 }
@@ -1882,22 +1952,20 @@ class FrameworkExtension extends Extension
                     ->setPublic($pool['public'])
                 ;
 
-                $pool['name'] = $name;
+                $pool['name'] = $tagAwareId = $name;
                 $pool['public'] = false;
                 $name = '.'.$name.'.inner';
-
-                if (!\in_array($pool['name'], ['cache.app', 'cache.system'], true)) {
-                    $container->registerAliasForArgument($pool['name'], TagAwareCacheInterface::class);
-                    $container->registerAliasForArgument($name, CacheInterface::class, $pool['name']);
-                    $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name']);
-                }
             } elseif (!\in_array($name, ['cache.app', 'cache.system'], true)) {
-                $container->register('.'.$name.'.taggable', TagAwareAdapter::class)
+                $tagAwareId = '.'.$name.'.taggable';
+                $container->register($tagAwareId, TagAwareAdapter::class)
                     ->addArgument(new Reference($name))
                 ;
-                $container->registerAliasForArgument('.'.$name.'.taggable', TagAwareCacheInterface::class, $name);
-                $container->registerAliasForArgument($name, CacheInterface::class);
-                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            }
+
+            if (!\in_array($name, ['cache.app', 'cache.system'], true)) {
+                $container->registerAliasForArgument($tagAwareId, TagAwareCacheInterface::class, $pool['name'] ?? $name);
+                $container->registerAliasForArgument($name, CacheInterface::class, $pool['name'] ?? $name);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name'] ?? $name);
             }
 
             $definition->setPublic($pool['public']);
@@ -1927,7 +1995,10 @@ class FrameworkExtension extends Extension
     {
         $loader->load('http_client.php');
 
-        $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);
+        $options = $config['default_options'] ?? [];
+        $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
+        unset($options['retry_failed']);
+        $container->getDefinition('http_client')->setArguments([$options, $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
             $container->removeDefinition('psr18.http_client');
@@ -1938,8 +2009,11 @@ class FrameworkExtension extends Extension
             $container->removeDefinition(HttpClient::class);
         }
 
-        $httpClientId = $this->isConfigEnabled($container, $profilerConfig) ? '.debug.http_client.inner' : 'http_client';
+        if ($this->isConfigEnabled($container, $retryOptions)) {
+            $this->registerHttpClientRetry($retryOptions, 'http_client', $container);
+        }
 
+        $httpClientId = $retryOptions['enabled'] ?? false ? 'http_client.retry.inner' : ($this->isConfigEnabled($container, $profilerConfig) ? '.debug.http_client.inner' : 'http_client');
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ('http_client' === $name) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
@@ -1947,11 +2021,16 @@ class FrameworkExtension extends Extension
 
             $scope = $scopeConfig['scope'] ?? null;
             unset($scopeConfig['scope']);
+            $retryOptions = $scopeConfig['retry_failed'] ?? ['enabled' => false];
+            unset($scopeConfig['retry_failed']);
 
             if (null === $scope) {
+                $baseUri = $scopeConfig['base_uri'];
+                unset($scopeConfig['base_uri']);
+
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference($httpClientId), $scopeConfig['base_uri'], $scopeConfig])
+                    ->setArguments([new Reference($httpClientId), $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {
@@ -1959,6 +2038,10 @@ class FrameworkExtension extends Extension
                     ->setArguments([new Reference($httpClientId), [$scope => $scopeConfig], $scope])
                     ->addTag('http_client.client')
                 ;
+            }
+
+            if ($this->isConfigEnabled($container, $retryOptions)) {
+                $this->registerHttpClientRetry($retryOptions, $name, $container);
             }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
@@ -1970,6 +2053,50 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
             }
         }
+
+        if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
+            $container->getDefinition($httpClientId)
+                ->setClass(MockHttpClient::class)
+                ->setArguments([new Reference($responseFactoryId)]);
+        }
+    }
+
+    private function registerHttpClientRetry(array $retryOptions, string $name, ContainerBuilder $container)
+    {
+        if (!class_exists(RetryableHttpClient::class)) {
+            throw new LogicException('Retry failed request support cannot be enabled as version 5.2+ of the HTTP Client component is required.');
+        }
+
+        if (null !== $retryOptions['backoff_service']) {
+            $backoffReference = new Reference($retryOptions['backoff_service']);
+        } else {
+            $retryServiceId = $name.'.retry.exponential_backoff';
+            $retryDefinition = new ChildDefinition('http_client.retry.abstract_exponential_backoff');
+            $retryDefinition
+                ->replaceArgument(0, $retryOptions['delay'])
+                ->replaceArgument(1, $retryOptions['multiplier'])
+                ->replaceArgument(2, $retryOptions['max_delay']);
+            $container->setDefinition($retryServiceId, $retryDefinition);
+
+            $backoffReference = new Reference($retryServiceId);
+        }
+        if (null !== $retryOptions['decider_service']) {
+            $deciderReference = new Reference($retryOptions['decider_service']);
+        } else {
+            $retryServiceId = $name.'.retry.decider';
+            $retryDefinition = new ChildDefinition('http_client.retry.abstract_httpstatuscode_decider');
+            $retryDefinition
+                ->replaceArgument(0, $retryOptions['http_codes']);
+            $container->setDefinition($retryServiceId, $retryDefinition);
+
+            $deciderReference = new Reference($retryServiceId);
+        }
+
+        $container
+            ->register($name.'.retry', RetryableHttpClient::class)
+            ->setDecoratedService($name, null, -10) // lower priority than TraceableHttpClient
+            ->setArguments([new Reference($name.'.retry.inner'), $deciderReference, $backoffReference, $retryOptions['max_retries'], new Reference('logger')])
+            ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
 
     private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
@@ -1987,6 +2114,9 @@ class FrameworkExtension extends Extension
         $container->getDefinition('mailer.transports')->setArgument(0, $transports);
         $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
 
+        $container->removeDefinition('mailer.logger_message_listener');
+        $container->setAlias('mailer.logger_message_listener', (new Alias('mailer.message_logger_listener'))->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "mailer.message_logger_listener" instead.'));
+
         $mailer = $container->getDefinition('mailer.mailer');
         if (false === $messageBus = $config['message_bus']) {
             $mailer->replaceArgument(1, null);
@@ -1995,12 +2125,14 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
-            SesTransportFactory::class => 'mailer.transport_factory.amazon',
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
-            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
+            MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
+            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
+            SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
+            SesTransportFactory::class => 'mailer.transport_factory.amazon',
         ];
 
         foreach ($classToServices as $class => $service) {
@@ -2075,13 +2207,20 @@ class FrameworkExtension extends Extension
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
+            GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
+            InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
+            ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
+            MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
+            SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
+            EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
+            SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
         ];
 
         foreach ($classToServices as $class => $service) {
@@ -2094,10 +2233,48 @@ class FrameworkExtension extends Extension
             $notifier = $container->getDefinition('notifier');
             foreach ($config['admin_recipients'] as $i => $recipient) {
                 $id = 'notifier.admin_recipient.'.$i;
-                $container->setDefinition($id, new Definition(AdminRecipient::class, [$recipient['email'], $recipient['phone']]));
+                $container->setDefinition($id, new Definition(Recipient::class, [$recipient['email'], $recipient['phone']]));
                 $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
             }
         }
+    }
+
+    private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        if (!$this->lockConfigEnabled) {
+            throw new LogicException('Rate limiter support cannot be enabled without enabling the Lock component.');
+        }
+
+        $loader->load('rate_limiter.php');
+
+        foreach ($config['limiters'] as $name => $limiterConfig) {
+            self::registerRateLimiter($container, $name, $limiterConfig);
+        }
+    }
+
+    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
+    {
+        // default configuration (when used by other DI extensions)
+        $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
+
+        $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
+
+        $limiter->addArgument(new Reference($limiterConfig['lock_factory']));
+        unset($limiterConfig['lock_factory']);
+
+        $storageId = $limiterConfig['storage_service'] ?? null;
+        if (null === $storageId) {
+            $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
+        }
+
+        $limiter->replaceArgument(1, new Reference($storageId));
+        unset($limiterConfig['storage']);
+        unset($limiterConfig['cache_pool']);
+
+        $limiterConfig['id'] = $name;
+        $limiter->replaceArgument(0, $limiterConfig);
+
+        $container->registerAliasForArgument($limiterId, Limiter::class, $name.'.limiter');
     }
 
     private function resolveTrustedHeaders(array $headers): int

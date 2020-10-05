@@ -15,10 +15,13 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Component\Translation\Translatable;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(TranslatorInterface::class);
@@ -52,6 +55,16 @@ final class TranslationExtension extends AbstractExtension
         }
 
         return $this->translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('t', [$this, 'createTranslatable']),
+        ];
     }
 
     /**
@@ -91,12 +104,41 @@ final class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans(string $message, array $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    /**
+     * @param string|\Stringable|TranslatableInterface|null $message
+     * @param array|string                                  $arguments Can be the locale as a string when $message is a TranslatableInterface
+     */
+    public function trans($message, $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
+        if ($message instanceof TranslatableInterface) {
+            if ([] !== $arguments && !\is_string($arguments)) {
+                throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a locale passed as a string when the message is a "%s", "%s" given.', __METHOD__, TranslatableInterface::class, get_debug_type($arguments)));
+            }
+
+            return $message->trans($this->getTranslator(), $locale ?? (\is_string($arguments) ? $arguments : null));
+        }
+
+        if (!\is_array($arguments)) {
+            throw new \TypeError(sprintf('Unless the message is a "%s", argument 2 passed to "%s()" must be an array of parameters, "%s" given.', TranslatableInterface::class, __METHOD__, get_debug_type($arguments)));
+        }
+
+        if ('' === $message = (string) $message) {
+            return '';
+        }
+
         if (null !== $count) {
             $arguments['%count%'] = $count;
         }
 
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
+    }
+
+    public function createTranslatable(string $message, array $parameters = [], string $domain = null): Translatable
+    {
+        if (!class_exists(Translatable::class)) {
+            throw new \LogicException(sprintf('You cannot use the "%s" as the Translation Component is not installed. Try running "composer require symfony/translation".', __CLASS__));
+        }
+
+        return new Translatable($message, $parameters, $domain);
     }
 }

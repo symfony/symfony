@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -31,6 +32,7 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -62,6 +64,9 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('format'),
                 abstract_arg('context'),
             ])
+
+        ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -880])
 
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
 
@@ -123,6 +128,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.transport.sqs.factory', AmazonSqsTransportFactory::class)
 
+        ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
+
         // retry
         ->set('messenger.retry_strategy_locator')
             ->args([
@@ -145,6 +152,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('senders service locator'),
                 service('messenger.retry_strategy_locator'),
                 service('logger')->ignoreOnInvalid(),
+                service('event_dispatcher'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

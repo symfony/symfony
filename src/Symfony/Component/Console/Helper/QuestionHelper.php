@@ -107,12 +107,12 @@ class QuestionHelper extends Helper
     {
         $this->writePrompt($output, $question);
 
-        $inputStream = $this->inputStream ?: STDIN;
+        $inputStream = $this->inputStream ?: \STDIN;
         $autocomplete = $question->getAutocompleterCallback();
 
         if (\function_exists('sapi_windows_cp_set')) {
             // Codepage used by cmd.exe on Windows to allow special characters (éàüñ).
-            sapi_windows_cp_set(1252);
+            @sapi_windows_cp_set(1252);
         }
 
         if (null === $autocomplete || !self::$stty || !Terminal::hasSttyAvailable()) {
@@ -129,7 +129,7 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = fgets($inputStream, 4096);
+                $ret = $this->readInput($inputStream, $question);
                 if (false === $ret) {
                     throw new MissingInputException('Aborted.');
                 }
@@ -501,5 +501,69 @@ class QuestionHelper extends Helper
         exec('stty 2> /dev/null', $output, $status);
 
         return self::$stdinIsInteractive = 1 !== $status;
+    }
+
+    /**
+     * Reads one or more lines of input and returns what is read.
+     *
+     * @param resource $inputStream The handler resource
+     * @param Question $question    The question being asked
+     *
+     * @return string|bool The input received, false in case input could not be read
+     */
+    private function readInput($inputStream, Question $question)
+    {
+        if (!$question->isMultiline()) {
+            return fgets($inputStream, 4096);
+        }
+
+        $multiLineStreamReader = $this->cloneInputStream($inputStream);
+        if (null === $multiLineStreamReader) {
+            return false;
+        }
+
+        $ret = '';
+        while (false !== ($char = fgetc($multiLineStreamReader))) {
+            if (\PHP_EOL === "{$ret}{$char}") {
+                break;
+            }
+            $ret .= $char;
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Clones an input stream in order to act on one instance of the same
+     * stream without affecting the other instance.
+     *
+     * @param resource $inputStream The handler resource
+     *
+     * @return resource|null The cloned resource, null in case it could not be cloned
+     */
+    private function cloneInputStream($inputStream)
+    {
+        $streamMetaData = stream_get_meta_data($inputStream);
+        $seekable = $streamMetaData['seekable'] ?? false;
+        $mode = $streamMetaData['mode'] ?? 'rb';
+        $uri = $streamMetaData['uri'] ?? null;
+
+        if (null === $uri) {
+            return null;
+        }
+
+        $cloneStream = fopen($uri, $mode);
+
+        // For seekable and writable streams, add all the same data to the
+        // cloned stream and then seek to the same offset.
+        if (true === $seekable && !\in_array($mode, ['r', 'rb', 'rt'])) {
+            $offset = ftell($inputStream);
+            rewind($inputStream);
+            stream_copy_to_stream($inputStream, $cloneStream);
+            fseek($inputStream, $offset);
+            fseek($cloneStream, $offset);
+        }
+
+        return $cloneStream;
     }
 }

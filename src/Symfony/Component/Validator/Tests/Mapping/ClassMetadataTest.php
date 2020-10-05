@@ -14,20 +14,25 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
+use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
-    const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    const CLASSNAME = Entity::class;
+    const PARENTCLASS = EntityParent::class;
+    const PROVIDERCLASS = GroupSequenceProviderEntity::class;
     const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
@@ -54,6 +59,20 @@ class ClassMetadataTest extends TestCase
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new PropertyConstraint());
+    }
+
+    public function testAddCompositeConstraintRejectsNestedPropertyConstraints()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint" cannot be put on classes.');
+
+        $this->metadata->addConstraint(new ClassCompositeConstraint([new PropertyConstraint()]));
+    }
+
+    public function testAddCompositeConstraintAcceptsNestedClassConstraints()
+    {
+        $this->metadata->addConstraint($constraint = new ClassCompositeConstraint([new ClassConstraint()]));
+        $this->assertSame($this->metadata->getConstraints(), [$constraint]);
     }
 
     public function testAddPropertyConstraints()
@@ -345,5 +364,25 @@ class ClassMetadataTest extends TestCase
             'staticChild',
             'children',
         ], $metadata->getConstrainedProperties());
+    }
+}
+
+class ClassCompositeConstraint extends Composite
+{
+    public $nested;
+
+    public function getDefaultOption()
+    {
+        return $this->getCompositeOption();
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'nested';
+    }
+
+    public function getTargets()
+    {
+        return [self::CLASS_CONSTRAINT];
     }
 }

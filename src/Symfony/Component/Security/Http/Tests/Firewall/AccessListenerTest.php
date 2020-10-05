@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\AccessMapInterface;
@@ -272,13 +273,13 @@ class AccessListenerTest extends TestCase
         $accessMap->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->willReturn([[AccessListener::PUBLIC_ACCESS], null])
+            ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
         $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
-            ->with($this->isInstanceOf(NullToken::class), [AccessListener::PUBLIC_ACCESS])
+            ->with($this->isInstanceOf(NullToken::class), [AuthenticatedVoter::PUBLIC_ACCESS])
             ->willReturn(true);
 
         $listener = new AccessListener(
@@ -303,13 +304,13 @@ class AccessListenerTest extends TestCase
         $accessMap->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->willReturn([[AccessListener::PUBLIC_ACCESS], null])
+            ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
         $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
-            ->with($this->equalTo($token), [AccessListener::PUBLIC_ACCESS])
+            ->with($this->equalTo($token), [AuthenticatedVoter::PUBLIC_ACCESS])
             ->willReturn(true);
 
         $listener = new AccessListener(

@@ -21,29 +21,23 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Send messages via Slack using Slack Incoming Webhooks.
- *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Daniel Stancu <birkof@birkof.ro>
  *
  * @internal
- *
- * @see https://api.slack.com/messaging/webhooks
  *
  * @experimental in 5.1
  */
 final class SlackTransport extends AbstractTransport
 {
-    protected const HOST = 'hooks.slack.com';
+    protected const HOST = 'slack.com';
 
-    private $id;
+    private $accessToken;
+    private $chatChannel;
 
-    /**
-     * @param string $id The hook id (anything after https://hooks.slack.com/services/)
-     */
-    public function __construct(string $id, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
-        $this->id = $id;
+        $this->accessToken = $accessToken;
+        $this->chatChannel = $channel;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -51,7 +45,7 @@ final class SlackTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('slack://%s/%s', $this->getEndpoint(), $this->id);
+        return sprintf('slack://%s?channel=%s', $this->getEndpoint(), urlencode($this->chatChannel));
     }
 
     public function supports(MessageInterface $message): bool
@@ -59,6 +53,9 @@ final class SlackTransport extends AbstractTransport
         return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof SlackOptions);
     }
 
+    /**
+     * @see https://api.slack.com/methods/chat.postMessage
+     */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
@@ -73,19 +70,22 @@ final class SlackTransport extends AbstractTransport
         }
 
         $options = $opts ? $opts->toArray() : [];
-        $id = $message->getRecipientId() ?: $this->id;
+        if (!isset($options['channel'])) {
+            $options['channel'] = $message->getRecipientId() ?: $this->chatChannel;
+        }
         $options['text'] = $message->getSubject();
-        $response = $this->client->request('POST', sprintf('https://%s/services/%s', $this->getEndpoint(), $id), [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/chat.postMessage', [
             'json' => array_filter($options),
+            'auth_bearer' => $this->accessToken,
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException('Unable to post the Slack message: '.$response->getContent(false), $response);
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
         }
 
-        $result = $response->getContent(false);
-        if ('ok' !== $result) {
-            throw new TransportException('Unable to post the Slack message: '.$result, $response);
+        $result = $response->toArray(false);
+        if (!$result['ok']) {
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
         }
 
         return new SentMessage($message, (string) $this);

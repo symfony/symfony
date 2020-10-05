@@ -64,15 +64,17 @@ class MailgunApiTransport extends AbstractApiTransport
             'body' => $body->bodyToIterable(),
         ]);
 
-        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
+                $result = $response->toArray(false);
                 throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $response->getStatusCode()), $response);
             }
 
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $response->getStatusCode()), $response);
         }
 
+        // The assumption here is that all 200 responses are "application/json", so it's safe to call "toArray".
+        $result = $response->toArray(false);
         $sentMessage->setMessageId($result['id']);
 
         return $response;
@@ -135,7 +137,7 @@ class MailgunApiTransport extends AbstractApiTransport
             } else {
                 // fallback to prefix with "h:" to not break BC
                 $headerName = 'h:'.$name;
-                @trigger_error(sprintf('Not prefixing the Mailgun header name with "h:" is deprecated since Symfony  5.1. Use header name "%s" instead.', $headerName), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not prefixing the Mailgun header name with "h:" is deprecated since Symfony  5.1. Use header name "%s" instead.', $headerName), \E_USER_DEPRECATED);
             }
 
             $payload[$headerName] = $header->getBodyAsString();

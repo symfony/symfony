@@ -79,7 +79,7 @@ class AmqpSenderTest extends TestCase
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         unset($encoded['headers']['Content-Type']);
-        $stamp = new AmqpStamp(null, AMQP_NOPARAM, ['content_type' => 'application/json']);
+        $stamp = new AmqpStamp(null, \AMQP_NOPARAM, ['content_type' => 'application/json']);
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
 
         $sender = new AmqpSender($connection, $serializer);
@@ -88,7 +88,7 @@ class AmqpSenderTest extends TestCase
 
     public function testContentTypeHeaderDoesNotOverwriteAttribute()
     {
-        $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new AmqpStamp('rk', AMQP_NOPARAM, ['content_type' => 'custom']));
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new AmqpStamp('rk', \AMQP_NOPARAM, ['content_type' => 'custom']));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
 
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();

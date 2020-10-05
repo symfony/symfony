@@ -48,7 +48,7 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            flock($lock, LOCK_UN);
+            flock($lock, \LOCK_UN);
             fclose($lock);
         }
 
@@ -70,7 +70,7 @@ class Store implements StoreInterface
                 return $path;
             }
             $h = fopen($path, 'cb');
-            if (!flock($h, LOCK_EX | LOCK_NB)) {
+            if (!flock($h, \LOCK_EX | \LOCK_NB)) {
                 fclose($h);
 
                 return $path;
@@ -92,7 +92,7 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
 
         if (isset($this->locks[$key])) {
-            flock($this->locks[$key], LOCK_UN);
+            flock($this->locks[$key], \LOCK_UN);
             fclose($this->locks[$key]);
             unset($this->locks[$key]);
 
@@ -115,8 +115,8 @@ class Store implements StoreInterface
         }
 
         $h = fopen($path, 'rb');
-        flock($h, LOCK_EX | LOCK_NB, $wouldBlock);
-        flock($h, LOCK_UN); // release the lock we just acquired
+        flock($h, \LOCK_EX | \LOCK_NB, $wouldBlock);
+        flock($h, \LOCK_UN); // release the lock we just acquired
         fclose($h);
 
         return (bool) $wouldBlock;
@@ -326,7 +326,7 @@ class Store implements StoreInterface
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
-            flock($this->locks[$key], LOCK_UN);
+            flock($this->locks[$key], \LOCK_UN);
             fclose($this->locks[$key]);
             unset($this->locks[$key]);
         }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -186,9 +187,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     public function addConstraint(Constraint $constraint)
     {
-        if (!\in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets())) {
-            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', get_debug_type($constraint)));
-        }
+        $this->checkConstraint($constraint);
 
         if ($constraint instanceof Traverse) {
             if ($constraint->traverse) {
@@ -501,5 +500,18 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         $property = $metadata->getPropertyName();
 
         $this->members[$property][] = $metadata;
+    }
+
+    private function checkConstraint(Constraint $constraint)
+    {
+        if (!\in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets(), true)) {
+            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', get_debug_type($constraint)));
+        }
+
+        if ($constraint instanceof Composite) {
+            foreach ($constraint->getNestedContraints() as $nestedContraint) {
+                $this->checkConstraint($nestedContraint);
+            }
+        }
     }
 }

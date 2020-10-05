@@ -60,7 +60,7 @@ class FileTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
 
         $this->assertFileExists($targetPath);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
@@ -79,7 +79,7 @@ class FileTest extends TestCase
         $movedFile = $file->move($targetDir, 'test.newname.gif');
 
         $this->assertFileExists($targetPath);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
@@ -121,7 +121,7 @@ class FileTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
 
         $this->assertFileExists($targetPath);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
@@ -141,7 +141,7 @@ class FileTest extends TestCase
         $movedFile = $file->move($targetDir);
 
         $this->assertFileExists($targetPath);
-        $this->assertFileNotExists($sourcePath);
+        $this->assertFileDoesNotExist($sourcePath);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($sourcePath);

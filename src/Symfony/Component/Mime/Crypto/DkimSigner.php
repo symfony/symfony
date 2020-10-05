@@ -53,7 +53,7 @@ final class DkimSigner
         $this->defaultOptions = $defaultOptions + [
             'algorithm' => self::ALGO_SHA256,
             'signature_expiration_delay' => 0,
-            'body_max_length' => PHP_INT_MAX,
+            'body_max_length' => \PHP_INT_MAX,
             'body_show_length' => false,
             'header_canon' => self::CANON_RELAXED,
             'body_canon' => self::CANON_RELAXED,
@@ -117,7 +117,7 @@ final class DkimSigner
         $header = new UnstructuredHeader('DKIM-Signature', $value);
         $headerCanonData .= rtrim($this->canonicalizeHeader($header->toString()."\r\n b=", $options['header_canon']));
         if (self::ALGO_SHA256 === $options['algorithm']) {
-            if (!openssl_sign($headerCanonData, $signature, $this->key, OPENSSL_ALGO_SHA256)) {
+            if (!openssl_sign($headerCanonData, $signature, $this->key, \OPENSSL_ALGO_SHA256)) {
                 throw new RuntimeException('Unable to sign DKIM hash: '.openssl_error_string());
             }
         } else {

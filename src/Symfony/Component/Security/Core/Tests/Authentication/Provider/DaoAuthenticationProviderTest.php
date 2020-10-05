@@ -300,7 +300,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null, $passwordEncoder = null)
     {
-        $userProvider = $this->getMockBuilder([UserProviderInterface::class, PasswordUpgraderInterface::class])->getMock();
+        $userProvider = $this->getMockBuilder(PasswordUpgraderProvider::class)->getMock();
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
@@ -352,4 +352,7 @@ class TestUser implements UserInterface
     public function eraseCredentials()
     {
     }
+}
+interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
+{
 }

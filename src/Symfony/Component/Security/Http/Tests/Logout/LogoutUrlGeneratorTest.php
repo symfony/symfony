@@ -88,7 +88,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromTokenWithoutProviderKeyFallbacksToCurrentFirewall()
+    public function testGuessFromTokenWithoutFirewallNameFallbacksToCurrentFirewall()
     {
         $this->tokenStorage->setToken(new UsernamePasswordToken('username', 'password', 'provider'));
         $this->generator->registerListener('secured_area', '/logout', null, null);

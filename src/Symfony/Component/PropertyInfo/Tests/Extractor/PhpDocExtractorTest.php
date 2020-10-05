@@ -117,6 +117,22 @@ class PhpDocExtractorTest extends TestCase
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
             ['emptyVar', null, $this->isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
+            [
+                'arrayWithKeys',
+                $this->isPhpDocumentorV5() ? [
+                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING)),
+                ] : null,
+                null,
+                null,
+            ],
+            [
+                'arrayOfMixed',
+                $this->isPhpDocumentorV5() ? [
+                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null),
+                ] : null,
+                null,
+                null,
+            ],
         ];
     }
 
@@ -146,6 +162,39 @@ class PhpDocExtractorTest extends TestCase
                     true,
                     new Type(Type::BUILTIN_TYPE_INT),
                     new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))
+                )],
+                null,
+                null,
+            ],
+            [
+                'arrayWithKeys',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(Type::BUILTIN_TYPE_STRING)
+                )],
+                null,
+                null,
+            ],
+            [
+                'arrayWithKeysAndComplexValue',
+                [new Type(
+                    Type::BUILTIN_TYPE_ARRAY,
+                    false,
+                    null,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                    new Type(
+                        Type::BUILTIN_TYPE_ARRAY,
+                        true,
+                        null,
+                        true,
+                        new Type(Type::BUILTIN_TYPE_INT),
+                        new Type(Type::BUILTIN_TYPE_STRING, true)
+                    )
                 )],
                 null,
                 null,
@@ -281,6 +330,25 @@ class PhpDocExtractorTest extends TestCase
 
         return (new \ReflectionMethod(StandardTagFactory::class, 'create'))
             ->hasReturnType();
+    }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractConstructorTypes($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function constructorTypesProvider()
+    {
+        return [
+            ['date', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['dateObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeInterface')]],
+            ['dateTime', null],
+            ['ddd', null],
+        ];
     }
 }
 

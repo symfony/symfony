@@ -54,7 +54,7 @@ class GitRepositoryTest extends TestCase
         $this->assertDirectoryExists($this->targetDir.'/.git');
         $this->assertSame($this->targetDir, $git->getPath());
         $this->assertSame(self::REPO_URL, $git->getUrl());
-        $this->assertRegExp('#^[0-9a-z]{40}$#', $git->getLastCommitHash());
+        $this->assertMatchesRegularExpression('#^[0-9a-z]{40}$#', $git->getLastCommitHash());
         $this->assertNotEmpty($git->getLastAuthor());
         $this->assertInstanceOf('DateTime', $git->getLastAuthoredDate());
         $this->assertStringMatchesFormat('v%s', $git->getLastTag());

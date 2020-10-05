@@ -13,9 +13,11 @@ namespace Symfony\Component\Form\Extension\Validator;
 
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Extension supporting the Symfony Validator component in forms.
@@ -25,9 +27,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ValidatorExtension extends AbstractExtension
 {
     private $validator;
+    private $formRenderer;
+    private $translator;
     private $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
         $this->legacyErrorMessages = $legacyErrorMessages;
 
@@ -43,6 +47,8 @@ class ValidatorExtension extends AbstractExtension
         $metadata->addConstraint(new Traverse(false));
 
         $this->validator = $validator;
+        $this->formRenderer = $formRenderer;
+        $this->translator = $translator;
     }
 
     public function loadTypeGuesser()
@@ -53,7 +59,7 @@ class ValidatorExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return [
-            new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages),
+            new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages, $this->formRenderer, $this->translator),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
         ];

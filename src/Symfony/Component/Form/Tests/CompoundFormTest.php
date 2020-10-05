@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -394,17 +394,17 @@ class CompoundFormTest extends AbstractFormTest
     {
         $form = $this->getBuilder()
             ->setCompound(true)
-            // We test using PropertyPathMapper on purpose. The traversal logic
+            // We test using DataMapper on purpose. The traversal logic
             // is currently contained in InheritDataAwareIterator, but even
             // if that changes, this test should still function.
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
 
         $childToBeRemoved = $this->createForm('removed', false);
         $childToBeAdded = $this->createForm('added', false);
         $child = $this->getBuilder('child', new EventDispatcher())
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
@@ -449,7 +449,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSetDataDoesNotMapViewDataToChildrenWithLockedSetData()
     {
-        $mapper = new PropertyPathMapper();
+        $mapper = new DataMapper();
         $viewData = [
             'firstName' => 'Fabien',
             'lastName' => 'Pot',
@@ -623,7 +623,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $files = [
             'author' => [
-                'error' => ['image' => UPLOAD_ERR_OK],
+                'error' => ['image' => \UPLOAD_ERR_OK],
                 'name' => ['image' => 'upload.png'],
                 'size' => ['image' => null],
                 'tmp_name' => ['image' => $path],
@@ -646,7 +646,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -670,7 +670,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $files = [
             'image' => [
-                'error' => UPLOAD_ERR_OK,
+                'error' => \UPLOAD_ERR_OK,
                 'name' => 'upload.png',
                 'size' => null,
                 'tmp_name' => $path,
@@ -693,7 +693,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -713,7 +713,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $files = [
             'image' => [
-                'error' => UPLOAD_ERR_OK,
+                'error' => \UPLOAD_ERR_OK,
                 'name' => 'upload.png',
                 'size' => null,
                 'tmp_name' => $path,
@@ -732,7 +732,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
         $this->assertEquals($file, $form->getData());
 
@@ -1117,7 +1117,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->form->submit([
             'foo' => 'Foo',
-            'bar' => new UploadedFile(__FILE__, 'upload.png', 'image/png', UPLOAD_ERR_OK),
+            'bar' => new UploadedFile(__FILE__, 'upload.png', 'image/png', \UPLOAD_ERR_OK),
         ]);
 
         $this->assertSame('Submitted data was expected to be text or number, file upload given.', $this->form->get('bar')->getTransformationFailure()->getMessage());

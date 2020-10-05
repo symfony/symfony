@@ -202,10 +202,10 @@ class UserAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken')->setMethods(['getCredentials', 'getProviderKey', 'getRoles'])->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken')->setMethods(['getCredentials', 'getFirewallName', 'getRoles'])->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
-            ->method('getProviderKey')
+            ->method('getFirewallName')
             ->willReturn('key')
         ;
 

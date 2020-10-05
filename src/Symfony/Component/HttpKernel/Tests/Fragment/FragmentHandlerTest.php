@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
 /**
@@ -53,11 +54,20 @@ class FragmentHandlerTest extends TestCase
 
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $this->expectException('RuntimeException');
-        $this->expectExceptionMessage('Error when rendering "http://localhost/" (Status code is 404).');
         $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
+        try {
+            $handler->render('/', 'foo');
+            $this->fail('->render() throws a \RuntimeException exception if response is not successful');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e);
+            $this->assertEquals(0, $e->getCode());
+            $this->assertEquals('Error when rendering "http://localhost/" (Status code is 404).', $e->getMessage());
 
-        $handler->render('/', 'foo');
+            $previousException = $e->getPrevious();
+            $this->assertInstanceOf(HttpException::class, $previousException);
+            $this->assertEquals(404, $previousException->getStatusCode());
+            $this->assertEquals(0, $previousException->getCode());
+        }
     }
 
     public function testRender()

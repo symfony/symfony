@@ -110,7 +110,7 @@ class AbstractFactoryTest extends TestCase
         if ($defaultHandlerInjection) {
             $this->assertEquals('setOptions', $methodCalls[0][0]);
             $this->assertEquals(['default_target_path' => '/bar'], $methodCalls[0][1][0]);
-            $this->assertEquals('setProviderKey', $methodCalls[1][0]);
+            $this->assertEquals('setFirewallName', $methodCalls[1][0]);
             $this->assertEquals(['foo'], $methodCalls[1][1]);
         } else {
             $this->assertCount(0, $methodCalls);

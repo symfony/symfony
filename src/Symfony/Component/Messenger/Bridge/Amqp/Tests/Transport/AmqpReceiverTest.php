@@ -67,7 +67,7 @@ class AmqpReceiverTest extends TestCase
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
-        $connection->method('nack')->with($amqpEnvelope, 'queueName', AMQP_NOPARAM)->willThrowException(new \AMQPException());
+        $connection->method('nack')->with($amqpEnvelope, 'queueName', \AMQP_NOPARAM)->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));

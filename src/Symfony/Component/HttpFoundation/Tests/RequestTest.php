@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -1250,6 +1251,30 @@ class RequestTest extends TestCase
         ];
     }
 
+    public function testToArrayEmpty()
+    {
+        $req = new Request();
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Response body is empty.');
+        $req->toArray();
+    }
+
+    public function testToArrayNonJson()
+    {
+        $req = new Request([], [], [], [], [], [], 'foobar');
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessageMatches('|Could not decode request body.+|');
+        $req->toArray();
+    }
+
+    public function testToArray()
+    {
+        $req = new Request([], [], [], [], [], [], json_encode([]));
+        $this->assertEquals([], $req->toArray());
+        $req = new Request([], [], [], [], [], [], json_encode(['foo' => 'bar']));
+        $this->assertEquals(['foo' => 'bar'], $req->toArray());
+    }
+
     /**
      * @dataProvider provideOverloadedMethods
      */
@@ -2276,6 +2301,51 @@ class RequestTest extends TestCase
 
         $this->assertSame('[::1]:443', $request->getHttpHost());
         $this->assertSame(443, $request->getPort());
+    }
+
+    public function testTrustedPrefix()
+    {
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+
+        //test with index deployed under root
+        $request = Request::create('/method');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X-Forwarded-Prefix', '/myprefix');
+        $request->headers->set('Forwarded', 'host=localhost:8080');
+
+        $this->assertSame('/myprefix', $request->getBaseUrl());
+        $this->assertSame('/myprefix', $request->getBasePath());
+        $this->assertSame('/method', $request->getPathInfo());
+    }
+
+    public function testTrustedPrefixWithSubdir()
+    {
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+
+        $server = [
+            'SCRIPT_FILENAME' => '/var/hidden/app/public/public/index.php',
+            'SCRIPT_NAME' => '/public/index.php',
+            'PHP_SELF' => '/public/index.php',
+        ];
+
+        //test with index file deployed in subdir, i.e. local dev server (insecure!!)
+        $request = Request::create('/public/method', 'GET', [], [], [], $server);
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X-Forwarded-Prefix', '/prefix');
+        $request->headers->set('Forwarded', 'host=localhost:8080');
+
+        $this->assertSame('/prefix/public', $request->getBaseUrl());
+        $this->assertSame('/prefix/public', $request->getBasePath());
+        $this->assertSame('/method', $request->getPathInfo());
+    }
+
+    public function testTrustedPrefixEmpty()
+    {
+        //check that there is no error, if no prefix is provided
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
+        $request = Request::create('/method');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertSame('', $request->getBaseUrl());
     }
 
     public function testTrustedPort()

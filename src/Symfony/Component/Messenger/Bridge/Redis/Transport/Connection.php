@@ -33,6 +33,7 @@ class Connection
         'consumer' => 'consumer',
         'auto_setup' => true,
         'delete_after_ack' => false,
+        'delete_after_reject' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
         'tls' => false,
@@ -51,6 +52,7 @@ class Connection
     private $nextClaim = 0;
     private $claimInterval;
     private $deleteAfterAck;
+    private $deleteAfterReject;
     private $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
@@ -63,12 +65,17 @@ class Connection
         $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
-        if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
-            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+        $auth = $connectionCredentials['auth'] ?? null;
+        if ('' === $auth) {
+            $auth = null;
+        }
+
+        if (null !== $auth && !$this->connection->auth($auth)) {
+            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
         }
 
         if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
         }
 
         foreach (['stream', 'group', 'consumer'] as $key) {
@@ -84,6 +91,7 @@ class Connection
         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
         $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
         $this->deleteAfterAck = $configuration['delete_after_ack'] ?? self::DEFAULT_OPTIONS['delete_after_ack'];
+        $this->deleteAfterReject = $configuration['delete_after_reject'] ?? self::DEFAULT_OPTIONS['delete_after_reject'];
         $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
@@ -107,43 +115,49 @@ class Connection
 
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {
-            $autoSetup = filter_var($redisOptions['auto_setup'], FILTER_VALIDATE_BOOLEAN);
+            $autoSetup = filter_var($redisOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['auto_setup']);
         }
 
         $maxEntries = null;
         if (\array_key_exists('stream_max_entries', $redisOptions)) {
-            $maxEntries = filter_var($redisOptions['stream_max_entries'], FILTER_VALIDATE_INT);
+            $maxEntries = filter_var($redisOptions['stream_max_entries'], \FILTER_VALIDATE_INT);
             unset($redisOptions['stream_max_entries']);
         }
 
         $deleteAfterAck = null;
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
-            $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], FILTER_VALIDATE_BOOLEAN);
+            $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
+        }
+
+        $deleteAfterReject = null;
+        if (\array_key_exists('delete_after_reject', $redisOptions)) {
+            $deleteAfterReject = filter_var($redisOptions['delete_after_reject'], \FILTER_VALIDATE_BOOLEAN);
+            unset($redisOptions['delete_after_reject']);
         }
 
         $dbIndex = null;
         if (\array_key_exists('dbindex', $redisOptions)) {
-            $dbIndex = filter_var($redisOptions['dbindex'], FILTER_VALIDATE_INT);
+            $dbIndex = filter_var($redisOptions['dbindex'], \FILTER_VALIDATE_INT);
             unset($redisOptions['dbindex']);
         }
 
         $tls = false;
         if (\array_key_exists('tls', $redisOptions)) {
-            $tls = filter_var($redisOptions['tls'], FILTER_VALIDATE_BOOLEAN);
+            $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['tls']);
         }
 
         $redeliverTimeout = null;
         if (\array_key_exists('redeliver_timeout', $redisOptions)) {
-            $redeliverTimeout = filter_var($redisOptions['redeliver_timeout'], FILTER_VALIDATE_INT);
+            $redeliverTimeout = filter_var($redisOptions['redeliver_timeout'], \FILTER_VALIDATE_INT);
             unset($redisOptions['redeliver_timeout']);
         }
 
         $claimInterval = null;
         if (\array_key_exists('claim_interval', $redisOptions)) {
-            $claimInterval = filter_var($redisOptions['claim_interval'], FILTER_VALIDATE_INT);
+            $claimInterval = filter_var($redisOptions['claim_interval'], \FILTER_VALIDATE_INT);
             unset($redisOptions['claim_interval']);
         }
 
@@ -154,6 +168,7 @@ class Connection
             'auto_setup' => $autoSetup,
             'stream_max_entries' => $maxEntries,
             'delete_after_ack' => $deleteAfterAck,
+            'delete_after_reject' => $deleteAfterReject,
             'dbindex' => $dbIndex,
             'redeliver_timeout' => $redeliverTimeout,
             'claim_interval' => $claimInterval,
@@ -343,7 +358,9 @@ class Connection
     {
         try {
             $deleted = $this->connection->xack($this->stream, $this->group, [$id]);
-            $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
+            if ($this->deleteAfterReject) {
+                $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
+            }
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -421,7 +438,7 @@ class Connection
             $this->connection->clearLastError();
         }
 
-        if ($this->deleteAfterAck) {
+        if ($this->deleteAfterAck || $this->deleteAfterReject) {
             $groups = $this->connection->xinfo('GROUPS', $this->stream);
             if (
                 // support for Redis extension version 5+
@@ -429,7 +446,7 @@ class Connection
                 // support for Redis extension version 4.x
                 || (\is_string($groups) && substr_count($groups, '"name"'))
             ) {
-                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
+                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
             }
         }
 
@@ -443,6 +460,19 @@ class Connection
 
     public function cleanup(): void
     {
+        static $unlink = true;
+
+        if ($unlink) {
+            try {
+                $this->connection->unlink($this->stream);
+                $this->connection->unlink($this->queue);
+
+                return;
+            } catch (\Throwable $e) {
+                $unlink = false;
+            }
+        }
+
         $this->connection->del($this->stream);
         $this->connection->del($this->queue);
     }

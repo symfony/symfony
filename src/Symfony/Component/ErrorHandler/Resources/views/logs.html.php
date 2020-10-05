@@ -20,7 +20,7 @@
             if (($exception = $log['context']['exception'] ?? null) instanceof \ErrorException) {
                 $severity = $exception->getSeverity();
             }
-            $status = E_DEPRECATED === $severity || E_USER_DEPRECATED === $severity ? 'warning' : 'normal';
+            $status = \E_DEPRECATED === $severity || \E_USER_DEPRECATED === $severity ? 'warning' : 'normal';
         } ?>
         <tr class="status-<?= $status; ?>" data-filter-level="<?= strtolower($this->escape($log['priorityName'])); ?>"<?php if ($channelIsDefined) { ?> data-filter-channel="<?= $this->escape($log['channel']); ?>"<?php } ?>>
             <td class="text-small" nowrap>
@@ -35,7 +35,7 @@
             <td>
                 <?= $this->formatLogMessage($log['message'], $log['context']); ?>
                 <?php if ($log['context']) { ?>
-                <pre class="text-muted prewrap m-t-5"><?= json_encode($log['context'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></pre>
+                <pre class="text-muted prewrap m-t-5"><?= $this->escape(json_encode($log['context'], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)); ?></pre>
                 <?php } ?>
             </td>
         </tr>

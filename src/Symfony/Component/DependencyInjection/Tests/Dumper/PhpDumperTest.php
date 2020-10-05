@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -238,7 +239,7 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
     }
@@ -265,7 +266,7 @@ class PhpDumperTest extends TestCase
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\', '/Fixtures/includes/', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories.txt', $dump);
     }
@@ -291,7 +292,7 @@ class PhpDumperTest extends TestCase
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\', '/Fixtures/includes/', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
     }
@@ -306,10 +307,11 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo_lazy.php', '/Fixtures/includes/foo_lazy.php', $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt', $dump);
     }
@@ -720,6 +722,24 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy.php', $dumper->dump());
     }
 
+    public function testNonSharedDuplicates()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setShared(false);
+        $container->register('baz', 'stdClass')->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument(['foo' => new Reference('foo')]));
+        $container->register('bar', 'stdClass')->setPublic(true)
+            ->addArgument(new Reference('foo'))
+            ->addArgument(new Reference('foo'))
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_duplicates.php', $dumper->dump());
+    }
+
     public function testInitializePropertiesBeforeMethodCalls()
     {
         require_once self::$fixturesPath.'/includes/classes.php';
@@ -962,7 +982,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace('\\\\Dumper', '/Dumper', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
     }
 
     public function testExpressionReferencingPrivateService()
@@ -1123,7 +1143,7 @@ class PhpDumperTest extends TestCase
 
         $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $dump = str_replace("'\\\\includes\\\\HotPath\\\\", "'/includes/HotPath/", $dump);
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_inline_requires.php', $dump);

@@ -412,4 +412,84 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
+
+    public function testTransformForHtml5Format()
+    {
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP, true);
+
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $this->assertEquals('10', $transformer->transform(0.104));
+        $this->assertEquals('11', $transformer->transform(0.105));
+        $this->assertEquals('200000', $transformer->transform(2000));
+    }
+
+    public function testTransformForHtml5FormatWithInteger()
+    {
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP, true);
+
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $this->assertEquals('0', $transformer->transform(0.1));
+        $this->assertEquals('1234', $transformer->transform(1234));
+    }
+
+    public function testTransformForHtml5FormatWithScale()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP, true);
+
+        $this->assertEquals('12.34', $transformer->transform(0.1234));
+    }
+
+    public function testReverseTransformForHtml5Format()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP, true);
+
+        $this->assertEquals(0.02, $transformer->reverseTransform('1.5')); // rounded up, for 2 decimals
+        $this->assertEquals(0.15, $transformer->reverseTransform('15'));
+        $this->assertEquals(2000, $transformer->reverseTransform('200000'));
+    }
+
+    public function testReverseTransformForHtml5FormatWithInteger()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP, true);
+
+        $this->assertEquals(10, $transformer->reverseTransform('10'));
+        $this->assertEquals(15, $transformer->reverseTransform('15'));
+        $this->assertEquals(12, $transformer->reverseTransform('12'));
+        $this->assertEquals(200, $transformer->reverseTransform('200'));
+    }
+
+    public function testReverseTransformForHtml5FormatWithScale()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP, true);
+
+        $this->assertEquals(0.1234, $transformer->reverseTransform('12.34'));
+    }
 }

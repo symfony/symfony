@@ -23,6 +23,7 @@ use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCusto
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -365,6 +366,7 @@ class SecurityExtensionTest extends TestCase
         $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.project_dir', __DIR__);
         $container->setParameter('kernel.cache_dir', __DIR__);
+        $container->setParameter('kernel.container_class', 'FooContainer');
 
         $container->loadFromExtension('security', [
             'firewalls' => [
@@ -671,7 +673,7 @@ class SecurityExtensionTest extends TestCase
         $bundle = new SecurityBundle();
         $bundle->build($container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
 
@@ -764,11 +766,16 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
 {
     public function createListeners(ContainerBuilder $container, string $firewallName, array $config): array
     {
+        $container->register('custom_firewall_listener_id', \stdClass::class);
+
         return ['custom_firewall_listener_id'];
     }
 
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
     {
+        $container->register('provider_id', \stdClass::class);
+        $container->register('listener_id', \stdClass::class);
+
         return ['provider_id', 'listener_id', $defaultEntryPoint];
     }
 

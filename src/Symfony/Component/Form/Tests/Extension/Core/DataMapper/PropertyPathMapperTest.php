@@ -22,6 +22,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @group legacy
+ */
 class PropertyPathMapperTest extends TestCase
 {
     /**
@@ -361,21 +364,5 @@ class PropertyPathMapperTest extends TestCase
             [new \DateTime()],
             [new \DateTimeImmutable()],
         ];
-    }
-}
-
-class SubmittedForm extends Form
-{
-    public function isSubmitted(): bool
-    {
-        return true;
-    }
-}
-
-class NotSynchronizedForm extends SubmittedForm
-{
-    public function isSynchronized(): bool
-    {
-        return false;
     }
 }

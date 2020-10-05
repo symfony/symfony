@@ -28,6 +28,7 @@
         "symfony/amazon-mailer": "^4.4|^5.0",
         "symfony/google-mailer": "^4.4|^5.0",
         "symfony/http-client-contracts": "^1.1|^2",
+        "symfony/mailjet-mailer": "^4.4|^5.0",
         "symfony/mailgun-mailer": "^4.4|^5.0",
         "symfony/mailchimp-mailer": "^4.4|^5.0",
         "symfony/messenger": "^4.4|^5.0",

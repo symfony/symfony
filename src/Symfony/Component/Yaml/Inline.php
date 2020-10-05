@@ -90,7 +90,7 @@ class Inline
             }
 
             // some comments are allowed at the end
-            if (preg_replace('/\s+#.*$/A', '', substr($value, $i))) {
+            if (preg_replace('/\s*#.*$/A', '', substr($value, $i))) {
                 throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
@@ -161,10 +161,10 @@ class Inline
                 return 'false';
             case ctype_digit($value):
                 return \is_string($value) ? "'$value'" : (int) $value;
-            case is_numeric($value):
-                $locale = setlocale(LC_NUMERIC, 0);
+            case is_numeric($value) && false === strpos($value, "\f") && false === strpos($value, "\n") && false === strpos($value, "\r") && false === strpos($value, "\t") && false === strpos($value, "\v"):
+                $locale = setlocale(\LC_NUMERIC, 0);
                 if (false !== $locale) {
-                    setlocale(LC_NUMERIC, 'C');
+                    setlocale(\LC_NUMERIC, 'C');
                 }
                 if (\is_float($value)) {
                     $repr = (string) $value;
@@ -178,7 +178,7 @@ class Inline
                     $repr = \is_string($value) ? "'$value'" : (string) $value;
                 }
                 if (false !== $locale) {
-                    setlocale(LC_NUMERIC, $locale);
+                    setlocale(\LC_NUMERIC, $locale);
                 }
 
                 return $repr;
@@ -289,7 +289,7 @@ class Inline
                 $i += \strlen($output);
 
                 // remove comments
-                if (Parser::preg_match('/[ \t]+#/', $output, $match, PREG_OFFSET_CAPTURE)) {
+                if (Parser::preg_match('/[ \t]+#/', $output, $match, \PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
             } elseif (Parser::preg_match('/^(.*?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
@@ -631,6 +631,7 @@ class Inline
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                 }
+                // no break
             case preg_match('/^(?:\+|-)?0o(?P<value>[0-7_]++)$/', $scalar, $matches):
                 $value = str_replace('_', '', $matches['value']);
 
@@ -649,20 +650,20 @@ class Inline
 
                 switch (true) {
                     case ctype_digit($scalar):
-                        if ('0' === $scalar[0] && '0' !== $scalar) {
+                        if (preg_match('/^0[0-7]+$/', $scalar)) {
                             trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
 
-                            return octdec(preg_replace('/[^0-7]/', '', $scalar));
+                            return octdec($scalar);
                         }
 
                         $cast = (int) $scalar;
 
                         return ($scalar === (string) $cast) ? $cast : $scalar;
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
-                        if ('0' === $scalar[1] && '-0' !== $scalar) {
+                        if (preg_match('/^-0[0-7]+$/', $scalar)) {
                             trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
 
-                            return -octdec(preg_replace('/[^0-7]/', '', substr($scalar, 1)));
+                            return -octdec(substr($scalar, 1));
                         }
 
                         $cast = (int) $scalar;

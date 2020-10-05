@@ -1,0 +1,33 @@
+framework:
+    secret: test
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
+    test: ~
+    default_locale: en
+    profiler: false
+    session:
+        storage_id: session.storage.mock_file
+
+services:
+    logger: { class: Psr\Log\NullLogger }
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ProfileController:
+        public: true
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags: [container.service_subscriber]
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
+
+security:
+    enable_authenticator_manager: true
+
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    'jane@example.org': { password: test, roles: [ROLE_USER] }
+        in_memory2:
+            memory:
+                users:
+                    'john@example.org': { password: test, roles: [ROLE_USER] }

@@ -36,9 +36,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
     private $passthru;
 
     /**
-     * @param callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
+     * @param ?callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
      */
-    public function __construct(HttpClientInterface $client, string $method, string $url, array $options, callable $passthru)
+    public function __construct(HttpClientInterface $client, string $method, string $url, array $options, callable $passthru = null)
     {
         $this->client = $client;
         $this->shouldBuffer = $options['buffer'] ?? true;
@@ -98,7 +98,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         $handle = function () {
             $stream = $this->response instanceof StreamableInterface ? $this->response->toStream(false) : StreamWrapper::createResource($this->response);
 
-            return stream_get_meta_data($stream)['wrapper_data']->stream_cast(STREAM_CAST_FOR_SELECT);
+            return stream_get_meta_data($stream)['wrapper_data']->stream_cast(\STREAM_CAST_FOR_SELECT);
         };
 
         $stream = StreamWrapper::createResource($this);
@@ -205,6 +205,15 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
 
             foreach ($client->stream($wrappedResponses, $timeout) as $response => $chunk) {
                 $r = $asyncMap[$response];
+
+                if (null === $chunk->getError()) {
+                    if ($chunk->isFirst()) {
+                        // Ensure no exception is thrown on destruct for the wrapped response
+                        $r->response->getStatusCode();
+                    } elseif (0 === $r->offset && null === $r->content && $chunk->isLast()) {
+                        $r->content = fopen('php://memory', 'w+');
+                    }
+                }
 
                 if (!$r->passthru) {
                     if (null !== $chunk->getError() || $chunk->isLast()) {

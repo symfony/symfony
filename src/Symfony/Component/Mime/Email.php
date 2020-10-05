@@ -378,7 +378,7 @@ class Email extends Message
     }
 
     /**
-     * @return DataPart[]
+     * @return array|DataPart[]
      */
     public function getAttachments(): array
     {

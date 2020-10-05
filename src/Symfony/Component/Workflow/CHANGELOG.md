@@ -5,6 +5,10 @@ CHANGELOG
 -----
 
  * Added `Workflow::getEnabledTransition()` to easily retrieve a specific transition object
+ * Added context to the event dispatched
+ * Dispatch an event when the subject enters in the workflow for the very first time
+ * Added a default context to the previous event
+ * Added support for specifying which events should be dispatched when calling `workflow->apply()`
 
 5.1.0
 -----

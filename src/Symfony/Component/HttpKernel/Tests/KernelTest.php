@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -87,7 +89,7 @@ class KernelTest extends TestCase
         $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
-        $this->assertFileNotExists($containerDir.'.legacy');
+        $this->assertFileDoesNotExist($containerDir.'.legacy');
 
         $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
@@ -95,8 +97,8 @@ class KernelTest extends TestCase
         $this->assertFileExists($containerDir);
         $this->assertFileExists($containerDir.'.legacy');
 
-        $this->assertFileNotExists($legacyContainerDir);
-        $this->assertFileNotExists($legacyContainerDir.'.legacy');
+        $this->assertFileDoesNotExist($legacyContainerDir);
+        $this->assertFileDoesNotExist($legacyContainerDir.'.legacy');
     }
 
     public function testBootInitializesBundlesAndContainer()
@@ -165,9 +167,12 @@ class KernelTest extends TestCase
     public function testShutdownGivesNullContainerToAllBundles()
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')->getMock();
-        $bundle->expects($this->at(3))
+        $bundle->expects($this->exactly(2))
             ->method('setContainer')
-            ->with(null);
+            ->withConsecutive(
+                [$this->isInstanceOf(ContainerInterface::class)],
+                [null]
+            );
 
         $kernel = $this->getKernel(['getBundles']);
         $kernel->expects($this->any())
@@ -471,6 +476,34 @@ EOF;
         $this->assertFileExists(\dirname($containerFile).'.legacy');
     }
 
+    public function testKernelExtension()
+    {
+        $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
+            public function load(array $configs, ContainerBuilder $container)
+            {
+                $container->setParameter('test.extension-registered', true);
+            }
+
+            public function getNamespace()
+            {
+                return '';
+            }
+
+            public function getXsdValidationBasePath()
+            {
+                return false;
+            }
+
+            public function getAlias()
+            {
+                return 'test-extension';
+            }
+        };
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test.extension-registered'));
+    }
+
     public function testKernelPass()
     {
         $kernel = new PassKernel();
@@ -552,7 +585,7 @@ EOF;
             }
         };
 
-        $this->assertRegExp('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
+        $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
     /**

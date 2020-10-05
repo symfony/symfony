@@ -62,6 +62,22 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testRetry404WithThrow()
+    {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            $this->assertTrue($chunk->isFirst());
+            $this->assertSame(404, $context->getStatusCode());
+            $context->getResponse()->cancel();
+            $context->replaceRequest('GET', 'http://localhost:8057/404');
+            $context->passthru();
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+
+        $this->expectException(ClientExceptionInterface::class);
+        $response->getContent(true);
+    }
+
     public function testRetryTransportError()
     {
         $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
@@ -92,7 +108,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
             $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $content);
 
-            $steps = preg_split('{\{"id":"\\\/json\\\/(\d)"\}}', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $steps = preg_split('{\{"id":"\\\/json\\\/(\d)"\}}', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
             $steps[7] = $context->getResponse();
             $steps[1] = $context->replaceRequest('GET', 'http://localhost:8057/json/1');
             $steps[3] = $context->replaceRequest('GET', 'http://localhost:8057/json/2');

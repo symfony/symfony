@@ -19,11 +19,11 @@ use Symfony\Component\Console\SignalRegistry\SignalRegistry;
  */
 class SignalRegistryTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         pcntl_async_signals(false);
-        pcntl_signal(SIGUSR1, SIG_DFL);
-        pcntl_signal(SIGUSR2, SIG_DFL);
+        pcntl_signal(\SIGUSR1, \SIG_DFL);
+        pcntl_signal(\SIGUSR2, \SIG_DFL);
     }
 
     public function testOneCallbackForASignal_signalIsHandled()
@@ -31,11 +31,11 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled = false;
-        $signalRegistry->register(SIGUSR1, function () use (&$isHandled) {
+        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled) {
             $isHandled = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR1);
+        posix_kill(posix_getpid(), \SIGUSR1);
 
         $this->assertTrue($isHandled);
     }
@@ -45,16 +45,16 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry->register(SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR1);
+        posix_kill(posix_getpid(), \SIGUSR1);
 
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);
@@ -67,20 +67,20 @@ class SignalRegistryTest extends TestCase
         $isHandled1 = false;
         $isHandled2 = false;
 
-        $signalRegistry->register(SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR1);
+        posix_kill(posix_getpid(), \SIGUSR1);
 
         $this->assertTrue($isHandled1);
         $this->assertFalse($isHandled2);
 
-        $signalRegistry->register(SIGUSR2, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR2, function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR2);
+        posix_kill(posix_getpid(), \SIGUSR2);
 
         $this->assertTrue($isHandled2);
     }
@@ -90,16 +90,16 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        pcntl_signal(SIGUSR1, function () use (&$isHandled1) {
+        pcntl_signal(\SIGUSR1, function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR1);
+        posix_kill(posix_getpid(), \SIGUSR1);
 
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);
@@ -110,18 +110,18 @@ class SignalRegistryTest extends TestCase
         $signalRegistry1 = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry1->register(SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry1->register(\SIGUSR1, function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $signalRegistry2 = new SignalRegistry();
 
         $isHandled2 = false;
-        $signalRegistry2->register(SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry2->register(\SIGUSR1, function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
-        posix_kill(posix_getpid(), SIGUSR1);
+        posix_kill(posix_getpid(), \SIGUSR1);
 
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);

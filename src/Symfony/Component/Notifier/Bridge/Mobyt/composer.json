@@ -1,0 +1,36 @@
+{
+    "name": "symfony/mobyt-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony Mobyt Notifier Bridge",
+    "keywords": ["sms", "mobyt", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bastien Durand",
+            "email": "bdurand-dev@outlook.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "php": "^7.2.5",
+        "symfony/http-client": "^4.3|^5.0",
+        "symfony/notifier": "^5.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mobyt\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.2-dev"
+        }
+    }
+}

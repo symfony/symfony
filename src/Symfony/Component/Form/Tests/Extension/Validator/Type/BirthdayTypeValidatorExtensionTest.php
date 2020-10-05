@@ -20,7 +20,7 @@ class BirthdayTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
-    protected function createForm(array $options = array())
+    protected function createForm(array $options = [])
     {
         return $this->factory->create(BirthdayType::class, null, $options);
     }
@@ -39,9 +39,9 @@ class BirthdayTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
 
-        $form = $this->createForm(array(
+        $form = $this->createForm([
             'legacy_error_messages' => true,
-        ));
+        ]);
 
         $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }

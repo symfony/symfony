@@ -41,6 +41,7 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Twig\Extension\AbstractExtension;
 
 /**
@@ -342,6 +343,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
+
+            if ($this->authenticatorManagerEnabled) {
+                $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
+                    ->addTag('kernel.event_listener', ['event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
+                    ->replaceArgument(0, new Reference($defaultProvider));
+            }
         } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
         }
@@ -597,7 +604,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        if (false === $hasListeners) {
+        if (false === $hasListeners && !$this->authenticatorManagerEnabled) {
             throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 
@@ -632,7 +639,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $userProvider;
         }
 
-        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey) {
+        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
             return 'security.user_providers';
         }
 
@@ -689,7 +696,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
             $config['algorithm'] = 'native';
-            $config['native_algorithm'] = PASSWORD_BCRYPT;
+            $config['native_algorithm'] = \PASSWORD_BCRYPT;
 
             return $this->createEncoder($config);
         }
@@ -700,7 +707,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'sodium';
             } elseif (\defined('PASSWORD_ARGON2I')) {
                 $config['algorithm'] = 'native';
-                $config['native_algorithm'] = PASSWORD_ARGON2I;
+                $config['native_algorithm'] = \PASSWORD_ARGON2I;
             } else {
                 throw new InvalidConfigurationException(sprintf('Algorithm "argon2i" is not available. Either use "%s" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id", "auto' : 'auto'));
             }
@@ -713,7 +720,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'sodium';
             } elseif (\defined('PASSWORD_ARGON2ID')) {
                 $config['algorithm'] = 'native';
-                $config['native_algorithm'] = PASSWORD_ARGON2ID;
+                $config['native_algorithm'] = \PASSWORD_ARGON2ID;
             } else {
                 throw new InvalidConfigurationException(sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
             }
@@ -937,7 +944,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $cidrParts = explode('/', $cidr);
 
         if (1 === \count($cidrParts)) {
-            return false !== filter_var($cidrParts[0], FILTER_VALIDATE_IP);
+            return false !== filter_var($cidrParts[0], \FILTER_VALIDATE_IP);
         }
 
         $ip = $cidrParts[0];
@@ -947,11 +954,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return false;
         }
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
             return $netmask <= 32;
         }
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        if (filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
             return $netmask <= 128;
         }
 

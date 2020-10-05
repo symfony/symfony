@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -35,9 +36,11 @@ class ClassDiscriminatorMappingTest extends TestCase
     {
         $mapping = new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
+            'third' => AbstractDummyThirdChild::class,
         ]);
 
         $this->assertEquals('first', $mapping->getMappedObjectType(new AbstractDummyFirstChild()));
         $this->assertNull($mapping->getMappedObjectType(new AbstractDummySecondChild()));
+        $this->assertSame('third', $mapping->getMappedObjectType(new AbstractDummyThirdChild()));
     }
 }

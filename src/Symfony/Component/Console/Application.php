@@ -14,6 +14,7 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -79,6 +80,7 @@ class Application implements ResetInterface
     private $singleCommand = false;
     private $initialized;
     private $signalRegistry;
+    private $signalsToDispatchEvent = [];
 
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
@@ -86,6 +88,10 @@ class Application implements ResetInterface
         $this->version = $version;
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
+        $this->signalRegistry = new SignalRegistry();
+        if (\defined('SIGINT')) {
+            $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2];
+        }
     }
 
     /**
@@ -101,9 +107,14 @@ class Application implements ResetInterface
         $this->commandLoader = $commandLoader;
     }
 
-    public function setSignalRegistry(SignalRegistry $signalRegistry)
+    public function getSignalRegistry(): SignalRegistry
     {
-        $this->signalRegistry = $signalRegistry;
+        return $this->signalRegistry;
+    }
+
+    public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent)
+    {
+        $this->signalsToDispatchEvent = $signalsToDispatchEvent;
     }
 
     /**
@@ -115,8 +126,10 @@ class Application implements ResetInterface
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        putenv('LINES='.$this->terminal->getHeight());
-        putenv('COLUMNS='.$this->terminal->getWidth());
+        if (\function_exists('putenv')) {
+            @putenv('LINES='.$this->terminal->getHeight());
+            @putenv('COLUMNS='.$this->terminal->getWidth());
+        }
 
         if (null === $input) {
             $input = new ArgvInput();
@@ -268,14 +281,20 @@ class Application implements ResetInterface
             $command = $this->find($alternative);
         }
 
-        if ($this->signalRegistry) {
-            foreach ($this->signalRegistry->getHandlingSignals() as $handlingSignal) {
-                $event = new ConsoleSignalEvent($command, $input, $output, $handlingSignal);
-                $onSignalHandler = function () use ($event) {
-                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-                };
+        if ($this->dispatcher) {
+            foreach ($this->signalsToDispatchEvent as $signal) {
+                $event = new ConsoleSignalEvent($command, $input, $output, $signal);
 
-                $this->signalRegistry->register($handlingSignal, $onSignalHandler);
+                $this->signalRegistry->register($signal, function ($signal, $hasNext) use ($event) {
+                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
+
+                    // No more handlers, we try to simulate PHP default behavior
+                    if (!$hasNext) {
+                        if (!\in_array($signal, [\SIGUSR1, \SIGUSR2], true)) {
+                            exit(0);
+                        }
+                    }
+                });
             }
         }
 
@@ -511,6 +530,11 @@ class Application implements ResetInterface
 
         if (!$this->has($name)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
+        }
+
+        // When the command has a different name than the one used at the command loader level
+        if (!isset($this->commands[$name])) {
+            throw new CommandNotFoundException(sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
         }
 
         $command = $this->commands[$name];
@@ -806,7 +830,7 @@ class Application implements ResetInterface
                 }, $message);
             }
 
-            $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
+            $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : \PHP_INT_MAX;
             $lines = [];
             foreach ('' !== $message ? preg_split('/\r?\n/', $message) : [] as $line) {
                 foreach ($this->splitStringByWidth($line, $width - 4) as $line) {
@@ -905,7 +929,9 @@ class Application implements ResetInterface
             $input->setInteractive(false);
         }
 
-        putenv('SHELL_VERBOSITY='.$shellVerbosity);
+        if (\function_exists('putenv')) {
+            @putenv('SHELL_VERBOSITY='.$shellVerbosity);
+        }
         $_ENV['SHELL_VERBOSITY'] = $shellVerbosity;
         $_SERVER['SHELL_VERBOSITY'] = $shellVerbosity;
     }
@@ -923,6 +949,12 @@ class Application implements ResetInterface
         foreach ($command->getHelperSet() as $helper) {
             if ($helper instanceof InputAwareInterface) {
                 $helper->setInput($input);
+            }
+        }
+
+        if ($command instanceof SignalableCommandInterface) {
+            foreach ($command->getSubscribedSignals() as $signal) {
+                $this->signalRegistry->register($signal, [$command, 'handleSignal']);
             }
         }
 
@@ -988,8 +1020,7 @@ class Application implements ResetInterface
     {
         return new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
-
-            new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message'),
+            new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display help for the given command. When no command is given display help for the <info>'.$this->defaultCommand.'</info> command'),
             new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
             new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
             new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
@@ -1089,7 +1120,7 @@ class Application implements ResetInterface
         }
 
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }

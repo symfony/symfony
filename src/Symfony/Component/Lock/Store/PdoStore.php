@@ -13,8 +13,9 @@ namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -119,14 +120,32 @@ class PdoStore implements PersistingStoreInterface
         $key->reduceLifetime($this->initialTtl);
 
         $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (:id, :token, {$this->getCurrentTimestampStatement()} + $this->initialTtl)";
-        $stmt = $this->getConnection()->prepare($sql);
+        $conn = $this->getConnection();
+        try {
+            $stmt = $conn->prepare($sql);
+        } catch (TableNotFoundException $e) {
+            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                $this->createTable();
+            }
+            $stmt = $conn->prepare($sql);
+        } catch (\PDOException $e) {
+            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                $this->createTable();
+            }
+            $stmt = $conn->prepare($sql);
+        }
 
         $stmt->bindValue(':id', $this->getHashedKey($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
 
         try {
             $stmt->execute();
-        } catch (DBALException $e) {
+        } catch (TableNotFoundException $e) {
+            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                $this->createTable();
+            }
+            $stmt->execute();
+        } catch (DBALException | Exception $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         } catch (\PDOException $e) {
@@ -134,7 +153,7 @@ class PdoStore implements PersistingStoreInterface
             $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
+        if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->gcProbability)) {
             $this->prune();
         }
 
@@ -162,7 +181,7 @@ class PdoStore implements PersistingStoreInterface
         $result = $stmt->execute();
 
         // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
-        if (!($result instanceof Result ? $result : $stmt)->rowCount() && !$this->exists($key)) {
+        if (!(\is_object($result) ? $result : $stmt)->rowCount() && !$this->exists($key)) {
             throw new LockConflictedException();
         }
 
@@ -194,7 +213,7 @@ class PdoStore implements PersistingStoreInterface
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $result = $stmt->execute();
 
-        return (bool) ($result instanceof Result ? $result->fetchOne() : $stmt->fetchColumn());
+        return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**
@@ -240,6 +259,7 @@ class PdoStore implements PersistingStoreInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
+     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable(): void
@@ -336,7 +356,6 @@ class PdoStore implements PersistingStoreInterface
             switch (true) {
                 case $driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver:
                     throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
-
                 case $driver instanceof \Doctrine\DBAL\Driver\AbstractMySQLDriver:
                     $this->driver = 'mysql';
                     break;

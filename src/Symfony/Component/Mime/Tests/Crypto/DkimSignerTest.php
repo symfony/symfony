@@ -119,39 +119,39 @@ EOF;
     public function getCanonicalizeHeaderData()
     {
         yield 'simple_empty' => [
-            DkimSigner::CANON_SIMPLE, "\r\n", '', PHP_INT_MAX,
+            DkimSigner::CANON_SIMPLE, "\r\n", '', \PHP_INT_MAX,
         ];
         yield 'relaxed_empty' => [
-            DkimSigner::CANON_RELAXED, "\r\n", '', PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, "\r\n", '', \PHP_INT_MAX,
         ];
 
         yield 'simple_empty_single_ending_CLRF' => [
-            DkimSigner::CANON_SIMPLE, "\r\n", "\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_SIMPLE, "\r\n", "\r\n", \PHP_INT_MAX,
         ];
         yield 'relaxed_empty_single_ending_CLRF' => [
-            DkimSigner::CANON_RELAXED, "\r\n", "\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, "\r\n", "\r\n", \PHP_INT_MAX,
         ];
 
         yield 'simple_multiple_ending_CLRF' => [
-            DkimSigner::CANON_SIMPLE, "Some body\r\n", "Some body\r\n\r\n\r\n\r\n\r\n\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_SIMPLE, "Some body\r\n", "Some body\r\n\r\n\r\n\r\n\r\n\r\n", \PHP_INT_MAX,
         ];
         yield 'relaxed_multiple_ending_CLRF' => [
-            DkimSigner::CANON_RELAXED, "Some body\r\n", "Some body\r\n\r\n\r\n\r\n\r\n\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, "Some body\r\n", "Some body\r\n\r\n\r\n\r\n\r\n\r\n", \PHP_INT_MAX,
         ];
 
         yield 'simple_basic' => [
-            DkimSigner::CANON_SIMPLE, "Some body\r\n", "Some body\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_SIMPLE, "Some body\r\n", "Some body\r\n", \PHP_INT_MAX,
         ];
         yield 'relaxed_basic' => [
-            DkimSigner::CANON_RELAXED, "Some body\r\n", "Some body\r\n", PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, "Some body\r\n", "Some body\r\n", \PHP_INT_MAX,
         ];
 
         $body = "Some    body      with whitespaces\r\n";
         yield 'simple_with_many_inline_whitespaces' => [
-            DkimSigner::CANON_SIMPLE, $body, $body, PHP_INT_MAX,
+            DkimSigner::CANON_SIMPLE, $body, $body, \PHP_INT_MAX,
         ];
         yield 'relaxed_with_many_inline_whitespaces' => [
-            DkimSigner::CANON_RELAXED, "Some body with whitespaces\r\n", $body, PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, "Some body with whitespaces\r\n", $body, \PHP_INT_MAX,
         ];
 
         yield 'simple_basic_with_length' => [

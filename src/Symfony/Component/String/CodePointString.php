@@ -65,7 +65,7 @@ class CodePointString extends AbstractUnicodeString
         $str = clone $this;
         $chunks = [];
 
-        foreach (preg_split($rx, $this->string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY) as $chunk) {
+        foreach (preg_split($rx, $this->string, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) as $chunk) {
             $str->string = $chunk;
             $chunks[] = clone $str;
         }

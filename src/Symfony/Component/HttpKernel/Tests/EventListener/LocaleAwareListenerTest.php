@@ -47,13 +47,15 @@ class LocaleAwareListenerTest extends TestCase
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
     {
         $this->localeAwareService
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('setLocale')
-            ->will($this->throwException(new \InvalidArgumentException()));
-        $this->localeAwareService
-            ->expects($this->at(1))
-            ->method('setLocale')
-            ->with($this->equalTo('en'));
+            ->withConsecutive(
+                [$this->anything()],
+                ['en']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \InvalidArgumentException())
+            );
 
         $event = new RequestEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -89,13 +91,15 @@ class LocaleAwareListenerTest extends TestCase
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
     {
         $this->localeAwareService
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('setLocale')
-            ->will($this->throwException(new \InvalidArgumentException()));
-        $this->localeAwareService
-            ->expects($this->at(1))
-            ->method('setLocale')
-            ->with($this->equalTo('en'));
+            ->withConsecutive(
+                [$this->anything()],
+                ['en']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \InvalidArgumentException())
+            );
 
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));

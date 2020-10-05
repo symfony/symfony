@@ -68,6 +68,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
             $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
+            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -83,6 +84,8 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
+
+        $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
 
         $message = $transport->send($mail);
 

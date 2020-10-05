@@ -26,7 +26,7 @@ final class ExpectDeprecationTraitTest extends TestCase
     public function testOne()
     {
         $this->expectDeprecation('foo');
-        @trigger_error('foo', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
     }
 
     /**
@@ -38,7 +38,7 @@ final class ExpectDeprecationTraitTest extends TestCase
     public function testOneInIsolation()
     {
         $this->expectDeprecation('foo');
-        @trigger_error('foo', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
     }
 
     /**
@@ -50,8 +50,8 @@ final class ExpectDeprecationTraitTest extends TestCase
     {
         $this->expectDeprecation('foo');
         $this->expectDeprecation('bar');
-        @trigger_error('foo', E_USER_DEPRECATED);
-        @trigger_error('bar', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
+        @trigger_error('bar', \E_USER_DEPRECATED);
     }
 
     /**
@@ -64,8 +64,8 @@ final class ExpectDeprecationTraitTest extends TestCase
     public function testOneWithAnnotation()
     {
         $this->expectDeprecation('bar');
-        @trigger_error('foo', E_USER_DEPRECATED);
-        @trigger_error('bar', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
+        @trigger_error('bar', \E_USER_DEPRECATED);
     }
 
     /**
@@ -80,9 +80,9 @@ final class ExpectDeprecationTraitTest extends TestCase
     {
         $this->expectDeprecation('ccc');
         $this->expectDeprecation('fcy');
-        @trigger_error('foo', E_USER_DEPRECATED);
-        @trigger_error('bar', E_USER_DEPRECATED);
-        @trigger_error('ccc', E_USER_DEPRECATED);
-        @trigger_error('fcy', E_USER_DEPRECATED);
+        @trigger_error('foo', \E_USER_DEPRECATED);
+        @trigger_error('bar', \E_USER_DEPRECATED);
+        @trigger_error('ccc', \E_USER_DEPRECATED);
+        @trigger_error('fcy', \E_USER_DEPRECATED);
     }
 }

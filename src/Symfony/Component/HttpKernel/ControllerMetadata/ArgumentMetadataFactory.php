@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
+use Symfony\Component\HttpKernel\Attribute\ArgumentInterface;
+use Symfony\Component\HttpKernel\Exception\InvalidMetadataException;
+
 /**
  * Builds {@see ArgumentMetadata} objects based on the given Controller.
  *
@@ -34,7 +37,28 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param, $reflection), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull());
+            $attribute = null;
+            if (\PHP_VERSION_ID >= 80000) {
+                $reflectionAttributes = $param->getAttributes(ArgumentInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+                if (\count($reflectionAttributes) > 1) {
+                    $representative = $controller;
+
+                    if (\is_array($representative)) {
+                        $representative = sprintf('%s::%s()', \get_class($representative[0]), $representative[1]);
+                    } elseif (\is_object($representative)) {
+                        $representative = \get_class($representative);
+                    }
+
+                    throw new InvalidMetadataException(sprintf('Controller "%s" has more than one attribute for "$%s" argument.', $representative, $param->getName()));
+                }
+
+                if (isset($reflectionAttributes[0])) {
+                    $attribute = $reflectionAttributes[0]->newInstance();
+                }
+            }
+
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param, $reflection), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull(), $attribute);
         }
 
         return $arguments;

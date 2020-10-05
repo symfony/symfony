@@ -1897,6 +1897,30 @@ YAML
                 [new TaggedValue('foo', 'bar')],
                 '[ !foo bar ]',
             ],
+            'with-comments' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz
+    #bar
+  ]]
+YAML
+            ],
+            'with-comments-trailing-comma' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz,
+    #bar
+  ]]
+YAML
+            ],
         ];
     }
 
@@ -2074,6 +2098,34 @@ YAML;
         $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
 
         $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+    }
+
+    public function testPhpConstantTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - foo: 'value_0'
+    !php/const 'Symfony\Component\Yaml\Tests\B::BAR': 'value_1'
+map2:
+  - !php/const 'Symfony\Component\Yaml\Tests\B::FOO': 'value_0'
+    bar: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['foo' => 'value_0', 'bar' => 'value_1']],
+            'map2' => [['foo' => 'value_0', 'bar' => 'value_1']],
+        ], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - !!str 0: 'value_0'
+    !!str 1: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['0' => 'value_0', '1' => 'value_1']],
+        ], $this->parser->parse($yaml));
     }
 
     public function testMergeKeysWhenMappingsAreParsedAsObjects()
@@ -2338,7 +2390,7 @@ YAML;
 parameters:
     abc
 
-# Comment 
+# Comment
 YAML;
 
         $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
@@ -2384,6 +2436,33 @@ YAML;
             ],
             $this->parser->parse($yaml)
         );
+    }
+
+    /**
+     * This is a regression test for a bug where a YAML block with a nested multiline string using | was parsed without
+     * a trailing \n when a shorter YAML document was parsed before.
+     *
+     * When a shorter document was parsed before, the nested string did not have a \n at the end of the string, because
+     * the Parser thought it was the end of the file, even though it is not.
+     */
+    public function testParsingMultipleDocuments()
+    {
+        $shortDocument = 'foo: bar';
+        $longDocument = <<<YAML
+a:
+    b: |
+        row
+        row2
+c: d
+YAML;
+
+        // The first parsing set and fixed the totalNumberOfLines in the Parser before, so parsing the short document here
+        // to reproduce the issue. If the issue would not have been fixed, the next assertion will fail
+        $this->parser->parse($shortDocument);
+
+        // After the total number of lines has been reset the result will be the same as if a new parser was used
+        // (before, there was no \n after row2)
+        $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
 }
 

@@ -39,6 +39,7 @@
                 "by_reference",
                 "data",
                 "disabled",
+                "getter",
                 "help",
                 "help_attr",
                 "help_html",
@@ -57,6 +58,7 @@
                 "property_path",
                 "required",
                 "row_attr",
+                "setter",
                 "translation_domain",
                 "upload_max_size_message"
             ]

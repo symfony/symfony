@@ -35,7 +35,7 @@ trait TranslatorTrait
      */
     public function getLocale()
     {
-        return $this->locale ?: \Locale::getDefault();
+        return $this->locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en');
     }
 
     /**
@@ -92,8 +92,8 @@ EOF;
                         }
                     }
                 } else {
-                    $leftNumber = '-Inf' === $matches['left'] ? -INF : (float) $matches['left'];
-                    $rightNumber = is_numeric($matches['right']) ? (float) $matches['right'] : INF;
+                    $leftNumber = '-Inf' === $matches['left'] ? -\INF : (float) $matches['left'];
+                    $rightNumber = is_numeric($matches['right']) ? (float) $matches['right'] : \INF;
 
                     if (('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
                         && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)

@@ -36,7 +36,7 @@ class IntlFormatterTest extends \PHPUnit\Framework\TestCase
 
     public function testFormatWithNamedArguments()
     {
-        if (version_compare(INTL_ICU_VERSION, '4.8', '<')) {
+        if (version_compare(\INTL_ICU_VERSION, '4.8', '<')) {
             $this->markTestSkipped('Format with named arguments can only be run with ICU 4.8 or higher and PHP >= 5.5');
         }
 

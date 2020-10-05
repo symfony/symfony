@@ -23,16 +23,21 @@
     "require-dev": {
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "phpdocumentor/reflection-docblock": "^3.2|^4.0",
+        "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "symfony/cache": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/error-handler": "^4.4|^5.0",
+        "symfony/filesystem": "^4.4|^5.0",
+        "symfony/form": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
+        "symfony/uid": "^5.1",
         "symfony/validator": "^4.4|^5.0",
+        "symfony/var-exporter": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0"
     },
     "conflict": {
@@ -50,7 +55,8 @@
         "symfony/property-access": "For using the ObjectNormalizer.",
         "symfony/mime": "For using a MIME type guesser within the DataUriNormalizer.",
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
-        "doctrine/cache": "For using the default cached annotation reader and metadata cache."
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+        "symfony/var-exporter": "For using the metadata compiler."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },

@@ -338,9 +338,9 @@ class ObjectNormalizerTest extends TestCase
 
     // circular reference
 
-    protected function getNormalizerForCircularReference(): ObjectNormalizer
+    protected function getNormalizerForCircularReference(array $defaultContext): ObjectNormalizer
     {
-        $normalizer = new ObjectNormalizer();
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -568,6 +568,17 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => function () {
         }]));
+    }
+
+    public function testDefaultExcludeFromCacheKey()
+    {
+        $normalizer = new class(null, null, null, null, null, null, [ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['foo']]) extends ObjectNormalizer {
+            protected function isCircularReference($object, &$context)
+            {
+                ObjectNormalizerTest::assertContains('foo', $this->defaultContext[ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY]);
+            }
+        };
+        $normalizer->normalize(new ObjectDummy());
     }
 
     public function testThrowUnexpectedValueException()

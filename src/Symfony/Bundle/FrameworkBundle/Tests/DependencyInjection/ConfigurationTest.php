@@ -379,6 +379,14 @@ class ConfigurationTest extends TestCase
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
                 'enabled_locales' => [],
+                'pseudo_localization' => [
+                    'enabled' => false,
+                    'accents' => true,
+                    'expansion_factor' => 1.0,
+                    'brackets' => true,
+                    'parse_html' => false,
+                    'localizable_html_attributes' => [],
+                ],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -407,6 +415,8 @@ class ConfigurationTest extends TestCase
             ],
             'property_access' => [
                 'magic_call' => false,
+                'magic_get' => true,
+                'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],
@@ -453,6 +463,7 @@ class ConfigurationTest extends TestCase
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
+                'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [
                 'enabled' => false,
@@ -519,6 +530,10 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
+            ],
+            'rate_limiter' => [
+                'enabled' => false,
+                'limiters' => [],
             ],
         ];
     }

@@ -37,15 +37,16 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testDenormalize()
     {
-        $this->serializer->expects($this->at(0))
+        $this->serializer->expects($this->exactly(2))
             ->method('denormalize')
-            ->with(['foo' => 'one', 'bar' => 'two'])
-            ->willReturn(new ArrayDummy('one', 'two'));
-
-        $this->serializer->expects($this->at(1))
-            ->method('denormalize')
-            ->with(['foo' => 'three', 'bar' => 'four'])
-            ->willReturn(new ArrayDummy('three', 'four'));
+            ->withConsecutive(
+                [['foo' => 'one', 'bar' => 'two']],
+                [['foo' => 'three', 'bar' => 'four']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ArrayDummy('one', 'two'),
+                new ArrayDummy('three', 'four')
+            );
 
         $result = $this->denormalizer->denormalize(
             [

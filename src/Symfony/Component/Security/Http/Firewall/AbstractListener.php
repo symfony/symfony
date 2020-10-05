@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractListener
+abstract class AbstractListener implements FirewallListenerInterface
 {
     final public function __invoke(RequestEvent $event)
     {
@@ -39,4 +39,9 @@ abstract class AbstractListener
      * Does whatever is required to authenticate the request, typically calling $event->setResponse() internally.
      */
     abstract public function authenticate(RequestEvent $event);
+
+    public static function getPriority(): int
+    {
+        return 0; // Default
+    }
 }

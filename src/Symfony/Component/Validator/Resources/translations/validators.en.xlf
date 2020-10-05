@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>Each element of this collection should satisfy its own set of constraints.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>This value is not a valid International Securities Identification Number (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

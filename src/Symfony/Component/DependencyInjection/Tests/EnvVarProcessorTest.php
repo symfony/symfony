@@ -196,7 +196,7 @@ class EnvVarProcessorTest extends TestCase
     {
         return [
             ['Symfony\Component\DependencyInjection\Tests\EnvVarProcessorTest::TEST_CONST', self::TEST_CONST],
-            ['E_ERROR', E_ERROR],
+            ['E_ERROR', \E_ERROR],
         ];
     }
 

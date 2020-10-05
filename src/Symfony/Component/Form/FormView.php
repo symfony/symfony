@@ -148,7 +148,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns an iterator to iterate over children (implements \IteratorAggregate).
      *
-     * @return \ArrayIterator|FormView[] The iterator
+     * @return \ArrayIterator<string, FormView> The iterator
      */
     public function getIterator()
     {

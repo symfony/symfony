@@ -111,7 +111,7 @@ trait HttpClientTrait
             throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string or an array, "%s" given.', get_debug_type($options['auth_basic'])));
         }
 
-        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._=~+/0-9a-zA-Z]++$}', $options['auth_bearer']))) {
+        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._=:~+/0-9a-zA-Z]++$}', $options['auth_bearer']))) {
             throw new InvalidArgumentException(sprintf('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, %s given.', \is_string($options['auth_bearer']) ? 'invalid string' : '"'.get_debug_type($options['auth_bearer']).'"'));
         }
 
@@ -198,16 +198,22 @@ trait HttpClientTrait
                 continue;
             }
 
+            if ('auth_ntlm' === $name) {
+                if (!\extension_loaded('curl')) {
+                    $msg = 'try installing the "curl" extension to use "%s" instead.';
+                } else {
+                    $msg = 'try using "%s" instead.';
+                }
+
+                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", '.$msg, __CLASS__, CurlHttpClient::class));
+            }
+
             $alternatives = [];
 
             foreach ($defaultOptions as $key => $v) {
                 if (levenshtein($name, $key) <= \strlen($name) / 3 || false !== strpos($key, $name)) {
                     $alternatives[] = $key;
                 }
-            }
-
-            if ('auth_ntlm' === $name) {
-                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", try using CurlHttpClient instead.', __CLASS__));
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported option "%s" passed to "%s", did you mean "%s"?', $name, __CLASS__, implode('", "', $alternatives ?: array_keys($defaultOptions))));
@@ -269,7 +275,7 @@ trait HttpClientTrait
     private static function normalizeBody($body)
     {
         if (\is_array($body)) {
-            return http_build_query($body, '', '&', PHP_QUERY_RFC1738);
+            return http_build_query($body, '', '&', \PHP_QUERY_RFC1738);
         }
 
         if (\is_string($body)) {
@@ -352,15 +358,15 @@ trait HttpClientTrait
      */
     private static function jsonEncode($value, int $flags = null, int $maxDepth = 512): string
     {
-        $flags = $flags ?? (JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION);
+        $flags = $flags ?? (\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION);
 
         try {
-            $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0), $maxDepth);
+            $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0), $maxDepth);
         } catch (\JsonException $e) {
             throw new InvalidArgumentException('Invalid value for "json" option: '.$e->getMessage());
         }
 
-        if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & \JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new InvalidArgumentException('Invalid value for "json" option: '.json_last_error_msg());
         }
 
@@ -455,7 +461,7 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Unsupported IDN "%s", try enabling the "intl" PHP extension or running "composer require symfony/polyfill-intl-idn".', $host));
             }
 
-            $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) ?: strtolower($host) : strtolower($host);
+            $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, \IDNA_DEFAULT, \INTL_IDNA_VARIANT_UTS46) ?: strtolower($host) : strtolower($host);
             $host .= $port ? ':'.$port : '';
         }
 
@@ -540,7 +546,7 @@ trait HttpClientTrait
             }
         }
 
-        $queryString = http_build_query($queryArray, '', '&', PHP_QUERY_RFC3986);
+        $queryString = http_build_query($queryArray, '', '&', \PHP_QUERY_RFC3986);
         $queryArray = [];
 
         if ($queryString) {

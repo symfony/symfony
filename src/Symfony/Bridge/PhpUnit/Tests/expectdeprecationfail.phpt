@@ -8,7 +8,7 @@ passthru('php '.getenv('SYMFONY_SIMPLE_PHPUNIT_BIN_DIR').'/simple-phpunit.php --
 --EXPECTF--
 PHPUnit %s by Sebastian Bergmann and contributors.
 
-Testing Symfony\Bridge\PhpUnit\Tests\FailTests\ExpectDeprecationTraitTestFail
+%ATesting Symfony\Bridge\PhpUnit\Tests\FailTests\ExpectDeprecationTraitTestFail
 FF                                                                  2 / 2 (100%)
 
 Time: %s, Memory: %s

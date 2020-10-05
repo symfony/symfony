@@ -125,6 +125,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.cache_dir', __DIR__);
+        $container->setParameter('kernel.build_dir', __DIR__);
         $container->setParameter('kernel.charset', 'UTF-8');
         $container->setParameter('kernel.container_class', 'cc');
         $container->setParameter('kernel.debug', true);

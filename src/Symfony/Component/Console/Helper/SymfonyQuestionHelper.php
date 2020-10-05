@@ -33,6 +33,10 @@ class SymfonyQuestionHelper extends QuestionHelper
         $text = OutputFormatter::escapeTrailingBackslash($question->getQuestion());
         $default = $question->getDefault();
 
+        if ($question->isMultiline()) {
+            $text .= sprintf(' (press %s to continue)', $this->getEofShortcut());
+        }
+
         switch (true) {
             case null === $default:
                 $text = sprintf(' <info>%s</info>:', $text);
@@ -92,5 +96,14 @@ class SymfonyQuestionHelper extends QuestionHelper
         }
 
         parent::writeError($output, $error);
+    }
+
+    private function getEofShortcut(): string
+    {
+        if (false !== strpos(\PHP_OS, 'WIN')) {
+            return '<comment>Ctrl+Z</comment> then <comment>Enter</comment>';
+        }
+
+        return '<comment>Ctrl+D</comment>';
     }
 }

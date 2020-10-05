@@ -1,0 +1,102 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\RateLimiter;
+
+use Symfony\Component\RateLimiter\Util\TimeUtil;
+
+/**
+ * Data object representing the fill rate of a token bucket.
+ *
+ * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @experimental in 5.2
+ */
+final class Rate
+{
+    private $refillTime;
+    private $refillAmount;
+
+    public function __construct(\DateInterval $refillTime, int $refillAmount = 1)
+    {
+        $this->refillTime = $refillTime;
+        $this->refillAmount = $refillAmount;
+    }
+
+    public static function perSecond(int $rate = 1): self
+    {
+        return new static(new \DateInterval('PT1S'), $rate);
+    }
+
+    public static function perMinute(int $rate = 1): self
+    {
+        return new static(new \DateInterval('PT1M'), $rate);
+    }
+
+    public static function perHour(int $rate = 1): self
+    {
+        return new static(new \DateInterval('PT1H'), $rate);
+    }
+
+    public static function perDay(int $rate = 1): self
+    {
+        return new static(new \DateInterval('P1D'), $rate);
+    }
+
+    /**
+     * @param string $string using the format: "%interval_spec%-%rate%", {@see DateInterval}
+     */
+    public static function fromString(string $string): self
+    {
+        [$interval, $rate] = explode('-', $string, 2);
+
+        return new static(new \DateInterval($interval), $rate);
+    }
+
+    /**
+     * Calculates the time needed to free up the provided number of tokens.
+     *
+     * @return int the time in seconds
+     */
+    public function calculateTimeForTokens(int $tokens): int
+    {
+        $cyclesRequired = ceil($tokens / $this->refillAmount);
+
+        return TimeUtil::dateIntervalToSeconds($this->refillTime) * $cyclesRequired;
+    }
+
+    /**
+     * Calculates the next moment of token availability.
+     *
+     * @return \DateTimeImmutable the next moment a token will be available
+     */
+    public function calculateNextTokenAvailability(): \DateTimeImmutable
+    {
+        return (new \DateTimeImmutable())->add($this->refillTime);
+    }
+
+    /**
+     * Calculates the number of new free tokens during $duration.
+     *
+     * @param float $duration interval in seconds
+     */
+    public function calculateNewTokensDuringInterval(float $duration): int
+    {
+        $cycles = floor($duration / TimeUtil::dateIntervalToSeconds($this->refillTime));
+
+        return $cycles * $this->refillAmount;
+    }
+
+    public function __toString(): string
+    {
+        return $this->refillTime->format('P%dDT%HH%iM%sS').'-'.$this->refillAmount;
+    }
+}

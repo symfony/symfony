@@ -54,6 +54,82 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             '(',
             self::MESSAGE_TOKEN,
         ],
+        [
+            'new',
+            'Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+            ',',
+            self::METHOD_ARGUMENTS_TOKEN,
+            ',',
+            self::DOMAIN_TOKEN,
+        ],
+        [
+            'new',
+            'Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+        ],
+        [
+            'new',
+            '\\',
+            'Symfony',
+            '\\',
+            'Component',
+            '\\',
+            'Translation',
+            '\\',
+            'Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+            ',',
+            self::METHOD_ARGUMENTS_TOKEN,
+            ',',
+            self::DOMAIN_TOKEN,
+        ],
+        [
+            'new',
+            '\Symfony\Component\Translation\Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+            ',',
+            self::METHOD_ARGUMENTS_TOKEN,
+            ',',
+            self::DOMAIN_TOKEN,
+        ],
+        [
+            'new',
+            '\\',
+            'Symfony',
+            '\\',
+            'Component',
+            '\\',
+            'Translation',
+            '\\',
+            'Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+        ],
+        [
+            'new',
+            '\Symfony\Component\Translation\Translatable',
+            '(',
+            self::MESSAGE_TOKEN,
+        ],
+        [
+            't',
+            '(',
+            self::MESSAGE_TOKEN,
+            ',',
+            self::METHOD_ARGUMENTS_TOKEN,
+            ',',
+            self::DOMAIN_TOKEN,
+        ],
+        [
+            't',
+            '(',
+            self::MESSAGE_TOKEN,
+        ],
     ];
 
     /**
@@ -100,7 +176,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if (T_WHITESPACE !== $t[0]) {
+            if (\T_WHITESPACE !== $t[0]) {
                 break;
             }
         }
@@ -148,23 +224,23 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             }
 
             switch ($t[0]) {
-                case T_START_HEREDOC:
+                case \T_START_HEREDOC:
                     $docToken = $t[1];
                     break;
-                case T_ENCAPSED_AND_WHITESPACE:
-                case T_CONSTANT_ENCAPSED_STRING:
+                case \T_ENCAPSED_AND_WHITESPACE:
+                case \T_CONSTANT_ENCAPSED_STRING:
                     if ('' === $docToken) {
                         $message .= PhpStringTokenParser::parse($t[1]);
                     } else {
                         $docPart = $t[1];
                     }
                     break;
-                case T_END_HEREDOC:
+                case \T_END_HEREDOC:
                     $message .= PhpStringTokenParser::parseDocString($docToken, $docPart);
                     $docToken = '';
                     $docPart = '';
                     break;
-                case T_WHITESPACE:
+                case \T_WHITESPACE:
                     break;
                 default:
                     break 2;
@@ -232,7 +308,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     protected function canBeExtracted(string $file)
     {
-        return $this->isFile($file) && 'php' === pathinfo($file, PATHINFO_EXTENSION);
+        return $this->isFile($file) && 'php' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
     /**

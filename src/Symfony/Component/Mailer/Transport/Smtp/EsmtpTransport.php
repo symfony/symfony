@@ -166,7 +166,11 @@ class EsmtpTransport extends SmtpTransport
 
                 return;
             } catch (TransportExceptionInterface $e) {
-                $this->executeCommand("RSET\r\n", [250]);
+                try {
+                    $this->executeCommand("RSET\r\n", [250]);
+                } catch (TransportExceptionInterface $_) {
+                    // ignore this exception as it probably means that the server error was final
+                }
 
                 // keep the error message, but tries the other authenticators
                 $errors[$authenticator->getAuthKeyword()] = $e;

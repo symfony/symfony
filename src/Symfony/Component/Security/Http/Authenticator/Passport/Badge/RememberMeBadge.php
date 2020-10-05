@@ -26,7 +26,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class RememberMeBadge implements BadgeInterface
 {

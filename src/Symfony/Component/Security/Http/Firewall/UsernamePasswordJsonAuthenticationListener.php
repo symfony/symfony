@@ -34,6 +34,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * UsernamePasswordJsonAuthenticationListener is a stateless implementation of
@@ -56,6 +57,11 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
     private $eventDispatcher;
     private $propertyAccessor;
     private $sessionStrategy;
+
+    /**
+     * @var TranslatorInterface|null
+     */
+    private $translator;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, string $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -177,12 +183,18 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         }
 
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
         }
 
         if (!$this->failureHandler) {
-            return new JsonResponse(['error' => $failed->getMessageKey()], 401);
+            $errorMessage = $failed->getMessageKey();
+
+            if (null !== $this->translator) {
+                $errorMessage = $this->translator->trans($failed->getMessageKey(), $failed->getMessageData(), 'security');
+            }
+
+            return new JsonResponse(['error' => $errorMessage], 401);
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
@@ -202,6 +214,11 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
     public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
     {
         $this->sessionStrategy = $sessionStrategy;
+    }
+
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     private function migrateSession(Request $request, TokenInterface $token)

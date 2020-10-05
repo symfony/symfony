@@ -21,22 +21,23 @@ class SwitchUserTokenTest extends TestCase
     public function testSerialize()
     {
         $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
-        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken);
+        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken, 'https://symfony.com/blog');
 
         $unserializedToken = unserialize(serialize($token));
 
         $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
         $this->assertSame('admin', $unserializedToken->getUsername());
         $this->assertSame('bar', $unserializedToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedToken->getProviderKey());
+        $this->assertSame('provider-key', $unserializedToken->getFirewallName());
         $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
+        $this->assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
 
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
         $this->assertSame('user', $unserializedOriginalToken->getUsername());
         $this->assertSame('foo', $unserializedOriginalToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedOriginalToken->getProviderKey());
+        $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 
@@ -72,5 +73,15 @@ class SwitchUserTokenTest extends TestCase
         $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
         $token->setUser($impersonated);
         $this->assertTrue($token->isAuthenticated());
+    }
+
+    public function testSerializeNullImpersonateUrl()
+    {
+        $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken);
+
+        $unserializedToken = unserialize(serialize($token));
+
+        $this->assertNull($unserializedToken->getOriginatedFromUri());
     }
 }

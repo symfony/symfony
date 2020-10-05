@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
@@ -32,7 +33,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
- * @experimental in Symfony 5.1
+ * @experimental in 5.2
  */
 abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthenticatorInterface
 {
@@ -86,10 +87,9 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
 
     public function authenticate(Request $request): PassportInterface
     {
-        $username = $request->attributes->get('_pre_authenticated_username');
-        $user = $this->userProvider->loadUserByUsername($username);
-
-        return new SelfValidatingPassport($user, [new PreAuthenticatedUserBadge()]);
+        return new SelfValidatingPassport(new UserBadge($request->attributes->get('_pre_authenticated_username'), function ($username) {
+            return $this->userProvider->loadUserByUsername($username);
+        }), [new PreAuthenticatedUserBadge()]);
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
@@ -117,7 +117,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
     private function clearToken(AuthenticationException $exception): void
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getProviderKey()) {
+        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {

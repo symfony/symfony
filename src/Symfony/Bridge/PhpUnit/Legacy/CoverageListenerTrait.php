@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use PHPUnit\Util\Annotation\Registry;
 use PHPUnit\Util\Test;
 
 /**
@@ -66,9 +67,6 @@ class CoverageListenerTrait
             return;
         }
 
-        $r = new \ReflectionProperty(Test::class, 'annotationCache');
-        $r->setAccessible(true);
-
         $covers = $sutFqcn;
         if (!\is_array($sutFqcn)) {
             $covers = [$sutFqcn];
@@ -78,13 +76,47 @@ class CoverageListenerTrait
             }
         }
 
+        if (class_exists(Registry::class)) {
+            $this->addCoversForDocBlockInsideRegistry($test, $covers);
+
+            return;
+        }
+
+        $this->addCoversForClassToAnnotationCache($test, $covers);
+    }
+
+    private function addCoversForClassToAnnotationCache($test, $covers)
+    {
+        $r = new \ReflectionProperty(Test::class, 'annotationCache');
+        $r->setAccessible(true);
+
         $cache = $r->getValue();
         $cache = array_replace_recursive($cache, [
             \get_class($test) => [
                 'covers' => $covers,
             ],
         ]);
+
         $r->setValue(Test::class, $cache);
+    }
+
+    private function addCoversForDocBlockInsideRegistry($test, $covers)
+    {
+        $docBlock = Registry::getInstance()->forClassName(\get_class($test));
+
+        $symbolAnnotations = new \ReflectionProperty($docBlock, 'symbolAnnotations');
+        $symbolAnnotations->setAccessible(true);
+
+        // Exclude internal classes; PHPUnit 9.1+ is picky about tests covering, say, a \RuntimeException
+        $covers = array_filter($covers, function ($class) {
+            $reflector = new \ReflectionClass($class);
+
+            return $reflector->isUserDefined();
+        });
+
+        $symbolAnnotations->setValue($docBlock, array_replace($docBlock->symbolAnnotations(), [
+            'covers' => $covers,
+        ]));
     }
 
     private function findSutFqcn($test)

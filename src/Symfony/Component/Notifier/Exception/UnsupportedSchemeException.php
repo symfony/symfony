@@ -34,6 +34,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mattermost\MattermostTransportFactory::class,
             'package' => 'symfony/mattermost-notifier',
         ],
+        'googlechat' => [
+            'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
+            'package' => 'symfony/googlechat-notifier',
+        ],
         'nexmo' => [
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',
@@ -45,6 +49,10 @@ class UnsupportedSchemeException extends LogicException
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
+        ],
+        'infobip' => [
+            'class' => Bridge\Infobip\InfobipTransportFactory::class,
+            'package' => 'symfony/infobip-notifier',
         ],
         'firebase' => [
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
@@ -61,6 +69,18 @@ class UnsupportedSchemeException extends LogicException
         'sinch' => [
             'class' => Bridge\Sinch\SinchTransportFactory::class,
             'package' => 'symfony/sinch-notifier',
+        ],
+        'zulip' => [
+            'class' => Bridge\Zulip\ZulipTransportFactory::class,
+            'package' => 'symfony/zulip-notifier',
+        ],
+        'smsapi' => [
+            'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
+            'package' => 'symfony/smsapi-notifier',
+        ],
+        'esendex' => [
+            'class' => Bridge\Esendex\EsendexTransportFactory::class,
+            'package' => 'symfony/esendex-notifier',
         ],
     ];
 

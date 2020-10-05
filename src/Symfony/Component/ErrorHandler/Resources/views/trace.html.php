@@ -13,7 +13,7 @@
         $lineNumber = $trace['line'] ?: 1;
         $fileLink = $this->getFileLink($trace['file'], $lineNumber);
         $filePath = strtr(strip_tags($this->formatFile($trace['file'], $lineNumber)), [' at line '.$lineNumber => '']);
-        $filePathParts = explode(DIRECTORY_SEPARATOR, $filePath);
+        $filePathParts = explode(\DIRECTORY_SEPARATOR, $filePath);
         ?>
         <span class="block trace-file-path">
             in

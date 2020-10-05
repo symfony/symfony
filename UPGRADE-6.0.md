@@ -48,6 +48,7 @@ Form
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.
  * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
  * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been removed, use `\NumberFormatter::ROUND_*` instead.
+ * Removed `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
 
 FrameworkBundle
 ---------------
@@ -76,6 +77,12 @@ Inflector
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
 
+Lock
+----
+
+ * Removed the `NotSupportedException`. It shouldn't be thrown anymore.
+ * Removed the `RetryTillSaveStore`. Logic has been moved in `Lock` and is not needed anymore.
+
 Mailer
 ------
 
@@ -97,6 +104,12 @@ Mime
 
  * Removed `Address::fromString()`, use `Address::create()` instead
 
+Monolog
+-------
+
+ * The `$actionLevel` constructor argument of `Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy` has been replaced by the `$inner` one which expects an ActivationStrategyInterface to decorate instead. `Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy` is now final.
+ * The `$actionLevel` constructor argument of `Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy` has been replaced by the `$inner` one which expects an ActivationStrategyInterface to decorate instead. `Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy` is now final.
+
 OptionsResolver
 ---------------
 
@@ -107,6 +120,17 @@ PhpUnitBridge
 -------------
 
  * Removed support for `@expectedDeprecation` annotations, use the `ExpectDeprecationTrait::expectDeprecation()` method instead.
+
+PropertyAccess
+--------------
+
+ * Dropped support of a boolean as the first argument of `PropertyAccessor::__construct()`.
+   Pass a combination of bitwise flags instead.
+
+PropertyInfo
+------------
+
+ * Dropped the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()` in favor of `enable_magic_methods_extraction`.
 
 Routing
 -------
@@ -122,6 +146,10 @@ Security
  * Removed `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
  * Added a `logout(Request $request, Response $response, TokenInterface $token)` method to the `RememberMeServicesInterface`.
+ * Removed `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()`
+   in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`,
+   `DefaultAuthenticationSuccessHandler`.
+ * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
 
 TwigBundle
 ----------
@@ -155,6 +183,8 @@ Validator
     * })
     */
    ```
+
+ * Removed the `NumberConstraintTrait` trait.
 
 Yaml
 ----

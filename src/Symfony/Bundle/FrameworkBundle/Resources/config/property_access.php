@@ -18,7 +18,7 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('property_accessor', PropertyAccessor::class)
             ->args([
-                abstract_arg('magicCall, set by the extension'),
+                abstract_arg('magic methods allowed, set by the extension'),
                 abstract_arg('throwExceptionOnInvalidIndex, set by the extension'),
                 service('cache.property_access')->ignoreOnInvalid(),
                 abstract_arg('throwExceptionOnInvalidPropertyPath, set by the extension'),

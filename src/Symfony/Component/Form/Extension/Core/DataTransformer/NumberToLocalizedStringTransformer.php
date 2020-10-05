@@ -154,7 +154,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (false !== strpos($value, $decSep)) {
             $type = \NumberFormatter::TYPE_DOUBLE;
         } else {
-            $type = PHP_INT_SIZE === 8
+            $type = \PHP_INT_SIZE === 8
                 ? \NumberFormatter::TYPE_INT64
                 : \NumberFormatter::TYPE_INT32;
         }
@@ -165,7 +165,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
-        if ($result >= PHP_INT_MAX || $result <= -PHP_INT_MAX) {
+        if ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX) {
             throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like.');
         }
 
@@ -237,7 +237,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     {
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding
-            $roundingCoef = pow(10, $this->scale);
+            $roundingCoef = 10 ** $this->scale;
             // string representation to avoid rounding errors, similar to bcmul()
             $number = (string) ($number * $roundingCoef);
 
@@ -255,13 +255,13 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
                     $number = $number > 0 ? floor($number) : ceil($number);
                     break;
                 case \NumberFormatter::ROUND_HALFEVEN:
-                    $number = round($number, 0, PHP_ROUND_HALF_EVEN);
+                    $number = round($number, 0, \PHP_ROUND_HALF_EVEN);
                     break;
                 case \NumberFormatter::ROUND_HALFUP:
-                    $number = round($number, 0, PHP_ROUND_HALF_UP);
+                    $number = round($number, 0, \PHP_ROUND_HALF_UP);
                     break;
                 case \NumberFormatter::ROUND_HALFDOWN:
-                    $number = round($number, 0, PHP_ROUND_HALF_DOWN);
+                    $number = round($number, 0, \PHP_ROUND_HALF_DOWN);
                     break;
             }
 

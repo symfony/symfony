@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+
 class GroupSequenceProviderChildEntity extends GroupSequenceProviderEntity
 {
 }

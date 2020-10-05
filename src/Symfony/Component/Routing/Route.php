@@ -539,7 +539,7 @@ class Route implements \Serializable
             return $pattern;
         }
 
-        return preg_replace_callback('#\{(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
+        return preg_replace_callback('#\{(!?\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
             if (isset($m[3][0])) {
                 $this->setDefault($m[1], '?' !== $m[3] ? substr($m[3], 1) : null);
             }

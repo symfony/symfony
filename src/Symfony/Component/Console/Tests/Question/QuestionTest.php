@@ -297,4 +297,18 @@ class QuestionTest extends TestCase
     {
         self::assertNull($this->question->getNormalizer());
     }
+
+    /**
+     * @dataProvider providerTrueFalse
+     */
+    public function testSetMultiline(bool $multiline)
+    {
+        self::assertSame($this->question, $this->question->setMultiline($multiline));
+        self::assertSame($multiline, $this->question->isMultiline());
+    }
+
+    public function testIsMultilineDefault()
+    {
+        self::assertFalse($this->question->isMultiline());
+    }
 }

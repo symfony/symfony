@@ -40,7 +40,7 @@ final class FormDataPart extends AbstractMultipartPart
             $this->fields[$name] = $value;
         }
         // HTTP does not support \r\n in header values
-        $this->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $this->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
     }
 
     public function getMediaSubtype(): string
@@ -58,7 +58,16 @@ final class FormDataPart extends AbstractMultipartPart
         $values = [];
 
         $prepare = function ($item, $key, $root = null) use (&$values, &$prepare) {
-            $fieldName = $root ? sprintf('%s[%s]', $root, $key) : $key;
+            if (\is_int($key) && \is_array($item)) {
+                if (1 !== \count($item)) {
+                    throw new InvalidArgumentException(sprintf('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, %d provided.', \count($item)));
+                }
+
+                $key = key($item);
+                $item = $item[$key];
+            }
+
+            $fieldName = null !== $root ? sprintf('%s[%s]', $root, $key) : $key;
 
             if (\is_array($item)) {
                 array_walk($item, $prepare, $fieldName);
@@ -95,7 +104,7 @@ final class FormDataPart extends AbstractMultipartPart
         $part->setDisposition('form-data');
         $part->setName($name);
         // HTTP does not support \r\n in header values
-        $part->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $part->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
         $r->setValue($part, '8bit');
 
         return $part;

@@ -95,6 +95,10 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             throw new BadCredentialsException('Invalid username.');
         }
 
+        if (null === $password) {
+            throw new \LogicException(sprintf('The key "%s" cannot be null; check that the password field name of the form matches.', $this->options['password_parameter']));
+        }
+
         $request->getSession()->set(Security::LAST_USERNAME, $username);
 
         return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));

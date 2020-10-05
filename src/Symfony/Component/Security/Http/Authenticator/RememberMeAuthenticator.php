@@ -17,9 +17,9 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
@@ -57,13 +57,19 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
-        if (($cookie = $request->attributes->get(AbstractRememberMeServices::COOKIE_ATTR_NAME)) && null === $cookie->getValue()) {
+        // if the attribute is set, this is a lazy firewall. The previous
+        // support call already indicated support, so return null and avoid
+        // recreating the cookie
+        if ($request->attributes->has('_remember_me_token')) {
+            return null;
+        }
+
+        $token = $this->rememberMeServices->autoLogin($request);
+        if (null === $token) {
             return false;
         }
 
-        if (isset($this->options['name']) && !$request->cookies->has($this->options['name'])) {
-            return false;
-        }
+        $request->attributes->set('_remember_me_token', $token);
 
         // the `null` return value indicates that this authenticator supports lazy firewalls
         return null;
@@ -71,9 +77,12 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function authenticate(Request $request): PassportInterface
     {
-        $token = $this->rememberMeServices->autoLogin($request);
+        $token = $request->attributes->get('_remember_me_token');
+        if (null === $token) {
+            throw new \LogicException('No remember me token is set.');
+        }
 
-        return new SelfValidatingPassport($token->getUser());
+        return new SelfValidatingPassport(new UserBadge($token->getUsername(), [$token, 'getUser']));
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface

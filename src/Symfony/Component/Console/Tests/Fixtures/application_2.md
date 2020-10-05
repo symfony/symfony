@@ -28,11 +28,11 @@ Displays help for a command
 
 The help command displays help for a given command:
 
-  php app/console help list
+  app/console help list
 
 You can also output the help in other formats by using the --format option:
 
-  php app/console help --format=xml list
+  app/console help --format=xml list
 
 To display the list of available commands, please use the list command.
 
@@ -68,7 +68,7 @@ To output raw command help
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no
@@ -140,19 +140,19 @@ Lists commands
 
 The list command lists all commands:
 
-  php app/console list
+  app/console list
 
 You can also display the commands for a specific namespace:
 
-  php app/console list test
+  app/console list test
 
 You can also output the information in other formats by using the --format option:
 
-  php app/console list --format=xml
+  app/console list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  php app/console list --raw
+  app/console list --raw
 
 ### Arguments
 
@@ -184,6 +184,69 @@ The output format (txt, xml, json, or md)
 * Is multiple: no
 * Default: `'txt'`
 
+#### `--help|-h`
+
+Display help for the given command. When no command is given display help for the list command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--verbose|-v|-vv|-vvv`
+
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--version|-V`
+
+Display this application version
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--ansi`
+
+Force ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
 `descriptor:command1`
 ---------------------
 
@@ -201,7 +264,7 @@ command 1 help
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no
@@ -294,7 +357,7 @@ command 2 help
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no
@@ -369,7 +432,7 @@ Do not ask any interactive question
 
 #### `--help|-h`
 
-Display this help message
+Display help for the given command. When no command is given display help for the list command
 
 * Accept value: no
 * Is value required: no

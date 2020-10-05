@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 use MongoDB\Client;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MongoDbStore;
@@ -81,17 +80,6 @@ class MongoDbStoreTest extends AbstractStoreTest
         $this->assertContains('expires_at_1', $indexes);
     }
 
-    public function testNonBlocking()
-    {
-        $this->expectException(NotSupportedException::class);
-
-        $store = $this->getStore();
-
-        $key = new Key(uniqid(__METHOD__, true));
-
-        $store->waitAndSave($key);
-    }
-
     /**
      * @dataProvider provideConstructorArgs
      */
@@ -121,17 +109,22 @@ class MongoDbStoreTest extends AbstractStoreTest
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
     }
 
-    public function testDsnPrecedence()
+    public function testUriPrecedence()
     {
         $client = self::getMongoClient();
 
-        $store = new MongoDbStore('mongodb://localhost/test_dsn?collection=lock_dns', ['collection' => 'lock_option', 'database' => 'test_option']);
-        $r = new \ReflectionObject($store);
-        $p = $r->getProperty('options');
-        $p->setAccessible(true);
-        $options = $p->getValue($store);
-        $this->assertSame('lock_dns', $options['collection']);
-        $this->assertSame('test_dsn', $options['database']);
+        $store = new MongoDbStore('mongodb://localhost/test_uri?collection=lock_uri', [
+            'database' => 'test_option',
+            'collection' => 'lock_option',
+        ]);
+        $storeReflection = new \ReflectionObject($store);
+
+        $optionsProperty = $storeReflection->getProperty('options');
+        $optionsProperty->setAccessible(true);
+        $options = $optionsProperty->getValue($store);
+
+        $this->assertSame('test_uri', $options['database']);
+        $this->assertSame('lock_uri', $options['collection']);
     }
 
     /**
@@ -153,5 +146,41 @@ class MongoDbStoreTest extends AbstractStoreTest
         yield ['mongodb://localhost/?collection=lock', []];
         yield ['mongodb://localhost/test', []];
         yield ['mongodb://localhost/', []];
+    }
+
+    /**
+     * @dataProvider provideUriCollectionStripArgs
+     */
+    public function testUriCollectionStrip(string $uri, array $options, string $driverUri)
+    {
+        $client = self::getMongoClient();
+
+        $store = new MongoDbStore($uri, $options);
+        $storeReflection = new \ReflectionObject($store);
+
+        $uriProperty = $storeReflection->getProperty('uri');
+        $uriProperty->setAccessible(true);
+        $uri = $uriProperty->getValue($store);
+        $this->assertSame($driverUri, $uri);
+    }
+
+    public function provideUriCollectionStripArgs()
+    {
+        yield ['mongodb://localhost/?collection=lock', ['database' => 'test'], 'mongodb://localhost/'];
+        yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock'], 'mongodb://localhost/'];
+        yield ['mongodb://localhost/test?collection=lock', [], 'mongodb://localhost/test'];
+        yield ['mongodb://localhost/test', ['collection' => 'lock'], 'mongodb://localhost/test'];
+
+        yield ['mongodb://localhost/?collection=lock&replicaSet=repl', ['database' => 'test'], 'mongodb://localhost/?replicaSet=repl'];
+        yield ['mongodb://localhost/?replicaSet=repl', ['database' => 'test', 'collection' => 'lock'], 'mongodb://localhost/?replicaSet=repl'];
+        yield ['mongodb://localhost/test?collection=lock&replicaSet=repl', [], 'mongodb://localhost/test?replicaSet=repl'];
+        yield ['mongodb://localhost/test?replicaSet=repl', ['collection' => 'lock'], 'mongodb://localhost/test?replicaSet=repl'];
+
+        yield ['mongodb://localhost/test?readPreferenceTags=dc:foo&collection=lock&readPreferenceTags=dc:bar', [], 'mongodb://localhost/test?readPreferenceTags=dc:foo&readPreferenceTags=dc:bar'];
+        yield ['mongodb://localhost?foo_collection=x&collection=lock&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://localhost?collection=lock&foo_collection=x&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://localhost?foo_collection=x&bar_collection=x&collection=lock#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
+        yield ['mongodb://user:?collection=a@localhost?collection=lock', ['database' => 'test'], 'mongodb://user:?collection=a@localhost'];
+        yield ['mongodb://user:&collection=a@localhost/?collection=lock', ['database' => 'test'], 'mongodb://user:&collection=a@localhost/'];
     }
 }

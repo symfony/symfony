@@ -73,7 +73,7 @@ final class Envelope
     {
         $cloned = clone $this;
 
-        unset($cloned->stamps[$stampFqcn]);
+        unset($cloned->stamps[$this->resolveAlias($stampFqcn)]);
 
         return $cloned;
     }
@@ -84,6 +84,7 @@ final class Envelope
     public function withoutStampsOfType(string $type): self
     {
         $cloned = clone $this;
+        $type = $this->resolveAlias($type);
 
         foreach ($cloned->stamps as $class => $stamps) {
             if ($class === $type || is_subclass_of($class, $type)) {
@@ -96,7 +97,7 @@ final class Envelope
 
     public function last(string $stampFqcn): ?StampInterface
     {
-        return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
+        return isset($this->stamps[$stampFqcn = $this->resolveAlias($stampFqcn)]) ? end($this->stamps[$stampFqcn]) : null;
     }
 
     /**
@@ -105,7 +106,7 @@ final class Envelope
     public function all(string $stampFqcn = null): array
     {
         if (null !== $stampFqcn) {
-            return $this->stamps[$stampFqcn] ?? [];
+            return $this->stamps[$this->resolveAlias($stampFqcn)] ?? [];
         }
 
         return $this->stamps;
@@ -117,5 +118,15 @@ final class Envelope
     public function getMessage(): object
     {
         return $this->message;
+    }
+
+    /**
+     * BC to be removed in 6.0.
+     */
+    private function resolveAlias(string $fqcn): string
+    {
+        static $resolved;
+
+        return $resolved[$fqcn] ?? ($resolved[$fqcn] = (new \ReflectionClass($fqcn))->getName());
     }
 }

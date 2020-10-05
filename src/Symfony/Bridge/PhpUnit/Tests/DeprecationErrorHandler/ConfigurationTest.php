@@ -176,10 +176,22 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
     }
 
-    public function testItCanBeDisabled()
+    public function provideItCanBeDisabled(): array
     {
-        $configuration = Configuration::fromUrlEncodedString('disabled');
-        $this->assertFalse($configuration->isEnabled());
+        return [
+            ['disabled', false],
+            ['disabled=1', false],
+            ['disabled=0', true]
+        ];
+    }
+
+    /**
+     * @dataProvider provideItCanBeDisabled
+     */
+    public function testItCanBeDisabled(string $encodedString, bool $expectedEnabled)
+    {
+        $configuration = Configuration::fromUrlEncodedString($encodedString);
+        $this->assertSame($expectedEnabled, $configuration->isEnabled());
     }
 
     public function testItCanBeShushed()

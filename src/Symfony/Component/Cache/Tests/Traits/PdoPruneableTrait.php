@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
-use Doctrine\DBAL\Driver\Result;
-
 trait PdoPruneableTrait
 {
     protected function isPruned($cache, string $name): bool
@@ -31,6 +29,6 @@ trait PdoPruneableTrait
         $select->bindValue(':id', sprintf('%%%s', $name));
         $result = $select->execute();
 
-        return 1 !== (int) ($result instanceof Result ? $result->fetchOne() : $select->fetch(\PDO::FETCH_COLUMN));
+        return 1 !== (int) (\is_object($result) ? $result->fetchOne() : $select->fetch(\PDO::FETCH_COLUMN));
     }
 }

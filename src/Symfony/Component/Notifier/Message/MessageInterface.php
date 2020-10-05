@@ -25,4 +25,6 @@ interface MessageInterface
     public function getOptions(): ?MessageOptionsInterface;
 
     public function getTransport(): ?string;
+
+    public function transport(string $transport): self;
 }

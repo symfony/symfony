@@ -354,7 +354,7 @@ class SerializerTest extends TestCase
 
     public function testNormalizerAware()
     {
-        $normalizerAware = $this->getMockBuilder([NormalizerAwareInterface::class, NormalizerInterface::class])->getMock();
+        $normalizerAware = $this->getMockBuilder(NormalizerAwareNormalizer::class)->getMock();
         $normalizerAware->expects($this->once())
             ->method('setNormalizer')
             ->with($this->isInstanceOf(NormalizerInterface::class));
@@ -364,7 +364,7 @@ class SerializerTest extends TestCase
 
     public function testDenormalizerAware()
     {
-        $denormalizerAware = $this->getMockBuilder([DenormalizerAwareInterface::class, DenormalizerInterface::class])->getMock();
+        $denormalizerAware = $this->getMockBuilder(DenormalizerAwareDenormalizer::class)->getMock();
         $denormalizerAware->expects($this->once())
             ->method('setDenormalizer')
             ->with($this->isInstanceOf(DenormalizerInterface::class));
@@ -697,4 +697,12 @@ class Bar
     {
         $this->value = $value;
     }
+}
+
+interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAwareInterface
+{
+}
+
+interface DenormalizerAwareDenormalizer extends DenormalizerInterface, DenormalizerAwareInterface
+{
 }

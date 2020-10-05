@@ -77,6 +77,18 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinNamed($value)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(min: 10);');
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMax($value)
@@ -88,11 +100,35 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMaxNamed($value)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(max: 20);');
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinMax($value)
     {
         $constraint = new Range(['min' => 10, 'max' => 20]);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @requires PHP 8
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinMaxNamed($value)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(min:10, max: 20);');
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -118,6 +154,23 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesMinNamed($value, $formattedValue)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(min:10, minMessage: "myMessage");');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesMax($value, $formattedValue)
@@ -126,6 +179,23 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             'max' => 20,
             'maxMessage' => 'myMessage',
         ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @requires PHP 8
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesMaxNamed($value, $formattedValue)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(max:20, maxMessage: "myMessage");');
 
         $this->validator->validate($value, $constraint);
 
@@ -158,6 +228,24 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesCombinedMaxNamed($value, $formattedValue)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(min: 10, max:20, notInRangeMessage: "myNotInRangeMessage");');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMin($value, $formattedValue)
@@ -167,6 +255,24 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             'max' => 20,
             'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @requires PHP 8
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesCombinedMinNamed($value, $formattedValue)
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(min: 10, max:20, notInRangeMessage: "myNotInRangeMessage");');
 
         $this->validator->validate($value, $constraint);
 
@@ -379,13 +485,102 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNonNumeric()
     {
-        $this->validator->validate('abcd', new Range([
+        $constraint = new Range([
             'min' => 10,
             'max' => 20,
-            'invalidMessage' => 'myMessage',
-        ]));
+        ]);
 
-        $this->buildViolation('myMessage')
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMaxNull()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMaxAndMinNull()
+    {
+        $constraint = new Range([
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMin()
+    {
+        $constraint = new Range([
+            'min' => 'March 40, 2014',
+            'max' => 'March 20, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 10, 2014',
+            'max' => 'March 50, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range([
+            'min' => 'March 40, 2014',
+            'max' => 'March 50, 2014',
+        ]);
+
+        $this->validator->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
             ->setCode(Range::INVALID_CHARACTERS_ERROR)
             ->assertRaised();
@@ -443,6 +638,19 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinPropertyPathNamed($value)
+    {
+        $this->setObject(new Limit(10));
+
+        $this->validator->validate($value, eval('return new \Symfony\Component\Validator\Constraints\Range(minPropertyPath: "value");'));
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMaxPropertyPath($value)
@@ -452,6 +660,19 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new Range([
             'maxPropertyPath' => 'value',
         ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @requires PHP 8
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMaxPropertyPathNamed($value)
+    {
+        $this->setObject(new Limit(20));
+
+        $this->validator->validate($value, eval('return new \Symfony\Component\Validator\Constraints\Range(maxPropertyPath: "value");'));
 
         $this->assertNoViolation();
     }
@@ -541,6 +762,32 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @requires PHP 8
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesCombinedMaxPropertyPathNamed($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(
+            minPropertyPath: "min",
+            maxPropertyPath: "max",
+            notInRangeMessage: "myNotInRangeMessage",
+        );');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMinPropertyPath($value, $formattedValue)
@@ -552,6 +799,32 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             'maxPropertyPath' => 'max',
             'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @requires PHP 8
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesCombinedMinPropertyPathNamed($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Range(
+            minPropertyPath: "min",
+            maxPropertyPath: "max",
+            notInRangeMessage: "myNotInRangeMessage",
+        );');
 
         $this->validator->validate($value, $constraint);
 
@@ -752,6 +1025,66 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
             ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function provideMessageIfMinAndMaxSet(): array
+    {
+        $notInRangeMessage = (new Range(['min' => '']))->notInRangeMessage;
+
+        return [
+            [
+                [],
+                12,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['notInRangeMessage' => 'not_in_range_message'],
+                12,
+                'not_in_range_message',
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['minMessage' => 'min_message'],
+                0,
+                'min_message',
+                Range::TOO_LOW_ERROR,
+            ],
+            [
+                ['maxMessage' => 'max_message'],
+                0,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['minMessage' => 'min_message'],
+                15,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['maxMessage' => 'max_message'],
+                15,
+                'max_message',
+                Range::TOO_HIGH_ERROR,
+            ],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideMessageIfMinAndMaxSet
+     */
+    public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)
+    {
+        $constraint = new Range(array_merge(['min' => 1, 'max' => 10], $constraintExtraOptions));
+        $this->validator->validate($value, $constraint);
+
+        $this
+            ->buildViolation($expectedMessage)
+            ->setParameters(['{{ min }}' => '1', '{{ max }}' => '10', '{{ value }}' => (string) $value])
+            ->setCode($expectedCode)
             ->assertRaised();
     }
 }

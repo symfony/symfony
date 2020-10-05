@@ -155,6 +155,28 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
+    public function testNoAuthWithEmptyPassword()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(0))->method('auth')
+            ->with('')
+            ->willThrowException(new \RuntimeException());
+
+        Connection::fromDsn('redis://@localhost/queue', [], $redis);
+    }
+
+    public function testAuthZeroPassword()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('0')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://0@localhost/queue', [], $redis);
+    }
+
     public function testFailedAuth()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -322,6 +344,21 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis); // 1 = always
         $connection->ack('1');
+    }
+
+    public function testDeleteAfterReject()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis); // 1 = always
+        $connection->reject('1');
     }
 
     public function testLastErrorGetsCleared()

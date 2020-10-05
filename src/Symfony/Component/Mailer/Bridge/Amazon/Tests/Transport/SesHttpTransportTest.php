@@ -70,6 +70,8 @@ class SesHttpTransportTest extends TestCase
             $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
+            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+
             $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
   <SendRawEmailResult>
     <MessageId>foobar</MessageId>
@@ -88,6 +90,8 @@ class SesHttpTransportTest extends TestCase
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
+
+        $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
 
         $message = $transport->send($mail);
 

@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\Translatable;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
 
 class TranslatableTest extends TestCase
@@ -44,14 +44,14 @@ class TranslatableTest extends TestCase
 
     public function testToString()
     {
-        $this->assertSame('Symfony is great!', (string) new Translatable('Symfony is great!'));
+        $this->assertSame('Symfony is great!', (string) new TranslatableMessage('Symfony is great!'));
     }
 
     public function getTransTests()
     {
         return [
-            ['Symfony est super !', new Translatable('Symfony is great!', [], ''), 'Symfony est super !', 'fr'],
-            ['Symfony est awesome !', new Translatable('Symfony is %what%!', ['%what%' => 'awesome'], ''), 'Symfony est %what% !', 'fr'],
+            ['Symfony est super !', new TranslatableMessage('Symfony is great!', [], ''), 'Symfony est super !', 'fr'],
+            ['Symfony est awesome !', new TranslatableMessage('Symfony is %what%!', ['%what%' => 'awesome'], ''), 'Symfony est %what% !', 'fr'],
         ];
     }
 
@@ -72,9 +72,9 @@ class TranslatableTest extends TestCase
         ];
 
         return [
-            ['Symfony est super!', $messages, new Translatable('symfony.is.great', [], '')],
-            ['Foo Bar Baz', $messages, new Translatable('foo.bar.baz', [], '')],
-            ['Foo Baz', $messages, new Translatable('foo.baz', [], '')],
+            ['Symfony est super!', $messages, new TranslatableMessage('symfony.is.great', [], '')],
+            ['Foo Bar Baz', $messages, new TranslatableMessage('foo.bar.baz', [], '')],
+            ['Foo Baz', $messages, new TranslatableMessage('foo.baz', [], '')],
         ];
     }
 }

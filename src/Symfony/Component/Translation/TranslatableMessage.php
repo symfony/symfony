@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @author Nate Wiebe <nate@northern.co>
  */
-class Translatable implements TranslatableInterface
+class TranslatableMessage implements TranslatableInterface
 {
     private $message;
     private $parameters;

@@ -93,4 +93,24 @@ class RetryableHttpClientTest extends TestCase
         $this->expectExceptionMessageMatches('/must not return null when called with a body/');
         $response->getHeaders();
     }
+
+    public function testStreamNoRetry()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+            ]),
+            new HttpStatusCodeDecider([500]),
+            new ExponentialBackOff(0),
+            0
+        );
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        foreach ($client->stream($response) as $chunk) {
+            if ($chunk->isFirst()) {
+                self::assertSame(500, $response->getStatusCode());
+            }
+        }
+    }
 }

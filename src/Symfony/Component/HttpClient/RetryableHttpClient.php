@@ -53,7 +53,7 @@ class RetryableHttpClient implements HttpClientInterface
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         if ($this->maxRetries <= 0) {
-            return $this->client->request($method, $url, $options);
+            return new AsyncResponse($this->client, $method, $url, $options);
         }
 
         $retryCount = 0;
@@ -97,7 +97,7 @@ class RetryableHttpClient implements HttpClientInterface
                     if (!$chunk->isLast()) {
                         return;
                     }
-                    $shouldRetry = $this->decider->shouldRetry($method, $url, $options, $statusCode, $headers, $content, null);
+                    $shouldRetry = $this->decider->shouldRetry($method, $url, $options, $statusCode, $headers, $content);
                     if (null === $shouldRetry) {
                         throw new \LogicException(sprintf('The "%s::shouldRetry" method must not return null when called with a body.', \get_class($this->decider)));
                     }

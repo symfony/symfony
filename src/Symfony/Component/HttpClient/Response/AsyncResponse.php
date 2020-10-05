@@ -36,9 +36,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
     private $passthru;
 
     /**
-     * @param callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
+     * @param ?callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
      */
-    public function __construct(HttpClientInterface $client, string $method, string $url, array $options, callable $passthru)
+    public function __construct(HttpClientInterface $client, string $method, string $url, array $options, callable $passthru = null)
     {
         $this->client = $client;
         $this->shouldBuffer = $options['buffer'] ?? true;

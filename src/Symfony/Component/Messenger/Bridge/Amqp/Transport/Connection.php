@@ -255,8 +255,12 @@ class Connection
                     trigger_deprecation('symfony/messenger', '5.2', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "bindings" option should be used rather than "binding_keys" and "binding_arguments".', implode('", "', $invalidQueueOptions));
                 }
 
-                if (\is_array($queue['bindings'] ?? false) && 0 < \count($invalidBindingsOptions = array_diff(array_keys($queue['bindings']), self::AVAILABLE_BINDINGS_OPTIONS))) {
-                    throw new \InvalidArgumentException('Invalid bindings option(s) "%s" passed to the AMQP Messenger transport. The "bindings" option only accepts "key" and "arguments"', implode('", "', $invalidBindingsOptions));
+                if (\is_array($queue['bindings'] ?? false)) {
+                    foreach ($queue['bindings'] as $title => $individualBinding) {
+                        if (0 < \count($invalidBindingsOptions = array_diff(array_keys($individualBinding), self::AVAILABLE_BINDINGS_OPTIONS))) {
+                            throw new \InvalidArgumentException(sprintf('Invalid bindings option(s) "%s" passed to the AMQP Messenger transport in "%s". Each "bindings" option only accepts "key" and "arguments"', implode('", "', $invalidBindingsOptions), $title));
+                        }
+                    }
                 }
             }
         }

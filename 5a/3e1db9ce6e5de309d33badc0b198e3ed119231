@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-05T08:05:01Z
+
+changed to -10.
+
+FYI, here is the render (this change leak the ['buffer'=>false] injected by the StreamResponse
+
+| before | after |
+|--------|-------|
+| ![Screenshot from 2020-10-05 10-02-40](https://user-images.githubusercontent.com/578547/95054365-1212b400-06f2-11eb-83b0-d42b1ca92548.png) | ![Screenshot from 2020-10-05 10-01-54](https://user-images.githubusercontent.com/578547/95054386-1ccd4900-06f2-11eb-8db3-07ea50abd449.png) |

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-05T16:33:33Z
+
+> This post should also be corrected: symfony.com/blog/new-in-symfony-5-2-doctrine-types-for-uuid-and-ulid cc @javiereguiluz
+
+now fixed, it's using `IdGenerator`, in anticipation for this PR.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-10-05T19:02:46Z
+
+I'll watch the fail travis quickly
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2020-10-05T22:00:14Z
+
+It's now okay, the remaining errors are unrelated

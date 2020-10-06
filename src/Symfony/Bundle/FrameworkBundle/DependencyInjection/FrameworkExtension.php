@@ -2075,7 +2075,8 @@ class FrameworkExtension extends Extension
             $retryDefinition
                 ->replaceArgument(0, $retryOptions['delay'])
                 ->replaceArgument(1, $retryOptions['multiplier'])
-                ->replaceArgument(2, $retryOptions['max_delay']);
+                ->replaceArgument(2, $retryOptions['max_delay'])
+                ->replaceArgument(3, $retryOptions['jitter']);
             $container->setDefinition($retryServiceId, $retryDefinition);
 
             $backoffReference = new Reference($retryServiceId);

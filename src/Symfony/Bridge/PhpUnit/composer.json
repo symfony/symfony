@@ -43,5 +43,5 @@
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
     },
-    "version": "4.4-dev"
+    "version": "4.4.x-dev"
 }

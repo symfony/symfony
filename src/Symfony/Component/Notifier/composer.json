@@ -29,9 +29,5 @@
         ]
     },
     "minimum-stability": "dev",
-<<<<<<< HEAD:src/Symfony/Component/Notifier/composer.json
     "version": "5.1-dev"
-=======
-    "version": "4.4-dev"
->>>>>>> 4.4:src/Symfony/Component/Debug/composer.json
 }

@@ -30,14 +30,6 @@
             "/Tests/"
         ]
     },
-<<<<<<< HEAD:src/Symfony/Component/Mailer/Bridge/Amazon/composer.json
     "minimum-stability": "dev",
-<<<<<<< HEAD
     "version": "5.1-dev"
-=======
-    "version": "4.4-dev"
-=======
-    "version": "3.4-dev"
->>>>>>> 3.4:src/Symfony/Component/ClassLoader/composer.json
->>>>>>> 4.4
 }

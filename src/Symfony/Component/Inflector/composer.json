@@ -33,9 +33,5 @@
         ]
     },
     "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "4.4-dev"
-        }
-    }
+    "version": "4.4-dev"
 }

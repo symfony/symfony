@@ -35,9 +35,5 @@
         "symfony/expression-language": "For using the filter option of the log server."
     },
     "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "4.4-dev"
-        }
-    }
+    "version": "4.4-dev"
 }

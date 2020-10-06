@@ -31,7 +31,7 @@ return static function (ContainerConfigurator $container) {
         ->set('assets.packages', Packages::class)
             ->args([
                 service('assets._default_package'),
-                tagged_iterator('assets.package', 'package'),
+                tagged_iterator('assets.package', 'package', 'getDefaultName'),
             ])
 
         ->alias(Packages::class, 'assets.packages')

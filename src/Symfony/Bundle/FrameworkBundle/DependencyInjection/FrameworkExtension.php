@@ -445,6 +445,8 @@ class FrameworkExtension extends Extension
             $loader->load('mime_type.php');
         }
 
+        $container->registerForAutoconfiguration(PackageInterface::class)
+            ->addTag('assets.package');
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)

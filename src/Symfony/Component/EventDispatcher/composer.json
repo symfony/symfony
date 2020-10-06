@@ -40,5 +40,5 @@
         ]
     },
     "minimum-stability": "dev",
-    "version": "3.4-dev"
+    "version": "3.4.x-dev"
 }

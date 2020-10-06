@@ -38,5 +38,5 @@
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }
     },
     "minimum-stability": "dev",
-    "version": "5.2-dev"
+    "version": "5.2.x-dev"
 }

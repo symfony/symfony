@@ -25,5 +25,5 @@
         ]
     },
     "minimum-stability": "dev",
-    "version": "5.2-dev"
+    "version": "5.2.x-dev"
 }

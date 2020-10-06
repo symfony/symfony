@@ -54,7 +54,6 @@ foreach ($dirs as $k => $dir) {
         echo "Missing \"version\" in composer.json.\n";
         exit(1);
     }
-    $package->version = str_replace('-dev', '.x-dev', $package->version);
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 

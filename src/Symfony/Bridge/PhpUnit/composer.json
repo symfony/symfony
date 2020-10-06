@@ -46,5 +46,5 @@
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
     },
-    "version": "5.2-dev"
+    "version": "5.2.x-dev"
 }

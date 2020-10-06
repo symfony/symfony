@@ -38,5 +38,10 @@
     "bin": [
         "Resources/bin/yaml-lint"
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "dev-master"
+        }
+    }
 }

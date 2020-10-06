@@ -136,9 +136,9 @@ final class Cursor
 
         return $this;
     }
-    
+
     /**
-     * Return the total rows of the screen
+     * Return the total rows of the screen.
      */
     public function getRowCount(): int
     {
@@ -146,7 +146,7 @@ final class Cursor
     }
 
     /**
-     * Return the total columns of the screen
+     * Return the total columns of the screen.
      */
     public function getColumnCount(): int
     {

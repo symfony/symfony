@@ -1654,13 +1654,43 @@ class Configuration implements ConfigurationInterface
                         ->performNoDeepMerging()
                         ->beforeNormalization()
                             ->ifArray()
-                            ->then(function ($v) {
-                                return array_filter(array_values($v));
+                            ->then(static function ($v) {
+                                $list = [];
+                                foreach ($v as $key => $val) {
+                                    if (is_numeric($val)) {
+                                        $list[] = ['code' => $val];
+                                    } elseif (\is_array($val)) {
+                                        if (isset($val['code']) || isset($val['methods'])) {
+                                            $list[] = $val;
+                                        } else {
+                                            $list[] = ['code' => $key, 'methods' => $val];
+                                        }
+                                    } elseif (true === $val || null === $val) {
+                                        $list[] = ['code' => $key];
+                                    }
+                                }
+
+                                return $list;
                             })
                         ->end()
-                        ->prototype('integer')->end()
+                        ->useAttributeAsKey('code')
+                        ->arrayPrototype()
+                            ->fixXmlConfig('method')
+                            ->children()
+                                ->integerNode('code')->end()
+                                ->arrayNode('methods')
+                                    ->beforeNormalization()
+                                    ->ifArray()
+                                        ->then(function ($v) {
+                                            return array_map('strtoupper', $v);
+                                        })
+                                    ->end()
+                                    ->prototype('scalar')->end()
+                                    ->info('A list of HTTP methods that triggers a retry for this status code. When empty, all methods are retried')
+                                ->end()
+                            ->end()
+                        ->end()
                         ->info('A list of HTTP status code that triggers a retry')
-                        ->defaultValue([423, 425, 429, 500, 502, 503, 504, 507, 510])
                     ->end()
                     ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
                     ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used)')->end()

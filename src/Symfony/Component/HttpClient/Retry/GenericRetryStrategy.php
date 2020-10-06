@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Retry;
 
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
@@ -21,7 +22,19 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 class GenericRetryStrategy implements RetryStrategyInterface
 {
-    public const DEFAULT_RETRY_STATUS_CODES = [423, 425, 429, 500, 502, 503, 504, 507, 510];
+    public const IDEMPOTENT_METHODS = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'];
+    public const DEFAULT_RETRY_STATUS_CODES = [
+        0 => self::IDEMPOTENT_METHODS, // for transport exceptions
+        423,
+        425,
+        429,
+        500 => self::IDEMPOTENT_METHODS,
+        502,
+        503,
+        504 => self::IDEMPOTENT_METHODS,
+        507 => self::IDEMPOTENT_METHODS,
+        510 => self::IDEMPOTENT_METHODS,
+    ];
 
     private $statusCodes;
     private $delayMs;
@@ -63,7 +76,25 @@ class GenericRetryStrategy implements RetryStrategyInterface
 
     public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
     {
-        return \in_array($context->getStatusCode(), $this->statusCodes, true);
+        $statusCode = $context->getStatusCode();
+        if (\in_array($statusCode, $this->statusCodes, true)) {
+            return true;
+        }
+        if (isset($this->statusCodes[$statusCode]) && \is_array($this->statusCodes[$statusCode])) {
+            return \in_array($context->getInfo('http_method'), $this->statusCodes[$statusCode], true);
+        }
+        if (null === $exception) {
+            return false;
+        }
+
+        if (\in_array(0, $this->statusCodes, true)) {
+            return true;
+        }
+        if (isset($this->statusCodes[0]) && \is_array($this->statusCodes[0])) {
+            return \in_array($context->getInfo('http_method'), $this->statusCodes[0], true);
+        }
+
+        return false;
     }
 
     public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int

@@ -3,7 +3,9 @@ framework:
         default_options:
             retry_failed:
                 retry_strategy: null
-                http_codes: [429, 500]
+                http_codes:
+                    429: true
+                    500: ['GET', 'HEAD']
                 max_retries: 2
                 delay: 100
                 multiplier: 2

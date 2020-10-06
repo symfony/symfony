@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * A console command for dumping available configuration reference.
@@ -112,6 +113,13 @@ EOF
         $this->validateConfiguration($extension, $configuration);
 
         $format = $input->getOption('format');
+
+        if ('yaml' === $format && !class_exists(Yaml::class)) {
+            $errorIo->error('Setting the "format" option to "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=xml" instead.');
+
+            return 1;
+        }
+
         $path = $input->getArgument('path');
 
         if (null !== $path && 'yaml' !== $format) {

@@ -131,44 +131,46 @@ class ViolationMapper implements ViolationMapperInterface
 
         // Only add the error if the form is synchronized
         if ($this->acceptsErrors($scope)) {
-            $labelFormat = $scope->getConfig()->getOption('label_format');
-
-            if (null !== $labelFormat) {
-                $label = str_replace(
-                    [
-                        '%name%',
-                        '%id%',
-                    ],
-                    [
-                        $scope->getName(),
-                        (string) $scope->getPropertyPath(),
-                    ],
-                    $labelFormat
-                );
-            } else {
-                $label = $scope->getConfig()->getOption('label');
-            }
-
-            if (null === $label && null !== $this->formRenderer) {
-                $label = $this->formRenderer->humanize($scope->getName());
-            } elseif (null === $label) {
-                $label = $scope->getName();
-            }
-
-            if (false !== $label && null !== $this->translator) {
-                $label = $this->translator->trans(
-                    $label,
-                    $scope->getConfig()->getOption('label_translation_parameters', []),
-                    $scope->getConfig()->getOption('translation_domain')
-                );
-            }
-
             $message = $violation->getMessage();
             $messageTemplate = $violation->getMessageTemplate();
 
-            if (false !== $label) {
-                $message = str_replace('{{ label }}', $label, $message);
-                $messageTemplate = str_replace('{{ label }}', $label, $messageTemplate);
+            if (false !== strpos($message, '{{ label }}') || false !== strpos($messageTemplate, '{{ label }}')) {
+                $labelFormat = $scope->getConfig()->getOption('label_format');
+
+                if (null !== $labelFormat) {
+                    $label = str_replace(
+                        [
+                            '%name%',
+                            '%id%',
+                        ],
+                        [
+                            $scope->getName(),
+                            (string) $scope->getPropertyPath(),
+                        ],
+                        $labelFormat
+                    );
+                } else {
+                    $label = $scope->getConfig()->getOption('label');
+                }
+
+                if (false !== $label) {
+                    if (null === $label && null !== $this->formRenderer) {
+                        $label = $this->formRenderer->humanize($scope->getName());
+                    } elseif (null === $label) {
+                        $label = $scope->getName();
+                    }
+
+                    if (null !== $this->translator) {
+                        $label = $this->translator->trans(
+                            $label,
+                            $scope->getConfig()->getOption('label_translation_parameters', []),
+                            $scope->getConfig()->getOption('translation_domain')
+                        );
+                    }
+
+                    $message = str_replace('{{ label }}', $label, $message);
+                    $messageTemplate = str_replace('{{ label }}', $label, $messageTemplate);
+                }
             }
 
             $scope->addError(new FormError(

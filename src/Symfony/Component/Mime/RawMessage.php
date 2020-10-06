@@ -78,7 +78,7 @@ class RawMessage implements \Serializable
 
     public function __serialize(): array
     {
-        return [$this->message];
+        return [$this->toString()];
     }
 
     public function __unserialize(array $data): void

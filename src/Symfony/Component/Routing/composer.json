@@ -48,5 +48,5 @@
         ]
     },
     "minimum-stability": "dev",
-    "version": "5.1-dev"
+    "version": "5.1.x-dev"
 }

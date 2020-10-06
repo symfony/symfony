@@ -1738,4 +1738,25 @@ class ViolationMapperTest extends TestCase
             $this->assertSame('Message Translated 2nd Custom Label', $error->getMessage());
         }
     }
+
+    public function testTranslatorNotCalledWithoutLabel()
+    {
+        $renderer = $this->getMockBuilder(FormRenderer::class)
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator->expects($this->never())->method('trans');
+        $this->mapper = new ViolationMapper($renderer, $translator);
+
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('name', 'name');
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message without label', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+    }
 }

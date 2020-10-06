@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-04T09:14:05Z
+
+Should be done on master as this is a behavior change.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-05T06:27:20Z
+
+Thinking about it, I think changing the default value depending on the YAML component availability is not a good idea. I would instead keep the default and throw an exception when YAML is used (either explicitly or implicitly) and the component is not installed.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-05T06:46:58Z
+
+Fair enough. But if we don't change the default, all this PR does is replacing an ugly exception with a nice error message. And that would be a valid thing to do in a bugfix release, wouldn't it?

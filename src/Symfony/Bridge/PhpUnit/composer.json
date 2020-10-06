@@ -20,6 +20,9 @@
         "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
         "php": ">=5.5.9"
     },
+    "require-dev": {
+        "symfony/deprecation-contracts": "^2.1"
+    },
     "suggest": {
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
@@ -38,15 +41,10 @@
     ],
     "minimum-stability": "dev",
     "extra": {
-        "branch-alias": {
-            "dev-master": "5.2-dev"
-        },
         "thanks": {
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
     },
-    "require-dev": {
-        "symfony/deprecation-contracts": "^2.1"
-    }
+    "version": "5.2-dev"
 }

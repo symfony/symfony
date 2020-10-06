@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Types;
+namespace Symfony\Bridge\Doctrine\IdGenerator;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Id\AbstractIdGenerator;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV1;
 
-final class UuidV4Generator extends AbstractIdGenerator
+final class UuidV1Generator extends AbstractIdGenerator
 {
-    public function generate(EntityManager $em, $entity): UuidV4
+    public function generate(EntityManager $em, $entity): UuidV1
     {
-        return new UuidV4();
+        return new UuidV1();
     }
 }

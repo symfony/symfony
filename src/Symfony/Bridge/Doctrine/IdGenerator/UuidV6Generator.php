@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Types;
+namespace Symfony\Bridge\Doctrine\IdGenerator;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Id\AbstractIdGenerator;

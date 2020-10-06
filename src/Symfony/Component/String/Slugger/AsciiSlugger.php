@@ -72,7 +72,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     public function __construct(string $defaultLocale = null, $symbolsMap = null)
     {
         if (null !== $symbolsMap && !\is_array($symbolsMap) && !$symbolsMap instanceof \Closure) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, Closure or null, "%s" given.', __METHOD__, \gettype($symbolMap)));
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, Closure or null, "%s" given.', __METHOD__, \gettype($symbolsMap)));
         }
 
         $this->defaultLocale = $defaultLocale;

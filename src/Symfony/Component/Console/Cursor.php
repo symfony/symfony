@@ -136,6 +136,22 @@ final class Cursor
 
         return $this;
     }
+    
+    /**
+     * Return the total rows of the screen
+     */
+    public function getRowCount(): int
+    {
+        return (int) shell_exec('tput lines');
+    }
+
+    /**
+     * Return the total columns of the screen
+     */
+    public function getColumnCount(): int
+    {
+        return (int) shell_exec('tput cols');
+    }
 
     /**
      * Returns the current cursor position as x,y coordinates.

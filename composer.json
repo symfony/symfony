@@ -134,5 +134,9 @@
         "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
     "minimum-stability": "dev",
-    "version": "3.4-dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.4-dev"
+        }
+    }
 }

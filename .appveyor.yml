@@ -57,6 +57,7 @@ install:
     - git config --global user.email ""
     - git config --global user.name "Symfony"
     - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
+    - SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev
     - php composer.phar config platform.php 5.5.9
     - php composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install

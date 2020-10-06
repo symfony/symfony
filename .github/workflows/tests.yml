@@ -107,7 +107,7 @@ jobs:
             -   name: Configure composer
                 run: |
                     ([ -d ~/.composer ] || mkdir ~/.composer) && cp .github/composer-config.json ~/.composer/config.json
-                    SYMFONY_VERSION=$(cat composer.json | grep '^ *\"dev-master\". *\"[1-9]' | grep -o '[0-9.]*')
+                    SYMFONY_VERSION=$(cat composer.json | grep '^ *\"version\". *\"[1-9]' | grep -o '[0-9.]*[0-9]')
                     echo "::set-env name=SYMFONY_VERSION::$SYMFONY_VERSION"
                     echo "::set-env name=COMPOSER_ROOT_VERSION::$SYMFONY_VERSION.x-dev"
 

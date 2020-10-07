@@ -102,7 +102,7 @@ final class EmailMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function transport(string $transport): MessageInterface
+    public function transport(string $transport): self
     {
         if (!$this->message instanceof Email) {
             throw new LogicException('Cannot set a Transport on a RawMessage instance.');

@@ -61,10 +61,10 @@ trait BlockingStoreTestTrait
                 $store->save($key);
                 $this->fail('The store saves a locked key.');
             } catch (LockConflictedException $e) {
+            } finally {
+                // send the ready signal to the child
+                posix_kill($childPID, \SIGHUP);
             }
-
-            // send the ready signal to the child
-            posix_kill($childPID, \SIGHUP);
 
             // This call should be blocked by the child #1
             $store->waitAndSave($key);

@@ -97,8 +97,16 @@ class StoreFactory
             case 0 === strpos($connection, 'sqlite3://'):
                 return new PdoStore($connection);
 
+            case 0 === strpos($connection, 'pgsql+advisory:'):
+            case 0 === strpos($connection, 'postgres+advisory://'):
+            case 0 === strpos($connection, 'postgresql+advisory://'):
+                return new PostgreSqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
+
             case 0 === strpos($connection, 'zookeeper://'):
                 return new ZookeeperStore(ZookeeperStore::createConnection($connection));
+
+            case 'in-memory' === $connection:
+                return new InMemoryStore();
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));

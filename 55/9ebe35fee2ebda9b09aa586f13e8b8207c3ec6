@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-07T06:07:00Z
+
+@alexpott Still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2020-10-07T09:20:26Z
+
+@fabpot @nicolas-grekas @ogizanagi I've added the deprecation location and counting feature. It's pretty ugly but it works. Open to suggestions for improvements :)

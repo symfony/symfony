@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-10-04T10:12:27Z
+
+Side note: to test the component I've created an OpenLDAP instance on docker using latest osixia/openldap. TO make test working, I had to add `ldap_set_option($h, LDAP_OPT_PROTOCOL_VERSION, 3);` in `LdapTestCase`.
+
+Even with this configuration, some test fails with message `Failed asserting that actual size 2 matches expected size 1.`. This happens both in my version and in 4.4 version of Symfony.
+
+It would be a good idea to have a docker environment prepared to test those methods....at least in order to have a common environment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-05T09:55:59Z
+
+> It would be a good idea to have a docker environment prepared to test those methods....at least in order to have a common environment.
+
+I agree. We run such tests in [`.github/workflows/tests.yml`](https://github.com/symfony/symfony/blob/master/.github/workflows/tests.yml) if you'd like to have a look (could be done in a separate PR).

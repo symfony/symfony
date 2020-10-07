@@ -15,7 +15,7 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Component\Translation\Translatable;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
@@ -133,12 +133,12 @@ final class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
-    public function createTranslatable(string $message, array $parameters = [], string $domain = null): Translatable
+    public function createTranslatable(string $message, array $parameters = [], string $domain = null): TranslatableMessage
     {
-        if (!class_exists(Translatable::class)) {
+        if (!class_exists(TranslatableMessage::class)) {
             throw new \LogicException(sprintf('You cannot use the "%s" as the Translation Component is not installed. Try running "composer require symfony/translation".', __CLASS__));
         }
 
-        return new Translatable($message, $parameters, $domain);
+        return new TranslatableMessage($message, $parameters, $domain);
     }
 }

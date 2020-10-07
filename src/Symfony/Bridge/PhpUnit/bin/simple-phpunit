@@ -175,7 +175,7 @@ if (class_exists('PHPUnit_Util_Blacklist')) {
     eval(" // PHP 5.3 compat
     (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
     PHPUnit\Util\Blacklist::addDirectory(dirname((new ReflectionClass('SymfonyBlacklistPhpunit'))->getFileName()));
-    PHPUnit\Util\Blacklist::addDirectory(dirname((new ReflectionClass('SymfonyBlacklistSimplePhpunit'))->getFileName()));
+    class_exists('SymfonyBlacklistSimplePhpunit', false) && PHPUnit\Util\Blacklist::addDirectory(dirname((new ReflectionClass('SymfonyBlacklistSimplePhpunit'))->getFileName()));
     ");
 } else {
     PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;

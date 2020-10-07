@@ -87,6 +87,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
         // Check if lock is acquired
         if (true === (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn())) {
+            $key->markUnserializable();
             // release sharedLock in case of promotion
             $this->unlockShared($key);
 
@@ -109,6 +110,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
         // Check if lock is acquired
         if (true === (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn())) {
+            $key->markUnserializable();
             // release lock in case of demotion
             $this->unlock($key);
 

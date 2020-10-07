@@ -15,19 +15,3 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags: [container.service_subscriber]
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
-
-security:
-    enable_authenticator_manager: true
-
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
-
-    providers:
-        in_memory:
-            memory:
-                users:
-                    'jane@example.org': { password: test, roles: [ROLE_USER] }
-        in_memory2:
-            memory:
-                users:
-                    'john@example.org': { password: test, roles: [ROLE_USER] }

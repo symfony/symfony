@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -24,6 +25,13 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
+    private $selfLoadingUser = false;
+
+    public function __construct(bool $selfLoadingUser = false)
+    {
+        $this->selfLoadingUser = $selfLoadingUser;
+    }
+
     public function supports(Request $request): ?bool
     {
         return $request->headers->has('X-USER-EMAIL');
@@ -36,7 +44,12 @@ class ApiAuthenticator extends AbstractAuthenticator
             throw new BadCredentialsException('Email is not a valid email address.');
         }
 
-        return new SelfValidatingPassport(new UserBadge($email));
+        $userLoader = null;
+        if ($this->selfLoadingUser) {
+            $userLoader = function ($username) { return new User($username, 'test', ['ROLE_USER']); };
+        }
+
+        return new SelfValidatingPassport(new UserBadge($email, $userLoader));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

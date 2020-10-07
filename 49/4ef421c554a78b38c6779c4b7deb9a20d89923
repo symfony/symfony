@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-06T13:00:31Z
+
+If I understand this feature, when using 1000ms and a multiplier of 3, instead of waiting this:
+
+```
+1000ms   3000ms   9000ms
+```
+
+It would wait something like this:
+
+```
+800ms    3150ms   8830ms
+```
+
+I can't understand why the second is best for the server or for the local application. Thanks.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-06T13:05:06Z
+
+> I can't understand why the second is best for the server or for the local application. Thanks.
+
+When several clients perform the same request at the same time (ie. started by a crontab) they all call the server at the exact same time, and have a highest probability to trigger an error then they all retries at the exact same time.
+
+More documentation here https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/?did=ba_card&trk=ba_card and here https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-06T13:06:45Z
+
+@javiereguiluz if you are the only client, the jitter has indeed no value. The value appears when multiple clients apply such jitter:
+
+Without jitter:
+
+```
+A: 1000ms   3000ms   9000ms
+B: 1000ms   3000ms   9000ms
+```
+
+With jitter:
+```
+A:  800ms    3150ms   8830ms
+B: 1100ms    2953ms   8900ms
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-06T13:24:17Z
+
+Thanks for the comments ... but isn't a bit unlikely that your app starts more than one HTTP client making requests to the same server at the exact same time? I'm probably missing something, because I like this idea in theory but I don't say any significant difference in practice. But I guess some folks using Symfony will fit this scenario so they'll like the new feature. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-06T13:30:51Z
+
+@javiereguiluz This can happen trivially when making concurrent requests to a rate-limited endpoint (eg the github API).
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-06T13:48:07Z
+
+> what about retry-after headers?
+
+yeah, I wondered if it should bellongs to `ExponentialBackOff` or to the `RetryableHttpClient`  in order to add jitter everywhere.
+
+On the other hand, the server provide the `retry-after` header. It should be able to distribute load on all clients.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-06T13:55:57Z
+
+> but isn't a bit unlikely that your app starts more than one HTTP client making requests to the same server at the exact same time?
+
+there is not even a need for both clients to be part of the same app.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-06T13:57:12Z
+
+and indeed, `A` and `B` don't need to be 2 different clients in your app. they might be 2 concurrent requests done by the same client

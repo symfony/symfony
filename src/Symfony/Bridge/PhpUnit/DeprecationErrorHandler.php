@@ -129,6 +129,9 @@ class DeprecationErrorHandler
         if ($deprecation->isMuted()) {
             return null;
         }
+        if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
+            return null;
+        }
         $group = 'other';
 
         if ($deprecation->originatesFromAnObject()) {
@@ -206,6 +209,10 @@ class DeprecationErrorHandler
 
             $isFailingAtShutdown = !$configuration->tolerates($this->deprecationGroups);
             $this->displayDeprecations($groups, $configuration, $isFailingAtShutdown);
+
+            if ($configuration->isGeneratingBaseline()) {
+                $configuration->writeBaseline();
+            }
 
             if ($isFailing || $isFailingAtShutdown) {
                 exit(1);

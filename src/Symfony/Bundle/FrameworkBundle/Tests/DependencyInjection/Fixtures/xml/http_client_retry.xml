@@ -12,7 +12,8 @@
                         delay="100"
                         max-delay="0"
                         max-retries="2"
-                        multiplier="2">
+                        multiplier="2"
+                        jitter="0.3">
                     <framework:http-code>429</framework:http-code>
                     <framework:http-code>500</framework:http-code>
                 </framework:retry-failed>

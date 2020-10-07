@@ -11,6 +11,7 @@ $container->loadFromExtension('framework', [
                 'delay' => 100,
                 'multiplier' => 2,
                 'max_delay' => 0,
+                'jitter' => 0.3,
             ]
         ],
         'scoped_clients' => [

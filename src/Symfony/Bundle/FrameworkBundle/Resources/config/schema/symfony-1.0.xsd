@@ -587,6 +587,7 @@
         <xsd:attribute name="delay" type="xsd:integer" />
         <xsd:attribute name="multiplier" type="xsd:float" />
         <xsd:attribute name="max-delay" type="xsd:float" />
+        <xsd:attribute name="jitter" type="xsd:float" />
         <xsd:attribute name="response_header" type="xsd:boolean" />
     </xsd:complexType>
 

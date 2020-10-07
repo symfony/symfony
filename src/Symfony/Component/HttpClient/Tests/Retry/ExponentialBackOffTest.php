@@ -21,7 +21,7 @@ class ExponentialBackOffTest extends TestCase
      */
     public function testGetDelay(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
-        $backOff = new ExponentialBackOff($delay, $multiplier, $maxDelay);
+        $backOff = new ExponentialBackOff($delay, $multiplier, $maxDelay, 0);
 
         self::assertSame($expectedDelay, $backOff->getDelay($previousRetries, 'GET', 'http://example.com/', [], 200, [], null, null));
     }
@@ -49,5 +49,23 @@ class ExponentialBackOffTest extends TestCase
         // never a delay
         yield [0, 2, 10000, 0, 0];
         yield [0, 2, 10000, 1, 0];
+    }
+
+    public function testJitter()
+    {
+        $backOff = new ExponentialBackOff(1000, 1, 0, 1);
+        $belowHalf = 0;
+        $aboveHalf = 0;
+        for ($i = 0; $i < 20; ++$i) {
+            $delay = $backOff->getDelay(0, 'GET', 'http://example.com/', [], 200, [], null, null);
+            if ($delay < 500) {
+                ++$belowHalf;
+            } elseif ($delay > 1500) {
+                ++$aboveHalf;
+            }
+        }
+
+        $this->assertGreaterThanOrEqual(1, $belowHalf);
+        $this->assertGreaterThanOrEqual(1, $aboveHalf);
     }
 }

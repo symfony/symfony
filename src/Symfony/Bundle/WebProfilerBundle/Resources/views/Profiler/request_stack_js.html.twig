@@ -1,0 +1,24 @@
+<script{% if csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
+(function () {
+    if (window.fetch && window.fetch.polyfill === undefined) {
+        window.Sfjs_globalFetchStack = window.Sfjs_globalFetchStack||[];
+
+        var oldFetch = window.fetch;
+        window.fetch = function () {
+            var promise = oldFetch.apply(this, arguments);
+            window.Sfjs_globalFetchStack.push([promise, arguments]);
+            return promise;
+        }
+    }
+
+    if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
+        window.Sfjs_globalXHRStack = window.Sfjs_globalXHRStack||[];
+
+        var proxied = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+            window.Sfjs_globalXHRStack.push([this, method, url]);
+            proxied.apply(this, Array.prototype.slice.call(arguments));
+        };
+    }
+})();
+/*]]>*/</script>

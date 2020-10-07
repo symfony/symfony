@@ -117,6 +117,19 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected function injectToolbar(Response $response, Request $request, array $nonces)
     {
         $content = $response->getContent();
+        $pos = strripos($content, '</head>');
+
+        if (false !== $pos) {
+            $requestStack = $this->twig->render(
+                '@WebProfiler/Profiler/request_stack_js.html.twig',
+                [
+                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
+                ]
+            );
+            $content = substr($content, 0, $pos).$requestStack.substr($content, $pos);
+            $response->setContent($content);
+        }
+
         $pos = strripos($content, '</body>');
 
         if (false !== $pos) {

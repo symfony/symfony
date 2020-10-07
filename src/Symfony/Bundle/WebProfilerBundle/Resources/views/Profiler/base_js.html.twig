@@ -269,21 +269,19 @@
         };
 
         {% if excluded_ajax_paths is defined %}
-            if (window.fetch && window.fetch.polyfill === undefined) {
-                var oldFetch = window.fetch;
-                window.fetch = function () {
-                    var promise = oldFetch.apply(this, arguments);
-                    var url = arguments[0];
-                    var params = arguments[1];
-                    var paramType = Object.prototype.toString.call(arguments[0]);
+            if (typeof window.Sfjs_globalFetchStack !== 'undefined') {
+                function processSingleFetch(promise, args) {
+                    var url = args[0];
+                    var params = args[1];
+                    var paramType = Object.prototype.toString.call(args[0]);
                     if (paramType === '[object Request]') {
-                        url = arguments[0].url;
+                        url = args[0].url;
                         params = {
-                            method: arguments[0].method,
-                            credentials: arguments[0].credentials,
-                            headers: arguments[0].headers,
-                            mode: arguments[0].mode,
-                            redirect: arguments[0].redirect
+                            method: args[0].method,
+                            credentials: args[0].credentials,
+                            headers: args[0].headers,
+                            mode: args[0].mode,
+                            redirect: args[0].redirect
                         };
                     } else {
                         url = String(url);
@@ -318,18 +316,22 @@
                         });
                         startAjaxRequest(idx);
                     }
+                }
 
-                    return promise;
+                /* Process the pending requests in global fetch stack */
+                window.Sfjs_globalFetchStack.forEach(function (req) {
+                    processSingleFetch(req[0], req[1]);
+                });
+
+                /* Rewrite the global fetch stack push method */
+                window.Sfjs_globalFetchStack.push = function (args) {
+                    processSingleFetch(args[0], args[1]);
                 };
             }
-            if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
-                var proxied = XMLHttpRequest.prototype.open;
-
-                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                    var self = this;
-
-                    /* prevent logging AJAX calls to static and inline files, like templates */
+            if (typeof window.Sfjs_globalXHRStack !== 'undefined') {
+                function processSingleXHR(xhr, method, url) {
                     var path = url;
+                    /* prevent logging AJAX calls to static and inline files, like templates */
                     if (url.substr(0, 1) === '/') {
                         if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
                             path = url.substr({{ request.basePath|length }});
@@ -350,21 +352,36 @@
 
                         var idx = requestStack.push(stackElement) - 1;
 
-                        this.addEventListener('readystatechange', function() {
-                            if (self.readyState == 4) {
-                                stackElement.duration = new Date() - stackElement.start;
-                                stackElement.error = self.status < 200 || self.status >= 400;
-                                stackElement.statusCode = self.status;
-                                extractHeaders(self, stackElement);
+                        function onRequestComplete(stackElement, xhr) {
+                            stackElement.duration = new Date() - stackElement.start;
+                            stackElement.error = xhr.status < 200 || xhr.status >= 400;
+                            stackElement.statusCode = xhr.status;
+                            extractHeaders(xhr, stackElement);
+                            finishAjaxRequest(idx);
+                        }
 
-                                finishAjaxRequest(idx);
-                            }
-                        }, false);
+                        if (xhr.readyState == 4) {
+                            onRequestComplete(stackElement, xhr);
+                        } else {
+                            xhr.addEventListener('readystatechange', function() {
+                                if (xhr.readyState == 4) {
+                                    onRequestComplete(stackElement, xhr);
+                                }
+                            }, false);
+                        }
 
                         startAjaxRequest(idx);
                     }
+                }
 
-                    proxied.apply(this, Array.prototype.slice.call(arguments));
+                /* Process the pending xhr requests in global stack */
+                window.Sfjs_globalXHRStack.forEach(function (req) {
+                    processSingleXHR(req[0], req[1], req[2]);
+                });
+
+                /* Rewrite the global xhr stack push method */
+                window.Sfjs_globalXHRStack.push = function (args) {
+                    processSingleXHR(args[0], args[1], args[2]);
                 };
             }
         {% endif %}

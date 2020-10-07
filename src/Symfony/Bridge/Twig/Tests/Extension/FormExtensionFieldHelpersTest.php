@@ -49,7 +49,12 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->rawExtension = new FormExtension();
         $this->translatorExtension = new FormExtension(new StubTranslator());
 
-        $form = $this->factory->createNamedBuilder('register', FormType::class, ['username' => 'tgalopin'])
+        $data = [
+            'username' => 'tgalopin',
+            'choice_multiple' => ['sugar', 'salt'],
+        ];
+
+        $form = $this->factory->createNamedBuilder('register', FormType::class, $data)
             ->add('username', TextType::class, [
                 'label' => 'base.username',
                 'label_translation_parameters' => ['%label_brand%' => 'Symfony'],
@@ -77,6 +82,14 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
                 ],
                 'choice_translation_domain' => 'forms',
             ])
+            ->add('choice_multiple', ChoiceType::class, [
+                'choices' => [
+                    'base.sugar' => 'sugar',
+                    'base.salt' => 'salt',
+                ],
+                'multiple' => true,
+                'expanded' => true,
+            ])
             ->getForm()
         ;
 
@@ -95,6 +108,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
     public function testFieldValue()
     {
         $this->assertSame('tgalopin', $this->rawExtension->getFieldValue($this->view->children['username']));
+        $this->assertSame(['sugar', 'salt'], $this->rawExtension->getFieldValue($this->view->children['choice_multiple']));
     }
 
     public function testFieldLabel()
@@ -233,5 +247,41 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 
         $this->assertSame('jp', $choicesArray[1]['choices'][1]['value']);
         $this->assertSame('[trans]base.jp[/trans]', $choicesArray[1]['choices'][1]['label']);
+    }
+
+    public function testFieldChoicesMultiple()
+    {
+        $choices = $this->rawExtension->getFieldChoices($this->view->children['choice_multiple']);
+
+        $choicesArray = [];
+        foreach ($choices as $label => $value) {
+            $choicesArray[] = ['label' => $label, 'value' => $value];
+        }
+
+        $this->assertCount(2, $choicesArray);
+
+        $this->assertSame('sugar', $choicesArray[0]['value']);
+        $this->assertSame('base.sugar', $choicesArray[0]['label']);
+
+        $this->assertSame('salt', $choicesArray[1]['value']);
+        $this->assertSame('base.salt', $choicesArray[1]['label']);
+    }
+
+    public function testFieldTranslatedChoicesMultiple()
+    {
+        $choices = $this->translatorExtension->getFieldChoices($this->view->children['choice_multiple']);
+
+        $choicesArray = [];
+        foreach ($choices as $label => $value) {
+            $choicesArray[] = ['label' => $label, 'value' => $value];
+        }
+
+        $this->assertCount(2, $choicesArray);
+
+        $this->assertSame('sugar', $choicesArray[0]['value']);
+        $this->assertSame('[trans]base.sugar[/trans]', $choicesArray[0]['label']);
+
+        $this->assertSame('salt', $choicesArray[1]['value']);
+        $this->assertSame('[trans]base.salt[/trans]', $choicesArray[1]['label']);
     }
 }

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-01T12:41:19Z
+
+> the PostgreSqlStore couldn't rely on the database only to acquire a lock, because all store sharing the same connection won't be concurrent each other. That's why, I added the InMemory store that prevent concurrency within the same process.
+
+I'm not sure I understand what you mean here. Is concurrency within the same process really an issue? E.g. `flock()` doesn't block when locking the same file twice in the same process.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-01T14:24:42Z
+
+> Is concurrency within the same process really an issue? E.g. `flock()` doesn't block when locking the same file twice in the same process.
+
+This is a design choice that allows concurrency within the same process.
+It allows using `symfony/lock` in various "async" cases
+- react-php
+- guzzle/promise
+- symfony/http-client
+
+All Store test extends an LockAbstractTest that assert this.
+
+The php `flock` function does not block the same `handle` but can lock different handle on the same file in the same process: https://3v4l.org/69WBC
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-10-02T20:28:59Z
+
+This is the kind of feature I proposed when I made a [PR to add a `MysqlStore` that uses `GET_LOCK`](https://github.com/symfony/symfony/pull/25578). It's interesting to read how you changed your mind @jderusse https://github.com/symfony/symfony/pull/25578#issuecomment-393474568. Having a lock tied to the db connection is a good alternative to `flock` for distributed systems ; but does not meet the need for locks that needs to be persisted (and serialized).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-03T05:59:21Z
+
+@GromNaN I'm the one who suggested this feature to @jderusse
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-03T10:49:19Z
+
+I'm truly sorry if I offended you with my comment @GromNaN.
+
+Time flies, and since Decembre 2017, many things changed:
+- first of all I changed. I don't stick to my ideas just to pretend I'm always right. When I was wrong, I admit it.
+- about serialization: Lock component now has several Store that don't provide serialization (zookeeper).
+- about connection-lost: all stores has drawbacks (Memcached can reboot, Redis can evict lock when clock drift). It's not a dead-end, but have to be documented.
+- Lock component now provide an adapter for MySQL that provides serialization (PDO) for people who need it.
+- pg_advisory enhance PDO by natively providing shared lock and blocking lock
+- #25578 didn't provide concurrency within the same process. This could be fixed with the MemoryStore from this PR
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2020-10-03T11:03:55Z
+
+Thank you for taking time to reply. I was not offended. On the contrary I'm satisfied by the `PdoStore` as you made it. I like that all implementations can be provided in Symfony with their pros and cons. Again thank you and go ahead.

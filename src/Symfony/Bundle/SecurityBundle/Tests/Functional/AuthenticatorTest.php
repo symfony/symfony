@@ -44,6 +44,20 @@ class AuthenticatorTest extends AbstractWebTestCase
         }
     }
 
+    /**
+     * @dataProvider provideEmails
+     */
+    public function testWithoutUserProvider($email)
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'no_user_provider.yml']);
+
+        $client->request('GET', '/profile', [], [], [
+            'HTTP_X-USER-EMAIL' => $email,
+        ]);
+
+        $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
+    }
+
     public function provideEmails()
     {
         yield ['jane@example.org', true];

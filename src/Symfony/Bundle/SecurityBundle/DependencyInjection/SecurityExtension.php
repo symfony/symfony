@@ -249,10 +249,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
         $arguments[1] = $userProviderIteratorsArgument = new IteratorArgument($userProviders);
         $contextListenerDefinition->setArguments($arguments);
+        $nbUserProviders = \count($userProviders);
 
-        if (\count($userProviders) > 1) {
+        if ($nbUserProviders > 1) {
             $container->setDefinition('security.user_providers', new Definition(ChainUserProvider::class, [$userProviderIteratorsArgument]))
                 ->setPublic(false);
+        } elseif (0 === $nbUserProviders) {
+            $container->removeDefinition('security.listener.user_provider');
         } else {
             $container->setAlias('security.user_providers', new Alias(current($providerIds)))->setPublic(false);
         }

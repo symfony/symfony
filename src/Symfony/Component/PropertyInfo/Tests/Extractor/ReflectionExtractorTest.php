@@ -257,7 +257,7 @@ class ReflectionExtractorTest extends TestCase
             ['defaultInt', [new Type(Type::BUILTIN_TYPE_INT, false)]],
             ['defaultFloat', [new Type(Type::BUILTIN_TYPE_FLOAT, false)]],
             ['defaultString', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
-            ['defaultArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false)]],
+            ['defaultArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
             ['defaultNull', null],
         ];
     }
@@ -415,6 +415,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableBoolProp'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))], $this->extractor->getTypes(Php74Dummy::class, 'stringCollection'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)], $this->extractor->getTypes(Php74Dummy::class, 'collection'));
     }
 
     /**

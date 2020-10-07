@@ -477,8 +477,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $type = \gettype($defaultValue);
+        $type = static::MAP_TYPES[$type] ?? $type;
 
-        return [new Type(static::MAP_TYPES[$type] ?? $type)];
+        return [new Type($type, false, null, Type::BUILTIN_TYPE_ARRAY === $type)];
     }
 
     private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionClass $declaringClass): array

@@ -23,7 +23,7 @@
             $status = \E_DEPRECATED === $severity || \E_USER_DEPRECATED === $severity ? 'warning' : 'normal';
         } ?>
         <tr class="status-<?= $status; ?>" data-filter-level="<?= strtolower($this->escape($log['priorityName'])); ?>"<?php if ($channelIsDefined) { ?> data-filter-channel="<?= $this->escape($log['channel']); ?>"<?php } ?>>
-            <td class="text-small" nowrap>
+            <td class="text-small nowrap">
                 <span class="colored text-bold"><?= $this->escape($log['priorityName']); ?></span>
                 <span class="text-muted newline"><?= date('H:i:s', $log['timestamp']); ?></span>
             </td>

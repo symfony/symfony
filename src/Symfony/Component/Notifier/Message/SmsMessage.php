@@ -83,7 +83,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function transport(string $transport): MessageInterface
+    public function transport(string $transport): self
     {
         $this->transport = $transport;
 

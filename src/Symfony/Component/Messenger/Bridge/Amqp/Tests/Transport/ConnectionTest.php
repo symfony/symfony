@@ -398,6 +398,38 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testMultipleBindings()
+    {
+        $amqpConnection = $this->createMock(\AMQPConnection::class);
+        $amqpChannel = $this->createMock(\AMQPChannel::class);
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpQueue = $this->createMock(\AMQPQueue::class);
+
+        $factory = $this->createMock(AmqpFactory::class);
+        $factory->method('createConnection')->willReturn($amqpConnection);
+        $factory->method('createChannel')->willReturn($amqpChannel);
+        $factory->method('createExchange')->willReturn($amqpExchange);
+        $factory->method('createQueue')->willReturn($amqpQueue);
+
+        $amqpExchange->expects($this->once())->method('declareExchange');
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
+        $amqpQueue->expects($this->once())->method('declareQueue');
+        $amqpQueue->expects($this->exactly(2))->method('bind')->withConsecutive(
+            [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all', 'header-property' => 'change']],
+            [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', ['x-match' => 'all', 'header-property' => 'remove']]
+        );
+
+        $dsn = 'amqp://localhost?exchange[type]=headers'.
+            '&queues[queue0][bindings][one][arguments][x-match]=all'.
+            '&queues[queue0][bindings][one][arguments][header-property]=change'.
+            '&queues[queue0][bindings][two][arguments][x-match]=all'.
+            '&queues[queue0][bindings][two][arguments][header-property]=remove'.
+            '&queues[queue0][bindings][two][key]=binding_key0';
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->publish('body');
+    }
+
     public function testItCanDisableTheSetup()
     {
         $factory = new TestAmqpFactory(

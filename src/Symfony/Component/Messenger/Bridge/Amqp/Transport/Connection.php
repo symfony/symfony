@@ -60,9 +60,18 @@ class Connection
     ];
 
     private const AVAILABLE_QUEUE_OPTIONS = [
+        'bindings',
+        'flags',
+        'arguments',
+    ];
+
+    private const ORIGINAL_BINDING_KEYS = [
         'binding_keys',
         'binding_arguments',
-        'flags',
+    ];
+
+    private const AVAILABLE_BINDINGS_OPTIONS = [
+        'key',
         'arguments',
     ];
 
@@ -131,8 +140,11 @@ class Connection
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
      *   * confirm_timeout: Timeout in seconds for confirmation, if none specified transport will not wait for message confirmation. Note: 0 or greater seconds. May be fractional.
      *   * queues[name]: An array of queues, keyed by the name
-     *     * binding_keys: The binding keys (if any) to bind to this queue
-     *     * binding_arguments: Arguments to be used while binding the queue.
+     *     * binding_keys: The binding keys (if any) to bind to this queue (Usage is deprecated. See 'bindings')
+     *     * binding_arguments: Arguments to be used while binding the queue. (Usage is deprecated. See 'bindings')
+     *     * bindings[name]: An array of bindings for this queue, keyed by the name
+     *       * key: The binding key (if any) to bind to this queue
+     *       * arguments: An array of arguments to be used while binding the queue.
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
@@ -237,8 +249,18 @@ class Connection
                     continue;
                 }
 
-                if (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS))) {
+                if (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS, self::ORIGINAL_BINDING_KEYS))) {
                     trigger_deprecation('symfony/messenger', '5.1', 'Invalid queue option(s) "%s" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated.', implode('", "', $invalidQueueOptions));
+                } elseif (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS))) {
+                    trigger_deprecation('symfony/messenger', '5.2', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "bindings" option should be used rather than "binding_keys" and "binding_arguments".', implode('", "', $invalidQueueOptions));
+                }
+
+                if (\is_array($queue['bindings'] ?? false)) {
+                    foreach ($queue['bindings'] as $title => $individualBinding) {
+                        if (0 < \count($invalidBindingsOptions = array_diff(array_keys($individualBinding), self::AVAILABLE_BINDINGS_OPTIONS))) {
+                            throw new \InvalidArgumentException(sprintf('Invalid bindings option(s) "%s" passed to the AMQP Messenger transport in "%s". Each "bindings" option only accepts "key" and "arguments"', implode('", "', $invalidBindingsOptions), $title));
+                        }
+                    }
                 }
             }
         }
@@ -461,6 +483,12 @@ class Connection
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
+            foreach ($queueConfig['bindings'] ?? [] as $binding) {
+                $this->queue($queueName)->bind($this->exchangeOptions['name'], $binding['key'] ?? null, $binding['arguments'] ?? []);
+            }
+            if (isset($queueConfig['bindings']) && empty($queueConfig['binding_keys'])) {
+                continue;
+            }
             foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
                 $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
             }

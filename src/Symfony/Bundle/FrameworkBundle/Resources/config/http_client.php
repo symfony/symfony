@@ -58,6 +58,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('delay ms'),
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
+                abstract_arg('jitter'),
             ])
         ->set('http_client.retry.abstract_httpstatuscode_decider', HttpStatusCodeDecider::class)
             ->abstract()

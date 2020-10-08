@@ -19,21 +19,25 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
  */
 class DelayStampTest extends TestCase
 {
-    public function testSeconds()
+    public function testDelayFor()
     {
-        $stamp = DelayStamp::delayForSeconds(30);
+        $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 seconds'));
         $this->assertSame(30000, $stamp->getDelay());
-    }
-
-    public function testMinutes()
-    {
-        $stamp = DelayStamp::delayForMinutes(30);
+        $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 minutes'));
         $this->assertSame(1800000, $stamp->getDelay());
+        $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 hours'));
+        $this->assertSame(108000000, $stamp->getDelay());
+
+        $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('-5 seconds'));
+        $this->assertSame(-5000, $stamp->getDelay());
     }
 
-    public function testHours()
+    public function testDelayUntil()
     {
-        $stamp = DelayStamp::delayForHours(30);
-        $this->assertSame(108000000, $stamp->getDelay());
+        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('+30 seconds'));
+        $this->assertSame(30000, $stamp->getDelay());
+
+        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('-5 seconds'));
+        $this->assertSame(-5000, $stamp->getDelay());
     }
 }

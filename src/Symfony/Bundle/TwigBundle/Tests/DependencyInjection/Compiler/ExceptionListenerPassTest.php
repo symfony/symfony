@@ -46,9 +46,26 @@ class ExceptionListenerPassTest extends TestCase
         $this->assertTrue($builder->hasDefinition('exception_listener'));
         $this->assertFalse($builder->hasDefinition('twig.exception_listener'));
     }
+    
+    public function testRemovesBothExceptionListenerIfTwigIsNotUsedAsTemplateEngine(): void
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('twig', Environment::class);
+        $builder->register('exception_listener', ExceptionListener::class);
+        $builder->register('twig.exception_listener', ExceptionListener::class);
+        $builder->setParameter('twig.exception_listener.controller', 'exception_controller::showAction');
+        $builder->setParameter('templating.engines', ['php']);
+
+        ($pass = new ExceptionListenerPass())->process($builder);
+
+        $this->assertFalse($builder->hasDefinition('exception_listener'));
+        $this->assertFalse($builder->hasDefinition('twig.exception_listener'));
+    }
 
     public function testRemovesTwigExceptionListenerIfTwigIsNotUsedAsTemplateEngine(): void
     {
+        $this->markTestSkipped(sprintf('This test was implemented in accordance to version %. However, the implementation which this test cover was a behavior change.', '4.4.15'));
+        
         $builder = new ContainerBuilder();
         $builder->register('twig', Environment::class);
         $builder->register('exception_listener', ExceptionListener::class);

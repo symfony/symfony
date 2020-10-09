@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTranspor
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\AuthorizationCheckerMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -87,6 +88,11 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.middleware.validation', ValidationMiddleware::class)
             ->args([
                 service('validator'),
+            ])
+
+        ->set('messenger.middleware.authorization_checker', AuthorizationCheckerMiddleware::class)
+            ->args([
+                service('security.authorization_checker'),
             ])
 
         ->set('messenger.middleware.reject_redelivered_message_middleware', RejectRedeliveredMessageMiddleware::class)

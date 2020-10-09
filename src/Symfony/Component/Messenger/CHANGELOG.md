@@ -10,6 +10,7 @@ CHANGELOG
 * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
 * Added `WorkerMessageRetriedEvent`
 * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
+* Added `AuthorizationCheckerMiddleware` to check the message authorization with a `AuthorizationAttributeStamp`.
 
 5.1.0
 -----

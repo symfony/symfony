@@ -1766,6 +1766,12 @@ class FrameworkExtension extends Extension
                 if (!$validationConfig['enabled'] && \in_array($middlewareItem['id'], ['validation', 'messenger.middleware.validation'], true)) {
                     throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
                 }
+
+                if (\in_array($middlewareItem['id'], ['authorization_checker', 'messenger.middleware.authorization_checker'], true)) {
+                    if (!class_exists(Security::class)) {
+                        throw new LogicException('The Authorization checker middleware is only available when the Security component is installed. Try running "composer require symfony/security-core".');
+                    }
+                }
             }
 
             if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {

@@ -256,9 +256,9 @@ class Connection
                 }
 
                 if (\is_array($queue['bindings'] ?? false)) {
-                    foreach ($queue['bindings'] as $title => $individualBinding) {
+                    foreach ($queue['bindings'] as $individualBinding) {
                         if (0 < \count($invalidBindingsOptions = array_diff(array_keys($individualBinding), self::AVAILABLE_BINDINGS_OPTIONS))) {
-                            throw new \InvalidArgumentException(sprintf('Invalid bindings option(s) "%s" passed to the AMQP Messenger transport in "%s". Each "bindings" option only accepts "key" and "arguments"', implode('", "', $invalidBindingsOptions), $title));
+                            throw new \InvalidArgumentException(sprintf("Valid options for each 'bindings' are: %s", implode(', ', self::AVAILABLE_BINDINGS_OPTIONS)));
                         }
                     }
                 }

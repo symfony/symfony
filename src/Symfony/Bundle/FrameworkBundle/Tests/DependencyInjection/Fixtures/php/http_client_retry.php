@@ -8,6 +8,7 @@ $container->loadFromExtension('framework', [
                 'decider_service' => null,
                 'http_codes' => [429, 500],
                 'max_retries' => 2,
+                'retry_timeout' => 10,
                 'delay' => 100,
                 'multiplier' => 2,
                 'max_delay' => 0,

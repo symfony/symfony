@@ -1667,6 +1667,7 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue([423, 425, 429, 500, 502, 503, 504, 507, 510])
                     ->end()
                     ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
+                    ->floatNode('retry_timeout')->defaultNull()->min(0)->info('The idle timeout in seconds before retrying the request, defaults to the "default_socket_timeout" ini parameter.')->end()
                     ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used)')->end()
                     ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: (delay * (multiple ^ retries))')->end()
                     ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()

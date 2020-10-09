@@ -584,6 +584,7 @@
         <xsd:attribute name="backoff-service" type="xsd:string" />
         <xsd:attribute name="decider-service" type="xsd:string" />
         <xsd:attribute name="max-retries" type="xsd:integer" />
+        <xsd:attribute name="retry-timeout" type="xsd:float" />
         <xsd:attribute name="delay" type="xsd:integer" />
         <xsd:attribute name="multiplier" type="xsd:float" />
         <xsd:attribute name="max-delay" type="xsd:float" />

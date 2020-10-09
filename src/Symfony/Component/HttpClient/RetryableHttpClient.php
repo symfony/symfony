@@ -36,18 +36,21 @@ class RetryableHttpClient implements HttpClientInterface
     private $decider;
     private $strategy;
     private $maxRetries;
+    private $retryTimeout;
     private $logger;
 
     /**
-     * @param int $maxRetries The maximum number of times to retry
+     * @param int $maxRetries   The maximum number of times to retry
+     * @param int $retryTimeout the idle timeout in seconds before retrying the request, defaults to the "default_socket_timeout" ini parameter
      */
-    public function __construct(HttpClientInterface $client, RetryDeciderInterface $decider = null, RetryBackOffInterface $strategy = null, int $maxRetries = 3, LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client, RetryDeciderInterface $decider = null, RetryBackOffInterface $strategy = null, int $maxRetries = 3, float $retryTimeout = null, LoggerInterface $logger = null)
     {
         $this->client = $client;
         $this->decider = $decider ?? new HttpStatusCodeDecider();
         $this->strategy = $strategy ?? new ExponentialBackOff();
         $this->maxRetries = $maxRetries;
         $this->logger = $logger ?: new NullLogger();
+        $this->retryTimeout = $retryTimeout ?? (float) ini_get('default_socket_timeout');
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -59,11 +62,18 @@ class RetryableHttpClient implements HttpClientInterface
         $retryCount = 0;
         $content = '';
         $firstChunk = null;
+        $lastEventTime = microtime(true);
 
-        return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$retryCount, &$content, &$firstChunk) {
+        return new AsyncResponse($this->client, $method, $url, $options + ['timeout' => $this->retryTimeout], function (ChunkInterface $chunk, AsyncContext $context) use (&$lastEventTime, $method, $url, $options, &$retryCount, &$content, &$firstChunk) {
             $exception = null;
             try {
-                if ($chunk->isTimeout() || null !== $chunk->getInformationalStatus()) {
+                if ($chunk->isTimeout() && microtime(true) - $lastEventTime <= $this->retryTimeout) {
+                    yield $chunk;
+
+                    return;
+                }
+                $lastEventTime = microtime(true);
+                if (null !== $chunk->getInformationalStatus()) {
                     yield $chunk;
 
                     return;
@@ -124,11 +134,16 @@ class RetryableHttpClient implements HttpClientInterface
                 'delay' => $delay,
             ]);
 
-            $context->replaceRequest($method, $url, $options);
-            $context->pause($delay / 1000);
-
+            // it's expected to no having chunk in the next $delay seconds
+            $lastEventTime = microtime(true) + $delay / 1000;
             if ($retryCount >= $this->maxRetries) {
+                $context->replaceRequest($method, $url, $options);
+                $context->pause($delay / 1000);
+
                 $context->passthru();
+            } else {
+                $context->replaceRequest($method, $url, $options + ['timeout' => $this->retryTimeout + $delay / 1000]);
+                $context->pause($delay / 1000);
             }
         });
     }

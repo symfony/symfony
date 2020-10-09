@@ -12,6 +12,8 @@
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Exception\AssetNotFoundException;
+use Symfony\Component\Asset\Exception\RuntimeException;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -19,7 +21,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 class JsonManifestVersionStrategyTest extends TestCase
 {
     /**
-     * @dataProvider ProvideValidStrategies
+     * @dataProvider provideValidStrategies
      */
     public function testGetVersion(JsonManifestVersionStrategy $strategy)
     {
@@ -27,7 +29,7 @@ class JsonManifestVersionStrategyTest extends TestCase
     }
 
     /**
-     * @dataProvider ProvideValidStrategies
+     * @dataProvider provideValidStrategies
      */
     public function testApplyVersion(JsonManifestVersionStrategy $strategy)
     {
@@ -35,7 +37,7 @@ class JsonManifestVersionStrategyTest extends TestCase
     }
 
     /**
-     * @dataProvider ProvideValidStrategies
+     * @dataProvider provideValidStrategies
      */
     public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
     {
@@ -43,20 +45,31 @@ class JsonManifestVersionStrategyTest extends TestCase
     }
 
     /**
-     * @dataProvider ProvideMissingStrategies
+     * @dataProvider provideStrictStrategies
+     */
+    public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message)
+    {
+        $this->expectException(AssetNotFoundException::class);
+        $this->expectExceptionMessageMatches($message);
+
+        $strategy->getVersion($path);
+    }
+
+    /**
+     * @dataProvider provideMissingStrategies
      */
     public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
     }
 
     /**
-     * @dataProvider ProvideInvalidStrategies
+     * @dataProvider provideInvalidStrategies
      */
     public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error parsing JSON');
         $strategy->getVersion('main.js');
     }
@@ -99,5 +112,22 @@ class JsonManifestVersionStrategyTest extends TestCase
         yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
 
         yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
+    }
+
+    public function provideStrictStrategies()
+    {
+        $strategy = new JsonManifestVersionStrategy(__DIR__.'/../fixtures/manifest-valid.json', null, true);
+
+        yield [
+            $strategy,
+            'css/styles.555def.css',
+            '~Asset "css/styles.555def.css" not found in manifest "(.*)/manifest-valid.json"\. Did you mean one of these\? "css/styles.css", "css/style.css".~',
+        ];
+
+        yield [
+            $strategy,
+            'img/avatar.png',
+            '~Asset "img/avatar.png" not found in manifest "(.*)/manifest-valid.json"\.~',
+        ];
     }
 }

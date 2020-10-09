@@ -39,10 +39,8 @@ class ExceptionListenerPass implements CompilerPassInterface
 
         if ($container->hasParameter('templating.engines')) {
             $engines = $container->getParameter('templating.engines');
-            if (\in_array('twig', $engines, true)) {
+            if (!\in_array('twig', $engines, true)) {
                 $container->removeDefinition('twig.exception_listener');
-
-                return;
             }
         }
 

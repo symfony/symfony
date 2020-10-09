@@ -46,7 +46,7 @@ class ValidationListener implements EventSubscriberInterface
         $this->validator = $validator;
         $this->violationMapper = $violationMapper;
 
-        if (!$this->eventDispatcher) {
+        if (!$eventDispatcher) {
             @trigger_error(sprintf('The "$eventDispatcher" argument to the "%s" constructor will be required in Symfony 6.0.', self::class));
         }
 

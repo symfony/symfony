@@ -1506,6 +1506,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(0, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(2));
         $this->assertSame(0.3, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(3));
         $this->assertSame(2, $container->getDefinition('http_client.retry')->getArgument(3));
+        $this->assertSame(10, $container->getDefinition('http_client.retry')->getArgument(4));
 
         $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retry')->getClass());
         $this->assertSame(4, $container->getDefinition('foo.retry.exponential_backoff')->getArgument(1));

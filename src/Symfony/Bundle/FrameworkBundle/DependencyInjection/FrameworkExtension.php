@@ -1141,7 +1141,7 @@ class FrameworkExtension extends Extension
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);
         } else {
-            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
+            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default', $config['strict_mode']);
         }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
@@ -1157,7 +1157,7 @@ class FrameworkExtension extends Extension
                 // let format fallback to main version_format
                 $format = $package['version_format'] ?: $config['version_format'];
                 $version = $package['version'] ?? null;
-                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
+                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name, $package['strict_mode']);
             }
 
             $packageDefinition = $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version)
@@ -1186,7 +1186,7 @@ class FrameworkExtension extends Extension
         return $package;
     }
 
-    private function createVersion(ContainerBuilder $container, ?string $version, ?string $format, ?string $jsonManifestPath, string $name): Reference
+    private function createVersion(ContainerBuilder $container, ?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): Reference
     {
         // Configuration prevents $version and $jsonManifestPath from being set
         if (null !== $version) {
@@ -1203,6 +1203,7 @@ class FrameworkExtension extends Extension
         if (null !== $jsonManifestPath) {
             $def = new ChildDefinition('assets.json_manifest_version_strategy');
             $def->replaceArgument(0, $jsonManifestPath);
+            $def->replaceArgument(2, $strictMode);
             $container->setDefinition('assets._version_'.$name, $def);
 
             return new Reference('assets._version_'.$name);

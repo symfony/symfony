@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-09T09:24:04Z
+
+FYI: I tested this PR, it does fix the memory leak.

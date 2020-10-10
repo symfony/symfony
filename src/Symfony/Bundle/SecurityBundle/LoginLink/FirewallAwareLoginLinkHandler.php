@@ -53,9 +53,14 @@ class FirewallAwareLoginLinkHandler implements LoginLinkHandlerInterface
             throw new \LogicException('Cannot determine the correct LoginLinkHandler to use: there is no active Request and so, the firewall cannot be determined. Try using the specific login link handler service.');
         }
 
-        $firewallName = $this->firewallMap->getFirewallConfig($request)->getName();
+        $firewall = $this->firewallMap->getFirewallConfig($request);
+        if (!$firewall) {
+            throw new \LogicException('No login link handler found as the current route is not covered by a firewall.');
+        }
+
+        $firewallName = $firewall->getName();
         if (!$this->loginLinkHandlerLocator->has($firewallName)) {
-            throw new \InvalidArgumentException(sprintf('No login link handler found. Did you add a login_link key under your "%s" firewall?', $firewallName));
+            throw new \LogicException(sprintf('No login link handler found. Did you add a login_link key under your "%s" firewall?', $firewallName));
         }
 
         return $this->loginLinkHandlerLocator->get($firewallName);

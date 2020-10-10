@@ -193,7 +193,7 @@ final class NativeResponse implements ResponseInterface
     private function close(): void
     {
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
-        $this->handle = $this->buffer = $this->inflate = $this->onProgress = null;
+        $this->handle = $this->buffer = $this->onProgress = null;
     }
 
     /**

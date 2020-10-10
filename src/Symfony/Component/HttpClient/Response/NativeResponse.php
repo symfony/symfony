@@ -16,7 +16,6 @@ use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\NativeClientState;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -87,14 +86,9 @@ final class NativeResponse implements ResponseInterface
     public function __destruct()
     {
         try {
-            $e = null;
             $this->doDestruct();
-        } catch (HttpExceptionInterface $e) {
-            throw $e;
         } finally {
-            if ($e ?? false) {
-                throw $e;
-            }
+            $multi = clone $this->multi;
 
             $this->close();
 
@@ -103,6 +97,8 @@ final class NativeResponse implements ResponseInterface
                 $this->multi->responseCount = 0;
                 $this->multi->dnsCache = [];
             }
+
+            $this->multi = $multi;
         }
     }
 

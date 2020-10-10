@@ -157,7 +157,7 @@ switch ($vars['REQUEST_URI']) {
         exit;
 
     case '/json':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'documents' => [
                 ['id' => '/json/1'],
@@ -170,7 +170,7 @@ switch ($vars['REQUEST_URI']) {
     case '/json/1':
     case '/json/2':
     case '/json/3':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'title' => $vars['REQUEST_URI'],
         ]);

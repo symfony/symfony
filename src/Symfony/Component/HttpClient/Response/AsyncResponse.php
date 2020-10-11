@@ -45,7 +45,25 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         $this->response = $client->request($method, $url, ['buffer' => false] + $options);
         $this->passthru = $passthru;
         $this->initializer = static function (self $response) {
-            return null !== $response->shouldBuffer;
+            if (null === $response->shouldBuffer) {
+                return false;
+            }
+
+            foreach (self::stream([$response]) as $chunk) {
+                if ($chunk->isTimeout() && $response->passthru) {
+                    foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
+                        return !$chunk->isFirst();
+                    }
+
+                    return true;
+                }
+
+                if ($chunk->isFirst()) {
+                    break;
+                }
+            }
+
+            return false;
         };
         if (\array_key_exists('user_data', $options)) {
             $this->info['user_data'] = $options['user_data'];

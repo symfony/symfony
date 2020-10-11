@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Laurent Clouet <laurent35240@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Ulid extends Constraint
 {
     const TOO_SHORT_ERROR = '7b44804e-37d5-4df4-9bdd-b738d4a45bb4';
@@ -33,4 +34,15 @@ class Ulid extends Constraint
     ];
 
     public $message = 'This is not a valid ULID.';
+
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

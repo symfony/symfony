@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraint;
  * @author Michael Schummel
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Iban extends Constraint
 {
     const INVALID_COUNTRY_CODE_ERROR = 'de78ee2c-bd50-44e2-aec8-3d8228aeadb9';
@@ -38,4 +39,11 @@ class Iban extends Constraint
     ];
 
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
+
+    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

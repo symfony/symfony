@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hostname extends Constraint
 {
     const INVALID_HOSTNAME_ERROR = '7057ffdb-0af4-4f7e-bd5e-e9acfa6d7a2d';
@@ -29,4 +30,17 @@ class Hostname extends Constraint
 
     public $message = 'This value is not a valid hostname.';
     public $requireTld = true;
+
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        bool $requireTld = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->requireTld = $requireTld ?? $this->requireTld;
+    }
 }

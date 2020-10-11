@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Time extends Constraint
 {
     const INVALID_FORMAT_ERROR = '9d27b2bb-f755-4fbf-b725-39b1edbdebdf';
@@ -30,4 +31,15 @@ class Time extends Constraint
     ];
 
     public $message = 'This value is not a valid time.';
+
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 }

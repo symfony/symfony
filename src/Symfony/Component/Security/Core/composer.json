@@ -28,13 +28,14 @@
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/ldap": "^4.4|^5.0",
-        "symfony/validator": "^4.4|^5.0",
+        "symfony/validator": "^5.2",
         "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.4",
         "symfony/security-guard": "<4.4",
-        "symfony/ldap": "<4.4"
+        "symfony/ldap": "<4.4",
+        "symfony/validator": "<5.2"
     },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",

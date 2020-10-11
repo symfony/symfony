@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Ip extends Constraint
 {
     const V4 = '4';
@@ -78,9 +79,19 @@ class Ip extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    public function __construct(
+        array $options = null,
+        string $version = null,
+        string $message = null,
+        callable $normalizer = null,
+        array $groups = null,
+        $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->version = $version ?? $this->version;
+        $this->message = $message ?? $this->message;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (!\in_array($this->version, self::$versions)) {
             throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', self::$versions)));

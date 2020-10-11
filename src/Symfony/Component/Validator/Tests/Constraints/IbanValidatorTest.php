@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\IbanValidator;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IbanValidatorTest extends ConstraintValidatorTestCase
@@ -423,6 +425,24 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($iban, Iban::INVALID_COUNTRY_CODE_ERROR);
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testLoadFromAttribute()
+    {
+        $classMetadata = new ClassMetadata(IbanDummy::class);
+        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+
+        [$constraint] = $classMetadata->properties['iban']->constraints;
+
+        $this->validator->validate('DE89 3704 0044 0532 0130 01', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE89 3704 0044 0532 0130 01"')
+            ->setCode(Iban::CHECKSUM_FAILED_ERROR)
+            ->assertRaised();
+    }
+
     public function getIbansWithInvalidCountryCode()
     {
         return [
@@ -445,4 +465,10 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ->setCode($code)
             ->assertRaised();
     }
+}
+
+class IbanDummy
+{
+    #[Iban(message: 'myMessage')]
+    private $iban;
 }

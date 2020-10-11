@@ -80,4 +80,19 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ['Z1ARZ3NDEKTSV4RRFFQ69G5FAV', Ulid::TOO_LARGE_ERROR],
         ];
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidUlidNamed()
+    {
+        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Ulid(message: "testMessage");');
+
+        $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
+
+        $this->buildViolation('testMessage')
+            ->setParameter('{{ value }}', '"01ARZ3NDEKTSV4RRFFQ69G5FA"')
+            ->setCode(Ulid::TOO_SHORT_ERROR)
+            ->assertRaised();
+    }
 }

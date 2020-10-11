@@ -22,8 +22,22 @@ use Symfony\Component\Validator\Constraint;
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class CardScheme extends Constraint
 {
+    const AMEX = 'AMEX';
+    const CHINA_UNIONPAY = 'CHINA_UNIONPAY';
+    const DINERS = 'DINERS';
+    const DISCOVER = 'DISCOVER';
+    const INSTAPAYMENT = 'INSTAPAYMENT';
+    const JCB = 'JCB';
+    const LASER = 'LASER';
+    const MAESTRO = 'MAESTRO';
+    const MASTERCARD = 'MASTERCARD';
+    const MIR = 'MIR';
+    const UATP = 'UATP';
+    const VISA = 'VISA';
+
     const NOT_NUMERIC_ERROR = 'a2ad9231-e827-485f-8a1e-ef4d9a6d5c2e';
     const INVALID_FORMAT_ERROR = 'a8faedbf-1c2f-4695-8d22-55783be8efed';
 
@@ -34,6 +48,24 @@ class CardScheme extends Constraint
 
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param array|string $schemes The schemes to validate against or a set of options
+     */
+    public function __construct($schemes, string $message = null, array $groups = null, $payload = null, array $options = [])
+    {
+        if (\is_array($schemes) && \is_string(key($schemes))) {
+            $options = array_merge($schemes, $options);
+        } else {
+            $options['value'] = $schemes;
+        }
+
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 
     public function getDefaultOption()
     {

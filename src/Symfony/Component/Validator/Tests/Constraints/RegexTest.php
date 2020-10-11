@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -106,4 +108,42 @@ class RegexTest extends TestCase
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => new \stdClass()]);
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributes()
+    {
+        $metadata = new ClassMetadata(RegexDummy::class);
+        $loader = new AnnotationLoader();
+        self::assertTrue($loader->loadClassMetadata($metadata));
+
+        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        self::assertSame('/^[0-9]+$/', $aConstraint->pattern);
+        self::assertTrue($aConstraint->match);
+        self::assertNull($aConstraint->normalizer);
+
+        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        self::assertSame('myMessage', $bConstraint->message);
+        self::assertSame('/^[0-9]+$/', $bConstraint->pattern);
+        self::assertSame('[0-9]+', $bConstraint->htmlPattern);
+        self::assertFalse($bConstraint->match);
+        self::assertSame(['Default', 'RegexDummy'], $bConstraint->groups);
+
+        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
+    }
+}
+
+class RegexDummy
+{
+    #[Regex('/^[0-9]+$/')]
+    private $a;
+
+    #[Regex(message: 'myMessage', pattern: '/^[0-9]+$/', htmlPattern: '[0-9]+', match: false, normalizer: 'trim')]
+    private $b;
+
+    #[Regex('/^[0-9]+$/', groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

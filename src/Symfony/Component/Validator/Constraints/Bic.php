@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  *
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Bic extends Constraint
 {
     const INVALID_LENGTH_ERROR = '66dad313-af0b-4214-8566-6c799be9789c';
@@ -45,20 +47,33 @@ class Bic extends Constraint
     public $iban;
     public $ibanPropertyPath;
 
-    public function __construct($options = null)
+    /**
+     * {@inheritdoc}
+     *
+     * @param string|PropertyPathInterface|null $ibanPropertyPath
+     */
+    public function __construct(array $options = null, string $message = null, string $iban = null, $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, $payload = null)
     {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');
         }
+        if (null !== $ibanPropertyPath && !\is_string($ibanPropertyPath) && !$ibanPropertyPath instanceof PropertyPathInterface) {
+            throw new \TypeError(sprintf('"%s": Expected argument $ibanPropertyPath to be either null, a string or an instance of "%s", got "%s".', __METHOD__, PropertyPathInterface::class, get_debug_type($ibanPropertyPath)));
+        }
 
-        if (isset($options['iban']) && isset($options['ibanPropertyPath'])) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->ibanMessage = $ibanMessage ?? $this->ibanMessage;
+        $this->iban = $iban ?? $this->iban;
+        $this->ibanPropertyPath = $ibanPropertyPath ?? $this->ibanPropertyPath;
+
+        if (null !== $this->iban && null !== $this->ibanPropertyPath) {
             throw new ConstraintDefinitionException('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time.');
         }
 
-        if (isset($options['ibanPropertyPath']) && !class_exists(PropertyAccess::class)) {
+        if (null !== $this->ibanPropertyPath && !class_exists(PropertyAccess::class)) {
             throw new LogicException(sprintf('The "symfony/property-access" component is required to use the "%s" constraint with the "ibanPropertyPath" option.', self::class));
         }
-
-        parent::__construct($options);
     }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Email extends Constraint
 {
     public const VALIDATION_MODE_HTML5 = 'html5';
@@ -49,13 +50,23 @@ class Email extends Constraint
     public $mode;
     public $normalizer;
 
-    public function __construct($options = null)
-    {
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        string $mode = null,
+        callable $normalizer = null,
+        array $groups = null,
+        $payload = null
+    ) {
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
-        parent::__construct($options);
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->mode = $mode ?? $this->mode;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (self::VALIDATION_MODE_STRICT === $this->mode && !class_exists(StrictEmailValidator::class)) {
             throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode.', __CLASS__));

@@ -104,6 +104,55 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidLocales
+     */
+    public function testValidLocalesWithoutCanonicalization(string $locale)
+    {
+        $constraint = new Locale([
+            'message' => 'myMessage',
+            'canonicalize' => false,
+        ]);
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getUncanonicalizedLocales
+     */
+    public function testInvalidLocalesWithoutCanonicalization(string $locale)
+    {
+        $constraint = new Locale([
+            'message' => 'myMessage',
+            'canonicalize' => false,
+        ]);
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testInvalidLocaleWithoutCanonicalizationNamed()
+    {
+        $this->validator->validate(
+            'en-US',
+            eval('return new \Symfony\Component\Validator\Constraints\Locale(message: "myMessage", canonicalize: false);')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"en-US"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
+    }
+
     public function getUncanonicalizedLocales(): iterable
     {
         return [

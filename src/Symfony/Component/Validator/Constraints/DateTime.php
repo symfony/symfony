@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class DateTime extends Constraint
 {
     const INVALID_FORMAT_ERROR = '1a9da513-2640-4f84-9b6a-4d99dcddc628';
@@ -33,6 +34,24 @@ class DateTime extends Constraint
 
     public $format = 'Y-m-d H:i:s';
     public $message = 'This value is not a valid datetime.';
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string|array|null $format
+     */
+    public function __construct($format = null, string $message = null, array $groups = null, $payload = null, array $options = [])
+    {
+        if (\is_array($format)) {
+            $options = array_merge($format, $options);
+        } elseif (null !== $format) {
+            $options['value'] = $format;
+        }
+
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+    }
 
     public function getDefaultOption()
     {

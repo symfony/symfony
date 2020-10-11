@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-10T07:26:12Z
+
+@derrabus Can you have a look at the failing test?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-10T20:18:44Z
+
+@fabpot The failing Validator tests on the php 7.4 run also fail on 5.x and seem to be related to the new baseline feature added with #37733.

@@ -2269,7 +2269,7 @@ class FrameworkExtension extends Extension
         }
 
         $limiter->replaceArgument(1, new Reference($storageId));
-        unset($limiterConfig['storage']);
+        unset($limiterConfig['storage_service']);
         unset($limiterConfig['cache_pool']);
 
         $limiterConfig['id'] = $name;

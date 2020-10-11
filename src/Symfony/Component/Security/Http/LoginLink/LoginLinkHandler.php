@@ -106,7 +106,11 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $signatureFields = [base64_encode($user->getUsername()), $expires];
 
         foreach ($this->signatureProperties as $property) {
-            $value = $this->propertyAccessor->getValue($user, $property);
+            $value = $this->propertyAccessor->getValue($user, $property) ?? '';
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format('c');
+            }
+
             if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
                 throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, \get_class($user), get_debug_type($value)));
             }

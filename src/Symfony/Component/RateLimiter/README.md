@@ -18,9 +18,9 @@ $ composer require symfony/rate-limiter
 
 ```php
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Component\RateLimiter\Limiter;
+use Symfony\Component\RateLimiter\RateLimiter;
 
-$limiter = new Limiter([
+$limiter = new RateLimiter([
     'id' => 'login',
     'strategy' => 'token_bucket', // or 'fixed_window'
     'limit' => 10,

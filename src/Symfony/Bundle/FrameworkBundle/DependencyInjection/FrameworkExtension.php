@@ -128,8 +128,8 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
-use Symfony\Component\RateLimiter\Limiter;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\RateLimiter;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
@@ -2266,7 +2266,7 @@ class FrameworkExtension extends Extension
         $limiterConfig['id'] = $name;
         $limiter->replaceArgument(0, $limiterConfig);
 
-        $container->registerAliasForArgument($limiterId, Limiter::class, $name.'.limiter');
+        $container->registerAliasForArgument($limiterId, RateLimiter::class, $name.'.limiter');
     }
 
     private function resolveTrustedHeaders(array $headers): int

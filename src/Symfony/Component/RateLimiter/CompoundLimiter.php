@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
@@ -29,6 +31,11 @@ final class CompoundLimiter implements LimiterInterface
             throw new \LogicException(sprintf('"%s::%s()" require at least one limiter.', self::class, __METHOD__));
         }
         $this->limiters = $limiters;
+    }
+
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    {
+        throw new ReserveNotSupportedException(__CLASS__);
     }
 
     public function consume(int $tokens = 1): Limit

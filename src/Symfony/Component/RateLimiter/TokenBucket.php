@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
+ * @internal
  * @experimental in 5.2
  */
 final class TokenBucket implements LimiterStateInterface
@@ -32,6 +33,10 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, ?float $timer = null)
     {
+        if ($initialTokens < 1) {
+            throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
+        }
+
         $this->id = $id;
         $this->tokens = $this->burstSize = $initialTokens;
         $this->rate = $rate;

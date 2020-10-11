@@ -60,7 +60,7 @@ class FixedWindowLimiterTest extends TestCase
         sleep(10);
         $limit = $limiter->consume(10);
         $this->assertEquals(0, $limit->getRemainingTokens());
-        $this->assertEquals(time() + 60, $limit->getRetryAfter()->getTimestamp());
+        $this->assertTrue($limit->isAccepted());
     }
 
     public function testWrongWindowFromCache()

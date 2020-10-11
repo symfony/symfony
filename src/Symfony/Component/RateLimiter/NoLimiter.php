@@ -23,6 +23,11 @@ namespace Symfony\Component\RateLimiter;
  */
 final class NoLimiter implements LimiterInterface
 {
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    {
+        return new Reservation(time(), new Limit(\INF, new \DateTimeImmutable(), true));
+    }
+
     public function consume(int $tokens = 1): Limit
     {
         return new Limit(\INF, new \DateTimeImmutable(), true);

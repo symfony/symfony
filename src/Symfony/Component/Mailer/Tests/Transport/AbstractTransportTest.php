@@ -12,7 +12,11 @@
 namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\MessageSentEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mime\Address;
@@ -54,5 +58,26 @@ class AbstractTransportTest extends TestCase
 
         $transport = new NullTransport();
         $transport->send(new RawMessage('Some raw email message'));
+    }
+
+    public function testEventDispatching()
+    {
+        $message = new RawMessage('');
+        $envelope = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]);
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        // we expect to calls to the dispatcher, first with a MessageEvent, and then with a MessageSentEvent
+        $expectedEvents = [MessageEvent::class, MessageSentEvent::class];
+        $eventDispatcher
+            ->expects($this->exactly(2))
+            ->method('dispatch')
+            ->with($this->callback(function($event) use (&$expectedEvents) {
+                $currentEvent = array_shift($expectedEvents);
+                return $event instanceof $currentEvent;
+            }));
+
+        $transport = new NullTransport($eventDispatcher, $this->createMock(LoggerInterface::class));
+        $transport->send($message, $envelope);
     }
 }

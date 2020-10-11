@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\MessageSentEvent;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
@@ -67,6 +68,9 @@ abstract class AbstractTransport implements TransportInterface
         $message = new SentMessage($message, $envelope);
         $this->doSend($message);
 
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(new MessageSentEvent($message, (string) $this));
+        }
         $this->checkThrottling();
 
         return $message;

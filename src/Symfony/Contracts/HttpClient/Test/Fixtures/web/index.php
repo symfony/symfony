@@ -63,6 +63,12 @@ switch ($vars['REQUEST_URI']) {
         header('Content-Type: application/json', true, 404);
         break;
 
+    case '/404-gzipped':
+        header('Content-Type: text/plain', true, 404);
+        ob_start('ob_gzhandler');
+        echo 'some text';
+        exit;
+
     case '/301':
         if ('Basic Zm9vOmJhcg==' === $vars['HTTP_AUTHORIZATION']) {
             header('Location: http://127.0.0.1:8057/302', true, 301);

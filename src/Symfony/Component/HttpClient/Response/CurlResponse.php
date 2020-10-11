@@ -225,7 +225,6 @@ final class CurlResponse implements ResponseInterface
      */
     private function close(): void
     {
-        $this->inflate = null;
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_setopt($this->handle, \CURLOPT_PRIVATE, '_0');
 

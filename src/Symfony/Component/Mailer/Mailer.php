@@ -36,12 +36,10 @@ final class Mailer implements MailerInterface
         $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): void
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         if (null === $this->bus) {
-            $this->transport->send($message, $envelope);
-
-            return;
+            return $this->transport->send($message, $envelope);
         }
 
         if (null !== $this->dispatcher) {

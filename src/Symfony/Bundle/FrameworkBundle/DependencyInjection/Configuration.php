@@ -1641,19 +1641,15 @@ class Configuration implements ConfigurationInterface
                 ->addDefaultsIfNotSet()
                 ->beforeNormalization()
                     ->always(function ($v) {
-                        if (isset($v['backoff_service']) && (isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']) || isset($v['jitter']))) {
-                            throw new \InvalidArgumentException('The "backoff_service" option cannot be used along with the "delay", "multiplier", "max_delay" or "jitter" options.');
-                        }
-                        if (isset($v['decider_service']) && (isset($v['http_codes']))) {
-                            throw new \InvalidArgumentException('The "decider_service" option cannot be used along with the "http_codes" options.');
+                        if (isset($v['retry_strategy']) && (isset($v['http_codes']) || isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']) || isset($v['jitter']))) {
+                            throw new \InvalidArgumentException('The "retry_strategy" option cannot be used along with the "http_codes", "delay", "multiplier", "max_delay" or "jitter" options.');
                         }
 
                         return $v;
                     })
                 ->end()
                 ->children()
-                    ->scalarNode('backoff_service')->defaultNull()->info('service id to override the retry backoff')->end()
-                    ->scalarNode('decider_service')->defaultNull()->info('service id to override the retry decider')->end()
+                    ->scalarNode('retry_strategy')->defaultNull()->info('service id to override the retry strategy')->end()
                     ->arrayNode('http_codes')
                         ->performNoDeepMerging()
                         ->beforeNormalization()
@@ -1668,9 +1664,9 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
                     ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used)')->end()
-                    ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: (delay * (multiple ^ retries))')->end()
+                    ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: delay * (multiple ^ retries)')->end()
                     ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()
-                    ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness in percent (between 0 and 1)) to apply to the delay')->end()
+                    ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness in percent (between 0 and 1) to apply to the delay')->end()
                 ->end()
             ;
     }

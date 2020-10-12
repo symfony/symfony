@@ -5,11 +5,11 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
-use Symfony\Component\HttpClient\Retry\HttpStatusCodeDecider;
-use Symfony\Component\HttpClient\Retry\RetryDeciderInterface;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class RetryableHttpClientTest extends TestCase
 {
@@ -20,8 +20,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new GenericRetryStrategy([500], 0),
             1
         );
 
@@ -38,8 +37,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new GenericRetryStrategy([500], 0),
             1
         );
 
@@ -56,13 +54,12 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new class() implements RetryDeciderInterface {
-                public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent): ?bool
+            new class(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0) extends GenericRetryStrategy {
+                public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
                 {
-                    return null === $responseContent ? null : 200 !== $responseCode;
+                    return null === $responseContent ? null : 200 !== $context->getStatusCode();
                 }
             },
-            new ExponentialBackOff(0),
             1
         );
 
@@ -78,13 +75,12 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
                 new MockResponse('', ['http_code' => 200]),
             ]),
-            new class() implements RetryDeciderInterface {
-                public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseCode, array $responseHeaders, ?string $responseContent, \Throwable $throwable = null): ?bool
+            new class(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0) extends GenericRetryStrategy {
+                public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
                 {
                     return null;
                 }
             },
-            new ExponentialBackOff(0),
             1
         );
 
@@ -100,8 +96,7 @@ class RetryableHttpClientTest extends TestCase
             new MockHttpClient([
                 new MockResponse('', ['http_code' => 500]),
             ]),
-            new HttpStatusCodeDecider([500]),
-            new ExponentialBackOff(0),
+            new GenericRetryStrategy([500], 0),
             0
         );
 

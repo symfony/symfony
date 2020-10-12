@@ -4,8 +4,7 @@ $container->loadFromExtension('framework', [
     'http_client' => [
         'default_options' => [
             'retry_failed' => [
-                'backoff_service' => null,
-                'decider_service' => null,
+                'retry_strategy' => null,
                 'http_codes' => [429, 500],
                 'max_retries' => 2,
                 'delay' => 100,

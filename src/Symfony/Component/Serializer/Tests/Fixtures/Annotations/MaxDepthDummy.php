@@ -9,23 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializedNameDummy
+class MaxDepthDummy
 {
     /**
-     * @SerializedName("baz")
+     * @MaxDepth(2)
      */
     public $foo;
 
     public $bar;
-
-    public $quux;
 
     /**
      * @var self
@@ -33,7 +31,7 @@ class SerializedNameDummy
     public $child;
 
     /**
-     * @SerializedName("qux")
+     * @MaxDepth(3)
      */
     public function getBar()
     {
@@ -43,5 +41,10 @@ class SerializedNameDummy
     public function getChild()
     {
         return $this->child;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
     }
 }

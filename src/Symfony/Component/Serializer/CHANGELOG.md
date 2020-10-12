@@ -8,6 +8,7 @@ CHANGELOG
  * added `UidNormalizer`
  * added `FormErrorNormalizer`
  * added `MimeMessageNormalizer`
+ * serializer mapping can be configured using php attributes
 
 5.1.0
 -----

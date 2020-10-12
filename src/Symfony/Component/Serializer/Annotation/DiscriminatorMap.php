@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
     /**
@@ -34,20 +35,29 @@ class DiscriminatorMap
     private $mapping;
 
     /**
+     * @param string|array $typeProperty
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $data)
+    public function __construct($typeProperty, array $mapping = null)
     {
-        if (empty($data['typeProperty'])) {
+        if (\is_array($typeProperty)) {
+            $mapping = $typeProperty['mapping'] ?? null;
+            $typeProperty = $typeProperty['typeProperty'] ?? null;
+        } elseif (!\is_string($typeProperty)) {
+            throw new \TypeError(sprintf('"%s": Argument $typeProperty was expected to be a string or array, got "%s".', __METHOD__, get_debug_type($typeProperty)));
+        }
+
+        if (empty($typeProperty)) {
             throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));
         }
 
-        if (empty($data['mapping'])) {
+        if (empty($mapping)) {
             throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', static::class));
         }
 
-        $this->typeProperty = $data['typeProperty'];
-        $this->mapping = $data['mapping'];
+        $this->typeProperty = $typeProperty;
+        $this->mapping = $mapping;
     }
 
     public function getTypeProperty(): string

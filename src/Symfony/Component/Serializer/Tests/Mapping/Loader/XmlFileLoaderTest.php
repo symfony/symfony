@@ -16,10 +16,10 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
-use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -39,7 +39,7 @@ class XmlFileLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->loader = new XmlFileLoader(__DIR__.'/../../Fixtures/serialization.xml');
-        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
     }
 
     public function testInterface()
@@ -61,7 +61,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testMaxDepth()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy');
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -71,7 +71,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testSerializedName()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy');
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();

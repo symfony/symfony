@@ -3,7 +3,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy;
 
 /**
  * Covers AbstractObjectNormalizer::ENABLE_MAX_DEPTH and AbstractObjectNormalizer::MAX_DEPTH_HANDLER.

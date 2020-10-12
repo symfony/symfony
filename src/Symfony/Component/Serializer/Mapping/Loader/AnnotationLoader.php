@@ -26,12 +26,21 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  * Annotation loader.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  */
 class AnnotationLoader implements LoaderInterface
 {
+    private const KNOWN_ANNOTATIONS = [
+        DiscriminatorMap::class => true,
+        Groups::class => true,
+        Ignore:: class => true,
+        MaxDepth::class => true,
+        SerializedName::class => true,
+    ];
+
     private $reader;
 
-    public function __construct(Reader $reader)
+    public function __construct(Reader $reader = null)
     {
         $this->reader = $reader;
     }
@@ -47,7 +56,7 @@ class AnnotationLoader implements LoaderInterface
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
-        foreach ($this->reader->getClassAnnotations($reflectionClass) as $annotation) {
+        foreach ($this->loadAnnotations($reflectionClass) as $annotation) {
             if ($annotation instanceof DiscriminatorMap) {
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                     $annotation->getTypeProperty(),
@@ -63,7 +72,7 @@ class AnnotationLoader implements LoaderInterface
             }
 
             if ($property->getDeclaringClass()->name === $className) {
-                foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
+                foreach ($this->loadAnnotations($property) as $annotation) {
                     if ($annotation instanceof Groups) {
                         foreach ($annotation->getGroups() as $group) {
                             $attributesMetadata[$property->name]->addGroup($group);
@@ -98,7 +107,7 @@ class AnnotationLoader implements LoaderInterface
                 }
             }
 
-            foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
+            foreach ($this->loadAnnotations($method) as $annotation) {
                 if ($annotation instanceof Groups) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
@@ -128,5 +137,33 @@ class AnnotationLoader implements LoaderInterface
         }
 
         return $loaded;
+    }
+
+    /**
+     * @param \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector
+     */
+    public function loadAnnotations(object $reflector): iterable
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            foreach ($reflector->getAttributes() as $attribute) {
+                if (self::KNOWN_ANNOTATIONS[$attribute->getName()] ?? false) {
+                    yield $attribute->newInstance();
+                }
+            }
+        }
+
+        if (null === $this->reader) {
+            return;
+        }
+
+        if ($reflector instanceof \ReflectionClass) {
+            yield from $this->reader->getClassAnnotations($reflector);
+        }
+        if ($reflector instanceof \ReflectionMethod) {
+            yield from $this->reader->getMethodAnnotations($reflector);
+        }
+        if ($reflector instanceof \ReflectionProperty) {
+            yield from $this->reader->getPropertyAnnotations($reflector);
+        }
     }
 }

@@ -35,6 +35,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Php80Dummy.php'):
         case false !== strpos($file, '/src/Symfony/Component/Routing/Tests/Fixtures/AttributeFixtures'):
         case false !== strpos($file, '/src/Symfony/Component/Serializer/Tests/Normalizer/Features/ObjectOuter.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Serializer/Tests/Fixtures/Attributes/'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/LotsOfAttributes.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/Attribute/'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/MyAttribute.php'):

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,9 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class GroupDummyParent
 {
-    /**
-     * @Groups({"a"})
-     */
+    #[Groups(["a"])]
     private $kevin;
     private $coopTilleuls;
 
@@ -39,9 +37,7 @@ class GroupDummyParent
         $this->coopTilleuls = $coopTilleuls;
     }
 
-    /**
-     * @Groups({"a", "b"})
-     */
+    #[Groups(["a", "b"])]
     public function getCoopTilleuls()
     {
         return $this->coopTilleuls;

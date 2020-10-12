@@ -31,9 +31,9 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
 
 class AbstractObjectNormalizerTest extends TestCase

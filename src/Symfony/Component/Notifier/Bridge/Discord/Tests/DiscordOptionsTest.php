@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordOptions;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordAuthorEmbedObject;
@@ -40,14 +41,14 @@ final class DiscordOptionsTest extends TestCase
             ->addEmbed((new DiscordEmbed())
                 ->description('descript.io')
                 ->url('http://ava.tar/pic.png')
-                ->timestamp(new \DateTime('2020-10-12 9:14:15'))
+                ->timestamp(new \DateTime('2020-10-12 9:14:15+0000'))
                 ->color(2021216)
                 ->title('New song added!')
             )
             ->addEmbed((new DiscordEmbed())
                 ->description('descript.io 2')
                 ->url('http://ava.tar/pic.png')
-                ->timestamp(new \DateTime('2020-10-12 9:14:15'))
+                ->timestamp(new \DateTime('2020-10-12 9:14:15+0000'))
                 ->color(2021216)
                 ->title('New song added!')
             );
@@ -75,7 +76,7 @@ final class DiscordOptionsTest extends TestCase
             ->addEmbed((new DiscordEmbed())
                 ->description('descript.io')
                 ->url('http://ava.tar/pic.png')
-                ->timestamp(new \DateTime('2020-10-12 9:14:15'))
+                ->timestamp(new \DateTime('2020-10-12 9:14:15+0000'))
                 ->color(2021216)
                 ->title('New song added!')
                 ->footer(

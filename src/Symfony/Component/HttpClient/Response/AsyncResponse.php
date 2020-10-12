@@ -34,6 +34,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
     private $response;
     private $info = ['canceled' => false];
     private $passthru;
+    private $lastYielded = false;
 
     /**
      * @param ?callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
@@ -255,7 +256,10 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 }
             }
 
-            if (null === $chunk->getError() && !$chunk->isLast() && $r->response === $response && null !== $r->client) {
+            if (null === $chunk->getError() && $chunk->isLast()) {
+                $r->lastYielded = true;
+            }
+            if (null === $chunk->getError() && !$r->lastYielded && $r->response === $response && null !== $r->client) {
                 throw new \LogicException('A chunk passthru must yield an "isLast()" chunk before ending a stream.');
             }
 

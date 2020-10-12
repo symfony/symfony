@@ -230,4 +230,27 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertSame(200, $response->getStatusCode());
     }
+
+    public function testRecurciveStream()
+    {
+        $client = new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
+            use AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://localhost:8057/json');
+        $content = '';
+        foreach ($client->stream($response) as $chunk) {
+            $content .= $chunk->getContent();
+            foreach ($client->stream($response) as $chunk) {
+                $content .= $chunk->getContent();
+            }
+        }
+
+        $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $content);
+    }
 }

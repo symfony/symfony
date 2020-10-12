@@ -50,17 +50,21 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 return false;
             }
 
-            foreach (self::stream([$response]) as $chunk) {
-                if ($chunk->isTimeout() && $response->passthru) {
-                    foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
-                        return !$chunk->isFirst();
+            while (true) {
+                foreach (self::stream([$response]) as $chunk) {
+                    if ($chunk->isTimeout() && $response->passthru) {
+                        foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
+                            if ($chunk->isFirst()) {
+                                return false;
+                            }
+                        }
+
+                        continue 2;
                     }
 
-                    return true;
-                }
-
-                if ($chunk->isFirst()) {
-                    break;
+                    if ($chunk->isFirst()) {
+                        return false;
+                    }
                 }
             }
 

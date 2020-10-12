@@ -17,7 +17,6 @@ use Symfony\Component\HttpClient\Chunk\InformationalChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -205,14 +204,9 @@ final class CurlResponse implements ResponseInterface
                 return; // Unused pushed response
             }
 
-            $e = null;
             $this->doDestruct();
-        } catch (HttpExceptionInterface $e) {
-            throw $e;
         } finally {
-            if ($e ?? false) {
-                throw $e;
-            }
+            $multi = clone $this->multi;
 
             $this->close();
 
@@ -221,6 +215,8 @@ final class CurlResponse implements ResponseInterface
                 $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
                 $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];
             }
+
+            $this->multi = $multi;
         }
     }
 
@@ -229,7 +225,6 @@ final class CurlResponse implements ResponseInterface
      */
     private function close(): void
     {
-        $this->inflate = null;
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_setopt($this->handle, \CURLOPT_PRIVATE, '_0');
 

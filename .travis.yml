@@ -225,7 +225,7 @@ install:
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
           echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json &&
-          php .github/build-packages.php HEAD^ $(find src/Symfony -mindepth 3 -type f -name composer.json -printf '%h\n' | sort) &&
+          php .github/build-packages.php HEAD^ $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | sort) &&
           mv composer.json composer.json.phpunit &&
           mv composer.json.orig composer.json
       fi
@@ -249,7 +249,7 @@ install:
     - |
       # Skip the phpunit-bridge on bugfix-only branches when $deps is empty
       if [[ ! $deps && ! $TRAVIS_BRANCH = *.x ]]; then
-          export COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
+          export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
       fi
 
     - |

@@ -23,4 +23,12 @@ class Php80Dummy
     public function setString(string|\Stringable $string)
     {
     }
+
+    public function setPayload(mixed $payload)
+    {
+    }
+
+    public function getData(): mixed
+    {
+    }
 }

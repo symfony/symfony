@@ -63,6 +63,12 @@ switch ($vars['REQUEST_URI']) {
         header('Content-Type: application/json', true, 404);
         break;
 
+    case '/404-gzipped':
+        header('Content-Type: text/plain', true, 404);
+        ob_start('ob_gzhandler');
+        echo 'some text';
+        exit;
+
     case '/301':
         if ('Basic Zm9vOmJhcg==' === $vars['HTTP_AUTHORIZATION']) {
             header('Location: http://127.0.0.1:8057/302', true, 301);
@@ -157,7 +163,7 @@ switch ($vars['REQUEST_URI']) {
         exit;
 
     case '/json':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'documents' => [
                 ['id' => '/json/1'],
@@ -170,7 +176,7 @@ switch ($vars['REQUEST_URI']) {
     case '/json/1':
     case '/json/2':
     case '/json/3':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'title' => $vars['REQUEST_URI'],
         ]);

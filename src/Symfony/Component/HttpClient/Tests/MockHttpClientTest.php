@@ -240,6 +240,9 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't timeout on destruct");
                 break;
 
+            case 'testHandleIsRemovedOnException':
+                $this->markTestSkipped("MockHttpClient doesn't cache handles");
+
             case 'testPause':
             case 'testPauseReplace':
             case 'testPauseDuringBody':

@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
@@ -304,5 +306,27 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         self::$vulcainStarted = true;
+    }
+
+    public function testHandleIsRemovedOnException()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        try {
+            $client->request('GET', 'http://localhost:8057/304');
+            $this->fail(RedirectionExceptionInterface::class.' expected');
+        } catch (RedirectionExceptionInterface $e) {
+            // The response content-type mustn't be json as that calls getContent
+            // @see src/Symfony/Component/HttpClient/Exception/HttpExceptionTrait.php:58
+            $this->assertStringNotContainsString('json', $e->getResponse()->getHeaders(false)['content-type'][0] ?? '');
+
+            $r = new \ReflectionProperty($client, 'multi');
+            $r->setAccessible(true);
+            /** @var ClientState $clientState */
+            $clientState = $r->getValue($client);
+
+            $this->assertCount(0, $clientState->handlesActivity);
+            $this->assertCount(0, $clientState->openHandles);
+        }
     }
 }

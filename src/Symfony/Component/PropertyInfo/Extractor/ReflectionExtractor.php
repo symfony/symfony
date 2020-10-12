@@ -545,8 +545,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $type = \gettype($defaultValue);
+        $type = static::MAP_TYPES[$type] ?? $type;
 
-        return [new Type(static::MAP_TYPES[$type] ?? $type)];
+        return [new Type($type, false, null, Type::BUILTIN_TYPE_ARRAY === $type)];
     }
 
     private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionClass $declaringClass): array
@@ -556,7 +557,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         foreach ($reflectionType instanceof \ReflectionUnionType ? $reflectionType->getTypes() : [$reflectionType] as $type) {
             $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : (string) $type;
-            if ('null' === $phpTypeOrClass) {
+            if ('null' === $phpTypeOrClass || 'mixed' === $phpTypeOrClass) {
                 continue;
             }
 

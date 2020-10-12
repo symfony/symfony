@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\InformationalChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -171,6 +172,31 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         // Schedule the request in a non-blocking way
         $multi->openHandles[$id] = [$ch, $options];
         curl_multi_add_handle($multi->handle, $ch);
+
+        $this->canary = new Canary(static function () use ($ch, $multi, $id) {
+            unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
+            curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
+
+            if (self::$performing) {
+                return;
+            }
+
+            curl_multi_remove_handle($multi->handle, $ch);
+            curl_setopt_array($ch, [
+                \CURLOPT_NOPROGRESS => true,
+                \CURLOPT_PROGRESSFUNCTION => null,
+                \CURLOPT_HEADERFUNCTION => null,
+                \CURLOPT_WRITEFUNCTION => null,
+                \CURLOPT_READFUNCTION => null,
+                \CURLOPT_INFILE => null,
+            ]);
+
+            if (!$multi->openHandles) {
+                // Schedule DNS cache eviction for the next request
+                $multi->dnsCache->evictions = $multi->dnsCache->evictions ?: $multi->dnsCache->removals;
+                $multi->dnsCache->removals = $multi->dnsCache->hostnames = [];
+            }
+        });
     }
 
     /**
@@ -221,48 +247,11 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
     public function __destruct()
     {
-        try {
-            if (null === $this->timeout) {
-                return; // Unused pushed response
-            }
-
-            $this->doDestruct();
-        } finally {
-            $multi = clone $this->multi;
-
-            $this->close();
-
-            if (!$this->multi->openHandles) {
-                // Schedule DNS cache eviction for the next request
-                $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
-                $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];
-            }
-
-            $this->multi = $multi;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function close(): void
-    {
-        unset($this->multi->pauseExpiries[$this->id], $this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
-        curl_setopt($this->handle, \CURLOPT_PRIVATE, '_0');
-
-        if (self::$performing) {
-            return;
+        if (null === $this->timeout) {
+            return; // Unused pushed response
         }
 
-        curl_multi_remove_handle($this->multi->handle, $this->handle);
-        curl_setopt_array($this->handle, [
-            \CURLOPT_NOPROGRESS => true,
-            \CURLOPT_PROGRESSFUNCTION => null,
-            \CURLOPT_HEADERFUNCTION => null,
-            \CURLOPT_WRITEFUNCTION => null,
-            \CURLOPT_READFUNCTION => null,
-            \CURLOPT_INFILE => null,
-        ]);
+        $this->doDestruct();
     }
 
     /**

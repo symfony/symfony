@@ -41,6 +41,7 @@ trait TransportResponseTrait
     private $timeout = 0;
     private $inflate;
     private $finalInfo;
+    private $canary;
     private $logger;
 
     /**
@@ -79,6 +80,15 @@ trait TransportResponseTrait
         $this->info['canceled'] = true;
         $this->info['error'] = 'Response has been canceled.';
         $this->close();
+    }
+
+    /**
+     * Closes the response and all its network handles.
+     */
+    protected function close(): void
+    {
+        $this->canary->cancel();
+        $this->inflate = null;
     }
 
     /**

@@ -30,6 +30,7 @@ use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\Internal\AmpBody;
 use Symfony\Component\HttpClient\Internal\AmpCanary;
 use Symfony\Component\HttpClient\Internal\AmpClientState;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -127,6 +128,11 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
         $multi->openHandles[$id] = $id;
         ++$multi->responseCount;
+
+        $this->canary = new Canary(static function () use ($canceller, $multi, $id) {
+            $canceller->cancel();
+            unset($multi->openHandles[$id], $multi->handlesActivity[$id]);
+        });
     }
 
     /**
@@ -142,27 +148,12 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         try {
             $this->doDestruct();
         } finally {
-            $multi = clone $this->multi;
-
-            $this->close();
-
             // Clear the DNS cache when all requests completed
             if (0 >= --$this->multi->responseCount) {
                 $this->multi->responseCount = 0;
                 $this->multi->dnsCache = [];
             }
-
-            $this->multi = $multi;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function close(): void
-    {
-        $this->canceller->cancel();
-        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
     }
 
     /**

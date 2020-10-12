@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-12T10:56:46Z
+
+Could you please rebase and squash the PR?
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-12T11:03:17Z
+
+@nicolas-grekas i've done the rebase and now fabbot says "code looks good" (and the conflict came back).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-12T11:08:35Z
+
+To fix the conflict, you need to 1. fetch the upstream symfony/symfony repo 2. rebase on the 5.x branch of this repo. Please also squash so that the PR contains only one commit (or two if there are two authors).

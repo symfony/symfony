@@ -26,6 +26,7 @@ use Twig\TwigFilter;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(TranslatorInterface::class);
+class_exists(TranslatorTrait::class);
 
 /**
  * Provides integration of the Translation component with Twig.

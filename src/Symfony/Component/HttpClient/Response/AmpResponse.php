@@ -24,6 +24,7 @@ use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\Internal\AmpBody;
+use Symfony\Component\HttpClient\Internal\AmpCanary;
 use Symfony\Component\HttpClient\Internal\AmpClientState;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -108,6 +109,8 @@ final class AmpResponse implements ResponseInterface
         try {
             $this->doDestruct();
         } finally {
+            $multi = clone $this->multi;
+
             $this->close();
 
             // Clear the DNS cache when all requests completed
@@ -115,6 +118,8 @@ final class AmpResponse implements ResponseInterface
                 $this->multi->responseCount = 0;
                 $this->multi->dnsCache = [];
             }
+
+            $this->multi = $multi;
         }
     }
 
@@ -189,11 +194,9 @@ final class AmpResponse implements ResponseInterface
 
     private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger)
     {
-        $activity = &$multi->handlesActivity;
-
-        $request->setInformationalResponseHandler(static function (Response $response) use (&$activity, $id, &$info, &$headers) {
+        $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
             self::addResponseHeaders($response, $info, $headers);
-            $activity[$id][] = new InformationalChunk($response->getStatus(), $response->getHeaders());
+            $multi->handlesActivity[$id][] = new InformationalChunk($response->getStatus(), $response->getHeaders());
             self::stopLoop();
         });
 
@@ -207,11 +210,11 @@ final class AmpResponse implements ResponseInterface
 
             $options = null;
 
-            $activity[$id][] = new FirstChunk();
+            $multi->handlesActivity[$id][] = new FirstChunk();
 
             if ('HEAD' === $response->getRequest()->getMethod() || \in_array($info['http_code'], [204, 304], true)) {
-                $activity[$id][] = null;
-                $activity[$id][] = null;
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = null;
                 self::stopLoop();
 
                 return;
@@ -231,14 +234,14 @@ final class AmpResponse implements ResponseInterface
                 }
 
                 $info['size_download'] += \strlen($data);
-                $activity[$id][] = $data;
+                $multi->handlesActivity[$id][] = $data;
             }
 
-            $activity[$id][] = null;
-            $activity[$id][] = null;
+            $multi->handlesActivity[$id][] = null;
+            $multi->handlesActivity[$id][] = null;
         } catch (\Throwable $e) {
-            $activity[$id][] = null;
-            $activity[$id][] = $e;
+            $multi->handlesActivity[$id][] = null;
+            $multi->handlesActivity[$id][] = $e;
         } finally {
             $info['download_content_length'] = $info['size_download'];
         }

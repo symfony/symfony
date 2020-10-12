@@ -24,6 +24,10 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 {
     protected function getHttpClient(string $testCase, \Closure $chunkFilter = null): HttpClientInterface
     {
+        if ('testHandleIsRemovedOnException' === $testCase) {
+            $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
+        }
+
         $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
 
         return new class(parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
@@ -227,7 +231,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 } else {
                     $context->passthru();
                     $context->getResponse()->cancel();
-                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 1]);
+                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 10]);
                 }
             }
         });

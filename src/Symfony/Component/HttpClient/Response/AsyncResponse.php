@@ -66,9 +66,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                         return false;
                     }
                 }
-            }
 
-            return false;
+                return false;
+            }
         };
         if (\array_key_exists('user_data', $options)) {
             $this->info['user_data'] = $options['user_data'];
@@ -175,7 +175,6 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
 
         if ($this->passthru && null === $this->getInfo('error')) {
             $this->info['canceled'] = true;
-            $this->info['error'] = 'Response has been canceled.';
 
             try {
                 foreach (self::passthru($this->client, $this, new LastChunk()) as $chunk) {

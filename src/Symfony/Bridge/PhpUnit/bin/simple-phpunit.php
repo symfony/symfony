@@ -264,11 +264,11 @@ if (!class_exists('SymfonyExcludeListPhpunit', false)) {
 if (method_exists('PHPUnit\Util\ExcludeList', 'addDirectory')) {
     (new PHPUnit\Util\Excludelist())->getExcludedDirectories();
     PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListPhpunit'))->getFileName()));
-    PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
+    class_exists('SymfonyExcludeListSimplePhpunit', false) && PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
 } elseif (method_exists('PHPUnit\Util\Blacklist', 'addDirectory')) {
     (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
     PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListPhpunit'))->getFileName()));
-    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
+    class_exists('SymfonyExcludeListSimplePhpunit', false) && PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass('SymfonyExcludeListSimplePhpunit'))->getFileName()));
 } else {
     PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListPhpunit'] = 1;
     PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListSimplePhpunit'] = 1;

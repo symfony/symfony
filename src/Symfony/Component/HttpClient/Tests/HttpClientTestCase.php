@@ -134,6 +134,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             // The response content-type mustn't be json as that calls getContent
             // @see src/Symfony/Component/HttpClient/Exception/HttpExceptionTrait.php:58
             $this->assertStringNotContainsString('json', $e->getResponse()->getHeaders(false)['content-type'][0] ?? '');
+            unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
             $r->setAccessible(true);

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -43,7 +44,7 @@ final class NativeResponse implements ResponseInterface
     public function __construct(NativeClientState $multi, $context, string $url, array $options, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
     {
         $this->multi = $multi;
-        $this->id = (int) $context;
+        $this->id = $id = (int) $context;
         $this->context = $context;
         $this->url = $url;
         $this->logger = $logger;
@@ -63,6 +64,10 @@ final class NativeResponse implements ResponseInterface
         $this->initializer = static function (self $response) {
             return null === $response->remaining;
         };
+
+        $this->canary = new Canary(static function () use ($multi, $id) {
+            unset($multi->openHandles[$id], $multi->handlesActivity[$id]);
+        });
     }
 
     /**
@@ -88,17 +93,11 @@ final class NativeResponse implements ResponseInterface
         try {
             $this->doDestruct();
         } finally {
-            $multi = clone $this->multi;
-
-            $this->close();
-
             // Clear the DNS cache when all requests completed
             if (0 >= --$this->multi->responseCount) {
                 $this->multi->responseCount = 0;
                 $this->multi->dnsCache = [];
             }
-
-            $this->multi = $multi;
         }
     }
 
@@ -192,8 +191,8 @@ final class NativeResponse implements ResponseInterface
      */
     private function close(): void
     {
-        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
-        $this->handle = $this->buffer = $this->onProgress = null;
+        $this->canary->cancel();
+        $this->handle = $this->buffer = $this->inflate = $this->onProgress = null;
     }
 
     /**

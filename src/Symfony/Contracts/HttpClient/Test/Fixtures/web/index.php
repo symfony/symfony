@@ -66,6 +66,9 @@ switch ($vars['REQUEST_URI']) {
     case '/404-gzipped':
         header('Content-Type: text/plain', true, 404);
         ob_start('ob_gzhandler');
+        @ob_flush();
+        flush();
+        usleep(300000);
         echo 'some text';
         exit;
 

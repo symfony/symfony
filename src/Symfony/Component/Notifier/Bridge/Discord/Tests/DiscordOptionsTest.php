@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
-use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordOptions;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordAuthorEmbedObject;
@@ -21,7 +20,7 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordMediaEmbedObject;
 
 final class DiscordOptionsTest extends TestCase
 {
-    public function testDiscordOptions(): void
+    public function testDiscordOptions()
     {
         $discordOptions = (new DiscordOptions())
             ->username('name of the bot')
@@ -35,7 +34,7 @@ final class DiscordOptionsTest extends TestCase
         ]);
     }
 
-    public function testDiscordEmbedFields(): void
+    public function testDiscordEmbedFields()
     {
         $discordOptions = (new DiscordOptions())
             ->addEmbed((new DiscordEmbed())
@@ -144,7 +143,7 @@ final class DiscordOptionsTest extends TestCase
         ]);
     }
 
-    public function testDiscordFooterEmbedFields(): void
+    public function testDiscordFooterEmbedFields()
     {
         $footer = (new DiscordFooterEmbedObject())
             ->text('text')
@@ -159,7 +158,7 @@ final class DiscordOptionsTest extends TestCase
         ]);
     }
 
-    public function testDiscordMediaEmbedFields(): void
+    public function testDiscordMediaEmbedFields()
     {
         $media = (new DiscordMediaEmbedObject())
             ->url('https://ur.l/')
@@ -176,7 +175,7 @@ final class DiscordOptionsTest extends TestCase
         ]);
     }
 
-    public function testDiscordAuthorEmbedFields(): void
+    public function testDiscordAuthorEmbedFields()
     {
         $author = (new DiscordAuthorEmbedObject())
             ->name('name field')

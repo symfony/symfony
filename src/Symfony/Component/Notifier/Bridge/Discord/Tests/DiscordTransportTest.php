@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class DiscordTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $webhookId = 'testChannel';
 
@@ -33,7 +33,7 @@ final class DiscordTransportTest extends TestCase
         $this->assertSame(sprintf('discord://%s?webhook_id=%s', 'testHost', $webhookId), (string) $transport);
     }
 
-    public function testSupportsChatMessage(): void
+    public function testSupportsChatMessage()
     {
         $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
@@ -41,7 +41,7 @@ final class DiscordTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows(): void
+    public function testSendNonChatMessageThrows()
     {
         $this->expectException(LogicException::class);
         $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
@@ -49,7 +49,7 @@ final class DiscordTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');

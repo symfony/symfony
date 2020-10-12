@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class DiscordTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new DiscordTransportFactory();
 
@@ -31,7 +31,7 @@ final class DiscordTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('discord://%s?webhook_id=%s', $host, $webhookId), (string) $transport);
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function testCreateWithNoTokenThrowsMalformed()
     {
         $factory = new DiscordTransportFactory();
 
@@ -39,7 +39,7 @@ final class DiscordTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString(sprintf('discord://%s/?webhook_id=%s', 'testHost', 'testChannel')));
     }
 
-    public function testSupportsDiscordScheme(): void
+    public function testSupportsDiscordScheme()
     {
         $factory = new DiscordTransportFactory();
 
@@ -47,7 +47,7 @@ final class DiscordTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?webhook_id=testChannel')));
     }
 
-    public function testNonDiscordSchemeThrows(): void
+    public function testNonDiscordSchemeThrows()
     {
         $factory = new DiscordTransportFactory();
 

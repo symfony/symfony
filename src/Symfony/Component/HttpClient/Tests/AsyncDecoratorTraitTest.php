@@ -215,14 +215,20 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testRetryTimeout()
     {
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+        $cpt = 0;
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$cpt) {
             try {
                 $this->assertTrue($chunk->isTimeout());
                 yield $chunk;
             } catch (TransportExceptionInterface $e) {
-                $context->passthru();
-                $context->getResponse()->cancel();
-                $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 1]);
+                if ($cpt++ < 3) {
+                    $context->getResponse()->cancel();
+                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+                } else {
+                    $context->passthru();
+                    $context->getResponse()->cancel();
+                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 1]);
+                }
             }
         });
 

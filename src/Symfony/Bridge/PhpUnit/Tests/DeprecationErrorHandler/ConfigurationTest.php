@@ -387,7 +387,7 @@ class ConfigurationTest extends TestCase
         $filename = $this->createFile();
         chmod($filename, 0444);
         $this->expectError();
-        $this->expectErrorMessageMatches('/failed to open stream: Permission denied/');
+        $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
         $configuration->writeBaseline();
     }

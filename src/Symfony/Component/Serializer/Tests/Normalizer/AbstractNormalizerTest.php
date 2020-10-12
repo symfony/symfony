@@ -190,4 +190,42 @@ class AbstractNormalizerTest extends TestCase
 
         $this->assertSame([], $normalizer->normalize($dummy));
     }
+
+    public function testObjectWithVersioning()
+    {
+        $classMetadata = new ClassMetadata('c');
+
+        $a = new AttributeMetadata('a');
+        $a->setSince('1.8.0');
+        $a->addGroup('test');
+        $classMetadata->addAttributeMetadata($a);
+
+        $b = new AttributeMetadata('b');
+        $b->setUntil('2.1.0');
+        $b->addGroup('test');
+        $classMetadata->addAttributeMetadata($b);
+
+        $c = new AttributeMetadata('c');
+        $c->setSince('1.8.0');
+        $c->setUntil('2.0.0');
+        $c->addGroup('test');
+        $classMetadata->addAttributeMetadata($c);
+
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.8.0',
+        ], true);
+        $this->assertSame(['a', 'b', 'c'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.7.0',
+        ], true);
+        $this->assertSame(['b'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '2.3.0',
+        ], true);
+        $this->assertSame(['a'], $result);
+    }
 }

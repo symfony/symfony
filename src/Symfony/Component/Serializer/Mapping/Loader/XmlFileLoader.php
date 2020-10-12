@@ -74,6 +74,14 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['ignore'])) {
                     $attributeMetadata->setIgnore((bool) $attribute['ignore']);
                 }
+
+                if (isset($attribute['since'])) {
+                    $attributeMetadata->setSince((string) $attribute['since']);
+                }
+
+                if (isset($attribute['until'])) {
+                    $attributeMetadata->setUntil((string) $attribute['until']);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {

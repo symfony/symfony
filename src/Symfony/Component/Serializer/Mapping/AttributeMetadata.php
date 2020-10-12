@@ -59,6 +59,24 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public $ignore = false;
 
+    /**
+     * @var string|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getSince()} instead.
+     */
+    public $since;
+
+    /**
+     * @var string|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getUntil()} instead.
+     */
+    public $until;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -163,12 +181,44 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setSince(string $version)
+    {
+        $this->since = $version;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSince(): ?string
+    {
+        return $this->since;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUntil(string $version)
+    {
+        $this->until = $version;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUntil(): ?string
+    {
+        return $this->until;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore'];
+        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore', 'since', 'until'];
     }
 }

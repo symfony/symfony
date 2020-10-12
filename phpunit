@@ -24,5 +24,8 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
+if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {
+    putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
+}
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
 require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

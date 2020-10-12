@@ -158,6 +158,7 @@ class MailjetApiTransport extends AbstractApiTransport
                 'Base64Content' => $attachment->bodyToString(),
             ];
             if ('inline' === $headers->getHeaderBody('Content-Disposition')) {
+                $formattedAttachment['ContentID'] = $headers->getHeaderParameter('Content-Disposition', 'name');
                 $inlines[] = $formattedAttachment;
             } else {
                 $attachments[] = $formattedAttachment;

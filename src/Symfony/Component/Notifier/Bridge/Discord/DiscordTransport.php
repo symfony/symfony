@@ -1,0 +1,108 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Notifier\Bridge\Discord;
+
+use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
+use Symfony\Component\Notifier\Transport\AbstractTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * @author Mathieu Piot <math.piot@gmail.com>
+ *
+ * @internal
+ *
+ * @experimental in 5.2
+ */
+final class DiscordTransport extends AbstractTransport
+{
+    protected const HOST = 'discord.com';
+
+    private $token;
+    private $webhookId;
+
+    public function __construct(string $token, string $webhookId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    {
+        $this->token = $token;
+        $this->webhookId = $webhookId;
+        $this->client = $client;
+
+        parent::__construct($client, $dispatcher);
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('discord://%s?webhook_id=%s', $this->getEndpoint(), $this->webhookId);
+    }
+
+    public function supports(MessageInterface $message): bool
+    {
+        return $message instanceof ChatMessage;
+    }
+
+    /**
+     * @see https://discord.com/developers/docs/resources/webhook
+     */
+    protected function doSend(MessageInterface $message): SentMessage
+    {
+        if (!$message instanceof ChatMessage) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+        }
+
+        $messageOptions = $message->getOptions();
+        $options = $messageOptions ? $messageOptions->toArray() : [];
+
+        $content = $message->getSubject();
+
+        if (\strlen($content) > 2000) {
+            throw new LogicException(sprintf('The subject length of "%s" transport must be less than 2000 characters.', __CLASS__, ChatMessage::class, get_debug_type($message)));
+        }
+
+        $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);
+        $options['content'] = $content;
+        $response = $this->client->request('POST', $endpoint, [
+            'json' => array_filter($options),
+        ]);
+
+        if (204 !== $response->getStatusCode()) {
+            $result = $response->toArray(false);
+
+            if (401 === $response->getStatusCode()) {
+                $originalContent = $message->getSubject();
+                $errorMessage = $result['message'];
+                $errorCode = $result['code'];
+                throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%d: "%s").', $originalContent, $errorCode, $errorMessage), $response);
+            }
+
+            if (400 === $response->getStatusCode()) {
+                $originalContent = $message->getSubject();
+
+                $errorMessage = '';
+                foreach ($result as $fieldName => $message) {
+                    $message = \is_array($message) ? implode(' ', $message) : $message;
+                    $errorMessage .= $fieldName.': '.$message.' ';
+                }
+
+                $errorMessage = trim($errorMessage);
+                throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%s).', $originalContent, $errorMessage), $response);
+            }
+
+            throw new TransportException(sprintf('Unable to post the Discord message: "%s" (Status Code: %d).', $message->getSubject(), $response->getStatusCode()), $response);
+        }
+
+        return new SentMessage($message, (string) $this);
+    }
+}

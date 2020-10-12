@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier;
 
+use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
@@ -62,6 +63,7 @@ class Transport
         SmsapiTransportFactory::class,
         EsendexTransportFactory::class,
         SendinblueTransportFactory::class,
+        DiscordTransportFactory::class,
     ];
 
     private $factories;

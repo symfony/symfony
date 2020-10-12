@@ -8,8 +8,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
-use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 
 final class ClassMetadataFactoryCompilerTest extends TestCase
 {

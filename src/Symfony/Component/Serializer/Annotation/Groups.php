@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class Groups
 {
     /**
@@ -31,20 +32,22 @@ class Groups
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(array $data)
+    public function __construct(array $groups)
     {
-        if (!isset($data['value']) || !$data['value']) {
+        if (isset($groups['value'])) {
+            $groups = (array) $groups['value'];
+        }
+        if (empty($groups)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', static::class));
         }
 
-        $value = (array) $data['value'];
-        foreach ($value as $group) {
+        foreach ($groups as $group) {
             if (!\is_string($group)) {
                 throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of strings.', static::class));
             }
         }
 
-        $this->groups = $value;
+        $this->groups = $groups;
     }
 
     /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
 use Symfony\Component\Serializer\Annotation\Ignore;
 
@@ -19,15 +19,11 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 class IgnoreDummy
 {
     public $notIgnored;
-    /**
-     * @Ignore()
-     */
+    #[Ignore]
     public $ignored1;
     private $ignored2;
 
-    /**
-     * @Ignore()
-     */
+    #[Ignore]
     public function getIgnored2()
     {
         return $this->ignored2;

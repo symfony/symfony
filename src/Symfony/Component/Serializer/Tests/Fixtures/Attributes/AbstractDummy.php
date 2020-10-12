@@ -9,17 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
-/**
- * @DiscriminatorMap(typeProperty="type", mapping={
- *    "first"="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild",
- *    "second"="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild",
- *    "third"="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyThirdChild",
- * })
- */
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'first' => AbstractDummyFirstChild::class,
+    'second' => AbstractDummySecondChild::class,
+    'third' => AbstractDummyThirdChild::class,
+])]
 abstract class AbstractDummy
 {
     public $foo;

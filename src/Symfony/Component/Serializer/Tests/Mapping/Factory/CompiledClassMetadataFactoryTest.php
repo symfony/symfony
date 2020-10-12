@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CompiledClassMetadataFactory;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
-use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>

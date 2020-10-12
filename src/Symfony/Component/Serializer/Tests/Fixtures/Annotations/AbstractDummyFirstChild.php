@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
+
+use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 
 class AbstractDummyFirstChild extends AbstractDummy
 {

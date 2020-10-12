@@ -37,6 +37,7 @@ trait ResponseTrait
 {
     private $logger;
     private $headers = [];
+    private $canary;
 
     /**
      * @var callable|null A callback that initializes the two previous properties
@@ -207,7 +208,11 @@ trait ResponseTrait
     /**
      * Closes the response and all its network handles.
      */
-    abstract protected function close(): void;
+    private function close(): void
+    {
+        $this->canary->cancel();
+        $this->inflate = null;
+    }
 
     /**
      * Adds pending responses to the activity list.

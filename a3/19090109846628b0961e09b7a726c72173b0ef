@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-12T12:03:44Z
+
+I was wondering is we should make the `Groups` attribute variadic. Instead of…
+```php
+#[Groups(['list', 'detail'])]
+```
+… we could then write…
+```php
+#[Groups('list', 'detail')]
+```
+This would look a bit nicer, but adding additional properties in the future would get messy.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-12T12:29:50Z
+
+@derrabus Can you have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-12T12:55:25Z
+
+I used `::class` in annotations, but Doctrine Annotations 1.0 does not support that. Should be fixed now.

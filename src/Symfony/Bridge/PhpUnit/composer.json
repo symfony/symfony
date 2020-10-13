@@ -46,12 +46,5 @@
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
-<<<<<<< HEAD
-    },
-    "extra": {
-        "branch-version": "5.1-dev"
     }
-=======
-    }
->>>>>>> 4.4
 }

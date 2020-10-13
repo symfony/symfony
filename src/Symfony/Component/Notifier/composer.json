@@ -29,13 +29,7 @@
         ]
     },
     "minimum-stability": "dev",
-<<<<<<< HEAD:src/Symfony/Component/Notifier/composer.json
     "extra": {
         "branch-version": "5.1-dev"
     }
-=======
-    "extra": {
-        "branch-version": "5.1-dev"
-    }
->>>>>>> 4.4:src/Symfony/Component/Debug/composer.json
 }

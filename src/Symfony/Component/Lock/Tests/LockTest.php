@@ -18,6 +18,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\Store\ExpiringStoreTrait;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -391,5 +392,51 @@ class LockTest extends TestCase
         yield [[], false];
         yield [[0.1], false];
         yield [[-0.1, null], false];
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testAcquireTwiceWithExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = new class() implements PersistingStoreInterface {
+            use ExpiringStoreTrait;
+            private $keys = [];
+            private $initialTtl = 30;
+
+            public function save(Key $key)
+            {
+                $key->reduceLifetime($this->initialTtl);
+                $this->keys[spl_object_hash($key)] = $key;
+                $this->checkNotExpired($key);
+
+                return true;
+            }
+
+            public function delete(Key $key)
+            {
+                unset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function exists(Key $key)
+            {
+                return isset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function putOffExpiration(Key $key, $ttl)
+            {
+                $key->reduceLifetime($ttl);
+                $this->checkNotExpired($key);
+            }
+        };
+        $ttl = 1;
+        $lock = new Lock($key, $store, $ttl);
+
+        $this->assertTrue($lock->acquire());
+        $lock->release();
+        sleep($ttl + 1);
+        $this->assertTrue($lock->acquire());
+        $lock->release();
     }
 }

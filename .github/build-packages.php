@@ -50,10 +50,11 @@ foreach ($dirs as $k => $dir) {
         passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
     }
 
-    if (!isset($package->version)) {
-        echo "Missing \"version\" in composer.json.\n";
+    if (!isset($package->extra->{'branch-version'})) {
+        echo "Missing \"branch-version\" in composer.json's \"extra\".\n";
         exit(1);
     }
+    $package->version = substr_replace($package->extra->{'branch-version'}, '.x-dev', -4);
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 
@@ -61,8 +62,6 @@ foreach ($dirs as $k => $dir) {
 
     $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"%s":%s}}}', $package->name, $package->version, file_get_contents($dir.'/composer.json'));
     $versions = json_decode($versions)->packages->{$package->name};
-
-    unset($versions->{'dev-master'});
 
     foreach ($versions as $v => $package) {
         $packages[$package->name] += array($v => $package);

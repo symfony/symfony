@@ -2011,10 +2011,10 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $retryOptions)) {
-            $this->registerHttpClientRetry($retryOptions, 'http_client', $container);
+            $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
-        $httpClientId = $retryOptions['enabled'] ?? false ? 'http_client.retry.inner' : ($this->isConfigEnabled($container, $profilerConfig) ? '.debug.http_client.inner' : 'http_client');
+        $httpClientId = ($retryOptions['enabled'] ?? false) ? 'http_client.retryable.inner' : ($this->isConfigEnabled($container, $profilerConfig) ? '.debug.http_client.inner' : 'http_client');
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ('http_client' === $name) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
@@ -2042,7 +2042,7 @@ class FrameworkExtension extends Extension
             }
 
             if ($this->isConfigEnabled($container, $retryOptions)) {
-                $this->registerHttpClientRetry($retryOptions, $name, $container);
+                $this->registerRetryableHttpClient($retryOptions, $name, $container);
             }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
@@ -2062,42 +2062,31 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpClientRetry(array $retryOptions, string $name, ContainerBuilder $container)
+    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container)
     {
         if (!class_exists(RetryableHttpClient::class)) {
-            throw new LogicException('Retry failed request support cannot be enabled as version 5.2+ of the HTTP Client component is required.');
+            throw new LogicException('Support for retrying failed requests requires symfony/http-client 5.2 or higher, try upgrading.');
         }
 
-        if (null !== $retryOptions['backoff_service']) {
-            $backoffReference = new Reference($retryOptions['backoff_service']);
+        if (null !== $options['retry_strategy']) {
+            $retryStrategy = new Reference($options['retry_strategy']);
         } else {
-            $retryServiceId = $name.'.retry.exponential_backoff';
-            $retryDefinition = new ChildDefinition('http_client.retry.abstract_exponential_backoff');
-            $retryDefinition
-                ->replaceArgument(0, $retryOptions['delay'])
-                ->replaceArgument(1, $retryOptions['multiplier'])
-                ->replaceArgument(2, $retryOptions['max_delay'])
-                ->replaceArgument(3, $retryOptions['jitter']);
-            $container->setDefinition($retryServiceId, $retryDefinition);
+            $retryStrategy = new ChildDefinition('http_client.abstract_retry_strategy');
+            $retryStrategy
+                ->replaceArgument(0, $options['http_codes'])
+                ->replaceArgument(1, $options['delay'])
+                ->replaceArgument(2, $options['multiplier'])
+                ->replaceArgument(3, $options['max_delay'])
+                ->replaceArgument(4, $options['jitter']);
+            $container->setDefinition($name.'.retry_strategy', $retryStrategy);
 
-            $backoffReference = new Reference($retryServiceId);
-        }
-        if (null !== $retryOptions['decider_service']) {
-            $deciderReference = new Reference($retryOptions['decider_service']);
-        } else {
-            $retryServiceId = $name.'.retry.decider';
-            $retryDefinition = new ChildDefinition('http_client.retry.abstract_httpstatuscode_decider');
-            $retryDefinition
-                ->replaceArgument(0, $retryOptions['http_codes']);
-            $container->setDefinition($retryServiceId, $retryDefinition);
-
-            $deciderReference = new Reference($retryServiceId);
+            $retryStrategy = new Reference($name.'.retry_strategy');
         }
 
         $container
-            ->register($name.'.retry', RetryableHttpClient::class)
+            ->register($name.'.retryable', RetryableHttpClient::class)
             ->setDecoratedService($name, null, -10) // lower priority than TraceableHttpClient
-            ->setArguments([new Reference($name.'.retry.inner'), $deciderReference, $backoffReference, $retryOptions['max_retries'], new Reference('logger')])
+            ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
 

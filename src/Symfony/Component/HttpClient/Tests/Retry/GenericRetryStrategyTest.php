@@ -12,18 +12,35 @@
 namespace Symfony\Component\HttpClient\Tests\Retry;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\Retry\ExponentialBackOff;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\AsyncContext;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 
-class ExponentialBackOffTest extends TestCase
+class GenericRetryStrategyTest extends TestCase
 {
+    public function testShouldRetryStatusCode()
+    {
+        $strategy = new GenericRetryStrategy([500]);
+
+        self::assertTrue($strategy->shouldRetry($this->getContext(0, 'GET', 'http://example.com/', 500), null, null));
+    }
+
+    public function testIsNotRetryableOk()
+    {
+        $strategy = new GenericRetryStrategy([500]);
+
+        self::assertFalse($strategy->shouldRetry($this->getContext(0, 'GET', 'http://example.com/', 200), null, null));
+    }
+
     /**
      * @dataProvider provideDelay
      */
     public function testGetDelay(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
-        $backOff = new ExponentialBackOff($delay, $multiplier, $maxDelay, 0);
+        $strategy = new GenericRetryStrategy([], $delay, $multiplier, $maxDelay, 0);
 
-        self::assertSame($expectedDelay, $backOff->getDelay($previousRetries, 'GET', 'http://example.com/', [], 200, [], null, null));
+        self::assertSame($expectedDelay, $strategy->getDelay($this->getContext($previousRetries, 'GET', 'http://example.com/', 200), null, null));
     }
 
     public function provideDelay(): iterable
@@ -53,11 +70,11 @@ class ExponentialBackOffTest extends TestCase
 
     public function testJitter()
     {
-        $backOff = new ExponentialBackOff(1000, 1, 0, 1);
+        $strategy = new GenericRetryStrategy([], 1000, 1, 0, 1);
         $belowHalf = 0;
         $aboveHalf = 0;
         for ($i = 0; $i < 20; ++$i) {
-            $delay = $backOff->getDelay(0, 'GET', 'http://example.com/', [], 200, [], null, null);
+            $delay = $strategy->getDelay($this->getContext(0, 'GET', 'http://example.com/', 200), null, null);
             if ($delay < 500) {
                 ++$belowHalf;
             } elseif ($delay > 1500) {
@@ -67,5 +84,19 @@ class ExponentialBackOffTest extends TestCase
 
         $this->assertGreaterThanOrEqual(1, $belowHalf);
         $this->assertGreaterThanOrEqual(1, $aboveHalf);
+    }
+
+    private function getContext($retryCount, $method, $url, $statusCode): AsyncContext
+    {
+        $passthru = null;
+        $info = [
+            'retry_count' => $retryCount,
+            'http_method' => $method,
+            'url' => $url,
+            'http_code' => $statusCode,
+        ];
+        $response = new MockResponse('', $info);
+
+        return new AsyncContext($passthru, new MockHttpClient(), $response, $info, null, 0);
     }
 }

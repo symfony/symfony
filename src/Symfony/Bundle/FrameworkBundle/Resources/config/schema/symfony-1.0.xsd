@@ -581,8 +581,7 @@
             <xsd:element name="http-code" type="xsd:integer" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="backoff-service" type="xsd:string" />
-        <xsd:attribute name="decider-service" type="xsd:string" />
+        <xsd:attribute name="retry-strategy" type="xsd:string" />
         <xsd:attribute name="max-retries" type="xsd:integer" />
         <xsd:attribute name="delay" type="xsd:integer" />
         <xsd:attribute name="multiplier" type="xsd:float" />

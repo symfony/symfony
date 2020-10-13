@@ -1500,15 +1500,15 @@ abstract class FrameworkExtensionTest extends TestCase
         }
         $container = $this->createContainerFromFile('http_client_retry');
 
-        $this->assertSame([429, 500], $container->getDefinition('http_client.retry.decider')->getArgument(0));
-        $this->assertSame(100, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(0));
-        $this->assertSame(2, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(1));
-        $this->assertSame(0, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(2));
-        $this->assertSame(0.3, $container->getDefinition('http_client.retry.exponential_backoff')->getArgument(3));
-        $this->assertSame(2, $container->getDefinition('http_client.retry')->getArgument(3));
+        $this->assertSame([429, 500], $container->getDefinition('http_client.retry_strategy')->getArgument(0));
+        $this->assertSame(100, $container->getDefinition('http_client.retry_strategy')->getArgument(1));
+        $this->assertSame(2, $container->getDefinition('http_client.retry_strategy')->getArgument(2));
+        $this->assertSame(0, $container->getDefinition('http_client.retry_strategy')->getArgument(3));
+        $this->assertSame(0.3, $container->getDefinition('http_client.retry_strategy')->getArgument(4));
+        $this->assertSame(2, $container->getDefinition('http_client.retryable')->getArgument(2));
 
-        $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retry')->getClass());
-        $this->assertSame(4, $container->getDefinition('foo.retry.exponential_backoff')->getArgument(1));
+        $this->assertSame(RetryableHttpClient::class, $container->getDefinition('foo.retryable')->getClass());
+        $this->assertSame(4, $container->getDefinition('foo.retry_strategy')->getArgument(2));
     }
 
     public function testHttpClientWithQueryParameterKey()

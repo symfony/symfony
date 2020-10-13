@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\HttpClient\Retry;
 
+use Symfony\Component\HttpClient\Response\AsyncContext;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-interface RetryDeciderInterface
+interface RetryStrategyInterface
 {
     /**
      * Returns whether the request should be retried.
@@ -23,5 +27,10 @@ interface RetryDeciderInterface
      *
      * @return ?bool Returns null to signal that the body is required to take a decision
      */
-    public function shouldRetry(string $requestMethod, string $requestUrl, array $requestOptions, int $responseStatusCode, array $responseHeaders, ?string $responseContent): ?bool;
+    public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool;
+
+    /**
+     * Returns the time to wait in milliseconds.
+     */
+    public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int;
 }

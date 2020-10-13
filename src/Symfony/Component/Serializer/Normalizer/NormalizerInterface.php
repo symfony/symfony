@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
- * Defines the interface of normalizers.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface NormalizerInterface

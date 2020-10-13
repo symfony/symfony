@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer;
 
 /**
- * Defines the interface of encoders.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SerializerAwareInterface

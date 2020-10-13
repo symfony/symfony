@@ -83,11 +83,16 @@ EOF
         $realCacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
-        $oldBuildDir = substr($realBuildDir, 0, -1).('~' === substr($realBuildDir, -1) ? '+' : '~');
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
-        $fs->remove([$oldBuildDir, $oldCacheDir]);
+        $fs->remove([$oldCacheDir]);
 
-        if (!is_writable($realBuildDir)) {
+        $useBuildDir = $realBuildDir !== $realCacheDir;
+        if ($useBuildDir) {
+            $oldBuildDir = substr($realBuildDir, 0, -1).('~' === substr($realBuildDir, -1) ? '+' : '~');
+            $fs->remove([$oldBuildDir]);
+        }
+
+        if ($useBuildDir && !is_writable($realBuildDir)) {
             throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realBuildDir));
         }
         if (!is_writable($realCacheDir)) {
@@ -95,7 +100,9 @@ EOF
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->cacheClearer->clear($realBuildDir);
+        if ($useBuildDir) {
+            $this->cacheClearer->clear($realBuildDir);
+        }
         $this->cacheClearer->clear($realCacheDir);
 
         // The current event dispatcher is stale, let's not use it anymore
@@ -161,31 +168,33 @@ EOF
                 }
             }
 
-            if ($oldBuildDir) {
-                $fs->rename($realBuildDir, $oldBuildDir);
-            } else {
-                $fs->remove($realBuildDir);
-            }
             if ($oldCacheDir) {
                 $fs->rename($realCacheDir, $oldCacheDir);
             } else {
                 $fs->remove($realCacheDir);
             }
             $fs->rename($warmupDir, $realCacheDir);
-            // Copy the content of the warmed cache in the build dir
-            $fs->copy($realCacheDir, $realBuildDir);
+
+            if ($useBuildDir) {
+                $fs->rename($realBuildDir, $oldBuildDir);
+                // Copy the content of the warmed cache in the build dir
+                $fs->mirror($realCacheDir, $realBuildDir);
+            }
 
             if ($output->isVerbose()) {
                 $io->comment('Removing old build and cache directory...');
             }
 
-            try {
-                $fs->remove($oldBuildDir);
-            } catch (IOException $e) {
-                if ($output->isVerbose()) {
-                    $io->warning($e->getMessage());
+            if ($useBuildDir) {
+                try {
+                    $fs->remove($oldBuildDir);
+                } catch (IOException $e) {
+                    if ($output->isVerbose()) {
+                        $io->warning($e->getMessage());
+                    }
                 }
             }
+
             try {
                 $fs->remove($oldCacheDir);
             } catch (IOException $e) {

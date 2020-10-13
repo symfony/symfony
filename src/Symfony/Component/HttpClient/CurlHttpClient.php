@@ -320,18 +320,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
-        if (!\is_resource($this->multi->handle) && !$this->multi->handle instanceof \CurlMultiHandle) {
-            $responses = [];
-        }
-
         if ($responses instanceof CurlResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
             throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of CurlResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
-        $active = 0;
-        while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+        if (\is_resource($this->multi->handle) || $this->multi->handle instanceof \CurlMultiHandle) {
+            $active = 0;
+            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+        }
 
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
     }

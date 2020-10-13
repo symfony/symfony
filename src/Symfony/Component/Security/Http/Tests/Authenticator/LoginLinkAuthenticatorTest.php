@@ -39,6 +39,24 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
 
+    /**
+     * @dataProvider provideSupportData
+     */
+    public function testSupport(array $options, $request, bool $supported)
+    {
+        $this->setUpAuthenticator($options);
+
+        $this->assertEquals($supported, $this->authenticator->supports($request));
+    }
+
+    public function provideSupportData()
+    {
+        yield [['check_route' => '/validate_link'], Request::create('/validate_link?hash=abc123'), true];
+        yield [['check_route' => '/validate_link'], Request::create('/login?hash=abc123'), false];
+        yield [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123'), false];
+        yield [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123', 'POST'), true];
+    }
+
     public function testSuccessfulAuthenticate()
     {
         $this->setUpAuthenticator();

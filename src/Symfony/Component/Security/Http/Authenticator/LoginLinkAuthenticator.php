@@ -43,18 +43,18 @@ final class LoginLinkAuthenticator extends AbstractAuthenticator implements Inte
         $this->httpUtils = $httpUtils;
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
-        $this->options = $options;
+        $this->options = $options + ['check_post_only' => false];
     }
 
     public function supports(Request $request): ?bool
     {
-        return $this->httpUtils->checkRequestPath($request, $this->options['check_route']);
+        return ($this->options['check_post_only'] ? $request->isMethod('POST') : true)
+            && $this->httpUtils->checkRequestPath($request, $this->options['check_route']);
     }
 
     public function authenticate(Request $request): PassportInterface
     {
         $username = $request->get('user');
-
         if (!$username) {
             throw new InvalidLoginLinkAuthenticationException('Missing user from link.');
         }

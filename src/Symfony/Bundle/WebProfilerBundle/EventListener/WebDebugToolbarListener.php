@@ -126,7 +126,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
                 ]
             );
-            $content = substr($content, 0, $pos).$requestStack.substr($content, $pos);
+            $content = substr_replace($content, $requestStack, $pos, 0);
             $response->setContent($content);
         }
 

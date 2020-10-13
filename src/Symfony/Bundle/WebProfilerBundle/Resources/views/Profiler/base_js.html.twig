@@ -269,55 +269,55 @@
         };
 
         {% if excluded_ajax_paths is defined %}
-            if (typeof window.Sfjs_globalFetchStack !== 'undefined') {
-                function processSingleFetch(promise, args) {
-                    var url = args[0];
-                    var params = args[1];
-                    var paramType = Object.prototype.toString.call(args[0]);
-                    if (paramType === '[object Request]') {
-                        url = args[0].url;
-                        params = {
-                            method: args[0].method,
-                            credentials: args[0].credentials,
-                            headers: args[0].headers,
-                            mode: args[0].mode,
-                            redirect: args[0].redirect
-                        };
-                    } else {
-                        url = String(url);
-                    }
-                    if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                        var method = 'GET';
-                        if (params && params.method !== undefined) {
-                            method = params.method;
-                        }
-
-                        var stackElement = {
-                            error: false,
-                            url: url,
-                            method: method,
-                            type: 'fetch',
-                            start: new Date()
-                        };
-
-                        var idx = requestStack.push(stackElement) - 1;
-                        promise.then(function (r) {
-                            stackElement.duration = new Date() - stackElement.start;
-                            stackElement.error = r.status < 200 || r.status >= 400;
-                            stackElement.statusCode = r.status;
-                            stackElement.profile = r.headers.get('x-debug-token');
-                            stackElement.profilerUrl = r.headers.get('x-debug-token-link');
-                            stackElement.toolbarReplaceFinished = false;
-                            stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
-                            finishAjaxRequest(idx);
-                        }, function (e){
-                            stackElement.error = true;
-                            finishAjaxRequest(idx);
-                        });
-                        startAjaxRequest(idx);
-                    }
+            function processSingleFetch(promise, args) {
+                var url = args[0];
+                var params = args[1];
+                var paramType = Object.prototype.toString.call(args[0]);
+                if (paramType === '[object Request]') {
+                    url = args[0].url;
+                    params = {
+                        method: args[0].method,
+                        credentials: args[0].credentials,
+                        headers: args[0].headers,
+                        mode: args[0].mode,
+                        redirect: args[0].redirect
+                    };
+                } else {
+                    url = String(url);
                 }
+                if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                    var method = 'GET';
+                    if (params && params.method !== undefined) {
+                        method = params.method;
+                    }
 
+                    var stackElement = {
+                        error: false,
+                        url: url,
+                        method: method,
+                        type: 'fetch',
+                        start: new Date()
+                    };
+
+                    var idx = requestStack.push(stackElement) - 1;
+                    promise.then(function (r) {
+                        stackElement.duration = new Date() - stackElement.start;
+                        stackElement.error = r.status < 200 || r.status >= 400;
+                        stackElement.statusCode = r.status;
+                        stackElement.profile = r.headers.get('x-debug-token');
+                        stackElement.profilerUrl = r.headers.get('x-debug-token-link');
+                        stackElement.toolbarReplaceFinished = false;
+                        stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
+                        finishAjaxRequest(idx);
+                    }, function (e){
+                        stackElement.error = true;
+                        finishAjaxRequest(idx);
+                    });
+                    startAjaxRequest(idx);
+                }
+            }
+
+            if (typeof window.Sfjs_globalFetchStack !== 'undefined') {
                 /* Process the pending requests in global fetch stack */
                 window.Sfjs_globalFetchStack.forEach(function (req) {
                     processSingleFetch(req[0], req[1]);
@@ -327,53 +327,61 @@
                 window.Sfjs_globalFetchStack.push = function (args) {
                     processSingleFetch(args[0], args[1]);
                 };
+            } else if (window.fetch && window.fetch.polyfill === undefined) {
+                var oldFetch = window.fetch;
+                window.fetch = function () {
+                    var promise = oldFetch.apply(this, arguments);
+                    processSingleFetch(promise, arguments);
+                    return promise;
+                }
             }
-            if (typeof window.Sfjs_globalXHRStack !== 'undefined') {
-                function processSingleXHR(xhr, method, url) {
-                    var path = url;
-                    /* prevent logging AJAX calls to static and inline files, like templates */
-                    if (url.substr(0, 1) === '/') {
-                        if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
-                            path = url.substr({{ request.basePath|length }});
-                        }
-                    }
-                    else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
-                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
-                    }
 
-                    if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                        var stackElement = {
-                            error: false,
-                            url: url,
-                            method: method,
-                            type: 'xhr',
-                            start: new Date()
-                        };
-
-                        var idx = requestStack.push(stackElement) - 1;
-
-                        function onRequestComplete(stackElement, xhr) {
-                            stackElement.duration = new Date() - stackElement.start;
-                            stackElement.error = xhr.status < 200 || xhr.status >= 400;
-                            stackElement.statusCode = xhr.status;
-                            extractHeaders(xhr, stackElement);
-                            finishAjaxRequest(idx);
-                        }
-
-                        if (xhr.readyState == 4) {
-                            onRequestComplete(stackElement, xhr);
-                        } else {
-                            xhr.addEventListener('readystatechange', function() {
-                                if (xhr.readyState == 4) {
-                                    onRequestComplete(stackElement, xhr);
-                                }
-                            }, false);
-                        }
-
-                        startAjaxRequest(idx);
+            function processSingleXHR(xhr, method, url) {
+                var path = url;
+                /* prevent logging AJAX calls to static and inline files, like templates */
+                if (url.substr(0, 1) === '/') {
+                    if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
+                        path = url.substr({{ request.basePath|length }});
                     }
                 }
+                else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
+                    path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
+                }
 
+                if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                    var stackElement = {
+                        error: false,
+                        url: url,
+                        method: method,
+                        type: 'xhr',
+                        start: new Date()
+                    };
+
+                    var idx = requestStack.push(stackElement) - 1;
+
+                    function onRequestComplete(stackElement, xhr) {
+                        stackElement.duration = new Date() - stackElement.start;
+                        stackElement.error = xhr.status < 200 || xhr.status >= 400;
+                        stackElement.statusCode = xhr.status;
+                        extractHeaders(xhr, stackElement);
+                        finishAjaxRequest(idx);
+                    }
+
+                    if (xhr.readyState == 4) {
+                        onRequestComplete(stackElement, xhr);
+                    } else {
+                        xhr.addEventListener('readystatechange', function() {
+                            if (xhr.readyState == 4) {
+                                onRequestComplete(stackElement, xhr);
+                            }
+                        }, false);
+                    }
+
+                    startAjaxRequest(idx);
+                }
+            }
+
+            if (typeof window.Sfjs_globalXHRStack !== 'undefined') {
                 /* Process the pending xhr requests in global stack */
                 window.Sfjs_globalXHRStack.forEach(function (req) {
                     processSingleXHR(req[0], req[1], req[2]);
@@ -382,6 +390,12 @@
                 /* Rewrite the global xhr stack push method */
                 window.Sfjs_globalXHRStack.push = function (args) {
                     processSingleXHR(args[0], args[1], args[2]);
+                };
+            } else if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
+                var proxied = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+                    processSingleXHR(this, method, url);
+                    proxied.apply(this, Array.prototype.slice.call(arguments));
                 };
             }
         {% endif %}

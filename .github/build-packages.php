@@ -54,7 +54,7 @@ foreach ($dirs as $k => $dir) {
         echo "Missing \"branch-version\" in composer.json's \"extra\".\n";
         exit(1);
     }
-    $package->version = substr_replace($package->extra->{'branch-version'}, '.x-dev', -4);
+    $package->version = $package->extra->{'branch-version'}.'.x-dev';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 

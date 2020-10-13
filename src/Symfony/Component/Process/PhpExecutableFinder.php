@@ -27,7 +27,7 @@ class PhpExecutableFinder
     }
 
     /**
-     * Finds The PHP executable.
+     * Finds the PHP executable.
      *
      * @return string|false The PHP executable path or false if it cannot be found
      */
@@ -70,7 +70,18 @@ class PhpExecutableFinder
             }
         }
 
-        if (@is_executable($php = \PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        return $this->findByName('php') ?? false;
+    }
+
+    /**
+     * Finds the PHP executable by a specific name.
+     *
+     * @param string $name
+     * @return string|null The PHP executable path or NULL if it cannot be found
+     */
+    public function findByName(string $name): ?string
+    {
+        if (@is_executable($php = \PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\'.$name.'.exe' : '/'.$name))) {
             return $php;
         }
 
@@ -79,7 +90,59 @@ class PhpExecutableFinder
             $dirs[] = 'C:\xampp\php\\';
         }
 
-        return $this->executableFinder->find('php', false, $dirs);
+        return $this->executableFinder->find($name, null, $dirs);
+    }
+
+    /**
+     * Finds a PHP executable with one of the given names.
+     *
+     * @param string[] $names
+     * @return string|null The PHP executable path or NULL if it cannot be found
+     */
+    public function tryNames(array $names): ?string
+    {
+        foreach ($names as $name) {
+            if ($php = $this->findByName($name)) {
+                return $php;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the PHP executable by a specific version.
+     *
+     * @param string $version
+     * @return string|null The PHP executable path or NULL if it cannot be found
+     */
+    public function findByVersion(string $version)
+    {
+        $versionWithoutDots = str_replace('.', '', $version);
+        $names = ['php'.$versionWithoutDots];
+
+        if ($version !== $versionWithoutDots) {
+            $names[] = 'php'.$version;
+        }
+
+        return $this->tryNames($names);
+    }
+
+    /**
+     * Finds a PHP executable in one of the given versions.
+     *
+     * @param string[] $versions
+     * @return string|null The PHP executable path or NULL if it cannot be found
+     */
+    public function tryVersions(array $versions)
+    {
+        foreach ($versions as $version) {
+            if ($php = $this->findByVersion($version)) {
+                return $php;
+            }
+        }
+
+        return null;
     }
 
     /**

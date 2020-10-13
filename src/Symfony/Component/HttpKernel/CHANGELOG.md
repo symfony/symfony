@@ -12,6 +12,7 @@ CHANGELOG
    in the request profiler raw content section
  * Allowed adding attributes on controller arguments that will be passed to argument resolvers.
  * kernels implementing the `ExtensionInterface` will now be auto-registered to the container
+ * added parameter `kernel.runtime_environment`, defined as `%env(default:kernel.environment:APP_RUNTIME_ENV)%`
 
 5.1.0
 -----

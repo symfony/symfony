@@ -10,6 +10,7 @@ CHANGELOG
  * added the `t()` function to easily create `TranslatableMessage` objects
  * Added support for extracting messages from the `t()` function
  * Added `field_*` Twig functions to access string values from Form fields
+ * changed the `importance` context option of `NotificationEmail` to allow `null`
 
 5.0.0
 -----

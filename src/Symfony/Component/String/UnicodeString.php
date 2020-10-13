@@ -268,7 +268,7 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
         try {
-            $str->string = (string) grapheme_substr($this->string, $start, $length ?? \PHP_INT_MAX);
+            $str->string = (string) grapheme_substr($this->string, $start, $length ?? 2147483647);
         } catch (\ValueError $e) {
             $str->string = '';
         }
@@ -280,8 +280,8 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
         $start = $start ? \strlen(grapheme_substr($this->string, 0, $start)) : 0;
-        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length ?? \PHP_INT_MAX)) : $length;
-        $str->string = substr_replace($this->string, $replacement, $start, $length ?? \PHP_INT_MAX);
+        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length ?? 2147483647)) : $length;
+        $str->string = substr_replace($this->string, $replacement, $start, $length ?? 2147483647);
         normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
 
         if (false === $str->string) {
@@ -293,7 +293,7 @@ class UnicodeString extends AbstractUnicodeString
 
     public function split(string $delimiter, int $limit = null, int $flags = null): array
     {
-        if (1 > $limit = $limit ?? \PHP_INT_MAX) {
+        if (1 > $limit = $limit ?? 2147483647) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');
         }
 

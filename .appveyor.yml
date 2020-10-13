@@ -46,10 +46,11 @@ install:
     - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.9.0/composer.phar)
     - php composer.phar self-update
     - copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
-    - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
+    - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex
     - git config --global user.email ""
     - git config --global user.name "Symfony"
-    - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit src\Symfony\Contracts
+    - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
+    - SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev
     - php composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install
 

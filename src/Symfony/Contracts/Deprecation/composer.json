@@ -24,6 +24,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "2.1-dev"
+        "branch-version": "2.1"
     }
 }

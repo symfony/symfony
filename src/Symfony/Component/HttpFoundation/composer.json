@@ -38,6 +38,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "5.1-dev"
+        "branch-version": "5.1"
     }
 }

@@ -100,6 +100,7 @@
             <tag name="monolog.logger" channel="messenger" />
             <argument /> <!-- senders service locator -->
             <argument type="service" id="messenger.retry_strategy_locator" />
+            <argument type="service" id="serializer" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

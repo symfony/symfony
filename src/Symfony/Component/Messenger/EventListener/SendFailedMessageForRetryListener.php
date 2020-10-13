@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
@@ -33,8 +34,9 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     private $retryStrategyLocator;
     private $logger;
     private $historySize;
+    private $seriliazer;
 
-    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, int $historySize = 10)
+    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, SerializerInterface $seriliazer, LoggerInterface $logger = null, int $historySize = 10)
     {
         $this->sendersLocator = $sendersLocator;
         $this->retryStrategyLocator = $retryStrategyLocator;
@@ -50,7 +52,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
         $message = $envelope->getMessage();
         $context = [
-            'message' => $message,
+            'message' => $this->seriliazer->serialize($message, 'json'),
             'class' => \get_class($message),
         ];
 

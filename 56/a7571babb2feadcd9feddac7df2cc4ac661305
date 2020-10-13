@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2020-10-07T12:12:40Z
+
+See https://github.com/composer/packagist/issues/1125#issuecomment-704886285
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-07T12:24:47Z
+
+I'm not sure to get what you mean in this comment: adding back the dev-master alias doesn't make sense to me. For sure, in Symfony, we need to put that version somewhere in composer.json. The CI needs it to then populate COMPOSER_ROOT_VERSION.
+
+Ideally, we would put that info in a field that composer knows also about, to populate the root-version when doing local devs (the dev-master alias didn't work for this purpose, so this issue is a longstanding one, unrelated to the new `5.x` branch)
+
+To me, the question is: will composer add support for a new field that would allow committing the dev-version of a specific checkout? If yes, which field?
+
+We can of course commit as is, with `dev-*`, and figure out later!
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-07T12:30:35Z
+
+@nicolas-grekas I'd rather use a separate key in `extra` rather than adding a special key in `extra.branch-alias`. The `extra.branch-alias` key is a key with an official meaning in Composer, while here you use a key for a different purpose.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-07T14:32:46Z
+
+I'm in a dead-end:
+
+the attached patch removes the "version" entries and didn't replace them by anything.
+I also updated the CI scripts so that they don't need the version in composer.json files anymore.
+This works for 3.4, but this will not work on 4.4, because of what I described in https://github.com/composer/packagist/issues/1125#issuecomment-704909834.
+
+The best solution I think is to update the version number for each release. This is for the releasing script to do. /cc @fabpot
+
+This will solve all 3 issues described in https://github.com/composer/packagist/issues/1125:
+- defining the root-version for the CI
+- defining the root-version for local devs
+- defining the root-version *of contracts* on 4.4+
+
+This will make the release of symfony/contracts more complex as they will also need to have this dance to put the exact version in "version" for each release. But that's doable.
+
+My ideal solution would be for composer to relax what we can put in composer.json's `version` field, to allow putting eg `3.4.x-dev` and still allow tagging. But given the discussion in https://github.com/composer/packagist/issues/1125, I'm not sure I should bet on this solution.
+
+Any other idea welcome, provided it accounts for the 3 above constraints.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-07T15:03:24Z
+
+The remaining critical issue is about symfony/contracts: embedding a "path" repo with a different version than the main repo requires putting a "version" field. But this requirement conflicts with the exact-match for tags.
+
+We have 3 solutions to move forward, I sorted them in increasing preference order (the last solution is my top pref):
+- keep the "version" field, and put there the exact version, via releasing scripts (we'd increment it at every version)
+- split symfony/contracts from symfony/symfony. This will make contributing there more complex (2 PRs to keep in sync for contributing to both repos, split reviews, broken-CI-before-merge, etc.)
+- have composer allow `3.4.x-dev` in the "version" field.
+
+---------------------------------------------------------------------------
+
+by naderman at 2020-10-07T15:30:02Z
+
+We already have a steady stream of support requests from people hardcoding version numbers in composer.json and then not understanding why versions do not show up if they tag them with a conflicting number. Please don't add to their confusion by hardcoding version numbers in Symfony. https://blog.packagist.com/tagged-a-new-release-for-composer-and-it-wont-show-up-on-packagist/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-08T12:53:08Z
+
+PR updated to account for composer/composer#9273
+Waiting for this PR to be merged on composer.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-12T18:09:05Z
+
+This one should be rebased and updated for the new Discord Notifier bridge.

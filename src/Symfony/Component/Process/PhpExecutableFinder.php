@@ -118,12 +118,10 @@ class PhpExecutableFinder
      */
     public function findByVersion(string $version)
     {
-        $versionWithoutDots = str_replace('.', '', $version);
-        $names = ['php'.$versionWithoutDots];
-
-        if ($version !== $versionWithoutDots) {
-            $names[] = 'php'.$version;
-        }
+        $names = [
+            'php'.$version,
+            'php'.str_replace('.', '', $version),
+        ];
 
         return $this->tryNames($names);
     }

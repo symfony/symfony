@@ -32,5 +32,7 @@
             "url": "https://github.com/symfony/contracts"
         }
     },
-    "version": "2.1.x-dev"
+    "extra": {
+        "branch-version": "2.1-dev"
+    }
 }

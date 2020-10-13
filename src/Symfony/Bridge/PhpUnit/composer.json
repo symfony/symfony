@@ -41,10 +41,17 @@
     ],
     "minimum-stability": "dev",
     "extra": {
+        "branch-version": "5.1-dev",
         "thanks": {
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
+<<<<<<< HEAD
     },
-    "version": "5.1.x-dev"
+    "extra": {
+        "branch-version": "5.1-dev"
+    }
+=======
+    }
+>>>>>>> 4.4
 }

@@ -37,5 +37,7 @@
         ]
     },
     "minimum-stability": "dev",
-    "version": "5.1.x-dev"
+    "extra": {
+        "branch-version": "5.1-dev"
+    }
 }

@@ -33,6 +33,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "3.4-dev"
+        "branch-version": "3.4"
     }
 }

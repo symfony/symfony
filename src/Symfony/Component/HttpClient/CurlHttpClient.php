@@ -320,6 +320,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
+        if (!\is_resource($this->multi->handle) && !$this->multi->handle instanceof \CurlMultiHandle) {
+            $responses = [];
+        }
+
         if ($responses instanceof CurlResponse) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {

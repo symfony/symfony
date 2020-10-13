@@ -38,10 +38,10 @@
     ],
     "minimum-stability": "dev",
     "extra": {
+        "branch-version": "4.4-dev",
         "thanks": {
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
-    },
-    "version": "4.4.x-dev"
+    }
 }

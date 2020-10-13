@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+
 /**
  * An executable finder specifically designed for the PHP executable.
  *
@@ -113,11 +115,15 @@ class PhpExecutableFinder
     /**
      * Finds the PHP executable by a specific version.
      *
-     * @param string $version
+     * @param string $version A version string in the form `x.y`
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function findByVersion(string $version)
     {
+        if (!preg_match('#^\d+\.\d+$#', $version)) {
+            throw new InvalidArgumentException('The version string must be in the form "x.y".');
+        }
+
         $names = [
             'php'.$version,
             'php'.str_replace('.', '', $version),
@@ -129,7 +135,7 @@ class PhpExecutableFinder
     /**
      * Finds a PHP executable in one of the given versions.
      *
-     * @param string[] $versions
+     * @param string[] $versions A list of version strings in the form `x.y`
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function tryVersions(array $versions)

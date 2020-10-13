@@ -209,7 +209,7 @@ install:
           git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
           git rm -rq src/Symfony/Bridge/PhpUnit
           git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
-          export SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"branch-version": *"[1-9]' | grep -o '[0-9.]*')
+          export SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9.]*')
           sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_VERSION'.x@dev"/' composer.json
           rm -rf .phpunit
       fi
@@ -243,7 +243,7 @@ install:
           git checkout -m FETCH_HEAD &&
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       else
-        export SYMFONY_VERSION=$(cat composer.json | grep '^ *"branch-version": *"[1-9]' | grep -o '[0-9.]*')
+        export SYMFONY_VERSION=$(cat composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9.]*')
       fi
 
     - |
@@ -270,7 +270,7 @@ install:
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
-      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"branch-version": *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
+      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi

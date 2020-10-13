@@ -26,14 +26,21 @@ trait TagTrait
             throw new InvalidArgumentException(sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
         }
 
-        foreach ($attributes as $attribute => $value) {
-            if (!is_scalar($value) && null !== $value) {
-                throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $this->id, $name, $attribute));
-            }
-        }
+        $this->recursiveValidateAttributes($name, $attributes);
 
         $this->definition->addTag($name, $attributes);
 
         return $this;
+    }
+
+    private function recursiveValidateAttributes(string $name, array $attributes, string $prefix = ''): void
+    {
+        foreach ($attributes as $attribute => $value) {
+            if (\is_array($value)) {
+                $this->recursiveValidateAttributes($name, $attributes, $attribute.'.');
+            } elseif (!is_scalar($value) && null !== $value) {
+                throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type or an array of scalar-types for service "%s", tag "%s", attribute "%s".', $this->id, $name, $prefix.$attribute));
+            }
+        }
     }
 }

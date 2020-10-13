@@ -50,7 +50,7 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->driverConnection->close();
         if (file_exists($this->sqliteFile)) {
-            unlink($this->sqliteFile);
+            @unlink($this->sqliteFile);
         }
     }
 

@@ -247,6 +247,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
     public function __destruct()
     {
+        curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
+
         if (null === $this->timeout) {
             return; // Unused pushed response
         }

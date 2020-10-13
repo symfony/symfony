@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Defines the interface of denormalizers.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface DenormalizerInterface

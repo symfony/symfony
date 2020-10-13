@@ -36,7 +36,11 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $builder
             ->scalarNode('check_route')
                 ->isRequired()
-                ->info('Route that will validate the login link - e.g. app_login_link_verify.')
+                ->info('Route that will validate the login link - e.g. "app_login_link_verify".')
+            ->end()
+            ->scalarNode('check_post_only')
+                ->defaultFalse()
+                ->info('If true, only HTTP POST requests to "check_route" will be handled by the authenticator.')
             ->end()
             ->arrayNode('signature_properties')
                 ->isRequired()
@@ -128,6 +132,7 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
             ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(4, [
                 'check_route' => $config['check_route'],
+                'check_post_only' => $config['check_post_only'],
             ]);
 
         return $authenticatorId;

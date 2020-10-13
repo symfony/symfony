@@ -264,4 +264,12 @@ class XmlDumperTest extends TestCase
         $dumper = new XmlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_abstract_argument.xml', $dumper->dump());
     }
+
+    public function testDumpNonScalarTags()
+    {
+        $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_array_tags.xml'), $dumper->dump());
+    }
 }

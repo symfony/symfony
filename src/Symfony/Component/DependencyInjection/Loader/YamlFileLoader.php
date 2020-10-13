@@ -303,11 +303,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in "%s".', $file));
                 }
 
-                foreach ($tag as $attribute => $value) {
-                    if (!\is_scalar($value) && null !== $value) {
-                        throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, $attribute, $file));
-                    }
-                }
+                $this->validateAttributes(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, '%s', $file), $tag);
             }
         }
 
@@ -611,11 +607,7 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $id, $file));
             }
 
-            foreach ($tag as $attribute => $value) {
-                if (!\is_scalar($value) && null !== $value) {
-                    throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in "%s". Check your YAML syntax.', $id, $name, $attribute, $file));
-                }
-            }
+            $this->validateAttributes(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in "%s". Check your YAML syntax.', $id, $name, '%s', $file), $tag);
 
             $definition->addTag($name, $tag);
         }
@@ -951,6 +943,17 @@ class YamlFileLoader extends FileLoader
         foreach ($definition as $key => $value) {
             if (!isset($keywords[$key])) {
                 throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
+            }
+        }
+    }
+
+    private function validateAttributes(string $message, array $attributes, string $prefix = ''): void
+    {
+        foreach ($attributes as $attribute => $value) {
+            if (\is_array($value)) {
+                $this->validateAttributes($message, $value, $attribute.'.');
+            } elseif (!\is_scalar($value ?? '')) {
+                throw new InvalidArgumentException(sprintf($message, $prefix.$attribute));
             }
         }
     }

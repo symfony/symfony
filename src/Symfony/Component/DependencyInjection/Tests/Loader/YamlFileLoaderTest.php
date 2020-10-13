@@ -418,16 +418,14 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
     }
 
-    public function testTagWithAttributeArrayThrowsException()
+    public function testTagWithAttributeArray()
     {
-        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
-        try {
-            $loader->load('badtag3.yml');
-            $this->fail('->load() should throw an exception when a tag-attribute is not a scalar');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
-            $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
-        }
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tag_array_arguments.yml');
+
+        $definition = $container->getDefinition('foo_service');
+        $this->assertEquals(['foo' => [['bar' => ['foo' => 'foo', 'bar' => 'bar']]]], $definition->getTags());
     }
 
     public function testLoadYamlOnlyWithKeys()

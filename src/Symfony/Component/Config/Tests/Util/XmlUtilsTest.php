@@ -199,9 +199,7 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $originalDisableEntities = libxml_disable_entity_loader(false);
-        }
+        $originalDisableEntities = libxml_disable_entity_loader(false);
         $errorReporting = error_reporting(-1);
 
         set_error_handler(function ($errno, $errstr) {
@@ -221,13 +219,11 @@ class XmlUtilsTest extends TestCase
             error_reporting($errorReporting);
         }
 
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-            libxml_disable_entity_loader($disableEntities);
+        $disableEntities = libxml_disable_entity_loader(true);
+        libxml_disable_entity_loader($disableEntities);
 
-            libxml_disable_entity_loader($originalDisableEntities);
-            $this->assertFalse($disableEntities);
-        }
+        libxml_disable_entity_loader($originalDisableEntities);
+        $this->assertFalse($disableEntities);
 
         // should not throw an exception
         XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');

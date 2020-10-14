@@ -95,19 +95,38 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-        }
+        $disableEntities = libxml_disable_entity_loader(true);
 
         $containerBuilder = new ContainerBuilder();
         $loader = new XmlFileLoader($containerBuilder, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services2.xml');
 
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader($disableEntities);
-        }
+        libxml_disable_entity_loader($disableEntities);
 
         $this->assertGreaterThan(0, $containerBuilder->getParameterBag()->all(), 'Parameters can be read from the config file.');
+    }
+
+    /**
+     * Tests to see whether or not calling libxml_disable_entity_loader() is still needed.
+     *
+     * The xml/xxe_schema.xsd highlights simulates a potential potential XXE attack by referencing an external file.
+     * Depending on the outcome of the schemaValidate() call, we can determine if calling libxml_disable_entity_loader()
+     * is required on that specific platform.
+     *
+     * External schemas are used internally in Symfony with local files only, and several classes enable external
+     * entity loading temporarily.
+     *
+     * @see https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing
+     */
+    public function testDisableEntityLoaderNeeded()
+    {
+        $this->expectWarning();
+        $this->expectWarningMessage('Document is empty');
+        // if loading external entities fails the warning message would contain "failed to load external entity"
+
+        $dom = new \DOMDocument();
+
+        $dom->schemaValidate(self::$fixturesPath.'/xml/xxe_schema.xsd');
     }
 
     public function testLoadParameters()

@@ -620,13 +620,9 @@ $imports
 EOF
         ;
 
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(false);
-            $valid = @$dom->schemaValidateSource($source);
-            libxml_disable_entity_loader($disableEntities);
-        } else {
-            $valid = @$dom->schemaValidateSource($source);
-        }
+        $disableEntities = libxml_disable_entity_loader(false);
+        $valid = @$dom->schemaValidateSource($source);
+        libxml_disable_entity_loader($disableEntities);
 
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);

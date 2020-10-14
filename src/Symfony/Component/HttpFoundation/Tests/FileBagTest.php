@@ -168,9 +168,9 @@ class FileBagTest extends TestCase
     protected function tearDown(): void
     {
         foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
-            unlink($file);
+            @unlink($file);
         }
 
-        rmdir(sys_get_temp_dir().'/form_test');
+        @rmdir(sys_get_temp_dir().'/form_test');
     }
 }

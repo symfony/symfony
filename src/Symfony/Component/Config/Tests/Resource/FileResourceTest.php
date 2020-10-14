@@ -30,11 +30,9 @@ class FileResourceTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (!file_exists($this->file)) {
-            return;
+        if (file_exists($this->file)) {
+            @unlink($this->file);
         }
-
-        unlink($this->file);
     }
 
     public function testGetResource()

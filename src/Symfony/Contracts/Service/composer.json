@@ -33,6 +33,9 @@
         }
     },
     "extra": {
-        "branch-version": "2.1"
+        "branch-version": "2.1",
+        "branch-alias": {
+            "dev-main": "2.1-dev"
+        }
     }
 }

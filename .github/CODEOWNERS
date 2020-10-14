@@ -1,4 +1,5 @@
 # Console
+/src/Symfony/Component/Console/ @chalasr
 /src/Symfony/Component/Console/Logger/ConsoleLogger.php @dunglas
 # DependencyInjection
 /src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php @dunglas
@@ -36,10 +37,10 @@
 # Serializer
 /src/Symfony/Component/Serializer/ @dunglas
 # Security
-/src/Symfony/Bridge/Doctrine/Security/ @wouterj
-/src/Symfony/Bundle/SecurityBundle/ @wouterj
-/src/Symfony/Component/Security/ @wouterj
-/src/Symfony/Component/Ldap/Security/ @wouterj
+/src/Symfony/Bridge/Doctrine/Security/ @wouterj @chalasr
+/src/Symfony/Bundle/SecurityBundle/ @wouterj @chalasr
+/src/Symfony/Component/Security/ @wouterj @chalasr
+/src/Symfony/Component/Ldap/Security/ @wouterj @chalasr
 # TwigBundle
 /src/Symfony/Bundle/TwigBundle/ErrorRenderer/TwigHtmlErrorRenderer.php @yceruto
 # WebLink

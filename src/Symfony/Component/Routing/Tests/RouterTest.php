@@ -36,7 +36,7 @@ class RouterTest extends TestCase
     {
         if (is_dir($this->cacheDir)) {
             array_map('unlink', glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
-            rmdir($this->cacheDir);
+            @rmdir($this->cacheDir);
         }
 
         $this->loader = null;

@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-13T20:04:44Z
+
+Thanks for the reviews! PR updated (apart from the 2 comments I replied on)
+
+> Maybe some tests also? :innocent:
+
+Both classes in this PR are rather basic data objects. I've added some tests on the `NotificationEmail` to extend its current tests. Other Notification objects doesn't seem to have tests as well, and doing so will require a huge amount of extra packages in security-http's `require-dev` (see https://github.com/symfony/symfony-docs/pull/14389/files#diff-ff3b2d12d83cc148d47afab48db9d6e1c3e52574b4da40dedd17440d678f0c45R275-R277 )

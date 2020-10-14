@@ -51,8 +51,11 @@ final class Limiter
             case 'fixed_window':
                 return new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
 
+            case 'sliding_window':
+                return new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
+
             default:
-                throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket" or "fixed_window".', $this->config['strategy']));
+                throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket", "sliding_window" or "fixed_window".', $this->config['strategy']));
         }
     }
 

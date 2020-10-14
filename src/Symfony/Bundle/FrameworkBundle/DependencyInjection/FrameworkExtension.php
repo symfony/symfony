@@ -74,6 +74,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
+use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;

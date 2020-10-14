@@ -121,6 +121,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
      */
     public function acquireRead(bool $blocking = false): bool
     {
+        $this->key->resetLifetime();
         try {
             if (!$this->store instanceof SharedLockStoreInterface) {
                 $this->logger->debug('Store does not support ReadLocks, fallback to WriteLock.', ['resource' => $this->key]);

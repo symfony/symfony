@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Rate;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
+use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 use Symfony\Component\RateLimiter\TokenBucket;
 use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
@@ -84,6 +85,15 @@ class TokenBucketLimiterTest extends TestCase
         $limit = $limiter->consume(5);
         $this->assertEquals(0, $limit->getRemainingTokens());
         $this->assertEqualsWithDelta(time(), $limit->getRetryAfter()->getTimestamp(), 1);
+    }
+
+    public function testWrongWindowFromCache()
+    {
+        $this->storage->save(new DummyWindow());
+        $limiter = $this->createLimiter();
+        $limit = $limiter->consume();
+        $this->assertTrue($limit->isAccepted());
+        $this->assertEquals(9, $limit->getRemainingTokens());
     }
 
     private function createLimiter($initialTokens = 10, Rate $rate = null)

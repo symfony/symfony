@@ -49,7 +49,7 @@ final class FixedWindowLimiter implements LimiterInterface
 
         try {
             $window = $this->storage->fetch($this->id);
-            if (null === $window) {
+            if (!$window instanceof Window) {
                 $window = new Window($this->id, $this->interval);
             }
 

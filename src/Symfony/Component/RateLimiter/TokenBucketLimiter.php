@@ -63,7 +63,7 @@ final class TokenBucketLimiter implements LimiterInterface
 
         try {
             $bucket = $this->storage->fetch($this->id);
-            if (null === $bucket) {
+            if (!$bucket instanceof TokenBucket) {
                 $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
             }
 
@@ -106,7 +106,7 @@ final class TokenBucketLimiter implements LimiterInterface
     public function consume(int $tokens = 1): Limit
     {
         $bucket = $this->storage->fetch($this->id);
-        if (null === $bucket) {
+        if (!$bucket instanceof TokenBucket) {
             $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
         }
         $now = microtime(true);

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by natepage at 2020-10-14T11:23:32Z
+
+@Nyholm Thank you for the quick reply + patch!
+
+```diff
+- MESSENGER_NOTIFICATIONS_TRANSPORT_DSN=redis://redis:6379/messages
++ MESSENGER_NOTIFICATIONS_TRANSPORT_DSN=redis://redis:6379/messages?lazy=1
+```
+
+Working like a charm!

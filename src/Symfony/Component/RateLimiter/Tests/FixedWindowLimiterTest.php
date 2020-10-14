@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
+use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
 /**
  * @group time-sensitive
@@ -60,6 +61,15 @@ class FixedWindowLimiterTest extends TestCase
         $limit = $limiter->consume(10);
         $this->assertEquals(0, $limit->getRemainingTokens());
         $this->assertEquals(time() + 60, $limit->getRetryAfter()->getTimestamp());
+    }
+
+    public function testWrongWindowFromCache()
+    {
+        $this->storage->save(new DummyWindow());
+        $limiter = $this->createLimiter();
+        $limit = $limiter->consume();
+        $this->assertTrue($limit->isAccepted());
+        $this->assertEquals(9, $limit->getRemainingTokens());
     }
 
     private function createLimiter(): FixedWindowLimiter

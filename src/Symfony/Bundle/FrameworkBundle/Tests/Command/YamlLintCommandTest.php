@@ -174,9 +174,9 @@ EOF;
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                @unlink($file);
             }
         }
-        rmdir(sys_get_temp_dir().'/yml-lint-test');
+        @rmdir(sys_get_temp_dir().'/yml-lint-test');
     }
 }

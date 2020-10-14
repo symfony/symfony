@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added a `delete_after_reject` option to the DSN to allow control over message
    deletion, similar to `delete_after_ack`.
+ * Added option `lazy` to delay connecting to Redis server until we first use it.
 
 5.1.0
 -----

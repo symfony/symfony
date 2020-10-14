@@ -39,6 +39,7 @@ class Connection
         'tls' => false,
         'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
+        'lazy' => false,
     ];
 
     private $connection;
@@ -61,22 +62,41 @@ class Connection
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
         }
 
-        $this->connection = $redis ?: new \Redis();
-        $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
-        $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
-
+        $host = $connectionCredentials['host'] ?? '127.0.0.1';
+        $port = $connectionCredentials['port'] ?? 6379;
+        $serializer = $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP;
+        $dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex'];
         $auth = $connectionCredentials['auth'] ?? null;
         if ('' === $auth) {
             $auth = null;
         }
 
-        if (null !== $auth && !$this->connection->auth($auth)) {
-            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
+        $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
+            $redis->connect($host, $port);
+            $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
+
+            if (null !== $auth && !$redis->auth($auth)) {
+                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+            }
+
+            if ($dbIndex && !$redis->select($dbIndex)) {
+                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
+            }
+
+            return true;
+        };
+
+        if (null === $redis) {
+            $redis = new \Redis();
         }
 
-        if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException('Redis connection failed: '.$this->connection->getLastError());
+        if ($configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy']) {
+            $redis = new RedisProxy($redis, $initializer);
+        } else {
+            $initializer($redis);
         }
+
+        $this->connection = $redis;
 
         foreach (['stream', 'group', 'consumer'] as $key) {
             if (isset($configuration[$key]) && '' === $configuration[$key]) {
@@ -165,6 +185,7 @@ class Connection
             'stream' => $redisOptions['stream'] ?? null,
             'group' => $redisOptions['group'] ?? null,
             'consumer' => $redisOptions['consumer'] ?? null,
+            'lazy' => $redisOptions['lazy'] ?? self::DEFAULT_OPTIONS['lazy'],
             'auto_setup' => $autoSetup,
             'stream_max_entries' => $maxEntries,
             'delete_after_ack' => $deleteAfterAck,

@@ -387,4 +387,16 @@ class ConnectionTest extends TestCase
 
         $this->assertSame('xack error', $e->getMessage());
     }
+
+    public function testLazy()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame('1', $message['body']);
+        $connection->reject($message['id']);
+        $redis->del('messenger-lazy');
+    }
 }

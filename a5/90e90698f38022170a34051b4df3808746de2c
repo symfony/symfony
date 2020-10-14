@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-14T12:19:17Z
+
+> This is pure CS, because the closures are found in a static method, so they are static already
+
+Okey. I didn't think about that. I thought it was strange that these weren't static already.
+
+Thank you for the info.

@@ -3,8 +3,8 @@
 /src/Symfony/Component/Console/Logger/ConsoleLogger.php @dunglas
 # DependencyInjection
 /src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php @dunglas
-# ErrorRenderer
-/src/Symfony/Component/ErrorRenderer/* @yceruto
+# ErrorHandler
+/src/Symfony/Component/ErrorHandler/ErrorRenderer/* @yceruto
 # Form
 /src/Symfony/Bridge/Twig/Extension/FormExtension.php @xabbuh
 /src/Symfony/Bridge/Twig/Form/ @xabbuh
@@ -21,7 +21,7 @@
 /src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/Compiler/FormPassTest.php @xabbuh
 /src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/FormHelperTableLayoutTest.php @xabbuh
 /src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/FormHelperDivLayoutTest.php @xabbuh
-/src/Symfony/Component/Form/ @xabbuh
+/src/Symfony/Component/Form/ @xabbuh @yceruto
 # HttpKernel
 /src/Symfony/Component/HttpKernel/Log/Logger.php @dunglas
 # LDAP
@@ -31,6 +31,8 @@
 # Messenger
 /src/Symfony/Bridge/Doctrine/Messenger/ @sroze
 /src/Symfony/Component/Messenger/ @sroze
+# OptionsResolver
+/src/Symfony/Component/OptionsResolver/ @yceruto
 # PropertyInfo
 /src/Symfony/Component/PropertyInfo/ @dunglas
 /src/Symfony/Bridge/Doctrine/PropertyInfo/ @dunglas
@@ -42,7 +44,7 @@
 /src/Symfony/Component/Security/ @wouterj @chalasr
 /src/Symfony/Component/Ldap/Security/ @wouterj @chalasr
 # TwigBundle
-/src/Symfony/Bundle/TwigBundle/ErrorRenderer/TwigHtmlErrorRenderer.php @yceruto
+/src/Symfony/Bundle/TwigBundle/ @yceruto
 # WebLink
 /src/Symfony/Component/WebLink/ @dunglas
 # Workflow

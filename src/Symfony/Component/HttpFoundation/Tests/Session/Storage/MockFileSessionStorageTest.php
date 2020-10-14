@@ -43,7 +43,7 @@ class MockFileSessionStorageTest extends TestCase
     {
         array_map('unlink', glob($this->sessionDir.'/*'));
         if (is_dir($this->sessionDir)) {
-            rmdir($this->sessionDir);
+            @rmdir($this->sessionDir);
         }
         $this->sessionDir = null;
         $this->storage = null;

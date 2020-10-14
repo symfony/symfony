@@ -460,7 +460,7 @@ class LockTest extends TestCase
                 return isset($this->keys[spl_object_hash($key)]);
             }
 
-            public function putOffExpiration(Key $key, float $ttl)
+            public function putOffExpiration(Key $key, $ttl)
             {
                 $key->reduceLifetime($ttl);
                 $this->checkNotExpired($key);
@@ -473,6 +473,52 @@ class LockTest extends TestCase
         $lock->release();
         sleep($ttl + 1);
         $this->assertTrue($lock->acquireRead());
+        $lock->release();
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testAcquireTwiceWithExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = new class() implements PersistingStoreInterface {
+            use ExpiringStoreTrait;
+            private $keys = [];
+            private $initialTtl = 30;
+
+            public function save(Key $key)
+            {
+                $key->reduceLifetime($this->initialTtl);
+                $this->keys[spl_object_hash($key)] = $key;
+                $this->checkNotExpired($key);
+
+                return true;
+            }
+
+            public function delete(Key $key)
+            {
+                unset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function exists(Key $key)
+            {
+                return isset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function putOffExpiration(Key $key, $ttl)
+            {
+                $key->reduceLifetime($ttl);
+                $this->checkNotExpired($key);
+            }
+        };
+        $ttl = 1;
+        $lock = new Lock($key, $store, $ttl);
+
+        $this->assertTrue($lock->acquire());
+        $lock->release();
+        sleep($ttl + 1);
+        $this->assertTrue($lock->acquire());
         $lock->release();
     }
 

@@ -66,6 +66,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
      */
     public function acquire(bool $blocking = false): bool
     {
+        $this->key->resetLifetime();
         try {
             if ($blocking) {
                 if (!$this->store instanceof BlockingStoreInterface) {

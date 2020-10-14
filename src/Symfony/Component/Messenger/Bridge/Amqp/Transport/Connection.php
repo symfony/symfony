@@ -124,8 +124,8 @@ class Connection
      *   * host: Hostname of the AMQP service
      *   * port: Port of the AMQP service
      *   * vhost: Virtual Host to use with the AMQP service
-     *   * user: Username to use to connect the the AMQP service
-     *   * password: Password to use the connect to the AMQP service
+     *   * user: Username to use to connect the AMQP service
+     *   * password: Password to use to connect to the AMQP service
      *   * read_timeout: Timeout in for income activity. Note: 0 or greater seconds. May be fractional.
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
@@ -157,8 +157,8 @@ class Connection
      *       which means heartbeats checked only during blocking calls.
      *
      *   TLS support (see https://www.rabbitmq.com/ssl.html for details):
-     *     * cacert: Path to the CA cert file in PEM format..
-     *     * cert: Path to the client certificate in PEM foramt.
+     *     * cacert: Path to the CA cert file in PEM format.
+     *     * cert: Path to the client certificate in PEM format.
      *     * key: Path to the client key in PEM format.
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.

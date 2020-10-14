@@ -88,12 +88,6 @@ trait CommonResponseTrait
             return $this->jsonData;
         }
 
-        $contentType = $this->headers['content-type'][0] ?? 'application/json';
-
-        if (!preg_match('/\bjson\b/i', $contentType)) {
-            throw new JsonException(sprintf('Response content-type is "%s" while a JSON-compatible one was expected for "%s".', $contentType, $this->getInfo('url')));
-        }
-
         try {
             $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {

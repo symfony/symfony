@@ -120,7 +120,7 @@ class LintCommandTest extends TestCase
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                @unlink($file);
             }
         }
     }

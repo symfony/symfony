@@ -45,7 +45,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         }
 
         if (file_exists($this->path)) {
-            unlink($this->path);
+            @unlink($this->path);
         }
 
         $this->path = null;

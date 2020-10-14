@@ -103,11 +103,9 @@ class AutowireServiceResourceTest extends TestCase
 
     protected function tearDown()
     {
-        if (!file_exists($this->file)) {
-            return;
+        if (file_exists($this->file)) {
+            @unlink($this->file);
         }
-
-        unlink($this->file);
     }
 
     private function getStaleFileTime()

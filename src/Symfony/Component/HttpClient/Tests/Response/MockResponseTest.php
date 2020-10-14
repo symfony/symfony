@@ -42,12 +42,6 @@ class MockResponseTest extends TestCase
         ];
 
         yield [
-            'content' => '{}',
-            'responseHeaders' => ['content-type' => 'plain/text'],
-            'message' => 'Response content-type is "plain/text" while a JSON-compatible one was expected for "https://example.com/file.json".',
-        ];
-
-        yield [
             'content' => 'not json',
             'responseHeaders' => [],
             'message' => 'Syntax error for "https://example.com/file.json".',

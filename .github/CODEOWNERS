@@ -35,6 +35,11 @@
 /src/Symfony/Bridge/Doctrine/PropertyInfo/ @dunglas
 # Serializer
 /src/Symfony/Component/Serializer/ @dunglas
+# Security
+/src/Symfony/Bridge/Doctrine/Security/ @wouterj
+/src/Symfony/Bundle/SecurityBundle/ @wouterj
+/src/Symfony/Component/Security/ @wouterj
+/src/Symfony/Component/Ldap/Security/ @wouterj
 # TwigBundle
 /src/Symfony/Bundle/TwigBundle/ErrorRenderer/TwigHtmlErrorRenderer.php @yceruto
 # WebLink

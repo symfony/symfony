@@ -13,9 +13,9 @@ namespace Symfony\Component\Semaphore\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\SemaphoreFactory;
-use Symfony\Component\Semaphore\SemaphoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -26,12 +26,59 @@ class SemaphoreFactoryTest extends TestCase
     public function testCreateSemaphore()
     {
         $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+
+        $keys = [];
+        $store
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($key) use (&$keys) {
+                $keys[] = $key;
+
+                return true;
+            }))
+            ->willReturn(true);
+
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $factory = new SemaphoreFactory($store);
         $factory->setLogger($logger);
 
-        $semaphore = $factory->createSemaphore('foo', 4);
+        $semaphore1 = $factory->createSemaphore('foo', 4);
+        $semaphore2 = $factory->createSemaphore('foo', 4);
 
-        $this->assertInstanceOf(SemaphoreInterface::class, $semaphore);
+        // assert lock1 and lock2 don't share the same state
+        $semaphore1->acquire();
+        $semaphore2->acquire();
+
+        $this->assertNotSame($keys[0], $keys[1]);
+    }
+
+    public function testCreateSemaphoreFromKey()
+    {
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+
+        $keys = [];
+        $store
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($key) use (&$keys) {
+                $keys[] = $key;
+
+                return true;
+            }))
+            ->willReturn(true);
+
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $factory = new SemaphoreFactory($store);
+        $factory->setLogger($logger);
+
+        $key = new Key('foo', 4);
+        $semaphore1 = $factory->createSemaphoreFromKey($key);
+        $semaphore2 = $factory->createSemaphoreFromKey($key);
+
+        // assert lock1 and lock2 share the same state
+        $semaphore1->acquire();
+        $semaphore2->acquire();
+
+        $this->assertSame($keys[0], $keys[1]);
     }
 }

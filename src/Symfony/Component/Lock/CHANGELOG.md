@@ -11,6 +11,7 @@ CHANGELOG
  * deprecated `RetryTillSaveStore`, logic has been moved in `Lock` and is not needed anymore.
  * added `InMemoryStore`
  * added `PostgreSqlStore`
+ * added the `LockFactory::CreateLockFromKey()` method.
 
 5.1.0
 -----

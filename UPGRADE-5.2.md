@@ -15,7 +15,7 @@ FrameworkBundle
    keep cache namespaces separated by environment of the app. The `%kernel.container_class%` (which includes the environment)
    used to be added by default to the seed, which is not the case anymore. This allows sharing caches between
    apps or different environments.
- * Deprecated the `lock.RESOURCE_NAME` service and the `lock` and `LockInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead.
+ * Deprecated the `lock.RESOURCE_NAME` and `lock.RESOURCE_NAME.store` services and the `lock`, `LockInterface`, `lock.store` and `PersistingStoreInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead.
 
 Form
 ----

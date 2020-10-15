@@ -80,6 +80,11 @@ final class Key
         return $this->state[$stateKey];
     }
 
+    public function resetLifetime(): void
+    {
+        $this->expiringTime = null;
+    }
+
     public function reduceLifetime(float $ttlInSeconds)
     {
         $newTime = microtime(true) + $ttlInSeconds;

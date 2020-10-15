@@ -76,7 +76,7 @@ final class SlidingWindow implements LimiterStateInterface
     public function __sleep(): array
     {
         // $cached is not serialized, it should only be set
-        // upon first creation of the Window.
+        // upon first creation of the window.
         return ['id', 'hitCount', 'intervalInSeconds', 'hitCountForLastWindow', 'windowEndAt'];
     }
 

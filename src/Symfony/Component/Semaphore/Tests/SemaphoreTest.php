@@ -252,4 +252,24 @@ class SemaphoreTest extends TestCase
         $semaphore = new Semaphore($key, $store);
         $this->assertTrue($semaphore->isExpired());
     }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testExpirationResetAfter()
+    {
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+
+        $key = new Key('key', 1);
+        $semaphore = new Semaphore($key, $store, 1);
+
+        $semaphore->acquire();
+        $this->assertFalse($semaphore->isExpired());
+        $semaphore->release();
+
+        sleep(2);
+
+        $semaphore->acquire();
+        $this->assertFalse($semaphore->isExpired());
+    }
 }

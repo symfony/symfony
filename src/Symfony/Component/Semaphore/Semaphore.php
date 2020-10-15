@@ -66,6 +66,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
     public function acquire(): bool
     {
         try {
+            $this->key->resetLifetime();
             $this->store->save($this->key, $this->ttlInSecond);
             $this->key->reduceLifetime($this->ttlInSecond);
             $this->dirty = true;
@@ -97,6 +98,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
 
         try {
+            $this->key->resetLifetime();
             $this->store->putOffExpiration($this->key, $ttlInSecond);
             $this->key->reduceLifetime($ttlInSecond);
 

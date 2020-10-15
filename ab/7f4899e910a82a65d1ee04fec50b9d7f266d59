@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-15T09:56:26Z
+
+Now I'm wondering: do we want to deprecate named locks? Why?
+The original issue was only about the default lock.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-15T10:51:57Z
+
+I believe the issue #38458 is about removing Lock in favor of LockFactory and not only the default one.  /cc @lyrixx
+
+I think arguments pointed in the issue are valid for **both** default lock and named locks. We should deprecate all of theme because they are dangerous/confusing for end users (no concurrency between services). And easy for end-user to fix:
+- inject the factory and call ->createLock() in the constructor
+- or create the service themselve `$services->set(LockInterface::class)->factory(LockFactory::class, 'createLock')->args(['default'])`

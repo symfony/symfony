@@ -1689,16 +1689,16 @@ class FrameworkExtension extends Extension
             $lockDefinition->setPublic(false);
             $lockDefinition->setFactory([new Reference('lock.'.$resourceName.'.factory'), 'createLock']);
             $lockDefinition->setArguments([$resourceName]);
-            $container->setDefinition('lock.'.$resourceName, $lockDefinition);
+            $container->setDefinition('lock.'.$resourceName, $lockDefinition)->setDeprecated('symfony/framework-bundle', '5.2', 'The "%service_id%" service is deprecated, use "lock.'.$resourceName.'.factory" instead.');
 
             // provide alias for default resource
             if ('default' === $resourceName) {
                 $container->setAlias('lock.store', new Alias('lock.'.$resourceName.'.store', false));
                 $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory', false));
-                $container->setAlias('lock', new Alias('lock.'.$resourceName, false));
+                $container->setAlias('lock', (new Alias('lock.'.$resourceName, false))->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "lock.factory" instead.'));
                 $container->setAlias(PersistingStoreInterface::class, new Alias('lock.store', false));
                 $container->setAlias(LockFactory::class, new Alias('lock.factory', false));
-                $container->setAlias(LockInterface::class, new Alias('lock', false));
+                $container->setAlias(LockInterface::class, (new Alias('lock.'.$resourceName, false))->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "'.LockFactory::class.'" instead.'));
             } else {
                 $container->registerAliasForArgument('lock.'.$resourceName.'.store', PersistingStoreInterface::class, $resourceName.'.lock.store');
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory');

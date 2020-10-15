@@ -1702,7 +1702,7 @@ class FrameworkExtension extends Extension
             } else {
                 $container->registerAliasForArgument('lock.'.$resourceName.'.store', PersistingStoreInterface::class, $resourceName.'.lock.store');
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory');
-                $container->registerAliasForArgument('lock.'.$resourceName, LockInterface::class, $resourceName.'.lock');
+                $container->registerAliasForArgument('lock.'.$resourceName, LockInterface::class, $resourceName.'.lock')->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "'.LockFactory::class.' $'.$resourceName.'LockFactory" instead.');
             }
         }
     }

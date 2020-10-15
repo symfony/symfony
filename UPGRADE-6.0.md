@@ -58,6 +58,7 @@ FrameworkBundle
  * Removed `session.attribute_bag` service and `session.flash_bag` service.
  * The `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
    `cache_clearer`, `filesystem` and `validator` services are now private.
+ * Removed the `lock.RESOURCE_NAME` service and the `lock` and `LockInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead.
 
 HttpFoundation
 --------------

@@ -4,7 +4,7 @@
 # DependencyInjection
 /src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php @dunglas
 # ErrorHandler
-/src/Symfony/Component/ErrorHandler/ErrorRenderer/* @yceruto
+/src/Symfony/Component/ErrorHandler/ @yceruto
 # Form
 /src/Symfony/Bridge/Twig/Extension/FormExtension.php @xabbuh
 /src/Symfony/Bridge/Twig/Form/ @xabbuh

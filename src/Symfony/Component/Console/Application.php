@@ -24,6 +24,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\NamespaceNotFoundException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -88,8 +89,8 @@ class Application implements ResetInterface
         $this->version = $version;
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
-        $this->signalRegistry = new SignalRegistry();
-        if (\defined('SIGINT')) {
+        if (\defined('SIGINT') && SignalRegistry::isSupported()) {
+            $this->signalRegistry = new SignalRegistry();
             $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2];
         }
     }
@@ -953,6 +954,9 @@ class Application implements ResetInterface
         }
 
         if ($command instanceof SignalableCommandInterface) {
+            if (!$this->signalsToDispatchEvent) {
+                throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
+            }
             foreach ($command->getSubscribedSignals() as $signal) {
                 $this->signalRegistry->register($signal, [$command, 'handleSignal']);
             }

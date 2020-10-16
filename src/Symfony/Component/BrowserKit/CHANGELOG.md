@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added `jsonRequest` method to `AbstractBrowser`
+
 4.3.0
 -----
 

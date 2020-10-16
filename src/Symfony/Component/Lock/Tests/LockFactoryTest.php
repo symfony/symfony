@@ -13,8 +13,8 @@ namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
@@ -25,12 +25,61 @@ class LockFactoryTest extends TestCase
     public function testCreateLock()
     {
         $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store->expects($this->any())->method('exists')->willReturn(false);
+
+        $keys = [];
+        $store
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($key) use (&$keys) {
+                $keys[] = $key;
+
+                return true;
+            }))
+            ->willReturn(true);
+
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $factory = new LockFactory($store);
         $factory->setLogger($logger);
 
-        $lock = $factory->createLock('foo');
+        $lock1 = $factory->createLock('foo');
+        $lock2 = $factory->createLock('foo');
 
-        $this->assertInstanceOf(LockInterface::class, $lock);
+        // assert lock1 and lock2 don't share the same state
+        $lock1->acquire();
+        $lock2->acquire();
+
+        $this->assertNotSame($keys[0], $keys[1]);
+    }
+
+    public function testCreateLockFromKey()
+    {
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store->expects($this->any())->method('exists')->willReturn(false);
+
+        $keys = [];
+        $store
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($key) use (&$keys) {
+                $keys[] = $key;
+
+                return true;
+            }))
+            ->willReturn(true);
+
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $factory = new LockFactory($store);
+        $factory->setLogger($logger);
+
+        $key = new Key('foo');
+        $lock1 = $factory->createLockFromKey($key);
+        $lock2 = $factory->createLockFromKey($key);
+
+        // assert lock1 and lock2 share the same state
+        $lock1->acquire();
+        $lock2->acquire();
+
+        $this->assertSame($keys[0], $keys[1]);
     }
 }

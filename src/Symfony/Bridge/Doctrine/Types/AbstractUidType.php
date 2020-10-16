@@ -56,7 +56,7 @@ abstract class AbstractUidType extends GuidType
         }
 
         if ($value instanceof AbstractUid) {
-            return (string) $value;
+            return $value->toRfc4122();
         }
 
         if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
@@ -64,7 +64,13 @@ abstract class AbstractUidType extends GuidType
         }
 
         if ($this->getUidClass()::isValid((string) $value)) {
-            return (string) $value;
+            try {
+                $uuid = $this->getUidClass()::fromString($value);
+
+                return $uuid->toRfc4122();
+            } catch (\InvalidArgumentException $e) {
+                throw ConversionException::conversionFailed($value, $this->getName());
+            }
         }
 
         throw ConversionException::conversionFailed($value, $this->getName());

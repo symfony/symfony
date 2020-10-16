@@ -49,6 +49,11 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         ];
         $onProgress = $options['on_progress'] ?? null;
 
+        if (false === ($options['extra']['trace_content'] ?? true)) {
+            unset($content);
+            $content = false;
+        }
+
         $options['on_progress'] = function (int $dlNow, int $dlSize, array $info) use (&$traceInfo, $onProgress) {
             $traceInfo = $info;
 

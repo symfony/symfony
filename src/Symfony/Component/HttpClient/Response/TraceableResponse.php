@@ -52,6 +52,10 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
     public function getContent(bool $throw = true): string
     {
+        if (false === $this->content) {
+            return $this->response->getContent($throw);
+        }
+
         $this->content = $this->response->getContent(false);
 
         if ($throw) {
@@ -63,6 +67,10 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
     public function toArray(bool $throw = true): array
     {
+        if (false === $this->content) {
+            return $this->response->toArray($throw);
+        }
+
         $this->content = $this->response->toArray(false);
 
         if ($throw) {

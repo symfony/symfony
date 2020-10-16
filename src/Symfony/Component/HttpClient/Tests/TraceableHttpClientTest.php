@@ -30,14 +30,14 @@ class TraceableHttpClientTest extends TestCase
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
         $httpClient
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('request')
             ->with(
                 'GET',
                 '/foo/bar',
                 $this->callback(function ($subject) {
                     $onprogress = $subject['on_progress'];
-                    unset($subject['on_progress']);
+                    unset($subject['on_progress'], $subject['extra']);
                     $this->assertEquals(['options1' => 'foo'], $subject);
 
                     return true;
@@ -45,8 +45,11 @@ class TraceableHttpClientTest extends TestCase
             )
             ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
         ;
+
         $sut = new TraceableHttpClient($httpClient);
+
         $sut->request('GET', '/foo/bar', ['options1' => 'foo'])->getContent();
+
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
         $actualTracedRequest = $tracedRequests[0];
         $this->assertEquals([
@@ -55,6 +58,18 @@ class TraceableHttpClientTest extends TestCase
             'options' => ['options1' => 'foo'],
             'info' => [],
             'content' => 'hello',
+        ], $actualTracedRequest);
+
+        $sut->request('GET', '/foo/bar', ['options1' => 'foo', 'extra' => ['trace_content' => false]])->getContent();
+
+        $this->assertCount(2, $tracedRequests = $sut->getTracedRequests());
+        $actualTracedRequest = $tracedRequests[1];
+        $this->assertEquals([
+            'method' => 'GET',
+            'url' => '/foo/bar',
+            'options' => ['options1' => 'foo', 'extra' => ['trace_content' => false]],
+            'info' => [],
+            'content' => null,
         ], $actualTracedRequest);
     }
 

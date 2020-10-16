@@ -44,7 +44,7 @@ final class UlidTypeTest extends TestCase
         $this->type = Type::getType('ulid');
     }
 
-    public function testUlidConvertsToDatabaseValue(): void
+    public function testUlidConvertsToDatabaseValue()
     {
         $ulid = Ulid::fromString(self::DUMMY_ULID);
 
@@ -54,7 +54,7 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testUlidInterfaceConvertsToDatabaseValue(): void
+    public function testUlidInterfaceConvertsToDatabaseValue()
     {
         $ulid = $this->createMock(AbstractUid::class);
 
@@ -68,34 +68,26 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testUlidStringConvertsToDatabaseValue(): void
-    {
-        $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
-        $ulid = Ulid::fromString(self::DUMMY_ULID);
-
-        $expected = $ulid->toRfc4122();
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testInvalidUlidConversionForDatabaseValue(): void
+    public function testNotSupportedUlidStringConversionToDatabaseValue()
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue('abcdefg', $this->platform);
+        $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(new \stdClass(), $this->platform));
+        $this->expectException(ConversionException::class);
+
+        $this->type->convertToDatabaseValue(new \stdClass(), $this->platform);
     }
 
-    public function testNullConversionForDatabaseValue(): void
+    public function testNullConversionForDatabaseValue()
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    public function testUlidInterfaceConvertsToPHPValue(): void
+    public function testUlidInterfaceConvertsToPHPValue()
     {
         $ulid = $this->createMock(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($ulid, $this->platform);
@@ -103,7 +95,7 @@ final class UlidTypeTest extends TestCase
         $this->assertSame($ulid, $actual);
     }
 
-    public function testUlidConvertsToPHPValue(): void
+    public function testUlidConvertsToPHPValue()
     {
         $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, $this->platform);
 
@@ -111,36 +103,36 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals(self::DUMMY_ULID, $ulid->__toString());
     }
 
-    public function testInvalidUlidConversionForPHPValue(): void
+    public function testInvalidUlidConversionForPHPValue()
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', $this->platform);
     }
 
-    public function testNullConversionForPHPValue(): void
+    public function testNullConversionForPHPValue()
     {
         $this->assertNull($this->type->convertToPHPValue(null, $this->platform));
     }
 
-    public function testReturnValueIfUlidForPHPValue(): void
+    public function testReturnValueIfUlidForPHPValue()
     {
         $ulid = new Ulid();
 
         $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, $this->platform));
     }
 
-    public function testGetName(): void
+    public function testGetName()
     {
         $this->assertEquals('ulid', $this->type->getName());
     }
 
-    public function testGetGuidTypeDeclarationSQL(): void
+    public function testGetGuidTypeDeclarationSQL()
     {
         $this->assertEquals('DUMMYVARCHAR()', $this->type->getSqlDeclaration(['length' => 36], $this->platform));
     }
 
-    public function testRequiresSQLCommentHint(): void
+    public function testRequiresSQLCommentHint()
     {
         $this->assertTrue($this->type->requiresSQLCommentHint($this->platform));
     }

@@ -13,21 +13,19 @@ namespace Symfony\Bridge\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\GuidType;
+use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Uid\AbstractUid;
 
-abstract class AbstractBinaryUidType extends GuidType
+abstract class AbstractBinaryUidType extends Type
 {
     abstract protected function getUidClass(): string;
 
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
-        return $platform->getBinaryTypeDeclarationSQL(
-            [
-                'length' => '16',
-                'fixed' => true,
-            ]
-        );
+        return $platform->getBinaryTypeDeclarationSQL([
+            'length' => '16',
+            'fixed' => true,
+        ]);
     }
 
     /**
@@ -37,21 +35,19 @@ abstract class AbstractBinaryUidType extends GuidType
      */
     public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUid
     {
-        if (null === $value || '' === $value) {
-            return null;
-        }
-
-        if ($value instanceof AbstractUid) {
+        if ($value instanceof AbstractUid || null === $value) {
             return $value;
         }
 
-        try {
-            $uuid = $this->getUidClass()::fromString($value);
-        } catch (\InvalidArgumentException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName());
+        if (!\is_string($value)) {
+            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
         }
 
-        return $uuid;
+        try {
+            return $this->getUidClass()::fromString($value);
+        } catch (\InvalidArgumentException $e) {
+            throw ConversionException::conversionFailed($value, $this->getName(), $e);
+        }
     }
 
     /**
@@ -61,23 +57,15 @@ abstract class AbstractBinaryUidType extends GuidType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        if (null === $value || '' === $value) {
-            return null;
-        }
-
         if ($value instanceof AbstractUid) {
             return $value->toBinary();
         }
 
-        if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (null === $value) {
             return null;
         }
 
-        try {
-            return $this->getUidClass()::fromString((string) $value)->toBinary();
-        } catch (\InvalidArgumentException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName());
-        }
+        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', AbstractUid::class]);
     }
 
     /**

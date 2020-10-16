@@ -110,6 +110,10 @@ class Application implements ResetInterface
 
     public function getSignalRegistry(): SignalRegistry
     {
+        if (!$this->signalRegistry) {
+            throw new RuntimeException('Signals are not supported. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
+        }
+
         return $this->signalRegistry;
     }
 
@@ -282,7 +286,7 @@ class Application implements ResetInterface
             $command = $this->find($alternative);
         }
 
-        if ($this->dispatcher) {
+        if ($this->dispatcher && $this->signalRegistry) {
             foreach ($this->signalsToDispatchEvent as $signal) {
                 $event = new ConsoleSignalEvent($command, $input, $output, $signal);
 
@@ -954,7 +958,7 @@ class Application implements ResetInterface
         }
 
         if ($command instanceof SignalableCommandInterface) {
-            if (!$this->signalsToDispatchEvent) {
+            if (!$this->signalRegistry) {
                 throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
             }
             foreach ($command->getSubscribedSignals() as $signal) {

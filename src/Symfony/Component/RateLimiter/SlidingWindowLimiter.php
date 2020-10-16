@@ -76,7 +76,7 @@ final class SlidingWindowLimiter implements LimiterInterface
     /**
      * {@inheritdoc}
      */
-    public function consume(int $tokens = 1): Limit
+    public function consume(int $tokens = 1): RateLimit
     {
         $this->lock->acquire(true);
 
@@ -91,13 +91,13 @@ final class SlidingWindowLimiter implements LimiterInterface
             $hitCount = $window->getHitCount();
             $availableTokens = $this->getAvailableTokens($hitCount);
             if ($availableTokens < $tokens) {
-                return new Limit($availableTokens, $window->getRetryAfter(), false);
+                return new RateLimit($availableTokens, $window->getRetryAfter(), false, $this->limit);
             }
 
             $window->add($tokens);
             $this->storage->save($window);
 
-            return new Limit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true);
+            return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {
             $this->lock->release();
         }

@@ -38,17 +38,19 @@ class SlidingWindowLimiterTest extends TestCase
         $limiter->consume(8);
         sleep(15);
 
-        $limit = $limiter->consume();
-        $this->assertTrue($limit->isAccepted());
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(10, $rateLimit->getLimit());
 
         // We are 25% into the new window
-        $limit = $limiter->consume(5);
-        $this->assertFalse($limit->isAccepted());
-        $this->assertEquals(3, $limit->getRemainingTokens());
+        $rateLimit = $limiter->consume(5);
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertEquals(3, $rateLimit->getRemainingTokens());
 
         sleep(13);
-        $limit = $limiter->consume(10);
-        $this->assertTrue($limit->isAccepted());
+        $rateLimit = $limiter->consume(10);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(10, $rateLimit->getLimit());
     }
 
     public function testReserve()

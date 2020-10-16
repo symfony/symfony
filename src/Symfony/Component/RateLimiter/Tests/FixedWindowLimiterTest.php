@@ -41,10 +41,12 @@ class FixedWindowLimiterTest extends TestCase
             sleep(5);
         }
 
-        $limit = $limiter->consume();
-        $this->assertTrue($limit->isAccepted());
-        $limit = $limiter->consume();
-        $this->assertFalse($limit->isAccepted());
+        $rateLimit = $limiter->consume();
+        $this->assertSame(10, $rateLimit->getLimit());
+        $this->assertTrue($rateLimit->isAccepted());
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(10, $rateLimit->getLimit());
     }
 
     public function testConsumeOutsideInterval()
@@ -58,18 +60,18 @@ class FixedWindowLimiterTest extends TestCase
         $limiter->consume(9);
         // ...try bursting again at the start of the next window
         sleep(10);
-        $limit = $limiter->consume(10);
-        $this->assertEquals(0, $limit->getRemainingTokens());
-        $this->assertTrue($limit->isAccepted());
+        $rateLimit = $limiter->consume(10);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
     }
 
     public function testWrongWindowFromCache()
     {
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
-        $limit = $limiter->consume();
-        $this->assertTrue($limit->isAccepted());
-        $this->assertEquals(9, $limit->getRemainingTokens());
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
     private function createLimiter(): FixedWindowLimiter

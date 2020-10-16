@@ -18,17 +18,19 @@ use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
  *
  * @experimental in 5.2
  */
-class Limit
+class RateLimit
 {
     private $availableTokens;
     private $retryAfter;
     private $accepted;
+    private $limit;
 
-    public function __construct(int $availableTokens, \DateTimeImmutable $retryAfter, bool $accepted)
+    public function __construct(int $availableTokens, \DateTimeImmutable $retryAfter, bool $accepted, int $limit)
     {
         $this->availableTokens = $availableTokens;
         $this->retryAfter = $retryAfter;
         $this->accepted = $accepted;
+        $this->limit = $limit;
     }
 
     public function isAccepted(): bool
@@ -56,6 +58,11 @@ class Limit
     public function getRemainingTokens(): int
     {
         return $this->availableTokens;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
     }
 
     public function wait(): void

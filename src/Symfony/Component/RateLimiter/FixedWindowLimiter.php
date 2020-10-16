@@ -64,19 +64,19 @@ final class FixedWindowLimiter implements LimiterInterface
             if ($availableTokens >= $tokens) {
                 $window->add($tokens);
 
-                $reservation = new Reservation($now, new Limit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true));
+                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $window->calculateTimeForTokens($remainingTokens);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new Limit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false));
+                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
                 }
 
                 $window->add($tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new Limit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
             $this->storage->save($window);
         } finally {
@@ -89,12 +89,12 @@ final class FixedWindowLimiter implements LimiterInterface
     /**
      * {@inheritdoc}
      */
-    public function consume(int $tokens = 1): Limit
+    public function consume(int $tokens = 1): RateLimit
     {
         try {
-            return $this->reserve($tokens, 0)->getLimit();
+            return $this->reserve($tokens, 0)->getRateLimit();
         } catch (MaxWaitDurationExceededException $e) {
-            return $e->getLimit();
+            return $e->getRateLimit();
         }
     }
 

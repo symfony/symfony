@@ -74,26 +74,28 @@ class TokenBucketLimiterTest extends TestCase
         $limiter = $this->createLimiter(10, $rate);
 
         // enough free tokens
-        $limit = $limiter->consume(5);
-        $this->assertTrue($limit->isAccepted());
-        $this->assertEquals(5, $limit->getRemainingTokens());
-        $this->assertEqualsWithDelta(time(), $limit->getRetryAfter()->getTimestamp(), 1);
+        $rateLimit = $limiter->consume(5);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(5, $rateLimit->getRemainingTokens());
+        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
+        $this->assertSame(10, $rateLimit->getLimit());
         // there are only 5 available free tokens left now
-        $limit = $limiter->consume(10);
-        $this->assertEquals(5, $limit->getRemainingTokens());
+        $rateLimit = $limiter->consume(10);
+        $this->assertEquals(5, $rateLimit->getRemainingTokens());
 
-        $limit = $limiter->consume(5);
-        $this->assertEquals(0, $limit->getRemainingTokens());
-        $this->assertEqualsWithDelta(time(), $limit->getRetryAfter()->getTimestamp(), 1);
+        $rateLimit = $limiter->consume(5);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
+        $this->assertSame(10, $rateLimit->getLimit());
     }
 
     public function testWrongWindowFromCache()
     {
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
-        $limit = $limiter->consume();
-        $this->assertTrue($limit->isAccepted());
-        $this->assertEquals(9, $limit->getRemainingTokens());
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
     private function createLimiter($initialTokens = 10, Rate $rate = null)

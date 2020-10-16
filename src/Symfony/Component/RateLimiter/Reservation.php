@@ -19,13 +19,15 @@ namespace Symfony\Component\RateLimiter;
 final class Reservation
 {
     private $timeToAct;
+    private $limit;
 
     /**
      * @param float $timeToAct Unix timestamp in seconds when this reservation should act
      */
-    public function __construct(float $timeToAct)
+    public function __construct(float $timeToAct, Limit $limit)
     {
         $this->timeToAct = $timeToAct;
+        $this->limit = $limit;
     }
 
     public function getTimeToAct(): float
@@ -36,6 +38,11 @@ final class Reservation
     public function getWaitDuration(): float
     {
         return max(0, (-microtime(true)) + $this->timeToAct);
+    }
+
+    public function getLimit(): Limit
+    {
+        return $this->limit;
     }
 
     public function wait(): void

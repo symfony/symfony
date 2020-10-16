@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
+ * @internal
  * @experimental in 5.2
  */
 final class Window implements LimiterStateInterface
@@ -21,11 +22,15 @@ final class Window implements LimiterStateInterface
     private $id;
     private $hitCount = 0;
     private $intervalInSeconds;
+    private $maxSize;
+    private $timer;
 
-    public function __construct(string $id, int $intervalInSeconds)
+    public function __construct(string $id, int $intervalInSeconds, int $windowSize, ?float $timer = null)
     {
         $this->id = $id;
         $this->intervalInSeconds = $intervalInSeconds;
+        $this->maxSize = $windowSize;
+        $this->timer = $timer ?? microtime(true);
     }
 
     public function getId(): string
@@ -38,8 +43,15 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds;
     }
 
-    public function add(int $hits = 1)
+    public function add(int $hits = 1, ?float $now = null)
     {
+        $now = $now ?? microtime(true);
+        if (($now - $this->timer) > $this->intervalInSeconds) {
+            // reset window
+            $this->timer = $now;
+            $this->hitCount = 0;
+        }
+
         $this->hitCount += $hits;
     }
 
@@ -48,13 +60,37 @@ final class Window implements LimiterStateInterface
         return $this->hitCount;
     }
 
+    public function getAvailableTokens(float $now)
+    {
+        // if timer is in future, there are no tokens available anymore
+        if ($this->timer > $now) {
+            return 0;
+        }
+
+        // if now is more than the window interval in the past, all tokens are available
+        if (($now - $this->timer) > $this->intervalInSeconds) {
+            return $this->maxSize;
+        }
+
+        return $this->maxSize - $this->hitCount;
+    }
+
+    public function calculateTimeForTokens(int $tokens): int
+    {
+        if (($this->maxSize - $this->hitCount) >= $tokens) {
+            return 0;
+        }
+
+        $cyclesRequired = ceil($tokens / $this->maxSize);
+
+        return $cyclesRequired * $this->intervalInSeconds;
+    }
+
     /**
      * @internal
      */
     public function __sleep(): array
     {
-        // $intervalInSeconds is not serialized, it should only be set
-        // upon first creation of the Window.
-        return ['id', 'hitCount'];
+        return ['id', 'hitCount', 'intervalInSeconds', 'timer', 'maxSize'];
     }
 }

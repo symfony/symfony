@@ -13,6 +13,7 @@ namespace Symfony\Component\RateLimiter;
 
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\NoLock;
+use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 
@@ -65,6 +66,11 @@ final class SlidingWindowLimiter implements LimiterInterface
         $this->id = $id;
         $this->limit = $limit;
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
+    }
+
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    {
+        throw new ReserveNotSupportedException(__CLASS__);
     }
 
     /**

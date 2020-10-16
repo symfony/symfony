@@ -22,7 +22,7 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  *
  * @experimental in 5.2
  */
-final class Limiter
+final class RateLimiter
 {
     private $config;
     private $storage;

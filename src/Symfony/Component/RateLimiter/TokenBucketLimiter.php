@@ -74,14 +74,16 @@ final class TokenBucketLimiter implements LimiterInterface
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
 
-                $reservation = new Reservation($now);
+                $reservation = new Reservation($now, new Limit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime));
+                    $limit = new Limit($availableTokens, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false);
+
+                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $limit);
                 }
 
                 // at $now + $waitDuration all tokens will be reserved for this process,
@@ -89,7 +91,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 $bucket->setTokens(0);
                 $bucket->setTimer($now + $waitDuration);
 
-                $reservation = new Reservation($bucket->getTimer());
+                $reservation = new Reservation($bucket->getTimer(), new Limit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false));
             }
 
             $this->storage->save($bucket);
@@ -105,18 +107,10 @@ final class TokenBucketLimiter implements LimiterInterface
      */
     public function consume(int $tokens = 1): Limit
     {
-        $bucket = $this->storage->fetch($this->id);
-        if (!$bucket instanceof TokenBucket) {
-            $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
-        }
-        $now = microtime(true);
-
         try {
-            $this->reserve($tokens, 0);
-
-            return new Limit($bucket->getAvailableTokens($now) - $tokens, $this->rate->calculateNextTokenAvailability(), true);
+            return $this->reserve($tokens, 0)->getLimit();
         } catch (MaxWaitDurationExceededException $e) {
-            return new Limit($bucket->getAvailableTokens($now), $this->rate->calculateNextTokenAvailability(), false);
+            return $e->getLimit();
         }
     }
 }

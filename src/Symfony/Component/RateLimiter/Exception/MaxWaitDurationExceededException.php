@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Exception;
 
+use Symfony\Component\RateLimiter\Limit;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
@@ -18,4 +20,17 @@ namespace Symfony\Component\RateLimiter\Exception;
  */
 class MaxWaitDurationExceededException extends \RuntimeException
 {
+    private $limit;
+
+    public function __construct(string $message, Limit $limit, int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+
+        $this->limit = $limit;
+    }
+
+    public function getLimit(): Limit
+    {
+        return $this->limit;
+    }
 }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\RateLimiter;
 
 use Symfony\Component\HttpFoundation\RateLimiter\AbstractRequestRateLimiter;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\RateLimiter\Limiter;
+use Symfony\Component\RateLimiter\RateLimiter;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -31,7 +31,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     private $globalLimiter;
     private $localLimiter;
 
-    public function __construct(Limiter $globalLimiter, Limiter $localLimiter)
+    public function __construct(RateLimiter $globalLimiter, RateLimiter $localLimiter)
     {
         $this->globalLimiter = $globalLimiter;
         $this->localLimiter = $localLimiter;

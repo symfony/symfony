@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
-use Symfony\Component\RateLimiter\Limiter;
+use Symfony\Component\RateLimiter\RateLimiter;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
@@ -63,7 +63,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             throw new \LogicException('Login throttling requires symfony/security-http:^5.2.');
         }
 
-        if (!class_exists(Limiter::class)) {
+        if (!class_exists(RateLimiter::class)) {
             throw new \LogicException('Login throttling requires symfony/rate-limiter to be installed and enabled.');
         }
 

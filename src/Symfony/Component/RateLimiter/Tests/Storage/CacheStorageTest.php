@@ -31,15 +31,14 @@ class CacheStorageTest extends TestCase
     public function testSave()
     {
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('expiresAfter')->with(10);
+        $cacheItem->expects($this->exactly(2))->method('expiresAfter')->with(10);
 
         $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
         $this->pool->expects($this->exactly(2))->method('save')->with($cacheItem);
 
-        $window = new Window('test', 10);
+        $window = new Window('test', 10, 20);
         $this->storage->save($window);
 
-        // test that expiresAfter is only called when getExpirationAt() does not return null
         $window = unserialize(serialize($window));
         $this->storage->save($window);
     }
@@ -47,7 +46,7 @@ class CacheStorageTest extends TestCase
     public function testFetchExistingState()
     {
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $window = new Window('test', 10);
+        $window = new Window('test', 10, 20);
         $cacheItem->expects($this->any())->method('get')->willReturn($window);
         $cacheItem->expects($this->any())->method('isHit')->willReturn(true);
 

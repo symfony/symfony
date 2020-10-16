@@ -13,6 +13,7 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
@@ -48,6 +49,13 @@ class SlidingWindowLimiterTest extends TestCase
         sleep(13);
         $limit = $limiter->consume(10);
         $this->assertTrue($limit->isAccepted());
+    }
+
+    public function testReserve()
+    {
+        $this->expectException(ReserveNotSupportedException::class);
+
+        $this->createLimiter()->reserve();
     }
 
     private function createLimiter(): SlidingWindowLimiter

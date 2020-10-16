@@ -2045,6 +2045,28 @@ EOF;
         return $this->doExport($value, true);
     }
 
+    private function varExportUtf8($value): string
+    {
+        if (\is_string($value) && false !== strpos($value, "\n")) {
+            $export = implode('."\n".', array_map(function ($part) {
+                return var_export($part, true);
+            }, explode("\n", $value)));
+        } else {
+            $export = var_export($value, true);
+        }
+
+        // replace all non-UTF8 or non-printable characters
+        $export = preg_replace(
+            '~" \. \'\' \. "| \. \'\'|\'\' \. ~',
+            '',
+            preg_replace_callback('~(?:[\n]|[\x20-\x7F]|[\xC0-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF7][\x80-\xBF]{3})*+\K.~', function ($matches) {
+                return '\' . "\x' . str_pad(dechex(ord($matches[0])), 2, '0', \STR_PAD_LEFT) . '" . \'';
+            }, $export)
+        );
+
+        return $export;
+    }
+
     /**
      * @return mixed
      */
@@ -2054,13 +2076,8 @@ EOF;
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {
             return $this->exportedVariables[$value];
         }
-        if (\is_string($value) && false !== strpos($value, "\n")) {
-            $cleanParts = explode("\n", $value);
-            $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
-            $export = implode('."\n".', $cleanParts);
-        } else {
-            $export = var_export($value, true);
-        }
+
+        $export = $this->varExportUtf8($value);
 
         if ($resolveEnv && "'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('string:%s').'")) {
             $export = $resolvedExport;

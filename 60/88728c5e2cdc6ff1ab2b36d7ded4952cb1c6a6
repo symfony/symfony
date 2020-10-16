@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-10-16T12:36:06Z
+
+There were other issues
+
+https://github.com/symfony/symfony/blob/cbfa540b02394ce103f6235b58296cfda22dea07/src/Symfony/Component/Console/Application.php#L289
+
+https://github.com/symfony/symfony/blob/cbfa540b02394ce103f6235b58296cfda22dea07/src/Symfony/Component/Console/Application.php#L961
+
+And this check is wrong too. I mean the error message does not reflect what is going. https://github.com/symfony/symfony/blob/cbfa540b02394ce103f6235b58296cfda22dea07/src/Symfony/Component/Console/Application.php#L957-L958
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-16T12:47:22Z
+
+> I'm gonna change the title of your PR to get a "nice" git history
+
+Broader, but not wrong :) Thanks!

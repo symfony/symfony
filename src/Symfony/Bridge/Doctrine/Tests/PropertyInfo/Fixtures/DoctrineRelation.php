@@ -30,7 +30,7 @@ class DoctrineRelation
     public $id;
 
     /**
-     * @Column(type="guid")
+     * @Column(type="guid", name="rguid_column")
      */
     protected $rguid;
 

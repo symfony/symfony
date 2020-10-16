@@ -42,7 +42,7 @@ class DoctrineDummy
     public $bar;
 
     /**
-     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid")
+     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid_column")
      */
     protected $indexedBar;
 

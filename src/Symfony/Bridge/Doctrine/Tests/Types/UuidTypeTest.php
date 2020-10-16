@@ -60,7 +60,7 @@ final class UuidTypeTest extends TestCase
 
         $uuid
             ->expects($this->once())
-            ->method('__toString')
+            ->method('toRfc4122')
             ->willReturn('foo');
 
         $actual = $this->type->convertToDatabaseValue($uuid, $this->platform);

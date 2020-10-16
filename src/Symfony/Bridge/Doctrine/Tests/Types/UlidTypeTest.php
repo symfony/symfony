@@ -48,7 +48,7 @@ final class UlidTypeTest extends TestCase
     {
         $ulid = Ulid::fromString(self::DUMMY_ULID);
 
-        $expected = $ulid->__toString();
+        $expected = $ulid->toRfc4122();
         $actual = $this->type->convertToDatabaseValue($ulid, $this->platform);
 
         $this->assertEquals($expected, $actual);
@@ -60,7 +60,7 @@ final class UlidTypeTest extends TestCase
 
         $ulid
             ->expects($this->once())
-            ->method('__toString')
+            ->method('toRfc4122')
             ->willReturn('foo');
 
         $actual = $this->type->convertToDatabaseValue($ulid, $this->platform);
@@ -71,8 +71,11 @@ final class UlidTypeTest extends TestCase
     public function testUlidStringConvertsToDatabaseValue(): void
     {
         $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
+        $ulid = Ulid::fromString(self::DUMMY_ULID);
 
-        $this->assertEquals(self::DUMMY_ULID, $actual);
+        $expected = $ulid->toRfc4122();
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function testInvalidUlidConversionForDatabaseValue(): void

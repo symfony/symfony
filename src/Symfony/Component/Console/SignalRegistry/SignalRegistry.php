@@ -37,6 +37,19 @@ final class SignalRegistry
         pcntl_signal($signal, [$this, 'handle']);
     }
 
+    public static function isSupported(): bool
+    {
+        if (!\function_exists('pcntl_signal')) {
+            return false;
+        }
+
+        if (\in_array('pcntl_signal', explode(',', ini_get('disable_functions')))) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @internal
      */

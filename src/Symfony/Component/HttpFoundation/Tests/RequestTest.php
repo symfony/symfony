@@ -1763,6 +1763,36 @@ class RequestTest extends TestCase
                 '/foo',
                 '/bar+baz',
             ],
+            [
+                '/sub/foo/bar',
+                [
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/app.php',
+                    'SCRIPT_NAME' => '/foo/app.php',
+                    'PHP_SELF' => '/foo/app.php',
+                ],
+                '/sub/foo',
+                '/bar',
+            ],
+            [
+                '/sub/foo/app.php/bar',
+                [
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/app.php',
+                    'SCRIPT_NAME' => '/foo/app.php',
+                    'PHP_SELF' => '/foo/app.php',
+                ],
+                '/sub/foo/app.php',
+                '/bar',
+            ],
+            [
+                '/sub/foo/bar/baz',
+                [
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/app2.phpx',
+                    'SCRIPT_NAME' => '/foo/app2.phpx',
+                    'PHP_SELF' => '/foo/app2.phpx',
+                ],
+                '/sub/foo',
+                '/bar/baz',
+            ],
         ];
     }
 

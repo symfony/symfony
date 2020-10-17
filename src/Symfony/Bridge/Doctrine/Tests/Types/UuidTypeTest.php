@@ -44,7 +44,7 @@ final class UuidTypeTest extends TestCase
         $this->type = Type::getType('uuid');
     }
 
-    public function testUuidConvertsToDatabaseValue(): void
+    public function testUuidConvertsToDatabaseValue()
     {
         $uuid = Uuid::fromString(self::DUMMY_UUID);
 
@@ -54,7 +54,7 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testUuidInterfaceConvertsToDatabaseValue(): void
+    public function testUuidInterfaceConvertsToDatabaseValue()
     {
         $uuid = $this->createMock(AbstractUid::class);
 
@@ -68,31 +68,26 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testUuidStringConvertsToDatabaseValue(): void
-    {
-        $actual = $this->type->convertToDatabaseValue(self::DUMMY_UUID, $this->platform);
-
-        $this->assertEquals(self::DUMMY_UUID, $actual);
-    }
-
-    public function testInvalidUuidConversionForDatabaseValue(): void
+    public function testNotSupportedUuidStringConversionToDatabaseValue()
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue('abcdefg', $this->platform);
+        $this->type->convertToDatabaseValue(self::DUMMY_UUID, $this->platform);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(new \stdClass(), $this->platform));
+        $this->expectException(ConversionException::class);
+
+        $this->type->convertToDatabaseValue(new \stdClass(), $this->platform);
     }
 
-    public function testNullConversionForDatabaseValue(): void
+    public function testNullConversionForDatabaseValue()
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    public function testUuidInterfaceConvertsToPHPValue(): void
+    public function testUuidInterfaceConvertsToPHPValue()
     {
         $uuid = $this->createMock(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($uuid, $this->platform);
@@ -100,7 +95,7 @@ final class UuidTypeTest extends TestCase
         $this->assertSame($uuid, $actual);
     }
 
-    public function testUuidConvertsToPHPValue(): void
+    public function testUuidConvertsToPHPValue()
     {
         $uuid = $this->type->convertToPHPValue(self::DUMMY_UUID, $this->platform);
 
@@ -108,36 +103,36 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals(self::DUMMY_UUID, $uuid->__toString());
     }
 
-    public function testInvalidUuidConversionForPHPValue(): void
+    public function testInvalidUuidConversionForPHPValue()
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', $this->platform);
     }
 
-    public function testNullConversionForPHPValue(): void
+    public function testNullConversionForPHPValue()
     {
         $this->assertNull($this->type->convertToPHPValue(null, $this->platform));
     }
 
-    public function testReturnValueIfUuidForPHPValue(): void
+    public function testReturnValueIfUuidForPHPValue()
     {
         $uuid = Uuid::v4();
 
         $this->assertSame($uuid, $this->type->convertToPHPValue($uuid, $this->platform));
     }
 
-    public function testGetName(): void
+    public function testGetName()
     {
         $this->assertEquals('uuid', $this->type->getName());
     }
 
-    public function testGetGuidTypeDeclarationSQL(): void
+    public function testGetGuidTypeDeclarationSQL()
     {
         $this->assertEquals('DUMMYVARCHAR()', $this->type->getSqlDeclaration(['length' => 36], $this->platform));
     }
 
-    public function testRequiresSQLCommentHint(): void
+    public function testRequiresSQLCommentHint()
     {
         $this->assertTrue($this->type->requiresSQLCommentHint($this->platform));
     }

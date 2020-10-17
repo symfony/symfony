@@ -52,24 +52,18 @@ class UlidBinaryTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testStringUlidConvertsToDatabaseValue()
-    {
-        $expected = Ulid::fromString(self::DUMMY_ULID)->toBinary();
-        $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testInvalidUlidConversionForDatabaseValue()
+    public function testNotSupportedStringUlidConversionToDatabaseValue()
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue('abcdefg', $this->platform);
+        $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(new \stdClass(), $this->platform));
+        $this->expectException(ConversionException::class);
+
+        $this->type->convertToDatabaseValue(new \stdClass(), $this->platform);
     }
 
     public function testNullConversionForDatabaseValue()

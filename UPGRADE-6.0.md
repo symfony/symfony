@@ -69,6 +69,7 @@ Form
 FrameworkBundle
 ---------------
 
+ * Remove the `session` service and the `SessionInterface` alias, use the `\Symfony\Component\HttpFoundation\Request::getSession()` or the new `\Symfony\Component\HttpFoundation\RequestStack::getSession()` methods instead
  * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
  * The "framework.router.utf8" configuration option defaults to `true`
  * Removed `session.attribute_bag` service and `session.flash_bag` service.
@@ -165,6 +166,9 @@ Routing
 Security
 --------
 
+ * Drop support for `SessionInterface $session` as constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
+ * Drop support for `session` provided by the ServiceLocator injected in `UsageTrackingTokenStorage`, provide a `request_stack` service instead
+ * Make `SessionTokenStorage` throw a `SessionNotFoundException` when called outside a request context
  * Removed `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute
  * Removed `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.

@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -375,13 +376,17 @@ class ContextListenerTest extends TestCase
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         if (null !== $original) {
             $session->set('_security_session', $original);
         }
 
-        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class(['session' => function () use ($session) {
-            return $session;
+        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class(['request_stack' => function () use ($requestStack) {
+            return $requestStack;
         },
         ]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -389,8 +394,6 @@ class ContextListenerTest extends TestCase
 
         $tokenStorage->setToken($newToken);
 
-        $request = new Request();
-        $request->setSession($session);
         $request->cookies->set('MOCKSESSID', true);
 
         $sessionId = $session->getId();
@@ -424,13 +427,22 @@ class ContextListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
         $request->cookies->set('MOCKSESSID', true);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
-        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(['session' => function () use ($session) {
-            return $session;
-        },
-        ]) implements ContainerInterface {
+        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(
+            (new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession') ? [
+                'request_stack' => function () use ($requestStack) {
+                return $requestStack;
+            }] : [
+                // BC for symfony/framework-bundle < 5.3
+                'session' => function () use ($session) {
+                    return $session;
+                },
+            ]
+        ) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
         $sessionTrackerEnabler = [$tokenStorage, 'enableUsageTracking'];

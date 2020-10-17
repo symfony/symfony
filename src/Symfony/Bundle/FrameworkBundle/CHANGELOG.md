@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate the `session` service and the `SessionInterface` alias, use the `Request::getSession()` or the new `RequestStack::getSession()` methods instead
  * Added `AbstractController::renderForm()` to render a form and set the appropriate HTTP status code
  * Added support for configuring PHP error level to log levels
  * Added the `dispatcher` option to `debug:event-dispatcher`

@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Creates the service-locators required by ServiceValueResolver.
@@ -165,7 +166,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                     }
 
-                    if (Request::class === $type) {
+                    if (Request::class === $type || SessionInterface::class === $type) {
                         continue;
                     }
 

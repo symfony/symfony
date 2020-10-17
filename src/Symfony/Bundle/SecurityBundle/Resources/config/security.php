@@ -73,7 +73,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.untracked_token_storage'),
                 service_locator([
-                    'session' => service('session'),
+                    'request_stack' => service('request_stack'),
                 ]),
             ])
             ->tag('kernel.reset', ['method' => 'disableUsageTracking'])

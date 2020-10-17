@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\Session\DeprecatedSessionFactory;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -33,15 +34,17 @@ return static function (ContainerConfigurator $container) {
     $container->parameters()->set('session.metadata.storage_key', '_sf2_meta');
 
     $container->services()
-        ->set('session', Session::class)
-            ->public()
+        ->set('.session.do-not-use', Session::class) // to be removed in 6.0
             ->args([
                 service('session.storage'),
                 null, // AttributeBagInterface
                 null, // FlashBagInterface
                 [service('session_listener'), 'onSessionUsage'],
             ])
-        ->alias(SessionInterface::class, 'session')
+        ->set('.session.deprecated', SessionInterface::class) // to be removed in 6.0
+            ->factory([inline_service(DeprecatedSessionFactory::class)->args([service('request_stack')]), 'getSession'])
+        ->alias(SessionInterface::class, '.session.do-not-use')
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "$requestStack->getSession()" instead.')
         ->alias(SessionStorageInterface::class, 'session.storage')
         ->alias(\SessionHandlerInterface::class, 'session.handler')
 
@@ -65,12 +68,12 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('session.flash_bag', FlashBag::class)
-            ->factory([service('session'), 'getFlashBag'])
+            ->factory([service('.session.do-not-use'), 'getFlashBag'])
             ->deprecate('symfony/framework-bundle', '5.1', 'The "%service_id%" service is deprecated, use "$session->getFlashBag()" instead.')
         ->alias(FlashBagInterface::class, 'session.flash_bag')
 
         ->set('session.attribute_bag', AttributeBag::class)
-            ->factory([service('session'), 'getBag'])
+            ->factory([service('.session.do-not-use'), 'getBag'])
             ->args(['attributes'])
             ->deprecate('symfony/framework-bundle', '5.1', 'The "%service_id%" service is deprecated, use "$session->getAttributeBag()" instead.')
 
@@ -94,8 +97,8 @@ return static function (ContainerConfigurator $container) {
         ->set('session_listener', SessionListener::class)
             ->args([
                 service_locator([
-                    'session' => service('session')->ignoreOnInvalid(),
-                    'initialized_session' => service('session')->ignoreOnUninitialized(),
+                    'session' => service('.session.do-not-use')->ignoreOnInvalid(),
+                    'initialized_session' => service('.session.do-not-use')->ignoreOnUninitialized(),
                     'logger' => service('logger')->ignoreOnInvalid(),
                     'session_collector' => service('data_collector.request.session_collector')->ignoreOnInvalid(),
                 ]),

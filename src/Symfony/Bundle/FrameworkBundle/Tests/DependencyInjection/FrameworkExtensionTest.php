@@ -46,6 +46,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -541,7 +542,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
@@ -567,7 +568,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session');
 
-        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));

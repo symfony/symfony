@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Add the `RequestStack::getSession` method
  * Deprecate the `NamespacedAttributeBag` class
  * added `ResponseFormatSame` PHPUnit constraint
 

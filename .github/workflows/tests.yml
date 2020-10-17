@@ -191,3 +191,44 @@ jobs:
           docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.4-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
           sudo rm -rf .phpunit
           [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
+
+  macOS:
+    name: PHPUnit on macOS
+    runs-on: macos-10.15
+    env:
+      SYMFONY_DEPRECATIONS_HELPER: weak
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: 'none'
+          extensions: 'apcu'
+          ini-values: 'memory_limit=-1'
+          php-version: '8.0'
+          tools: flex
+
+      - name: Setup Vulcain
+        run: |
+          curl https://github.com/dunglas/vulcain/releases/download/v0.1.4/vulcain_0.1.4_Darwin_x86_64.tar.gz -Lso /tmp/vulcain.tar.gz
+          tar -xzf /tmp/vulcain.tar.gz -C /usr/local/bin vulcain
+          rm /tmp/vulcain.tar.gz
+
+      - name: Configure composer
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          composer self-update
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9].[0-9x]').x-dev" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: composer update --no-progress --ansi
+
+      - name: Install PHPUnit
+        run: ./phpunit install
+
+      - name: Run tests
+        run: find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel ./phpunit --colors=always --exclude-group tty,benchmark,intl-data

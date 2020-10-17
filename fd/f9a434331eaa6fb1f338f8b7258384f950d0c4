@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-10-16T15:18:38Z
+
+> Also, the binary types should _not_ extend `GuidType`.
+
+IMO, none of them should, as they change the PHP format
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-16T16:44:30Z
+
+> IMO, none of them should, as they change the PHP format
+
+Alright, updated. I also removed `requiresSQLCommentHint()` because I don't think comment-hints are required.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-16T16:48:41Z
+
+>  I also removed `requiresSQLCommentHint()` because I don't think comment-hints are required.
+
+they are required, because the type does not register a mapping type, so schema introspection would not recognize them without the special comment
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-16T16:51:17Z
+
+Thanks, reverted this part :)

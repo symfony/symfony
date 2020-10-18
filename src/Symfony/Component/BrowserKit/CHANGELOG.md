@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `jsonRequest` method to `AbstractBrowser`
+ * Allowed sending a body with GET requests when a content-type is defined
 
 5.2.0
 -----

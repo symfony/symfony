@@ -28,5 +28,5 @@ interface RequestRateLimiterInterface
 {
     public function consume(Request $request): Limit;
 
-    public function reset(): void;
+    public function reset(Request $request): void;
 }

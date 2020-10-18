@@ -45,7 +45,7 @@ abstract class AbstractRequestRateLimiter implements RequestRateLimiterInterface
         return $minimalLimit;
     }
 
-    public function reset(): void
+    public function reset(Request $request): void
     {
         foreach ($this->getLimiters($request) as $limiter) {
             $limiter->reset();

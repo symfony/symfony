@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Allow validating every class against `UniqueEntity` constraint
+
 7.0
 ---
 
